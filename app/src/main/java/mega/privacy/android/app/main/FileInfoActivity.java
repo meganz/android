@@ -1287,7 +1287,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
 					//If I am the owner
-					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+					if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 						permissionInfo.setVisibility(View.GONE);
 					}
 					else{
@@ -2133,7 +2133,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 					dividerSharedLayout.setVisibility(View.GONE);
 
 					//If I am the owner
-					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+					if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 						permissionInfo.setVisibility(View.GONE);
 					}
 					else{

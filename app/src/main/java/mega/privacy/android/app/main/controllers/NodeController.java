@@ -168,8 +168,7 @@ public class NodeController {
             return node;
         }
 
-        String nodeFP = megaApi.getFingerprint(node);
-        ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(nodeFP);
+        ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(node.getFingerprint());
 
         if (fNodes == null) return null;
 
