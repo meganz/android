@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities
+package mega.privacy.presentation.security
 
 import android.app.Activity
 import android.content.Context
@@ -24,12 +24,26 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.security.InvalidParameterException
 import javax.inject.Inject
 
+/**
+ * Passcode facade
+ *
+ * A component that can be injected onto any [AppCompatActivity] to enforce a Passcode
+ * security check.
+ *
+ * All the necessary setup and implementation is handled inside this class and requires no
+ * further changes to the host activity
+ *
+ * @property passcodeUtil
+ * @property passcodeManagement
+ * @property megaApi
+ * @property context
+ */
 class PasscodeFacade @Inject constructor(
     private val passcodeUtil: PasscodeUtil,
     private val passcodeManagement: PasscodeManagement,
     @MegaApi private val megaApi: MegaApiAndroid,
     @ActivityContext private val context: Context,
-): LifecycleEventObserver, SavedStateRegistry.SavedStateProvider {
+): LifecycleEventObserver, SavedStateRegistry.SavedStateProvider, PasscodeCheck {
 
     companion object {
         private const val SCREEN_ORIENTATION = "SCREEN_ORIENTATION"

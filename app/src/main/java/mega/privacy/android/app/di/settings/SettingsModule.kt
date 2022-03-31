@@ -10,14 +10,14 @@ import mega.privacy.android.app.domain.usecase.*
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
+/**
+ * Settings module
+ *
+ * Provides dependencies used by multiple screens in the settings package
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SettingsModule {
-
-    @ExperimentalContracts
-    @Singleton
-    @Binds
-    abstract fun bindSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository
 
     @Binds
     abstract fun bindSetChatLogsEnabled(useCase: DefaultSetChatLogsEnabled): SetChatLogsEnabled

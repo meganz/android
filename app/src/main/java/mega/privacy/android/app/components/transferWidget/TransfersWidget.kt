@@ -89,7 +89,6 @@ class TransfersWidget(
             val drawerItem = (context as ManagerActivity).drawerItem
 
             return drawerItem !== DrawerItem.TRANSFERS
-                    && drawerItem !== DrawerItem.SETTINGS
                     && drawerItem !== DrawerItem.NOTIFICATIONS
                     && drawerItem !== DrawerItem.CHAT
                     && drawerItem !== DrawerItem.RUBBISH_BIN

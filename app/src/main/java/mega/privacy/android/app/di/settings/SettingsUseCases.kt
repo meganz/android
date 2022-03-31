@@ -6,6 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.*
 
+/**
+ * Settings use cases module
+ *
+ * Provides use cases used by the [mega.privacy.android.app.presentation.settings.SettingsViewModel]
+ */
 @Module
 @InstallIn(ViewModelComponent::class)
 abstract class SettingsUseCases {
@@ -21,9 +26,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindIsCameraSyncEnabled(useCase: DefaultIsCameraSyncEnabled): IsCameraSyncEnabled
-
-    @Binds
-    abstract fun bindRootNodeExists(useCase: DefaultRootNodeExists): RootNodeExists
 
     @Binds
     abstract fun bindIsMultiFactorAuthAvailable(useCase: DefaultIsMultiFactorAuthAvailable): IsMultiFactorAuthAvailable
@@ -48,8 +50,5 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindFetchMultiFactorAuthSetting(useCase: DefaultFetchMultiFactorAuthSetting): FetchMultiFactorAuthSetting
-
-    @Binds
-    abstract fun bindMonitorConnectivity(useCase: DefaultMonitorConnectivity): MonitorConnectivity
 
 }

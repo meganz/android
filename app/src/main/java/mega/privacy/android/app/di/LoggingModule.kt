@@ -12,13 +12,15 @@ import mega.privacy.android.app.domain.usecase.InitialiseLogging
 import mega.privacy.android.app.domain.usecase.ResetSdkLogger
 import javax.inject.Singleton
 
+/**
+ * Logging module
+ *
+ * Provides logging specific dependencies
+ *
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class LoggingModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
 
     @Singleton
     @Binds

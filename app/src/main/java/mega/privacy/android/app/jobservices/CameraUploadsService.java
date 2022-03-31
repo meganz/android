@@ -38,6 +38,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -682,11 +683,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Nothing to upload.");
 
                 // Make sure to send inactive heartbeat.
-                CuSyncManager.INSTANCE.doRegularHeartbeat();
-
-                // Make sure to re schedule the job
-                scheduleCameraUploadJob(this, true);
-
+                CuSyncManager.INSTANCE.doInactiveHeartbeat(() -> {
+                    logDebug("Nothing to upload, send inactive heartbeat.");
+                    return Unit.INSTANCE;
+                });
                 finish();
                 purgeDirectory(new File(tempRoot));
             }
@@ -1993,7 +1993,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
                 .setAutoCancel(true)
                 .setTicker(contentText)
                 .setContentTitle(message)

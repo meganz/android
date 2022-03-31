@@ -37,7 +37,7 @@
     <!-- Body text shown on document scanner dialog to delete current scan -->
     <string name="scan_dialog_delete_body">Xóa hình quét hiện tại?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
-    <string name="scan_requires_permission">Cần quyền hạn sử dụng Camera để quét tài liệu</string>
+    <string name="scan_requires_permission">Cần quyền hạn sử dụng Camêra để quét tài liệu</string>
     <!-- Error text for incorrect name -->
     <string name="scan_incorrect_name">Tên không hợp lệ</string>
     <!-- Error text for invalid characters -->

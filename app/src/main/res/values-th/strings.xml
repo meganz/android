@@ -2816,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]ครั้งเดียว (ปี)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
+    <string name="billed_monthly_text">[A]เรียกเก็บเงินรายเดือน[/A] %s/เดือน</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
+    <string name="billed_yearly_text">[A]เรียกเก็บเงินรายปี[/A] %s/ปี</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">ยกเลิก</string>
     <!-- dialog option continue in alert dialog -->
@@ -3106,7 +3106,7 @@
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">สายที่กำลังโทร</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
-    <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
+    <string name="join_call_layout_in_group_call">แตะเพื่อเข้าร่วมสายแบบกลุ่มปัจจุบัน</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">แตะเพื่อกลับไปที่การโทร</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3482,7 +3482,7 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">แชทใหม่</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
+    <string name="homepage_empty_hint_photos">[B]ไม่[/B][B]พบ[/B][A]รูปภาพ[/A]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">ไม่พบเอกสาร</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3734,7 +3734,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">เล่นเป็นเบื้องหลัง</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
+    <string name="photos_empty">[B]ไม่[/B][B]พบ[/B][A]รูปถ่าย[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">สำรองรูปภาพและวิดีโอของคุณไปยังคลาวด์ไดร์ฟโดยอัตโนมัติ</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">ไมโครโฟนของคุณปิดอยู่</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">ไมโครโฟนของคุณเปิดอยู่</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">กล้อง</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">กล้องของคุณเปิดอยู่</string>
@@ -3970,7 +3970,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">คัดลอกลิงก์การประชุมแล้ว</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
-    <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
+    <string name="join_meeting_layout_in_group_call">แตะเพื่อเข้าร่วมการประชุมปัจจุบัน</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA การประชุม</string>
     <!-- Content of fourth tour screen -->
@@ -4046,7 +4046,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">คุณเคยเชิญ %1$s แล้ว</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">ส่งคำเชิญเรียบร้อยแล้ว ดูได้ที่คำขอที่ส่งแล้ว</string>
     <!-- Message when file available offline. -->
@@ -4076,7 +4076,7 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">เปิดลิงก์ผู้ติดต่อ</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <string name="settings_mobile_data_resoluton_title">ใช้ข้อมูลมือถือเพื่อดูตัวอย่างภาพความละเอียดสูง</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">อนุญาตให้ใช้ข้อมูลมือถือเพื่อโหลดภาพความละเอียดสูงเมื่อดูตัวอย่าง หากปิดใช้งาน รูปภาพต้นฉบับจะถูกโหลดเมื่อคุณซูมภาพเท่านั้น</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4086,7 +4086,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">คุณกำลังลบโฟลเดอร์ข้อมูลสำรองของคุณ การดำเนินการนี้จะลบข้อมูลสำรองทั้งหมดที่คุณตั้งค่าไว้ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
+    <string name="backup_remove_sub_folder">คุณแน่ใจหรือไม่ว่าต้องการลบโฟลเดอร์ข้อมูลสำรองและปิดใช้งานข้อมูลสำรองที่คุณตั้งค่าไว้</string>
     <!-- The title of warning dialog for single folder moving -->
     <string name="backup_move_folder_title">ย้าย “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -4108,13 +4108,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">ตั้งค่าการสำรองข้อมูล</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
+    <string name="backup_add_item_to_root_text">เพื่อให้แน่ใจว่ารายการนี้ที่เพิ่มในโฟลเดอร์สำรองของคุณจะซิงโครไนซ์กับ MEGA คลาวด์โดยอัตโนมัติ กรุณาตั้งค่าได้ที่แอปเดสก์ท็อป</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">อ่านอย่างเดียว</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">โฟลเดอร์นี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">รายการในโฟลเดอร์นี้เป็นส่วนหนึ่งของการสำรองข้อมูลที่ได้กำหนดค่าและซิงโครไนซ์กับโฟลเดอร์ในเครื่องไว้ การดำเนินการนี้จะหยุดการซิงโครไนซ์และปิดใช้งานการสำรองข้อมูล การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งด้วยแอพ MEGA บนเดสก์ทอป คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
+    <string name="backup_add_item_text">รายการในโฟลเดอร์นี้เป็นส่วนหนึ่งของการสำรองข้อมูลที่ได้กำหนดค่าและซิงโครไนซ์กับโฟลเดอร์ในเครื่องไว้ การดำเนินการนี้จะหยุดการซิงโครไนซ์และปิดใช้งานการสำรองข้อมูล การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งในแอป MEGA บนเดสก์ทอป คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">โฟลเดอร์เหล่านี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4124,21 +4124,21 @@
         <item quantity="other">%d อุปกรณ์</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
-    <string name="title_join_one_to_one_call">Answer call</string>
+    <string name="title_join_one_to_one_call">รับสาย</string>
     <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
+    <string name="title_select_tracks">เลือกแทร็ก</string>
     <!-- Action button to upload files. -->
-    <string name="upload_files">Upload files</string>
+    <string name="upload_files">อัปโหลดไฟล์</string>
     <!-- Action button to upload a folder. -->
-    <string name="upload_folder">Upload folder</string>
+    <string name="upload_folder">อัปโหลดโฟลเดอร์</string>
     <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel upload?</string>
+    <string name="cancel_uploads">ยกเลิกการอัปโหลดหรือไม่</string>
     <!-- Title of the Payments screen -->
     <string name="payment">ชำระเงิน</string>
     <!-- Label indicating payment methods -->
-    <string name="payment_methods">Payment methods</string>
+    <string name="payment_methods">วิธีการชำระเงิน</string>
     <!-- Button to proceed with a payment -->
-    <string name="proceed">Proceed</string>
+    <string name="proceed">ดำเนินการต่อ</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">ขอบคุณสำหรับการสมัครใช้งาน %1$s</string>
     <!-- Pro Lite monthly subscription -->
@@ -4160,25 +4160,49 @@
     <!-- Action button which will cancel uploads. -->
     <string name="action_cancel_upload">ยกเลิกอัปโหลด</string>
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Don’t cancel</string>
+    <string name="action_do_not_cancel">ไม่ต้องยกเลิก</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">ลบออกจากการเป็นผู้ดูแล</string>
     <!-- Title of DCIM folder warning dialog -->
     <string name="title_dcim_folder_dialog">โฟลเดอร์ DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA จะอัปโหลดรูปภาพของคุณจากแกลเลอรี่ หากต้องการเปลี่ยนตำแหน่งอัปโหลด กรุณาไปที่การตั้งค่าการอัปโหลดจากกล้อง</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Buy new subscription?</string>
+    <string name="title_existing_subscription">ซื้อการสมัครใช้งานใหม่หรือไม่</string>
     <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <string name="button_buy_new_subscription">ซื้อการสมัครใช้งานใหม่</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกอันหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครปัจจุบันของคุณผ่าน %1$s ก่อน เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกอันหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครรับข้อมูลปัจจุบันจากบัญชี iTunes ของคุณ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_other_platform">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกอันหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครใช้งานปัจจุบันของคุณโดยไปที่ MEGA ในเบราว์เซอร์เดสก์ท็อปหรือมือถือ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">ไปที่การตั้งค่าเพื่อให้สิทธิ์ MEGA เข้าถึงอุปกรณ์บลูทูธที่อยู่บริเวณใกล้เคียง</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">เราไม่สามารถดำเนินการเรียกเก็บเงินได้ หากคุณกำลังใช้แอปที่ติดตั้งแบบซ้ำกันอยู่ กรุณาพิจารณาลงชื่อเข้าใช้ MEGA โดยไม่ใช้แอปนี้ หากไม่เป็นเช่นนั้น ให้ลองอัปเกรดผ่านเว็บเบราว์เซอร์ของคุณแทน</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">มีการสมัครใช้งานของ %1s อยู่</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">มีการสมัครใช้งานอยู่</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ %1$s คุณต้องยกเลิกที่ %2$s ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">เยี่ยมชม %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">นี่เป็นขั้นตอนสุดท้ายในการลบบัญชีของคุณ ทั้งบัญชีและการสมัครใช้งานของคุณจะถูกลบด้วย พร้อมทั้งคุณจะสูญเสียข้อมูลทั้งหมดที่จัดเก็บไว้ในระบบคลาวด์อย่างถาวร กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">ไทม์ไลน์</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">อัลบัม</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">รายการโปรด</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]ไม่มี[/B][A]รายการโปรด[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">ลบออกจากรายการโปรด</string>
 </resources>
