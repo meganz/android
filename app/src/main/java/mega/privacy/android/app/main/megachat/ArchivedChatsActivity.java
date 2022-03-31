@@ -18,17 +18,20 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -42,7 +45,13 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
+import javax.inject.Inject;
+
+@AndroidEntryPoint
+public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
+
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
     Toolbar tB;
     ActionBar aB;
@@ -77,9 +86,8 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
             return;
         }
 
-        megaChatApi.addChatListener(this);
-
         archivedChatsActivity = this;
+        checkChatChanges();
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -128,26 +136,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         ft.commitNow();
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        if (item != null){
-            logDebug("Chat ID: " + item.getChatId());
-        }
-        else{
-            logError("Item is NULL");
-            return;
-        }
 
-        if(archivedChatsFragment!=null){
-            if(archivedChatsFragment.isAdded()){
-                archivedChatsFragment.listItemUpdate(item);
-            }
-        }
-
-        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            updateNavigationToolbarIcon();
-        }
-    }
 
     public void showChatPanel(MegaChatListItem chat){
         logDebug("showChatPanel");
@@ -339,31 +328,6 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     }
 
     @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-    }
-
-    @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
     }
@@ -397,5 +361,31 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    /**
+     * Receive changes to OnChatListItemUpdate and make the necessary changes
+     */
+    private void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate)
+                .map(result -> (GetChatChangesUseCase.Result.OnChatListItemUpdate) result)
+                .subscribe((next) -> {
+                    MegaChatListItem item = next.component1();
+                    if (item != null) {
+                        logDebug("Chat ID: " + item.getChatId());
+                        if (archivedChatsFragment != null && archivedChatsFragment.isAdded()) {
+                            archivedChatsFragment.listItemUpdate(item);
+                        }
+
+                        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+                            updateNavigationToolbarIcon();
+                        }
+                    }
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
     }
 }

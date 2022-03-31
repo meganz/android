@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">마이크가 꺼졌습니다</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">마이크가 켜졌습니다</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">카메라</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">카메라 켜짐</string>
@@ -4167,8 +4167,6 @@
     <string name="title_dcim_folder_dialog">DCIM 폴더</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA가 갤러리로부터 이미지를 업로드합니다. 업로드 위치를 변경하려면 카메라 업로드 설정으로 가세요.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">이용 약관 위반</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">새 구독을 구매할까요?</string>
     <!-- Text of buy new subscription button -->
@@ -4181,4 +4179,30 @@
     <string name="message_subscription_from_other_platform">당신에게 이미 구독이 있습니다. 만약 다른 것을 구매하면 두번 결제됩니다. 이것을 피하려면, MEGA를 데스크톱 또는 모바일 웹 브라우저에서 접속하여 현재 구독을 취소하세요. 자세한 정보는 우리의 도움 센터를 방문하세요.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">설정에 가서 MEGA가 Bluetooth를 사용하여 주변 기기에 접근할 수 있도록 허용해주세요.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">결제를 처리할 수 없습니다. 만약 이중 앱을 사용하고 있다면, 사용하지 않은 상태에서 MEGA에 로그인 하세요. 만약 아니라면 웹 브라우저를 통해 업그레이드 하세요.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s 구독</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">활성 구독</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">당신은 %1$s에 활성 상태의 MEGA 구독이 있습니다. MEGA가 당신을 위해 처리할 수 없기 때문에, %2$s에서 별도로 취소하여야 합니다. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription">활성화된 MEGA 구독이 있습니다. 계정이 삭제된 후 자동으로 취소됩니다. 자세한 정보는 도움 센터를 방문하세요.</string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">당신은 Apple에 활성 상태의 MEGA 구독이 있습니다. MEGA가 당신을 위해 처리할 수 없기 때문에, iTunes 계정에서 별도로 취소하여야 합니다. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">%1s 방문</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">계정을 삭제하는 마지막 단계입니다. 당신의 계정과 구독 모두 삭제되며 클라우드에 저장된 모든 데이터를 영구적으로 잃게 됩니다. 아래에 암호를 입력하세요.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">연표</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">앨범</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">즐겨찾기</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[A]즐겨찾기[/A] [B]없음[/B]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">즐겨찾기 제거</string>
 </resources>

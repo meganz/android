@@ -69,10 +69,10 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
-        test {
-//            Add this once Robolectric tests work
-//            java.srcDir 'src/sharedTest/java'
+        testDebug {
+            java.srcDir 'src/sharedTest/java'
         }
+
         androidTest {
             java.srcDir 'src/sharedTest/java'
         }
@@ -260,11 +260,6 @@ dependencies {
     implementation "androidx.biometric:biometric:$biometricVersion"
     implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
-    // (Java only)
-    implementation "androidx.work:work-runtime:$workVersion"
-    // Kotlin + coroutines
-    implementation "androidx.work:work-runtime-ktx:$workVersion"
-
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'
     gmsImplementation 'com.google.android.gms:play-services-location:17.1.0'
@@ -310,10 +305,18 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
     testImplementation "app.cash.turbine:turbine:$turbineVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
@@ -329,6 +332,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
 }
 
