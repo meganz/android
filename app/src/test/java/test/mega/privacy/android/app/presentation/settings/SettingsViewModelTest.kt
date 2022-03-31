@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.lollipop.managerSections.settings
+package test.mega.privacy.android.app.presentation.settings
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -50,8 +50,8 @@ class SettingsViewModelTest {
             getAccountDetails = mock { on { invoke(any()) }.thenReturn(userAccount) },
             canDeleteAccount = mock { on { invoke(userAccount) }.thenReturn(true) },
             refreshPasscodeLockPreference = mock(),
-            areSdkLogsEnabled = mock(),
-            areChatLogsEnabled = mock(),
+            areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            areChatLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isCameraSyncEnabled = mock(),
             rootNodeExists = mock { on { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },

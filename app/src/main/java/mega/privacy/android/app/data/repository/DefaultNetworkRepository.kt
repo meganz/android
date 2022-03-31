@@ -13,28 +13,28 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.data.gateway.MonitorNetworkConnectivityChange
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.ConnectivityState
 import mega.privacy.android.app.domain.repository.NetworkRepository
+import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+/**
+ * Default network repository implementation
+ *
+ * @property context
+ * @property monitorNetworkConnectivityChange
+ * @property megaApi
+ */
 class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val monitorNetworkConnectivityChange: MonitorNetworkConnectivityChange,
+    @MegaApi private val megaApi: MegaApiAndroid,
 ) : NetworkRepository {
 
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
 
-
     override fun getCurrentConnectivityState(): ConnectivityState {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getConnectivityStateSDK23()
-        } else {
-            getConnectivityState()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun getConnectivityStateSDK23(): ConnectivityState {
         val activeNetwork =
             connectivityManager?.activeNetwork ?: return ConnectivityState.Disconnected
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
@@ -50,15 +50,6 @@ class DefaultNetworkRepository @Inject constructor(
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun getConnectivityState(): ConnectivityState {
-        return if (connectivityManager?.activeNetworkInfo?.isConnectedOrConnecting == true) {
-            ConnectivityState.Connected(connectivityManager.isActiveNetworkMetered)
-        } else {
-            ConnectivityState.Disconnected
-        }
-    }
-
     override fun monitorConnectivityChanges(): Flow<ConnectivityState> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             monitorConnectivitySDK26()
@@ -66,6 +57,7 @@ class DefaultNetworkRepository @Inject constructor(
             monitorConnectivity()
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun monitorConnectivitySDK26(): Flow<ConnectivityState> {
@@ -107,4 +99,7 @@ class DefaultNetworkRepository @Inject constructor(
         }
     }
 
+    override fun setUseHttps(enabled: Boolean) {
+        megaApi.useHttpsOnly(enabled)
+    }
 }

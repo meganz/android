@@ -1,9 +1,13 @@
-package test.mega.privacy.android.app.lollipop.managerSections.settings
+package test.mega.privacy.android.app.presentation.settings
 
 import android.view.View
 import android.widget.TextView
 import androidx.core.graphics.alpha
+import androidx.preference.R
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import kotlin.math.ceil
@@ -34,3 +38,9 @@ fun withTextColorAlpha(expectedAlpha: Double): Matcher<View?> {
         }
     }
 }
+
+/**
+ * Helper function to match views on a preference screen.
+ *
+ */
+fun onPreferences(): ViewInteraction = Espresso.onView(ViewMatchers.withId(R.id.recycler_view))
