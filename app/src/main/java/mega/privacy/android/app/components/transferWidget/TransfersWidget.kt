@@ -24,6 +24,12 @@ import kotlin.math.roundToInt
 
 /**
  * Class which allows to show a widget for informing about transfers progress and state.
+ *
+ * @property context                Required for get resources and check current section.
+ * @property megaApi                Required for get transfers progress. Note that this is temporary and should
+ *                                  be removed as soon as it is implemented in app side.
+ * @property transfersWidget        Required to show the transfers widget.
+ * @property transfersManagement    Required for transfers management.
  */
 class TransfersWidget(
     @ApplicationContext private val context: Context,
