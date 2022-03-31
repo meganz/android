@@ -910,7 +910,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK-Version</string>
+    <string name="settings_about_karere_version">MEGAchat-SDK-Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Quellcode ansehen</string>
     <!--  -->
@@ -1000,7 +1000,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Gratisaccount</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Pro Lite-Account</string>
+    <string name="my_account_prolite">Pro-Lite-Account</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Pro-I-Account</string>
     <!-- Label in My Account section to show user account type -->
@@ -1008,7 +1008,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro3">Pro-III-Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro Lite-Account</string>
+    <string name="my_account_prolite_feedback_email">Pro-Lite-Account</string>
     <!--  -->
     <string name="backup_title">Rettungsschlüssel sichern</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1695,7 +1695,7 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Hinweis zur Wahrung von Urheberrechten</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von Nutzern der MEGA Cloud die Einhaltung aller relevanten Copyright-Gesetze.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von Nutzern der MEGA Cloud die Einhaltung aller relevanten Urheberrechtsgesetze.</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">Es ist Ihnen strikt untersagt, den Dienst MEGA Cloud zur Verletzung von Urheberrechten zu missbrauchen. Sie dürfen Dateien, Daten oder Inhalte, die die Urheber- oder andere Eigentumsrechte Dritte verletzen, nicht uploaden, speichern, teilen, anzeigen, streamen, verteilen, emailen, verlinken, übertragen oder in irgendeiner anderen Form zugänglich machen.</string>
     <!-- text of the Agree button -->
@@ -1870,7 +1870,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Anmeldebonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA Desktop-App herunterladen</string>
+    <string name="title_install_desktop">MEGA-Desktop-App herunterladen</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Noch keine Medienuploads</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1884,9 +1884,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Funktionsprinzip</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen MEGA Free-Account zu erstellen und eine MEGA Mobil-App zu installieren. Für jede erfolgreiche Anmeldung mit App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
+    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen MEGA-Free-Account zu erstellen und eine MEGA-Mobil-App zu installieren. Für jede erfolgreiche Anmeldung mit App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA Mobil-App oder der MEGA Desktop-App gewährt.</string>
+    <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Nutzer aus Ihren Konakten auswählen oder E-Mail-Adresse(n) eingeben.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -1898,15 +1898,15 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Fehlerhafte E-Mail-Adresse</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Nach Installation der MEGA Desktop App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Die MEGA Desktop App ist für Windows, macOS und die meisten Linux-Distributionen erhältlich.</string>
+    <string name="paragraph_info_achievement_install_desktop">Nach Installation der MEGA-Desktop-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Die MEGA-Desktop-App ist für Windows, macOS und die meisten Linux-Distributionen erhältlich.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Bei Installation der MEGA Mobil-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Wir bieten Mobil-Apps für iOS und Android an.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Bei Installation der MEGA-Mobil-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Wir bieten Mobil-Apps für iOS und Android an.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Durch Verifikation Ihrer Telefonnummer erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Sie haben %1$s Speicherplatz für die Installation der MEGA Desktop App erhalten.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA Mobil-App erhalten.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA-Mobil-App erhalten.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Sie haben %1$s Speicherplatz für die Verifikation Ihrer Telefonnummer erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2009,7 +2009,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Ein Fehler ist aufgetreten. Der Anruf kann nicht verbunden werden.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Gefällt Ihnen die MEGA Mobil-App?</string>
+    <string name="title_evaluate_the_app_panel">Gefällt Ihnen die MEGA-Mobil-App?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Ja, App bewerten</string>
     <!-- Label to show send feedback -->
@@ -3684,7 +3684,7 @@
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Auf Pro umsteigen</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
-    <string name="link_upgrade_pro_explanation">MEGA Pro schaltet erweiterte Link-Features frei.</string>
+    <string name="link_upgrade_pro_explanation">MEGA-Pro schaltet erweiterte Link-Features frei.</string>
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Unsere Ende-zu-Ende-Verschlüsselung ordnet jeder Datei einen automatisch generierten Schlüssel zu. Normalerweise enthält der Link diesen Schlüssel, aber Sie können ihn auch separat exportieren und versenden.</string>
     <!-- Reset password label -->
@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Ihr Mikrofon ist ausgeschaltet</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Ihr Mikrofon ist eingeschaltet</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Ihre Kamera ist eingeschaltet.</string>
@@ -4171,7 +4171,7 @@
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">Sie sind dabei, den Speicherort eines Standard-Backup-Ordners zu ändern. Dies kann es Ihnen erschweren, Ihren Backup-Ordner später zu finden. Bitte merken Sie sich den Speicherort, damit Sie den Ordner in Zukunft wiederfinden.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA-Desktop-App erneut aktivieren. Fortfahren?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4197,13 +4197,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Backup einrichten</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA Desktop-App ein.</string>
+    <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA-Desktop-App ein.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Nur lesen</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Dieser Ordner kann nur schreibgeschützt freigegeben werden, da es sich um einen Backup-Ordner handelt. Änderungen am Inhalt des Ordners könnten dazu führen, dass das Backup deaktiviert wird.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Der Inhalt dieses Ordners ist Bestandteil eines konfigurierten Backups und wird mit einem lokalen Ordner synchronisiert. Durch diesen Vorgang wird die Synchronisierung abgebrochen und das Backup deaktiviert. Sie können das Backup in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <string name="backup_add_item_text">Der Inhalt dieses Ordners ist Bestandteil eines konfigurierten Backups und wird mit einem lokalen Ordner synchronisiert. Durch diesen Vorgang wird die Synchronisierung abgebrochen und das Backup deaktiviert. Sie können das Backup in der MEGA-Desktop-App erneut aktivieren. Fortfahren?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Diese Ordner können nur schreibgeschützt freigegeben werden, da es sich um Backup-Ordner handelt. Änderungen am Inhalt der Ordner könnten dazu führen, dass die Backups deaktiviert werden.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4257,18 +4257,42 @@
     <string name="title_dcim_folder_dialog">DCIM-Ordner</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA lädt Ihre Bilder aus der Galerie hoch. Den Upload-Speicherort können Sie in den Kamera-Upload-Einstellungen ändern.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">AGB/AUP-Verstoß</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Neues Abonnement kaufen?</string>
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Neues Abonnement kaufen</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement über %1$s. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement in Ihrem iTunes-Account. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Öffnen Sie die Einstellungen und erteilen Sie MEGA die Erlaubnis, über Bluetooth auf Geräte in der Nähe zuzugreifen.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Die Abrechnung kann nicht fortgesetzt werden. Wenn Sie eine duale App verwenden, melden Sie sich eventuell ohne diese Funktion bei MEGA an. Ansonsten versuchen Sie, das Upgrade in Ihrem Webbrowser durchzuführen.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s-Abonnement</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Aktives Abonnement</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei %1$s. Sie müssen dieses separat in %2$s kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription">Sie haben ein aktives MEGA-Abonnement. Dieses wird automatisch gekündigt, nachdem der Account gelöscht wurde. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem iTunes-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Besuchen Sie %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Dies ist der letzte Schritt, bevor Ihr Account gelöscht wird. Sowohl Ihr Account als auch Ihr Abonnement werden gelöscht und Sie verlieren unwiderruflich alle in der Cloud gespeicherten Daten. Bitte geben Sie unten Ihr Passwort ein.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Zeitleiste</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Alben</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoriten</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Keine[/B] [A]Favoriten[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Favoriten entfernen</string>
 </resources>
