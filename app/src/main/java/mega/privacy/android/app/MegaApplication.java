@@ -784,6 +784,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         super.onCreate();
 
+        setStrictModePolicies();
 
         if (PurgeLogsToggle.INSTANCE.getEnabled() == true) {
             initialiseLogging();
@@ -914,6 +915,24 @@ public class MegaApplication extends MultiDexApplication implements Application.
         if (PurgeLogsToggle.INSTANCE.getEnabled() == false) {// Try to initialize the loggers again in order to avoid have them uninitialized
             // in case they failed to initialize before for some reason.
             initLoggers();
+        }
+    }
+
+    private void setStrictModePolicies() {
+        if (BuildConfig.DEBUG){
+            StrictMode.setThreadPolicy(
+                    new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            );
+
+            StrictMode.setVmPolicy(
+                    new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            );
         }
     }
 

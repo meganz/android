@@ -9,14 +9,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaAttributes
-import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
 import mega.privacy.android.app.data.gateway.LoggingSettingsGateway
-import mega.privacy.android.app.data.gateway.MonitorHideRecentActivity
-import mega.privacy.android.app.data.gateway.MonitorStartScreen
+import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
+import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
@@ -35,13 +33,24 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Default settings repository implementation
+ *
+ * @property databaseHandler
+ * @property context
+ * @property sdk
+ * @property monitorStartScreenFacade
+ * @property monitorHideRecentActivityFacade
+ * @property loggingSettingsGateway
+ * @property appScope
+ */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     @MegaApi private val sdk: MegaApiAndroid,
-    private val monitorStartScreen: MonitorStartScreen,
-    private val monitorHideRecentActivity: MonitorHideRecentActivity,
+    private val monitorStartScreenFacade: MonitorStartScreenFacade,
+    private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
     private val loggingSettingsGateway: LoggingSettingsGateway,
     @ApplicationScope private val appScope: CoroutineScope
 ) : SettingsRepository {
@@ -60,15 +69,20 @@ class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override fun isPasscodeLockPreferenceEnabled(): Boolean =
+        databaseHandler.preferences.passcodeLockEnabled.toBoolean()
+
     override fun setPasscodeLockEnabled(enabled: Boolean) {
         databaseHandler.isPasscodeLockEnabled = enabled
     }
 
     override suspend fun fetchContactLinksOption(): Boolean {
         return suspendCoroutine { continuation ->
-            sdk.getContactLinksOption(OptionalMegaRequestListenerInterface(
-                onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
-            ))
+            sdk.getContactLinksOption(
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
+                )
+            )
         }
     }
 
@@ -79,10 +93,12 @@ class DefaultSettingsRepository @Inject constructor(
                     MegaError.API_OK -> {
                         continuation.resumeWith(Result.success(request.flag))
                     }
-                    MegaError.API_ENOENT -> continuation.failWithException(SettingNotFoundException(
-                        error.errorCode,
-                        error.errorString
-                    ))
+                    MegaError.API_ENOENT -> continuation.failWithException(
+                        SettingNotFoundException(
+                            error.errorCode,
+                            error.errorString
+                        )
+                    )
                     else -> continuation.failWithError(error)
                 }
             }
@@ -105,11 +121,12 @@ class DefaultSettingsRepository @Inject constructor(
         getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
 
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean {
-
         return suspendCoroutine { continuation ->
-            sdk.setContactLinksOption(!accept, OptionalMegaRequestListenerInterface(
-                onRequestFinish = onSetContactLinksOptionRequestFinished(continuation, accept)
-            ))
+            sdk.setContactLinksOption(
+                !accept, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onSetContactLinksOptionRequestFinished(continuation, accept)
+                )
+            )
         }
     }
 
@@ -139,15 +156,14 @@ class DefaultSettingsRepository @Inject constructor(
             Context.MODE_PRIVATE
         )
 
-    override fun getAttributes(): MegaAttributes = databaseHandler.attributes
+    override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
 
-    override fun getPreferences(): MegaPreferences = databaseHandler.preferences
+    override fun monitorHideRecentActivity(): Flow<Boolean> =
+        monitorHideRecentActivityFacade.getEvents()
 
-    override fun monitorStartScreen(): Flow<Int> = monitorStartScreen.getEvents()
-
-    override fun monitorHideRecentActivity(): Flow<Boolean> = monitorHideRecentActivity.getEvents()
-
-    override fun isSdkLoggingEnabled(): SharedFlow<Boolean> = loggingSettingsGateway.isLoggingEnabled().shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
+    override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
+        loggingSettingsGateway.isLoggingEnabled()
+            .shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
         loggingSettingsGateway.setLoggingEnabled(enabled)
@@ -158,5 +174,15 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
         loggingSettingsGateway.setChatLoggingEnabled(enabled)
+    }
+
+    override fun isCameraSyncPreferenceEnabled(): Boolean =
+        databaseHandler.preferences?.camSyncEnabled.toBoolean()
+
+    override suspend fun isUseHttpsPreferenceEnabled(): Boolean =
+        databaseHandler.useHttpsOnly.toBoolean()
+
+    override suspend fun setUseHttpsPreference(enabled: Boolean) {
+        databaseHandler.setUseHttpsOnly(enabled)
     }
 }

@@ -318,6 +318,10 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
     testImplementation "app.cash.turbine:turbine:$turbineVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

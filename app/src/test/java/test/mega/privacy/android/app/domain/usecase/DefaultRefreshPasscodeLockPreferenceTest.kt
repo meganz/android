@@ -24,7 +24,6 @@ private lateinit var underTest: RefreshPasscodeLockPreference
 
     @Test
     fun `test that passcodeLockPreference is set to false if preferences is null`() {
-        whenever(settingsRepository.getPreferences()).thenReturn(null)
         underTest()
         verify(settingsRepository, times(1)).setPasscodeLockEnabled(false)
     }

@@ -32,7 +32,7 @@ class RecyclerViewAssertions {
                     val itemType = adapter.getItemViewType(position)
                     val viewHolder = adapter.createViewHolder(recyclerView, itemType)
                     adapter.bindViewHolder(viewHolder, position)
-                    if (viewHolderMatcher(ViewMatchers.hasDescendant(viewMatcher)).matches(
+                    if (ViewMatchers.hasDescendant(viewMatcher).onViewHolder().matches(
                             viewHolder
                         )
                     ) {
@@ -65,7 +65,7 @@ class RecyclerViewAssertions {
                     val itemType = adapter.getItemViewType(position)
                     val viewHolder = adapter.createViewHolder(recyclerView, itemType)
                     adapter.bindViewHolder(viewHolder, position)
-                    if (viewHolderMatcher(ViewMatchers.hasDescendant(viewMatcher)).matches(
+                    if (ViewMatchers.hasDescendant(viewMatcher).onViewHolder().matches(
                             viewHolder
                         )
                     ) {
@@ -78,20 +78,21 @@ class RecyclerViewAssertions {
 
 
         /**
-         * Creates matcher for view holder with given item view matcher.
+         * On view holder
          *
-         * @param itemViewMatcher a item view matcher which is used to match item.
-         * @return a matcher which matches a view holder containing item matching itemViewMatcher.
+         * converts a view matcher to match views on a viewHolder
+         *
+         * @return  matcher as ViewHolder matcher
          */
-        private fun viewHolderMatcher(itemViewMatcher: Matcher<View>): Matcher<RecyclerView.ViewHolder> {
+        fun Matcher<View>.onViewHolder(): Matcher<RecyclerView.ViewHolder> {
             return object : TypeSafeMatcher<RecyclerView.ViewHolder>() {
                 override fun matchesSafely(viewHolder: RecyclerView.ViewHolder): Boolean {
-                    return itemViewMatcher.matches(viewHolder.itemView)
+                    return this@onViewHolder.matches(viewHolder.itemView)
                 }
 
                 override fun describeTo(description: Description) {
-                    description.appendText("holder with view: ")
-                    itemViewMatcher.describeTo(description)
+                    description.appendText("ViewHolder with view: ")
+                    this@onViewHolder.describeTo(description)
                 }
             }
         }

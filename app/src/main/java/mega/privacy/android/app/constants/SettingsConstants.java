@@ -109,9 +109,6 @@ public class SettingsConstants {
     public static final String KEY_FINGERPRINT_ENABLE = "settings_fingerprint_enable";
     public static final String KEY_REQUIRE_PASSCODE = "settings_require_passcode";
 
-    /* Advance settings  */
-    public static final String KEY_HTTPS_ONLY = "settings_use_https_only";
-
     /* Cookie settings  */
     public static final String KEY_COOKIE_ACCEPT = "settings_cookie_accept";
     public static final String KEY_COOKIE_ESSENTIAL = "settings_cookie_essential";
