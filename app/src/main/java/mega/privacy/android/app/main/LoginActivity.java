@@ -240,6 +240,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
+                            // TODO delete or not
                             loginFragment.returnToLogin();
                             onBackPressed();
                         }

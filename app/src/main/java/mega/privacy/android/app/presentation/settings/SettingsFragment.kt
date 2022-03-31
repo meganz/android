@@ -68,7 +68,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
         }
     }
 
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
@@ -245,12 +244,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             KEY_QR_CODE_AUTO_ACCEPT -> {
                 viewModel.toggleAutoAcceptPreference()
             }
-            KEY_SECURITY_ADVANCED -> startActivity(
-                Intent(
-                    context,
-                    AdvancedPreferencesActivity::class.java
-                )
-            )
             KEY_HELP_CENTRE -> {
                 launchWebPage(HELP_CENTRE_URL)
             }
