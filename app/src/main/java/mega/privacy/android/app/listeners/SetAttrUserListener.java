@@ -100,7 +100,7 @@ public class SetAttrUserListener extends BaseListener {
                         } else {
                             logDebug("Start CU by set primary, try to start CU, true.");
                             JobUtil.stopRunningCameraUploadService(context);
-                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
+                            JobUtil.fireCameraUploadJob(context, true);
                         }
                     }
                     if (secondaryHandle != INVALID_HANDLE) {
@@ -115,7 +115,7 @@ public class SetAttrUserListener extends BaseListener {
                         } else {
                             logDebug("Start CU by set secondary, try to start CU, true.");
                             JobUtil.stopRunningCameraUploadService(context);
-                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
+                            JobUtil.fireCameraUploadJob(context, true);
                         }
                     }
 

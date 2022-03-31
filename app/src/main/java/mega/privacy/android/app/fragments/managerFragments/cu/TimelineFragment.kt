@@ -152,7 +152,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
         Handler(Looper.getMainLooper()).postDelayed({
             LogUtil.logDebug("Starting CU")
-            JobUtil.fireCameraUploadJob(context)
+            JobUtil.fireCameraUploadJob(context, false)
         }, 1000)
     }
 

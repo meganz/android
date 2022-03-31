@@ -105,7 +105,6 @@ import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.startCameraUploadServiceIgnoreAttr;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -1081,7 +1080,7 @@ public class ManagerActivity extends TransfersManagementActivity
         public void onReceive(Context context, Intent intent) {
             try {
                 logDebug("cameraUploadLauncherReceiver: Start service here");
-                startCameraUploadServiceIgnoreAttr(ManagerActivity.this);
+                fireCameraUploadJob(ManagerActivity.this, true);
             } catch (Exception e) {
                 logError("cameraUploadLauncherReceiver: Exception", e);
             }
@@ -8880,7 +8879,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 }
                 storageState = newStorageState;
-                fireCameraUploadJob(ManagerActivity.this);
+                fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
             case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -8904,7 +8903,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 storageState = newStorageState;
                 logDebug("Try to start CU, false.");
-                fireCameraUploadJob(ManagerActivity.this);
+                fireCameraUploadJob(ManagerActivity.this, false);
 				break;
 
             case MegaApiJava.STORAGE_STATE_RED:

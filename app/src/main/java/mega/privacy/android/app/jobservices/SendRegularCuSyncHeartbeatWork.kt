@@ -9,6 +9,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 class SendRegularCuSyncHeartbeatWork(val appContext: Context, val workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
 
+    // TODO handle error cases
     override fun doWork(): Result {
         // Do the work here--in this case, upload the images.
         logDebug("Send regular heartbeat.")

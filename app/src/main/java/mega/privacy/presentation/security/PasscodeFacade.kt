@@ -131,7 +131,7 @@ class PasscodeFacade @Inject constructor(
         if (System.currentTimeMillis() - lastStart > 1000
             && megaApi.rootNode != null && !MegaApplication.isLoggingIn()
         ) {
-            JobUtil.startCameraUploadServiceIgnoreAttr(context)
+            JobUtil.fireCameraUploadJob(context, true)
         }
     }
 

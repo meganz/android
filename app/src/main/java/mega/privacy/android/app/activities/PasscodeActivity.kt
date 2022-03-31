@@ -94,7 +94,7 @@ open class PasscodeActivity : BaseActivity() {
         if (System.currentTimeMillis() - lastStart > 1000
             && megaApi.rootNode != null && !MegaApplication.isLoggingIn()
         ) {
-            JobUtil.startCameraUploadServiceIgnoreAttr(this@PasscodeActivity)
+            JobUtil.fireCameraUploadJob(this@PasscodeActivity, true)
         }
     }
 

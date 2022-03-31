@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
+import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -49,6 +50,7 @@ public class JobUtil {
     public static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
     public static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
     public static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
+    public static final String SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES";
 
     /**
      * Schedule job of camera upload
@@ -69,6 +71,7 @@ public class JobUtil {
         PeriodicWorkRequest cameraUploadWorkRequest =
                 new PeriodicWorkRequest.Builder(CameraUploadWork.class, CU_SCHEDULER_INTERVAL, TimeUnit.HOURS, SCHEDULER_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(CAMERA_UPLOAD_TAG)
+                        .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, false).build())
                         .build();
 
         WorkManager.getInstance(context)
@@ -102,7 +105,7 @@ public class JobUtil {
      * @param context From which the action is done.
      * @return The result of the job
      */
-    public static synchronized int fireCameraUploadJob(Context context) {
+    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
         if (!isCameraUploadEnabled(context)) {
             logDebug("Schedule failed as CU not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
@@ -112,6 +115,7 @@ public class JobUtil {
         OneTimeWorkRequest cameraUploadWorkRequest =
                 new OneTimeWorkRequest.Builder(CameraUploadWork.class)
                         .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                        .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes).build())
                         .build();
 
         WorkManager.getInstance(context)
@@ -121,24 +125,14 @@ public class JobUtil {
     }
 
     /**
-     * This should be never called outside of {@link CameraUploadWork}, otherwise the WorkManager will not know about this job.
+     * This should be never called outside of {@link CameraUploadWork},
+     * otherwise the WorkManager will not know about this job.
      *
-     * @param context from which the action is started
+     * @param context          from which the action is started
+     * @param shouldIgnoreAttr ignore attributes
      */
-    public static synchronized void startCameraUploadService(Context context) {
-        logDebug("JobUtil: startCameraUploadService()");
-        start(context, false);
-    }
-
-    // TODO refactor like above with additional data param into CameraUploadWork
-    public static synchronized void startCameraUploadServiceIgnoreAttr(final Context context) {
-        new Handler().postDelayed((() -> {
-            logDebug("JobUtil: startCameraUploadServiceIgnoreAttr()");
-            start(context, true);
-        }), CU_RESCHEDULE_INTERVAL);
-    }
-
-    private static void start(Context context, boolean shouldIgnoreAttr) {
+    public static synchronized void startCameraUploadWork(Context context, boolean shouldIgnoreAttr) {
+        logDebug("JobUtil: startCameraUploadWork()");
         boolean isOverQuota = isOverquota(context);
         boolean hasReadPermission = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         boolean isEnabled = isCameraUploadEnabled(context);
@@ -163,6 +157,7 @@ public class JobUtil {
         return app.getStorageState() == MegaApiJava.STORAGE_STATE_RED;
     }
 
+    // TODO stop by worker only and not from all over the place
     public static synchronized void stopRunningCameraUploadService(Context context) {
         if (!isCameraUploadEnabled(context) && !CameraUploadsService.isServiceRunning) return;
         logDebug("Stop CU.");
