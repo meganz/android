@@ -479,7 +479,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			} else if (currentFile.exists()) {
 				//Check the fingerprint
 				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
-				String megaFingerprint = megaApi.getFingerprint(currentDocument);
+				String megaFingerprint = currentDocument.getFingerprint();
 
 				if (!isTextEmpty(localFingerprint)
 						&& !isTextEmpty(megaFingerprint)

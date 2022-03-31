@@ -355,7 +355,7 @@ public class FileBrowserFragment extends RotatableFragment{
 
 			if (selected.size() == 1) {
 				if (!selected.get(0).isTakenDown()) {
-					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
+					if (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
 							== MegaError.API_OK) {
 						if (selected.get(0).isExported()) {
 							control.manageLink().setVisible(true)
@@ -369,7 +369,7 @@ public class FileBrowserFragment extends RotatableFragment{
 					}
 				}
 
-				if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode()
+				if (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode()
 						== MegaError.API_OK) {
 					control.rename().setVisible(true);
 				}
@@ -404,7 +404,7 @@ public class FileBrowserFragment extends RotatableFragment{
 				if (node.isTakenDown() || !node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
 					showShareFolder = false;
 				}
-				if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
+				if (megaApi.checkMoveErrorExtended(node, megaApi.getRubbishNode()).getErrorCode()
 						!= MegaError.API_OK) {
 					showTrash = false;
 				}
