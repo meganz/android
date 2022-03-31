@@ -5,6 +5,7 @@ import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
@@ -41,15 +42,19 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
         const val YEARLY_SUBSCRIBED = 2
     }
 
-    private val currentSubscription = SingleLiveEvent<Pair<Int, SubscriptionMethod?>>()
+    private val upgradeClick = SingleLiveEvent<Int>()
+    private val currentUpgradeClickedAndSubscription =
+        MutableLiveData<Pair<Int, SubscriptionMethod>?>()
 
-    fun onSubscriptionClicked(): LiveData<Pair<Int, SubscriptionMethod?>> = currentSubscription
+    fun onUpgradeClick(): LiveData<Int> = upgradeClick
+    fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, SubscriptionMethod>?> =
+        currentUpgradeClickedAndSubscription
 
     /**
      * Check the current subscription
      * @param upgradeType upgrade type
      */
-    fun subscriptionCheck(upgradeType: Int){
+    fun subscriptionCheck(upgradeType: Int) {
         SubscriptionMethod.values().firstOrNull {
             // Determines the current account if has the subscription and the current subscription
             // platform if is same as current payment platform.
@@ -61,8 +66,20 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
                         && it.methodId == myAccountInfo.subscriptionMethodId
             }
         }.run {
-            currentSubscription.value = Pair(upgradeType, this)
+            if (this == null) {
+                upgradeClick.value = upgradeType
+            } else {
+                currentUpgradeClickedAndSubscription.value = Pair(upgradeType, this)
+            }
         }
+    }
+
+    /**
+     * Resets the currentUpgradeClickedAndSubscription ensuring the subscription warning
+     * is not shown again.
+     */
+    fun dismissSubscriptionWarningClicked() {
+        currentUpgradeClickedAndSubscription.value = null
     }
 
     fun isGettingInfo(): Boolean =
