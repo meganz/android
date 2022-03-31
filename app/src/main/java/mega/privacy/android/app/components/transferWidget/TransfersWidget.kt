@@ -143,6 +143,7 @@ class TransfersWidget(
             val isTransferOverQuota = transfersManagement.isOnTransferOverQuota()
             val isStorageOverQuota = transfersManagement.isStorageOverQuota()
 
+            @Suppress("DEPRECATION")
             return (isTransferOverQuota && (megaApi.numPendingUploads <= 0 || isStorageOverQuota))
                     || (isStorageOverQuota && megaApi.numPendingDownloads <= 0)
         }
@@ -192,6 +193,7 @@ class TransfersWidget(
     fun setProgress(progress: Int, typeTransfer: Int) {
         this.progress = progress
         val numPendingDownloads = megaApi.getNumPendingDownloadsNonBackground()
+        @Suppress("DEPRECATION")
         val numPendingUploads = megaApi.numPendingUploads
         val pendingDownloads = numPendingDownloads > 0
         val pendingUploads = numPendingUploads > 0
@@ -226,6 +228,7 @@ class TransfersWidget(
      *
      * @return The number of pending transfers.
      */
+    @Suppress("DEPRECATION")
     val pendingTransfers: Int
         get() = megaApi.getNumPendingDownloadsNonBackground() + megaApi.numPendingUploads
 
@@ -234,7 +237,9 @@ class TransfersWidget(
      */
     private var progress: Int
         get() {
+            @Suppress("DEPRECATION")
             val totalSizePendingTransfer = megaApi.totalDownloadBytes + megaApi.totalUploadBytes
+            @Suppress("DEPRECATION")
             val totalSizeTransferred = megaApi.totalDownloadedBytes + megaApi.totalUploadedBytes
 
             return (totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100).roundToInt()

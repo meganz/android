@@ -203,6 +203,7 @@ class TransfersManagement @Inject constructor(
      *
      * @return True if the queue of transfers or all the current in-progress transfers are paused, false otherwise.
      */
+    @Suppress("DEPRECATION")
     fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)
                 || megaApi.numPendingDownloads + megaApi.numPendingUploads == pausedTransfers.size
@@ -322,6 +323,7 @@ class TransfersManagement @Inject constructor(
      *
      * @return True if the widget does not have to be shown, false otherwise
      */
+    @Suppress("DEPRECATION")
     fun hasNotToBeShowDueToTransferOverQuota(): Boolean =
         hasNotToBeShowDueToTransferOverQuota && megaApi.numPendingUploads <= 0
 
@@ -378,6 +380,7 @@ class TransfersManagement @Inject constructor(
 
         Handler(Looper.getMainLooper()).postDelayed({
             try {
+                @Suppress("DEPRECATION")
                 if (megaApi.numPendingDownloads > 0) {
                     val downloadServiceIntent =
                         Intent(app, DownloadService::class.java)
@@ -390,6 +393,7 @@ class TransfersManagement @Inject constructor(
                     }
                 }
 
+                @Suppress("DEPRECATION")
                 if (megaApi.numPendingUploads > 0) {
                     val uploadServiceIntent = Intent(app, UploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
