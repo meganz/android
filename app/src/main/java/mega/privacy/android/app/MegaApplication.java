@@ -8,13 +8,13 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATU
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_RINGING;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.CallUtil.callStatusToString;
 import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
 import static mega.privacy.android.app.utils.CallUtil.incomingCall;
 import static mega.privacy.android.app.utils.CallUtil.ongoingCall;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingRinging;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
@@ -166,6 +166,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
@@ -233,6 +234,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
 
+    @Inject
+    OpenCallWrapper openCallWrapper;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -1949,7 +1952,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public void launchCallActivity(MegaChatCall call) {
         logDebug("Show the call screen: " + callStatusToString(call.getStatus()) + ", callId = " + call.getCallId());
-        openMeetingRinging(this, call.getChatid(), passcodeManagement);
+        passcodeManagement.setShowPasscodeScreen(true);
+        MegaApplication.getInstance().openCallService(call.getChatid());
+        this.startActivity(openCallWrapper.getIntentForOpenRingingCall(this, MEETING_ACTION_RINGING, call.getChatid()));
     }
 
     /**

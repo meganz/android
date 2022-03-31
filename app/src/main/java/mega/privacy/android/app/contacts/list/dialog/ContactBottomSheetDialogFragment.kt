@@ -31,6 +31,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil
@@ -68,6 +69,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    @Inject
+    lateinit var openCallWrapper: OpenCallWrapper
 
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by extraNotNull<Long>(USER_HANDLE)
@@ -190,12 +194,13 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
+            if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement, openCallWrapper)) {
                 CallUtil.startNewCall(
                     activity,
                     activity as SnackbarShower,
                     megaUser,
-                    passcodeManagement
+                    passcodeManagement,
+                    openCallWrapper
                 )
                 dismiss()
             }

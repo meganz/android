@@ -27,6 +27,7 @@ import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -59,6 +60,9 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    @Inject
+    lateinit var openCallWrapper: OpenCallWrapper
 
     private val callStatusObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId)) {
@@ -320,9 +324,21 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     fun finishActivity() {
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else if (!inMeetingViewModel.checkIfAnotherCallShouldBeShown(passcodeManagement)) {
-            logDebug("Finish meeting activity")
-            meetingActivity.finish()
+        } else {
+            inMeetingViewModel.checkIfAnotherCallShouldBeShown()?.let {
+                logDebug("Finish meeting activity")
+                passcodeManagement.showPasscodeScreen = true
+                MegaApplication.getInstance().openCallService(it)
+                launchIntent(
+                    openCallWrapper.getIntentForOpenOngoingCall(
+                        context = requireContext(),
+                        actionForCall = MeetingActivity.MEETING_ACTION_IN,
+                        chatId = it, null, null
+                    )
+                )
+
+                meetingActivity.finish()
+            }
         }
     }
 

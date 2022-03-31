@@ -91,6 +91,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
@@ -121,6 +122,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -157,6 +159,8 @@ public class ContactInfoActivity extends PasscodeActivity
 
 	@Inject
 	GetChatChangesUseCase getChatChangesUseCase;
+	@Inject
+	OpenCallWrapper openCallWrapper;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -908,7 +912,7 @@ public class ContactInfoActivity extends PasscodeActivity
 			}
 			case R.id.action_return_call:
 				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					returnActiveCall(this, passcodeManagement);
+					returnActiveCall(this, passcodeManagement, openCallWrapper);
 				}
 				return true;
 		}
@@ -977,7 +981,9 @@ public class ContactInfoActivity extends PasscodeActivity
 			logDebug("Chat exists");
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				logDebug("There is a call, open it");
-				openMeetingInProgress(this, chatRoomTo.getChatId(), true, passcodeManagement);
+				passcodeManagement.setShowPasscodeScreen(true);
+				MegaApplication.getInstance().openCallService(chatRoomTo.getChatId());
+				startActivity(openCallWrapper.getIntentForOpenOngoingCall(this, MEETING_ACTION_IN, chatRoomTo.getChatId(), null, null));
 			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				logDebug("There is no call, start it");
 				startCallWithChatOnline(chatRoomTo);
@@ -1105,7 +1111,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
 	private void startingACall(boolean withVideo) {
 		startVideo = withVideo;
-		if (canCallBeStartedFromContactOption(this, passcodeManagement)) {
+		if (canCallBeStartedFromContactOption(this, passcodeManagement, openCallWrapper)) {
 			startCall();
 		}
 	}
@@ -1193,7 +1199,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
 			case R.id.call_in_progress_layout:
 				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
-					returnActiveCall(this, passcodeManagement);
+					returnActiveCall(this, passcodeManagement, openCallWrapper);
 				}
 				break;
 		}
@@ -2053,7 +2059,9 @@ public class ContactInfoActivity extends PasscodeActivity
 	public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
-			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
+			passcodeManagement.setShowPasscodeScreen(true);
+			MegaApplication.getInstance().openCallService(chatId);
+			startActivity(openCallWrapper.getIntentForOpenOngoingCall(this, MEETING_ACTION_IN, chatId, null, null));
 		}
 
 		enableCallLayouts(true);

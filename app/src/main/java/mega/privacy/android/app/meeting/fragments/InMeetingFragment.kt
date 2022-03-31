@@ -77,13 +77,14 @@ import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.ChatUtil.*
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.permission.*
+import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
@@ -95,6 +96,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    @Inject
+    lateinit var openCallWrapper: OpenCallWrapper
 
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -1262,12 +1266,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val anotherCall = inMeetingViewModel.getAnotherCall()
         if (anotherCall != null) {
             logDebug("Return to another call")
-            CallUtil.openMeetingInProgress(
-                requireContext(),
-                anotherCall.chatid,
-                false,
-                passcodeManagement
+            passcodeManagement.showPasscodeScreen = true
+            MegaApplication.getInstance().openCallService(anotherCall.chatid)
+            launchIntent(
+                openCallWrapper.getIntentForOpenOngoingCall(
+                    context = requireContext(),
+                    actionForCall = MeetingActivity.MEETING_ACTION_IN,
+                    chatId = anotherCall.chatid, null, null
+
+                )
             )
+            finishActivity()
         }
     }
 
@@ -2441,12 +2450,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Change of status on hold and switch of call")
                 inMeetingViewModel.setCallOnHold(true)
                 inMeetingViewModel.setAnotherCallOnHold(anotherCall.chatid, false)
-                CallUtil.openMeetingInProgress(
-                    requireContext(),
-                    anotherCall.chatid,
-                    false,
-                    passcodeManagement
+                passcodeManagement.showPasscodeScreen = true
+                MegaApplication.getInstance().openCallService(anotherCall.chatid)
+                launchIntent(
+                    openCallWrapper.getIntentForOpenOngoingCall(
+                        context = requireContext(),
+                        actionForCall = MeetingActivity.MEETING_ACTION_IN,
+                        chatId = anotherCall.chatid, null, null
+                    )
                 )
+                finishActivity()
             }
             inMeetingViewModel.isCallOnHold() -> {
                 logDebug("Change of status on hold")
@@ -2547,7 +2560,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
         } else {
-            inMeetingViewModel.checkIfAnotherCallShouldBeShown(passcodeManagement)
+            inMeetingViewModel.checkIfAnotherCallShouldBeShown()?.let {
+                passcodeManagement.showPasscodeScreen = true
+                MegaApplication.getInstance().openCallService(it)
+                launchIntent(
+                    openCallWrapper.getIntentForOpenOngoingCall(
+                        context = requireContext(),
+                        actionForCall = MeetingActivity.MEETING_ACTION_IN,
+                        chatId = it, null, null
+                    )
+
+                )
+                finishActivity()
+
+            }
         }
     }
 

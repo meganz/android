@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
@@ -20,6 +21,7 @@ import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
@@ -31,6 +33,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
@@ -41,6 +44,9 @@ import static mega.privacy.android.app.utils.Util.decodeURL;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
 	private DatabaseHandler dbH = null;
@@ -56,6 +62,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	private boolean needsRefreshSession;
 
 	private String url;
+
+	@Inject
+	OpenCallWrapper openCallWrapper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -438,7 +447,10 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	private void goToMeetingActivity(long chatId, String meetingName) {
-		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url, passcodeManagement);
+		passcodeManagement.setShowPasscodeScreen(true);
+		MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
+		MegaApplication.getInstance().setIsLoggingRunning(true);
+		startActivity(openCallWrapper.getIntentForOpenJoinMeeting(this, MEETING_ACTION_GUEST, chatId, meetingName, url, null));
 		finish();
 	}
 
@@ -543,7 +555,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
 			if (CallUtil.participatingInACall()) {
-				showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
+				showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement, openCallWrapper);
 			} else {
 				if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
 					logDebug("Meeting has ended, open dialog");

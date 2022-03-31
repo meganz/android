@@ -78,7 +78,6 @@ import static mega.privacy.android.app.utils.CallUtil.hideCallWidget;
 import static mega.privacy.android.app.utils.CallUtil.isChatConnectedInOrderToInitiateACall;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingToCreate;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
 import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
@@ -308,6 +307,7 @@ import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -529,6 +529,8 @@ public class ManagerActivity extends TransfersManagementActivity
     GetNodeUseCase getNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    OpenCallWrapper openCallWrapper;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1342,7 +1344,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if (MEETING_TYPE.equals(MEETING_ACTION_CREATE)) {
-                        openMeetingToCreate(this);
+                        startActivity(openCallWrapper.getIntentForOpenCreateMeeting(this, MEETING_TYPE));
                     }
                 } else {
                     showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
@@ -1358,7 +1360,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (checkPermissionsCall(this, typesCameraPermission)) {
             switch (typesCameraPermission) {
                 case RETURN_CALL_PERMISSIONS:
-                    returnActiveCall(this, passcodeManagement);
+                    returnActiveCall(this, passcodeManagement, openCallWrapper);
                     break;
 
                 case START_CALL_PERMISSIONS:
@@ -5939,7 +5941,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void returnCallWithPermissions() {
         if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-            returnActiveCall(this, passcodeManagement);
+            returnActiveCall(this, passcodeManagement, openCallWrapper);
         }
     }
 
@@ -7401,7 +7403,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void onJoinMeeting() {
         MEETING_TYPE = MEETING_ACTION_JOIN;
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
+            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement, openCallWrapper);
         } else {
             showOpenLinkDialog();
         }
@@ -7411,11 +7413,12 @@ public class ManagerActivity extends TransfersManagementActivity
     public void onCreateMeeting() {
         MEETING_TYPE = MEETING_ACTION_CREATE;
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement, openCallWrapper);
         } else {
             // For android 12, need android.permission.BLUETOOTH_CONNECT permission
             if (requestBluetoothPermission()) return;
-            openMeetingToCreate(this);
+
+            startActivity(openCallWrapper.getIntentForOpenCreateMeeting(this, MEETING_TYPE));
         }
     }
 
@@ -7810,7 +7813,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void showMeetingOptionsPanel() {
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement, openCallWrapper);
         } else {
             bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
@@ -11845,7 +11848,7 @@ public class ManagerActivity extends TransfersManagementActivity
 				}, false).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivity.this, ManagerActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
+				CallUtil.checkMeetingInProgress(ManagerActivity.this, ManagerActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement, openCallWrapper);
 			}
 		} else {
 			logDebug("It's a chat");

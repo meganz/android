@@ -2151,22 +2151,17 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Perform the necessary actions when the call is over.
      * Check if exists another call in progress or on hold
+     *
+     * @return chat id of another call
      */
-    fun checkIfAnotherCallShouldBeShown(passcodeManagement: PasscodeManagement): Boolean {
+    fun checkIfAnotherCallShouldBeShown(): Long? {
         getAnotherCall()?.let {
             logDebug("Show another call")
-            CallUtil.openMeetingInProgress(
-                MegaApplication.getInstance().applicationContext,
-                it.chatid,
-                false,
-                passcodeManagement
-            )
-            return true
+            return it.chatid
         }
 
-        return false
+        return null
     }
 
     /**

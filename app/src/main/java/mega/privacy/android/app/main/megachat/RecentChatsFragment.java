@@ -67,6 +67,7 @@ import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
@@ -105,6 +106,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Inject
     PasscodeManagement passcodeManagement;
+
+    @Inject
+    OpenCallWrapper openCallWrapper;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -737,7 +741,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnActiveCall(context, passcodeManagement);
+                    returnActiveCall(context, passcodeManagement, openCallWrapper);
                 }
                 break;
             }
@@ -1527,7 +1531,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnActiveCall(context, passcodeManagement);
+                        returnActiveCall(context, passcodeManagement, openCallWrapper);
                     }
                 }
                 break;
@@ -1536,7 +1540,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnActiveCall(context, passcodeManagement);
+                        returnActiveCall(context, passcodeManagement, openCallWrapper);
                     }
                 }
                 break;
