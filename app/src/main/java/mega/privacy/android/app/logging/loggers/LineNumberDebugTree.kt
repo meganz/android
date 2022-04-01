@@ -1,15 +1,43 @@
 package mega.privacy.android.app.logging.loggers
 
 import android.util.Log
+import mega.privacy.android.app.logging.TimberLegacyLog
+import mega.privacy.android.app.utils.LogUtil
 import timber.log.Timber
 
+/**
+ * Line number debug tree
+ *
+ * Debug log output tree for logcat
+ */
 class LineNumberDebugTree : Timber.DebugTree() {
-    override fun createStackElementTag(element: StackTraceElement): String? {
-        return "(${element.fileName}:${element.lineNumber})#${element.methodName}"
+    private val ignoredClasses = listOf(
+        Timber::class.java.name,
+        Timber.Forest::class.java.name,
+        Timber.Tree::class.java.name,
+        Timber.DebugTree::class.java.name,
+        TimberLegacyLog::class.java.name,
+        LogUtil::class.java.name,
+        MegaFileLogTree::class.java.name,
+        LineNumberDebugTree::class.java.name,
+        TimberMegaLogger::class.java.name,
+        TimberChatLogger::class.java.name,
+    )
+
+    private fun createTag(): String? {
+        return Throwable().stackTrace
+            .firstOrNull { filterKnownLoggerClasses(it) && filterDelegateLoggerClasses(it) }
+            ?.let { "(${it.fileName}:${it.lineNumber})#${it.methodName}" }
     }
 
+    private fun filterKnownLoggerClasses(it: StackTraceElement) =
+        it.className !in ignoredClasses
+
+    private fun filterDelegateLoggerClasses(it: StackTraceElement) =
+        !it.className.contains("logger", true)
+
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        super.log(priority, "${prioritySymbol(priority)} $tag", message, t)
+        super.log(priority, "${prioritySymbol(priority)} ${createTag()}", message, t)
     }
 
     private fun prioritySymbol(priority: Int): String {
@@ -24,3 +52,4 @@ class LineNumberDebugTree : Timber.DebugTree() {
         }
     }
 }
+
