@@ -717,7 +717,7 @@ object MegaNodeUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkMove(node, megaApi.rubbishNode).errorCode != MegaError.API_OK) {
+            if (megaApi.checkMoveErrorExtended(node, megaApi.rubbishNode).errorCode != MegaError.API_OK) {
                 return false
             }
         }
@@ -768,7 +768,7 @@ object MegaNodeUtil {
     fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         for (node in nodes) {
-            if (megaApi.checkAccess(node, MegaShare.ACCESS_FULL).errorCode != MegaError.API_OK) {
+            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_FULL).errorCode != MegaError.API_OK) {
                 return false
             }
         }
@@ -787,7 +787,7 @@ object MegaNodeUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
+            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
                 || node?.isTakenDown == true) {
                 return false
             }

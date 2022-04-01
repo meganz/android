@@ -113,7 +113,6 @@ public class TransferWidget {
         DrawerItem drawerItem = ((ManagerActivity) context).getDrawerItem();
 
         return drawerItem != DrawerItem.TRANSFERS
-                && drawerItem != DrawerItem.SETTINGS
                 && drawerItem != DrawerItem.NOTIFICATIONS
                 && drawerItem != DrawerItem.CHAT
                 && drawerItem != DrawerItem.RUBBISH_BIN

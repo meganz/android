@@ -4154,7 +4154,7 @@
     <string name="general_mic_mute">Ваш микрофон выключен</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Ваш микрофон включён</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Камера</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Ваша камера включена.</string>
@@ -4381,7 +4381,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Эта папка доступна только для чтения. Поскольку это папка резервных копий, любые изменения её содержимого могут отключить резервное копирование.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Элементы в этой папке являются частью настроенной резервной копии и синхронизируются с локальной папкой. Выполнение этого действия нарушит синхронизацию и отключит резервное копирование. Резервное копирование можно повторно включить с помощью настольного приложения MEGA. Вы действительно хотите продолжить?</string>
+    <string name="backup_add_item_text">Элементы в этой папке являются частью настроенной резервной копии и синхронизируются с локальной папкой. Выполнение этого действия нарушит синхронизацию и отключит резервное копирование. Резервное копирование можно повторно включить в настольном приложении MEGA. Вы действительно хотите продолжить?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Эти папки могут быть доступны только для чтения; это папки резервных копий, поэтому любые изменения их содержимого могут отключить резервное копирование.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4437,8 +4437,6 @@
     <string name="title_dcim_folder_dialog">Папка DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA загружает ваши изображения из галереи. Чтобы изменить место загрузки, перейдите в настройки загрузки из камеры.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Нарушение условий обслуживания/политики допустимого использования</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Оформить ещё одну подписку?</string>
     <!-- Text of buy new subscription button -->
@@ -4451,4 +4449,30 @@
     <string name="message_subscription_from_other_platform">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку, зайдя в MEGA в настольном или мобильном веб-браузере. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Перейдите в «Настройки», чтобы предоставить MEGA разрешение на доступ к устройствам поблизости с помощью Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Мы не можем продолжить выставление счёта. Если вы используете клонированное приложение, попробуйте войти в MEGA без него. Если нет, попробуйте улучшить аккаунт через веб-браузер.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Подписка %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Активная подписка</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">У вас есть активная подписка MEGA от %1$s. Вам нужно отменить её отдельно в %2$s, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">У вас есть активная подписка MEGA от Apple. Вам нужно отменить её отдельно в своей учётной записи iTunes, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Открыть %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Остался один шаг перед удалением аккаунта. Ваш аккаунт и подписка будут удалены, и вы навсегда потеряете все данные, хранящиеся в облаке. Пожалуйста, введите пароль.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Временная шкала</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Альбомы</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Избранное</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Нет[/B] [A]избранного[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Удалить из избранного</string>
 </resources>

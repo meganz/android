@@ -92,17 +92,19 @@ class ActionModeCallback constructor(
 
         if (areAllNotTakenDown) {
             if (selectedNodes.size == 1
-                && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
+                && megaApi.checkAccessErrorExtended(
+                    selectedNodes[0],
+                    MegaShare.ACCESS_OWNER
+                ).errorCode
                 == MegaError.API_OK
             ) {
                 if (selectedNodes[0]!!.isExported) {
-                    control.manageLink().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                    control.manageLink().setVisible(true).showAsAction =
+                        MenuItem.SHOW_AS_ACTION_ALWAYS
                     control.removeLink().isVisible = true
                 } else {
                     control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
                 }
-            } else {
-                control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
             }
         }
 

@@ -113,7 +113,7 @@ public class FileUtil {
     }
 
     public static boolean isLocalFile(MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        String fingerprintNode = megaApi.getFingerprint(node);
+        String fingerprintNode = node.getFingerprint();
         return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 

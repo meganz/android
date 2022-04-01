@@ -432,7 +432,7 @@ public class OfflineUtils {
             String handleIncoming = "-1";
 
             //If I am the owner
-            if (megaApi.checkAccess(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
+            if (megaApi.checkAccessErrorExtended(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
 
                 if (megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT) {
 
