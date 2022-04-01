@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.LoggingRepository
-import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
@@ -16,7 +15,7 @@ import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class DefaultInitialiseLoggingTest {
-private lateinit var underTest: InitialiseLogging
+    private lateinit var underTest: InitialiseLogging
     private val loggingRepository = mock<LoggingRepository>()
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
@@ -31,17 +30,17 @@ private lateinit var underTest: InitialiseLogging
     }
 
     @Test
-    fun `test that debug enables console logs only`() = runTest{
+    fun `test that debug enables console logs`() = runTest {
+        whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
+        whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
         underTest(true)
 
         verify(loggingRepository, times(1)).enableLogAllToConsole()
         verifyNoMoreInteractions(loggingRepository)
-        verifyNoInteractions(areSdkLogsEnabled)
-        verifyNoInteractions(areChatLogsEnabled)
     }
 
     @Test
-    fun `test that setting sdk logs setting true, enables sdk logs`() = runTest{
+    fun `test that setting sdk logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
@@ -53,7 +52,7 @@ private lateinit var underTest: InitialiseLogging
     }
 
     @Test
-    fun `test that setting chat logs setting true, enables sdk logs`() = runTest{
+    fun `test that setting chat logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
@@ -65,7 +64,7 @@ private lateinit var underTest: InitialiseLogging
     }
 
     @Test
-    fun `test that setting sdk logs setting false, disables sdk logs`() = runTest{
+    fun `test that setting sdk logs setting false, disables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(false))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
@@ -77,7 +76,7 @@ private lateinit var underTest: InitialiseLogging
     }
 
     @Test
-    fun `test that setting chat logs setting false, disables chat logs`() = runTest{
+    fun `test that setting chat logs setting false, disables chat logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
 

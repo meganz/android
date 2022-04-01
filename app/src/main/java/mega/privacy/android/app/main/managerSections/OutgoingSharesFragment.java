@@ -66,7 +66,7 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
 					new CloudStorageOptionControlUtil.Control();
 
 			if (selected.size() == 1 && !selected.get(0).isTakenDown()) {
-				if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
+				if (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
 						== MegaError.API_OK) {
 					if (selected.get(0).isExported()) {
 						control.manageLink().setVisible(true)
@@ -118,7 +118,7 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
 			}
 
 			if (selected.size() == 1
-					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+					&& megaApi.checkAccessErrorExtended(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
 				control.rename().setVisible(true);
 				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
