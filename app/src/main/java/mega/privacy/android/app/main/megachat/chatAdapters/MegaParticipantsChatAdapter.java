@@ -439,6 +439,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                     holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
                 }
 
+                holderParticipantsList.permissionsIcon.setVisibility(View.VISIBLE);
                 int permission = participant.getPrivilege();
 
                 if (permission == MegaChatRoom.PRIV_STANDARD) {
