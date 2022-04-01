@@ -314,12 +314,12 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			boolean itemsSelected = false;
 
 			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
+			if((selected.size() == 1) && (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
 			}
 			
 			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+			if ((selected.size() == 1) && (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				if (!selected.get(0).isTakenDown()) {
 					if (selected.get(0).isExported()) {
 						//Node has public link
@@ -344,7 +344,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
 
 				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+					if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;

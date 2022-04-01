@@ -6,11 +6,23 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.*
 import mega.privacy.android.app.domain.repository.*
+import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
+/**
+ * Repository module
+ *
+ * Provides all repository implementations
+ *
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @ExperimentalContracts
+    @Singleton
+    @Binds
+    abstract fun bindSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository
 
     @ExperimentalContracts
     @Binds
@@ -27,4 +39,8 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
 }

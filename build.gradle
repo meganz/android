@@ -48,8 +48,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.4"
-    versionCode = 430
+    appVersion = "6.5"
+    versionCode = 432
 
     // Sdk and tools
     compileSdkVersion = 31
@@ -104,5 +104,4 @@ ext {
     preferenceVersion ='1.1.1'
     coroutineTestVersion = '1.6.0'
     turbineVersion = '0.7.0'
-    workVersion = '2.7.1'
 }
