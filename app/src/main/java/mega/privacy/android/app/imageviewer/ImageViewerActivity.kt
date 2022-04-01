@@ -337,7 +337,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
 
-        viewModel.onImagesHandle().observe(this) { items ->
+        viewModel.onImagesIds().observe(this) { items ->
             if (items.isNullOrEmpty()) {
                 logError("Null or empty image items")
                 finish()
@@ -496,9 +496,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(nodeItem.handle).apply {
-                    show(supportFragmentManager)
-                }
+                bottomSheet = ImageBottomSheetDialogFragment.newInstance(imageItem.getUniqueId())
+                    .apply { show(supportFragmentManager) }
                 true
             }
             else -> super.onOptionsItemSelected(item)

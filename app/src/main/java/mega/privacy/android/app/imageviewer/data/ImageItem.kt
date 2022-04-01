@@ -1,6 +1,5 @@
 package mega.privacy.android.app.imageviewer.data
 
-import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 
 /**
@@ -29,13 +28,10 @@ data class ImageItem constructor(
     fun isFromChat(): Boolean =
         chatMessageId != null && chatRoomId != null
 
-    class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
-        override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem) =
-            oldItem.handle == newItem.handle
-
-        override fun areContentsTheSame(oldItem: ImageItem, newItem: ImageItem) =
-            oldItem == newItem
-                    && oldItem.nodeItem == newItem.nodeItem
-                    && oldItem.imageResult == newItem.imageResult
-    }
+    fun getUniqueId(): Long =
+        when {
+            !nodePublicLink.isNullOrBlank() -> nodePublicLink.hashCode().toLong()
+            chatRoomId != null && chatMessageId != null -> chatRoomId + chatMessageId
+            else -> handle
+        }
 }

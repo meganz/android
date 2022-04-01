@@ -39,13 +39,13 @@ class ImageViewerPageFragment : Fragment() {
         /**
          * Main method to create a ImageViewerPageFragment.
          *
-         * @param nodeHandle    Image node to show information from
+         * @param itemId        Item to show
          * @return              ImageBottomSheetDialogFragment to be shown
          */
-        fun newInstance(nodeHandle: Long): ImageViewerPageFragment =
+        fun newInstance(itemId: Long): ImageViewerPageFragment =
             ImageViewerPageFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                    putLong(INTENT_EXTRA_KEY_HANDLE, itemId)
                 }
             }
     }
@@ -55,13 +55,13 @@ class ImageViewerPageFragment : Fragment() {
     private var hasScreenBeenRotated = false
     private var hasZoomBeenTriggered = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
+    private val itemId: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireNotNull(nodeHandle)
+        requireNotNull(itemId)
         hasScreenBeenRotated = savedInstanceState != null
     }
 
@@ -88,7 +88,7 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onPause() {
         if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
-            viewModel.stopImageLoading(nodeHandle!!, aggressive = false)
+            viewModel.stopImageLoading(itemId!!, aggressive = false)
             showPreviewImage()
         }
         super.onPause()
@@ -96,7 +96,7 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onDestroy() {
         if (activity?.isFinishing == true) {
-            viewModel.stopImageLoading(nodeHandle!!, aggressive = true)
+            viewModel.stopImageLoading(itemId!!, aggressive = true)
         }
         super.onDestroy()
     }
@@ -113,7 +113,7 @@ class ImageViewerPageFragment : Fragment() {
                     onZoomCallback = {
                         if (!hasZoomBeenTriggered) {
                             hasZoomBeenTriggered = true
-                            viewModel.loadSingleImage(nodeHandle!!, fullSize = true)
+                            viewModel.loadSingleImage(itemId!!, fullSize = true)
                         }
                     }
                 )
@@ -122,7 +122,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner) { imageItem ->
+        viewModel.onImage(itemId!!).observe(viewLifecycleOwner) { imageItem ->
             val imageResult = imageItem?.imageResult ?: return@observe
 
             when (lifecycle.currentState) {
@@ -137,8 +137,8 @@ class ImageViewerPageFragment : Fragment() {
         }
 
         if (!hasScreenBeenRotated) {
-            viewModel.loadSingleNode(nodeHandle!!)
-            viewModel.loadSingleImage(nodeHandle!!, fullSize = false)
+            viewModel.loadSingleNode(itemId!!)
+            viewModel.loadSingleImage(itemId!!, fullSize = false)
         }
     }
 
@@ -148,7 +148,7 @@ class ImageViewerPageFragment : Fragment() {
      * @param imageResult   ImageResult to obtain images from
      */
     private fun showPreviewImage(
-        imageResult: ImageResult? = viewModel.getImageItem(nodeHandle!!)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
     ) {
         val previewImageRequest = imageResult?.previewUri?.toImageRequest()
         val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest()
@@ -181,7 +181,7 @@ class ImageViewerPageFragment : Fragment() {
      * ImageResult to obtain images from
      */
     private fun showFullImage(
-        imageResult: ImageResult? = viewModel.getImageItem(nodeHandle!!)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
     ) {
         val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest() ?: run {
             showPreviewImage(imageResult)
@@ -210,7 +210,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun buildImageControllerListener() = object : BaseControllerListener<ImageInfo>() {
         override fun onSubmit(id: String?, callerContext: Any?) {
-            if (viewModel.getImageItem(nodeHandle!!)?.imageResult?.isFullyLoaded != true) {
+            if (viewModel.getImageItem(itemId!!)?.imageResult?.isFullyLoaded != true) {
                 binding.progress.show()
             }
         }
@@ -220,12 +220,10 @@ class ImageViewerPageFragment : Fragment() {
             imageInfo: ImageInfo?,
             animatable: Animatable?
         ) {
-            val imageItem = viewModel.getImageItem(nodeHandle!!)
-            if (imageItem?.imageResult?.isFullyLoaded == true) {
+            val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
+            if (imageResult.isFullyLoaded) {
                 binding.image.post {
-                    if (imageItem.imageResult.isVideo) {
-                        showVideoButton()
-                    }
+                    if (imageResult.isVideo) showVideoButton()
                     binding.progress.hide()
                 }
             }
@@ -235,17 +233,15 @@ class ImageViewerPageFragment : Fragment() {
             logError(throwable.stackTraceToString())
             if (throwable is BasePool.PoolSizeViolationException) activity?.onLowMemory()
 
-            val imageItem = viewModel.getImageItem(nodeHandle!!)
+            val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
             binding.image.hierarchy.setFailureImage(R.drawable.ic_error, ScaleType.FIT_CENTER)
             binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(imageItem?.imageResult?.previewUri?.toImageRequest())
+                .setImageRequest(imageResult.previewUri?.toImageRequest())
                 .build()
 
-            if (imageItem?.imageResult?.isFullyLoaded == true) {
+            if (imageResult.isFullyLoaded) {
                 binding.image.post {
-                    if (imageItem.imageResult.isVideo) {
-                        showVideoButton()
-                    }
+                    if (imageResult.isVideo) showVideoButton()
                     binding.progress.hide()
                 }
             }
@@ -272,7 +268,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun launchVideoScreen() {
-        val imageItem = viewModel.getImageItem(nodeHandle!!) ?: return
+        val imageItem = viewModel.getImageItem(itemId!!) ?: return
         (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
     }
 

@@ -65,19 +65,19 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         /**
          * Main method to create a ImageBottomSheetDialogFragment.
          *
-         * @param nodeHandle    Image node to show information from
+         * @param itemId        Item to show
          * @return              ImageBottomSheetDialogFragment to be shown
          */
-        fun newInstance(nodeHandle: Long): ImageBottomSheetDialogFragment =
+        fun newInstance(itemId: Long): ImageBottomSheetDialogFragment =
             ImageBottomSheetDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                    putLong(INTENT_EXTRA_KEY_HANDLE, itemId)
                 }
             }
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
-    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
+    private val itemId: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
     private var alertDialog: Dialog? = null
     private var alertDialogType: AlertDialogType? = null
 
@@ -88,7 +88,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireNotNull(nodeHandle)
+        requireNotNull(itemId)
     }
 
     override fun onCreateView(
@@ -104,8 +104,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.loadSingleNode(nodeHandle!!)
-        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner, ::showNodeData)
+        viewModel.loadSingleNode(itemId!!)
+        viewModel.onImage(itemId!!).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -142,18 +142,20 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val isUserLoggedIn = viewModel.isUserLoggedIn()
 
         binding.apply {
-            imgThumbnail.post {
-                imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
-                    .setImageRequest(
-                        ImageRequestBuilder.newBuilderWithSource(imageItem.imageResult?.getLowestResolutionAvailableUri())
-                            .setRotationOptions(RotationOptions.autoRotate())
-                            .setResizeOptions(
-                                ResizeOptions.forDimensions(imgThumbnail.width, imgThumbnail.height)
-                            )
-                            .build()
-                    )
-                    .setOldController(binding.imgThumbnail.controller)
-                    .build()
+            imageItem.imageResult?.getLowestResolutionAvailableUri()?.let { imageUri ->
+                imgThumbnail.post {
+                    imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(
+                            ImageRequestBuilder.newBuilderWithSource(imageUri)
+                                .setRotationOptions(RotationOptions.autoRotate())
+                                .setResizeOptions(
+                                    ResizeOptions.forSquareSize(imgThumbnail.width)
+                                )
+                                .build()
+                        )
+                        .setOldController(binding.imgThumbnail.controller)
+                        .build()
+                }
             }
 
             txtName.text = nodeItem.name
@@ -401,7 +403,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * @param type  Alert Dialog Type of action
      */
     private fun showAlertDialog(type: AlertDialogType) {
-        val imageItem = viewModel.getImageItem(nodeHandle!!) ?: return
+        val imageItem = viewModel.getImageItem(itemId!!) ?: return
         alertDialog?.dismiss()
         alertDialogType = type
         when(type) {
