@@ -8906,7 +8906,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
                 try {
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
                     logError("Exception starting UploadService", e);
                     e.printStackTrace();
@@ -8930,7 +8930,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
                 try {
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
                     logError("Exception starting UploadService", e);
                     e.printStackTrace();
@@ -10385,7 +10385,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     logDebug("Over quota");
                     Intent intent = new Intent(this, UploadService.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 }
             }
         }
