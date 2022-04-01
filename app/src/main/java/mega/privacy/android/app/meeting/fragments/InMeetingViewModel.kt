@@ -12,11 +12,17 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -35,9 +41,11 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -49,8 +57,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
-    private val inMeetingRepository: InMeetingRepository
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    private val inMeetingRepository: InMeetingRepository,
+    private val getCallUseCase: GetCallUseCase
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     var status = InMeetingFragment.NOT_TYPE
@@ -66,6 +75,12 @@ class InMeetingViewModel @Inject constructor(
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
+
+    private val _switchCall = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
+    val switchCall: StateFlow<Long> get() = _switchCall
+
+    private val _finishCall = MutableStateFlow(false)
+    val finishCall: StateFlow<Boolean> get() = _finishCall
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -2151,17 +2166,39 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Check if exists another call in progress or on hold
-     *
-     * @return chat id of another call
+     * Control when to end a call, whether to display another call in progress or just end the current activity
      */
-    fun checkIfAnotherCallShouldBeShown(): Long? {
-        getAnotherCall()?.let {
-            logDebug("Show another call")
-            return it.chatid
-        }
+    fun endCall() {
+        getCallUseCase.getAnotherCallInProgress(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { chatId ->
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        _switchCall.value = chatId
+                    } else {
+                        _finishCall.value = true
+                    }
+                }
+            )
+            .addTo(composite)
+    }
 
-        return null
+    /**
+     * Control when calls are to be switched
+     */
+    fun switchCall() {
+        getCallUseCase.getAnotherCallInProgress(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { chatId ->
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        _switchCall.value = chatId
+                    }
+                }
+            )
+            .addTo(composite)
     }
 
     /**

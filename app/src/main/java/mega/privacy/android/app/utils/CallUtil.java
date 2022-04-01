@@ -43,7 +43,6 @@ import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -74,6 +73,152 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class CallUtil {
+    /**
+     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
+     *
+     * @param context Context*
+     */
+    public static void openMeetingToCreate(Context context) {
+        logDebug("Open create a meeting screen");
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_CREATE);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
+     *
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param meetingName        Meeting Name
+     * @param link               Meeting's link
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin, PasscodeManagement passcodeManagement) {
+        logDebug("Open join a meeting screen:: chatId = " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        if (isRejoin) {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+            meetingIntent.putExtra(MEETING_PUBLIC_CHAT_HANDLE, publicChatHandle);
+        } else {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+        }
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.putExtra(MEETING_NAME, meetingName);
+        meetingIntent.setData(Uri.parse(link));
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for starting the Meeting Activity when the meeting is in progress call.
+     *
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingToStart(Context context, long chatId, PasscodeManagement passcodeManagement) {
+        logDebug("Open join a meeting screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_START);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
+     *
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingRinging(Context context, long chatId, PasscodeManagement passcodeManagement) {
+        logDebug("Open incoming call screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        MegaApplication.getInstance().openCallService(chatId);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        meetingIntent.setAction(MEETING_ACTION_RINGING);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
+     *
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask, PasscodeManagement passcodeManagement) {
+        logDebug("Open in progress call screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        if (isNewTask) {
+            MegaApplication.getInstance().openCallService(chatId);
+        }
+
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.putExtra(MEETING_IS_GUEST, MegaApplication.getInstance().getMegaApi().isEphemeralPlusPlus());
+        if (isNewTask) {
+            logDebug("New task");
+            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        } else {
+            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call with audio or video enable.
+     *
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param isAudioEnable      it the audio is ON
+     * @param isVideoEnable      it the video is ON
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable, PasscodeManagement passcodeManagement) {
+        logDebug("Open call with audio or video. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        MegaApplication.getInstance().openCallService(chatId);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.putExtra(MEETING_AUDIO_ENABLE, isAudioEnable);
+        meetingIntent.putExtra(MEETING_VIDEO_ENABLE, isVideoEnable);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
+     * Method for opening the Meeting Activity in guest mode
+     *
+     * @param context            Context
+     * @param meetingName        Meeting Name
+     * @param chatId             chat ID
+     * @param link               Meeting's link
+     * @param passcodeManagement To disable passcode.
+     */
+    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement) {
+        logDebug("Open meeting in guest mode. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(true);
+        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
+        MegaApplication.getInstance().setIsLoggingRunning(true);
+
+        Intent intent = new Intent(context, MeetingActivity.class);
+        intent.setAction(MEETING_ACTION_GUEST);
+        if (!isTextEmpty(meetingName)) {
+            intent.putExtra(MEETING_NAME, meetingName);
+        }
+        intent.putExtra(MEETING_CHAT_ID, chatId);
+        intent.putExtra(MEETING_IS_GUEST, true);
+        intent.setData(Uri.parse(link));
+        context.startActivity(intent);
+    }
 
     /**
      * Retrieve if there's a call in progress that you're participating in.
@@ -159,15 +304,14 @@ public class CallUtil {
      * @param context            From which the action is done.
      * @param passcodeManagement To disable passcode.
      */
-    public static void returnActiveCall(Context context, PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+    public static void returnActiveCall(Context context, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
 
         if (currentCalls != null && !currentCalls.isEmpty()) {
             for (Long chatIdCall : currentCalls) {
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
                 if (call != null) {
-                    passcodeManagement.setShowPasscodeScreen(true);
-                    context.startActivity(openCallWrapper.getIntentForOpenOngoingCall(context, MEETING_ACTION_IN, chatIdCall, null, null));
+                    openMeetingInProgress(context, chatIdCall, false, passcodeManagement);
                     break;
                 }
             }
@@ -181,15 +325,14 @@ public class CallUtil {
      * @param chatId             ID chat.
      * @param passcodeManagement To disable passcode.
      */
-    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
         if (currentCalls == null || currentCalls.isEmpty())
             return;
 
         for (Long chatIdCall : currentCalls) {
             if (chatIdCall == chatId) {
-                passcodeManagement.setShowPasscodeScreen(true);
-                context.startActivity(openCallWrapper.getIntentForOpenOngoingCall(context, MEETING_ACTION_IN, chatId, null, null));
+                openMeetingInProgress(context, chatId, false, passcodeManagement);
                 return;
             }
         }
@@ -942,7 +1085,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void startNewCall(Activity activity, SnackbarShower snackbarShower, MegaUser user,
-                                    PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+                                    PasscodeManagement passcodeManagement) {
         if (user == null)
             return;
 
@@ -964,9 +1107,7 @@ public class CallUtil {
             }
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
             logDebug("There is a call, open it");
-            passcodeManagement.setShowPasscodeScreen(true);
-            MegaApplication.getInstance().openCallService(chat.getChatId());
-            activity.startActivity(openCallWrapper.getIntentForOpenOngoingCall(activity, MEETING_ACTION_IN, chat.getChatId(), null, null));
+            openMeetingInProgress(activity, chat.getChatId(), true, passcodeManagement);
         } else if (isStatusConnected(activity, chat.getChatId())) {
             logDebug("There is no call, start it");
             MegaApplication.setUserWaitingForCall(user.getHandle());
@@ -1077,12 +1218,12 @@ public class CallUtil {
      * @param message            String with the text to show in the dialogue
      * @param passcodeManagement To disable passcode.
      */
-    public static void showConfirmationInACall(Context context, String message, PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+    public static void showConfirmationInACall(Context context, String message, PasscodeManagement passcodeManagement) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_ok, (dialog, which) -> {
                     if (context instanceof OpenLinkActivity) {
-                        returnActiveCall(context, passcodeManagement, openCallWrapper);
+                        returnActiveCall(context, passcodeManagement);
                     }
                 })
                 .show();
@@ -1156,16 +1297,16 @@ public class CallUtil {
      * @param titleChat             The title of the chat
      * @param passcodeManagement    To disable passcode.
      */
-    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement) {
         if (amIParticipatingInThisMeeting(chatId)) {
             logDebug("I am participating in the meeting of this meeting link");
-            returnCall(context, chatId, passcodeManagement, openCallWrapper);
+            returnCall(context, chatId, passcodeManagement);
             return;
         }
 
         if (amIParticipatingInAnotherCall(chatId)) {
             logDebug("I am participating in another call");
-            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement, openCallWrapper);
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
             return;
         }
 
@@ -1173,12 +1314,10 @@ public class CallUtil {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
             if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("Call id: " + list.get(0) + ". It's a meeting, open to join");
-                passcodeManagement.setShowPasscodeScreen(true);
-                MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
-                context.startActivity(openCallWrapper.getIntentForOpenJoinMeeting(context, MEETING_ACTION_JOIN, chatId, titleChat, link, alreadyExist ? publicChatHandle : null));
+                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement);
             } else {
                 logDebug("Call id: " + list.get(0) + ". Return to call");
-                returnCall(context, chatId, passcodeManagement, openCallWrapper);
+                returnCall(context, chatId, passcodeManagement);
             }
             return;
         }
@@ -1320,14 +1459,14 @@ public class CallUtil {
      * @param passcodeManagement    To disable passcode.
      * @return True, if the call can be started. False, otherwise.
      */
-    public static boolean canCallBeStartedFromContactOption(Activity context, PasscodeManagement passcodeManagement, OpenCallWrapper openCallWrapper) {
+    public static boolean canCallBeStartedFromContactOption(Activity context, PasscodeManagement passcodeManagement) {
         if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return false;
         }
 
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement, openCallWrapper);
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
             return false;
         }
 

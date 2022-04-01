@@ -1,10 +1,10 @@
-package mega.privacy.android.app.di.calls
+package mega.privacy.android.app.di.meetings
 
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper
+import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
 import mega.privacy.android.app.utils.OpenCallHelper
 
 @Module

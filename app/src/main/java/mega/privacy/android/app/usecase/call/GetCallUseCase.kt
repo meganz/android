@@ -3,9 +3,11 @@ package mega.privacy.android.app.usecase.call
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.constants.EventConstants
 
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import java.util.ArrayList
 import javax.inject.Inject
@@ -79,4 +81,25 @@ class GetCallUseCase @Inject constructor(
 
         return listCalls
     }
+
+    /**
+     * Checks exists another call in progress
+     *
+     * @param chatId Chat ID of the current call
+     * @return Chat ID of the another call or -1 if no exists
+     */
+    fun getAnotherCallInProgress(chatId: Long): Single<Long> =
+        Single.create { emitter ->
+            val callsList: ArrayList<MegaChatCall> = getCallsInProgressAndOnHold()
+
+            for (call in callsList) {
+                if (call.chatid != chatId) {
+                    emitter.onSuccess(call.chatid)
+                    return@create
+                }
+            }
+
+            emitter.onSuccess(MEGACHAT_INVALID_HANDLE)
+            return@create
+        }
 }

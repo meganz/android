@@ -19,7 +19,6 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -44,9 +43,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     @Inject
     PasscodeManagement passcodeManagement;
-
-    @Inject
-    OpenCallWrapper openCallWrapper;
 
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
@@ -243,10 +239,10 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                if (canCallBeStartedFromContactOption((GroupChatInfoActivity) requireActivity(), passcodeManagement, openCallWrapper)) {
+                if (canCallBeStartedFromContactOption((GroupChatInfoActivity) requireActivity(), passcodeManagement)) {
                     startNewCall((GroupChatInfoActivity) requireActivity(),
                             (SnackbarShower) requireActivity(),
-                            megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement, openCallWrapper);
+                            megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
                 }
                 break;
 

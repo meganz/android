@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -27,6 +28,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -77,7 +80,7 @@ import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper
+import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -654,6 +657,37 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         checkCurrentParticipants()
         checkAnotherCall()
         inMeetingViewModel.getCall()?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.finishCall.collect {
+                withContext(Dispatchers.Main) {
+                    if (it) {
+                        meetingActivity.finish()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.switchCall.collect { chatId ->
+                withContext(Dispatchers.Main) {
+                    if(chatId != MEGACHAT_INVALID_HANDLE && chatId != inMeetingViewModel.currentChatId) {
+                        logDebug("Switch call")
+                        passcodeManagement.showPasscodeScreen = true
+                        MegaApplication.getInstance().openCallService(chatId)
+                        launchIntent(
+                            openCallWrapper.getIntentForOpenOngoingCall(
+                                context = requireContext(),
+                                chatId = chatId,
+                                isAudioEnabled = true,
+                                isVideoEnabled = false
+                            )
+                        )
+                        meetingActivity.finish()
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -930,7 +964,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         setHasOptionsMenu(true)
 
         bannerAnotherCallLayout.setOnClickListener {
-            returnToAnotherCall()
+            inMeetingViewModel.switchCall()
         }
     }
 
@@ -1256,27 +1290,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     initOneToOneCall()
                 }
             }
-        }
-    }
-
-    /**
-     * Method to return to another call if it exists
-     */
-    private fun returnToAnotherCall() {
-        val anotherCall = inMeetingViewModel.getAnotherCall()
-        if (anotherCall != null) {
-            logDebug("Return to another call")
-            passcodeManagement.showPasscodeScreen = true
-            MegaApplication.getInstance().openCallService(anotherCall.chatid)
-            launchIntent(
-                openCallWrapper.getIntentForOpenOngoingCall(
-                    context = requireContext(),
-                    actionForCall = MeetingActivity.MEETING_ACTION_IN,
-                    chatId = anotherCall.chatid, null, null
-
-                )
-            )
-            finishActivity()
         }
     }
 
@@ -2450,16 +2463,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Change of status on hold and switch of call")
                 inMeetingViewModel.setCallOnHold(true)
                 inMeetingViewModel.setAnotherCallOnHold(anotherCall.chatid, false)
-                passcodeManagement.showPasscodeScreen = true
-                MegaApplication.getInstance().openCallService(anotherCall.chatid)
-                launchIntent(
-                    openCallWrapper.getIntentForOpenOngoingCall(
-                        context = requireContext(),
-                        actionForCall = MeetingActivity.MEETING_ACTION_IN,
-                        chatId = anotherCall.chatid, null, null
-                    )
-                )
-                finishActivity()
+                inMeetingViewModel.switchCall()
             }
             inMeetingViewModel.isCallOnHold() -> {
                 logDebug("Change of status on hold")
@@ -2560,20 +2564,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
         } else {
-            inMeetingViewModel.checkIfAnotherCallShouldBeShown()?.let {
-                passcodeManagement.showPasscodeScreen = true
-                MegaApplication.getInstance().openCallService(it)
-                launchIntent(
-                    openCallWrapper.getIntentForOpenOngoingCall(
-                        context = requireContext(),
-                        actionForCall = MeetingActivity.MEETING_ACTION_IN,
-                        chatId = it, null, null
-                    )
-
-                )
-                finishActivity()
-
-            }
+            inMeetingViewModel.endCall()
         }
     }
 

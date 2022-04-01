@@ -88,7 +88,6 @@ import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -125,9 +124,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-
-    @Inject
-    OpenCallWrapper openCallWrapper;
 
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -3042,7 +3038,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private void toStartMeeting() {
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement, openCallWrapper);
+            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
         } else {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_MEETING, true);

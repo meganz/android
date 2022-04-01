@@ -11,7 +11,6 @@ import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.calls.facade.OpenCallWrapper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -19,7 +18,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -40,9 +38,6 @@ public class CallNotificationIntentService extends IntentService implements Hang
 
     @Inject
     PasscodeManagement passcodeManagement;
-
-    @Inject
-    OpenCallWrapper openCallWrapper;
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;
@@ -167,9 +162,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             return;
 
         logDebug("Incoming call answered.");
-        passcodeManagement.setShowPasscodeScreen(true);
-        MegaApplication.getInstance().openCallService(chatIdIncomingCall);
-        startActivity(openCallWrapper.getIntentForOpenOngoingCall(this, MEETING_ACTION_IN, chatIdIncomingCall, null, null));
+        openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
