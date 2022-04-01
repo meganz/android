@@ -8866,7 +8866,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
                 try {
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
                     logError("Exception starting UploadService", e);
                     e.printStackTrace();
@@ -8890,7 +8890,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
                 try {
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
                     logError("Exception starting UploadService", e);
                     e.printStackTrace();
@@ -9223,7 +9223,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
                     intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
                     intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 }
             }
         }
@@ -9308,7 +9308,7 @@ public class ManagerActivity extends TransfersManagementActivity
             intent.putExtra(UploadService.EXTRA_NAME, file.getName());
             intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
             intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-            startService(intent);
+            ContextCompat.startForegroundService(this, intent);
         } else {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
         }
@@ -10348,7 +10348,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     logDebug("Over quota");
                     Intent intent = new Intent(this, UploadService.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startService(intent);
+                    ContextCompat.startForegroundService(this, intent);
                 }
             }
         }
