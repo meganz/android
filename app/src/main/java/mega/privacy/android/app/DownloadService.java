@@ -95,7 +95,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static final String EXTRA_FROM_MV = "fromMV";
 	public static final String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
-	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP";
