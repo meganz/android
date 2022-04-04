@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -702,7 +703,7 @@ public class ContactFileListActivity extends PasscodeActivity
 			}
 
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-			final long folderHandle = intent.getLongExtra("SELECT", 0);
+			final long folderHandle = intent.getLongExtra(EXTRA_SELECTED_FOLDER, 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 

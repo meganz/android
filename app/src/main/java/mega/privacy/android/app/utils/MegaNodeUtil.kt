@@ -1489,7 +1489,13 @@ object MegaNodeUtil {
         when {
             // // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
             mime.isZip && !SDCardUtils.isLocalFolderOnSDCard(context, autoPlayInfo.localPath) -> {
-                openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
+                openZip(
+                    context = context,
+                    activityLauncher = activityLauncher,
+                    zipFilePath = autoPlayInfo.localPath,
+                    snackbarShower = snackbarShower,
+                    nodeHandle = autoPlayInfo.nodeHandle
+                )
             }
             mime.isPdf -> {
                 val pdfIntent = Intent(context, PdfViewerActivity::class.java)
@@ -1578,6 +1584,7 @@ object MegaNodeUtil {
      * @param context Android context.
      * @param activityLauncher interface to launch activity.
      * @param zipFilePath The local path of the zip file.
+     * @param snackbarShower interface to snackbar shower
      * @param nodeHandle The handle of the corresponding node.
      */
     @JvmStatic
@@ -1585,17 +1592,21 @@ object MegaNodeUtil {
         context: Context,
         activityLauncher: ActivityLauncher,
         zipFilePath: String,
+        snackbarShower: SnackbarShower,
         nodeHandle: Long
     ) {
-        val intentZip = Intent(context, ZipBrowserActivity::class.java)
-        intentZip.putExtra(
-            ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
-        )
-        intentZip.putExtra(
-            ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
-        )
-
-        activityLauncher.launchActivity(intentZip)
+        if (ZipBrowserActivity.zipFileFormatCheck(zipFilePath)) {
+            activityLauncher.launchActivity(Intent(context, ZipBrowserActivity::class.java).apply {
+                putExtra(
+                    ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
+                )
+                putExtra(
+                    ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
+                )
+            })
+        } else {
+            snackbarShower.showSnackbar(getString(R.string.message_zip_format_error))
+        }
     }
 
     /**
@@ -1871,8 +1882,11 @@ object MegaNodeUtil {
             ) {
                 logDebug("The file is zip, open in-app.")
                 openZip(
-                    context,
-                    activityLauncher, possibleLocalFile, node.handle
+                    context = context,
+                    activityLauncher = activityLauncher,
+                    zipFilePath = possibleLocalFile,
+                    snackbarShower = snackbarShower,
+                    nodeHandle = node.handle
                 )
             } else {
                 logDebug("The file cannot be opened in-app.")

@@ -101,6 +101,7 @@ import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
+import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -334,6 +335,8 @@ public class ChatActivity extends PasscodeActivity
     GetAvatarUseCase getAvatarUseCase;
     @Inject
     GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
+    @Inject
+    GetPublicNodeUseCase getPublicNodeUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -5965,8 +5968,15 @@ public class ChatActivity extends PasscodeActivity
         ChatLinkInfoListener listener = null;
         if (isFileLink(link)) {
             logDebug("isFileLink");
-            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-            megaApi.getPublicNode(link, listener);
+            getPublicNodeUseCase.get(link)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((richLink, throwable) -> {
+                        if (throwable == null) {
+                            setRichLinkInfo(msg.getMsgId(), richLink);
+                        }
+                    });
+
             return MEGA_FILE_LINK;
         } else {
             logDebug("isFolderLink");

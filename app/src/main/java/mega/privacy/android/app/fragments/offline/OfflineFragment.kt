@@ -484,12 +484,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                         OfflineAdapter.TYPE_LIST -> {
                             val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
                             val param = thumbnail.layoutParams as FrameLayout.LayoutParams
-                            param.width = Util.dp2px(
+                            param.width = dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_WIDTH,
                                 resources.displayMetrics
                             )
                             param.height = param.width
-                            param.marginStart = Util.dp2px(
+                            param.marginStart = dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
                                 resources.displayMetrics
                             )
@@ -535,14 +535,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         when {
             mime.isZip -> {
                 logDebug("MimeTypeList ZIP")
-                val intentZip = Intent(context, ZipBrowserActivity::class.java)
-                intentZip.action = ZipBrowserActivity.ACTION_OPEN_ZIP_FILE
-                intentZip.putExtra(
-                    ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN,
-                    viewModel.path
-                )
-                intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, file.absolutePath)
-                startActivity(intentZip)
+                ZipBrowserActivity.start(requireActivity(), file.path)
             }
             mime.isImage -> {
                 val handles = adapter!!.getOfflineNodes().map { it.handle.toLong() }.toLongArray()
