@@ -206,15 +206,10 @@ class ImageViewerPageFragment : Fragment() {
                 binding.image.post { showVideoButton() }
             }
         }
+        binding.progress.hide()
     }
 
     private fun buildImageControllerListener() = object : BaseControllerListener<ImageInfo>() {
-        override fun onSubmit(id: String?, callerContext: Any?) {
-            if (viewModel.getImageItem(itemId!!)?.imageResult?.isFullyLoaded != true) {
-                binding.progress.show()
-            }
-        }
-
         override fun onFinalImageSet(
             id: String?,
             imageInfo: ImageInfo?,
@@ -224,7 +219,6 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
-                    binding.progress.hide()
                 }
             }
         }
@@ -242,7 +236,6 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
-                    binding.progress.hide()
                 }
             }
         }

@@ -137,8 +137,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             return
         }
 
-        val node = imageItem.nodeItem.node
+        val node = imageItem.nodeItem?.node
         val nodeItem = imageItem.nodeItem
+        val nodeHandle = imageItem.getNodeHandle()
         val isUserLoggedIn = viewModel.isUserLoggedIn()
 
         binding.apply {
@@ -158,10 +159,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
 
-            txtName.text = nodeItem.name
-            txtInfo.text = nodeItem.infoText
+            txtName.text = imageItem.name
+            txtInfo.text = imageItem.infoText
 
-            if (nodeItem.hasVersions) {
+            if (nodeItem?.hasVersions == true) {
                 txtInfo.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_baseline_history,
                     0,
@@ -173,14 +174,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // File Info
             optionInfo.isVisible = imageItem.shouldShowInfoOption(isUserLoggedIn)
             optionInfo.setOnClickListener {
-                val intent = if (imageItem.isOffline) {
+                val intent = if (imageItem is ImageItem.OfflineNode) {
                     Intent(context, OfflineFileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, nodeItem.handle.toString())
+                        putExtra(HANDLE, imageItem.handle.toString())
                     }
                 } else {
                     Intent(context, FileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, nodeItem.handle)
-                        putExtra(NAME, nodeItem.name)
+                        putExtra(HANDLE, nodeHandle)
+                        putExtra(NAME, imageItem.name)
                     }
                 }
 
@@ -195,7 +196,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
-                    viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
+                    viewModel.markNodeAsFavorite(nodeHandle!!, !node.isFavourite)
                 }
             }
 
@@ -209,7 +210,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabelCurrent.text = getNodeLabelText(node.label)
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
                 optionLabelLayout.setOnClickListener {
-                    NodeLabelBottomSheetDialogFragment.newInstance(nodeItem.handle).show(childFragmentManager, TAG)
+                    NodeLabelBottomSheetDialogFragment.newInstance(nodeHandle!!).show(childFragmentManager, TAG)
                 }
             }
 
@@ -226,8 +227,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Open with
             optionOpenWith.isVisible = imageItem.shouldShowOpenWithOption(isUserLoggedIn)
             optionOpenWith.setOnClickListener {
-                if (imageItem.isOffline) {
-                    OfflineUtils.openWithOffline(requireActivity(), nodeItem.handle)
+                if (imageItem is ImageItem.OfflineNode) {
+                    OfflineUtils.openWithOffline(requireActivity(), nodeHandle)
                 } else {
                     ModalBottomSheetUtil.openWith(requireActivity(), node)
                 }
@@ -244,8 +245,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Download
             optionDownload.isVisible = imageItem.shouldShowDownloadOption()
             optionDownload.setOnClickListener {
-                if (nodeItem.isAvailableOffline) {
-                    (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
+                if (nodeItem?.isAvailableOffline == true) {
+                    (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeHandle!!)
                 } else if (node != null) {
                     (activity as? ImageViewerActivity?)?.saveNode(node)
                 }
@@ -254,13 +255,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Offline
             optionOfflineLayout.isVisible = imageItem.shouldShowOfflineOption()
-            optionOfflineRemove.isVisible = imageItem.isOffline
-            switchOffline.isChecked = nodeItem.isAvailableOffline
+            optionOfflineRemove.isVisible = imageItem is ImageItem.OfflineNode
+            switchOffline.isChecked = nodeItem?.isAvailableOffline == true
             val offlineAction = {
-                viewModel.switchNodeOfflineAvailability(nodeItem, requireActivity())
+                viewModel.switchNodeOfflineAvailability(nodeItem!!, requireActivity())
                 dismissAllowingStateLoss()
             }
-            optionOfflineRemove.setOnClickListener { viewModel.removeOfflineNode(imageItem.handle, requireActivity()) }
+            optionOfflineRemove.setOnClickListener { viewModel.removeOfflineNode(nodeHandle!!, requireActivity()) }
             switchOffline.post {
                 optionOfflineLayout.setOnClickListener { offlineAction.invoke() }
                 switchOffline.setOnCheckedChangeListener { _, _ -> offlineAction.invoke() }
@@ -275,7 +276,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionManageLink.text = getQuantityString(R.plurals.get_links, 1)
             }
             optionManageLink.setOnClickListener {
-                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeItem.handle)
+                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeHandle!!)
             }
             optionRemoveLink.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_REMOVE_LINK) }
 
@@ -290,11 +291,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionShare.isVisible = imageItem.shouldShowShareOption()
             optionShare.setOnClickListener {
                 when {
-                    imageItem.isOffline ->
-                        OfflineUtils.shareOfflineNode(context, nodeItem.handle)
+                    imageItem is ImageItem.OfflineNode ->
+                        OfflineUtils.shareOfflineNode(context, imageItem.handle)
                     imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
-                        FileUtil.shareFile(context, imageItem.imageResult.fullSizeUri!!.toFile())
-                    !imageItem.nodePublicLink.isNullOrBlank() ->
+                        FileUtil.shareFile(context, imageItem.imageResult!!.fullSizeUri!!.toFile())
+                    imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
                     node != null ->
                         viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
@@ -314,34 +315,34 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Move
             optionMove.isVisible = imageItem.shouldShowMoveOption()
             optionMove.setOnClickListener {
-                selectMoveFolderLauncher.launch(longArrayOf(nodeItem.handle))
+                selectMoveFolderLauncher.launch(longArrayOf(nodeHandle!!))
             }
 
             // Copy
             optionCopy.isVisible = imageItem.shouldShowCopyOption(isUserLoggedIn)
             optionCopy.setOnClickListener {
-                if (nodeItem.isExternalNode || imageItem.isFromChat()) {
-                    selectImportFolderLauncher.launch(longArrayOf(nodeItem.handle))
+                if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) {
+                    selectImportFolderLauncher.launch(longArrayOf(nodeHandle!!))
                 } else {
-                    selectCopyFolderLauncher.launch(longArrayOf(nodeItem.handle))
+                    selectCopyFolderLauncher.launch(longArrayOf(nodeHandle!!))
                 }
             }
-            val copyAction = if (nodeItem.isExternalNode) R.string.general_import else if (imageItem.isFromChat()) R.string.add_to_cloud_node_chat else R.string.context_copy
-            val copyDrawable = if (nodeItem.isExternalNode || imageItem.isFromChat()) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
+            val copyAction = if (nodeItem?.isExternalNode == true) R.string.general_import else if (imageItem is ImageItem.ChatNode) R.string.add_to_cloud_node_chat else R.string.context_copy
+            val copyDrawable = if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
 
             // Restore
             optionRestore.isVisible = imageItem.shouldShowRestoreOption()
             optionRestore.setOnClickListener {
-                viewModel.moveNode(nodeItem.handle, node!!.restoreHandle)
+                viewModel.moveNode(nodeHandle!!, node!!.restoreHandle)
                 dismissAllowingStateLoss()
             }
 
             // Rubbish bin
             optionRubbishBin.apply {
                 isVisible = imageItem.shouldShowRubbishBinOption()
-                if (nodeItem.isFromRubbishBin) {
+                if (nodeItem?.isFromRubbishBin == true) {
                     setText(R.string.general_remove)
                     setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_remove, 0, 0, 0);
                 } else {
@@ -353,7 +354,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Chat Remove
             optionChatRemove.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_REMOVE_CHAT_NODE) }
-            optionChatRemove.isVisible = imageItem.isChatDeletable && imageItem.isFromChat() && nodeItem.hasFullAccess
+            optionChatRemove.isVisible = imageItem.shouldShowChatRemoveOption()
 
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
@@ -404,6 +405,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun showAlertDialog(type: AlertDialogType) {
         val imageItem = viewModel.getImageItem(itemId!!) ?: return
+        val nodeHandle = imageItem.getNodeHandle() ?: return
         alertDialog?.dismiss()
         alertDialogType = type
         when(type) {
@@ -411,7 +413,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
                     .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
-                        viewModel.removeLink(imageItem.handle)
+                        viewModel.removeLink(nodeHandle)
                         dismissAllowingStateLoss()
                     }
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
@@ -434,9 +436,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setMessage(StringResourcesUtils.getString(messageText))
                     .setPositiveButton(StringResourcesUtils.getString(buttonText)) { _, _ ->
                         if (isFromRubbishBin) {
-                            viewModel.removeNode(imageItem.handle)
+                            viewModel.removeNode(nodeHandle)
                         } else {
-                            viewModel.moveNodeToRubbishBin(imageItem.handle)
+                            viewModel.moveNodeToRubbishBin(nodeHandle)
                         }
                         dismissAllowingStateLoss()
                     }
@@ -447,7 +449,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
                     .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
-                        viewModel.removeChatMessage(imageItem.chatRoomId!!, imageItem.chatMessageId!!)
+                        viewModel.removeChatMessage(nodeHandle)
                         dismissAllowingStateLoss()
                     }
                     .setNegativeButton(

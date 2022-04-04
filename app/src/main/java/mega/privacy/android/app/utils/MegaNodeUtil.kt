@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
+import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -2106,4 +2107,26 @@ object MegaNodeUtil {
     fun MegaApiAndroid.checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean =
         nodeFile?.canRead() == true && nodeFile.length() == node.size
                 && node.fingerprint == getFingerprint(nodeFile.absolutePath)
+
+    /**
+     * Generate MegaNode information preformatted text
+     *
+     * @return MegaNode information
+     */
+    fun MegaNode.getInfoText(): String {
+        val nodeSizeText = getSizeString(size)
+        val nodeDateText = formatLongDateTime(getLastAvailableTime())
+        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+    }
+
+    /**
+     * Generate MegaOffline information preformatted text
+     *
+     * @return MegaOffline information
+     */
+    fun MegaOffline.getInfoText(context: Context): String {
+        val nodeSizeText = getSizeString(getSize(context))
+        val nodeDateText = formatLongDateTime(getModificationDate(context))
+        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+    }
 }

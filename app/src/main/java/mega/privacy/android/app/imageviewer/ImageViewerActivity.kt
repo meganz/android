@@ -29,18 +29,13 @@ import mega.privacy.android.app.imageviewer.util.*
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
-import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -410,18 +405,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      * @param imageItem  Image item to show
      */
     private fun showCurrentImageInfo(imageItem: ImageItem?) {
+        binding.txtTitle.text = imageItem?.name
         if (imageItem?.nodeItem != null) {
-            binding.txtTitle.text = imageItem.nodeItem.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
-                findItem(R.id.action_share)?.isVisible = imageItem.isFromChat() && imageItem.shouldShowShareOption()
+                findItem(R.id.action_share)?.isVisible = imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption()
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
                 findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption()
                 findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn())
-                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem.handle != INVALID_HANDLE
+                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null
             }
-        } else {
-            logWarning("Null MegaNodeItem")
         }
     }
 
@@ -462,14 +455,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
             R.id.action_share -> {
                 when {
-                    imageItem.isOffline ->
+                    imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(this, nodeItem.handle)
                     imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
-                        FileUtil.shareFile(this, imageItem.imageResult.fullSizeUri!!.toFile())
-                    !imageItem.nodePublicLink.isNullOrBlank() ->
+                        FileUtil.shareFile(this, imageItem.imageResult!!.fullSizeUri!!.toFile())
+                    imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
-                    imageItem.nodeItem.node != null ->
-                        viewModel.exportNode(imageItem.nodeItem.node).observe(this) { link ->
+                    imageItem.nodeItem?.node != null ->
+                        viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
                             if (!link.isNullOrBlank()) {
                                 MegaNodeUtil.shareLink(this, link)
                             }
@@ -496,7 +489,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(imageItem.getUniqueId())
+                bottomSheet = ImageBottomSheetDialogFragment.newInstance(imageItem.id)
                     .apply { show(supportFragmentManager) }
                 true
             }
@@ -523,7 +516,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun launchVideoScreen(imageItem: ImageItem) {
-        val nodeHandle = imageItem.handle
+        val nodeHandle = imageItem.getNodeHandle() ?: return
         val nodeName = imageItem.nodeItem?.name ?: return
 
         val intent = Util.getMediaIntent(this, nodeName).apply {
@@ -539,7 +532,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             val localPath = existingFile.absolutePath ?: return
             FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
         } else {
-            val node = imageItem.nodeItem.node ?: return
+            val node = imageItem.nodeItem?.node ?: return
             val localPath = FileUtil.getLocalFile(node)
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
                 FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)

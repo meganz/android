@@ -27,11 +27,11 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -79,10 +79,10 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun onImagesIds(): LiveData<List<Long>?> =
-        images.map { items -> items?.map(ImageItem::getUniqueId) }
+        images.map { items -> items?.map(ImageItem::id) }
 
     fun onImage(itemId: Long): LiveData<ImageItem?> =
-        images.map { items -> items?.firstOrNull { it.getUniqueId() == itemId } }
+        images.map { items -> items?.firstOrNull { it.id == itemId } }
 
     fun onCurrentPosition(): LiveData<Pair<Int, Int>> =
         currentPosition.map { position -> Pair(position, images.value?.size ?: 0) }
@@ -94,7 +94,7 @@ class ImageViewerViewModel @Inject constructor(
         currentPosition.value?.let { images.value?.getOrNull(it) }
 
     fun getImageItem(itemId: Long): ImageItem? =
-        images.value?.find { it.getUniqueId() == itemId }
+        images.value?.find { it.id == itemId }
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
@@ -154,24 +154,24 @@ class ImageViewerViewModel @Inject constructor(
      * @param itemId    Item to be loaded.
      */
     fun loadSingleNode(itemId: Long) {
-        val imageItem = images.value?.find { it.getUniqueId() == itemId }
-        val subscription = when {
-            imageItem == null -> {
-                logWarning("Null item id: $itemId")
+        val imageItem = images.value?.find { it.id == itemId } ?: run {
+            logWarning("Null item id: $itemId")
+            return
+        }
+
+        val subscription = when (imageItem) {
+            is ImageItem.PublicNode ->
+                getNodeUseCase.getNodeItem(imageItem.nodePublicLink)
+            is ImageItem.ChatNode ->
+                getNodeUseCase.getNodeItem(imageItem.chatRoomId, imageItem.chatMessageId)
+            is ImageItem.OfflineNode ->
+                getNodeUseCase.getOfflineNodeItem(imageItem.handle)
+            is ImageItem.Node ->
+                getNodeUseCase.getNodeItem(imageItem.handle)
+            is ImageItem.File -> {
+                // do nothing
                 return
             }
-            imageItem.nodePublicLink?.isNotBlank() == true ->
-                getNodeUseCase.getNodeItem(imageItem.nodePublicLink)
-            imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
-                getNodeUseCase.getNodeItem(imageItem.chatRoomId, imageItem.chatMessageId)
-            imageItem.isOffline ->
-                getNodeUseCase.getOfflineNodeItem(imageItem.handle)
-            imageItem.handle != INVALID_HANDLE ->
-                getNodeUseCase.getNodeItem(imageItem.handle)
-            imageItem.nodeItem?.node != null ->
-                getNodeUseCase.getNodeItem(imageItem.nodeItem.node)
-            else ->
-                return // Image file uri with no handle
         }
 
         subscription
@@ -184,7 +184,7 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                    if (itemId == getCurrentImageItem()?.getUniqueId() && error is MegaException) {
+                    if (itemId == getCurrentImageItem()?.id && error is MegaException) {
                         snackbarMessage.value = error.getTranslatedErrorString()
                     }
                 }
@@ -201,27 +201,28 @@ class ImageViewerViewModel @Inject constructor(
      * @param fullSize      Flag to request full size image despite data/size requirements.
      */
     fun loadSingleImage(itemId: Long, fullSize: Boolean) {
-        val imageItem = images.value?.find { it.getUniqueId() == itemId }
-        val highPriority = itemId == getCurrentImageItem()?.handle
+        val imageItem = images.value?.find { it.id == itemId } ?: run {
+            logWarning("Null item id: $itemId")
+            return
+        }
 
-        val subscription = when {
-            imageItem == null
-                    || (imageItem.imageResult?.isFullyLoaded == true
-                    && imageItem.imageResult.fullSizeUri != null
-                    && imageItem.imageResult.previewUri != null) ->
-                return
-            imageItem.nodePublicLink?.isNotBlank() == true ->
+        if (imageItem.imageResult?.isFullyLoaded == true
+            && imageItem.imageResult?.fullSizeUri != null
+            && imageItem.imageResult?.previewUri != null
+        ) return // Already downloaded
+
+        val highPriority = itemId == getCurrentImageItem()?.id
+        val subscription = when (imageItem) {
+            is ImageItem.PublicNode ->
                 getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
-            imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
+            is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
-            imageItem.isOffline ->
+            is ImageItem.OfflineNode ->
                 getImageUseCase.getOffline(imageItem.handle)
-            imageItem.handle != INVALID_HANDLE ->
+            is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
-            imageItem.nodeItem?.node != null ->
-                getImageUseCase.get(imageItem.nodeItem.node, fullSize, highPriority)
-            else ->
-                return // Image file uri with no handle
+            is ImageItem.File ->
+                getImageUseCase.getImageUri(imageItem.fileUri)
         }
 
         subscription
@@ -236,7 +237,7 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                    if (itemId == getCurrentImageItem()?.getUniqueId()
+                    if (itemId == getCurrentImageItem()?.id
                         && error is MegaException && error !is ResourceAlreadyExistsMegaException
                     ) {
                         snackbarMessage.value = error.getTranslatedErrorString()
@@ -263,7 +264,7 @@ class ImageViewerViewModel @Inject constructor(
 
         val items = images.value?.toMutableList()
         if (!items.isNullOrEmpty()) {
-            val index = items.indexOfFirst { it.getUniqueId() == itemId }
+            val index = items.indexOfFirst { it.id == itemId }
             if (index != INVALID_POSITION) {
                 val currentItem = items[index]
                 if (nodeItem != null) {
@@ -301,21 +302,30 @@ class ImageViewerViewModel @Inject constructor(
             .filter { change -> change is Result.OnNodesUpdate }
             .subscribeBy(
                 onNext = { change ->
-                    val items = images.value?.toMutableList()
-                    if (items.isNullOrEmpty()) {
+                    val items = images.value?.toMutableList() ?: run {
                         logWarning("Images are null or empty")
                         return@subscribeBy
                     }
 
                     val dirtyNodeHandles = mutableListOf<Long>()
                     (change as Result.OnNodesUpdate).nodes?.forEach { changedNode ->
-                        val currentIndex = items.indexOfFirst { it.handle == changedNode.handle }
+                        val currentIndex = items.indexOfFirst { changedNode.handle == it.getNodeHandle() }
                         when {
+                            currentIndex == INVALID_POSITION -> {
+                                return@subscribeBy // Not found
+                            }
                             changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW) -> {
                                 val hasSameParent = (changedNode.parentHandle != null
                                         && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
                                 if (hasSameParent && changedNode.isValidForImageViewer()) {
-                                    items.add(ImageItem(changedNode.handle))
+                                    items.add(
+                                        ImageItem.Node(
+                                            id = changedNode.handle,
+                                            handle = changedNode.handle,
+                                            name = changedNode.name,
+                                            infoText = changedNode.getInfoText()
+                                        )
+                                    )
                                     dirtyNodeHandles.add(changedNode.handle)
                                 }
                             }
@@ -333,7 +343,7 @@ class ImageViewerViewModel @Inject constructor(
                                     items.removeAt(currentIndex)
                                 }
                             }
-                            currentIndex != INVALID_POSITION -> {
+                            else -> {
                                 dirtyNodeHandles.add(changedNode.handle)
                             }
                         }
@@ -398,7 +408,7 @@ class ImageViewerViewModel @Inject constructor(
             if (items.isNullOrEmpty()) {
                 0
             } else {
-                val currentPositionNewIndex = newItems.indexOfFirst { it.handle == getCurrentImageItem()?.handle }
+                val currentPositionNewIndex = newItems.indexOfFirst { it.id == getCurrentImageItem()?.id }
                 val currentItemPosition = currentPosition.value ?: 0
                 when {
                     currentPositionNewIndex != INVALID_POSITION ->
@@ -418,7 +428,7 @@ class ImageViewerViewModel @Inject constructor(
     fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
         getNodeUseCase.removeOfflineNode(nodeHandle, activity)
             .subscribeAndComplete {
-                val index = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
+                val index = images.value?.indexOfFirst { nodeHandle == it.getNodeHandle() } ?: INVALID_POSITION
                 removeImageItemAt(index)
             }
     }
@@ -430,10 +440,11 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun removeChatMessage(chatRoomId: Long, messageId: Long) {
-        deleteChatMessageUseCase.delete(chatRoomId, messageId)
+    fun removeChatMessage(nodeHandle: Long) {
+        val imageItem = images.value?.firstOrNull { nodeHandle == it.getNodeHandle() } as? ImageItem.ChatNode ?: return
+        deleteChatMessageUseCase.delete(imageItem.chatRoomId, imageItem.chatMessageId)
             .subscribeAndComplete {
-                val index = images.value?.indexOfFirst { it.chatRoomId == chatRoomId && it.chatMessageId == messageId } ?: INVALID_POSITION
+                val index = images.value?.indexOfFirst { it.id == imageItem.id } ?: INVALID_POSITION
                 removeImageItemAt(index)
 
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
@@ -489,8 +500,8 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun stopImageLoading(nodeHandle: Long, aggressive: Boolean) {
-        images.value?.find { nodeHandle == it.getUniqueId() }?.imageResult?.let { imageResult ->
+    fun stopImageLoading(itemId: Long, aggressive: Boolean) {
+        images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
             }
@@ -520,7 +531,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =
-        images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
+        images.value?.find { it.getNodeHandle() == nodeHandle }?.nodeItem?.node
 
     /**
      * Check if current user is logged in
@@ -552,7 +563,7 @@ class ImageViewerViewModel @Inject constructor(
                 onSuccess = { items ->
                     images.value = items.toList()
 
-                    val position = items.indexOfFirst { it.handle == currentNodeHandle }
+                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() }
                     if (position != INVALID_POSITION) {
                         updateCurrentPosition(position, true)
                     } else {
