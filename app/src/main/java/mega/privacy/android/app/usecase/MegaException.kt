@@ -19,85 +19,6 @@ sealed class MegaException constructor(
     val isChatError: Boolean = false
 ) : RuntimeException("$errorCode: $errorMessage") {
 
-    companion object {
-
-        /**
-         * Converts MegaError to MegaException
-         *
-         * @return MegaException
-         */
-        @JvmStatic
-        fun MegaError.toMegaException(): MegaException =
-            when (errorCode) {
-                API_OK -> SuccessMegaException(errorString, false)
-                API_EINTERNAL -> InternalMegaException(errorString)
-                API_EARGS -> BadArgumentMegaException(errorString)
-                API_EAGAIN -> RequestFailedMegaException(errorString)
-                API_ERATELIMIT -> RateLimitMegaException(errorString)
-                API_EFAILED -> PermanentlyFailMegaException(errorString)
-                API_ETOOMANY -> TooManyRequestsMegaException(errorString)
-                API_ERANGE -> ResourceOutOfRangeMegaException(errorString)
-                API_EEXPIRED -> ResourceExpiredMegaException(errorString)
-                API_ENOENT -> ResourceDoesNotExistMegaException(errorString)
-                API_ECIRCULAR -> CircularLinkageMegaException(errorString)
-                API_EACCESS -> AccessDeniedMegaException(errorString)
-                API_EEXIST -> ResourceAlreadyExistsMegaException(errorString)
-                API_EINCOMPLETE -> RequestIncompleteMegaException(errorString)
-                API_EKEY -> CryptographicMegaException(errorString)
-                API_ESID -> BadSessionIdMegaException(errorString)
-                API_EBLOCKED -> ResourceAdministrativelyBlockedMegaException(errorString)
-                API_EOVERQUOTA -> QuotaExceededMegaException(errorString)
-                API_ETEMPUNAVAIL -> ResourceTemporarilyNotAvailableMegaException(errorString)
-                API_ETOOMANYCONNECTIONS -> TooManyConnectionsMegaException(errorString)
-                API_EWRITE -> FileCouldNotBeWrittenMegaException(errorString)
-                API_EREAD -> FileCouldNotBeReadMegaException(errorString)
-                API_EAPPKEY -> InvalidApplicationKeyMegaException(errorString)
-                API_ESSL -> InvalidSslKeyMegaException(errorString)
-                API_EGOINGOVERQUOTA -> NotEnoughQuotaMegaException(errorString)
-                API_EMFAREQUIRED -> MultiFactorAuthenticationRequiredMegaException(errorString)
-                API_EMASTERONLY -> AccessDeniedForSubUsersMegaException(errorString)
-                API_EBUSINESSPASTDUE -> BusinessAccountExpiredMegaException(errorString)
-                API_EPAYWALL -> OverDiskQuotaPaywallMegaException(errorString)
-                PAYMENT_ECARD -> CreditCardRejectedPaymentMegaException(errorString)
-                PAYMENT_EBILLING -> BillingPaymentMegaException(errorString)
-                PAYMENT_EFRAUD -> FraudProtectionRejectedPaymentMegaException(errorString)
-                PAYMENT_ETOOMANY -> TooManyRequestsPaymentPaymentMegaException(errorString)
-                PAYMENT_EBALANCE -> BalancePaymentMegaException(errorString)
-                PAYMENT_EGENERIC -> GenericPaymentMegaException(errorString)
-                else -> {
-                    if (errorCode > 0) {
-                        HttpMegaException(errorCode, errorString, false)
-                    } else {
-                        UnknownMegaException(errorCode, errorString, false)
-                    }
-                }
-            }
-
-        /**
-         * Converts MegaChatError to MegaException
-         *
-         * @return MegaException
-         */
-        @JvmStatic
-        fun MegaChatError.toMegaException(): MegaException =
-            when (errorCode) {
-                ERROR_OK -> SuccessMegaException(errorString, true)
-                ERROR_UNKNOWN -> UnknownMegaChatException(errorString)
-                ERROR_ARGS -> BadArgumentMegaChatException(errorString)
-                ERROR_TOOMANY -> TooManyUsesMegaChatException(errorString)
-                ERROR_NOENT -> ResourceDoesNotExistMegaChatException(errorString)
-                ERROR_ACCESS -> AccessDeniedMegaChatException(errorString)
-                ERROR_EXIST -> ResourceAlreadyExistsMegaChatException(errorString)
-                else -> {
-                    if (errorCode > 0) {
-                        HttpMegaException(errorCode, errorString, true)
-                    } else {
-                        UnknownMegaException(errorCode, errorString, true)
-                    }
-                }
-            }
-    }
-
     /**
      * Gets the translated string of the error.
      *
@@ -161,3 +82,77 @@ class TooManyUsesMegaChatException(errorMessage: String): MegaException(ERROR_TO
 class ResourceDoesNotExistMegaChatException(errorMessage: String): MegaException(ERROR_NOENT, errorMessage, true)
 class AccessDeniedMegaChatException(errorMessage: String): MegaException(ERROR_ACCESS, errorMessage, true)
 class ResourceAlreadyExistsMegaChatException(errorMessage: String): MegaException(ERROR_EXIST, errorMessage, true)
+
+/**
+ * Converts MegaError to MegaException
+ *
+ * @return MegaException
+ */
+fun MegaError.toMegaException(): MegaException =
+    when (errorCode) {
+        API_OK -> SuccessMegaException(errorString, false)
+        API_EINTERNAL -> InternalMegaException(errorString)
+        API_EARGS -> BadArgumentMegaException(errorString)
+        API_EAGAIN -> RequestFailedMegaException(errorString)
+        API_ERATELIMIT -> RateLimitMegaException(errorString)
+        API_EFAILED -> PermanentlyFailMegaException(errorString)
+        API_ETOOMANY -> TooManyRequestsMegaException(errorString)
+        API_ERANGE -> ResourceOutOfRangeMegaException(errorString)
+        API_EEXPIRED -> ResourceExpiredMegaException(errorString)
+        API_ENOENT -> ResourceDoesNotExistMegaException(errorString)
+        API_ECIRCULAR -> CircularLinkageMegaException(errorString)
+        API_EACCESS -> AccessDeniedMegaException(errorString)
+        API_EEXIST -> ResourceAlreadyExistsMegaException(errorString)
+        API_EINCOMPLETE -> RequestIncompleteMegaException(errorString)
+        API_EKEY -> CryptographicMegaException(errorString)
+        API_ESID -> BadSessionIdMegaException(errorString)
+        API_EBLOCKED -> ResourceAdministrativelyBlockedMegaException(errorString)
+        API_EOVERQUOTA -> QuotaExceededMegaException(errorString)
+        API_ETEMPUNAVAIL -> ResourceTemporarilyNotAvailableMegaException(errorString)
+        API_ETOOMANYCONNECTIONS -> TooManyConnectionsMegaException(errorString)
+        API_EWRITE -> FileCouldNotBeWrittenMegaException(errorString)
+        API_EREAD -> FileCouldNotBeReadMegaException(errorString)
+        API_EAPPKEY -> InvalidApplicationKeyMegaException(errorString)
+        API_ESSL -> InvalidSslKeyMegaException(errorString)
+        API_EGOINGOVERQUOTA -> NotEnoughQuotaMegaException(errorString)
+        API_EMFAREQUIRED -> MultiFactorAuthenticationRequiredMegaException(errorString)
+        API_EMASTERONLY -> AccessDeniedForSubUsersMegaException(errorString)
+        API_EBUSINESSPASTDUE -> BusinessAccountExpiredMegaException(errorString)
+        API_EPAYWALL -> OverDiskQuotaPaywallMegaException(errorString)
+        PAYMENT_ECARD -> CreditCardRejectedPaymentMegaException(errorString)
+        PAYMENT_EBILLING -> BillingPaymentMegaException(errorString)
+        PAYMENT_EFRAUD -> FraudProtectionRejectedPaymentMegaException(errorString)
+        PAYMENT_ETOOMANY -> TooManyRequestsPaymentPaymentMegaException(errorString)
+        PAYMENT_EBALANCE -> BalancePaymentMegaException(errorString)
+        PAYMENT_EGENERIC -> GenericPaymentMegaException(errorString)
+        else -> {
+            if (errorCode > 0) {
+                HttpMegaException(errorCode, errorString, false)
+            } else {
+                UnknownMegaException(errorCode, errorString, false)
+            }
+        }
+    }
+
+/**
+ * Converts MegaChatError to MegaException
+ *
+ * @return MegaException
+ */
+fun MegaChatError.toMegaException(): MegaException =
+    when (errorCode) {
+        ERROR_OK -> SuccessMegaException(errorString, true)
+        ERROR_UNKNOWN -> UnknownMegaChatException(errorString)
+        ERROR_ARGS -> BadArgumentMegaChatException(errorString)
+        ERROR_TOOMANY -> TooManyUsesMegaChatException(errorString)
+        ERROR_NOENT -> ResourceDoesNotExistMegaChatException(errorString)
+        ERROR_ACCESS -> AccessDeniedMegaChatException(errorString)
+        ERROR_EXIST -> ResourceAlreadyExistsMegaChatException(errorString)
+        else -> {
+            if (errorCode > 0) {
+                HttpMegaException(errorCode, errorString, true)
+            } else {
+                UnknownMegaException(errorCode, errorString, true)
+            }
+        }
+    }

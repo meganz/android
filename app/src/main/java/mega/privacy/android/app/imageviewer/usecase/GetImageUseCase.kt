@@ -24,7 +24,6 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.usecase.*
-import mega.privacy.android.app.usecase.MegaException.Companion.toMegaException
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
