@@ -36,6 +36,8 @@ import mega.privacy.android.app.utils.view.MultiTapGestureListener
 class ImageViewerPageFragment : Fragment() {
 
     companion object {
+        private const val IMAGE_SCALE_FACTOR = 4f
+
         /**
          * Main method to create a ImageViewerPageFragment.
          *
@@ -105,6 +107,7 @@ class ImageViewerPageFragment : Fragment() {
             setZoomingEnabled(true)
             setIsLongpressEnabled(true)
             setAllowTouchInterceptionWhileZoomed(false)
+            setMaxScaleFactor(IMAGE_SCALE_FACTOR)
             setTapListener(
                 MultiTapGestureListener(
                     this,
