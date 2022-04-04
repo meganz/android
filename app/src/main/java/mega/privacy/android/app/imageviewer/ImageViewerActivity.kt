@@ -16,8 +16,8 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -46,7 +46,7 @@ import nz.mega.sdk.MegaNode
  * Entry point to show an image based on an existing Node.
  */
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
+class ImageViewerActivity : PasscodeActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
         private const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
