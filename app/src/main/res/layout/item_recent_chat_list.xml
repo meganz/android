@@ -103,12 +103,12 @@
 
                 <ImageView
                     android:id="@+id/recent_chat_list_private_icon"
-                    android:layout_width="12.8dp"
-                    android:layout_height="6.4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="6dp"
                     android:background="@null"
-                    android:src="@drawable/ic_mask"
+                    android:src="@drawable/ic_ekr_chat_list"
                     app:tint="@color/grey_054_white_054"
                     tools:ignore="ContentDescription" />
 
