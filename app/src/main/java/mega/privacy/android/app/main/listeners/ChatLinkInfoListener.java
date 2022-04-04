@@ -55,47 +55,9 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                     ((ChatActivity) context).setRichLinkImage(msgId);
                 }
             }
-            else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE) {
-                MegaNode document = request.getPublicMegaNode();
-                String link = request.getLink();
-
-                richLinkMessage = new AndroidMegaRichLinkMessage(link, document);
-
-                ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
-
-                //Get preview of file
-                if (document.isFile()) {
-                    Bitmap thumb = null;
-                    thumb = getThumbnailFromCache(document);
-                    if (thumb == null) {
-                        thumb = getThumbnailFromFolder(document, context);
-                        if (thumb == null) {
-                            if (document.hasThumbnail()) {
-                                File previewFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
-                                megaApi.getThumbnail(document, previewFile.getAbsolutePath(), this);
-                            }
-                        }
-                    }
-                }
-            }
         }
         else{
             logError("ERROR - Info of the public node not recovered");
-
-            if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE) {
-                if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    String link = request.getLink();
-
-                    richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-                else if(e.getErrorCode() == MegaError.API_EARGS) {
-                    String link = request.getLink();
-
-                    richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-            }
         }
     }
 
