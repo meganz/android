@@ -181,7 +181,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                     break;
                 }
 
-                managerActivity.retryTransfer(transfer);
+                managerActivity.retrySingleTransfer(transfer);
                 break;
         }
 
