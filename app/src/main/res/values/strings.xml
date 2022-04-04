@@ -4289,6 +4289,8 @@
     <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remove favourites</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Please do not close the application.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
