@@ -393,6 +393,7 @@ import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
+import mega.privacy.android.app.usecase.DownloadNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
@@ -526,6 +527,8 @@ public class ManagerActivity extends TransfersManagementActivity
     GetNodeUseCase getNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    DownloadNodeUseCase downloadNodeUseCase;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -11212,7 +11215,7 @@ public class ManagerActivity extends TransfersManagementActivity
      *
      * @param transfer the transfer to retry
      */
-    public void retryTransfer(AndroidCompletedTransfer transfer) {
+    private void retryTransfer(AndroidCompletedTransfer transfer) {
         if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
             MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
             if (node == null) {
@@ -11224,7 +11227,11 @@ public class ManagerActivity extends TransfersManagementActivity
                 File offlineFile = new File(transfer.getOriginalPath());
                 saveOffline(offlineFile.getParentFile(), node, ManagerActivity.this);
             } else {
-                nodeSaver.saveNode(node, transfer.getPath());
+                downloadNodeUseCase.download(this, node, transfer.getPath())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> logDebug("Transfer retried: " + node.getHandle()),
+                                throwable -> logError("Retry transfer failed.", throwable));
             }
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
             String originalPath = transfer.getOriginalPath();
@@ -11385,9 +11392,25 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void retryAllTransfers() {
         ArrayList<AndroidCompletedTransfer> failedOrCancelledTransfers = getFailedAndCancelledTransfers();
+        dbH.removeFailedOrCancelledTransfers();
         for (AndroidCompletedTransfer transfer : failedOrCancelledTransfers) {
+            if (isTransfersCompletedAdded()) {
+                completedTransfersFragment.transferRemoved(transfer);
+            }
+
             retryTransfer(transfer);
         }
+    }
+
+
+    /**
+     * Retry a single transfer.
+     *
+     * @param transfer AndroidCompletedTransfer to retry.
+     */
+    public void retrySingleTransfer(AndroidCompletedTransfer transfer) {
+        removeCompletedTransfer(transfer);
+        retryTransfer(transfer);
     }
 
     /**
