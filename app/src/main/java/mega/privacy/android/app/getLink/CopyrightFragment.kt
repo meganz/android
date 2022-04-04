@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.Scrollable
@@ -35,9 +34,9 @@ class CopyrightFragment : BaseFragment(), Scrollable {
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollViewCopyright
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollViewCopyright.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         checkScroll()
 

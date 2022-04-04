@@ -29,9 +29,9 @@ import mega.privacy.android.app.activities.settingsActivities.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.lollipop.ChangePasswordActivity
-import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
-import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
+import mega.privacy.android.app.main.ChangePasswordActivity
+import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
+import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -73,14 +73,27 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v = super.onCreateView(inflater, container, savedInstanceState)
+        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
+        return v
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         observeState()
+        navigateToInitialPreference()
     }
 
     private fun observeState() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { state ->
                     findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
                         state.cameraUploadEnabled
@@ -115,22 +128,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                 }
             }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
-        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
-        return v
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        navigateToInitialPreference()
     }
 
     private fun navigateToInitialPreference() {

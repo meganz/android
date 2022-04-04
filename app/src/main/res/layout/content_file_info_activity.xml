@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="mega.privacy.android.app.lollipop.ContactInfoActivity"
+    tools:context="mega.privacy.android.app.main.ContactInfoActivity"
     tools:showIn="@layout/activity_file_info">
 
     <LinearLayout

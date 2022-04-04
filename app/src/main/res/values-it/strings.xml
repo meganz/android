@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Il tuo microfono è spento</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Il tuo microfono è acceso</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Fotocamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">La tua fotocamera è accesa.</string>
@@ -4257,18 +4257,42 @@
     <string name="title_dcim_folder_dialog">Cartella DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA carica le tue immagini dalla galleria. Per cambiare la posizione di caricamento, per favore vai nelle Impostazioni dei Caricamenti da fotocamera.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Buy new subscription?</string>
+    <string name="title_existing_subscription">Acquistare un nuovo abbonamento?</string>
     <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <string name="button_buy_new_subscription">Acquista un nuovo abbonamento</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente tramite %1$s. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente dal tuo account iTunes. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_other_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente andando su MEGA da un browser desktop o mobile. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Vai nelle Impostazioni per dare a MEGA il permesso di accedere ai tuoi dispositivi vicini utilizzando il Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Non riusciamo a portare a termine la fatturazione. Se stai utilizzando un\’app duplicata, per favore considera di effettuare il login su MEGA senza di essa. Altrimenti, prova ad effettuare l\’upgrade tramite un browser web.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Abbonamento %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Abbonamento attivo</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Hai già un abbonamento MEGA attivo con %1$s. Devi annullarlo separatamente su %2$s, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Hai già un abbonamento MEGA attivo con Apple. Devi annullarlo separatamente tramite il tuo account iTunes, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visita %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Questo è l\’ultimo step per eliminare il tuo account. Sia il tuo account che il tuo abbonamento verranno eliminati e perderai permanentemente tutti i dati archiviati nel cloud. Per favore, inserisci la tua password qui sotto.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Cronologia</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Album</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Preferiti</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Nessun[/B] [A]preferito[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Rimuovi preferiti</string>
 </resources>

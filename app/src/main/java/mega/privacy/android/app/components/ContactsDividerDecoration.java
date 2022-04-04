@@ -6,8 +6,8 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
-import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
 public class ContactsDividerDecoration extends HeaderItemDecoration {
 

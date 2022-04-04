@@ -14,6 +14,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -23,12 +25,13 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.LoginActivity
-import mega.privacy.android.app.lollipop.TestPasswordActivity
-import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
-import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.TestPasswordActivity
+import mega.privacy.android.app.main.VerifyTwoFactorActivity
+import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.myAccount.usecase.*
+import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -84,6 +87,95 @@ class MyAccountViewModel @Inject constructor(
     private val versionsInfo: MutableLiveData<String> = MutableLiveData()
     private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
     private val processingFile: MutableLiveData<Boolean> = MutableLiveData()
+
+    private val defaultSubscriptionDialogState = SubscriptionDialogState.Invisible
+    private val defaultCancelAccountDialogState = CancelAccountDialogState.Invisible
+
+    private val _subscriptionDialogState =
+        MutableStateFlow<SubscriptionDialogState>(defaultSubscriptionDialogState)
+    val dialogVisibleState: StateFlow<SubscriptionDialogState>
+        get() = _subscriptionDialogState
+
+    private val _cancelAccountDialogState =
+        MutableStateFlow<CancelAccountDialogState>(defaultCancelAccountDialogState)
+    val cancelAccountDialogState: StateFlow<CancelAccountDialogState>
+        get() = _cancelAccountDialogState
+
+    /**
+     * Check the subscription for current account
+     */
+    fun checkSubscription() {
+        PlatformInfo.values().firstOrNull {
+            it.subscriptionMethodId == myAccountInfo.subscriptionMethodId
+        }?.run {
+            when {
+                isSubscriptionAndGatewaySame(subscriptionMethodId) -> {
+                    _subscriptionDialogState.value = SubscriptionDialogState.Visible(
+                        SubscriptionCheckResult(typeID = TYPE_ANDROID_PLATFORM, platformInfo = this)
+                    )
+                }
+                subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET ||
+                        subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET -> {
+                    _subscriptionDialogState.value = SubscriptionDialogState.Visible(
+                        SubscriptionCheckResult(
+                            typeID = TYPE_ANDROID_PLATFORM_NO_NAVIGATION,
+                            platformInfo = this
+                        )
+                    )
+                }
+                subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_ITUNES -> {
+                    _subscriptionDialogState.value = SubscriptionDialogState.Visible(
+                        SubscriptionCheckResult(typeID = TYPE_ITUNES, platformInfo = this)
+                    )
+                }
+                else -> {
+                    _cancelAccountDialogState.value =
+                        CancelAccountDialogState.VisibleWithSubscription
+                }
+            }
+        } ?: run {
+            _cancelAccountDialogState.value =
+                CancelAccountDialogState.VisibleDefault
+        }
+    }
+
+    /**
+     * Restore the SubscriptionDialogState value
+     */
+    fun restoreSubscriptionDialogState() {
+        _subscriptionDialogState.value = defaultSubscriptionDialogState
+    }
+
+    /**
+     * Restore the CancelAccountDialogState value
+     */
+    fun restoreCancelAccountDialogState() {
+        _cancelAccountDialogState.value = defaultCancelAccountDialogState
+    }
+
+    /**
+     * Set cancel account dialog state
+     * @param isVisible the dialog if is visible
+     */
+    fun setCancelAccountDialogState(isVisible: Boolean) {
+        _cancelAccountDialogState.value = if (isVisible) {
+            CancelAccountDialogState.VisibleDefault
+        } else {
+            CancelAccountDialogState.Invisible
+        }
+    }
+
+    /**
+     * Check the subscription platform and current gateway if is same
+     * @param subscriptionMethodId current subscription method id
+     * @return ture is same
+     */
+    private fun isSubscriptionAndGatewaySame(subscriptionMethodId: Int): Boolean {
+        return (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
+                && subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) ||
+                (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
+                        && subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET)
+    }
 
     fun checkElevation(): LiveData<Boolean> = withElevation
     fun getVersionsInfo(): LiveData<String> = versionsInfo

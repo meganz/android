@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.main.LoginActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
