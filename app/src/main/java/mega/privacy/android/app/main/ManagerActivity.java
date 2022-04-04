@@ -3236,10 +3236,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     logDebug("Open zip browser");
 
                     String pathZip = intent.getExtras().getString(EXTRA_PATH_ZIP);
-
-                    Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);
-                    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-                    startActivity(intentZip);
+                    ZipBrowserActivity.Companion.start(this, pathZip);
                 }
 
                 if (getIntent().getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)) {
