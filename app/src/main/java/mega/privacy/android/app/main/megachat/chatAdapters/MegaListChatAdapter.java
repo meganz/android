@@ -922,7 +922,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
 				logDebug("date timestamp: "+date);
 				int maxAllowed = getMaxAllowed(title);
-				//((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
+				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
 				title = converterShortCodes(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
