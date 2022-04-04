@@ -63,10 +63,6 @@ public class CameraUploadUtil {
            .apply();
     }
 
-    public static void clearCUBackUp() {
-        app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE).edit().clear().apply();
-    }
-
     /**
      * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
      * if not clean the sync record from previous primary folder
