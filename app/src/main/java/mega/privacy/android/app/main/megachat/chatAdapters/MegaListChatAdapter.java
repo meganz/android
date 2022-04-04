@@ -465,13 +465,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 			TextFormatterViewCompat.applyFormatting(((ViewHolderNormalChatList) holder).textViewContent);
 
-			if(isScreenInPortrait(context)){
-				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_PORT, outMetrics));
-				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTENT_PORT, outMetrics));
-			}else{
-				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_LAND, outMetrics));
-				((ViewHolderNormalChatList) holder).textViewContent.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTENT_LAND, outMetrics));
-			}
 			((ViewHolderNormalChatList) holder).textViewContent.setNeccessaryShortCode(false);
 
 			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout = v.findViewById(R.id.last_message_voice_clip_or_location);
@@ -929,7 +922,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
 				logDebug("date timestamp: "+date);
 				int maxAllowed = getMaxAllowed(title);
-				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
+				//((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
 				title = converterShortCodes(title);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
