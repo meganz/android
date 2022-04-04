@@ -210,7 +210,9 @@
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
     <!-- Section name for the "My Backups" and "old index files" section. Preferably one word. There is little space for this word. -->
-    <string name="section_restricted_folder">Restricted folder</string>
+    <string name="section_restricted_folder">Restricted Folder</string>
+    <!-- title of the screen that shows the files saved for offline in the device -->
+    <string name="section_saved_for_offline">Saved for Offline</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
