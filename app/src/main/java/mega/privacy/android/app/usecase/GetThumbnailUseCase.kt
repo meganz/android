@@ -10,9 +10,9 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.ThumbnailDoesNotExistException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
@@ -87,12 +87,10 @@ class GetThumbnailUseCase @Inject constructor(
                 thumbnailFile!!.absolutePath,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request: MegaRequest, error: MegaError ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                        if (error.errorCode == MegaError.API_OK) {
-                            emitter.onSuccess(request.file.toUri())
-                        } else {
-                            emitter.onError(MegaException(error.errorCode, error.errorString))
+                        when {
+                            emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                            error.errorCode == MegaError.API_OK -> emitter.onSuccess(request.file.toUri())
+                            else -> emitter.onError(error.toMegaException())
                         }
                     }
                 )

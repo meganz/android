@@ -30,9 +30,9 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.RemoveListener
+import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -45,10 +45,11 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
+import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -57,10 +58,12 @@ import mega.privacy.android.app.utils.Util.*
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
 
@@ -1965,11 +1968,36 @@ object MegaNodeUtil {
                     || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
 
     /**
-     * Check if provided node File is the expected one
+     * Check if provided node File is valid for the specified MegaNode
      *
-     * @param nodeFile  File to be checked
+     * @param node      MegaNode to be compared with
+     * @param nodeFile  Node file to be compared with
+     * @return          true if its valid, false otherwise
      */
     @JvmStatic
-    fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
-        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
+    fun MegaApiAndroid.checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean =
+        nodeFile?.canRead() == true && nodeFile.length() == node.size
+                && node.fingerprint == getFingerprint(nodeFile.absolutePath)
+
+    /**
+     * Generate MegaNode information preformatted text
+     *
+     * @return MegaNode information
+     */
+    fun MegaNode.getInfoText(): String {
+        val nodeSizeText = getSizeString(size)
+        val nodeDateText = formatLongDateTime(getLastAvailableTime())
+        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+    }
+
+    /**
+     * Generate MegaOffline information preformatted text
+     *
+     * @return MegaOffline information
+     */
+    fun MegaOffline.getInfoText(context: Context): String {
+        val nodeSizeText = getSizeString(getSize(context))
+        val nodeDateText = formatLongDateTime(getModificationDate(context))
+        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+    }
 }

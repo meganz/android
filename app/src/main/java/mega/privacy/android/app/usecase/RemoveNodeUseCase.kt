@@ -6,11 +6,10 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
-import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaError.API_EMASTERONLY
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -53,14 +52,10 @@ class RemoveNodeUseCase @Inject constructor(
             megaApi.remove(
                 node,
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) {
-                        return@OptionalMegaRequestListenerInterface
-                    }
-
-                    when (error.errorCode) {
-                        API_OK -> emitter.onComplete()
-                        API_EMASTERONLY -> emitter.onError(IllegalStateException("Sub-user business account"))
-                        else -> emitter.onError(MegaException(error.errorCode, error.errorString))
+                    when {
+                        emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                        error.errorCode == API_OK -> emitter.onComplete()
+                        else -> emitter.onError(error.toMegaException())
                     }
                 })
             )
@@ -77,22 +72,21 @@ class RemoveNodeUseCase @Inject constructor(
             var errorCount = 0
 
             handles.forEach { handle ->
-                val node = megaApi.getNodeByHandle(handle)
+                val node = getNodeUseCase.get(handle).blockingGetOrNull()
 
-                if (node == null) {
+                remove(node).blockingSubscribeBy(onError = {
                     errorCount++
-                } else {
-                    remove(node).blockingSubscribeBy(onError = {
-                        errorCount++
-                    })
-                }
+                })
             }
 
-            emitter.onSuccess(
-                RemoveRequestResult(
-                    count = handles.size,
-                    errorCount
-                ).apply { resetAccountDetailsIfNeeded() }
-            )
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(
+                    RemoveRequestResult(
+                        count = handles.size,
+                        errorCount
+                    ).apply { resetAccountDetailsIfNeeded() }
+                )
+            }
         }
 }

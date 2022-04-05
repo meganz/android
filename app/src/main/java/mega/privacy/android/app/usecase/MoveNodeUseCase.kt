@@ -3,7 +3,6 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -11,7 +10,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError.*
@@ -89,25 +87,12 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                when (error.errorCode) {
-                    API_OK -> emitter.onComplete()
-                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueException())
-                    API_EGOINGOVERQUOTA -> emitter.onError(PreOverQuotaException())
-                    else ->
-                        if (error.errorCode == API_EOVERQUOTA
-                            && megaApi.isForeignNode(parentNode.handle)
-                        ) {
-                            emitter.onError(ForeignNodeException())
-                        } else {
-                            emitter.onError(
-                                MegaException(
-                                    error.errorCode,
-                                    getString(R.string.context_no_moved)
-                                )
-                            )
-                        }
+                when {
+                    emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                    error.errorCode == API_OK -> emitter.onComplete()
+                    error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(parentNode.handle) ->
+                        emitter.onError(ForeignNodeException())
+                    else -> emitter.onError(error.toMegaException())
                 }
             })
 
@@ -359,7 +344,7 @@ class MoveNodeUseCase @Inject constructor(
      */
     private fun Throwable.shouldEmmitError(): Boolean =
         when (this) {
-            is OverQuotaException, is PreOverQuotaException, is ForeignNodeException -> true
+            is QuotaExceededMegaException, is NotEnoughQuotaMegaException, is ForeignNodeException -> true
             else -> false
         }
 

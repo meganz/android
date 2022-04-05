@@ -397,8 +397,8 @@ import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.ForeignNodeException;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException;
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CallUtil;
@@ -8126,6 +8126,22 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     @Override
+    protected boolean manageThrowable(Throwable throwable) {
+        if (throwable instanceof ForeignNodeException) {
+            launchForeignNodeError();
+            return true;
+        } else if (throwable instanceof QuotaExceededMegaException) {
+            showOverquotaAlert(false);
+            return true;
+        } else if (throwable instanceof NotEnoughQuotaMegaException) {
+            showOverquotaAlert(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
@@ -8322,14 +8338,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((moveResult, moveThrowable) -> {
-                                            if (moveThrowable == null) {
+                                            if (!manageThrowable(moveThrowable)) {
                                                 showMovementResult(moveResult, handlesWithoutCollision[0]);
-                                            } else if (moveThrowable instanceof ForeignNodeException) {
-                                                launchForeignNodeError();
-                                            } else if (moveThrowable instanceof OverQuotaException) {
-                                                showOverquotaAlert(false);
-                                            } else if (moveThrowable instanceof PreOverQuotaException) {
-                                                showOverquotaAlert(true);
                                             }
                                         });
                             }
@@ -8369,14 +8379,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((copyResult, copyThrowable) -> {
                                             dismissAlertDialogIfExists(statusDialog);
-                                            if (copyThrowable == null) {
+                                            if (!manageThrowable(copyThrowable)) {
                                                 showCopyResult(copyResult);
-                                            } else if (copyThrowable instanceof ForeignNodeException) {
-                                                launchForeignNodeError();
-                                            } else if (copyThrowable instanceof OverQuotaException) {
-                                                showOverquotaAlert(false);
-                                            } else if (copyThrowable instanceof PreOverQuotaException) {
-                                                showOverquotaAlert(true);
                                             }
                                         });
                             }

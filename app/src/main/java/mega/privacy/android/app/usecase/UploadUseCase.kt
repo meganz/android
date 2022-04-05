@@ -12,9 +12,9 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
-import mega.privacy.android.app.usecase.exception.StorageStatePaywallException
+import mega.privacy.android.app.usecase.exception.BreakTransfersProcessingException
+import mega.privacy.android.app.usecase.exception.OverDiskQuotaPaywallMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiJava
 import java.io.File
 import javax.inject.Inject
@@ -46,12 +46,12 @@ class UploadUseCase @Inject constructor(
     ): Completable = Completable.create { emitter ->
         if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning()
-            emitter.onError(StorageStatePaywallException())
+            emitter.onError(OverDiskQuotaPaywallMegaException(""))
             return@create
         }
 
         if (transfersManagement.shouldBreakTransfersProcessing()) {
-            emitter.onComplete()
+            emitter.onError(BreakTransfersProcessingException())
             return@create
         }
 
@@ -176,9 +176,8 @@ class UploadUseCase @Inject constructor(
                     return@create
                 }
 
-                upload(context, shareInfo, nameFiles?.get(shareInfo.getTitle()), parentHandle).blockingSubscribeBy(
-                    onError = { error -> logError("Cannot upload.", error) }
-                )
+                upload(context, shareInfo, nameFiles?.get(shareInfo.getTitle()), parentHandle)
+                    .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
             }
 
             if (emitter.isDisposed) {
@@ -213,7 +212,7 @@ class UploadUseCase @Inject constructor(
                 }
 
                 upload(context, collision, rename).blockingSubscribeBy(
-                    onError = { error -> logError("Cannot upload.", error) }
+                    onError = { error -> emitter.onError(error) }
                 )
             }
 

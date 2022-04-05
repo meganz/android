@@ -14,9 +14,11 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -141,10 +143,6 @@ class GetNodeUseCase @Inject constructor(
         Single.fromCallable {
             requireNotNull(node)
 
-            val nodeSizeText = Util.getSizeString(node.size)
-            val nodeDateText = TimeUtils.formatLongDateTime(node.getLastAvailableTime())
-            val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-
             var hasReadAccess = false
             var hasReadWriteAccess = false
             var hasFullAccess = false
@@ -187,7 +185,6 @@ class GetNodeUseCase @Inject constructor(
             MegaNodeItem(
                 name = node.name,
                 handle = node.handle,
-                infoText = infoText,
                 hasReadAccess = hasReadAccess,
                 hasReadWriteAccess = hasReadWriteAccess,
                 hasFullAccess = hasFullAccess,
@@ -230,14 +227,9 @@ class GetNodeUseCase @Inject constructor(
             if (offlineNode != null) {
                 val file = OfflineUtils.getOfflineFile(context, offlineNode)
                 if (file.exists()) {
-                    val nodeSizeText = Util.getSizeString(offlineNode.getSize(context))
-                    val nodeDateText = TimeUtils.formatLongDateTime(offlineNode.getModificationDate(context))
-                    val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-
                     MegaNodeItem(
                         name = offlineNode.name,
                         handle = offlineNode.handle.toLong(),
-                        infoText = infoText,
                         hasReadAccess = true,
                         hasReadWriteAccess = false,
                         hasFullAccess = false,
@@ -315,15 +307,10 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.setNodeFavourite(node, isFavorite, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueException())
-                        else ->
-                            emitter.onError(error.toThrowable())
+                    when {
+                        emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                        error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                        else -> emitter.onError(error.toMegaException())
                     }
                 }
             ))

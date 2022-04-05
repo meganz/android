@@ -152,8 +152,8 @@ import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.upgradeAccount.PaymentActivity;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.exception.ForeignNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException;
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -1665,10 +1665,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         if (throwable instanceof ForeignNodeException) {
             launchForeignNodeError();
             return true;
-        } else if (throwable instanceof OverQuotaException) {
+        } else if (throwable instanceof QuotaExceededMegaException) {
             launchOverQuota();
             return true;
-        } else if (throwable instanceof PreOverQuotaException) {
+        } else if (throwable instanceof NotEnoughQuotaMegaException) {
             launchPreOverQuota();
             return true;
         }
