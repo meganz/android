@@ -62,7 +62,7 @@ fun ImageItem.shouldShowRestoreOption(): Boolean =
             && nodeItem?.node?.restoreHandle != MegaApiJava.INVALID_HANDLE
 
 fun ImageItem.shouldShowChatRemoveOption(): Boolean =
-    this is ImageItem.ChatNode && isDeletable && nodeItem?.hasFullAccess == true
+    this is ImageItem.ChatNode && isDeletable
 
 fun ImageItem.shouldShowRubbishBinOption(): Boolean =
     nodeItem?.hasFullAccess == true && this !is ImageItem.ChatNode
