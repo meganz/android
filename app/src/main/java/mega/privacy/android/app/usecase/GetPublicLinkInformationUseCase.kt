@@ -40,7 +40,7 @@ class GetPublicLinkInformationUseCase @Inject constructor(
                             )
                         )
                     } else {
-                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                        emitter.onError(error.toMegaException())
                     }
                 })
             )
