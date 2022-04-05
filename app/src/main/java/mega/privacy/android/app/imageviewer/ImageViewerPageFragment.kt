@@ -137,6 +137,8 @@ class ImageViewerPageFragment : Fragment() {
                     // do nothing
                 }
             }
+
+            if (imageResult.isFullyLoaded) binding.progress.hide()
         }
 
         if (!hasScreenBeenRotated) {
@@ -209,7 +211,6 @@ class ImageViewerPageFragment : Fragment() {
                 binding.image.post { showVideoButton() }
             }
         }
-        binding.progress.hide()
     }
 
     private fun buildImageControllerListener() = object : BaseControllerListener<ImageInfo>() {
