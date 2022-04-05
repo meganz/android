@@ -13,7 +13,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.*
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
@@ -51,59 +50,6 @@ class GetNodeUseCase @Inject constructor(
      */
     fun get(nodeHandle: Long): Single<MegaNode> =
         Single.fromCallable { nodeHandle.getMegaNode() }
-
-    /**
-     * Gets the attachment MegaNodes given a chat identifier and a message identifier.
-     * Notes:
-     *  * A MegaNode attached to a chat cannot be get from its handle and must be get from
-     *  the MegaChatMessage.
-     *  * A MegaChatMessage can contain more than one attached MegaNode.
-     *
-     * @param chatId    Chat identifier.
-     * @param messageId Message identifier.
-     * @return Single with the list of attached MegaNodes.
-     */
-    fun get(chatId: Long, messageId: Long): Single<MutableList<MegaNode>> =
-        Single.create { emitter ->
-            val chat = megaChatApi.getChatRoom(chatId)
-
-            if (chat == null) {
-                emitter.onError(ChatDoesNotExistException())
-                return@create
-            }
-
-            val message = megaChatApi.getMessage(chatId, messageId)
-                ?: megaChatApi.getMessageFromNodeHistory(chatId, messageId)
-
-            if (message == null) {
-                emitter.onError(MessageDoesNotExistException())
-                return@create
-            }
-
-            val attachments = message.megaNodeList
-
-            if (attachments == null || attachments.size() <= 0) {
-                emitter.onError(AttachmentDoesNotExistException())
-                return@create
-            }
-
-            val nodes = mutableListOf<MegaNode>()
-
-            for (i in 0 until attachments.size()) {
-                nodes.add(
-                    if (chat.isPreview) megaApi.authorizeChatNode(
-                        attachments.get(i),
-                        chat.authorizationToken
-                    )
-                    else attachments.get(i)
-                )
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(nodes)
-            }
-        }
 
     /**
      * Get a MegaNodeItem given a Node Handle.

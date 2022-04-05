@@ -7,6 +7,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
@@ -17,16 +18,18 @@ import javax.inject.Inject
 /**
  * Use case for copying MegaNodes.
  *
- * @property megaApi            MegaApiAndroid instance to copy nodes.
- * @property megaChatApi        MegaChatApiAndroid instance to get nodes from chats.
- * @property getNodeUseCase     Required for getting MegaNodes.
- * @property moveNodeUseCase    Required for moving MegaNodes to the Rubbish Bin.
+ * @property megaApi                MegaApiAndroid instance to copy nodes.
+ * @property megaChatApi            MegaChatApiAndroid instance to get nodes from chats.
+ * @property getNodeUseCase         Required for getting [MegaNode]s.
+ * @property moveNodeUseCase        Required for moving MegaNodes to the Rubbish Bin.
+ * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 class CopyNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase
+    private val moveNodeUseCase: MoveNodeUseCase,
+    private val getChatMessageUseCase: GetChatMessageUseCase
 ) {
 
     /**
@@ -108,8 +111,9 @@ class CopyNodeUseCase @Inject constructor(
         Single.create { emitter ->
             val node = if (collisionResult.nameCollision is NameCollision.Import) {
                 val collision = collisionResult.nameCollision
-                val nodes = getNodeUseCase.get(collision.chatId, collision.messageId)
-                    .blockingGetOrNull()
+                val nodes =
+                    getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
+                        .blockingGetOrNull()
 
                 if (nodes == null) {
                     null

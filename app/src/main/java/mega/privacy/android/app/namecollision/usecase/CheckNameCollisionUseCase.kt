@@ -10,6 +10,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -23,12 +24,14 @@ import javax.inject.Inject
 /**
  * Use case for checking name collisions before uploading, copying or moving.
  *
- * @property megaApi        [MegaApiAndroid] instance to check collisions.
- * @property getNodeUseCase Required for getting nodes.
+ * @property megaApi                [MegaApiAndroid] instance to check collisions.
+ * @property getNodeUseCase         Required for getting nodes.
+ * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val getChatMessageUseCase: GetChatMessageUseCase
 ) {
 
     /**
@@ -426,7 +429,7 @@ class CheckNameCollisionUseCase @Inject constructor(
             val nodesWithoutCollision = mutableListOf<MegaNode>()
 
             messageIds.forEach { messageId ->
-                getNodeUseCase.get(chatId, messageId).blockingSubscribeBy(
+                getChatMessageUseCase.getChatNodes(chatId, messageId).blockingSubscribeBy(
                     onError = { error -> logError("Error getting chat node.", error) },
                     onSuccess = { nodes ->
                         nodes.forEach { node ->

@@ -14,6 +14,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -30,12 +31,14 @@ import javax.inject.Inject
  * @property context                Required for getting thumbnail files.
  * @property getNodeUseCase         Required for getting MegaNodes.
  * @property getThumbnailUseCase    Required for getting thumbnails.
+ * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 class GetNameCollisionResultUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase
+    private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val getChatMessageUseCase: GetChatMessageUseCase
 ) {
 
     /**
@@ -86,8 +89,9 @@ class GetNameCollisionResultUseCase @Inject constructor(
                         }
                     )
                 } else if (collision is NameCollision.Import) {
-                    val nodes = getNodeUseCase.get(collision.chatId, collision.messageId)
-                        .blockingGetOrNull()
+                    val nodes =
+                        getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
+                            .blockingGetOrNull()
 
                     if (nodes != null) {
                         for (node in nodes) {
