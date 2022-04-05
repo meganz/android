@@ -75,8 +75,8 @@ import static mega.privacy.android.app.utils.CallUtil.hideCallWidget;
 import static mega.privacy.android.app.utils.CallUtil.isChatConnectedInOrderToInitiateACall;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
-import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.openMeetingToCreate;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
 import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
@@ -11514,6 +11514,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     public void onViewMeetingChat() {
                         showChatLink(link);
                     }
+
 					@Override
 					public void onLeave() {
 					}

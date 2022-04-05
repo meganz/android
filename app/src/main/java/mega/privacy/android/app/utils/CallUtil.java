@@ -1084,8 +1084,8 @@ public class CallUtil {
      * @param user               The mega User.
      * @param passcodeManagement To disable passcode.
      */
-    public static void startNewCall(Activity activity, SnackbarShower snackbarShower, MegaUser user,
-                                    PasscodeManagement passcodeManagement) {
+    public static void startNewCall(Activity activity, SnackbarShower snackbarShower,
+                                    MegaUser user, PasscodeManagement passcodeManagement) {
         if (user == null)
             return;
 

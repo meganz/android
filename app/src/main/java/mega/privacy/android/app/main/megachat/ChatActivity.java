@@ -745,7 +745,6 @@ public class ChatActivity extends PasscodeActivity
                 }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
-
                 CallUtil.checkMeetingInProgress(ChatActivity.this, ChatActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
             }
         } else {

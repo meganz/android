@@ -9,21 +9,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.*
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
@@ -62,6 +62,9 @@ class MeetingActivity : BaseActivity() {
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
+    @Inject
+    lateinit var openCallWrapper: OpenCallWrapper
+
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
@@ -76,9 +79,12 @@ class MeetingActivity : BaseActivity() {
         this.layoutParams = menuLayoutParams
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         intent?.let { it ->
             if(it.action == CallNotificationIntentService.ANSWER){
                 it.extras?.let { extra->
@@ -134,6 +140,38 @@ class MeetingActivity : BaseActivity() {
         initActionBar()
         initNavigation()
         setStatusBarTranslucent()
+
+        lifecycleScope.launchWhenStarted {
+            meetingViewModel.finishCall.collect {
+                withContext(Dispatchers.Main) {
+                    if (it) {
+                        finish()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            meetingViewModel.switchCall.collect { chatId ->
+                withContext(Dispatchers.Main) {
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        logDebug("Switch call")
+                        passcodeManagement.showPasscodeScreen = true
+                        MegaApplication.getInstance().openCallService(chatId)
+                        startActivity(
+                            openCallWrapper.getIntentForOpenOngoingCall(
+                                context = this@MeetingActivity,
+                                chatId = chatId,
+                                isAudioEnabled = true,
+                                isVideoEnabled = false,
+                                isNewTask = true
+                            )
+                        )
+                        finish()
+                    }
+                }
+            }
+        }
     }
 
     @Suppress("DEPRECATION")

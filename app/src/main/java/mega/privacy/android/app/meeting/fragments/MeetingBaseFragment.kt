@@ -294,21 +294,4 @@ open class MeetingBaseFragment : BaseFragment() {
         // SharedPreference file name
         protected const val MEETINGS_PREFERENCE = "meeting_preference"
     }
-
-    /**
-     * Launch Intent
-     *
-     * @param intent the intent that will be launch
-     */
-    protected fun launchIntent(intent: Intent?) {
-        intent?.run {
-            requireActivity().startActivity(this)
-        } ?: run {
-            Snackbar.make(
-                requireView(),
-                StringResourcesUtils.getString(R.string.intent_not_available),
-                Snackbar.LENGTH_SHORT
-            ).show()
-        }
-    }
 }

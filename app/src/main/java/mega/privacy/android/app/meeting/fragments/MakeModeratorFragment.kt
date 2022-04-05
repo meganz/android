@@ -30,7 +30,6 @@ import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -63,9 +62,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    @Inject
-    lateinit var openCallWrapper: OpenCallWrapper
 
     private val callStatusObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId)) {
@@ -115,37 +111,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         setupView()
         initLiveEvent()
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.finishCall.collect {
-                withContext(Dispatchers.Main) {
-                    if (it) {
-                        meetingActivity.finish()
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.switchCall.collect { chatId ->
-                withContext(Dispatchers.Main) {
-                    if(chatId != MEGACHAT_INVALID_HANDLE && chatId != inMeetingViewModel.currentChatId) {
-                        logDebug("Switch call")
-                        passcodeManagement.showPasscodeScreen = true
-                        MegaApplication.getInstance().openCallService(chatId)
-                        launchIntent(
-                            openCallWrapper.getIntentForOpenOngoingCall(
-                                context = requireContext(),
-                                chatId = chatId,
-                                isAudioEnabled = true,
-                                isVideoEnabled = false
-                            )
-                        )
-                        meetingActivity.finish()
-                    }
-                }
-            }
-        }
 
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
@@ -358,7 +323,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
         } else {
-            inMeetingViewModel.endCall()
+            sharedModel.clickEndCall()
         }
     }
 

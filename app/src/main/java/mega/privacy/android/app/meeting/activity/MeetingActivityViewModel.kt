@@ -6,10 +6,17 @@ import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
@@ -23,6 +30,7 @@ import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -44,8 +52,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
-    private val meetingActivityRepository: MeetingActivityRepository
-) : ViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
+    private val meetingActivityRepository: MeetingActivityRepository,
+    private val getCallUseCase: GetCallUseCase
+) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
     // Avatar
@@ -106,6 +115,14 @@ class MeetingActivityViewModel @Inject constructor(
     // Show snack bar
     private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
+
+    //Control when call should be switched
+    private val _switchCall = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
+    val switchCall: StateFlow<Long> get() = _switchCall
+
+    //Control when call should be finish
+    private val _finishCall = MutableStateFlow(false)
+    val finishCall: StateFlow<Boolean> get() = _finishCall
 
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
@@ -170,6 +187,38 @@ class MeetingActivityViewModel @Inject constructor(
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
+        }
+    }
+
+    /**
+     * Control when calls are to be switched
+     */
+    fun clickSwitchCall(){
+        checkAnotherCalls(false)
+    }
+
+    /**
+     * Control when call should be finish
+     */
+    fun clickEndCall(){
+        checkAnotherCalls(true)
+    }
+
+    private fun checkAnotherCalls(shouldEndCurrentCall: Boolean) {
+        currentChatId.value?.let { currentChatId ->
+            getCallUseCase.getAnotherCallInProgress(currentChatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { chatId ->
+                        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId) {
+                            _switchCall.value = chatId
+                        } else if (shouldEndCurrentCall) {
+                            _finishCall.value = true
+                        }
+                    }
+                )
+                .addTo(composite)
         }
     }
 
