@@ -3153,11 +3153,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Create your Network</string>
+    <string name="title_tour_three">Create your network</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Your Photos in the Cloud</string>
+    <string name="title_tour_four">Your photos in the cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA meeting</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">End-to-end encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->

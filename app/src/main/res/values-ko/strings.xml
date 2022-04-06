@@ -4205,4 +4205,6 @@
     <string name="empty_hint_favourite_album">[A]즐겨찾기[/A] [B]없음[/B]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">즐겨찾기 제거</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">지원 되지 않는 파일 형식입니다. 파일을 열 수 없습니다.</string>
 </resources>

@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">Reunión MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Reunión cifrada punto a punto</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4295,4 +4295,6 @@
     <string name="empty_hint_favourite_album">[B]No hay[/B] [A]favoritos[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Eliminar favoritos</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
 </resources>
