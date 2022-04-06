@@ -3,9 +3,9 @@ package mega.privacy.android.app.utils
 import androidx.recyclerview.widget.DiffUtil
 
 /**
- * Simple DiffUtil.ItemCallback to compare Long items representing node handles.
+ * Simple DiffUtil.ItemCallback to compare Long items.
  */
-class HandleDiffCallback : DiffUtil.ItemCallback<Long>() {
+class LongDiffCallback : DiffUtil.ItemCallback<Long>() {
     override fun areItemsTheSame(oldItem: Long, newItem: Long) =
         oldItem == newItem
 
