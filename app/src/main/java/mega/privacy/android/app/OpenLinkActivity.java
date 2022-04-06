@@ -272,14 +272,13 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 						cancelAccountIntent.setData(Uri.parse(url));
 						startActivity(cancelAccountIntent);
-						finish();
-
 					} else {
 						logDebug("Logged IN");
 						startActivity(new Intent(this, ManagerActivity.class)
 								.setAction(ACTION_CANCEL_ACCOUNT)
 								.setData(Uri.parse(url)));
 					}
+					finish();
 				} else {
 					logDebug("Not logged");
 					setError(getString(R.string.alert_not_logged_in));

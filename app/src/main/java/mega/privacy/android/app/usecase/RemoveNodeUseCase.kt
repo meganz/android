@@ -34,7 +34,7 @@ class RemoveNodeUseCase @Inject constructor(
                     if (error.errorCode == API_OK) {
                         emitter.onComplete()
                     } else {
-                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                        emitter.onError(error.toMegaException())
                     }
                 })
             )

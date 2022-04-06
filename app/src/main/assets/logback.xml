@@ -46,7 +46,7 @@
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="mega.privacy.android.app.logging.loggers.ChatFileLogger" >
+    <logger name="mega.privacy.android.app.logging.loggers.TimberChatLogger" >
         <appender-ref ref="ROLLING_CHAT" />
     </logger>
 

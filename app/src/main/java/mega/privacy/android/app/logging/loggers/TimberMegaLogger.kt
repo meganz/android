@@ -10,6 +10,8 @@ import javax.inject.Inject
  * Timber mega logger
  *
  * Class responsible for writing SDK log output to the Timber log, adding custom tags.
+ *
+ * See logback.xml for configuration.
  */
 class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     override fun log(time: String?, loglevel: Int, source: String?, message: String?) {

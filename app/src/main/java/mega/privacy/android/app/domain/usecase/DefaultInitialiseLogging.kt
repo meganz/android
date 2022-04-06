@@ -19,37 +19,36 @@ class DefaultInitialiseLogging @Inject constructor(
     private val areChatLogsEnabled: AreChatLogsEnabled,
 ) : InitialiseLogging {
     override suspend fun invoke(isDebug: Boolean) {
-        if (isDebug) {
-            loggingRepository.enableLogAllToConsole()
-        } else {
-            coroutineScope {
-                launch{ monitorSdkLoggingSetting() }
-                launch{ monitorChatLoggingSetting() }
-            }
+        if (isDebug) loggingRepository.enableLogAllToConsole()
+
+        coroutineScope {
+            launch { monitorSdkLoggingSetting() }
+            launch { monitorChatLoggingSetting() }
         }
+
     }
 
     private suspend fun monitorSdkLoggingSetting() {
         areSdkLogsEnabled()
             .distinctUntilChanged()
             .collect { enabled ->
-            if (enabled) {
-                loggingRepository.enableWriteSdkLogsToFile()
-            } else {
-                loggingRepository.disableWriteSdkLogsToFile()
+                if (enabled) {
+                    loggingRepository.enableWriteSdkLogsToFile()
+                } else {
+                    loggingRepository.disableWriteSdkLogsToFile()
+                }
             }
-        }
     }
 
     private suspend fun monitorChatLoggingSetting() {
         areChatLogsEnabled()
             .distinctUntilChanged()
             .collect { enabled ->
-            if (enabled) {
-                loggingRepository.enableWriteChatLogsToFile()
-            } else {
-                loggingRepository.disableWriteChatLogsToFile()
+                if (enabled) {
+                    loggingRepository.enableWriteChatLogsToFile()
+                } else {
+                    loggingRepository.disableWriteChatLogsToFile()
+                }
             }
-        }
     }
 }

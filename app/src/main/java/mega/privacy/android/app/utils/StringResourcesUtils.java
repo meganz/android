@@ -138,11 +138,17 @@ public class StringResourcesUtils {
             return error.getErrorString();
         }
 
-        if (error.getErrorCode() > 0) {
-            return getString(R.string.api_error_http);
-        }
+        return getTranslatedErrorString(error.getErrorCode(), error.getErrorString());
+    }
 
-        switch (error.getErrorCode()) {
+    /**
+     * Gets the translated string of a Mega error.
+     *
+     * @param   errorCode MegaChat error code
+     * @return  The translated string
+     */
+    public static String getTranslatedErrorString(int errorCode, String errorString) {
+        switch (errorCode) {
             case API_OK:
                 return getString(R.string.api_ok);
             case API_EINTERNAL:
@@ -156,12 +162,12 @@ public class StringResourcesUtils {
             case API_EFAILED:
                 return getString(R.string.api_efailed);
             case API_ETOOMANY:
-                if (error.getErrorString().equals("Terms of Service breached")) {
+                if (errorString.equals("Terms of Service breached")) {
                     return getString(R.string.api_etoomany_ec_download);
-                } else if (error.getErrorString().equals("Too many concurrent connections or transfers")){
+                } else if (errorString.equals("Too many concurrent connections or transfers")){
                     return getString(R.string.api_etoomay);
                 } else {
-                    return error.getErrorString();
+                    return errorString;
                 }
             case API_ERANGE:
                 return getString(R.string.api_erange);
@@ -170,12 +176,12 @@ public class StringResourcesUtils {
             case API_ENOENT:
                 return getString(R.string.api_enoent);
             case API_ECIRCULAR:
-                if (error.getErrorString().equals("Upload produces recursivity")) {
+                if (errorString.equals("Upload produces recursivity")) {
                     return getString(R.string.api_ecircular_ec_upload);
-                } else if (error.getErrorString().equals("Circular linkage detected")){
+                } else if (errorString.equals("Circular linkage detected")){
                     return getString(R.string.api_ecircular);
                 } else {
-                    return error.getErrorString();
+                    return errorString;
                 }
             case API_EACCESS:
                 return getString(R.string.api_eaccess);
@@ -188,12 +194,12 @@ public class StringResourcesUtils {
             case API_ESID:
                 return getString(R.string.api_esid);
             case API_EBLOCKED:
-                if (error.getErrorString().equals("Not accessible due to ToS/AUP violation")) {
+                if (errorString.equals("Not accessible due to ToS/AUP violation")) {
                     return getString(R.string.api_eblocked_ec_import_ec_download);
-                } else if (error.getErrorString().equals("Blocked")) {
+                } else if (errorString.equals("Blocked")) {
                     return getString(R.string.api_eblocked);
                 } else {
-                    return error.getErrorString();
+                    return errorString;
                 }
             case API_EOVERQUOTA:
                 return getString(R.string.api_eoverquota);
@@ -229,7 +235,11 @@ public class StringResourcesUtils {
                 return getString(R.string.payment_ebalance);
             case PAYMENT_EGENERIC:
             default:
-                return getString(R.string.payment_egeneric_api_error_unknown);
+                if (errorCode > 0) {
+                    return getString(R.string.api_error_http);
+                } else {
+                    return getString(R.string.payment_egeneric_api_error_unknown);
+                }
         }
     }
 
@@ -245,7 +255,17 @@ public class StringResourcesUtils {
             return error.getErrorString();
         }
 
-        switch (error.getErrorCode()) {
+        return getTranslatedChatErrorString(error.getErrorCode());
+    }
+
+    /**
+     * Gets the translated string of a MegaChat error code.
+     *
+     * @param   errorCode MegaChat error code
+     * @return  The translated string
+     */
+    public static String getTranslatedChatErrorString(int errorCode) {
+        switch (errorCode) {
             case ERROR_OK:
                 return getString(R.string.error_ok);
             case ERROR_ARGS:

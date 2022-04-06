@@ -12,11 +12,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
@@ -40,6 +45,8 @@ class MediaPlayerFragment : Fragment() {
     private var videoPlayerPausedForPlaylist = false
 
     private var delayHideToolbarCanceled = false
+
+    private var videoPlayerView: PlayerView? = null
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -199,6 +206,16 @@ class MediaPlayerFragment : Fragment() {
                     }
                 }
             }
+
+            service.viewModel.mediaPlaybackState.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle,
+                Lifecycle.State.RESUMED
+            ).onEach { isPaused ->
+                if (isVideoPlayer()) {
+                    // The keepScreenOn is true when the video is playing, otherwise it's false.
+                    videoPlayerView?.keepScreenOn = !isPaused
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
         }
     }
 
@@ -215,7 +232,7 @@ class MediaPlayerFragment : Fragment() {
             }
         } else {
             val viewHolder = videoPlayerVH ?: return
-
+            videoPlayerView = viewHolder.binding.playerView
             setupPlayerView(service.player, viewHolder.binding.playerView, true)
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 

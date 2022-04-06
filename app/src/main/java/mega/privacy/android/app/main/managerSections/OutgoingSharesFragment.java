@@ -326,7 +326,6 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
 
 			managerActivity.setToolbarTitle();
 			findNodes();
-			adapter.setNodes(nodes);
 			visibilityFastScroller();
 
 			int lastVisiblePosition = 0;
