@@ -623,6 +623,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
     private boolean isInAlbumContent;
+    public boolean fromAlbumContent = false;
 
     public enum FragmentTag {
         CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
@@ -3622,7 +3623,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipToAlbumContentFragment(Fragment f) {
         albumContentFragment = (AlbumContentFragment) f;
-        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
+        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag(), true);
         isInAlbumContent = true;
         firstNavigationLevel = false;
 
@@ -3638,6 +3639,25 @@ public class ManagerActivity extends TransfersManagementActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, f, fTag);
         ft.commitNowAllowingStateLoss();
+        // refresh manually
+        if (f instanceof RecentChatsFragment) {
+            RecentChatsFragment rcf = (RecentChatsFragment) f;
+            if (rcf.isResumed()) {
+                rcf.refreshMegaContactsList();
+                rcf.setCustomisedActionBar();
+            }
+        }
+    }
+
+    void replaceFragment(Fragment f, String fTag, @NonNull Boolean addToBackStack) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, f, fTag);
+        if (addToBackStack) {
+            ft.addToBackStack(fTag);
+            ft.commit();
+        } else {
+            ft.commitNowAllowingStateLoss();
+        }
         // refresh manually
         if (f instanceof RecentChatsFragment) {
             RecentChatsFragment rcf = (RecentChatsFragment) f;
@@ -6071,12 +6091,13 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (drawerItem == DrawerItem.PHOTOS) {
             if (isInAlbumContent) {
+                fromAlbumContent = true;
                 isInAlbumContent = false;
-                backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    showHideBottomNavigationView(false);
+                    getSupportFragmentManager().popBackStack();
                 } else {
-                    photosFragment.switchToAlbum();
+                    backToDrawerItem(bottomNavigationCurrentItem);
                 }
             } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
                 performOnBack();
@@ -6196,6 +6217,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (nV != null) {
             Menu nVMenu = nV.getMenu();
             resetNavigationViewMenu(nVMenu);
+        }
+
+        /* Prevent accidental bottomnav button click */
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+            return true;
         }
 
         DrawerItem oldDrawerItem = drawerItem;
