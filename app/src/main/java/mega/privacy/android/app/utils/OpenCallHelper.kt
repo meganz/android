@@ -2,13 +2,11 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -27,8 +25,7 @@ class OpenCallHelper @Inject constructor(
         context: Context,
         chatId: Long,
         isAudioEnabled: Boolean,
-        isVideoEnabled: Boolean,
-        isNewTask: Boolean
+        isVideoEnabled: Boolean
     ): Intent {
         return Intent(context, MeetingActivity::class.java).apply {
             putExtra(MEETING_CHAT_ID, chatId)
@@ -36,11 +33,6 @@ class OpenCallHelper @Inject constructor(
             putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, isAudioEnabled)
             putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, isVideoEnabled)
             action = MeetingActivity.MEETING_ACTION_IN
-            flags = if (isNewTask) {
-                FLAG_ACTIVITY_NEW_TASK
-            } else {
-                FLAG_ACTIVITY_SINGLE_TOP
-            }
         }
     }
 }

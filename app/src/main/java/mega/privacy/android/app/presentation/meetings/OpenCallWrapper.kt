@@ -14,13 +14,11 @@ interface OpenCallWrapper {
      * @param chatId Chat room ID
      * @param isAudioEnabled True, audio ON. False, audio OFF.
      * @param isVideoEnabled True, video ON. False, video OFF.
-     * @param isNewTask a new task must be created. False, otherwise.
      */
     fun getIntentForOpenOngoingCall(
         context: Context,
         chatId: Long,
         isAudioEnabled: Boolean,
         isVideoEnabled: Boolean,
-        isNewTask: Boolean
     ): Intent?
 }

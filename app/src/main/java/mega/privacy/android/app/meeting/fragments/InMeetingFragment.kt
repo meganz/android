@@ -573,34 +573,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         logDebug("In the meeting fragment")
+
+        initViewModel()
         MegaApplication.getInstance().startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
-
-        var chatId: Long? =
-            arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-
-        if (chatId == MEGACHAT_INVALID_HANDLE) {
-            sharedModel.currentChatId.value?.let {
-                chatId = it
-            }
-        }
-
-        chatId?.let {
-            if (it != MEGACHAT_INVALID_HANDLE) {
-                if (it == inMeetingViewModel.getChatId()) {
-                    logDebug("Same chat")
-                } else {
-                    logDebug("Different chat")
-                    sharedModel.updateChatRoomId(it)
-                    inMeetingViewModel.setChatId(it)
-                }
-            }
-        }
-
-        logDebug("Chat ID of the call is $chatId")
         initFloatingPanel()
 
         val meetingName: String = args.meetingName
@@ -641,7 +619,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         initLiveEventBus()
-        initViewModel()
         takeActionByArgs()
 
         // Set on page tapping listener.

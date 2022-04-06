@@ -72,6 +72,7 @@ class MeetingActivity : BaseActivity() {
 
     private var isGuest = false
     private var isLockingEnabled = false
+    private var currentChatId = MEGACHAT_INVALID_HANDLE
 
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -79,12 +80,13 @@ class MeetingActivity : BaseActivity() {
         this.layoutParams = menuLayoutParams
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
+    override fun onNewIntent(newIntent: Intent?) {
+        super.onNewIntent(newIntent)
+        intent = newIntent
+        init()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun init(){
         intent?.let { it ->
             if(it.action == CallNotificationIntentService.ANSWER){
                 it.extras?.let { extra->
@@ -102,27 +104,29 @@ class MeetingActivity : BaseActivity() {
                     return
                 }
             }
-        }
-        intent?.let {
-            isGuest = intent.getBooleanExtra(
+
+            currentChatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+            meetingViewModel.updateChatRoomId(currentChatId)
+
+            isGuest = it.getBooleanExtra(
                 MEETING_IS_GUEST,
                 false
             )
+
+            if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
+                (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
+            ) {
+                if (currentChatId != MEGACHAT_INVALID_HANDLE) {
+                    //Notification of this call should be displayed again
+                    MegaApplication.getChatManagement().removeNotificationShown(currentChatId)
+                }
+
+                return
+            }
+
+            meetingAction = it.action
         }
 
-        if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
-            (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
-        ) {
-            intent?.let {
-                it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
-                    if (chatId != MEGACHAT_INVALID_HANDLE) {
-                        //Notification of this call should be displayed again
-                        MegaApplication.getChatManagement().removeNotificationShown(chatId)
-                    }
-                }
-            }
-            return
-        }
 
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
@@ -130,48 +134,41 @@ class MeetingActivity : BaseActivity() {
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        meetingAction = intent.action
-
-        isGuest = intent.getBooleanExtra(
-            MEETING_IS_GUEST,
-            false
-        )
-
         initActionBar()
         initNavigation()
         setStatusBarTranslucent()
 
         lifecycleScope.launchWhenStarted {
             meetingViewModel.finishCall.collect {
-                withContext(Dispatchers.Main) {
-                    if (it) {
-                        finish()
-                    }
+                if (it) {
+                    finish()
                 }
             }
         }
 
         lifecycleScope.launchWhenStarted {
             meetingViewModel.switchCall.collect { chatId ->
-                withContext(Dispatchers.Main) {
-                    if (chatId != MEGACHAT_INVALID_HANDLE) {
-                        logDebug("Switch call")
-                        passcodeManagement.showPasscodeScreen = true
-                        MegaApplication.getInstance().openCallService(chatId)
-                        startActivity(
-                            openCallWrapper.getIntentForOpenOngoingCall(
-                                context = this@MeetingActivity,
-                                chatId = chatId,
-                                isAudioEnabled = true,
-                                isVideoEnabled = false,
-                                isNewTask = true
-                            )
+                if (chatId != MEGACHAT_INVALID_HANDLE) {
+                    logDebug("Switch call")
+                    passcodeManagement.showPasscodeScreen = true
+                    MegaApplication.getInstance().openCallService(chatId)
+                    startActivity(
+                        openCallWrapper.getIntentForOpenOngoingCall(
+                            context = this@MeetingActivity,
+                            chatId = chatId,
+                            isAudioEnabled = true,
+                            isVideoEnabled = false
                         )
-                        finish()
-                    }
+                    )
+                    finish()
                 }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        init()
     }
 
     @Suppress("DEPRECATION")
@@ -223,13 +220,12 @@ class MeetingActivity : BaseActivity() {
         val navGraph: NavGraph =
             navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
-
         // The args to be passed to startDestination
         val bundle = Bundle()
 
         bundle.putLong(
             MEETING_CHAT_ID,
-            intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+            currentChatId
         )
 
         bundle.putLong(
@@ -265,11 +261,6 @@ class MeetingActivity : BaseActivity() {
 
         if (meetingAction == MEETING_ACTION_START) {
             bundle.putString("action", MEETING_ACTION_START)
-
-            bundle.putLong(
-                MEETING_CHAT_ID,
-                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-            )
         }
 
         navGraph.startDestination = when (meetingAction) {
