@@ -3627,6 +3627,8 @@ public class ManagerActivity extends TransfersManagementActivity
         String albumContentTag = FragmentTag.ALBUM_CONTENT.getTag();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, f, albumContentTag);
+        // Null check for rotation. In this case, we don't want to add another
+        // albumcontentfragment in to the backstack
         if (getSupportFragmentManager().findFragmentByTag(albumContentTag) == null) {
             ft.addToBackStack(FragmentTag.ALBUM_CONTENT.getTag());
             ft.commitAllowingStateLoss();
