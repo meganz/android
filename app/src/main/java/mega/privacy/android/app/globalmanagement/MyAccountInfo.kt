@@ -43,7 +43,7 @@ class MyAccountInfo @Inject constructor(
     }
 
     enum class UpgradeFrom {
-        MANAGER, ACCOUNT
+        MANAGER, ACCOUNT, SETTINGS
     }
 
     var usedPercentage = INVALID_VALUE
@@ -414,4 +414,5 @@ class MyAccountInfo @Inject constructor(
 
     fun isUpgradeFromAccount(): Boolean = upgradeOpenedFrom == UpgradeFrom.ACCOUNT
     fun isUpgradeFromManager(): Boolean = upgradeOpenedFrom == UpgradeFrom.MANAGER
+    fun isUpgradeFromSettings(): Boolean = upgradeOpenedFrom == UpgradeFrom.SETTINGS
 }

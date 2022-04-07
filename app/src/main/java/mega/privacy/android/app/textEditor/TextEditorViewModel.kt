@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -437,7 +438,7 @@ class TextEditorViewModel @Inject constructor(
                 }
             )
 
-        activity.startService(uploadIntent)
+        ContextCompat.startForegroundService(activity, uploadIntent)
         activity.finish()
     }
 

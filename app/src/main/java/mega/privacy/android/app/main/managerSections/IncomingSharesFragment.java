@@ -74,7 +74,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 			}
 
 			if (selected.size() == 1
-					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+					&& megaApi.checkAccessErrorExtended(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
 				control.rename().setVisible(true);
 				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);

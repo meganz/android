@@ -19,6 +19,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -74,6 +76,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -700,7 +703,7 @@ public class ContactFileListActivity extends PasscodeActivity
 			}
 
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-			final long folderHandle = intent.getLongExtra("SELECT", 0);
+			final long folderHandle = intent.getLongExtra(EXTRA_SELECTED_FOLDER, 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
@@ -761,7 +764,7 @@ public class ContactFileListActivity extends PasscodeActivity
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				startService(uploadServiceIntent);
+				ContextCompat.startForegroundService(this, uploadServiceIntent);
 				i++;
 			}
 		} else if (requestCode == TAKE_PHOTO_CODE) {
@@ -824,7 +827,7 @@ public class ContactFileListActivity extends PasscodeActivity
 				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				startService(intent);
+				ContextCompat.startForegroundService(this, intent);
 			}
 		}
 	}

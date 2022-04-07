@@ -31,8 +31,8 @@ import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -164,7 +164,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
                         it.node,
-                        if (viewModel.searchMode) MODE5 else MODE1
+                        if (viewModel.searchMode) SEARCH_MODE else CLOUD_DRIVE_MODE
                     )
                 }
             }

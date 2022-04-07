@@ -4,9 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
@@ -51,7 +50,6 @@ import static mega.privacy.android.app.fragments.offline.OfflineFragment.SHOW_OF
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -266,23 +264,17 @@ public class AccountController {
     void showConfirmDialogRecoveryKeySaved(){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(context.getString(R.string.copy_MK_confirmation));
-        builder.setPositiveButton(context.getString(R.string.action_logout), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).passwordReminderSucceeded();
-                }
-                else {
-                    logout(context, megaApi);
-                }
+        builder.setPositiveButton(context.getString(R.string.action_logout), (dialog, which) -> {
+            if (context instanceof TestPasswordActivity) {
+                ((TestPasswordActivity) context).passwordReminderSucceeded();
+            }
+            else {
+                logout(context, megaApi);
             }
         });
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).passwordReminderSucceeded();
-                }
+        builder.setOnDismissListener(dialog -> {
+            if (context instanceof TestPasswordActivity) {
+                ((TestPasswordActivity) context).passwordReminderSucceeded();
             }
         });
         builder.show();
@@ -325,7 +317,7 @@ public class AccountController {
             context.startService(cancelTransfersIntent);
             cancelTransfersIntent = new Intent(context, UploadService.class);
             cancelTransfersIntent.setAction(UploadService.ACTION_CANCEL);
-            context.startService(cancelTransfersIntent);
+            ContextCompat.startForegroundService(context, cancelTransfersIntent);
         }
         catch(IllegalStateException e){
             //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26
@@ -366,23 +358,28 @@ public class AccountController {
         new MegaContactGetter(context).clearLastSyncTimeStamp();
 
         // clean time stamps preference settings after logout
-        clearCUBackUp();
-
-        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
-        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+        context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0)
+                .apply();
 
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
-        //clear text editor preference
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_LINE_NUMBERS, false).apply();
-
-        //clear offline warning preference
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_OFFLINE_WARNING, true).apply();
-
         //clear user interface preferences
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply();
+
+        // Clear text editor preference
+        // Clear offline warning preference
+        // Clear Key mobile data high resolution preference
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(SHOW_LINE_NUMBERS, false)
+                .putBoolean(SHOW_OFFLINE_WARNING, true)
+                .remove(KEY_MOBILE_DATA_HIGH_RESOLUTION)
+                .apply();
 
         //reset zoom level
         ZoomUtil.INSTANCE.resetZoomLevel();
@@ -401,10 +398,6 @@ public class AccountController {
 
         // Clear get banner success flag
         LiveEventBus.get(EVENT_LOGOUT_CLEARED).post(null);
-
-        // Clear Key mobile data high resolution preference
-        SharedPreferences defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        defaultPreferences.edit().remove(KEY_MOBILE_DATA_HIGH_RESOLUTION).apply();
     }
 
     public static void removeFolder(Context context, File folder) {

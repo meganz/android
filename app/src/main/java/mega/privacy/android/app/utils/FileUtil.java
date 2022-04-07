@@ -113,7 +113,7 @@ public class FileUtil {
     }
 
     public static boolean isLocalFile(MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        String fingerprintNode = megaApi.getFingerprint(node);
+        String fingerprintNode = node.getFingerprint();
         return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 
@@ -1203,7 +1203,7 @@ public class FileUtil {
      * @return      True if it's valid, false otherwise
      */
     public static boolean isValidForImageViewer(File file) {
-        if (file.exists() && file.canRead()) {
+        if (file.isFile() && file.exists() && file.canRead()) {
             MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
             return mimeTypeList.isImage() || mimeTypeList.isGIF()
                     || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();

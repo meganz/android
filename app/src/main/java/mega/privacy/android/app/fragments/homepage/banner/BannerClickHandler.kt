@@ -7,6 +7,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megaachievements.AchievementsActivity
+import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.utils.LinksUtil
 
 /**
@@ -27,8 +28,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
                 LinksUtil.requiresTransferSession(context, link)
             }
             SETTINGS -> {
-                (fragment.activity as ManagerActivity).selectDrawerItem(
-                    DrawerItem.SETTINGS)
+                context.startActivity(Intent(context, SettingsActivity::class.java))
             }
             TEXT_EDITOR -> {
                 (fragment.activity as ManagerActivity).showNewTextFileDialog(null)

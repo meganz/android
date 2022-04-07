@@ -12,6 +12,7 @@ public class Constants {
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
     public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
     public static final int BOOT_JOB_ID = 10097;
+    public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
@@ -368,6 +369,7 @@ public class Constants {
     public static final int FROM_IMAGE_VIEWER = 2036;
     public static final int MEDIA_BROWSE_ADAPTER = 2037;
     public static final int ALBUM_CONTENT_ADAPTER = 2038;
+    public static final int FAVOURITES_ADAPTER = 2039;
 
     public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;

@@ -60,6 +60,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -88,6 +91,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -99,10 +103,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -120,6 +121,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
+import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -148,11 +150,14 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 @AndroidEntryPoint
 public class ContactInfoActivity extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
-		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
+		MegaRequestListenerInterface, OnItemClickListener,
 		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.StartChatCallCallback {
 
 	@Inject
 	PasscodeManagement passcodeManagement;
+
+	@Inject
+	GetChatChangesUseCase getChatChangesUseCase;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -393,7 +398,7 @@ public class ContactInfoActivity extends PasscodeActivity
         contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_offline_dark_standard
                 : R.drawable.ic_offline_light;
 
-		megaChatApi.addChatListener(this);
+		checkChatChanges();
 
 		chatC = new ChatController(this);
 		cC = new ContactController(this);
@@ -1316,7 +1321,7 @@ public class ContactInfoActivity extends PasscodeActivity
 			}
 
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-			final long folderHandle = intent.getLongExtra("SELECT", 0);
+			final long folderHandle = intent.getLongExtra(EXTRA_SELECTED_FOLDER, 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
@@ -1940,38 +1945,7 @@ public class ContactInfoActivity extends PasscodeActivity
     
     }
 
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-	}
-
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-	}
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-		logDebug("userhandle: " + userhandle + ", status: " + status + ", inProgress: " + inProgress);
-		setContactPresenceStatus();
-		requestLastGreen(status);
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-	}
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-		MegaChatRoom chatRoom = api.getChatRoom(chatid);
-		if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-			startCallWithChatOnline(api.getChatRoom(chatid));
-		}
-	}
-
-	@Override
-	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+	private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
 		if(userhandle == user.getHandle()){
 			logDebug("Update last green");
 
@@ -2089,5 +2063,39 @@ public class ContactInfoActivity extends PasscodeActivity
 	@Override
 	public void onCallFailed(long chatId) {
 		enableCallLayouts(true);
+	}
+
+	/**
+	 * Receive changes to OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
+	 */
+	private void checkChatChanges() {
+		Disposable chatSubscription = getChatChangesUseCase.get()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((next) -> {
+					if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
+						int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
+						setContactPresenceStatus();
+						requestLastGreen(status);
+					}
+
+					if (next instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
+						long chatId = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component1();
+						int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+						if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
+							startCallWithChatOnline(megaChatApi.getChatRoom(chatId));
+						}
+					}
+
+					if (next instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
+						long userHandle = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component1();
+						int lastGreen = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component2();
+						onChatPresenceLastGreen(userHandle, lastGreen);
+					}
+
+				}, (error) -> logError("Error " + error));
+
+		composite.add(chatSubscription);
 	}
 }

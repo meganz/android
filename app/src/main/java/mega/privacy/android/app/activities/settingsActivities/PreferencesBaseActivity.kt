@@ -5,8 +5,10 @@ import android.view.MenuItem
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_SCROLL
@@ -18,6 +20,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
 
+@AndroidEntryPoint
 open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack {
 
     protected lateinit var binding: ActivitySettingsBinding
@@ -55,7 +58,7 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
             .uppercase(Locale.getDefault())
     }
 
-    protected fun replaceFragment(fragment: SettingsBaseFragment) {
+    protected fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(R.id.fragment_container, fragment)

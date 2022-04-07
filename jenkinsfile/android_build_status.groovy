@@ -276,9 +276,9 @@ pipeline {
                         cd ${WORKSPACE}
                         pwd
 
-                        echo "apply dependency patches"
-                        rm -fr app/src/debug
-                        rm -fr app/src/release
+                        echo "Applying Google Map API patches"
+                        rm -fr app/src/debug/res/values/google_maps_api.xml
+                        rm -fr app/src/release/res/values/google_maps_api.xml
                         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
                 
                     """

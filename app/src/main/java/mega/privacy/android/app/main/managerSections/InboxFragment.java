@@ -287,7 +287,7 @@ public class InboxFragment extends RotatableFragment{
 				showMove = true;
 				showCopy = areAllNotTakenDown;
 				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
+					if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;

@@ -66,6 +66,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -84,16 +88,13 @@ import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -116,7 +117,13 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class AddContactActivity extends PasscodeActivity implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaGlobalListenerInterface {
+import javax.inject.Inject;
+
+@AndroidEntryPoint
+public class AddContactActivity extends PasscodeActivity implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -1636,9 +1643,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         addContactActivity = this;
 
-        if (megaChatApi != null){
-            megaChatApi.addChatListener(this);
-        }
+        checkChatChanges();
 
         dbH = DatabaseHandler.getDbHandler(this);
         setContentView(R.layout.activity_add_contact);
@@ -3666,34 +3671,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     }
 
-
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
         logDebug("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
@@ -3784,5 +3762,23 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
             logDebug("Date last green: " + formattedDate);
         }
+    }
+
+    /**
+     * Receive changes to OnChatPresenceLastGreen and make the necessary changes
+     */
+    private void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
+                .map(result -> (GetChatChangesUseCase.Result.OnChatPresenceLastGreen) result)
+                .subscribe((next) -> {
+                    long userHandle = next.component1();
+                    int lastGreen = next.component2();
+                    onChatPresenceLastGreen(userHandle, lastGreen);
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
     }
 }

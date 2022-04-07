@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
 class AlarmReceiver : BroadcastReceiver() {
-    private val megaApi = MegaApplication.getInstance().megaApi
+    private val megaApi by lazy { MegaApplication.getInstance().megaApi }
 
     override fun onReceive(context: Context, intent: Intent) {
         wakeLock.acquire(30 * SECOND)  // The wakelock will be held for at most 30 Secs
@@ -48,12 +48,16 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val CHECK_PSA_INTENT = "android.intent.action.checking.psa"
 
         /** The wake lock being held while getting the PSA with the Url */
-        val wakeLock: PowerManager.WakeLock =
-            (MegaApplication.getInstance().getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")}
+        val wakeLock: PowerManager.WakeLock by lazy {
+            (MegaApplication.getInstance()
+                .getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")
+            }
+        }
+
 
         /** the callback being called when getting the PSA with the Url finished */
-        var callback : ((Psa) -> Unit)? = null
+        var callback: ((Psa) -> Unit)? = null
 
         /**
          * Cancel the alarm of timed checking the PSA

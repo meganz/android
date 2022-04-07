@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -97,6 +98,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class SearchFragment extends RotatableFragment implements SearchCallback.View,
@@ -314,12 +316,12 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			boolean itemsSelected = false;
 
 			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
+			if((selected.size() == 1) && (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
 			}
 			
 			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+			if ((selected.size() == 1) && (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				if (!selected.get(0).isTakenDown()) {
 					if (selected.get(0).isExported()) {
 						//Node has public link
@@ -344,7 +346,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
 
 				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+					if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;
@@ -786,12 +788,14 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					MegaNode node = nodes.get(position);
-					Intent intent = ImageViewerActivity.getIntentForParentNode(
+					Long currentNodeHandle = nodes.get(position).getHandle();
+					long[] nodeHandles = nodes.stream().mapToLong(
+							node -> node != null ? node.getHandle() : INVALID_HANDLE
+					).toArray();
+					Intent intent = ImageViewerActivity.getIntentForChildren(
 							requireContext(),
-							megaApi.getParentNode(node).getHandle(),
-							sortOrderManagement.getOrderCloud(),
-							node.getHandle()
+							nodeHandles,
+							currentNodeHandle
 					);
 					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					startActivity(intent);
