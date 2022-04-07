@@ -650,7 +650,7 @@ public class ContactFileListActivity extends PasscodeActivity
 											if (copyThrowable == null) {
 												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
 											} else {
-												manageThrowable(copyThrowable);
+												manageCopyMoveException(copyThrowable);
 											}
 										});
 							}
@@ -677,7 +677,7 @@ public class ContactFileListActivity extends PasscodeActivity
 			}
 			statusDialog = temp;
 
-			checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVEMENT)
+			checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe((result, throwable) -> {
@@ -699,7 +699,7 @@ public class ContactFileListActivity extends PasscodeActivity
 											if (moveThrowable == null) {
 												showMovementResult(moveResult, handlesWithoutCollision[0]);
 											} else {
-												manageThrowable(moveThrowable);
+												manageCopyMoveException(moveThrowable);
 											}
 										});
 							}
@@ -773,10 +773,10 @@ public class ContactFileListActivity extends PasscodeActivity
 							.subscribeOn(Schedulers.io())
 							.observeOn(AndroidSchedulers.mainThread())
 							.subscribe(handle -> {
-										NameCollision collision = NameCollision.Upload
-												.getUploadCollision(handle, file, parentHandle);
-
-										nameCollisionActivityContract.launch(collision);
+										ArrayList<NameCollision> list = new ArrayList<>();
+										list.add(NameCollision.Upload.getUploadCollision(handle,
+												file, parentHandle));
+										nameCollisionActivityContract.launch(list);
 									},
 									throwable -> {
 										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

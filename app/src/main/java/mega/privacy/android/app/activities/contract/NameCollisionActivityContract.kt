@@ -11,15 +11,15 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 
 /**
  * A contract to start NameCollisionActivity and manage its result.
- * [Any] must be ArrayList<NameCollision> or [NameCollision].
  */
-class NameCollisionActivityContract : ActivityResultContract<Any, String?>() {
+class NameCollisionActivityContract : ActivityResultContract<ArrayList<NameCollision>, String?>() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun createIntent(context: Context, any: Any): Intent =
-        when (any) {
-            is ArrayList<*> -> getIntentForList(context, any as ArrayList<NameCollision>)
-            else -> getIntentForSingleItem(context, any as NameCollision)
+    override fun createIntent(context: Context, list: ArrayList<NameCollision>): Intent =
+        if (list.size == 1) {
+            getIntentForSingleItem(context, list[0])
+        } else {
+            getIntentForList(context, list)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): String? =

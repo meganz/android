@@ -67,6 +67,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -1820,13 +1821,15 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(collision -> {
                             dismissAlertDialogIfExists(statusDialog);
-                            nameCollisionActivityContract.launch(collision);
+                            ArrayList<NameCollision> list = new ArrayList<>();
+                            list.add(collision);
+                            nameCollisionActivityContract.launch(list);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-                                if (type == NameCollisionType.MOVEMENT) {
+                                if (type == NameCollisionType.MOVE) {
                                     move(parentHandle);
                                 } else {
                                     copy(parentHandle);
@@ -1851,7 +1854,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                             finish();
                         }, throwable -> {
                             dismissAlertDialogIfExists(statusDialog);
-                            if (!manageThrowable(throwable)) {
+                            if (!manageCopyMoveException(throwable)) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), MEGACHAT_INVALID_HANDLE);
                             }
                         }
@@ -1873,7 +1876,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                         }, throwable -> {
                             dismissAlertDialogIfExists(statusDialog);
 
-                            if (!manageThrowable(throwable)) {
+                            if (!manageCopyMoveException(throwable)) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_copied), MEGACHAT_INVALID_HANDLE);
                             }
                         }
@@ -1916,7 +1919,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             }
             statusDialog = temp;
 
-            checkCollision(toHandle, NameCollisionType.MOVEMENT);
+            checkCollision(toHandle, NameCollisionType.MOVE);
         } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);

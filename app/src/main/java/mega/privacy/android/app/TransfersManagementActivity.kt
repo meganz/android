@@ -7,6 +7,11 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
 import mega.privacy.android.app.constants.BroadcastConstants.*
@@ -16,41 +21,32 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.PENDING_TAB
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
+import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import javax.inject.Inject
 
 /**
  * Activity for showing concrete UI items related to transfers management.
  */
+@AndroidEntryPoint
 open class TransfersManagementActivity : PasscodeActivity() {
 
     companion object {
         const val IS_CANCEL_TRANSFERS_SHOWN = "IS_CANCEL_TRANSFERS_SHOWN"
     }
 
+    @Inject
+    lateinit var getNetworkConnectionUseCase: GetNetworkConnectionUseCase
+
     private var transfersWidget: TransfersWidget? = null
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
-
-    /**
-     * Broadcast to update the transfers widget when a change in network connection is detected.
-     */
-    private var networkUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action != BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE) {
-                return
-            }
-
-            when (intent.getIntExtra(ACTION_TYPE, INVALID_ACTION)) {
-                GO_ONLINE -> transfersManagement.resetNetworkTimer()
-                GO_OFFLINE -> transfersManagement.startNetworkTimer()
-            }
-        }
-    }
 
     /**
      * Broadcast to update the transfers widget.
@@ -87,14 +83,24 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Registers the transfers BroadcastReceivers and observers.
      */
     private fun setupObservers() {
+        getNetworkConnectionUseCase.getConnectionUpdates()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { online ->
+                    if (online) {
+                        transfersManagement.resetNetworkTimer()
+                    } else {
+                        transfersManagement.startNetworkTimer()
+                    }
+                },
+                onError = { error -> logError("Network update error", error) }
+            )
+            .addTo(composite)
+
         registerReceiver(
             transfersUpdateReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
-        )
-
-        registerReceiver(
-            networkUpdateReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
@@ -255,7 +261,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
         super.onDestroy()
 
         unregisterReceiver(transfersUpdateReceiver)
-        unregisterReceiver(networkUpdateReceiver)
 
         scanningTransfersDialog?.dismiss()
         cancelTransfersDialog?.dismiss()

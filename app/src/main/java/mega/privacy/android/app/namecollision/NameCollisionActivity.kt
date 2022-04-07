@@ -193,7 +193,7 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
         viewModel.onExceptionThrown().observe(this) { error ->
-            if (!manageThrowable(error) && error is MegaException) {
+            if (!manageCopyMoveException(error) && error is MegaException) {
                 showSnackbar(error.message!!)
             }
         }
@@ -481,7 +481,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     if (isFile) R.string.copy_and_replace
                     else R.string.copy_and_merge
             }
-            NameCollisionType.MOVEMENT -> {
+            NameCollisionType.MOVE -> {
                 replaceUpdateMergeInfoId =
                     if (isFile) R.string.warning_move_and_replace
                     else R.string.warning_move_and_merge

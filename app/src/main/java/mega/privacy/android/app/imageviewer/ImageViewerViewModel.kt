@@ -81,7 +81,7 @@ class ImageViewerViewModel @Inject constructor(
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
-    private val throwable = SingleLiveEvent<Throwable>()
+    private val copyMoveException = SingleLiveEvent<Throwable>()
     private val collision = SingleLiveEvent<NameCollision>()
 
     private var isUserLoggedIn = false
@@ -116,9 +116,9 @@ class ImageViewerViewModel @Inject constructor(
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
-    fun onExceptionThrown(): LiveData<Throwable> = throwable
+    fun onCopyMoveException(): LiveData<Throwable> = copyMoveException
 
-    fun getCollision(): LiveData<NameCollision> = collision
+    fun onCollision(): LiveData<NameCollision> = collision
 
     fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
@@ -509,7 +509,7 @@ class ImageViewerViewModel @Inject constructor(
                 .subscribeAndComplete(
                     completeAction = {
                         snackbarMessage.value = getString(R.string.context_correctly_copied)
-                    }, errorAction = { error -> throwable.value = error })
+                    }, errorAction = { error -> copyMoveException.value = error })
         }
     }
 
@@ -525,13 +525,13 @@ class ImageViewerViewModel @Inject constructor(
         checkNameCollision(
             node = node,
             newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVEMENT
+            type = NameCollisionType.MOVE
         ) {
             moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete(
                     completeAction = {
                         snackbarMessage.value = getString(R.string.context_correctly_moved)
-                    }, errorAction = { error -> throwable.value = error }
+                    }, errorAction = { error -> copyMoveException.value = error }
                 )
         }
     }

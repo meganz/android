@@ -1392,13 +1392,9 @@ public class Util {
 		} catch (IOException e) {}
 
 		//This method is in the v4 support library, so can be applied to all devices
-		Uri outputFileUri;
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile);
-		} else {
-			outputFileUri = Uri.fromFile(newFile);
-		}
+		Uri outputFileUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+				? FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile)
+				: Uri.fromFile(newFile);
 
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);

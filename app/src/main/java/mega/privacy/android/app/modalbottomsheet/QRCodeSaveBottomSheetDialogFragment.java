@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -92,10 +93,10 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(handle -> {
-                            NameCollision collision = NameCollision.Upload
-                                    .getUploadCollision(handle, qrFile, parentNode.getParentHandle());
-
-                            ((QRCodeActivity) requireActivity()).nameCollisionActivityContract.launch(collision);
+                            ArrayList<NameCollision> list = new ArrayList<>();
+                            list.add(NameCollision.Upload.getUploadCollision(handle, qrFile,
+                                    parentNode.getHandle()));
+                            ((QRCodeActivity) requireActivity()).nameCollisionActivityContract.launch(list);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

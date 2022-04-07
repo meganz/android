@@ -121,7 +121,7 @@ class UploadFolderViewModel @Inject constructor(
         }
 
         getFolderContentUseCase.get(currentFolder.value!!, order, isList)
-            .subscribeOn(Schedulers.single())
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { folderItems.value = mutableListOf() },
@@ -168,7 +168,7 @@ class UploadFolderViewModel @Inject constructor(
 
             if (!folderItems.value.isNullOrEmpty()) {
                 getFolderContentUseCase.reorder(folderItems.value!!, order, isList)
-                    .subscribeOn(Schedulers.single())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onError = { folderItems.value = mutableListOf() },
@@ -186,7 +186,7 @@ class UploadFolderViewModel @Inject constructor(
             val folder: FolderContent.Data? = if (query == null) currentFolder.value else null
 
             getFolderContentUseCase.reorder(folderContent, folder, order, isList)
-                .subscribeOn(Schedulers.single())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onError = { error -> logWarning("Cannot reorder", error) },
@@ -207,7 +207,7 @@ class UploadFolderViewModel @Inject constructor(
 
             if (!folderItems.value.isNullOrEmpty()) {
                 getFolderContentUseCase.switchView(folderItems.value!!, isList)
-                    .subscribeOn(Schedulers.single())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onError = { error -> logWarning("No switch view.", error) },
@@ -225,7 +225,7 @@ class UploadFolderViewModel @Inject constructor(
             val folder: FolderContent.Data? = if (query == null) currentFolder.value else null
 
             getFolderContentUseCase.switchView(folderContent, folder, isList)
-                .subscribeOn(Schedulers.single())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onError = { error -> logWarning("Cannot switch view.", error) },
@@ -377,7 +377,8 @@ class UploadFolderViewModel @Inject constructor(
             currentFolder.value!!,
             selectedItems.value,
             folderItems.value
-        ).subscribeOn(AndroidSchedulers.mainThread())
+        ).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { error -> logError("Cannot upload anything", error) },
                 onSuccess = { results -> checkNameCollisions(results) }
@@ -392,7 +393,8 @@ class UploadFolderViewModel @Inject constructor(
     private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
         nameCollisionDisposable =
             checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults)
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onError = { error -> logError("Cannot upload anything", error) },
                     onSuccess = { result ->
@@ -419,7 +421,7 @@ class UploadFolderViewModel @Inject constructor(
             parentHandle,
             pendingUploads,
             collisionsResolution
-        ).subscribeOn(Schedulers.single())
+        ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { error ->

@@ -198,7 +198,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         serviceBound = true
 
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(collision)
+            nameCollisionActivityContract.launch(arrayListOf(collision))
         }
 
         viewModel.onSnackbarMessage().observe(this) { message ->
@@ -1003,7 +1003,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      * @param throwable The exception.
      */
     private fun manageException(throwable: Throwable) {
-        if (!manageThrowable(throwable) && throwable is MegaException) {
+        if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             showSnackbar(throwable.message!!)
         }
     }

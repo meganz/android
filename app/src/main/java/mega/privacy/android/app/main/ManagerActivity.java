@@ -8126,7 +8126,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     @Override
-    protected boolean manageThrowable(Throwable throwable) {
+    protected boolean manageCopyMoveException(Throwable throwable) {
         if (throwable instanceof ForeignNodeException) {
             launchForeignNodeError();
             return true;
@@ -8319,7 +8319,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVEMENT)
+            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -8338,7 +8338,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((moveResult, moveThrowable) -> {
-                                            if (!manageThrowable(moveThrowable)) {
+                                            if (!manageCopyMoveException(moveThrowable)) {
                                                 showMovementResult(moveResult, handlesWithoutCollision[0]);
                                             }
                                         });
@@ -8379,7 +8379,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((copyResult, copyThrowable) -> {
                                             dismissAlertDialogIfExists(statusDialog);
-                                            if (!manageThrowable(copyThrowable)) {
+                                            if (!manageCopyMoveException(copyThrowable)) {
                                                 showCopyResult(copyResult);
                                             }
                                         });
@@ -8422,10 +8422,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(handle -> {
-                                        NameCollision collision = NameCollision.Upload
-                                                .getUploadCollision(handle, file, parentHandle);
-
-                                        nameCollisionActivityContract.launch(collision);
+                                        ArrayList<NameCollision> list = new ArrayList<>();
+                                        list.add(NameCollision.Upload.getUploadCollision(handle,
+                                                file, parentHandle));
+                                        nameCollisionActivityContract.launch(list);
                                     },
                                     throwable -> {
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
@@ -9376,10 +9376,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(handle -> {
-                            NameCollision collision = NameCollision.Upload
-                                    .getUploadCollision(handle, file, parentNode.getParentHandle());
-
-                            nameCollisionActivityContract.launch(collision);
+                            ArrayList<NameCollision> list = new ArrayList<>();
+                            list.add(NameCollision.Upload.getUploadCollision(handle,
+                                    file, parentNode.getHandle()));
+                            nameCollisionActivityContract.launch(list);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

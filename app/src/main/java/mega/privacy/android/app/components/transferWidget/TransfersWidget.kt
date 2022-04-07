@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Util
@@ -45,9 +46,7 @@ class TransfersWidget(
      * Hides the widget.
      */
     fun hide() {
-        if (transfersWidget.visibility != View.GONE) {
-            transfersWidget.visibility = View.GONE
-        }
+        transfersWidget.isVisible = false
     }
 
     /**
@@ -125,8 +124,8 @@ class TransfersWidget(
             isOverQuota -> {
                 updateStatus(getDrawable(R.drawable.ic_transfers_overquota))
             }
-            status.visibility != View.GONE -> {
-                status.visibility = View.GONE
+            status.isVisible -> {
+                status.isVisible = false
             }
         }
 

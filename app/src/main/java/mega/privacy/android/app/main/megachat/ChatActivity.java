@@ -3694,7 +3694,7 @@ public class ChatActivity extends PasscodeActivity
                                         dismissAlertDialogIfExists(statusDialog);
 
                                         if (copyThrowable != null) {
-                                            manageThrowable(copyThrowable);
+                                            manageCopyMoveException(copyThrowable);
                                         }
 
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null

@@ -1636,7 +1636,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 									startChatUploadService();
 								}
 
-								manageThrowable(throwable);
+								manageCopyMoveException(throwable);
 							});
 				}
 			} else {
@@ -1978,10 +1978,10 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(handle -> {
-							NameCollision collision = NameCollision.Upload
-									.getUploadCollision(handle, file, parentNode.getParentHandle());
-
-							nameCollisionActivityContract.launch(collision);
+							ArrayList<NameCollision> list = new ArrayList<>();
+							list.add(NameCollision.Upload.getUploadCollision(handle, file,
+									parentNode.getHandle()));
+							nameCollisionActivityContract.launch(list);
 						},
 						throwable -> {
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

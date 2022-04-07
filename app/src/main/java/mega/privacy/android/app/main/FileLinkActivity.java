@@ -37,6 +37,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -49,6 +50,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -668,7 +670,11 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 		checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(collision -> nameCollisionActivityContract.launch(collision),
+				.subscribe(collision -> {
+							ArrayList<NameCollision> list = new ArrayList<>();
+							list.add(collision);
+							nameCollisionActivityContract.launch(list);
+						},
 						throwable -> {
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 								showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
@@ -691,7 +697,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 							finish();
 						}, copyThrowable -> {
-							if (!manageThrowable(copyThrowable)) {
+							if (!manageCopyMoveException(copyThrowable)) {
 								showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
 								startActivity(new Intent(this, ManagerActivity.class)
 										.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));

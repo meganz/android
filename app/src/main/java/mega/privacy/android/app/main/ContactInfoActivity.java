@@ -1364,8 +1364,8 @@ public class ContactInfoActivity extends PasscodeActivity
 
 			statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
 
-			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-			final long toHandle = intent.getLongExtra("COPY_TO", 0);
+			final long[] copyHandles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES);
+			final long toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, 0);
 
 			checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
 					.subscribeOn(Schedulers.io())
@@ -1395,7 +1395,7 @@ public class ContactInfoActivity extends PasscodeActivity
 											if (copyThrowable == null) {
 												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
 											} else {
-												manageThrowable(copyThrowable);
+												manageCopyMoveException(copyThrowable);
 											}
 										});
 							}

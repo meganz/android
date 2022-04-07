@@ -98,7 +98,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class FolderLinkActivity extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener,
@@ -701,7 +700,9 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 						.subscribe((collision, throwable) -> {
 							if (throwable == null) {
 								dismissAlertDialogIfExists(statusDialog);
-								nameCollisionActivityContract.launch(collision);
+								ArrayList<NameCollision> list = new ArrayList<>();
+								list.add(collision);
+								nameCollisionActivityContract.launch(list);
 							} else {
 								copyNodeUseCase.copy(selectedNode, toHandle)
 										.subscribeOn(Schedulers.io())
@@ -732,7 +733,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 		} else if (throwable == null) {
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied));
 		} else {
-			manageThrowable(throwable);
+			manageCopyMoveException(throwable);
 		}
 	}
 

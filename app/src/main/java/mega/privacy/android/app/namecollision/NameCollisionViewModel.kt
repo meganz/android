@@ -198,7 +198,7 @@ class NameCollisionViewModel @Inject constructor(
     private fun getCollisionType(): NameCollisionType =
         when (currentCollision.value?.nameCollision) {
             is NameCollision.Copy, is NameCollision.Import -> NameCollisionType.COPY
-            is NameCollision.Movement -> NameCollisionType.MOVEMENT
+            is NameCollision.Movement -> NameCollisionType.MOVE
             else -> NameCollisionType.UPLOAD
         }
 
@@ -355,7 +355,7 @@ class NameCollisionViewModel @Inject constructor(
                     else -> singleUpload(context!!, rename)
                 }
             }
-            NameCollisionType.MOVEMENT -> {
+            NameCollisionType.MOVE -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         move(proceedWithAllFiles(choice), rename)

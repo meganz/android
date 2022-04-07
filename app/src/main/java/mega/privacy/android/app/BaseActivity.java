@@ -121,6 +121,7 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -144,6 +145,7 @@ import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
@@ -195,7 +197,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     @Inject
     public TransfersManagement transfersManagement;
 
-    public ActivityResultLauncher<Object> nameCollisionActivityContract;
+    public ActivityResultLauncher<ArrayList<NameCollision>> nameCollisionActivityContract;
 
     private BillingManager billingManager;
     private List<MegaSku> skuDetailsList;
@@ -1663,7 +1665,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param throwable Throwable to check.
      * @return True if the Throwable has been managed, false otherwise.
      */
-    protected boolean manageThrowable(Throwable throwable) {
+    protected boolean manageCopyMoveException(Throwable throwable) {
         if (throwable instanceof ForeignNodeException) {
             launchForeignNodeError();
             return true;

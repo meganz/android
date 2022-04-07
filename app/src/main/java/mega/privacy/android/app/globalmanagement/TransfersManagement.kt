@@ -352,8 +352,8 @@ class TransfersManagement @Inject constructor(
      * Cancels the CountDownTimer to show warnings related to no internet connection.
      */
     fun resetNetworkTimer() {
-        if (networkTimer != null) {
-            networkTimer?.cancel()
+        networkTimer?.let { timer ->
+            timer.cancel()
             shouldShowNetworkWarning = false
             launchTransferUpdateIntent(NO_TYPE)
         }

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -539,7 +538,7 @@ class TextEditorViewModel @Inject constructor(
     fun moveNode(newParentHandle: Long) {
         checkNameCollision(
             newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVEMENT
+            type = NameCollisionType.MOVE
         ) {
             moveNodeUseCase.move(
                 handle = getNode()?.handle ?: return@checkNameCollision,

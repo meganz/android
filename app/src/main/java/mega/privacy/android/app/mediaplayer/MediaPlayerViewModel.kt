@@ -98,7 +98,7 @@ class MediaPlayerViewModel @Inject constructor(
         checkNameCollision(
             nodeHandle = nodeHandle,
             newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVEMENT
+            type = NameCollisionType.MOVE
         ) {
             moveNodeUseCase.move(handle = nodeHandle, parentHandle = newParentHandle)
                 .subscribeOn(Schedulers.io())

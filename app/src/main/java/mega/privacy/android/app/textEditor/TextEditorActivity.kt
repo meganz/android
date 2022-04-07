@@ -473,7 +473,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             showSnackbar(message)
         }
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(collision)
+            nameCollisionActivityContract.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
 
@@ -874,7 +874,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @param throwable The exception.
      */
     private fun manageException(throwable: Throwable) {
-        if (!manageThrowable(throwable) && throwable is MegaException) {
+        if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             showSnackbar(throwable.message!!)
         }
     }
