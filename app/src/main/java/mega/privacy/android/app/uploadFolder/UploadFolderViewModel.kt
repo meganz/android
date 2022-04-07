@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
@@ -375,7 +376,13 @@ class UploadFolderViewModel @Inject constructor(
         ).subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError = { error -> logError("Cannot upload anything", error) },
+                onError = { error ->
+                    if (error is EmptyFolderException) {
+                        uploadResults.value = arrayListOf()
+                    } else {
+                        logError("Cannot upload anything", error)
+                    }
+                },
                 onSuccess = { uploadResult -> uploadResults.value = uploadResult }
             )
             .addTo(composite)
@@ -392,7 +399,7 @@ class UploadFolderViewModel @Inject constructor(
      * If the upload results are already get, then notifies the observer to proceed with the upload.
      */
     fun proceedWithUpload() {
-        if (!uploadResults.value.isNullOrEmpty()) {
+        if (uploadResults.value != null) {
             uploadResults.notifyObserver()
         }
     }
