@@ -30,9 +30,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.tasks.ManageOfflineTask;
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -302,7 +302,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         firstButton.setText(StringResourcesUtils.getString(R.string.button_plans_almost_full_warning));
         firstButton.setOnClickListener(v1 -> {
             generalDialog.dismiss();
-            showUpgradeAccount();
+            startActivity(new Intent(this, UpgradeAccountActivity.class));
+            myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.SETTINGS);
         });
 
         Button secondButton = v.findViewById(R.id.dialog_second_button);
@@ -311,12 +312,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         generalDialog = builder.create();
         generalDialog.show();
-    }
-
-    private void showUpgradeAccount() {
-        Intent upgradeIntent = new Intent(this, ManagerActivity.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     /**

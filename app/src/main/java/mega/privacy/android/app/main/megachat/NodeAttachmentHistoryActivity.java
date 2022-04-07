@@ -1401,7 +1401,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     public void checkScroll() {
         if (listView != null) {
-            changeViewElevation(aB, listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
+            changeToolBarElevation(this, tB, listView.canScrollVertically(-1)
+                    || (adapter != null && adapter.isMultipleSelect()));
         }
     }
 

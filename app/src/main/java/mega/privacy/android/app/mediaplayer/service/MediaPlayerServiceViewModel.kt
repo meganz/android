@@ -14,6 +14,9 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -132,6 +135,9 @@ class MediaPlayerServiceViewModel(
         set(value) {
             field = value
             postPlaylistItems()
+            _mediaPlaybackState.update {
+                value
+            }
         }
 
     var audioPlayer = false
@@ -145,6 +151,10 @@ class MediaPlayerServiceViewModel(
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
+
+    private var _mediaPlaybackState = MutableStateFlow(false)
+    val mediaPlaybackState: StateFlow<Boolean>
+        get() = _mediaPlaybackState
 
     init {
         compositeDisposable.add(
