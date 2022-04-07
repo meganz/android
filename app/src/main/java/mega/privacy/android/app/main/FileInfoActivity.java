@@ -673,16 +673,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            MegaNode parent = nC.getParent(node);
-
-            if (!node.isTakenDown() && parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
-                offlineSwitch.setEnabled(true);
-                offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
-                availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-            } else {
-                offlineSwitch.setEnabled(false);
-                availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_700_026_grey_300_026));
-            }
 
             if(megaApi.hasVersions(node)){
                 versionsLayout.setVisibility(View.VISIBLE);
@@ -725,6 +715,16 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         listView.setAdapter(adapter);
 
         refreshProperties();
+
+        MegaNode parent = nC.getParent(node);
+        if (!node.isTakenDown() && parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
+            offlineSwitch.setEnabled(true);
+            offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+            availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        } else {
+            offlineSwitch.setEnabled(false);
+            availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_700_026_grey_300_026));
+        }
 
         setIconResource();
 
