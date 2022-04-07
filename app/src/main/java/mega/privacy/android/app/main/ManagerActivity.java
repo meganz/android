@@ -320,18 +320,13 @@ import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -381,14 +376,12 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
-import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
@@ -428,9 +421,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -1968,7 +1959,7 @@ public class ManagerActivity extends TransfersManagementActivity
         enableCUButton = findViewById(R.id.enable_cu_button);
         enableCUButton.setOnClickListener(v -> {
             if (getPhotosFragment() != null) {
-                photosFragment.enableCUClick();
+                photosFragment.enableCameraUploadClick();
             }
         });
 
@@ -2796,9 +2787,9 @@ public class ManagerActivity extends TransfersManagementActivity
     private void enableCUClicked() {
         if (getPhotosFragment() != null) {
             if (photosFragment.isEnablePhotosFragmentShown()) {
-                photosFragment.enableCu();
+                photosFragment.enableCameraUpload();
             } else {
-                photosFragment.enableCUClick();
+                photosFragment.enableCameraUploadClick();
             }
         }
     }
@@ -2818,7 +2809,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 })
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> {
                     if (getPhotosFragment() != null) {
-                        photosFragment.enableCUClick();
+                        photosFragment.enableCameraUploadClick();
                     }
                 })
                 .setCancelable(false)

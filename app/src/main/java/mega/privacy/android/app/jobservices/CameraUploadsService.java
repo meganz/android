@@ -1,5 +1,69 @@
 package mega.privacy.android.app.jobservices;
 
+import static android.content.ContentResolver.QUERY_ARG_OFFSET;
+import static android.content.ContentResolver.QUERY_ARG_SQL_LIMIT;
+import static android.content.ContentResolver.QUERY_ARG_SQL_SELECTION;
+import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
+import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
+import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
+import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
+import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
+import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
+import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
+import static mega.privacy.android.app.utils.CameraUploadUtil.disableMediaUploadProcess;
+import static mega.privacy.android.app.utils.CameraUploadUtil.findDefaultFolder;
+import static mega.privacy.android.app.utils.CameraUploadUtil.getPrimaryFolderHandle;
+import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
+import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_CAM_SYNC;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_SETTINGS;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_CU;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION;
+import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CAMERA_UPLOADS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA;
+import static mega.privacy.android.app.utils.Constants.SEPARATOR;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.copyFile;
+import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
+import static mega.privacy.android.app.utils.ImageProcessor.createImagePreview;
+import static mega.privacy.android.app.utils.ImageProcessor.createThumbnail;
+import static mega.privacy.android.app.utils.ImageProcessor.createVideoPreview;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.SDCardUtils.isLocalFolderOnSDCard;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
+import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
+import static mega.privacy.android.app.utils.Util.getLocalIpAddress;
+import static mega.privacy.android.app.utils.Util.getPhotoSyncNameWithIndex;
+import static mega.privacy.android.app.utils.Util.getProgressSize;
+import static mega.privacy.android.app.utils.Util.isCharging;
+import static mega.privacy.android.app.utils.Util.isOnWifi;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,6 +96,7 @@ import androidx.exifinterface.media.ExifInterface;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -53,12 +118,10 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -66,33 +129,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static android.content.ContentResolver.QUERY_ARG_OFFSET;
-import static android.content.ContentResolver.QUERY_ARG_SQL_LIMIT;
-import static android.content.ContentResolver.QUERY_ARG_SQL_SELECTION;
-import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.jobservices.SyncRecord.*;
-import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
-import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
-import static mega.privacy.android.app.utils.ImageProcessor.*;
-import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.SDCardUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -126,14 +162,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
 
-    private int notificationId = NOTIFICATION_CAMERA_UPLOADS;
-    private String notificationChannelId = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
-    private String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
+    private final int notificationId = NOTIFICATION_CAMERA_UPLOADS;
+    private final String notificationChannelId = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
+    private final String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
 
     public static boolean running, ignoreAttr;
     private Handler handler;
 
-    private ExecutorService threadPool = Executors.newFixedThreadPool(8);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(8);
 
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
@@ -157,7 +193,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
-    private MegaChatApiAndroid megaChatApi;
     private MegaApplication app;
 
     private static final int LOGIN_IN = 12;
@@ -171,19 +206,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean stopped;
     private NetworkTypeChangeReceiver receiver;
 
-    public class Media {
+    public static class Media {
         public String filePath;
         public long timestamp;
     }
 
-    private Queue<Media> cameraFiles = new LinkedList<>();
-    private Queue<Media> primaryVideos = new LinkedList<>();
-    private Queue<Media> secondaryVideos = new LinkedList<>();
-    private Queue<Media> mediaFilesSecondary = new LinkedList<>();
+    private final Queue<Media> cameraFiles = new LinkedList<>();
+    private final Queue<Media> primaryVideos = new LinkedList<>();
+    private final Queue<Media> secondaryVideos = new LinkedList<>();
+    private final Queue<Media> mediaFilesSecondary = new LinkedList<>();
     private MegaNode cameraUploadNode = null;
     private int totalUploaded;
     private int totalToUpload;
-    private List<MegaTransfer> cuTransfers = new ArrayList<>();
+    private final List<MegaTransfer> cuTransfers = new ArrayList<>();
 
     private long currentTimeStamp = 0;
     private long secondaryTimeStamp = 0;
@@ -195,7 +230,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String tempRoot;
     private VideoCompressor mVideoCompressor;
 
-    private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -203,7 +238,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     };
 
-    private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -214,7 +249,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     };
 
-    private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -244,7 +279,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
         getAttrUserListener = new GetCuAttributeListener(this);
         setAttrUserListener = new SetAttrUserListener(this);
-        createFolderListener = new CreateFolderListener(this, INIT_CU);
+        createFolderListener = new CreateFolderListener(this, INIT_CAMERA_UPLOAD);
     }
 
     @Override
@@ -252,20 +287,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Service destroys.");
         super.onDestroy();
         isServiceRunning = false;
-        JobUtil.hasStartedCU = false;
         uploadingInProgress = false;
         if (receiver != null) {
             unregisterReceiver(receiver);
         }
-        if (chargingStopReceiver != null) {
-            unregisterReceiver(chargingStopReceiver);
-        }
-        if (batteryInfoReceiver != null) {
-            unregisterReceiver(batteryInfoReceiver);
-        }
-        if (pauseReceiver != null) {
-            unregisterReceiver(pauseReceiver);
-        }
+        unregisterReceiver(chargingStopReceiver);
+        unregisterReceiver(batteryInfoReceiver);
+        unregisterReceiver(pauseReceiver);
         getAttrUserListener = null;
         setAttrUserListener = null;
         createFolderListener = null;
@@ -306,7 +334,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        logDebug("Starting CU service (flags: " + flags + ", startId: " + startId + ")");
+        logDebug("Starting CameraUpload service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
         startForegroundNotification();
         initService();
@@ -322,7 +350,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (intent.getAction().equals(ACTION_CANCEL) ||
                     intent.getAction().equals(ACTION_STOP) ||
                     intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)) {
-                logDebug("Cancel all CU transfers.");
+                logDebug("Cancel all CameraUpload transfers.");
                 for (MegaTransfer transfer : cuTransfers) {
                     megaApi.cancelTransfer(transfer, this);
                 }
@@ -350,7 +378,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * Should call this both when "onCreate" and "onStartCommand".
      */
     private void startForegroundNotification() {
-        if(mNotificationManager == null) {
+        if (mNotificationManager == null) {
             mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
 
@@ -372,7 +400,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Thread task = createWorkerThread();
             task.start();
         } catch (Exception ex) {
-            logError("CameraUploadsService Exception: " + ex.getMessage() + "_" + ex.getStackTrace());
+            logError("CameraUploadsService Exception: " + ex.getMessage() + "_" + Arrays.toString(ex.getStackTrace()));
             finish();
         }
     }
@@ -560,7 +588,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             //Primary Media Folder
             Cursor cursorPrimary;
             String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
-            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED  + " ASC ";
+            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
 
             // Only paging for files in internal storage, because files on SD card usually have same timestamp(the time when the SD is loaded).
             boolean shouldPagingPrimary = !isLocalFolderOnSDCard(this, localPath);
@@ -732,7 +760,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             String title = getString(R.string.title_out_of_space);
                             String message = getString(R.string.error_not_enough_free_space);
                             Intent intent = new Intent(this, ManagerActivity.class);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_IMMUTABLE);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
                             showNotification(title, message, pendingIntent, true);
                             return;
                         }
@@ -1000,7 +1028,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return BATTERY_STATE_LOW;
         }
 
-        if (isInCameraUploadsSetting()){
+        if (isInCameraUploadsSetting()) {
             logWarning("Camera uploads setting is in progress");
             return SHOULD_RUN_STATE_FAILED;
         }
@@ -1153,7 +1181,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (dbH.getMediaFolderExternalSdCard()) {
                 Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
                 localPathSecondary = getFullPathFromTreeUri(uri, this);
-                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                if (localPathSecondary != null && !localPathSecondary.endsWith(SEPARATOR)) {
                     localPathSecondary += SEPARATOR;
                 }
 
@@ -1293,7 +1321,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         megaApi = app.getMegaApi();
         megaApiFolder = app.getMegaApiFolder();
-        megaChatApi = app.getMegaChatApi();
 
         if (megaApi == null) {
             finish();
@@ -2078,7 +2105,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private float[] getGPSCoordinates(String filePath, boolean isVideo) {
-        float output[] = new float[2];
+        float[] output = new float[2];
         try {
             if (isVideo) {
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -2117,7 +2144,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 retriever.release();
             } else {
                 ExifInterface exif = new ExifInterface(filePath);
-                exif.getLatLong(output);
+                exif.getLatLong();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -2230,8 +2257,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     /**
      * Check if camera uploads setting is in progress
+     *
      * @return - true : During camera uploads setting
-     *         - false : not in camera uploads setting
+     * - false : not in camera uploads setting
      */
     private boolean isInCameraUploadsSetting() {
         return bInCameraUploadsSetting;

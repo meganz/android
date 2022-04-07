@@ -156,23 +156,23 @@ class PhotosFragment : BaseFragment() {
     fun checkScroll() = currentTab?.checkScroll()
 
     /**
-     * Enable CU
+     * Enable Camera Upload
      */
-    fun enableCu() {
+    fun enableCameraUpload() {
         (currentTab as? TimelineFragment)?.enableCameraUpload()
     }
 
     /**
-     * handle enable CU click UI and logic
+     * handle enable Camera Upload click UI and logic
      */
-    fun enableCUClick() {
+    fun enableCameraUploadClick() {
         if (currentTab !is TimelineFragment) {
             viewPager.postDelayed({
                 viewPager.currentItem = TIMELINE_INDEX
-                (currentTab as TimelineFragment).enableCUClick()
+                (currentTab as TimelineFragment).enableCameraUploadClick()
             }, 50)
         } else {
-            (currentTab as TimelineFragment).enableCUClick()
+            (currentTab as TimelineFragment).enableCameraUploadClick()
         }
     }
 

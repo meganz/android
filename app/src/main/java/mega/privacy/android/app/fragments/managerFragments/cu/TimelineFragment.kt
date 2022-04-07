@@ -259,7 +259,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
      * Set up other views
      */
     private fun setupOtherViews() {
-        binding.emptyEnableCuButton.setOnClickListener { enableCUClick() }
+        binding.emptyEnableCuButton.setOnClickListener { enableCameraUploadClick() }
         setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
         binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
@@ -271,9 +271,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     /**
-     * handle enable CU click UI and logic
+     * handle enable Camera Upload click UI and logic
      */
-    fun enableCUClick() {
+    fun enableCameraUploadClick() {
         ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
         val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (hasPermissions(context, *permissions)) {

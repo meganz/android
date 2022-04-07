@@ -44,7 +44,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadWork;
-import static mega.privacy.android.app.utils.JobUtil.stopRegularCuSyncHeartbeatWork;
+import static mega.privacy.android.app.utils.JobUtil.stopRegularCameraUploadSyncHeartbeatWork;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -491,7 +491,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      */
     public void disableCameraUpload() {
         stopCameraUploadWork(getContext());
-        stopRegularCuSyncHeartbeatWork(getContext());
+        stopRegularCameraUploadSyncHeartbeatWork(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }

@@ -45,8 +45,6 @@ public class JobUtil {
 
     private static final int START_JOB_FAILED_NOT_ENABLED = -2;
 
-    public static volatile boolean hasStartedCU;
-
     public static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
     public static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
     public static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
@@ -124,43 +122,9 @@ public class JobUtil {
         return START_JOB_SUCCEED;
     }
 
-    /**
-     * This should be never called outside of {@link CameraUploadWork},
-     * otherwise the WorkManager will not know about this job.
-     *
-     * @param context          from which the action is started
-     * @param shouldIgnoreAttr ignore attributes
-     */
-    public static synchronized void startCameraUploadWork(Context context, boolean shouldIgnoreAttr) {
-        logDebug("JobUtil: startCameraUploadWork()");
-        boolean isOverQuota = isOverquota(context);
-        boolean hasReadPermission = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-        boolean isEnabled = isCameraUploadEnabled(context);
-        logDebug("isOverQuota:" + isOverQuota +
-                ", hasStoragePermission:" + hasReadPermission +
-                ", isCameraUploadEnabled:" + isEnabled +
-                ", isRunning:" + CameraUploadsService.isServiceRunning +
-                ", hasStartedCU:" + hasStartedCU +
-                ", should ignore attr: " + shouldIgnoreAttr);
-        if (!CameraUploadsService.isServiceRunning
-                && !isOverQuota && hasReadPermission
-                && isEnabled && !hasStartedCU) {
-            hasStartedCU = true;
-            Intent newIntent = new Intent(context, CameraUploadsService.class);
-            newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, shouldIgnoreAttr);
-            ContextCompat.startForegroundService(context, newIntent);
-        }
-    }
-
-    private static boolean isOverquota(Context context) {
-        MegaApplication app = (MegaApplication) context.getApplicationContext();
-        return app.getStorageState() == MegaApiJava.STORAGE_STATE_RED;
-    }
-
-    // TODO stop by worker only and not from all over the place
     public static synchronized void stopRunningCameraUploadService(Context context) {
         if (!isCameraUploadEnabled(context) && !CameraUploadsService.isServiceRunning) return;
-        logDebug("Stop CU.");
+        logDebug("Stop CameraUpload");
         Intent stopIntent = new Intent(context, CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
         ContextCompat.startForegroundService(context, stopIntent);
@@ -182,7 +146,7 @@ public class JobUtil {
         }, CU_RESCHEDULE_INTERVAL);
     }
 
-    private static boolean isCameraUploadEnabled(Context context) {
+    public static boolean isCameraUploadEnabled(Context context) {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         MegaPreferences prefs = dbH.getPreferences();
         if (prefs == null) {
@@ -192,7 +156,7 @@ public class JobUtil {
 
         String cuEnabled = prefs.getCamSyncEnabled();
         if (TextUtils.isEmpty(cuEnabled)) {
-            logDebug("CU not enabled");
+            logDebug("Camera Upload not enabled");
             return false;
         }
 
@@ -215,8 +179,8 @@ public class JobUtil {
      *
      * @param context From which the action is done.
      */
-    public static void stopRegularCuSyncHeartbeatWork(Context context) {
-        logDebug("JobUtil: stopRegularCuSyncHeartbeatWork()");
+    public static void stopRegularCameraUploadSyncHeartbeatWork(Context context) {
+        logDebug("JobUtil: stopRegularCameraUploadSyncHeartbeatWork()");
         cancelWorkByTag(context, HEART_BEAT_TAG);
     }
 
