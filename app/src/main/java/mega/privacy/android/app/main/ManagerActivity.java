@@ -300,6 +300,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -3623,7 +3624,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipToAlbumContentFragment(Fragment f) {
         albumContentFragment = (AlbumContentFragment) f;
-        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag(), true);
+        String albumContentTag = FragmentTag.ALBUM_CONTENT.getTag();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, f, albumContentTag);
+        if (getSupportFragmentManager().findFragmentByTag(albumContentTag) == null) {
+            ft.addToBackStack(FragmentTag.ALBUM_CONTENT.getTag());
+            ft.commitAllowingStateLoss();
+        }
         isInAlbumContent = true;
         firstNavigationLevel = false;
 
@@ -3639,25 +3646,6 @@ public class ManagerActivity extends TransfersManagementActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, f, fTag);
         ft.commitNowAllowingStateLoss();
-        // refresh manually
-        if (f instanceof RecentChatsFragment) {
-            RecentChatsFragment rcf = (RecentChatsFragment) f;
-            if (rcf.isResumed()) {
-                rcf.refreshMegaContactsList();
-                rcf.setCustomisedActionBar();
-            }
-        }
-    }
-
-    void replaceFragment(Fragment f, String fTag, @NonNull Boolean addToBackStack) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, f, fTag);
-        if (addToBackStack) {
-            ft.addToBackStack(fTag);
-            ft.commit();
-        } else {
-            ft.commitNowAllowingStateLoss();
-        }
         // refresh manually
         if (f instanceof RecentChatsFragment) {
             RecentChatsFragment rcf = (RecentChatsFragment) f;
@@ -5589,6 +5577,8 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (photosFragment.isEnablePhotosFragmentShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
+                            } else if (isInAlbumContent) {
+                                onBackPressed();
                             }
 
                             setToolbarTitle();
