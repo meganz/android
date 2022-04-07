@@ -5584,9 +5584,6 @@ public class ManagerActivity extends TransfersManagementActivity
                             setToolbarTitle();
                             invalidateOptionsMenu();
                             return true;
-                        } else if (isInAlbumContent) {
-                            // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
-                            onBackPressed();
                         }
 					} else if (drawerItem == DrawerItem.INBOX) {
 						inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
