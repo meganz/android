@@ -437,7 +437,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     }
 
     fun mainPlayerUIClosed() {
-        if (!playing() || !viewModel.audioPlayer) {
+        if (!viewModel.audioPlayer) {
             stopAudioPlayer()
         }
     }
