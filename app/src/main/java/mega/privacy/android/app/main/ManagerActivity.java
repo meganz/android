@@ -2331,11 +2331,16 @@ public class ManagerActivity extends TransfersManagementActivity
                     } else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
                         logDebug("Open after LauncherFileExplorerActivity ");
                         boolean locationFileInfo = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false);
-                        long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+                        long handleIntent = getIntent().getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
 
                         if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
                             int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
                             showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, numberUploads, numberUploads), -1);
+                        }
+
+                        String message = getIntent().getStringExtra(EXTRA_MESSAGE);
+                        if (message != null) {
+                            showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
                         }
 
                         if (locationFileInfo) {
@@ -3401,6 +3406,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
                         int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
                         showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, numberUploads, numberUploads), -1);
+                    }
+
+                    String message = getIntent().getStringExtra(EXTRA_MESSAGE);
+                    if (message != null) {
+                        showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
                     }
 
                     actionOpenFolder(handleIntent);
@@ -8398,7 +8408,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ((MegaApplication) getApplication()).askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
+                parentHandleBrowser = intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null

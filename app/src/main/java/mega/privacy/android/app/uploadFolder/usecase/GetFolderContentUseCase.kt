@@ -163,7 +163,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     fun getRootContentToUpload(
         currentFolder: FolderContent.Data,
-        selectedItems: MutableList<Int>?,
+        selectedItems: List<Int>,
         folderItems: MutableList<FolderContent>?
     ): Single<MutableList<FolderContent.Data>> =
         Single.create { emitter ->
@@ -174,7 +174,7 @@ class GetFolderContentUseCase @Inject constructor(
 
             val results = mutableListOf<FolderContent.Data>()
 
-            if (!selectedItems.isNullOrEmpty()) {
+            if (selectedItems.isNotEmpty()) {
                 selectedItems.forEach { selected ->
                     if (emitter.isDisposed) {
                         return@create

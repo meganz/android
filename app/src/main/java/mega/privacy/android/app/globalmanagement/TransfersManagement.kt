@@ -13,6 +13,12 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
 import com.jeremyliao.liveeventbus.LiveEventBus
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.*
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
@@ -99,13 +105,23 @@ class TransfersManagement @Inject constructor(
             completedTransfer: AndroidCompletedTransfer,
             dbH: DatabaseHandler
         ) {
-            val id = dbH.setCompletedTransfer(completedTransfer)
-            completedTransfer.id = id
-
-            MegaApplication.getInstance().sendBroadcast(
-                Intent(BROADCAST_ACTION_TRANSFER_FINISH)
-                    .putExtra(COMPLETED_TRANSFER, completedTransfer)
-            )
+            Completable.create { emitter ->
+                completedTransfer.id = dbH.setCompletedTransfer(completedTransfer)
+                emitter.onComplete()
+            }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        MegaApplication.getInstance().sendBroadcast(
+                            Intent(BROADCAST_ACTION_TRANSFER_FINISH)
+                                .putExtra(COMPLETED_TRANSFER, completedTransfer)
+                        )
+                    },
+                    onError = { error ->
+                        LogUtil.logError(error.message)
+                    }
+                )
+                .addTo(CompositeDisposable())
         }
 
         /**

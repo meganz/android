@@ -80,27 +80,65 @@ class GetNameCollisionResultUseCase @Inject constructor(
                     else -> null
                 }
 
+                val nodes =
+                    if (collision is NameCollision.Import) {
+                        getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
+                            .blockingGetOrNull()
+                    } else {
+                        null
+                    }
+
+                var thumbnailRequests = when {
+                    handle != null -> 1
+                    nodes != null -> nodes.size
+                    else -> 0
+                }
+
+                if (collision.isFile) {
+                    thumbnailRequests++
+                }
+
                 if (handle != null) {
                     getThumbnailUseCase.get(handle).blockingSubscribeBy(
-                        onError = { error -> logWarning("No thumbnail", error) },
+                        onError = { error ->
+                            logWarning("No thumbnail", error)
+                            thumbnailRequests--
+
+                            if (thumbnailRequests == 0) {
+                                emitter.onComplete()
+                            }
+                        },
                         onSuccess = { thumbnailUri ->
                             nameCollisionResult.thumbnail = thumbnailUri
                             emitter.onNext(nameCollisionResult)
+                            thumbnailRequests--
+
+                            if (thumbnailRequests == 0) {
+                                emitter.onComplete()
+                            }
                         }
                     )
                 } else if (collision is NameCollision.Import) {
-                    val nodes =
-                        getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
-                            .blockingGetOrNull()
-
                     if (nodes != null) {
                         for (node in nodes) {
                             if (node.handle == collision.nodeHandle) {
                                 getThumbnailUseCase.get(node).blockingSubscribeBy(
-                                    onError = { error -> logWarning("No thumbnail", error) },
+                                    onError = { error ->
+                                        logWarning("No thumbnail", error)
+                                        thumbnailRequests--
+
+                                        if (thumbnailRequests == 0) {
+                                            emitter.onComplete()
+                                        }
+                                    },
                                     onSuccess = { thumbnailUri ->
                                         nameCollisionResult.thumbnail = thumbnailUri
                                         emitter.onNext(nameCollisionResult)
+                                        thumbnailRequests--
+
+                                        if (thumbnailRequests == 0) {
+                                            emitter.onComplete()
+                                        }
                                     }
                                 )
                                 break
@@ -111,15 +149,29 @@ class GetNameCollisionResultUseCase @Inject constructor(
 
                 if (collision.isFile) {
                     getThumbnailUseCase.get(this).blockingSubscribeBy(
-                        onError = { error -> logWarning("No thumbnail", error) },
+                        onError = { error ->
+                            logWarning("No thumbnail", error)
+                            thumbnailRequests--
+
+                            if (thumbnailRequests == 0) {
+                                emitter.onComplete()
+                            }
+                        },
                         onSuccess = { thumbnailUri ->
                             nameCollisionResult.collisionThumbnail = thumbnailUri
                             emitter.onNext(nameCollisionResult)
+                            thumbnailRequests--
+
+                            if (thumbnailRequests == 0) {
+                                emitter.onComplete()
+                            }
                         }
                     )
                 }
 
-                emitter.onComplete()
+                if (thumbnailRequests == 0) {
+                    emitter.onComplete()
+                }
             }
         }, BackpressureStrategy.LATEST)
 

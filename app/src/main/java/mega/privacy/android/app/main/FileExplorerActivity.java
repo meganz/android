@@ -58,6 +58,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -295,6 +296,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 	private FileExplorerActivityViewModel mViewModel;
 
+	private long parentHandle;
+
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -411,6 +414,9 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
+				result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
 		mViewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
 		mViewModel.info.observe(this, this::onProcessAsyncInfo);
@@ -1694,13 +1700,14 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				return;
 			}
 
-			long parentHandle = cDriveExplorer != null
+			parentHandle = cDriveExplorer != null
 					? cDriveExplorer.getParentHandle()
 					: parentHandleCloud;
 
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode == null) {
 				parentNode = megaApi.getRootNode();
+				parentHandle = parentNode.getHandle();
 			}
 
 			MegaNode finalParentNode = parentNode;
@@ -1727,7 +1734,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe(() -> {
 											showSnackbar(text);
-											backToCloud(finalParentNode.getHandle(), infos.size());
+											backToCloud(finalParentNode.getHandle(), infos.size(), null);
 											filePreparedInfos = null;
 											logDebug("finish!!!");
 											finishActivity();
@@ -1938,17 +1945,33 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		}
 	}
 
-	private void backToCloud(long handle, int numberUploads){
+	/**
+	 * Goes back to Cloud.
+	 *
+	 * @param handle        Parent handle of the folder to open.
+	 * @param numberUploads Numer of uploads.
+	 * @param message       Message to show.
+	 */
+	private void backToCloud(long handle, int numberUploads, String message) {
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivity.class)
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
-				.putExtra(NUMBER_UPLOADS, numberUploads);
-		if(handle!=-1){
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+		if (handle != INVALID_HANDLE) {
 			startIntent.setAction(ACTION_OPEN_FOLDER);
-			startIntent.putExtra("PARENT_HANDLE", handle);
+			startIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, handle);
 		}
+
+		if (numberUploads > 0) {
+			startIntent.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
+					.putExtra(NUMBER_UPLOADS, numberUploads);
+		}
+
+		if (message != null) {
+			startIntent.putExtra(EXTRA_MESSAGE, message);
+		}
+
 		startActivity(startIntent);
 	}
 
@@ -1974,6 +1997,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 			return;
 		}
 
+		parentHandle = parentNode.getHandle();
 		checkNameCollisionUseCase.check(file.getName(), parentNode)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
@@ -1995,7 +2019,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 										.subscribe(() -> {
 											showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE);
 											logDebug("After UPLOAD click - back to Cloud");
-											this.backToCloud(parentNode.getHandle(), 1);
+											this.backToCloud(parentNode.getHandle(), 1, null);
 											finishActivity();
 										});
 							}

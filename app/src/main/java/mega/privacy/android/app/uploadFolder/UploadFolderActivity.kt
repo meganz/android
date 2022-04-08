@@ -131,21 +131,18 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
         menuInflater.inflate(R.menu.activity_upload_folder, finalMenu)
         searchMenuItem = finalMenu.findItem(R.id.action_search).apply {
-            val isLoading = binding.progressBar.isVisible
-            isVisible = !isLoading
+            isVisible = binding.progressBar.isVisible
 
-            if (!isLoading) {
-                setupSearchView { query ->
-                    showProgress(true)
-                    viewModel.search(query)
-                }
+            setupSearchView { query ->
+                showProgress(true)
+                viewModel.search(query)
+            }
 
-                val query = viewModel.query
+            val query = viewModel.query
 
-                if (!isActionViewExpanded && query != null) {
-                    expandActionView()
-                    (actionView as SearchView).setQuery(query, false)
-                }
+            if (!isActionViewExpanded && query != null) {
+                expandActionView()
+                (actionView as SearchView).setQuery(query, false)
             }
         }
 
@@ -228,7 +225,10 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             isEnabled = !show
         }
 
-        invalidateOptionsMenu()
+        if (this::searchMenuItem.isInitialized && !searchMenuItem.isActionViewExpanded) {
+            searchMenuItem.isVisible = !show
+        }
+
         checkScroll()
     }
 

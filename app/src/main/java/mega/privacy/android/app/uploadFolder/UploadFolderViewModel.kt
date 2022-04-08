@@ -374,9 +374,9 @@ class UploadFolderViewModel @Inject constructor(
      */
     fun upload() {
         getFolderContentUseCase.getRootContentToUpload(
-            currentFolder.value!!,
-            selectedItems.value,
-            folderItems.value
+            currentFolder = currentFolder.value!!,
+            selectedItems = ArrayList(selectedItems.value!!),
+            folderItems = folderItems.value
         ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

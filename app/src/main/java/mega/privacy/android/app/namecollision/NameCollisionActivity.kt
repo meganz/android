@@ -453,14 +453,16 @@ class NameCollisionActivity : PasscodeActivity() {
      */
     private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionType, Boolean>) {
         val isFileVersioningEnabled = fileVersioningInfo.first
+        val nameCollisionType = fileVersioningInfo.second
         val isFile = fileVersioningInfo.third
 
-        binding.learnMore.isVisible = isFileVersioningEnabled
+        binding.learnMore.isVisible =
+            isFileVersioningEnabled && nameCollisionType == NameCollisionType.UPLOAD
 
         val replaceUpdateMergeInfoId: Int
         val replaceUpdateMergeButtonId: Int
 
-        when (fileVersioningInfo.second) {
+        when (nameCollisionType) {
             NameCollisionType.UPLOAD -> {
                 replaceUpdateMergeInfoId = when {
                     !isFile -> R.string.warning_upload_and_merge

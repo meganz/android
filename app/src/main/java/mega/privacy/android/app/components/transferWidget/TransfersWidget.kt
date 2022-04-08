@@ -71,7 +71,7 @@ class TransfersWidget(
 
         when {
             pendingTransfers > 0 && !transfersManagement.shouldShowNetworkWarning -> {
-                setProgress(progress, transferType)
+                setProgress(getProgress(), transferType)
                 updateState()
             }
             (pendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
@@ -175,9 +175,21 @@ class TransfersWidget(
             transfersWidget.visibility = View.VISIBLE
         }
 
-        setProgress(progress, NO_TYPE)
+        setProgress(getProgress(), NO_TYPE)
         progressBar.progressDrawable = getDrawable(R.drawable.thin_circular_warning_progress_bar)
         updateStatus(getDrawable(R.drawable.ic_transfers_error))
+    }
+
+    /**
+     * Sets the progress of the transfers.
+     *
+     * @param progress The progress to set.
+     */
+    private fun setProgress(progress: Int) {
+        if (transfersManagement.hasNotToBeShowDueToTransferOverQuota()) return
+
+        transfersWidget.isVisible = true
+        progressBar.progress = progress
     }
 
     /**
@@ -190,7 +202,7 @@ class TransfersWidget(
      * - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
     fun setProgress(progress: Int, typeTransfer: Int) {
-        this.progress = progress
+        setProgress(progress)
         val numPendingDownloads = megaApi.getNumPendingDownloadsNonBackground()
         @Suppress("DEPRECATION")
         val numPendingUploads = megaApi.numPendingUploads
@@ -232,26 +244,18 @@ class TransfersWidget(
         get() = megaApi.getNumPendingDownloadsNonBackground() + megaApi.numPendingUploads
 
     /**
-     * Gets/sets the progress of the transfers.
+     * Gets the progress of the transfers.
+     *
+     * @return The transfers progress.
      */
-    private var progress: Int
-        get() {
-            @Suppress("DEPRECATION")
-            val totalSizePendingTransfer = megaApi.totalDownloadBytes + megaApi.totalUploadBytes
-            @Suppress("DEPRECATION")
-            val totalSizeTransferred = megaApi.totalDownloadedBytes + megaApi.totalUploadedBytes
+    @Suppress("DEPRECATION")
+    private fun getProgress(): Int {
+        val totalSizePendingTransfer = megaApi.totalDownloadBytes + megaApi.totalUploadBytes
+        val totalSizeTransferred = megaApi.totalDownloadedBytes + megaApi.totalUploadedBytes
+        val doubleProgress = totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100
 
-            return (totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100).roundToInt()
-        }
-        private set(progress) {
-            if (transfersManagement.hasNotToBeShowDueToTransferOverQuota()) return
-
-            if (transfersWidget.visibility != View.VISIBLE) {
-                transfersWidget.visibility = View.VISIBLE
-            }
-
-            progressBar.progress = progress
-        }
+        return if (!doubleProgress.isNaN()) doubleProgress.roundToInt() else 0
+    }
 
     /**
      * Updates the status of the widget.

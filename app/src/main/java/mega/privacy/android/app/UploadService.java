@@ -821,7 +821,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							try {
 								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
 								double[] latLong = exifInterface.getLatLong();
-								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+
+								if (latLong != null) {
+                                    megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+                                }
 							} catch (Exception e) {
 								logWarning("Couldn't read exif info: " + transfer.getPath(), e);
 							}
