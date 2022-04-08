@@ -328,10 +328,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     viewModel.retrieveSingleImage(nodeFileLink!!)
                 nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle!!)
-                imageFileUri != null -> {
-                    val fakeHandle = FileUtil.getFileFakeHandle(imageFileUri!!.toFile())
-                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, fakeHandle)
-                }
+                imageFileUri != null ->
+                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, imageFileUri.hashCode().toLong())
                 else ->
                     error("Invalid params")
             }

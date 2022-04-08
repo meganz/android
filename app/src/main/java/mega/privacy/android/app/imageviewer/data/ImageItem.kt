@@ -129,6 +129,7 @@ sealed class ImageItem {
             is Node -> handle
             is ChatNode -> handle
             is PublicNode -> handle
+            is OfflineNode -> handle
             else -> null
         }
 
