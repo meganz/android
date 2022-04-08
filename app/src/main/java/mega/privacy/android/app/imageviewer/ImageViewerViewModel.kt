@@ -112,9 +112,9 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages()
     }
 
-    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, currentNodeHandle: Long? = null) {
+    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, itemId: Long? = null) {
         getImageHandlesUseCase.get(imageFileUri = imageUri, showNearbyFiles = showNearbyFiles)
-            .subscribeAndUpdateImages(currentNodeHandle)
+            .subscribeAndUpdateImages(itemId)
     }
 
     fun retrieveImagesFromParent(
@@ -218,7 +218,7 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOffline(imageItem.handle)
+                getImageUseCase.getOfflineNode(imageItem.handle)
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
@@ -563,7 +563,7 @@ class ImageViewerViewModel @Inject constructor(
                 onSuccess = { items ->
                     images.value = items.toList()
 
-                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() }
+                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id }
                     if (position != INVALID_POSITION) {
                         updateCurrentPosition(position, true)
                     } else {
