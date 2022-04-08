@@ -105,7 +105,7 @@ import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logInfo;
@@ -1056,7 +1056,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if (actionType == GO_OFFLINE) {
                     //stop cu process
-                    stopRunningCameraUploadService(ManagerActivity.this);
+                    fireStopCameraUploadJob(ManagerActivity.this);
                     showOfflineMode();
                     LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
                 } else if (actionType == GO_ONLINE) {
@@ -1726,7 +1726,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (newIntent.getAction().equals(ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)) {
                         openLink = true;
                     } else if (newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        stopRunningCameraUploadService(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext());
                         finish();
                         return;
                     }
@@ -2151,7 +2151,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        stopRunningCameraUploadService(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext());
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)) {
@@ -3305,7 +3305,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     builder.setPositiveButton(getString(R.string.general_yes),
                             (dialog, whichButton) -> {
-                                stopRunningCameraUploadService(ManagerActivity.this);
+                                fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 
@@ -5878,7 +5878,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 disableMediaUploadProcess();
             } else {
                 // Just stop the upload process.
-                stopRunningCameraUploadService(app);
+                fireStopCameraUploadJob(app);
             }
         } else if (isPrimaryFolderInRubbish) {
             // If CU folder is in rubbish bin.
@@ -5890,7 +5890,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
             } else {
                 // Just stop the upload process.
-                stopRunningCameraUploadService(app);
+                fireStopCameraUploadJob(app);
             }
         }
     }

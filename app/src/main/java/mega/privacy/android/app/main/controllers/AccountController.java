@@ -28,11 +28,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.jobservices.SyncRecordKt;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
-import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.TestPasswordActivity;
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity;
@@ -330,7 +330,7 @@ public class AccountController {
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            stopRunningCameraUploadService(context);
+            fireStopCameraUploadJob(context);
         }
 
         dbH.clearOffline();
@@ -347,7 +347,7 @@ public class AccountController {
 
         dbH.clearAttributes();
 
-        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+        dbH.deleteAllSyncRecords(SyncRecordKt.TYPE_ANY);
 
         dbH.clearChatSettings();
 

@@ -43,8 +43,7 @@ import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
-import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadWork;
-import static mega.privacy.android.app.utils.JobUtil.stopRegularCameraUploadSyncHeartbeatWork;
+import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -94,7 +93,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.jobservices.SyncRecordKt;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
@@ -486,12 +485,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     }
 
     /**
-     * This method is to do the setting process
-     * and UI related process
+     * This method is to do the setting process and UI related process.
+     * It also cancels all CameraUpload and Heartbeat workers.
      */
     public void disableCameraUpload() {
-        stopCameraUploadWork(getContext());
-        stopRegularCameraUploadSyncHeartbeatWork(getContext());
+        stopCameraUploadSyncHeartbeatWorkers(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }
@@ -898,11 +896,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 if (value == VIDEO_QUALITY_ORIGINAL) {
                     disableChargingSettings();
-                    dbH.updateVideoState(SyncRecord.STATUS_PENDING);
+                    dbH.updateVideoState(SyncRecordKt.STATUS_PENDING);
                 } else {
                     dbH.setConversionOnCharging(true);
                     enableChargingSettings();
-                    dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
+                    dbH.updateVideoState(SyncRecordKt.STATUS_TO_COMPRESS);
                 }
 
                 videoQuality.setSummary(videoQuality.getEntry());

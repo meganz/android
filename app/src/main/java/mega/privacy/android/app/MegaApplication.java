@@ -151,7 +151,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.GetCuAttributeListener;
+import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.logging.InitialiseLoggingUseCaseJavaWrapper;
@@ -434,8 +434,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     }
 
                     //Ask for MU and CU folder when App in init state
-                    logDebug("Get CU attribute on fetch nodes.");
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+                    logDebug("Get CameraUpload attribute on fetch nodes.");
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(getApplicationContext()));
 
                     // Init CU sync data after login successfully
                     new CUBackupInitializeChecker(megaApi).initCuSync();

@@ -13,9 +13,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRAN
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
-import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
-import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
 import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
@@ -45,7 +42,7 @@ import static mega.privacy.android.app.utils.ImageProcessor.createImagePreview;
 import static mega.privacy.android.app.utils.ImageProcessor.createThumbnail;
 import static mega.privacy.android.app.utils.ImageProcessor.createVideoPreview;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -112,7 +109,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
-import mega.privacy.android.app.listeners.GetCuAttributeListener;
+import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
@@ -151,7 +148,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static final String CU_CACHE_FOLDER = "cu";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
-    public static boolean isServiceRunning = false;
+    public static volatile boolean isServiceRunning = false;
     public static boolean uploadingInProgress;
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
@@ -267,7 +264,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     };
 
-    private GetCuAttributeListener getAttrUserListener;
+    private GetCameraUploadAttributeListener getAttrUserListener;
     private SetAttrUserListener setAttrUserListener;
     private CreateFolderListener createFolderListener;
 
@@ -277,7 +274,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
-        getAttrUserListener = new GetCuAttributeListener(this);
+        getAttrUserListener = new GetCameraUploadAttributeListener(this);
         setAttrUserListener = new SetAttrUserListener(this);
         createFolderListener = new CreateFolderListener(this, INIT_CAMERA_UPLOAD);
     }
@@ -736,7 +733,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (parent == null) continue;
 
 
-            if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
+            if (file.getType() == SyncRecordKt.TYPE_PHOTO && !file.isCopyOnly()) {
                 if (removeGPS) {
                     String newPath = createTempFile(file);
                     //IOException occurs.
@@ -776,7 +773,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
 
             String path;
-            if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO || (file.getType() == SyncRecord.TYPE_VIDEO && shouldCompressVideo())) {
+            if (isCompressedVideo || file.getType() == SyncRecordKt.TYPE_PHOTO || (file.getType() == SyncRecordKt.TYPE_VIDEO && shouldCompressVideo())) {
                 path = file.getNewPath();
                 File temp = new File(path);
                 if (!temp.exists()) {
@@ -880,7 +877,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecord.TYPE_ANY);
+                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecordKt.TYPE_ANY);
                 } while ((inCloud || inDatabase));
             } else {
                 do {
@@ -891,7 +888,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecord.TYPE_ANY);
+                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecordKt.TYPE_ANY);
                 } while ((inCloud || inDatabase));
             }
 
@@ -931,7 +928,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         MegaNode parentNode = megaApi.getNodeByHandle(parentNodeHandle);
 
         logDebug("Upload to parent node which handle is: " + parentNodeHandle);
-        int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
+        int type = isVideo ? SyncRecordKt.TYPE_VIDEO : SyncRecordKt.TYPE_PHOTO;
 
         while (mediaList.size() > 0) {
             if (stopped) break;
@@ -939,7 +936,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Media media = mediaList.poll();
             if (media == null) continue;
 
-            if (dbH.localPathExists(media.filePath, isSecondary, SyncRecord.TYPE_ANY)) {
+            if (dbH.localPathExists(media.filePath, isSecondary, SyncRecordKt.TYPE_ANY)) {
                 logDebug("Skip media with timestamp: " + media.timestamp);
                 continue;
             }
@@ -957,22 +954,40 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
             if (nodeExists == null) {
                 logDebug("Possible node with same fingerprint is null.");
-                SyncRecord record = new SyncRecord(sourceFile.getAbsolutePath(), sourceFile.getName(), media.timestamp, isSecondary, type);
-                if (shouldCompressVideo() && type == SyncRecord.TYPE_VIDEO) {
-                    record.setStatus(STATUS_TO_COMPRESS);
-                }
                 float[] gpsData = getGPSCoordinates(sourceFile.getAbsolutePath(), isVideo);
-                record.setLatitude(gpsData[0]);
-                record.setLongitude(gpsData[1]);
-                record.setOriginFingerprint(localFingerPrint);
+                SyncRecord record = new SyncRecord(0,
+                        sourceFile.getAbsolutePath(),
+                        null,
+                        localFingerPrint,
+                        null,
+                        media.timestamp,
+                        sourceFile.getName(),
+                        gpsData[1],
+                        gpsData[0],
+                        shouldCompressVideo() && type == SyncRecordKt.TYPE_VIDEO ? SyncRecordKt.STATUS_TO_COMPRESS : SyncRecordKt.STATUS_PENDING,
+                        type,
+                        null,
+                        false,
+                        isSecondary);
                 logDebug("Add local file with timestamp: " + record.getTimestamp() + " to pending list, for upload.");
                 pendingList.add(record);
             } else {
                 logDebug("Possible node with same fingerprint which handle is: " + nodeExists.getHandle());
                 if (megaApi.getParentNode(nodeExists).getHandle() != parentNodeHandle) {
-                    SyncRecord record = new SyncRecord(nodeExists.getHandle(), sourceFile.getName(), true, media.filePath, media.timestamp, isSecondary, type);
-                    record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
-                    record.setNewFingerprint(nodeExists.getFingerprint());
+                    SyncRecord record = new SyncRecord(0,
+                            media.filePath,
+                            null,
+                            nodeExists.getOriginalFingerprint(),
+                            nodeExists.getFingerprint(),
+                            media.timestamp,
+                            sourceFile.getName(),
+                            null,
+                            null,
+                            SyncRecordKt.STATUS_PENDING,
+                            type,
+                            nodeExists.getHandle(),
+                            true,
+                            isSecondary);
                     logDebug("Add local file with handle: " + record.getNodeHandle() + " to pending list, for copy.");
                     pendingList.add(record);
                 } else {
@@ -1356,7 +1371,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (dbH.shouldClearCamsyncRecords()) {
-            dbH.deleteAllSyncRecords(TYPE_ANY);
+            dbH.deleteAllSyncRecords(SyncRecordKt.TYPE_ANY);
             dbH.saveShouldClearCamsyncRecords(false);
         }
     }
@@ -1395,7 +1410,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if (isOverQuota) {
             showStorageOverQuotaNotification();
-            stopRunningCameraUploadService(this);
+            fireStopCameraUploadJob(this);
         }
 
         if (mVideoCompressor != null) {
@@ -1714,7 +1729,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void updateTimeStamp() {
         //primary
-        Long timeStampPrimary = dbH.findMaxTimestamp(false, SyncRecord.TYPE_PHOTO);
+        Long timeStampPrimary = dbH.findMaxTimestamp(false, SyncRecordKt.TYPE_PHOTO);
         if (timeStampPrimary == null) {
             timeStampPrimary = 0L;
         }
@@ -1725,7 +1740,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("Primary photo timestamp is: " + currentTimeStamp);
         }
 
-        Long timeStampPrimaryVideo = dbH.findMaxTimestamp(false, SyncRecord.TYPE_VIDEO);
+        Long timeStampPrimaryVideo = dbH.findMaxTimestamp(false, SyncRecordKt.TYPE_VIDEO);
         if (timeStampPrimaryVideo == null) {
             timeStampPrimaryVideo = 0L;
         }
@@ -1738,7 +1753,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         //secondary
         if (secondaryEnabled) {
-            Long timeStampSecondary = dbH.findMaxTimestamp(true, SyncRecord.TYPE_PHOTO);
+            Long timeStampSecondary = dbH.findMaxTimestamp(true, SyncRecordKt.TYPE_PHOTO);
             if (timeStampSecondary == null) {
                 timeStampSecondary = 0L;
             }
@@ -1749,7 +1764,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Secondary photo timestamp is: " + secondaryTimeStamp);
             }
 
-            Long timeStampSecondaryVideo = dbH.findMaxTimestamp(true, SyncRecord.TYPE_VIDEO);
+            Long timeStampSecondaryVideo = dbH.findMaxTimestamp(true, SyncRecordKt.TYPE_VIDEO);
             if (timeStampSecondaryVideo == null) {
                 timeStampSecondaryVideo = 0L;
             }
@@ -1783,7 +1798,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean isCompressedVideoPending() {
-        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && !String.valueOf(VIDEO_QUALITY_ORIGINAL).equals(prefs.getUploadVideoQuality());
+        return dbH.findVideoSyncRecordsByState(SyncRecordKt.STATUS_TO_COMPRESS).size() > 0 && !String.valueOf(VIDEO_QUALITY_ORIGINAL).equals(prefs.getUploadVideoQuality());
     }
 
     private boolean isCompressorAvailable() {
@@ -1795,7 +1810,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void startVideoCompression() {
-        List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
+        List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(SyncRecordKt.STATUS_TO_COMPRESS);
         if (megaApi.getNumPendingUploads() <= 0) {
             megaApi.resetTotalUploads();
         }
@@ -1857,7 +1872,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public synchronized void onCompressSuccessful(SyncRecord record) {
         logDebug("Compression successfully for file with timestamp: " + record.getTimestamp());
-        dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING, record.getLocalPath(), record.isSecondary());
+        dbH.updateSyncRecordStatusByLocalPath(SyncRecordKt.STATUS_PENDING, record.getLocalPath(), record.isSecondary());
     }
 
     public synchronized void onCompressNotSupported(SyncRecord record) {
@@ -1878,7 +1893,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
                     String newPath = record.getNewPath();
                     File temp = new File(newPath);
-                    dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING, localPath, isSecondary);
+                    dbH.updateSyncRecordStatusByLocalPath(SyncRecordKt.STATUS_PENDING, localPath, isSecondary);
                     if (newPath.startsWith(tempRoot) && temp.exists()) {
                         temp.delete();
                     }
@@ -1897,7 +1912,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onCompressFinished(String currentIndexString) {
         if (!canceled) {
             logDebug("Preparing to upload compressed video.");
-            ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
+            ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(SyncRecordKt.STATUS_PENDING));
             if (compressedList.size() > 0) {
                 logDebug("Start to upload " + compressedList.size() + " compressed videos.");
                 startParallelUpload(compressedList, true);

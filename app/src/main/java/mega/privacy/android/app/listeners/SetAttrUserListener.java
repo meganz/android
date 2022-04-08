@@ -99,7 +99,7 @@ public class SetAttrUserListener extends BaseListener {
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
                             logDebug("Start CU by set primary, try to start CU, true.");
-                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.fireStopCameraUploadJob(context);
                             JobUtil.fireCameraUploadJob(context, true);
                         }
                     }
@@ -114,7 +114,7 @@ public class SetAttrUserListener extends BaseListener {
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
                             logDebug("Start CU by set secondary, try to start CU, true.");
-                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.fireStopCameraUploadJob(context);
                             JobUtil.fireCameraUploadJob(context, true);
                         }
                     }
@@ -131,7 +131,7 @@ public class SetAttrUserListener extends BaseListener {
                     MegaApplication.getInstance().sendBroadcast(intent);
                 } else {
                     logWarning("Set CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-                    JobUtil.stopRunningCameraUploadService(context);
+                    JobUtil.fireStopCameraUploadJob(context);
                 }
                 break;
 

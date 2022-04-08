@@ -19,7 +19,7 @@ import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -490,7 +490,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    stopRunningCameraUploadService(LoginActivity.this);
+                                    fireStopCameraUploadJob(LoginActivity.this);
                                     dbH.setCamSyncEnabled(false);
                                 }
                             });

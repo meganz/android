@@ -12,6 +12,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.SyncRecordKt;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
@@ -19,7 +20,6 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
-import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -93,7 +93,7 @@ public class CameraUploadUtil {
             }
         } else {
             // when primary target folder has been changed, delete primary sync records.
-            dbH.deleteAllPrimarySyncRecords(TYPE_ANY);
+            dbH.deleteAllPrimarySyncRecords(SyncRecordKt.TYPE_ANY);
         }
         clearPrimaryBackUp();
     }
@@ -128,7 +128,7 @@ public class CameraUploadUtil {
             }
         } else {
             // when secondary target folder has been changed, delete secondary sync records.
-            dbH.deleteAllSecondarySyncRecords(TYPE_ANY);
+            dbH.deleteAllSecondarySyncRecords(SyncRecordKt.TYPE_ANY);
         }
         clearSecondaryBackUp();
     }
@@ -180,14 +180,14 @@ public class CameraUploadUtil {
         logDebug("Reset primary timeline");
         dbH.setCamSyncTimeStamp(0);
         dbH.setCamVideoSyncTimeStamp(0);
-        dbH.deleteAllPrimarySyncRecords(TYPE_ANY);
+        dbH.deleteAllPrimarySyncRecords(SyncRecordKt.TYPE_ANY);
     }
 
     public static void resetSecondaryTimeline() {
         logDebug("Reset secondary timeline");
         dbH.setSecSyncTimeStamp(0);
         dbH.setSecVideoSyncTimeStamp(0);
-        dbH.deleteAllSecondarySyncRecords(TYPE_ANY);
+        dbH.deleteAllSecondarySyncRecords(SyncRecordKt.TYPE_ANY);
     }
 
     public static long getPrimaryFolderHandle() {
@@ -226,7 +226,7 @@ public class CameraUploadUtil {
     public static void disableMediaUploadProcess() {
         resetMUTimestampsAndCache();
         dbH.setSecondaryUploadEnabled(false);
-        stopRunningCameraUploadService(app);
+        fireStopCameraUploadJob(app);
     }
     /**
      * This method is to disable the CU and MU settings in database
@@ -237,7 +237,7 @@ public class CameraUploadUtil {
         resetCUTimestampsAndCache(clearCamsyncRecords);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dbH.shouldClearCamsyncRecords()) {
-                dbH.deleteAllSyncRecords(TYPE_ANY);
+                dbH.deleteAllSyncRecords(SyncRecordKt.TYPE_ANY);
                 dbH.saveShouldClearCamsyncRecords(false);
             }
         }, 10 * 1000);
@@ -245,7 +245,7 @@ public class CameraUploadUtil {
         // disable both primary and secondary.
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
-        stopRunningCameraUploadService(app);
+        fireStopCameraUploadJob(app);
     }
 
     /**

@@ -20,9 +20,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
 
-public class GetCuAttributeListener extends BaseListener {
+public class GetCameraUploadAttributeListener extends BaseListener {
 
-    public GetCuAttributeListener(Context context) {
+    public GetCameraUploadAttributeListener(Context context) {
         super(context);
     }
 
@@ -50,7 +50,7 @@ public class GetCuAttributeListener extends BaseListener {
             }
         } else {
             logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-            JobUtil.stopRunningCameraUploadService(context);
+            JobUtil.fireStopCameraUploadJob(context);
         }
     }
 
@@ -97,8 +97,8 @@ public class GetCuAttributeListener extends BaseListener {
         } else {
             shouldStopCameraUpload = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
             // stop CameraUpload if destination has changed
-            if (shouldStopCameraUpload && CameraUploadsService.isServiceRunning) {
-                JobUtil.stopRunningCameraUploadService(context);
+            if (shouldStopCameraUpload) {
+                JobUtil.fireStopCameraUploadJob(context);
             }
 
             forceUpdateCameraUploadFolderIcon(isSecondary, handle);
