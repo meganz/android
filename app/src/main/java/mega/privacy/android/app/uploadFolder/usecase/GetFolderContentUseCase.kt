@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.domain.exception.EmptySearchException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
@@ -20,7 +21,6 @@ import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
-import java.io.FileNotFoundException
 import java.security.InvalidParameterException
 import java.util.*
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class GetFolderContentUseCase @Inject constructor(
         Single.create { emitter ->
             val listFiles = currentFolder.document.listFiles()
             if (listFiles.isNullOrEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
             } else {
                 val folderContentList = mutableListOf<FolderContent.Data>()
 
@@ -81,7 +81,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             get(currentFolder).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(
                         onError = { error -> emitter.onError(error) },
@@ -282,16 +282,15 @@ class GetFolderContentUseCase @Inject constructor(
                 uploadResults.isEmpty() -> emitter.onError(EmptyFolderException())
                 else -> {
                     for (result in uploadResults) {
-                        if (emitter.isDisposed) {
-                            return@create
-                        }
-
                         uploadUseCase.upload(context, result).blockingSubscribeBy(
                             onError = { error -> emitter.onError(error) }
                         )
                     }
 
-                    emitter.onSuccess(uploadResults.size)
+                    when {
+                        emitter.isDisposed -> return@create
+                        else -> emitter.onSuccess(uploadResults.size)
+                    }
                 }
             }
         }
@@ -318,7 +317,7 @@ class GetFolderContentUseCase @Inject constructor(
             }
 
             reorder(results, order, isList).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
             )
         }
@@ -339,7 +338,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
             } else {
                 val folders = ArrayList<FolderContent.Data>()
                 val files = ArrayList<FolderContent.Data>()
@@ -410,7 +409,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -442,7 +441,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content."))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -499,7 +498,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -532,7 +531,7 @@ class GetFolderContentUseCase @Inject constructor(
             val searchResults = mutableListOf<FolderContent.Data>()
 
             get(currentFolder).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { folderContentList ->
                     folderContentList.forEach { item ->
                         if (item.isFolder) {
@@ -551,7 +550,7 @@ class GetFolderContentUseCase @Inject constructor(
             )
 
             if (searchResults.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty search"))
+                emitter.onError(EmptySearchException())
             } else {
                 emitter.onSuccess(searchResults)
             }
@@ -577,7 +576,7 @@ class GetFolderContentUseCase @Inject constructor(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(
-                        onError = { emitter.onError(FileNotFoundException("Empty search")) },
+                        onError = { error -> emitter.onError(error) },
                         onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
                     )
                 })

@@ -51,7 +51,11 @@ class PhotosFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
-        tabIndex = savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
+        tabIndex = if (mManagerActivity.fromAlbumContent) {
+            ALBUM_INDEX
+        } else {
+            savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
+        }
         setupPhotosViewPager()
         return binding.root
     }

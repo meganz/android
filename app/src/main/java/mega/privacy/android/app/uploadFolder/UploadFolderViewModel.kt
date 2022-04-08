@@ -14,7 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.domain.exception.EmptyFolderException
-import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -24,6 +23,7 @@ import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -428,11 +428,11 @@ class UploadFolderViewModel @Inject constructor(
                     transfersManagement.setIsProcessingFolders(false)
 
                     if (error is EmptyFolderException) {
-                        actionResult.value = null
+                        actionResult.value = getString(R.string.no_uploads_empty_folder)
                         return@subscribeBy
+                    } else {
+                        logError("Cannot upload anything", error)
                     }
-
-                    logError("Cannot upload anything", error)
                 },
                 onSuccess = { uploadResults ->
                     transfersManagement.setIsProcessingFolders(false)
