@@ -27,6 +27,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.core.content.ContextCompat;
@@ -159,7 +160,9 @@ public class UploadUtil {
         }
 
         int size = uploadResults.size();
-        Util.showSnackbar(activity, getQuantityString(R.plurals.upload_began, size, size));
+        Util.showSnackbar(activity, size > 0
+                ? getQuantityString(R.plurals.upload_began, size, size)
+                : getString(R.string.no_uploads_empty_folder));
     }
 
     /** The method is to return sdcard root of the file

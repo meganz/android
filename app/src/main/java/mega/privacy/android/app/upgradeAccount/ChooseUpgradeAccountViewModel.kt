@@ -17,12 +17,12 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
 import mega.privacy.android.app.utils.DBUtil.callToPricing
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiJava
 import java.text.NumberFormat
 import java.util.*
@@ -42,15 +42,19 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
         const val YEARLY_SUBSCRIBED = 2
     }
 
-    private val _currentSubscription = MutableLiveData<Pair<Int, SubscriptionMethod?>>()
-    val currentSubscription: LiveData<Pair<Int, SubscriptionMethod?>>
-        get() = _currentSubscription
+    private val upgradeClick = SingleLiveEvent<Int>()
+    private val currentUpgradeClickedAndSubscription =
+        MutableLiveData<Pair<Int, SubscriptionMethod>?>()
+
+    fun onUpgradeClick(): LiveData<Int> = upgradeClick
+    fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, SubscriptionMethod>?> =
+        currentUpgradeClickedAndSubscription
 
     /**
      * Check the current subscription
      * @param upgradeType upgrade type
      */
-    fun subscriptionCheck(upgradeType: Int){
+    fun subscriptionCheck(upgradeType: Int) {
         SubscriptionMethod.values().firstOrNull {
             // Determines the current account if has the subscription and the current subscription
             // platform if is same as current payment platform.
@@ -62,8 +66,20 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
                         && it.methodId == myAccountInfo.subscriptionMethodId
             }
         }.run {
-            _currentSubscription.value = Pair(upgradeType, this)
+            if (this == null) {
+                upgradeClick.value = upgradeType
+            } else {
+                currentUpgradeClickedAndSubscription.value = Pair(upgradeType, this)
+            }
         }
+    }
+
+    /**
+     * Resets the currentUpgradeClickedAndSubscription ensuring the subscription warning
+     * is not shown again.
+     */
+    fun dismissSubscriptionWarningClicked() {
+        currentUpgradeClickedAndSubscription.value = null
     }
 
     fun isGettingInfo(): Boolean =

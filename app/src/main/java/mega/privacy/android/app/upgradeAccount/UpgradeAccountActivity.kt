@@ -19,6 +19,8 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         const val SUBSCRIPTION_FROM_OTHER_PLATFORM = 12
     }
 
+    private var subscriptionWarningDialog: VerticalLayoutButtonDialog? = null
+
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
 
@@ -30,14 +32,12 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
-        viewModel.currentSubscription.observe(this) {
-            it.second?.run {
-                showSubscriptionDialog(it.first, it.second)
-            } ?: run{
-                startActivity(Intent(this, PaymentActivity::class.java)
-                    .putExtra(UPGRADE_TYPE, it.first))
-            }
-        }
+        setupObservers()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        subscriptionWarningDialog?.dismiss()
     }
 
     override fun onBackPressed() {
@@ -53,6 +53,19 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
+    }
+
+    private fun setupObservers() {
+        viewModel.onUpgradeClick().observe(this) { upgradeType ->
+            startActivity(
+                Intent(this, PaymentActivity::class.java).putExtra(UPGRADE_TYPE, upgradeType)
+            )
+        }
+        viewModel.onUpgradeClickWithSubscription().observe(this) { warning ->
+            if (warning == null) return@observe
+
+            showSubscriptionDialog(warning.first, warning.second)
+        }
     }
 
     private fun showAvailableAccount() {
@@ -154,7 +167,7 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
      */
     private fun showSubscriptionDialog(upgradeType: Int, subscriptionMethod: SubscriptionMethod?) {
         subscriptionMethod?.run {
-            VerticalLayoutButtonDialog(
+            subscriptionWarningDialog = VerticalLayoutButtonDialog(
                 context = this@UpgradeAccountActivity,
                 title = StringResourcesUtils.getString(R.string.title_existing_subscription),
                 message = when (platformType) {
@@ -177,12 +190,14 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
                         Intent(this@UpgradeAccountActivity, PaymentActivity::class.java)
                             .putExtra(UPGRADE_TYPE, upgradeType)
                     )
+                    viewModel.dismissSubscriptionWarningClicked()
                     it.dismiss()
                 },
                 onDismissClicked = {
+                    viewModel.dismissSubscriptionWarningClicked()
                     it.dismiss()
                 }
-            ).show()
+            ).apply { show() }
         }
     }
 }

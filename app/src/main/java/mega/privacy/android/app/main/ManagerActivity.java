@@ -299,6 +299,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -616,6 +617,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
     private boolean isInAlbumContent;
+    public boolean fromAlbumContent = false;
 
     public enum FragmentTag {
         CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
@@ -3612,7 +3614,15 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipToAlbumContentFragment(Fragment f) {
         albumContentFragment = (AlbumContentFragment) f;
-        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
+        String albumContentTag = FragmentTag.ALBUM_CONTENT.getTag();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, f, albumContentTag);
+        // Null check for rotation. In this case, we don't want to add another
+        // albumcontentfragment in to the backstack
+        if (getSupportFragmentManager().findFragmentByTag(albumContentTag) == null) {
+            ft.addToBackStack(FragmentTag.ALBUM_CONTENT.getTag());
+            ft.commitAllowingStateLoss();
+        }
         isInAlbumContent = true;
         firstNavigationLevel = false;
 
@@ -5559,14 +5569,13 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (photosFragment.isEnablePhotosFragmentShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
+                            } else if (isInAlbumContent) {
+                                onBackPressed();
                             }
 
                             setToolbarTitle();
                             invalidateOptionsMenu();
                             return true;
-                        } else if (isInAlbumContent) {
-                            // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
-                            onBackPressed();
                         }
 					} else if (drawerItem == DrawerItem.INBOX) {
 						inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -6061,12 +6070,13 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (drawerItem == DrawerItem.PHOTOS) {
             if (isInAlbumContent) {
+                fromAlbumContent = true;
                 isInAlbumContent = false;
-                backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    showHideBottomNavigationView(false);
+                    getSupportFragmentManager().popBackStack();
                 } else {
-                    photosFragment.switchToAlbum();
+                    backToDrawerItem(bottomNavigationCurrentItem);
                 }
             } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
                 performOnBack();
@@ -6186,6 +6196,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (nV != null) {
             Menu nVMenu = nV.getMenu();
             resetNavigationViewMenu(nVMenu);
+        }
+
+        /* Prevent accidental bottomnav button click */
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+            return true;
         }
 
         DrawerItem oldDrawerItem = drawerItem;
