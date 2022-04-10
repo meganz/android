@@ -74,11 +74,14 @@ class ZipBrowserActivity : PasscodeActivity() {
          * @param zipFilePath zip file full path
          */
         fun zipFileFormatCheck(zipFilePath: String): Boolean {
+            var zipFile: ZipFile? = null
             try {
-                ZipFile(zipFilePath)
+                zipFile = ZipFile(zipFilePath)
             } catch (exception: ZipException) {
+                zipFile?.close()
                 return false
             }
+            zipFile.close()
             return true
         }
     }
