@@ -5,7 +5,7 @@ import java.util.zip.ZipFile
 /**
  * Zip repository to handle zip file
  */
-interface IZipFileRepo {
+interface ZipFileRepository {
 
     /**
      * Unpack Zip file
