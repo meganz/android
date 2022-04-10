@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.ActivityModule
-import mega.privacy.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
