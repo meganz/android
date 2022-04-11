@@ -6,15 +6,19 @@ import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Timber mega logger
+ *
+ * Class responsible for writing SDK log output to the Timber log, adding custom tags.
+ *
+ * See logback.xml for configuration.
+ */
 class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     override fun log(time: String?, loglevel: Int, source: String?, message: String?) {
+        Timber.tag("[ $time ][ ${getLogLevelString(loglevel)} ]")
         Timber.log(
-            getPriority(loglevel),
-            "[ %s ][ %s ] %s %s",
-            time,
-            getLogLevelString(loglevel),
-            message,
-            getSource(source)
+            priority = getPriority(loglevel),
+            message = "$message ${getSource(source)}",
         )
     }
 

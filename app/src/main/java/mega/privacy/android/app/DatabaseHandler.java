@@ -2125,6 +2125,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return getCompletedTransfers(selectQuery);
 	}
 
+	/**
+	 * Removes the completed transfers which have cancelled or failed as state .
+	 */
+	public void removeFailedOrCancelledTransfers() {
+		String whereCause = KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_CANCELLED + "")
+				+ "' OR " + KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_FAILED + "") + "'";
+		db.delete(TABLE_COMPLETED_TRANSFERS, whereCause, null);
+	}
+
     /**
      * Gets a list with completed transfers depending on the query received by parameter.
      *

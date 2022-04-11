@@ -38,22 +38,11 @@ interface SettingsRepository{
     suspend fun setChatLoggingEnabled(enabled: Boolean)
 
     /**
-     * Get attributes
+     * Is passcode lock preference enabled
      *
-     * This method requires some refactoring as MegaAttributes is not a domain entity and thus violates the architecture
-     *
-     * @return the current MegaAttributes
+     * @return true if enabled
      */
-    fun getAttributes(): MegaAttributes?
-
-    /**
-     * Get preferences
-     *
-     * This method requires some refactoring as MegaPreferences is not a domain entity and thus violates the architecture
-     *
-     * @return the current MegaPreferences
-     */
-    fun getPreferences(): MegaPreferences?
+    fun isPasscodeLockPreferenceEnabled(): Boolean
 
     /**
      * Set passcode lock enabled/disabled
@@ -104,4 +93,26 @@ interface SettingsRepository{
      * @return hide recent activity option enabled status as a flow
      */
     fun monitorHideRecentActivity(): Flow<Boolean>
+
+    /**
+     * Is camera sync enabled
+     *
+     * @return
+     */
+    fun isCameraSyncPreferenceEnabled(): Boolean
+
+    /**
+     * Is use https preference set
+     *
+     * @return true if set
+     */
+    suspend fun isUseHttpsPreferenceEnabled(): Boolean
+
+    /**
+     * Set use https preference
+     *
+     * @param enabled
+     */
+    suspend fun setUseHttpsPreference(enabled: Boolean)
+
 }

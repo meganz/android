@@ -148,6 +148,7 @@
             app:iconSpaceReserved="false" />
 
         <androidx.preference.Preference
+            android:fragment="mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment"
             android:key="settings_security_advanced"
             android:title="@string/settings_advanced_features"
             app:allowDividerAbove="true"

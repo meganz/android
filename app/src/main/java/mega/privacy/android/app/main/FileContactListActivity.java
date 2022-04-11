@@ -16,6 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -741,7 +742,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				startService(intent);
+				ContextCompat.startForegroundService(this, intent);
 			}
 		}
 	}

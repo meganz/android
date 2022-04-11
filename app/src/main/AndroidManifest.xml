@@ -396,10 +396,6 @@
         <activity android:name=".smsVerification.SMSVerificationActivity" />
         <activity android:name=".smsVerification.SMSVerificationReceiveTxtActivity" />
         <activity
-            android:name=".activities.settingsActivities.AdvancedPreferencesActivity"
-            android:label="@string/settings_advanced_features"
-            android:launchMode="singleTop" />
-        <activity
             android:name=".activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
