@@ -41,8 +41,9 @@ import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.ImageProcessor.createImagePreview;
 import static mega.privacy.android.app.utils.ImageProcessor.createThumbnail;
 import static mega.privacy.android.app.utils.ImageProcessor.createVideoPreview;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireSingleHeartbeat;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -707,7 +708,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Nothing to upload.");
 
                 // Make sure to send inactive heartbeat.
-                CuSyncManager.INSTANCE.doRegularHeartbeat();
+                fireSingleHeartbeat(this);
 
                 // Make sure to re schedule the job
                 scheduleCameraUploadJob(this);

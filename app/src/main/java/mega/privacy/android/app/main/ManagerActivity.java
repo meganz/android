@@ -103,7 +103,7 @@ import static mega.privacy.android.app.utils.FileUtil.buildExternalStorageFile;
 import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelUploadsJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -299,7 +299,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -10217,7 +10216,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    cancelAllUploads(ManagerActivity.this);
+                    fireCancelUploadsJob(ManagerActivity.this);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })

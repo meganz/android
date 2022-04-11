@@ -682,7 +682,8 @@ object CuSyncManager {
 
     /**
      * When the CU service has nothing to upload, send heartbeat as well.
-     * Before sending, check the account state and login again when the rootNode is null
+     * Before sending, check the account state and login again when the rootNode is null.
+     * Only call in Worker class.
      */
     fun doRegularHeartbeat() {
         if (megaApi.rootNode == null) {

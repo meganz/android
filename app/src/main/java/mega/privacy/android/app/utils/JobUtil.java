@@ -3,11 +3,9 @@ package mega.privacy.android.app.utils;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.text.TextUtils;
 
-import androidx.core.content.ContextCompat;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -21,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.jobservices.CancelUploadsWorker;
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
 import mega.privacy.android.app.jobservices.SyncHeartbeatWorker;
@@ -42,11 +41,22 @@ public class JobUtil {
 
     private static final int START_JOB_FAILED_NOT_ENABLED = -2;
 
-    public static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
-    public static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
-    public static final String STOP_CAMERA_UPLOAD_TAG = "MEGA_STOP_CAMERA_UPLOAD_TAG";
-    public static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
     public static final String SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES";
+
+    /**
+     * Worker tags
+     */
+    private static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
+
+    private static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
+
+    private static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
+
+    private static final String SINGLE_HEART_BEAT_TAG = "MEGA_SINGLE_HEART_BEAT_TAG";
+
+    private static final String STOP_CAMERA_UPLOAD_TAG = "MEGA_STOP_CAMERA_UPLOAD_TAG";
+
+    private static final String CANCEL_UPLOADS_TAG = "MEGA_CANCEL_UPLOADS_TAG";
 
     /**
      * Schedule job of camera upload
@@ -92,6 +102,21 @@ public class JobUtil {
         WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(HEART_BEAT_TAG, ExistingPeriodicWorkPolicy.KEEP, cuSyncActiveHeartbeatWorkRequest);
         logDebug("CameraUpload Sync Heartbeat Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(HEART_BEAT_TAG));
+    }
+
+    /**
+     * Fire a single camera upload heartbeat
+     *
+     * @param context From which the action is done.
+     */
+    public static synchronized void fireSingleHeartbeat(Context context) {
+        logDebug("JobUtil: sendSingleHeartbeat()");
+        OneTimeWorkRequest heartbeatWorkRequest =
+                new OneTimeWorkRequest.Builder(SyncHeartbeatWorker.class).addTag(SINGLE_HEART_BEAT_TAG).build();
+
+        WorkManager.getInstance(context).
+                enqueueUniqueWork(SINGLE_HEART_BEAT_TAG, ExistingWorkPolicy.KEEP, heartbeatWorkRequest);
+        logDebug("Single Sync Heartbeat Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_HEART_BEAT_TAG));
     }
 
     /**
@@ -142,11 +167,14 @@ public class JobUtil {
         logDebug("Stop CameraUpload Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG));
     }
 
-    public static synchronized void cancelAllUploads(Context context) {
-        logDebug("stopRunningCameraUploadService");
-        Intent stopIntent = new Intent(context, CameraUploadsService.class);
-        stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
-        ContextCompat.startForegroundService(context, stopIntent);
+    public static synchronized void fireCancelUploadsJob(Context context) {
+        logDebug("JobUtil: fireCancelUploadsJob()");
+        OneTimeWorkRequest cancelWorkRequest =
+                new OneTimeWorkRequest.Builder(CancelUploadsWorker.class).addTag(CANCEL_UPLOADS_TAG).build();
+
+        WorkManager.getInstance(context).
+                enqueueUniqueWork(CANCEL_UPLOADS_TAG, ExistingWorkPolicy.KEEP, cancelWorkRequest);
+        logDebug("Cancel Uploads Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(CANCEL_UPLOADS_TAG));
     }
 
     public static void rescheduleCameraUpload(final Context context) {
@@ -156,6 +184,22 @@ public class JobUtil {
             logDebug("JobUtil: rescheduleCameraUpload()");
             scheduleCameraUploadJob(context);
         }, CU_RESCHEDULE_INTERVAL);
+    }
+
+    /**
+     * Stop the camera upload work by tag.
+     * Stop regular camera upload sync heartbeat work by tag.
+     *
+     * @param context From which the action is done.
+     */
+    public static void stopCameraUploadSyncHeartbeatWorkers(Context context) {
+        if (context != null) {
+            logDebug("JobUtil: stopCameraUploadSyncHeartbeatWorkers()");
+            WorkManager manager = WorkManager.getInstance(context);
+            for (String tag : Arrays.asList(CAMERA_UPLOAD_TAG, SINGLE_CAMERA_UPLOAD_TAG, HEART_BEAT_TAG, SINGLE_HEART_BEAT_TAG)) {
+                manager.cancelAllWorkByTag(tag);
+            }
+        }
     }
 
     private static boolean isCameraUploadDisabled(Context context) {
@@ -171,21 +215,5 @@ public class JobUtil {
             return true;
         }
         return !Boolean.parseBoolean(cameraUploadEnabled);
-    }
-
-    /**
-     * Stop the camera upload work by tag.
-     * Stop regular camera upload sync heartbeat work by tag.
-     *
-     * @param context From which the action is done.
-     */
-    public static void stopCameraUploadSyncHeartbeatWorkers(Context context) {
-        if (context != null) {
-            logDebug("JobUtil: stopCameraUploadSyncHeartbeatWorkers()");
-            WorkManager manager = WorkManager.getInstance(context);
-            for (String tag : Arrays.asList(CAMERA_UPLOAD_TAG, SINGLE_CAMERA_UPLOAD_TAG, HEART_BEAT_TAG)) {
-                manager.cancelAllWorkByTag(tag);
-            }
-        }
     }
 }
