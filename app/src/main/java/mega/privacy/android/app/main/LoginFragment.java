@@ -1301,29 +1301,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            int ret = megaChatApi.getInitState();
+            int ret = megaChatApi.init(null);
             logDebug("INIT STATE: " + ret);
-            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                ret = megaChatApi.init(null);
-                logDebug("result of init ---> " + ret);
+            switch (ret) {
+                case MegaChatApi.INIT_WAITING_NEW_SESSION:
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                    break;
+                case MegaChatApi.INIT_ERROR:
+                    logWarning("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
 
-                switch (ret) {
-                    case MegaChatApi.INIT_WAITING_NEW_SESSION:
-                        logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                        disableLoginButton();
-                        megaApi.login(lastEmail, lastPassword, this);
-                        break;
-                    case MegaChatApi.INIT_ERROR:
-                        logWarning("ERROR INIT CHAT: " + ret);
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
-
-                        disableLoginButton();
-                        megaApi.login(lastEmail, lastPassword, this);
-                        break;
-                    default:
-                        logDebug("Chat correctly initialized");
-                        break;
-                }
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                    break;
             }
         }
     }
@@ -1935,11 +1926,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-            //cancel login process by press back.
-            if(!MegaApplication.isLoggingIn()) {
-                logDebug("Terminate login process when fetch nodes");
-                return;
-            }
             LoginActivity.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 
