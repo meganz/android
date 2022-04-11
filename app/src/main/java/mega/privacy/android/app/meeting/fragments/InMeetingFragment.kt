@@ -2688,7 +2688,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (chatId != MEGACHAT_INVALID_HANDLE) {
             logDebug("Update chat id $chatId")
             sharedModel.updateChatRoomId(chatId)
-            inMeetingViewModel.setChatId(chatId)
         }
 
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)

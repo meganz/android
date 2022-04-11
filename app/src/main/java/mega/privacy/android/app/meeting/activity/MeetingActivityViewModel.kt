@@ -211,7 +211,7 @@ class MeetingActivityViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { chatId ->
-                        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId) {
+                        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId && _switchCall.value != chatId) {
                             _switchCall.value = chatId
                         } else if (shouldEndCurrentCall) {
                             _finishCall.value = true
@@ -298,7 +298,9 @@ class MeetingActivityViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun updateChatRoomId(chatId: Long) {
-        _currentChatId.value = chatId
+        if(_currentChatId.value != chatId){
+            _currentChatId.value = chatId
+        }
     }
 
     /**

@@ -34,7 +34,6 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -233,7 +232,7 @@ class InMeetingViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun setChatId(chatId: Long) {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
+        if (chatId == MEGACHAT_INVALID_HANDLE || currentChatId == chatId)
             return
 
         currentChatId = chatId

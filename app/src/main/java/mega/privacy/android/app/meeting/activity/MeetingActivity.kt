@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -10,8 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -19,10 +18,8 @@ import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.*
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.meetings.OpenCallWrapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -54,6 +51,15 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_VIDEO_ENABLE = "video_enable"
         const val MEETING_IS_GUEST = "is_guest"
         const val CALL_ACTION = "call_action"
+
+        fun getIntentOngoingCall(context: Context, chatId:Long, isAudioEnabled: Boolean? = true, isVideoEnabled: Boolean? = false): Intent {
+            return Intent(context, MeetingActivity::class.java).apply {
+                putExtra(MEETING_CHAT_ID, chatId)
+                putExtra(MEETING_AUDIO_ENABLE, isAudioEnabled)
+                putExtra(MEETING_VIDEO_ENABLE, isVideoEnabled)
+                action = MEETING_ACTION_IN
+            }
+        }
     }
 
     @Inject
@@ -61,9 +67,6 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    @Inject
-    lateinit var openCallWrapper: OpenCallWrapper
 
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
@@ -83,6 +86,11 @@ class MeetingActivity : BaseActivity() {
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
         intent = newIntent
+        init()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         init()
     }
 
@@ -127,7 +135,6 @@ class MeetingActivity : BaseActivity() {
             meetingAction = it.action
         }
 
-
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
@@ -148,27 +155,14 @@ class MeetingActivity : BaseActivity() {
 
         lifecycleScope.launchWhenStarted {
             meetingViewModel.switchCall.collect { chatId ->
-                if (chatId != MEGACHAT_INVALID_HANDLE) {
+                if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
                     logDebug("Switch call")
                     passcodeManagement.showPasscodeScreen = true
                     MegaApplication.getInstance().openCallService(chatId)
-                    startActivity(
-                        openCallWrapper.getIntentForOpenOngoingCall(
-                            context = this@MeetingActivity,
-                            chatId = chatId,
-                            isAudioEnabled = true,
-                            isVideoEnabled = false
-                        )
-                    )
-                    finish()
+                    startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
                 }
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        init()
     }
 
     @Suppress("DEPRECATION")
@@ -259,10 +253,6 @@ class MeetingActivity : BaseActivity() {
             )
         }
 
-        if (meetingAction == MEETING_ACTION_START) {
-            bundle.putString("action", MEETING_ACTION_START)
-        }
-
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
             MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
@@ -272,7 +262,7 @@ class MeetingActivity : BaseActivity() {
             MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
             else -> R.id.createMeetingFragment
         }
-
+        navController.popBackStack(navGraph.startDestination,true)
         navController.setGraph(navGraph, bundle)
     }
 
