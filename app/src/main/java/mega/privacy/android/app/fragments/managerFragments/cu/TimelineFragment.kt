@@ -387,8 +387,10 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     public override fun setHideBottomViewScrollBehaviour() {
-        mManagerActivity.showBottomView()
-        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        if (!isInActionMode()) {
+            mManagerActivity.showBottomView()
+            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        }
     }
 
     override fun whenStartActionMode() {
