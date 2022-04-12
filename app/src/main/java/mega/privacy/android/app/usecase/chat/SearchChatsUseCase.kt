@@ -1,6 +1,7 @@
 package mega.privacy.android.app.usecase.chat
 
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.utils.ChatUtil
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatListItem
 import javax.inject.Inject
@@ -30,14 +31,14 @@ class SearchChatsUseCase @Inject constructor(
 
             items
                 .filter { item ->
-                    val chatTitle = item.title
-                    val lastMessage = item.lastMessage
+                    val chatDateTitle = ChatUtil.getTitleChat(megaChatApi.getChatRoom(item.chatId))
                     val userAlias = megaChatApi.getUserAliasFromCache(item.peerHandle)
                     val userEmail = megaChatApi.getUserEmailFromCache(item.peerHandle)
                     val userFullName = megaChatApi.getUserFullnameFromCache(item.peerHandle)
 
-                    chatTitle.contains(query, true)
-                            || lastMessage?.contains(query, true) == true
+                    item.title.contains(query, true)
+                            || chatDateTitle.contains(query, true)
+                            || item.lastMessage?.contains(query, true) == true
                             || userAlias?.contains(query, true) == true
                             || userEmail?.contains(query, true) == true
                             || userFullName?.contains(query, true) == true
