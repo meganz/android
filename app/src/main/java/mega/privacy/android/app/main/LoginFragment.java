@@ -1926,6 +1926,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            //cancel login process by press back.
+            if(!MegaApplication.isLoggingIn()) {
+                logDebug("Terminate login process when fetch nodes");
+                return;
+            }
+
             LoginActivity.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 
