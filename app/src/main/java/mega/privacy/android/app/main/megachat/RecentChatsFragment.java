@@ -8,7 +8,6 @@ import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
 import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
 import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
 import static mega.privacy.android.app.utils.ChatUtil.getPositionFromChatId;
-import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
 import static mega.privacy.android.app.utils.ChatUtil.shouldMuteOrUnmuteOptionsBeShown;
 import static mega.privacy.android.app.utils.ChatUtil.showConfirmationLeaveChats;
@@ -44,7 +43,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -1848,74 +1846,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private void loadMegaContacts() {
         contactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
-    }
-
-    class FilterChatsTask extends AsyncTask<String, Void, Void> {
-
-        ArrayList<MegaChatListItem> filteredChats = new ArrayList<>();
-        int archivedSize = 0;
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            ArrayList<MegaChatListItem> chatsToSearch = new ArrayList<>();
-            if (chats != null) {
-                chatsToSearch.addAll(chats);
-            }
-
-            if (context instanceof ManagerActivity) {
-                ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
-                if (archivedChats != null && !archivedChats.isEmpty()) {
-                    archivedSize = archivedChats.size();
-                    sortChats(archivedChats);
-                    chatsToSearch.addAll(archivedChats);
-                }
-            }
-
-            if (!chatsToSearch.isEmpty()) {
-                filteredChats.clear();
-                for (MegaChatListItem chat : chatsToSearch) {
-                    if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
-                        filteredChats.add(chat);
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (adapterList == null) {
-                return;
-            }
-            adapterList.setChats(filteredChats);
-
-            if (shouldShowEmptyState()) {
-                logDebug("adapterList.getItemCount() == 0");
-                listView.setVisibility(View.GONE);
-                emptyLayout.setVisibility(View.VISIBLE);
-                inviteButton.setVisibility(View.GONE);
-
-                CharSequence result = getSpannedMessageForEmptyChat(
-                        context.getString(R.string.recent_chat_empty).toUpperCase());
-                emptyTextViewInvite.setText(result);
-                emptyTextViewInvite.setVisibility(View.VISIBLE);
-            } else {
-                logDebug("adapterList.getItemCount() NOT = 0");
-                listView.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.GONE);
-            }
-        }
-
-        private boolean shouldShowEmptyState() {
-            if (context instanceof ManagerActivity) {
-                if ((adapterList.getItemCount() == 0 && archivedSize == 0) || (adapterList.getItemCount() == 1 && archivedSize > 0))
-                    return true;
-            } else if (context instanceof ArchivedChatsActivity) {
-                if (adapterList.getItemCount() == 0)
-                    return true;
-            }
-            return false;
-        }
     }
 
     public void setCustomisedActionBar() {
