@@ -1301,20 +1301,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            int ret = megaChatApi.init(null);
-            logDebug("INIT STATE: " + ret);
-            switch (ret) {
-                case MegaChatApi.INIT_WAITING_NEW_SESSION:
-                    disableLoginButton();
-                    megaApi.login(lastEmail, lastPassword, this);
-                    break;
-                case MegaChatApi.INIT_ERROR:
-                    logWarning("ERROR INIT CHAT: " + ret);
-                    megaChatApi.logout(new ChatLogoutListener(getContext()));
-
-                    disableLoginButton();
-                    megaApi.login(lastEmail, lastPassword, this);
-                    break;
+            int initState = megaChatApi.getInitState();
+            logDebug("INIT STATE: " + initState);
+            if (initState == MegaChatApi.INIT_NOT_DONE || initState == MegaChatApi.INIT_ERROR) {
+                int ret = megaChatApi.init(null);
+                logDebug("result of init ---> " + ret);
+                switch (ret) {
+                    case MegaChatApi.INIT_WAITING_NEW_SESSION:
+                        disableLoginButton();
+                        megaApi.login(email, password, this);
+                        break;
+                    case MegaChatApi.INIT_ERROR:
+                        logWarning("ERROR INIT CHAT: " + ret);
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
+                        disableLoginButton();
+                        megaApi.login(email, password, this);
+                        break;
+                }
             }
         }
     }
