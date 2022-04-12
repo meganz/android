@@ -11,7 +11,9 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -31,9 +33,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MediaViewModel @Inject constructor(
-    repository: MediaItemRepository,
+    val repository: MediaItemRepository,
     private val sortOrderManagement: SortOrderManagement,
-    savedStateHandle: SavedStateHandle? = null
+    savedStateHandle: SavedStateHandle? = null,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     companion object {

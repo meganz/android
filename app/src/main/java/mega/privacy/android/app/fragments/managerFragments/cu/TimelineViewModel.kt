@@ -18,11 +18,12 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -50,6 +51,7 @@ class TimelineViewModel @Inject constructor(
     private val mDbHandler: DatabaseHandler,
     private val sortOrderManagement: SortOrderManagement,
     private val jobUtilWrapper: JobUtilWrapper,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
 ) : ViewModel() {
 
@@ -365,7 +367,7 @@ class TimelineViewModel @Inject constructor(
     }
 
     fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(ioDispatcher) {
             runCatching {
                 enableCUSettingForDb(enableCellularSync, syncVideo)
                 startCameraUploadJob()
@@ -407,7 +409,7 @@ class TimelineViewModel @Inject constructor(
     }
 
     fun checkAndUpdateCamSyncEnabledStatus() {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(ioDispatcher) {
             camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
         }
     }

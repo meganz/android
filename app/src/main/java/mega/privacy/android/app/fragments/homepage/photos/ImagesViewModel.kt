@@ -1,6 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.ImagesItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
@@ -11,8 +13,13 @@ import javax.inject.Inject
 @HiltViewModel
 class ImagesViewModel @Inject constructor(
     repository: ImagesItemRepository,
-    sortOrderManagement: SortOrderManagement
-) : GalleryViewModel(repository, sortOrderManagement) {
+    sortOrderManagement: SortOrderManagement,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : GalleryViewModel(
+    galleryItemRepository = repository,
+    sortOrderManagement = sortOrderManagement,
+    ioDispatcher = ioDispatcher,
+) {
 
     override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
 

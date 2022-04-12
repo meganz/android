@@ -13,7 +13,6 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.ArrayList
 import java.util.Locale
 import java.util.Date
 
@@ -24,20 +23,28 @@ import java.util.Date
  */
 class DateCardsProvider {
 
+    companion object {
+        private const val DATE_FORMAT_DAY = "dd"
+        private const val DATE_FORMAT_MONTH = "MMMM"
+        private const val DATE_FORMAT_MONTH_STANDALONE = "LLLL"
+        private const val DATE_FORMAT_YEAR = "uuuu"
+        private const val DATE_FORMAT_YEAR_OF_ERA = "yyyy"
+    }
+
     /**
      * Days list.
      */
-    private val days = ArrayList<GalleryCard>()
+    private val days = arrayListOf<GalleryCard>()
 
     /**
      * Months list.
      */
-    private val months = ArrayList<GalleryCard>()
+    private val months = arrayListOf<GalleryCard>()
 
     /**
      * Years list.
      */
-    private val years = ArrayList<GalleryCard>()
+    private val years = arrayListOf<GalleryCard>()
 
     /**
      * MegaNodes which doesn't have local preview.
@@ -66,19 +73,24 @@ class DateCardsProvider {
             )
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val day = DateTimeFormatter.ofPattern("dd").format(modifyDate)
-            val month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
+            val day = DateTimeFormatter.ofPattern(DATE_FORMAT_DAY).format(modifyDate)
+            val month = SimpleDateFormat(DATE_FORMAT_MONTH_STANDALONE, Locale.getDefault()).format(
                 Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             )
-            val year = DateTimeFormatter.ofPattern("uuuu").format(modifyDate)
-            val monthForDayCard = DateTimeFormatter.ofPattern("MMMM").format(modifyDate)
+            val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifyDate)
+            val monthForDayCard = DateTimeFormatter.ofPattern(DATE_FORMAT_MONTH).format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             if (lastDayDate == null || lastDayDate!!.dayOfYear != modifyDate.dayOfYear) {
                 shouldGetPreview = true
                 lastDayDate = modifyDate
-                val date =
-                    DateTimeFormatter.ofPattern(if (sameYear) "dd MMMM" else "dd MMMM uuuu").format(lastDayDate)
+                val date = DateTimeFormatter.ofPattern(
+                    if (sameYear) {
+                        "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH"
+                    } else {
+                        "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH $DATE_FORMAT_YEAR"
+                    }
+                ).format(lastDayDate)
                 days.add(
                     GalleryCard(
                         node, if (preview.exists()) preview else null, day, monthForDayCard,
@@ -93,7 +105,7 @@ class DateCardsProvider {
             ) {
                 shouldGetPreview = true
                 lastMonthDate = modifyDate
-                val date = if (sameYear) month else SimpleDateFormat("LLLL yyyy", Locale.getDefault()).format(
+                val date = if (sameYear) month else SimpleDateFormat("$DATE_FORMAT_MONTH_STANDALONE $DATE_FORMAT_YEAR_OF_ERA", Locale.getDefault()).format(
                     Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
                 )
                 months.add(

@@ -9,8 +9,9 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -25,8 +26,9 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 
 abstract class GalleryViewModel constructor(
-    private val repository: GalleryItemRepository,
+    private val galleryItemRepository: GalleryItemRepository,
     private val sortOrderManagement: SortOrderManagement,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
 ) : BaseRxViewModel(), SearchCallback.Data {
 
@@ -93,14 +95,14 @@ abstract class GalleryViewModel constructor(
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
                 cancelToken = initNewSearch()
-                repository.getFiles(cancelToken ?: return@liveData,
+                galleryItemRepository.getFiles(cancelToken ?: return@liveData,
                     sortOrderManagement.getOrderCamera(),
                     mZoom,
                     currentHandle)
             } else {
-                repository.emitFiles()
+                galleryItemRepository.emitFiles()
             }
-            emit(repository.galleryItems.value ?: return@liveData)
+            emit(galleryItemRepository.galleryItems.value ?: return@liveData)
         }
     }.map {
         var index = 0
@@ -114,22 +116,22 @@ abstract class GalleryViewModel constructor(
         it
     }
 
-    var dateCards: LiveData<List<List<GalleryCard>>> = items.map {
-        val cardsProvider = DateCardsProvider()
-        cardsProvider.extractCardsFromNodeList(
-            repository.context,
-            it.mapNotNull { item -> item.node }
-                // Sort by modification time and name desc.
-                .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }.thenByDescending { node -> node.name })
-        )
+    var dateCards: LiveData<List<List<GalleryCard>>> = items.switchMap { galleryItems ->
+        liveData(context = ioDispatcher) {
+            val cardsProvider = DateCardsProvider()
+            cardsProvider.extractCardsFromNodeList(
+                context = galleryItemRepository.context,
+                nodes = galleryItems.mapNotNull { item -> item.node }
+                    .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
+                        .thenByDescending { node -> node.name })
+            )
 
-        viewModelScope.launch {
-            repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
+            emit(listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears()))
+
+            galleryItemRepository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
                 _refreshCards.value = true
             }
         }
-
-        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
 
     /**
