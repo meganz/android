@@ -54,16 +54,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintGuide_end="52dp" />
 
-    <ImageButton
-        android:id="@id/exo_shuffle"
-        style="@style/AudioPlayerButton"
-        android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toBottomOf="@id/control_button_center"
-        app:layout_constraintEnd_toStartOf="@id/exo_prev"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guide_line"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/control_button_center"
-        tools:src="@drawable/exo_controls_shuffle_on" />
+        app:layout_constraintGuide_begin="62dp" />
 
     <ImageButton
         android:id="@id/exo_prev"
@@ -71,8 +68,7 @@
         android:src="@drawable/media_player_prev"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/exo_shuffle"
+        app:layout_constraintStart_toEndOf="@id/left_guide_line"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <View
@@ -80,9 +76,8 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
-        app:layout_constraintEnd_toStartOf="@id/exo_next"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/exo_prev"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
@@ -109,7 +104,6 @@
         android:src="@drawable/media_player_next"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_repeat_toggle"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
@@ -120,8 +114,6 @@
         android:src="@drawable/exo_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/exo_next"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
