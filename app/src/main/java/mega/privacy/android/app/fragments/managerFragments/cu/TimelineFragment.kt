@@ -232,7 +232,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             return
         }
 
-        mManagerActivity.updateCUViewTypes(View.VISIBLE)
+        if (!mManagerActivity.fromAlbumContent) {
+            mManagerActivity.updateCUViewTypes(View.VISIBLE)
+        }
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
@@ -304,11 +306,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
             viewTypePanel.visibility = if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
 
-            if (galleryItems.isEmpty()) {
-                handleOptionsMenuUpdate(shouldShow = false)
-            } else {
-                handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
-            }
+            updateOptionsButtons()
+            mManagerActivity.fromAlbumContent = false
 
             updateEnableCUButtons(
                 gridAdapterHasData = galleryItems.isNotEmpty(),
@@ -390,6 +389,14 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!isInActionMode()) {
             mManagerActivity.showBottomView()
             mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        }
+    }
+
+    fun updateOptionsButtons() {
+        if (viewModel.items.value?.isEmpty() == true || mManagerActivity.fromAlbumContent) {
+            handleOptionsMenuUpdate(shouldShow = false)
+        } else {
+            handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
         }
     }
 

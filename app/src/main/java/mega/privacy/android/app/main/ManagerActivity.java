@@ -3624,15 +3624,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipToAlbumContentFragment(Fragment f) {
         albumContentFragment = (AlbumContentFragment) f;
-        String albumContentTag = FragmentTag.ALBUM_CONTENT.getTag();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, f, albumContentTag);
-        // Null check for rotation. In this case, we don't want to add another
-        // albumcontentfragment in to the backstack
-        if (getSupportFragmentManager().findFragmentByTag(albumContentTag) == null) {
-            ft.addToBackStack(FragmentTag.ALBUM_CONTENT.getTag());
-            ft.commitAllowingStateLoss();
-        }
+        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
         isInAlbumContent = true;
         firstNavigationLevel = false;
 
@@ -5579,13 +5571,14 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (photosFragment.isEnablePhotosFragmentShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
-                            } else if (isInAlbumContent) {
-                                onBackPressed();
                             }
 
                             setToolbarTitle();
                             invalidateOptionsMenu();
                             return true;
+                        } else if (isInAlbumContent) {
+                            // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
+                            onBackPressed();
                         }
 					} else if (drawerItem == DrawerItem.INBOX) {
 						inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -6082,11 +6075,12 @@ public class ManagerActivity extends TransfersManagementActivity
             if (isInAlbumContent) {
                 fromAlbumContent = true;
                 isInAlbumContent = false;
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    showHideBottomNavigationView(false);
-                    getSupportFragmentManager().popBackStack();
-                } else {
+
+                backToDrawerItem(bottomNavigationCurrentItem);
+                if (photosFragment == null) {
                     backToDrawerItem(bottomNavigationCurrentItem);
+                } else {
+                    photosFragment.switchToAlbum();
                 }
             } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
                 performOnBack();
@@ -6206,12 +6200,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (nV != null) {
             Menu nVMenu = nV.getMenu();
             resetNavigationViewMenu(nVMenu);
-        }
-
-        /* Prevent accidental bottomnav button click */
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStackImmediate();
-            return true;
         }
 
         DrawerItem oldDrawerItem = drawerItem;
