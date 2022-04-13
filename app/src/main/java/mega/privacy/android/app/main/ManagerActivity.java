@@ -5257,7 +5257,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     searchQuery = newText;
                     recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
                     if (recentChatsFragment != null) {
-                        recentChatsFragment.filterChats(newText);
+                        recentChatsFragment.filterChats(newText, false);
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
