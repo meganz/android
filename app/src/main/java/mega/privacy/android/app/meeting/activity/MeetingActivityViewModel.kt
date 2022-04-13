@@ -121,8 +121,8 @@ class MeetingActivityViewModel @Inject constructor(
     val switchCall: StateFlow<Long> get() = _switchCall
 
     //Control when call should be finish
-    private val _finishCall = MutableStateFlow(false)
-    val finishCall: StateFlow<Boolean> get() = _finishCall
+    private val _finishMeetingActivity = MutableStateFlow(false)
+    val finishMeetingActivity: StateFlow<Boolean> get() = _finishMeetingActivity
 
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
@@ -214,7 +214,7 @@ class MeetingActivityViewModel @Inject constructor(
                         if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId && _switchCall.value != chatId) {
                             _switchCall.value = chatId
                         } else if (shouldEndCurrentCall) {
-                            _finishCall.value = true
+                            _finishMeetingActivity.value = true
                         }
                     }
                 )

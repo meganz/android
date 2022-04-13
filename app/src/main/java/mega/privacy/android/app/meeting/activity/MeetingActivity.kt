@@ -77,6 +77,8 @@ class MeetingActivity : BaseActivity() {
     private var isLockingEnabled = false
     private var currentChatId = MEGACHAT_INVALID_HANDLE
 
+    var navGraph: NavGraph? = null
+
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
@@ -86,15 +88,45 @@ class MeetingActivity : BaseActivity() {
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
         intent = newIntent
-        init()
+        initIntent()
+
+        initActionBar()
+        initNavigation()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        init()
+
+        initIntent()
+
+        binding = ActivityMeetingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        initActionBar()
+        initNavigation()
+        setStatusBarTranslucent()
+
+        lifecycleScope.launchWhenStarted {
+            meetingViewModel.finishMeetingActivity.collect {
+                if (it) {
+                    finish()
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            meetingViewModel.switchCall.collect { chatId ->
+                if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
+                    logDebug("Switch call")
+                    passcodeManagement.showPasscodeScreen = true
+                    MegaApplication.getInstance().openCallService(chatId)
+                    startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
+                }
+            }
+        }
     }
 
-    private fun init(){
+    private fun initIntent(){
         intent?.let { it ->
             if(it.action == CallNotificationIntentService.ANSWER){
                 it.extras?.let { extra->
@@ -133,35 +165,6 @@ class MeetingActivity : BaseActivity() {
             }
 
             meetingAction = it.action
-        }
-
-        @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
-
-        binding = ActivityMeetingBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        initActionBar()
-        initNavigation()
-        setStatusBarTranslucent()
-
-        lifecycleScope.launchWhenStarted {
-            meetingViewModel.finishCall.collect {
-                if (it) {
-                    finish()
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            meetingViewModel.switchCall.collect { chatId ->
-                if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
-                    logDebug("Switch call")
-                    passcodeManagement.showPasscodeScreen = true
-                    MegaApplication.getInstance().openCallService(chatId)
-                    startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
-                }
-            }
         }
     }
 
@@ -208,11 +211,10 @@ class MeetingActivity : BaseActivity() {
      * according to the meeting action
      */
     private fun initNavigation() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        val navGraph: NavGraph =
-            navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
+        navGraph?.clear()
+        navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
         // The args to be passed to startDestination
         val bundle = Bundle()
@@ -253,17 +255,19 @@ class MeetingActivity : BaseActivity() {
             )
         }
 
-        navGraph.startDestination = when (meetingAction) {
-            MEETING_ACTION_CREATE -> R.id.createMeetingFragment
-            MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
-            MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
-            MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
-            MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
-            MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
-            else -> R.id.createMeetingFragment
+        navGraph?.let {
+            it.startDestination = when (meetingAction) {
+                MEETING_ACTION_CREATE -> R.id.createMeetingFragment
+                MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
+                MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
+                MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
+                MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
+                MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
+                else -> R.id.createMeetingFragment
+            }
+
+            navController.setGraph(it, bundle)
         }
-        navController.popBackStack(navGraph.startDestination,true)
-        navController.setGraph(navGraph, bundle)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -310,6 +314,10 @@ class MeetingActivity : BaseActivity() {
         super.onResume()
 
         isLockingEnabled = passcodeUtil.shouldLock()
+
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
+
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
             currentFragment.sendEnterCallEvent()

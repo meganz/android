@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Pair
 import android.view.*
@@ -20,6 +21,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -1037,6 +1039,29 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.updateNetworkStatus(haveConnection)
             checkInfoBanner(TYPE_NO_CONNECTION)
         }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showCallDuration.collect { isVisible ->
+                if (isVisible) {
+                    meetingChrono?.let { chrono ->
+                        chrono.stop()
+                        inMeetingViewModel.getCallDuration().let {
+                            if(it != INVALID_VALUE.toLong()) {
+                                chrono.base = SystemClock.elapsedRealtime() - it * 1000
+                                chrono.start()
+                                chrono.format = " %s"
+                                chrono.isVisible = true
+                            }
+                        }
+                    }
+                } else {
+                    meetingChrono?.let {
+                        it.stop()
+                        it.isVisible = false
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1720,10 +1745,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param call MegaChatCall
      */
     private fun updateToolbarSubtitle(call: MegaChatCall) {
-        logDebug("Call status is " + CallUtil.callStatusToString(call.status))
+        logDebug("*Call status is " + CallUtil.callStatusToString(call.status))
         when (call.status) {
             MegaChatCall.CALL_STATUS_CONNECTING -> {
-                CallUtil.activateChrono(false, meetingChrono, null)
                 toolbarSubtitle?.let {
                     it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                 }
@@ -1733,7 +1757,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val chatRoom = inMeetingViewModel.getChat()
                 if (chatRoom != null && !chatRoom.isMeeting) {
                     if (inMeetingViewModel.isRequestSent() && call.isOutgoing) {
-                        CallUtil.activateChrono(false, meetingChrono, null)
                         toolbarSubtitle?.let {
                             it.text =
                                 StringResourcesUtils.getString(R.string.outgoing_call_starting)
@@ -1741,14 +1764,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         return
                     }
                 }
-
                 toolbarSubtitle?.let {
                     if (call.status == MegaChatCall.CALL_STATUS_JOINING) {
-                        CallUtil.activateChrono(false, meetingChrono, null)
                         it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                     } else {
                         it.text = StringResourcesUtils.getString(R.string.duration_meeting)
-                        CallUtil.activateChrono(true, meetingChrono, call)
                     }
                 }
             }
@@ -2632,7 +2652,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         removeUI()
         logDebug("Fragment destroyed")
-        CallUtil.activateChrono(false, meetingChrono, null)
+
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
         bottomFloatingPanelViewHolder.onDestroy()

@@ -12,11 +12,17 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -34,9 +40,11 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -49,7 +57,8 @@ import javax.inject.Inject
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    private val getCallUserCase: GetCallUseCase
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     var status = InMeetingFragment.NOT_TYPE
@@ -65,6 +74,11 @@ class InMeetingViewModel @Inject constructor(
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
+
+    private var callDurationDisposable: Disposable? = null
+
+    private val _showCallDuration = MutableStateFlow(false)
+    val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -114,6 +128,36 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(updateCallStatusObserver)
+    }
+
+    /**
+     * Method that controls whether the toolbar should be clickable or not.
+     */
+    private fun checkCallDuration() {
+        callDurationDisposable?.dispose()
+
+        callDurationDisposable = getCallUserCase.isCurrentCallInProgress(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    _showCallDuration.value = it
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            )
+
+        callDurationDisposable?.let {
+            composite.add(it)
+        }
+    }
+
+    fun getCallDuration():Long{
+        callLiveData.value?.let {
+            return it.duration
+        }
+        return INVALID_VALUE.toLong()
     }
 
     /**
@@ -241,9 +285,11 @@ class InMeetingViewModel @Inject constructor(
             setCall(it.chatId)
             _chatTitle.value = getTitleChat(it)
         }
+
+        checkCallDuration()
     }
 
-    /**
+    /*
      * Get the chat ID of the current meeting
      *
      * @return chat ID
