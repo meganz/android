@@ -1101,7 +1101,7 @@ public class ChatActivity extends PasscodeActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -2679,11 +2679,11 @@ public class ChatActivity extends PasscodeActivity
                 String link = getIntent().getDataString();
 
                 MegaApplication.getChatManagement().setPendingJoinLink(link);
-                loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+                loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(link));
             } else {
-                loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
+                loginIntent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
             }
 
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
