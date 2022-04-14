@@ -94,8 +94,9 @@ class PhotosFragment : BaseFragment() {
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
-                        with(timelineFragment) {
+                        with (timelineFragment) {
                             setHideBottomViewScrollBehaviour()
+                            updateOptionsButtons()
                             if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
                                 mManagerActivity.updateCUViewTypes(View.GONE)
                             } else {
@@ -143,10 +144,8 @@ class PhotosFragment : BaseFragment() {
      * Switch to AlbumFragment
      */
     fun switchToAlbum() {
-        viewPager.postDelayed({
-            viewPager.currentItem = ALBUM_INDEX
-            mManagerActivity.updateCUViewTypes(View.GONE)
-        }, 50)
+        viewPager.setCurrentItem(ALBUM_INDEX, false)
+        mManagerActivity.updateCUViewTypes(View.GONE)
     }
 
     /**

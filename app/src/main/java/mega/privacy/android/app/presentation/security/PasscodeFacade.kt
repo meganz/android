@@ -1,4 +1,4 @@
-package mega.privacy.presentation.security
+package mega.privacy.android.app.presentation.security
 
 import android.app.Activity
 import android.content.Context

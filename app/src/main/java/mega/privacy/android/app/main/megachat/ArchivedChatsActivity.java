@@ -216,7 +216,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
             @Override
             public boolean onQueryTextChange(String newText) {
                 querySearch = newText;
-                archivedChatsFragment.filterChats(newText);
+                archivedChatsFragment.filterChats(newText, true);
                 return true;
             }
         });
