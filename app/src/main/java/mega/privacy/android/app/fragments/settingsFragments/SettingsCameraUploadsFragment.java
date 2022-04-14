@@ -1007,10 +1007,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //set cu enabled and start the service
         dbH.setCamSyncEnabled(true);
 
-        handler.postDelayed(() -> {
-            logDebug("Enable Camera Uploads, Now I start the service");
-            fireCameraUploadJob(context, false);
-        }, 1000);
+        logDebug("CameraUpload enabled through Settings - fireCameraUploadJob()");
+        fireCameraUploadJob(context, false);
 
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);

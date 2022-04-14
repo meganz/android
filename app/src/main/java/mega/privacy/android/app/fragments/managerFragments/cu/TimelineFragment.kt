@@ -3,8 +3,6 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 import android.Manifest
 import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -20,6 +18,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -150,10 +149,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             it.refreshTimelineFragment()
         }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            LogUtil.logDebug("Starting CU")
-            JobUtil.fireCameraUploadJob(context, false)
-        }, 1000)
+        logDebug("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
+        JobUtil.fireCameraUploadJob(context, false)
     }
 
     /**

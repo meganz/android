@@ -331,6 +331,7 @@ public class AccountController {
             dbH.clearPreferences();
             dbH.setFirstTime(false);
             fireStopCameraUploadJob(context);
+            stopCameraUploadSyncHeartbeatWorkers(context);
         }
 
         dbH.clearOffline();

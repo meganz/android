@@ -106,6 +106,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelUploadsJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logInfo;
@@ -1070,18 +1071,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     };
 
-    private BroadcastReceiver cameraUploadLauncherReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                logDebug("cameraUploadLauncherReceiver: Start service here");
-                fireCameraUploadJob(ManagerActivity.this, true);
-            } catch (Exception e) {
-                logError("cameraUploadLauncherReceiver: Exception", e);
-            }
-        }
-    };
-
     private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1275,6 +1264,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     checkIfShouldShowBusinessCUAlert();
                 } else {
+                    stopCameraUploadSyncHeartbeatWorkers(this);
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
 
@@ -1662,7 +1652,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
-        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
         registerTransfersReceiver();
 
@@ -3570,7 +3559,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(receiverCUAttrChanged);
         unregisterReceiver(transferOverQuotaUpdateReceiver);
         unregisterReceiver(transferFinishReceiver);
-        unregisterReceiver(cameraUploadLauncherReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         unregisterReceiver(cuUpdateReceiver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
