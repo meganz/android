@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -244,7 +245,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             checkAnotherCall()
         } else if (inMeetingViewModel.isSameCall(it.callId)) {
             updateToolbarSubtitle(it)
-            updatePanelAndToolbar(it)
+            updatePanel()
 
             when (it.status) {
                 MegaChatCall.CALL_STATUS_INITIAL -> {
@@ -298,17 +299,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Method that updates the Bottom panel and toolbar depending the call status
-     *
-     * @param call The current call
+     * Method that updates the Bottom panel
      */
-    private fun updatePanelAndToolbar(call: MegaChatCall?) {
-        toolbar.setOnClickListener {
-            if (call?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                showMeetingInfoFragment()
-            }
-        }
-
+    private fun updatePanel() {
         bottomFloatingPanelViewHolder.updatePanel(false)
     }
 
@@ -635,7 +628,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             updateToolbarSubtitle(currentCall)
             enableOnHoldFab(currentCall.isOnHold)
-            updatePanelAndToolbar(currentCall)
+            updatePanel()
         } else {
             enableOnHoldFab(false)
         }
@@ -1060,15 +1053,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.updateNetworkStatus(haveConnection)
             checkInfoBanner(TYPE_NO_CONNECTION)
         }
-    }
 
-    private fun getParticipantsCount(): Long {
-        val chat = megaChatApi.getChatRoom(inMeetingViewModel.currentChatId)
-        return if (chat == null) {
-            -1L
-        } else {
-            logDebug("All participants: ${chat.peerCount}")
-            chat.peerCount
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.allowClickingOnToolbar.collect { allowed ->
+                if (allowed) {
+                    meetingActivity.binding.toolbar.setOnClickListener {
+                        showMeetingInfoFragment()
+                    }
+                } else {
+                    meetingActivity.binding.toolbar.setOnClickListener(null)
+                }
+            }
         }
     }
 
@@ -2509,7 +2504,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to navigate to the Make moderator screen
      */
     private val showAssignModeratorFragment = fun() {
-        var isPanelExpanded =
+        val isPanelExpanded =
             bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded
 
