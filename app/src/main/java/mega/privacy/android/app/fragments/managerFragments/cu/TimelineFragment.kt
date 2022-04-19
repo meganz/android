@@ -307,7 +307,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             viewTypePanel.visibility = if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
 
             updateOptionsButtons()
-            mManagerActivity.fromAlbumContent = false
 
             updateEnableCUButtons(
                 gridAdapterHasData = galleryItems.isNotEmpty(),
