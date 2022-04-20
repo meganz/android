@@ -391,7 +391,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Rời khỏi</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Trả lại về chủ sở hữu</string>
+    <string name="alert_leave_share">Từ bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Chấm dứt chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -4207,4 +4207,6 @@
     <string name="action_remove_favourites">Loại bỏ ưa thích</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">Dịnh dạng tệp tin không được hỗ trợ. Không thể mở được tệp tin.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Thư mục vừa chọn là thư mục trống. Không có tệp tin để tải lên.</string>
 </resources>
