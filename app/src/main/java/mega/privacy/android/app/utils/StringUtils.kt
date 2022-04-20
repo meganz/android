@@ -38,7 +38,11 @@ object StringUtils {
      * Decode the Base64-encoded data into a new formatted String
      */
     fun String.decodeBase64(): String =
-        Base64.decode(this, Base64.DEFAULT).toString(Charsets.UTF_8)
+        try {
+            Base64.decode(this.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
+        } catch (ignore: IllegalArgumentException) {
+            Base64.decode(this.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
+        }
 
     /**
      * Encode String to Base64
@@ -68,7 +72,7 @@ object StringUtils {
      * @param date String pair, which contains the whole date string.
      * @return Formatted Spanned can be set to TextView.
      */
-    fun  Pair<String?, String?>.formatDateTitle() : Spanned {
+    fun Pair<String?, String?>.formatDateTitle(): Spanned {
         var dateText =
             if (TextUtil.isTextEmpty(this.second)) "[B]" + this.first + "[/B]" else StringResourcesUtils.getString(
                 R.string.cu_month_year_date,

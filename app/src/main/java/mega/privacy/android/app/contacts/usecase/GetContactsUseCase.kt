@@ -15,9 +15,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatPresenceLastGreen
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -31,7 +32,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaChatApi.*
+import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
 import javax.inject.Inject
@@ -114,45 +115,53 @@ class GetContactsUseCase @Inject constructor(
                 }
             )
 
-            val chatSubscription = getChatChangesUseCase.get().subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
+            val chatSubscription = getChatChangesUseCase.get()
+                .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen }
+                .subscribeBy(
+                    onNext = { change ->
+                        if (emitter.isCancelled) return@subscribeBy
 
-                    when (change) {
-                        is OnChatOnlineStatusUpdate -> {
-                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                            if (index != INVALID_POSITION) {
-                                val currentContact = contacts[index]
-                                contacts[index] = currentContact.copy(
-                                    status = change.status,
-                                    statusColor = getUserStatusColor(change.status),
-                                    lastSeen = if (change.status == STATUS_ONLINE) {
-                                        context.getString(R.string.online_status)
-                                    } else {
-                                        megaChatApi.requestLastGreen(change.userHandle, null)
-                                        currentContact.lastSeen
-                                    }
-                                )
+                        when (change) {
+                            is OnChatOnlineStatusUpdate -> {
+                                val index = contacts.indexOfFirst { it.handle == change.userHandle }
+                                if (index != INVALID_POSITION) {
+                                    val currentContact = contacts[index]
+                                    contacts[index] = currentContact.copy(
+                                        status = change.status,
+                                        statusColor = getUserStatusColor(change.status),
+                                        lastSeen = if (change.status == STATUS_ONLINE) {
+                                            context.getString(R.string.online_status)
+                                        } else {
+                                            megaChatApi.requestLastGreen(change.userHandle, null)
+                                            currentContact.lastSeen
+                                        }
+                                    )
 
-                                emitter.onNext(contacts.sortedAlphabetically())
+                                    emitter.onNext(contacts.sortedAlphabetically())
+                                }
+                            }
+                            is OnChatPresenceLastGreen -> {
+                                val index = contacts.indexOfFirst { it.handle == change.userHandle }
+                                if (index != INVALID_POSITION) {
+                                    val currentContact = contacts[index]
+                                    contacts[index] = currentContact.copy(
+                                        lastSeen = TimeUtils.unformattedLastGreenDate(
+                                            context,
+                                            change.lastGreen
+                                        )
+                                    )
+
+                                    emitter.onNext(contacts.sortedAlphabetically())
+                                }
+                            }
+                            else -> {
+                                // Nothing to do
                             }
                         }
-                        is OnChatPresenceLastGreen -> {
-                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                            if (index != INVALID_POSITION) {
-                                val currentContact = contacts[index]
-                                contacts[index] = currentContact.copy(
-                                    lastSeen = TimeUtils.unformattedLastGreenDate(context, change.lastGreen)
-                                )
-
-                                emitter.onNext(contacts.sortedAlphabetically())
-                            }
-                        }
-                        else -> {
-                            // Nothing to do
-                        }
+                    },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
                     }
-                }
             )
 
             val globalSubscription = getGlobalChangesUseCase.get()
