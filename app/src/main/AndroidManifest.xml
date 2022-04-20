@@ -89,6 +89,9 @@
 
         <!-- Location opened outside the app -->
         <package android:name="com.google.android.apps.maps" />
+
+        <!-- Open authentication apps -->
+        <package android:name="com.google.android.apps.authenticator2" />
     </queries>
 
     <application
