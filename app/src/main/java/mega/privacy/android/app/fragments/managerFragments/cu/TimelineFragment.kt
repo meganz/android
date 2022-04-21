@@ -386,10 +386,10 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     public override fun setHideBottomViewScrollBehaviour() {
-        if (!isInActionMode()) {
-            mManagerActivity.showBottomView()
-            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
-        }
+//        if (!isInActionMode()) {
+//            mManagerActivity.showBottomView()
+//            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+//        }
     }
 
     fun updateOptionsButtons() {
@@ -402,7 +402,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun whenStartActionMode() {
         if (!mManagerActivity.isInPhotosPage) return
-        animateBottomView()
+        super.whenStartActionMode()
         with(parentFragment as PhotosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
@@ -414,7 +414,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!mManagerActivity.isInPhotosPage) return
         // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
-        mManagerActivity.updateCUViewTypes(if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) View.VISIBLE else View.GONE)
+        super.whenEndActionMode()
         with(parentFragment as PhotosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
@@ -489,18 +489,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(isShowMenu())
-    }
-
-    override fun animateBottomView() {
-        val hide = actionMode != null
-        with(mManagerActivity) {
-            animateCULayout(hide || viewModel.isCUEnabled())
-            animateBottomView(hide)
-            setDrawerLockMode(hide)
-            //action mode should hide BottomNavigationView
-            showHideBottomNavigationView(hide)
-        }
-        checkScroll()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

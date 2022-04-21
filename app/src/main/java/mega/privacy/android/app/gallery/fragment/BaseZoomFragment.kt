@@ -106,6 +106,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
+    protected var showBottomNav = true
+
     protected var selectedView = ALL_VIEW
     protected open var adapterType = 0
 
@@ -144,6 +146,31 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 .start()
         }
     }
+
+//    open fun animateViewType(hide: Boolean) {
+//        // AlbumContentFragment doesn't have view type panel.
+//        if(this is AlbumContentFragment) return
+//
+//        val deltaY =
+//            viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+//
+//        if (hide) {
+//            viewTypePanel
+//                .animate()
+//                .translationYBy(deltaY)
+//                .setDuration(ANIMATION_DURATION)
+//                .withEndAction { viewTypePanel.visibility = View.GONE }
+//                .start()
+//        } else {
+//            viewTypePanel
+//                .animate()
+//                .translationYBy(-deltaY)
+//                .setDuration(ANIMATION_DURATION)
+//                .withStartAction { viewTypePanel.visibility = View.VISIBLE }
+//                .start()
+//        }
+//    }
+
 
     private fun getNodeCount() = viewModel.getRealPhotoCount()
 
@@ -417,7 +444,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             if (zoomViewModel.getCurrentZoom() != ZOOM_OUT_2X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
-                animateBottomView()
+
             }
         })
 
@@ -518,7 +545,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             callManager { manager ->
                 manager.showKeyboardForSearch()
             }
-            animateBottomView()
         })
 
     fun doIfOnline(operation: () -> Unit) {
@@ -755,12 +781,29 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     /**
      * Sub fragment can custom operation when start ActionMode
      */
-    open fun whenStartActionMode(){}
+    open fun whenStartActionMode() {
+        if(this is AlbumContentFragment) return
+        with (mManagerActivity) {
+            showHideBottomNavigationView(true)
+            viewTypePanel.visibility = View.GONE
+        }
+    }
 
     /**
      * Sub fragment can custom operation when end ActionMode
      */
-    open fun whenEndActionMode(){}
+    open fun whenEndActionMode() {
+        if(this is AlbumContentFragment) return
+        with (mManagerActivity) {
+            showHideBottomNavigationView(!showBottomNav)
+            viewTypePanel.visibility =
+                if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+        }
+    }
 
     /**
      * Check is in action mode.
