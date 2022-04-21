@@ -430,9 +430,16 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
         }
 
         holder.progressText.setText(getProgress(transfer));
-        holder.speedText.setText(getSpeedString(isOnline(context) ?
-                transfer.getSpeed()
-                : 0));
+
+        if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
+                || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+            holder.speedText.setText(context.getResources().getString(R.string.transfer_paused));
+        } else {
+            holder.speedText.setText(getSpeedString(isOnline(context) ?
+                    transfer.getSpeed()
+                    : 0));
+        }
+
     }
 
     public boolean isMultipleSelect() {

@@ -4239,7 +4239,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Kliknij , aby dołączyć do bieżącego spotkania.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA spotkanie</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4475,4 +4475,6 @@
     <string name="empty_hint_favourite_album">[B]Brak[/B] [A]ulubionych[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Usuń ulubione</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
 </resources>

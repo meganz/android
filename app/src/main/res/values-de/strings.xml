@@ -4295,4 +4295,6 @@
     <string name="empty_hint_favourite_album">[B]Keine[/B] [A]Favoriten[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Favoriten entfernen</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
 </resources>

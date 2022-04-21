@@ -7,6 +7,7 @@ object ErrorUtils {
 
     /**
      * Converts MegaError to Throwable
+     * TODO Replace with MegaError.toMegaException() call
      *
      * @return MegaError wrapped into a Throwable
      */
@@ -15,6 +16,7 @@ object ErrorUtils {
 
     /**
      * Converts MegaChatError to Throwable
+     * TODO Replace with MegaChatError.toMegaException() call
      *
      * @return MegaChatError wrapped into a Throwable
      */

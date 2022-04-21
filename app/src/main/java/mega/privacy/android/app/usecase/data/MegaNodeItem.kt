@@ -6,7 +6,6 @@ import nz.mega.sdk.MegaNode
  * Data object that encapsulates an item representing a Mega Node with extra information.
  *
  * @property node               MegaNode itself
- * @property infoText           Node information preformatted text
  * @property hasReadAccess      Flag indicating if current user can read the node.
  * @property hasReadWriteAccess Flag indicating if current user can read and write the node.
  * @property hasFullAccess      Flag indicating if current user has full permissions over the node.
@@ -22,7 +21,6 @@ import nz.mega.sdk.MegaNode
 data class MegaNodeItem constructor(
     val name: String,
     val handle: Long,
-    val infoText: String,
     val hasReadAccess: Boolean = false,
     val hasReadWriteAccess: Boolean = false,
     val hasFullAccess: Boolean = false,

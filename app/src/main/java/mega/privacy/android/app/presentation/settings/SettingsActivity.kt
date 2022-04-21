@@ -14,7 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import org.jetbrains.anko.configuration
 import javax.inject.Inject
 

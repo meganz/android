@@ -57,7 +57,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
-    private val getCallUserCase: GetCallUseCase
+    private val getCallUseCase: GetCallUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -71,6 +71,8 @@ class InMeetingViewModel @Inject constructor(
     var isReconnectingStatus: Boolean = false
 
     private var haveConnection: Boolean = false
+
+    private var callInProgressDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -105,6 +107,9 @@ class InMeetingViewModel @Inject constructor(
     // List of visible participants in the meeting
     var visibleParticipants: MutableList<Participant> = mutableListOf()
 
+    private val _allowClickingOnToolbar = MutableStateFlow(false)
+    val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -136,7 +141,7 @@ class InMeetingViewModel @Inject constructor(
     private fun checkCallDuration() {
         callDurationDisposable?.dispose()
 
-        callDurationDisposable = getCallUserCase.isCurrentCallInProgress(currentChatId)
+        callDurationDisposable = getCallUseCase.isCurrentCallInProgress(currentChatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -158,6 +163,28 @@ class InMeetingViewModel @Inject constructor(
             return it.duration
         }
         return INVALID_VALUE.toLong()
+    }
+
+    private fun checkToolbarClickability() {
+        if (!isOneToOneCall()) {
+            callInProgressDisposable?.dispose()
+
+            callInProgressDisposable = getCallUseCase.isThereAnInProgressCall(currentChatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        _allowClickingOnToolbar.value = it
+                    },
+                    onError = { error ->
+                        LogUtil.logError(error.stackTraceToString())
+                    }
+                )
+
+            callInProgressDisposable?.let {
+                composite.add(it)
+            }
+        }
     }
 
     /**
@@ -287,6 +314,7 @@ class InMeetingViewModel @Inject constructor(
         }
 
         checkCallDuration()
+        checkToolbarClickability()
     }
 
     /*

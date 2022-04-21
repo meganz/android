@@ -27,6 +27,7 @@ import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
@@ -157,9 +158,9 @@ class RecentsBucketFragment : BaseFragment() {
         (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {
-        if (isImage) {
-            MimeTypeList.typeForName(it.name).isImage
+    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? = viewModel.items.value?.filter {
+        if (isImageViewerValid) {
+            it.isValidForImageViewer()
         } else {
             FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
         }
