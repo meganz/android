@@ -201,7 +201,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val call = inMeetingViewModel.getCall()
             call?.let { chatCall ->
                 logDebug("The call is no longer an outgoing call")
-                updateToolbarSubtitle(chatCall)
                 enableOnHoldFab(chatCall.isOnHold)
             }
         }
@@ -245,7 +244,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (it.status == INVALID_CALL_STATUS) {
             checkAnotherCall()
         } else if (inMeetingViewModel.isSameCall(it.callId)) {
-            updateToolbarSubtitle(it)
             updatePanel()
 
             when (it.status) {
@@ -594,24 +592,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             arguments?.getBoolean(MeetingActivity.MEETING_VIDEO_ENABLE, false)
 
         isVideoEnable?.let { if (it) sharedModel.camInitiallyOn() }
-
-        val currentCall: MegaChatCall? = inMeetingViewModel.getCall()
-        if (currentCall != null && currentCall.status > MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-            if (currentCall.hasLocalAudio()) {
-                sharedModel.micInitiallyOn()
-            }
-
-            if (currentCall.hasLocalVideo()) {
-                sharedModel.camInitiallyOn()
-            }
-
-            updateToolbarSubtitle(currentCall)
-            enableOnHoldFab(currentCall.isOnHold)
-            updatePanel()
-        } else {
-            enableOnHoldFab(false)
-        }
-
         initLiveEventBus()
         takeActionByArgs()
 
@@ -860,14 +840,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setBackgroundColor(Color.TRANSPARENT)
         }
 
-        toolbarTitle?.apply {
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        }
-
-        toolbarSubtitle?.apply {
-            text = StringResourcesUtils.getString(R.string.chat_connecting)
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        }
+        toolbarTitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        toolbarSubtitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
 
         bannerAnotherCallLayout = meetingActivity.binding.bannerAnotherCall
         bannerAnotherCallTitle = meetingActivity.binding.bannerAnotherCallTitle
@@ -1033,6 +1007,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.updateCallId.collect {
+               checkButtonsStatus()
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
             inMeetingViewModel.showCallDuration.collect { isVisible ->
                 if (isVisible) {
                     meetingChrono?.let { chrono ->
@@ -1056,6 +1036,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.updateCallSubtitle.collect { type ->
+                toolbarSubtitle?.let {
+                    when (type) {
+                        InMeetingViewModel.SubtitleCallType.TYPE_CONNECTING -> {
+                            it.text = StringResourcesUtils.getString(R.string.chat_connecting)
+                        }
+                        InMeetingViewModel.SubtitleCallType.TYPE_CALLING -> {
+                            it.text =
+                                StringResourcesUtils.getString(R.string.outgoing_call_starting)
+                        }
+                        InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
+                            it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                        }
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
             inMeetingViewModel.allowClickingOnToolbar.collect { allowed ->
                 if (allowed) {
                     meetingActivity.binding.toolbar.setOnClickListener {
@@ -1065,6 +1064,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     meetingActivity.binding.toolbar.setOnClickListener(null)
                 }
             }
+        }
+    }
+
+    private fun checkButtonsStatus() {
+        val currentCall: MegaChatCall? = inMeetingViewModel.getCall()
+        if (currentCall != null && currentCall.status > MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+            if (currentCall.hasLocalAudio()) {
+                sharedModel.micInitiallyOn()
+            }
+
+            if (currentCall.hasLocalVideo()) {
+                sharedModel.camInitiallyOn()
+            }
+
+            enableOnHoldFab(currentCall.isOnHold)
+            updatePanel()
+        } else {
+            enableOnHoldFab(false)
         }
     }
 
@@ -1741,42 +1758,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun removeChildFragment(fragment: Fragment) {
         childFragmentManager.beginTransaction().remove(fragment).commit()
-    }
-
-    /**
-     * Method that updates the toolbar caption depending on the status of the call
-     *
-     * @param call MegaChatCall
-     */
-    private fun updateToolbarSubtitle(call: MegaChatCall) {
-        logDebug("*Call status is " + CallUtil.callStatusToString(call.status))
-        when (call.status) {
-            MegaChatCall.CALL_STATUS_CONNECTING -> {
-                toolbarSubtitle?.let {
-                    it.text = StringResourcesUtils.getString(R.string.chat_connecting)
-                }
-            }
-
-            MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_JOINING -> {
-                val chatRoom = inMeetingViewModel.getChat()
-                if (chatRoom != null && !chatRoom.isMeeting) {
-                    if (inMeetingViewModel.isRequestSent() && call.isOutgoing) {
-                        toolbarSubtitle?.let {
-                            it.text =
-                                StringResourcesUtils.getString(R.string.outgoing_call_starting)
-                        }
-                        return
-                    }
-                }
-                toolbarSubtitle?.let {
-                    if (call.status == MegaChatCall.CALL_STATUS_JOINING) {
-                        it.text = StringResourcesUtils.getString(R.string.chat_connecting)
-                    } else {
-                        it.text = StringResourcesUtils.getString(R.string.duration_meeting)
-                    }
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
