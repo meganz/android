@@ -84,8 +84,6 @@ class InMeetingViewModel @Inject constructor(
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
-    private var callDurationDisposable: Disposable? = null
-
     private val _showCallDuration = MutableStateFlow(false)
     val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
 
@@ -171,49 +169,32 @@ class InMeetingViewModel @Inject constructor(
             }
             CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
                 getChat()?.let { chat ->
-                    _updateCallSubtitle.value =
-                        if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
-                            SubtitleCallType.TYPE_CALLING
-                        } else if (callStatus == CALL_STATUS_JOINING) {
-                            SubtitleCallType.TYPE_CONNECTING
-                        } else {
-                            SubtitleCallType.TYPE_ESTABLISHED
-                        }
+                    if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CALLING
+                        _showCallDuration.value = false
+                    } else if (callStatus == CALL_STATUS_JOINING) {
+                        _updateCallSubtitle.value =SubtitleCallType.TYPE_CONNECTING
+                        _showCallDuration.value = false
+                    } else {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_ESTABLISHED
+                        _showCallDuration.value = true
+                    }
                 }
             }
         }
     }
 
-    /**
-     * Method that controls whether the toolbar should be clickable or not.
-     */
-    private fun checkCallDuration() {
-        callDurationDisposable?.dispose()
-
-        callDurationDisposable = getCallUseCase.isCurrentCallInProgress(currentChatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    _showCallDuration.value = it
-                },
-                onError = { error ->
-                    LogUtil.logError(error.stackTraceToString())
-                }
-            )
-
-        callDurationDisposable?.let {
-            composite.add(it)
-        }
-    }
-
-    fun getCallDuration():Long{
-        callLiveData.value?.let {
+    fun getCallDuration(): Long {
+        getCall()?.let {
             return it.duration
         }
+
         return INVALID_VALUE.toLong()
     }
 
+    /**
+     * Method that controls whether the toolbar should be clickable or not.
+     */
     private fun checkToolbarClickability() {
         if (!isOneToOneCall()) {
             callInProgressDisposable?.dispose()
@@ -363,7 +344,6 @@ class InMeetingViewModel @Inject constructor(
             _chatTitle.value = getTitleChat(it)
         }
 
-        checkCallDuration()
         checkToolbarClickability()
     }
 
