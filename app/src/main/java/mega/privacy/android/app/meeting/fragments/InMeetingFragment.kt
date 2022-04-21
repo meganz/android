@@ -1008,7 +1008,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.updateCallId.collect {
-               checkButtonsStatus()
+                checkButtonsStatus()
+                showMuteBanner()
             }
         }
 
