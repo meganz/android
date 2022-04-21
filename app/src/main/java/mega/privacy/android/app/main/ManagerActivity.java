@@ -886,7 +886,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private final Observer<Boolean> fileBackupChangedObserver = change -> {
         if (change) {
-//            megaApi.getMyBackupsFolder(this);
+            getMyBackupsFolder();
         }
     };
 
@@ -1708,7 +1708,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         observePsa();
 
-//        megaApi.getMyBackupsFolder(this);
+        getMyBackupsFolder();
 
         //Set toolbar
         abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -2736,6 +2736,13 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             enableCUClicked();
         }
+    }
+
+    /**
+     * Retrieves the My Backups node by calling MegaApiJava.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, listener)
+     */
+    private void getMyBackupsFolder() {
+        megaApi.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, this);
     }
 
     /**
