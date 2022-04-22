@@ -2,12 +2,10 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.fragment.app.activityViewModels
 import android.os.Bundle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity

@@ -906,6 +906,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             if (micIsEnable != it) {
+                logDebug("Mic status has changed to $it")
                 micIsEnable = it
                 updateLocalAudio(it)
             }
@@ -1093,6 +1094,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * Control the initial state of the buttons when a call is established
+     */
     private fun checkButtonsStatus() {
         inMeetingViewModel.getCall()?.let {
             if (it.hasLocalAudio()) {

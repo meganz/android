@@ -153,7 +153,6 @@ class InMeetingViewModel @Inject constructor(
                 checkPreviousReconnectingStatus(call.status)
                 checkReconnectingStatus(call.status)
                 previousState = call.status
-
             }
         }
 
@@ -177,7 +176,12 @@ class InMeetingViewModel @Inject constructor(
             .observeForever(noOutgoingCallObserver)
     }
 
-
+    /**
+     * Method to check the subtitle in the toolbar
+     *
+     * @param callStatus The current status of the call
+     * @param isOutgoingCall If the current call is an outgoing call
+     */
     private fun checkSubtitleToolbar(callStatus: Int, isOutgoingCall: Boolean) {
         when (callStatus) {
             CALL_STATUS_CONNECTING -> {
@@ -189,7 +193,7 @@ class InMeetingViewModel @Inject constructor(
                         _updateCallSubtitle.value = SubtitleCallType.TYPE_CALLING
                         _showCallDuration.value = false
                     } else if (callStatus == CALL_STATUS_JOINING) {
-                        _updateCallSubtitle.value =SubtitleCallType.TYPE_CONNECTING
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
                         _showCallDuration.value = false
                     } else {
                         _updateCallSubtitle.value = SubtitleCallType.TYPE_ESTABLISHED
@@ -212,33 +216,26 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method that controls whether the another call banner should be visible or not.
+     * Method that controls whether the another call banner should be visible or not
      */
     private fun checkAnotherCallBanner() {
         anotherCallInProgressDisposable?.dispose()
+
         anotherCallInProgressDisposable = getCallUseCase.checkAnotherCall(currentChatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
                     if (it == MEGACHAT_INVALID_HANDLE) {
-                        if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_NO_CALL) {
-                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
-                        }
-
+                        _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
                     } else {
                         val call: MegaChatCall? = getCallUseCase.getMegaChatCall(it).blockingGet()
                         if (call != null) {
-                            if (call.isOnHold) {
-                                if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
-                                    _updateAnotherCallBannerType.value =
-                                        AnotherCallType.TYPE_ON_HOLD
-                                }
-                            } else {
-                                if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
-                                    _updateAnotherCallBannerType.value =
-                                        AnotherCallType.TYPE_IN_PROGRESS
-                                }
+                            if (call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
+                                _updateAnotherCallBannerType.value = AnotherCallType.TYPE_ON_HOLD
+                            } else if (!call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
+                                _updateAnotherCallBannerType.value =
+                                    AnotherCallType.TYPE_IN_PROGRESS
                             }
 
                             inMeetingRepository.getChatRoom(it)?.let { chat ->
@@ -335,7 +332,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if it is the same. False, otherwise
      */
     fun isSameCall(callId: Long): Boolean =
-        callLiveData.value?.let { it.callId == callId } ?: false
+        _callLiveData.value?.let { it.callId == callId } ?: false
 
     /**
      * Method to set a call
@@ -365,7 +362,10 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return MegaChatCall
      */
-    fun getCall(): MegaChatCall? = _callLiveData.value
+    fun getCall(): MegaChatCall? =
+        if (currentChatId == MEGACHAT_INVALID_HANDLE) null
+        else inMeetingRepository.getChatRoom(currentChatId)
+            ?.let { inMeetingRepository.getMeeting(it.chatId) }
 
     /**
      * If it's just me on the call
@@ -415,7 +415,7 @@ class InMeetingViewModel @Inject constructor(
         }
     }
 
-    /*
+    /**
      * Get the chat ID of the current meeting
      *
      * @return chat ID

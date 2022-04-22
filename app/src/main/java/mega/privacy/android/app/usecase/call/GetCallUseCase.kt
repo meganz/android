@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.utils.LogUtil.logDebug
 
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -69,37 +68,6 @@ class GetCallUseCase @Inject constructor(
                 when (call.status) {
                     CALL_STATUS_DESTROYED -> {
                         emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
-                    }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
-            }
-        }, BackpressureStrategy.LATEST)
-
-    fun isCurrentCallInProgress(chatId: Long): Flowable<Boolean> =
-        Flowable.create({ emitter ->
-            megaChatApi.getChatCall(chatId)?.let { call ->
-                when (call.status) {
-                    CALL_STATUS_IN_PROGRESS -> {
-                        emitter.onNext(true)
-                    }
-                    else -> emitter.onNext(false)
-                }
-            }
-
-            val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> { call ->
-                if(call.chatid == chatId){
-                    when (call.status) {
-                        CALL_STATUS_IN_PROGRESS -> {
-                            emitter.onNext(true)
-                        }
-                        else -> emitter.onNext(false)
                     }
                 }
             }

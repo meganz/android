@@ -52,7 +52,7 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_IS_GUEST = "is_guest"
         const val CALL_ACTION = "call_action"
 
-        fun getIntentOngoingCall(context: Context, chatId:Long): Intent {
+        fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
                 putExtra(MEETING_CHAT_ID, chatId)
                 action = MEETING_ACTION_IN
@@ -86,14 +86,15 @@ class MeetingActivity : BaseActivity() {
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
         intent = newIntent
-        initIntent()
 
+        initIntent()
         initActionBar()
         initNavigation()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         initIntent()
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
