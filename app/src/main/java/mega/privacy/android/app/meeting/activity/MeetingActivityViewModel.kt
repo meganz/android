@@ -6,10 +6,6 @@ import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -204,21 +200,20 @@ class MeetingActivityViewModel @Inject constructor(
         checkAnotherCalls(true)
     }
 
+    /**
+     * Check concurrent calls to see if the call should be switched or ended
+     *
+     * @param shouldEndCurrentCall if the current call should be finish
+     */
     private fun checkAnotherCalls(shouldEndCurrentCall: Boolean) {
         currentChatId.value?.let { currentChatId ->
-            getCallUseCase.getAnotherCallInProgress(currentChatId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { chatId ->
-                        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId && _switchCall.value != chatId) {
-                            _switchCall.value = chatId
-                        } else if (shouldEndCurrentCall) {
-                            _finishMeetingActivity.value = true
-                        }
-                    }
-                )
-                .addTo(composite)
+            val chatId =
+                getCallUseCase.getChatIdOfAnotherCallInProgress(currentChatId).blockingGet()
+            if (chatId != MEGACHAT_INVALID_HANDLE && chatId != currentChatId && _switchCall.value != chatId) {
+                _switchCall.value = chatId
+            } else if (shouldEndCurrentCall) {
+                _finishMeetingActivity.value = true
+            }
         }
     }
 

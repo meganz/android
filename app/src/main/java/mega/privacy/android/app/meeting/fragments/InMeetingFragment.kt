@@ -65,7 +65,6 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.OnDragTouchListener
-import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
@@ -80,7 +79,6 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -241,9 +239,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private val callStatusObserver = Observer<MegaChatCall> {
-        if (it.status == INVALID_CALL_STATUS) {
-            checkAnotherCall()
-        } else if (inMeetingViewModel.isSameCall(it.callId)) {
+         if (inMeetingViewModel.isSameCall(it.callId)) {
             updatePanel()
 
             when (it.status) {
@@ -255,12 +251,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
                 MegaChatCall.CALL_STATUS_DESTROYED -> {
+                    disableCamera()
+                    removeUI()
                     if (inMeetingViewModel.amIAGuest()) {
-                        disableCamera()
-                        removeUI()
                         inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-                    } else {
-                        finishActivity()
                     }
                 }
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
@@ -278,7 +272,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                     checkMenuItemsVisibility()
                 }
-                MegaChatCall.CALL_STATUS_JOINING,
                 MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
                         true,
@@ -339,8 +332,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             logDebug("Change in call on hold status")
             isCallOnHold(it.isOnHold)
             checkSwapCameraMenuItemVisibility()
-        } else {
-            checkAnotherCall()
         }
     }
 
@@ -364,18 +355,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         sharedModel.clickCamera(false)
                     }
                 }
-            } else {
-                checkAnotherCall()
             }
         }
 
     private val sessionStatusObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (!inMeetingViewModel.isSameCall(callAndSession.first)) {
-                checkAnotherCall()
-                return@Observer
-            }
-
             if (!inMeetingViewModel.isOneToOneCall()) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
@@ -565,6 +549,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         logDebug("In the meeting fragment")
 
         initViewModel()
@@ -583,15 +568,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Get meeting link from the arguments supplied when the fragment was instantiated
         meetingLink = args.meetingLink
 
-        val isAudioEnable: Boolean? =
-            arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false)
-
-        isAudioEnable?.let { if (it) sharedModel.micInitiallyOn() }
-
-        val isVideoEnable: Boolean? =
-            arguments?.getBoolean(MeetingActivity.MEETING_VIDEO_ENABLE, false)
-
-        isVideoEnable?.let { if (it) sharedModel.camInitiallyOn() }
         initLiveEventBus()
         takeActionByArgs()
 
@@ -599,7 +575,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         setPageOnClickListener(view)
         checkChildFragments()
         checkCurrentParticipants()
-        checkAnotherCall()
         inMeetingViewModel.getCall()?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
     }
 
@@ -931,7 +906,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             if (micIsEnable != it) {
-                logDebug("Mic status has changed to $it")
                 micIsEnable = it
                 updateLocalAudio(it)
             }
@@ -1011,7 +985,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (it != MEGACHAT_INVALID_HANDLE) {
                     checkButtonsStatus()
                     showMuteBanner()
-                    checkAnotherCall()
                 }
             }
         }
@@ -1069,24 +1042,71 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.anotherChatTitle.collect { title ->
+                if (title.isNotEmpty()) {
+                    bannerAnotherCallTitle?.text = title
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.updateAnotherCallBannerType.collect { type ->
+                when (type) {
+                    InMeetingViewModel.AnotherCallType.TYPE_NO_CALL -> {
+                        logDebug("No other calls in progress or on hold")
+                        bannerAnotherCallLayout.isVisible = false
+                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                            false
+                        )
+
+                    }
+                    InMeetingViewModel.AnotherCallType.TYPE_IN_PROGRESS -> {
+                        bannerAnotherCallLayout.let {
+                            it.alpha = 1f
+                            it.isVisible = true
+                        }
+                        bannerAnotherCallSubtitle?.text =
+                            StringResourcesUtils.getString(R.string.call_in_progress_layout)
+
+                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                            false
+                        )
+
+                    }
+                    InMeetingViewModel.AnotherCallType.TYPE_ON_HOLD -> {
+                        bannerAnotherCallLayout.let {
+                            it.alpha = 0.9f
+                            it.isVisible = true
+                        }
+
+                        bannerAnotherCallSubtitle?.text =
+                            StringResourcesUtils.getString(R.string.call_on_hold)
+
+                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                            true
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun checkButtonsStatus() {
-        val currentCall: MegaChatCall? = inMeetingViewModel.getCall()
-        if (currentCall != null && currentCall.status > MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-            if (currentCall.hasLocalAudio()) {
+        inMeetingViewModel.getCall()?.let {
+            if (it.hasLocalAudio()) {
                 sharedModel.micInitiallyOn()
             }
 
-            if (currentCall.hasLocalVideo()) {
+            if (it.hasLocalVideo()) {
                 sharedModel.camInitiallyOn()
             }
-
-            enableOnHoldFab(currentCall.isOnHold)
+            enableOnHoldFab(it.isOnHold)
             updatePanel()
-        } else {
-            enableOnHoldFab(false)
+            return
         }
+        enableOnHoldFab(false)
     }
 
     /**
@@ -1269,71 +1289,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     initOneToOneCall()
                 }
             }
-        }
-    }
-
-    /**
-     * Check whether or not there are calls on hold in other chats.
-     */
-    private fun checkAnotherCall() {
-        val anotherCall = inMeetingViewModel.getAnotherCall()
-        if (anotherCall != null) {
-            logDebug("Another call exists")
-            updateOnHoldFabButton(anotherCall)
-            updateBannerAnotherCall(anotherCall)
-            return
-        }
-
-        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(false)
-
-        logDebug("No other calls in progress or on hold")
-        bannerAnotherCallLayout.isVisible = false
-    }
-
-    /**
-     * Update the button if there are calls on hold in other chats or not.
-     *
-     * @param anotherCall Another call on hold or in progress
-     */
-    private fun updateOnHoldFabButton(anotherCall: MegaChatCall) {
-        bottomFloatingPanelViewHolder.changeOnHoldIcon(
-            anotherCall.isOnHold
-        )
-    }
-
-    /**
-     * Update the banner if there are calls on hold in other chats or not.
-     *
-     * @param anotherCall Another call on hold or in progress
-     */
-    private fun updateBannerAnotherCall(anotherCall: MegaChatCall) {
-        logDebug("Show banner of another call")
-        var isOnHold = anotherCall.isOnHold
-        if (inMeetingViewModel.isAnotherCallOneToOneCall(anotherCall.chatid) && inMeetingViewModel.isSessionOnHoldAnotherOneToOneCall(
-                anotherCall
-            )
-        ) {
-            isOnHold = true
-        }
-
-        val anotherChat = megaChatApi.getChatRoom(anotherCall.chatid)
-        bannerAnotherCallTitle?.let {
-            it.text = getTitleChat(anotherChat)
-        }
-
-        bannerAnotherCallSubtitle?.let {
-            it.text = StringResourcesUtils.getString(
-                if (isOnHold) R.string.call_on_hold
-                else R.string.call_in_progress_layout
-            )
-
-            it.alpha = 1f
-        }
-
-        bannerAnotherCallLayout.let {
-            it.alpha = if (isOnHold) 0.9f else 1f
-            it.isVisible = true
-
         }
     }
 
@@ -2512,7 +2467,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun finishActivity() {
         disableCamera()
         removeUI()
-        logDebug("Finishing the activity")
         meetingActivity.finish()
     }
 
@@ -2622,7 +2576,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.setCall(chatId)
         checkChildFragments()
         showMuteBanner()
-        checkAnotherCall()
     }
 
     override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
@@ -2634,10 +2587,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         sharedModel.hideSnackBar()
-        bannerAnotherCallLayout.isVisible = false
-        bannerParticipant?.isVisible = false
-        bannerInfo?.isVisible = false
-        bannerMuteLayout.isVisible = false
 
         removeUI()
         logDebug("Fragment destroyed")

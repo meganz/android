@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.utils.LogUtil.logDebug
 
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -20,6 +21,66 @@ import javax.inject.Inject
 class GetCallUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {
+
+    /**
+     * Get the MegaChatCall from a chatRoom ID
+     *
+     * @param chatRoomId Chat ID
+     * @return MegaChatCall
+     */
+    fun getMegaChatCall(chatRoomId: Long): Single<MegaChatCall> =
+        Single.fromCallable {
+            megaChatApi.getChatCall(chatRoomId)
+        }
+
+    /**
+     * Get a chat id of another call in progress or on hold
+     *
+     * @param currentChatId Chat ID of the current call
+     * @return Chat ID of the another call or -1 if no exists
+     */
+    fun getChatIdOfAnotherCallInProgress(currentChatId: Long): Single<Long> =
+        Single.fromCallable {
+            var result: Long = MEGACHAT_INVALID_HANDLE
+            val calls = getCallsInProgressAndOnHold()
+            if (calls.isNotEmpty()) {
+                for (call in getCallsInProgressAndOnHold()) {
+                    if (call.chatid != currentChatId) {
+                        result = call.chatid
+                        break
+                    }
+                }
+            }
+
+            result
+        }
+
+    /**
+     * Method to check if there is another call in progress or on hold
+     *
+     * @param currentChatId Chat ID of the current call
+     * @return Chat ID of the another call or -1 if no exists
+     */
+    fun checkAnotherCall(currentChatId: Long): Flowable<Long> =
+        Flowable.create({ emitter ->
+            emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
+
+            val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> { call ->
+                when (call.status) {
+                    CALL_STATUS_DESTROYED -> {
+                        emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
+                    }
+                }
+            }
+
+            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                .observeForever(callStatusObserver)
+
+            emitter.setCancellable {
+                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                    .removeObserver(callStatusObserver)
+            }
+        }, BackpressureStrategy.LATEST)
 
     fun isCurrentCallInProgress(chatId: Long): Flowable<Boolean> =
         Flowable.create({ emitter ->
@@ -137,25 +198,4 @@ class GetCallUseCase @Inject constructor(
 
         return listCalls
     }
-
-    /**
-     * Checks exists another call in progress
-     *
-     * @param chatId Chat ID of the current call
-     * @return Chat ID of the another call or -1 if no exists
-     */
-    fun getAnotherCallInProgress(chatId: Long): Single<Long> =
-        Single.create { emitter ->
-            val callsList: ArrayList<MegaChatCall> = getCallsInProgressAndOnHold()
-
-            for (call in callsList) {
-                if (call.chatid != chatId) {
-                    emitter.onSuccess(call.chatid)
-                    return@create
-                }
-            }
-
-            emitter.onSuccess(MEGACHAT_INVALID_HANDLE)
-            return@create
-        }
 }

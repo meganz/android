@@ -68,6 +68,13 @@ class InMeetingViewModel @Inject constructor(
         TYPE_CONNECTING, TYPE_CALLING, TYPE_ESTABLISHED
     }
 
+    /**
+     * Enum defining the type of another call.
+     */
+    enum class AnotherCallType{
+        TYPE_NO_CALL, TYPE_IN_PROGRESS, TYPE_ON_HOLD
+    }
+
     var status = InMeetingFragment.NOT_TYPE
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
@@ -80,6 +87,7 @@ class InMeetingViewModel @Inject constructor(
     private var haveConnection: Boolean = false
 
     private var callInProgressDisposable: Disposable? = null
+    private var anotherCallInProgressDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -122,6 +130,14 @@ class InMeetingViewModel @Inject constructor(
 
     private val _allowClickingOnToolbar = MutableStateFlow(false)
     val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
+
+    // Another call banner
+    private val _updateAnotherCallBannerType = MutableStateFlow(AnotherCallType.TYPE_NO_CALL)
+    val updateAnotherCallBannerType: StateFlow<AnotherCallType> get() = _updateAnotherCallBannerType
+
+    // Another chat title
+    private val _anotherChatTitle = MutableStateFlow(" ")
+    val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -184,12 +200,63 @@ class InMeetingViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Method to get the duration of the call
+     */
     fun getCallDuration(): Long {
         getCall()?.let {
             return it.duration
         }
 
         return INVALID_VALUE.toLong()
+    }
+
+    /**
+     * Method that controls whether the another call banner should be visible or not.
+     */
+    private fun checkAnotherCallBanner() {
+        anotherCallInProgressDisposable?.dispose()
+        anotherCallInProgressDisposable = getCallUseCase.checkAnotherCall(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    if (it == MEGACHAT_INVALID_HANDLE) {
+                        if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_NO_CALL) {
+                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                        }
+
+                    } else {
+                        val call: MegaChatCall? = getCallUseCase.getMegaChatCall(it).blockingGet()
+                        if (call != null) {
+                            if (call.isOnHold) {
+                                if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
+                                    _updateAnotherCallBannerType.value =
+                                        AnotherCallType.TYPE_ON_HOLD
+                                }
+                            } else {
+                                if (_updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
+                                    _updateAnotherCallBannerType.value =
+                                        AnotherCallType.TYPE_IN_PROGRESS
+                                }
+                            }
+
+                            inMeetingRepository.getChatRoom(it)?.let { chat ->
+                                _anotherChatTitle.value = getTitleChat(chat)
+                            }
+                        } else {
+                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                        }
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            )
+
+        anotherCallInProgressDisposable?.let {
+            composite.add(it)
+        }
     }
 
     /**
@@ -281,8 +348,11 @@ class InMeetingViewModel @Inject constructor(
             _callLiveData.value?.let {
                 if(_updateCallId.value != it.callId){
                     _updateCallId.value = it.callId
+                    checkSubtitleToolbar(it.status, it.isOutgoing)
+                    checkAnotherCallBanner()
+                    checkToolbarClickability()
                 }
-                checkSubtitleToolbar(it.status, it.isOutgoing)
+
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
                     previousState = it.status
                 }
@@ -343,8 +413,6 @@ class InMeetingViewModel @Inject constructor(
             setCall(it.chatId)
             _chatTitle.value = getTitleChat(it)
         }
-
-        checkToolbarClickability()
     }
 
     /*
@@ -846,8 +914,8 @@ class InMeetingViewModel @Inject constructor(
                                     session.peerid
                                 )
                             )
-                            return true
                         }
+                        return true
                     }
                 }
             }
@@ -2026,13 +2094,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     override fun onCallHungUp(callId: Long) {
-        _callLiveData.value?.let {
-            if (it.callId == callId) {
-                logDebug("Current call hung up")
-                _callLiveData.value = null
-                currentChatId = MEGACHAT_INVALID_HANDLE
-            }
-        }
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
