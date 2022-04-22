@@ -4476,5 +4476,7 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Удалить из избранного</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">Формат файла не поддерживается. Не удаётся открыть файл.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Выбранная папка пуста. Нет файлов для загрузки.</string>
 </resources>

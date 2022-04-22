@@ -4477,4 +4477,6 @@
     <string name="action_remove_favourites">Usuń ulubione</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Wybrany folder jest pusty. Brak plików do przesłania.</string>
 </resources>

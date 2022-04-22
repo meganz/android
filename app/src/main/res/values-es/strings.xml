@@ -3826,9 +3826,9 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Años</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s de %2$s [/B]de %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s de %2$s[/B] de %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Subida en curso, 1 archivo pendiente</item>
@@ -4296,5 +4296,7 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Eliminar favoritos</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">El formato de archivo no es compatible. No se puede abrir el archivo.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">La carpeta seleccionada está vacía. No hay archivos para subir.</string>
 </resources>
