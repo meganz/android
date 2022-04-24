@@ -3,6 +3,8 @@ package mega.privacy.android.app.mediaplayer.playlist
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 
 /**
  * UI data class for playlist screen.
@@ -15,6 +17,8 @@ import java.io.File
  * @property size size of the node
  * @property isSelected Whether the item is selected
  * @property headerIsVisible the header of item if is visible
+ * @property duration the duration of audio
+ * @property currentPosition the current playing position of audio
  */
 data class PlaylistItem(
     val nodeHandle: Long,
@@ -24,7 +28,9 @@ data class PlaylistItem(
     val type: Int,
     val size: Long,
     var isSelected: Boolean = false,
-    var headerIsVisible: Boolean = false
+    var headerIsVisible: Boolean = false,
+    var duration: Long = 0L,
+    var currentPosition: Long = 0L
 ) {
     /**
      * Create a new instance with the specified index and item type,
@@ -33,13 +39,27 @@ data class PlaylistItem(
      * @param index new index
      * @param type item type
      * @param isSelected Whether the item is selected
+     * @param duration the duration of audio
+     * @param currentPosition the current playing position of audio
      * @return the new instance
      */
-    fun finalizeItem(index: Int, type: Int, isSelected: Boolean = false): PlaylistItem {
+    fun finalizeItem(
+        index: Int,
+        type: Int,
+        isSelected: Boolean = false,
+        duration: Long = 0L,
+        currentPosition: Long = 0L
+    ): PlaylistItem {
         return PlaylistItem(
-            nodeHandle, nodeName,
-            if (thumbnail?.exists() == true) thumbnail else null,
-            index, type, size, isSelected
+            nodeHandle = nodeHandle,
+            nodeName = nodeName,
+            thumbnail = if (thumbnail?.exists() == true) thumbnail else null,
+            index = index,
+            type = type,
+            size = size,
+            isSelected = isSelected,
+            duration = duration,
+            currentPosition = currentPosition
         )
     }
 
@@ -50,7 +70,48 @@ data class PlaylistItem(
      * @return the new instance
      */
     fun updateNodeName(newName: String) =
-        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size, isSelected)
+        PlaylistItem(
+            nodeHandle = nodeHandle,
+            nodeName = newName,
+            thumbnail = thumbnail,
+            index = index,
+            type = type,
+            size = size,
+            isSelected = isSelected
+        )
+
+    /**
+     * Format current position and duration
+     * @return strings of time
+     */
+    fun formatCurrentPositionAndDuration() =
+        "${getTimeString(currentPosition)} / ${getTimeString(duration)}"
+
+    /**
+     * Format long to time string
+     * @param time long value of time
+     * @return strings of time
+     */
+    private fun getTimeString(time: Long): String {
+        // Make the time displayed is same as Exoplayer
+        val totalSeconds = (time.toFloat() / 1000).roundToLong()
+        val hour = TimeUnit.SECONDS.toHours(totalSeconds)
+        val minutes = TimeUnit.SECONDS.toMinutes(totalSeconds) - TimeUnit.HOURS.toMinutes(hour)
+        val seconds =
+            totalSeconds - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(totalSeconds))
+
+        return if (hour >= 1) {
+            String.format("%2d:%02d:%02d", hour, minutes, seconds)
+        } else {
+            String.format("%02d:%02d", minutes, seconds)
+        }
+    }
+
+    /**
+     * Format duration
+     * @return time strings
+     */
+    fun formatDuration() = getTimeString(this.duration)
 
     companion object {
         const val TYPE_PREVIOUS = 1

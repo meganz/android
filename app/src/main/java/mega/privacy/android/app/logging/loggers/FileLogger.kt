@@ -13,34 +13,31 @@ import org.slf4j.Logger
 class FileLogger(
     private val logger: Logger
 ) {
-
-    var enabled: Boolean = false
-
+    /**
+     * Log to file
+     *
+     * @param fileLogMessage
+     */
     fun logToFile(
-        tag: String?,
-        message: String,
-        stackTrace: String?,
-        priority: Int,
-        t: Throwable?
+        fileLogMessage: FileLogMessage
     ) {
-        if (enabled) {
-            val logMessage = "${tag.orEmpty()} $message ${stackTrace.orEmpty()}".trim()
-            with(logger) {
-                when (priority) {
-                    Log.VERBOSE -> trace(logMessage)
-                    Log.DEBUG -> debug(logMessage)
-                    Log.INFO -> info(logMessage)
-                    Log.ASSERT -> info(logMessage)
-                    Log.WARN -> warn(logMessage)
-                    Log.ERROR -> {
-                        if (t != null) {
-                            error(logMessage, t)
-                        } else {
-                            error(logMessage)
-                        }
+        val logMessage = fileLogMessage.toString()
+        with(logger) {
+            when (fileLogMessage.priority) {
+                Log.VERBOSE -> trace(logMessage)
+                Log.DEBUG -> debug(logMessage)
+                Log.INFO -> info(logMessage)
+                Log.ASSERT -> info(logMessage)
+                Log.WARN -> warn(logMessage)
+                Log.ERROR -> {
+                    if (fileLogMessage.throwable != null) {
+                        error(logMessage, fileLogMessage.throwable)
+                    } else {
+                        error(logMessage)
                     }
                 }
             }
         }
+
     }
 }

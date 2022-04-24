@@ -527,7 +527,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (e.getErrorCode() == MegaError.API_OK) {
 
                     boolean storage = (request.getNumDetails() & MyAccountInfo.HAS_STORAGE_DETAILS) != 0;
-                    if (storage) {
+                    if (storage && megaApi.getRootNode() != null) {
                         dbH.setAccountDetailsTimeStamp();
                     }
 

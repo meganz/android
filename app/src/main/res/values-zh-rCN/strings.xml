@@ -579,7 +579,7 @@
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">您将取消订阅MEGA。如果我们可以做些什么以改变您的心意，请让我们知道。</string>
     <!-- hint cancel subscriptions dialog -->
-    <string name="hint_cancel_subscriptions">在这里输入反馈意见</string>
+    <string name="hint_cancel_subscriptions">请在这里输入您的反馈意见</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">发送</string>
     <!-- confirmation cancel subscriptions dialog -->
@@ -1895,9 +1895,9 @@
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">发送反馈</string>
     <!-- mail subject -->
-    <string name="setting_feedback_subject">安卓反馈</string>
+    <string name="setting_feedback_subject">安卓反馈建议</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">请在此处提供您的反馈：</string>
+    <string name="setting_feedback_body">请在此处提供您的反馈意见：</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">设备型号</string>
     <!-- mail body -->
@@ -1975,7 +1975,7 @@
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">是的，评价应用程序</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">无发送反馈</string>
+    <string name="send_feedback_panel">不喜欢，我要发送反馈</string>
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">高级选项</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
@@ -3746,9 +3746,9 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <string name="cu_month_year_date">%2$s[B]%1$s[/B]</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <string name="cu_day_month_year_date">%3$s[B]%2$s%1$s[/B]</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">正在上传，%1$d个文件待上传</item>
@@ -4206,5 +4206,7 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">移除收藏</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">文件格式不支持。无法打开文件。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">所选文件夹为空。无可上传的文件。</string>
 </resources>
