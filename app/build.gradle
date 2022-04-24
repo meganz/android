@@ -309,7 +309,7 @@ dependencies {
     implementation "androidx.biometric:biometric:$biometricVersion"
     implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
-    // (Java only)
+    // Java
     implementation "androidx.work:work-runtime:$workVersion"
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$workVersion"
@@ -371,6 +371,8 @@ dependencies {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
+    testImplementation "androidx.work:work-testing:$workVersion"
+    testImplementation "androidx.room:room-testing:$roomVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

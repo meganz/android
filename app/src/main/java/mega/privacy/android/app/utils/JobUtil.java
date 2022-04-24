@@ -17,12 +17,14 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.CancelUploadsWorker;
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
 import mega.privacy.android.app.jobservices.SyncHeartbeatWorker;
+import nz.mega.sdk.MegaApiJava;
 
 public class JobUtil {
 
@@ -215,5 +217,9 @@ public class JobUtil {
             return true;
         }
         return !Boolean.parseBoolean(cameraUploadEnabled);
+    }
+
+    public static boolean isOverQuota(Context context) {
+        return ((MegaApplication) context.getApplicationContext()).getStorageState() == MegaApiJava.STORAGE_STATE_RED;
     }
 }

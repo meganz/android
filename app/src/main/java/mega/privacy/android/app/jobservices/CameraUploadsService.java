@@ -149,7 +149,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static final String CU_CACHE_FOLDER = "cu";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
-    public static volatile boolean isServiceRunning = false;
+    private static volatile boolean isServiceRunning = false;
     public static boolean uploadingInProgress;
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
@@ -368,6 +368,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Start service here, creating new working thread.");
         startWorkerThread();
         return START_NOT_STICKY;
+    }
+
+    public static boolean isServiceRunning() {
+        return isServiceRunning;
     }
 
     /**
