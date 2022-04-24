@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -20,10 +20,10 @@ class StopCameraUploadWorker @Inject constructor(
 
     override fun doWork(): Result {
         if (isStopped) return Result.failure()
-        logDebug("StopCameraUploadWorker: doWork()")
+        Timber.d("StopCameraUploadWorker: doWork()")
         return try {
             if (cameraUploadsServiceWrapper.isServiceRunning()) {
-                logDebug("StopCameraUploadWorker: Sending stop action")
+                Timber.d("StopCameraUploadWorker: Sending stop action")
                 val stopIntent = Intent(appContext, CameraUploadsService::class.java)
                 stopIntent.action = CameraUploadsService.ACTION_STOP
                 ContextCompat.startForegroundService(appContext, stopIntent)
@@ -32,7 +32,7 @@ class StopCameraUploadWorker @Inject constructor(
                 Result.failure()
             }
         } catch (throwable: Throwable) {
-            logDebug("StopCameraUploadWorker: doWork() fail")
+            Timber.d("StopCameraUploadWorker: doWork() fail")
             Result.failure()
         }
     }

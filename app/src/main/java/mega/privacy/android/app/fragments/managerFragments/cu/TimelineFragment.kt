@@ -18,11 +18,11 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaChatApiJava
+import timber.log.Timber
 
 /**
  * TimelineFragment is a sub fragment of PhotosFragment. Its sibling is AlbumsFragment
@@ -149,7 +149,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             it.refreshTimelineFragment()
         }
 
-        logDebug("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
+        Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
         JobUtil.fireCameraUploadJob(context, false)
     }
 

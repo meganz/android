@@ -101,6 +101,7 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
 import nz.mega.sdk.MegaNode;
+import timber.log.Timber;
 
 public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
@@ -1007,7 +1008,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //set cu enabled and start the service
         dbH.setCamSyncEnabled(true);
 
-        logDebug("CameraUpload enabled through Settings - fireCameraUploadJob()");
+        Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
         fireCameraUploadJob(context, false);
 
         logDebug("Camera Uploads ON");

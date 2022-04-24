@@ -127,6 +127,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
+import timber.log.Timber;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -332,7 +333,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        logDebug("Starting CameraUpload service (flags: " + flags + ", startId: " + startId + ")");
+        Timber.d("Starting CameraUpload service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
         startForegroundNotification();
         initService();
@@ -348,7 +349,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (intent.getAction().equals(ACTION_CANCEL) ||
                     intent.getAction().equals(ACTION_STOP) ||
                     intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)) {
-                logDebug("Cancel all CameraUpload transfers.");
+                Timber.d("Cancel all CameraUpload transfers.");
                 for (MegaTransfer transfer : cuTransfers) {
                     megaApi.cancelTransfer(transfer, this);
                 }

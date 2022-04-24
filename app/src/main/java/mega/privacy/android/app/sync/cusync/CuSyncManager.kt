@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -707,9 +708,9 @@ object CuSyncManager {
     private fun sendRegularHeartbeat() {
         val cuBackup = databaseHandler.cuBackup
 
-        logDebug("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
+        Timber.d("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
-            logDebug("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
+            Timber.d("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_UPTODATE,
@@ -724,7 +725,7 @@ object CuSyncManager {
 
         val muBackup = databaseHandler.muBackup
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
-            logDebug("doActiveHeartbeat Send MU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
+            Timber.d("doActiveHeartbeat Send MU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_UPTODATE,
@@ -746,12 +747,12 @@ object CuSyncManager {
      * @return MegaRequestListenerInterface object listen to the request.
      */
     private fun createOnFinishListener(onFinish: (() -> Unit)?) = OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
-        logDebug("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+        Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
 
         if(e.errorCode == MegaError.API_OK) {
             onFinish?.invoke()
         } else {
-            logError("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
+            Timber.e("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
         }
     })
 

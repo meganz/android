@@ -7,9 +7,9 @@ import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import mega.privacy.android.app.utils.JobUtil.SHOULD_IGNORE_ATTRIBUTES
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -26,7 +26,7 @@ class StartCameraUploadWorker @Inject constructor(
 
     override fun doWork(): Result {
         if (isStopped) return Result.failure()
-        logDebug("CameraUploadWork: doWork()")
+        Timber.d("CameraUploadWork: doWork()")
         val ignoreAttributes = inputData.getBoolean(SHOULD_IGNORE_ATTRIBUTES, false)
         return try {
             val isOverQuota = jobUtilWrapper.isOverQuota(appContext)
@@ -35,7 +35,7 @@ class StartCameraUploadWorker @Inject constructor(
                     appContext,
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 )
-            logDebug(
+            Timber.d(
                 "isOverQuota: " + isOverQuota +
                         ", hasStoragePermission: " + hasReadPermission +
                         ", isRunning: " + cameraUploadsServiceWrapper.isServiceRunning() +
@@ -50,7 +50,7 @@ class StartCameraUploadWorker @Inject constructor(
                 Result.failure()
             }
         } catch (throwable: Throwable) {
-            logDebug("CameraUploadWork: doWork() fail")
+            Timber.d("CameraUploadWork: doWork() fail")
             Result.failure()
         }
     }

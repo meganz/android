@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
@@ -66,7 +67,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                logDebug("Get CameraUpload attribute when change on other client.");
+                Timber.d("Get CameraUpload attribute when change on other client.");
                 api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(megaApplication));
                 break;
             }

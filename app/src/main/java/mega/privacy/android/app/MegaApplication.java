@@ -196,6 +196,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 @HiltAndroidApp
 public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
@@ -434,7 +435,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     }
 
                     //Ask for MU and CU folder when App in init state
-                    logDebug("Get CameraUpload attribute on fetch nodes.");
+                    Timber.d("Get CameraUpload attribute on fetch nodes.");
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(getApplicationContext()));
 
                     // Init CU sync data after login successfully

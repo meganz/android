@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity implements MegaRequestListenerInterface {
 
@@ -395,9 +396,9 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             startActivity(intent);
             finish();
         } else {
-            logDebug("Start the Camera Uploads service");
+            Timber.d("Start the Camera Uploads service");
             handler.postDelayed(() -> {
-                logDebug("Now I start the service");
+                Timber.d("Now I start the service");
                 scheduleCameraUploadJob(LoginActivity.this);
             }, time);
         }
