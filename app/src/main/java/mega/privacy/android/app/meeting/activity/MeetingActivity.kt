@@ -73,7 +73,6 @@ class MeetingActivity : BaseActivity() {
 
     private var isGuest = false
     private var isLockingEnabled = false
-    private var currentChatId = MEGACHAT_INVALID_HANDLE
 
     var navGraph: NavGraph? = null
 
@@ -105,8 +104,8 @@ class MeetingActivity : BaseActivity() {
         setStatusBarTranslucent()
 
         lifecycleScope.launchWhenStarted {
-            meetingViewModel.finishMeetingActivity.collect {
-                if (it) {
+            meetingViewModel.finishMeetingActivity.collect { shouldFinish ->
+                if (shouldFinish) {
                     finish()
                 }
             }
@@ -143,8 +142,7 @@ class MeetingActivity : BaseActivity() {
                 }
             }
 
-            currentChatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-            meetingViewModel.updateChatRoomId(currentChatId)
+            meetingViewModel.updateChatRoomId(it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE))
 
             isGuest = it.getBooleanExtra(
                 MEETING_IS_GUEST,
@@ -154,9 +152,11 @@ class MeetingActivity : BaseActivity() {
             if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
                 (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
             ) {
-                if (currentChatId != MEGACHAT_INVALID_HANDLE) {
-                    //Notification of this call should be displayed again
-                    MegaApplication.getChatManagement().removeNotificationShown(currentChatId)
+                meetingViewModel.currentChatId.value?.let { currentChatId ->
+                    if (currentChatId != MEGACHAT_INVALID_HANDLE) {
+                        //Notification of this call should be displayed again
+                        MegaApplication.getChatManagement().removeNotificationShown(currentChatId)
+                    }
                 }
 
                 return
@@ -217,10 +217,12 @@ class MeetingActivity : BaseActivity() {
         // The args to be passed to startDestination
         val bundle = Bundle()
 
-        bundle.putLong(
-            MEETING_CHAT_ID,
-            currentChatId
-        )
+        meetingViewModel.currentChatId.value?.let { currentChatId ->
+            bundle.putLong(
+                MEETING_CHAT_ID,
+                currentChatId
+            )
+        }
 
         bundle.putLong(
             MEETING_PUBLIC_CHAT_HANDLE,
@@ -253,8 +255,8 @@ class MeetingActivity : BaseActivity() {
             )
         }
 
-        navGraph?.let {
-            it.startDestination = when (meetingAction) {
+        navGraph?.apply {
+            startDestination = when (meetingAction) {
                 MEETING_ACTION_CREATE -> R.id.createMeetingFragment
                 MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
                 MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
@@ -264,7 +266,7 @@ class MeetingActivity : BaseActivity() {
                 else -> R.id.createMeetingFragment
             }
 
-            navController.setGraph(it, bundle)
+            navController.setGraph(this, bundle)
         }
     }
 

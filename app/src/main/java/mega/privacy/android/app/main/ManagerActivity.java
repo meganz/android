@@ -11539,18 +11539,18 @@ public class ManagerActivity extends TransfersManagementActivity
                         showChatLink(link);
                     }
 
-					@Override
-					public void onLeave() {
-					}
-				}, false).show(getSupportFragmentManager(),
-						MeetingHasEndedDialogFragment.TAG);
-			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivity.this, ManagerActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
-			}
-		} else {
-			logDebug("It's a chat");
-			showChatLink(link);
-		}
+                    @Override
+                    public void onLeave() {
+                    }
+                }, false).show(getSupportFragmentManager(),
+                        MeetingHasEndedDialogFragment.TAG);
+            } else {
+                CallUtil.checkMeetingInProgress(ManagerActivity.this, ManagerActivity.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
+            }
+        } else {
+            logDebug("It's a chat");
+            showChatLink(link);
+        }
 
         dismissAlertDialogIfExists(openLinkDialog);
     }

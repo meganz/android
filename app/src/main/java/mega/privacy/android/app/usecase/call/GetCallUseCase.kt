@@ -1,5 +1,6 @@
 package mega.privacy.android.app.usecase.call
 
+import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
@@ -42,12 +43,11 @@ class GetCallUseCase @Inject constructor(
         Single.fromCallable {
             var result: Long = MEGACHAT_INVALID_HANDLE
             val calls = getCallsInProgressAndOnHold()
-            if (calls.isNotEmpty()) {
-                for (call in getCallsInProgressAndOnHold()) {
-                    if (call.chatid != currentChatId) {
-                        result = call.chatid
-                        break
-                    }
+
+            for (call in calls) {
+                if (call.chatid != currentChatId) {
+                    result = call.chatid
+                    break
                 }
             }
 
@@ -64,7 +64,7 @@ class GetCallUseCase @Inject constructor(
         Flowable.create({ emitter ->
             emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
 
-            val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> { call ->
+            val callStatusObserver = Observer<MegaChatCall> { call ->
                 when (call.status) {
                     CALL_STATUS_DESTROYED -> {
                         emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
@@ -88,7 +88,7 @@ class GetCallUseCase @Inject constructor(
      */
     fun isThereAnOngoingCall(): Flowable<Boolean> =
         Flowable.create({ emitter ->
-            val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> { call ->
+            val callStatusObserver = Observer<MegaChatCall> { call ->
                 when (call.status) {
                     CALL_STATUS_USER_NO_PRESENT, CALL_STATUS_DESTROYED -> {
                         val result: Boolean = getCallInProgress() != null
@@ -116,7 +116,7 @@ class GetCallUseCase @Inject constructor(
      */
     fun isThereAnInProgressCall(chatId: Long): Flowable<Boolean> =
         Flowable.create({ emitter ->
-            val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> { call ->
+            val callStatusObserver = Observer<MegaChatCall> { call ->
                 if (chatId == call.chatid) {
                     when (call.status) {
                         CALL_STATUS_IN_PROGRESS -> emitter.onNext(true)

@@ -16,6 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -207,13 +208,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to get the duration of the call
      */
-    fun getCallDuration(): Long {
-        getCall()?.let {
-            return it.duration
-        }
-
-        return INVALID_VALUE.toLong()
-    }
+    fun getCallDuration(): Long = getCall()?.duration ?: INVALID_VALUE.toLong()
 
     /**
      * Method that controls whether the another call banner should be visible or not
@@ -249,11 +244,7 @@ class InMeetingViewModel @Inject constructor(
                 onError = { error ->
                     LogUtil.logError(error.stackTraceToString())
                 }
-            )
-
-        anotherCallInProgressDisposable?.let {
-            composite.add(it)
-        }
+            ).addTo(composite)
     }
 
     /**
@@ -273,11 +264,7 @@ class InMeetingViewModel @Inject constructor(
                     onError = { error ->
                         LogUtil.logError(error.stackTraceToString())
                     }
-                )
-
-            callInProgressDisposable?.let {
-                composite.add(it)
-            }
+                ).addTo(composite)
         }
     }
 
