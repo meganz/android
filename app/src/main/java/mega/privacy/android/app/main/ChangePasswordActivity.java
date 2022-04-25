@@ -54,7 +54,8 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ChangePasswordActivity extends PasscodeActivity implements OnClickListener, MegaRequestListenerInterface {
 
 	public static final String KEY_IS_LOGOUT = "logout";
-
+	private static final float DISABLED_BUTTON_ALPHA = 0.5F;
+	private static final float ENABLED_BUTTON_ALPHA = 1F;
 	private AlertDialog progress;
 	
 	float scaleH, scaleW;
@@ -154,7 +155,7 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 						String temp = s.toString();
 						containerPasswdElements.setVisibility(View.VISIBLE);
 
-						checkPasswordStrength(temp.trim());
+						checkPasswordStrength(temp.trim(), false);
 					}
 					else{
 						passwdValid = false;
@@ -170,6 +171,8 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 				if (newPassword1Layout.getHint() != null
 						&& !newPassword1Layout.getHint().toString().equals(normalHint)) {
 					newPassword1Layout.setHint(normalHint);
+					changePasswordButton.setEnabled(true);
+					changePasswordButton.setAlpha(ENABLED_BUTTON_ALPHA);
 				}
 
 				if (editable.toString().isEmpty()) {
@@ -368,10 +371,12 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 		}
 	}
 
-	public void checkPasswordStrength(String s) {
+	public void checkPasswordStrength(String s, boolean isSamePassword) {
 		newPassword1Layout.setErrorEnabled(false);
 
-		if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
+		if (isSamePassword
+				|| megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK
+				|| s.length() < 4){
 			firstShape.setBackground(ContextCompat.getDrawable(this, R.drawable.passwd_very_weak));
 			secondShape.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_password));
 			tirdShape.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_password));
@@ -691,9 +696,12 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 			case R.id.change_password_newPassword1:{
 				String samePasswordError = StringResourcesUtils.getString(R.string.error_same_password);
 				if (error.equals(samePasswordError)) {
+					checkPasswordStrength(editText.getText().toString(), true);
 					newPassword1Layout.setHint(samePasswordError);
 					newPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
 					newPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
+					changePasswordButton.setEnabled(false);
+					changePasswordButton.setAlpha(DISABLED_BUTTON_ALPHA);
 				} else {
 					newPassword1Layout.setError(error);
 					newPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
