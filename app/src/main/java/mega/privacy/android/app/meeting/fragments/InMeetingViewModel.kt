@@ -12,11 +12,17 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -35,9 +41,11 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -49,8 +57,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
-    private val inMeetingRepository: InMeetingRepository
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    private val inMeetingRepository: InMeetingRepository,
+    private val getCallUseCase: GetCallUseCase
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     var status = InMeetingFragment.NOT_TYPE
@@ -63,6 +72,8 @@ class InMeetingViewModel @Inject constructor(
     var isReconnectingStatus: Boolean = false
 
     private var haveConnection: Boolean = false
+
+    private var callInProgressDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -92,6 +103,9 @@ class InMeetingViewModel @Inject constructor(
     // List of visible participants in the meeting
     var visibleParticipants: MutableList<Participant> = mutableListOf()
 
+    private val _allowClickingOnToolbar = MutableStateFlow(false)
+    val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -115,6 +129,31 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(updateCallStatusObserver)
+    }
+
+    /**
+     * Method that controls whether the toolbar should be clickable or not.
+     */
+    private fun checkToolbarClickability() {
+        if (!isOneToOneCall()) {
+            callInProgressDisposable?.dispose()
+
+            callInProgressDisposable = getCallUseCase.isThereAnInProgressCall(currentChatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        _allowClickingOnToolbar.value = it
+                    },
+                    onError = { error ->
+                        LogUtil.logError(error.stackTraceToString())
+                    }
+                )
+
+            callInProgressDisposable?.let {
+                composite.add(it)
+            }
+        }
     }
 
     /**
@@ -233,7 +272,7 @@ class InMeetingViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun setChatId(chatId: Long) {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
+        if (chatId == MEGACHAT_INVALID_HANDLE || currentChatId == chatId)
             return
 
         currentChatId = chatId
@@ -242,6 +281,8 @@ class InMeetingViewModel @Inject constructor(
             setCall(it.chatId)
             _chatTitle.value = getTitleChat(it)
         }
+
+        checkToolbarClickability()
     }
 
     /**

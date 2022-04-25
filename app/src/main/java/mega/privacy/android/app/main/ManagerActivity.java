@@ -300,6 +300,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -626,6 +627,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
     private boolean isInAlbumContent;
+    public boolean fromAlbumContent = false;
 
     public enum FragmentTag {
         CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
@@ -5255,7 +5257,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     searchQuery = newText;
                     recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
                     if (recentChatsFragment != null) {
-                        recentChatsFragment.filterChats(newText);
+                        recentChatsFragment.filterChats(newText, false);
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -6071,7 +6073,9 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (drawerItem == DrawerItem.PHOTOS) {
             if (isInAlbumContent) {
+                fromAlbumContent = true;
                 isInAlbumContent = false;
+
                 backToDrawerItem(bottomNavigationCurrentItem);
                 if (photosFragment == null) {
                     backToDrawerItem(bottomNavigationCurrentItem);

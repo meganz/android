@@ -125,6 +125,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
@@ -316,7 +317,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             } else if (this instanceof UpgradeAccountActivity) {
                 finish();
             } else if ((this instanceof MyAccountActivity && myAccountInfo.isUpgradeFromAccount())
-                    || (this instanceof ManagerActivity && myAccountInfo.isUpgradeFromManager())) {
+                    || (this instanceof ManagerActivity && myAccountInfo.isUpgradeFromManager())
+                    || (this instanceof FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings())) {
                 purchaseType = (PurchaseType) type;
                 showQueryPurchasesResult();
             }

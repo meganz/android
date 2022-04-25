@@ -55,7 +55,7 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Not enough quota</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">Two-Factor Authentication required.</string>
+    <string name="api_emfarequired">Two-factor authentication required.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Access denied for non-admin users</string>
     <!-- A dialog title shown to users when their business account is expired. -->

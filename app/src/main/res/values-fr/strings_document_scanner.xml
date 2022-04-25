@@ -25,17 +25,17 @@
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Basse</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
-    <string name="scan_dialog_discard_title">Abandonner la numérisation ?</string>
+    <string name="scan_dialog_discard_title">Abandonner la numérisation ?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_body">La présente numérisation sera perdue</string>
     <!-- Title text shown on document scanner dialog to discard scan all scans -->
-    <string name="scan_dialog_discard_all_title">Abandonner toutes les numérisations ?</string>
+    <string name="scan_dialog_discard_all_title">Abandonner toutes les numérisations ?</string>
     <!-- Body text shown on document scanner dialog to discard all scans -->
     <string name="scan_dialog_discard_all_body">Le présent document sera perdue</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_action">Abandonner</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->
-    <string name="scan_dialog_delete_body">Supprimer la présente numérisation ?</string>
+    <string name="scan_dialog_delete_body">Supprimer la présente numérisation ?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">L’autorisation Appareil photo est nécessaire pour numériser des documents</string>
     <!-- Error text for incorrect name -->

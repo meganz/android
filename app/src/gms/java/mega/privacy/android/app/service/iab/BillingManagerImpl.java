@@ -109,6 +109,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private final Activity mActivity;
     private final List<Purchase> mPurchases = new ArrayList<>();
     private List<SkuDetails> mSkus;
+    private String obfuscatedAccountId;
 
     public static final String SUBSCRIPTION_PLATFORM_PACKAGE_NAME = "com.android.vending";
     public static final String SUBSCRIPTION_LINK_FOR_APP_STORE = "http://play.google.com/store/account/subscriptions";
@@ -124,6 +125,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
+        obfuscatedAccountId = ((MegaApplication)mActivity.getApplication()).getMyAccountInfo().generateObfuscatedAccountId();
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -160,7 +162,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
         logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
 
-        String obfuscatedAccountId = ((MegaApplication)mActivity.getApplication()).getMyAccountInfo().generateObfuscatedAccountId();
         logDebug("Obfuscated account id is:" + obfuscatedAccountId);
 
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
@@ -377,7 +378,10 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             // Verify all available purchases
             List<Purchase> list = new ArrayList<>();
             for (Purchase purchase : purchasesList) {
-                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())
+                        && purchase.getAccountIdentifiers() != null
+                        && purchase.getAccountIdentifiers().getObfuscatedAccountId() != null
+                        && purchase.getAccountIdentifiers().getObfuscatedAccountId().equals(obfuscatedAccountId)) {
                     list.add(purchase);
                     logDebug("Purchase added, " + purchase.getOriginalJson());
                 }
