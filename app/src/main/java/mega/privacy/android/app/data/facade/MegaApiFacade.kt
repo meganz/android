@@ -5,7 +5,6 @@ import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -58,4 +57,15 @@ class MegaApiFacade @Inject constructor(
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
     override fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
+
+    override fun setAutoAcceptContactsFromLink(
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.setContactLinksOption(disableAutoAccept, listener)
+
+    override fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface) =
+        megaApi.getContactLinksOption(listener)
+
+    override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
+        megaApi.getFolderInfo(node, listener)
 }

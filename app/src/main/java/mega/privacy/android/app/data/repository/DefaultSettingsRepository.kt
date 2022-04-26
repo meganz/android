@@ -3,20 +3,23 @@ package mega.privacy.android.app.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
-import mega.privacy.android.app.data.gateway.LoggingSettingsGateway
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
 import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
@@ -24,7 +27,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.SharedPreferenceConstants
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -38,21 +40,23 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property databaseHandler
  * @property context
- * @property sdk
+ * @property apiFacade
  * @property monitorStartScreenFacade
  * @property monitorHideRecentActivityFacade
  * @property loggingSettingsGateway
  * @property appScope
+ * @property ioDispatcher
  */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
-    @MegaApi private val sdk: MegaApiAndroid,
+    private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
-    private val loggingSettingsGateway: LoggingSettingsGateway,
-    @ApplicationScope private val appScope: CoroutineScope
+    private val loggingSettingsGateway: LoggingPreferencesDataStore,
+    @ApplicationScope private val appScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -69,16 +73,16 @@ class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-    override fun isPasscodeLockPreferenceEnabled(): Boolean =
+    override fun isPasscodeLockPreferenceEnabled() =
         databaseHandler.preferences.passcodeLockEnabled.toBoolean()
 
     override fun setPasscodeLockEnabled(enabled: Boolean) {
         databaseHandler.isPasscodeLockEnabled = enabled
     }
 
-    override suspend fun fetchContactLinksOption(): Boolean {
-        return suspendCoroutine { continuation ->
-            sdk.getContactLinksOption(
+    override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            apiFacade.isAutoAcceptContactsFromLinkEnabled(
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
                 )
@@ -110,25 +114,27 @@ class DefaultSettingsRepository @Inject constructor(
             MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
         )
 
-    override fun getStartScreen(): Int {
-        return getUiPreferences().getInt(
-            SharedPreferenceConstants.PREFERRED_START_SCREEN,
-            StartScreenUtil.HOME_BNV
-        )
-    }
+    override fun getStartScreen() = getUiPreferences().getInt(
+        SharedPreferenceConstants.PREFERRED_START_SCREEN,
+        StartScreenUtil.HOME_BNV
+    )
 
-    override fun shouldHideRecentActivity(): Boolean =
+    override fun shouldHideRecentActivity() =
         getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
 
-    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean {
-        return suspendCoroutine { continuation ->
-            sdk.setContactLinksOption(
-                !accept, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onSetContactLinksOptionRequestFinished(continuation, accept)
+    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                apiFacade.setAutoAcceptContactsFromLink(
+                    !accept, OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onSetContactLinksOptionRequestFinished(
+                            continuation,
+                            accept
+                        )
+                    )
                 )
-            )
+            }
         }
-    }
 
     private fun onSetContactLinksOptionRequestFinished(
         continuation: Continuation<Boolean>,
@@ -162,18 +168,18 @@ class DefaultSettingsRepository @Inject constructor(
         monitorHideRecentActivityFacade.getEvents()
 
     override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
-        loggingSettingsGateway.isLoggingEnabled()
+        loggingSettingsGateway.isLoggingPreferenceEnabled()
             .shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
-        loggingSettingsGateway.setLoggingEnabled(enabled)
+        loggingSettingsGateway.setLoggingEnabledPreference(enabled)
     }
 
     override fun isChatLoggingEnabled(): Flow<Boolean> =
-        loggingSettingsGateway.isChatLoggingEnabled()
+        loggingSettingsGateway.isChatLoggingPreferenceEnabled()
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
-        loggingSettingsGateway.setChatLoggingEnabled(enabled)
+        loggingSettingsGateway.setChatLoggingEnabledPreference(enabled)
     }
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
