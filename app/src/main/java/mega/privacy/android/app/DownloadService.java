@@ -1443,7 +1443,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_LOGIN){
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
+			logDebug("TYPE_CANCEL_TRANSFERS finished");
+			if (e.getErrorCode() == MegaError.API_OK) {
+				cancel();
+			}
+		} else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Logged in. Setting account auth token for folder links.");
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());

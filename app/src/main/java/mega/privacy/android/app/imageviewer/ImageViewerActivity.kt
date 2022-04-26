@@ -37,7 +37,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
-import mega.privacy.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -328,10 +328,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     viewModel.retrieveSingleImage(nodeFileLink!!)
                 nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle!!)
-                imageFileUri != null -> {
-                    val fakeHandle = FileUtil.getFileFakeHandle(imageFileUri!!.toFile())
-                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, fakeHandle)
-                }
+                imageFileUri != null ->
+                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, imageFileUri.hashCode().toLong())
                 else ->
                     error("Invalid params")
             }

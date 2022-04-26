@@ -1,33 +1,13 @@
 package mega.privacy.android.app.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.logging.loggers.FileLogMessage
+
 /**
  * Logging repository
  *
  */
 interface LoggingRepository {
-    /**
-     * Enable write sdk logs to file
-     *
-     */
-    fun enableWriteSdkLogsToFile()
-
-    /**
-     * Disable write sdk logs to file
-     *
-     */
-    fun disableWriteSdkLogsToFile()
-
-    /**
-     * Enable write chat logs to file
-     *
-     */
-    fun enableWriteChatLogsToFile()
-
-    /**
-     * Disable write chat logs to file
-     *
-     */
-    fun disableWriteChatLogsToFile()
 
     /**
      * Enable log all to console
@@ -40,4 +20,30 @@ interface LoggingRepository {
      *
      */
     fun resetSdkLogging()
+
+    /**
+     * Get sdk logging flow
+     *
+     */
+    fun getSdkLoggingFlow(): Flow<FileLogMessage>
+
+    /**
+     * Get chat logging flow
+     *
+     */
+    fun getChatLoggingFlow(): Flow<FileLogMessage>
+
+    /**
+     * Log to sdk file
+     *
+     * @param logMessage
+     */
+    fun logToSdkFile(logMessage: FileLogMessage)
+
+    /**
+     * Log to chat file
+     *
+     * @param logMessage
+     */
+    fun logToChatFile(logMessage: FileLogMessage)
 }

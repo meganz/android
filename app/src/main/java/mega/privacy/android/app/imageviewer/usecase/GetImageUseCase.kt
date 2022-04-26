@@ -3,10 +3,11 @@ package mega.privacy.android.app.imageviewer.usecase
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.media.ThumbnailUtils.createVideoThumbnail
+import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,6 +31,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.checkValidNodeFile
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
@@ -162,7 +164,7 @@ class GetImageUseCase @Inject constructor(
                     )
 
                     if (image.isVideo && fullFile?.exists() == true && previewFile == null) {
-                        image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
+                        image.previewUri = getVideoThumbnail(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
                     }
 
                     if ((!fullSizeRequired && previewFile?.exists() == true) || megaApi.checkValidNodeFile(node, fullFile)) {
@@ -342,7 +344,7 @@ class GetImageUseCase @Inject constructor(
      * @param nodeHandle    Image Node handle to request.
      * @return              Single with the ImageResult
      */
-    fun getOffline(nodeHandle: Long): Flowable<ImageResult> =
+    fun getOfflineNode(nodeHandle: Long): Flowable<ImageResult> =
         Flowable.fromCallable {
             val offlineNode = getNodeUseCase.getOfflineNode(nodeHandle).blockingGetOrNull()
             when {
@@ -352,18 +354,22 @@ class GetImageUseCase @Inject constructor(
                     val file = OfflineUtils.getOfflineFile(context, offlineNode)
                     if (file.exists()) {
                         val isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo
-                        val thumbnailFileName = "${offlineNode.handle.encodeBase64()}${FileUtil.JPG_EXTENSION}"
+                        val thumbnailFileName = "${offlineNode.handle.encodeBase64()}$JPG_EXTENSION"
                         val thumbnailFile = buildThumbnailFile(context, thumbnailFileName)
-                        val previewFile = buildPreviewFile(context, thumbnailFileName)
+                        var previewFile = buildPreviewFile(context, thumbnailFileName)
 
-                        if (isVideo && !previewFile.exists()) {
-                            getVideoPreviewImage(thumbnailFileName, file.toUri()).blockingGetOrNull()
+                        if (!previewFile.exists()) {
+                            if (isVideo) {
+                                previewFile = getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                previewFile = getImageThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                            }
                         }
 
                         ImageResult(
                             isVideo = isVideo,
                             thumbnailUri = if (thumbnailFile.exists()) thumbnailFile.toUri() else null,
-                            previewUri = if (previewFile.exists()) previewFile.toUri() else null,
+                            previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
                             fullSizeUri = file.toUri(),
                             isFullyLoaded = true
                         )
@@ -385,11 +391,15 @@ class GetImageUseCase @Inject constructor(
             val file = imageUri.toFile()
             if (file.exists() && file.canRead()) {
                 val isVideo = MimeTypeList.typeForName(file.name).isVideo
+
+                val previewName = "${(file.name + file.length()).encodeBase64()}$JPG_EXTENSION"
                 var previewUri: Uri? = null
                 if (isVideo) {
-                    val previewName = "${(file.name + file.length()).encodeBase64()}${FileUtil.JPG_EXTENSION}"
-                    previewUri = getVideoPreviewImage(previewName, file.toUri()).blockingGetOrNull()
+                    previewUri = getVideoThumbnail(previewName, file.toUri()).blockingGetOrNull()
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    previewUri = getImageThumbnail(previewName, file.toUri()).blockingGetOrNull()
                 }
+
                 ImageResult(
                     previewUri = previewUri,
                     fullSizeUri = file.toUri(),
@@ -409,20 +419,50 @@ class GetImageUseCase @Inject constructor(
      * @return          Single with generated file uri
      */
     @Suppress("deprecation")
-    fun getVideoPreviewImage(fileName: String, videoUri: Uri): Single<Uri> =
+    fun getVideoThumbnail(fileName: String, videoUri: Uri): Single<Uri> =
         Single.fromCallable {
             val videoFile = videoUri.toFile()
             require(videoFile.exists())
 
+            val previewFile = buildPreviewFile(context, fileName)
+            if (previewFile.exists()) return@fromCallable previewFile.toUri()
+
             val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val screenSize = context.getScreenSize()
-                createVideoThumbnail(videoFile, screenSize, null)
+                ThumbnailUtils.createVideoThumbnail(videoFile, context.getScreenSize(), null)
             } else {
-                createVideoThumbnail(videoFile.path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND)
+                ThumbnailUtils.createVideoThumbnail(videoFile.path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND)
             }
             requireNotNull(bitmap)
 
+            BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
+                close()
+            }
+            bitmap.recycle()
+
+            previewFile.toUri()
+        }
+
+    /**
+     * Generate a thumbnail given an image file
+     *
+     * @param fileName  Thumbnail file name
+     * @param imageUri  Image to get thumbnail from
+     * @return          Single with generated file uri
+     */
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun getImageThumbnail(fileName: String, imageUri: Uri): Single<Uri> =
+        Single.fromCallable {
+            require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+
+            val imageFile = imageUri.toFile()
+            require(imageFile.exists())
+            require(imageFile.length() > SIZE_1_MB) { "Image too small" }
+
             val previewFile = buildPreviewFile(context, fileName)
+            if (previewFile.exists()) return@fromCallable previewFile.toUri()
+
+            val bitmap = ThumbnailUtils.createImageThumbnail(imageFile, context.getScreenSize(), null)
             BufferedOutputStream(FileOutputStream(previewFile)).apply {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
                 close()

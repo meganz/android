@@ -1,22 +1,26 @@
 package mega.privacy.android.app.zippreview.domain
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.IoDispatcher
 import java.io.*
 import java.lang.Exception
 import java.util.zip.ZipFile
+import javax.inject.Inject
 
 /**
  * Zip repository implementation class
  */
-class ZipFileRepo : IZipFileRepo {
+class DefaultZipFileRepository @Inject constructor(@IoDispatcher private val ioDispatcher: CoroutineDispatcher) :
+    ZipFileRepository {
     companion object {
         private const val SUFFIX_ZIP = ".zip"
     }
+
     private val zipTreeNodeMap: ZipTreeMap = ZipTreeMap()
 
     override suspend fun unzipFile(zipFullPath: String, unzipRootPath: String): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             unzip(zipFullPath, unzipRootPath)
         }
     }
@@ -116,53 +120,55 @@ class ZipFileRepo : IZipFileRepo {
      * repeatedly iterate zip entries when the directory is changed.
      */
     override suspend fun initZipTreeNode(zipFile: ZipFile) {
-        zipFile.entries().toList().forEach { zipEntry ->
-            zipEntry.name.let { name ->
-                val nodeDepth = name.getZipTreeNodeDepth()
-                for (i in 1..nodeDepth) {
-                    //Get every sub path of current zip entry. For example, the path zip entry
-                    // path is 1/2/3.txt, the sub paths respectively are 1/ 1/2/ 1/2/3.txt
-                    val subPath = name.getSubPathByDepth(i)
-                    //Get name of current sub path
-                    val subName = subPath.getZipTreeNodeName()
-                    //Get parent path of current sub path. For example, if current sub path is 1/2/
-                    //its parent path is 1/
-                    val subParentPath = if (i == 1) {
-                        null
-                    } else {
-                        name.getSubPathByDepth(i - 1)
-                    }
-                    //Get current zip tree node using sub path
-                    var zipTreeNode = zipTreeNodeMap[subPath]
+        withContext(ioDispatcher) {
+            zipFile.entries().toList().forEach { zipEntry ->
+                zipEntry.name.let { name ->
+                    val nodeDepth = name.getZipTreeNodeDepth()
+                    for (i in 1..nodeDepth) {
+                        //Get every sub path of current zip entry. For example, the path zip entry
+                        // path is 1/2/3.txt, the sub paths respectively are 1/ 1/2/ 1/2/3.txt
+                        val subPath = name.getSubPathByDepth(i)
+                        //Get name of current sub path
+                        val subName = subPath.getZipTreeNodeName()
+                        //Get parent path of current sub path. For example, if current sub path is 1/2/
+                        //its parent path is 1/
+                        val subParentPath = if (i == 1) {
+                            null
+                        } else {
+                            name.getSubPathByDepth(i - 1)
+                        }
+                        //Get current zip tree node using sub path
+                        var zipTreeNode = zipTreeNodeMap[subPath]
 
-                    // If node doesn't exist, create one, otherwise ignore it
-                    if (zipTreeNode == null) {
-                        zipTreeNode = ZipTreeNode(
-                            subName,
-                            subPath,
-                            zipEntry.size,
-                            if (i == nodeDepth) {
-                                if (zipEntry.isDirectory) {
-                                    FileType.FOLDER
-                                } else {
-                                    when {
-                                        subPath.endsWith(SUFFIX_ZIP) -> FileType.ZIP
-                                        else -> FileType.FILE
+                        // If node doesn't exist, create one, otherwise ignore it
+                        if (zipTreeNode == null) {
+                            zipTreeNode = ZipTreeNode(
+                                name = subName,
+                                path = subPath,
+                                size = zipEntry.size,
+                                fileType = if (i == nodeDepth) {
+                                    if (zipEntry.isDirectory) {
+                                        FileType.FOLDER
+                                    } else {
+                                        when {
+                                            subPath.endsWith(SUFFIX_ZIP) -> FileType.ZIP
+                                            else -> FileType.FILE
+                                        }
                                     }
-                                }
-                            } else {
-                                FileType.FOLDER
-                            },
-                            subParentPath,
-                            mutableListOf(),
-                        )
-                        zipTreeNodeMap[subPath] = zipTreeNode
+                                } else {
+                                    FileType.FOLDER
+                                },
+                                parent = subParentPath,
+                                children = mutableListOf(),
+                            )
+                            zipTreeNodeMap[subPath] = zipTreeNode
 
-                        // If parent path is not empty add current path to map
-                        // Empty path represents root directory
-                        if (!subParentPath.isNullOrEmpty()) {
-                            val parentNode = zipTreeNodeMap[subParentPath]
-                            parentNode?.children?.add(zipTreeNode)
+                            // If parent path is not empty add current path to map
+                            // Empty path represents root directory
+                            if (!subParentPath.isNullOrEmpty()) {
+                                val parentNode = zipTreeNodeMap[subParentPath]
+                                parentNode?.children?.add(zipTreeNode)
+                            }
                         }
                     }
                 }

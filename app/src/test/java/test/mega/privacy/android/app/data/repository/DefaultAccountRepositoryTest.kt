@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.StandardTestDispatcher
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
@@ -25,7 +26,8 @@ class DefaultAccountRepositoryTest{
             myAccountInfoFacade = accountInfoWrapper,
             apiFacade = megaApiWrapper,
             context = mock(),
-            monitorMultiFactorAuth = MonitorMultiFactorAuth()
+            monitorMultiFactorAuth = MonitorMultiFactorAuth(),
+            ioDispatcher = StandardTestDispatcher()
         )
     }
 

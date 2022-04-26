@@ -4559,7 +4559,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">لا يمكن مشاركة هذا المجلد إلا للقراءة فقط ؛ نظرًا لأن هذا مجلد نسخ احتياطي ، فإن أي تغييرات تطرأ على محتواه قد تؤدي إلى تعطيل النسخ الاحتياطي.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled in the MEGA Desktop App. Are you sure you want to proceed?</string>
+    <string name="backup_add_item_text">العناصر الموجودة في هذا المجلد هي جزء من نسخة احتياطية تم تكوينها و مزامنتها مع مجلد محلي. سيؤدي اتخاذ هذا الإجراء إلى تعطيل المزامنة وتعطيل النسخ الاحتياطي. يمكن إعادة تمكين النسخ الاحتياطي باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل انت متأكد انك تريد المتابعة؟</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">يمكن مشاركة هذه المجلدات للقراءة فقط لأنها مجلدات نسخ احتياطي، قد تؤدي أي تغييرات في محتواها إلى تعطيل النسخ الاحتياطية.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4632,17 +4632,17 @@
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">نحن غير قادرين على المضي قدماً في الفواتير. إذا كنت تستخدم تطبيقًا مزدوجًا ، فالرجاء تسجيل الدخول إلى ميغا MEGA بدونه. إذا لم يكن كذلك، فحاول الترقية من خلال متصفح الويب الخاص بك.</string>
     <!-- Title for subscription dialog that shows before delete account -->
-    <string name="title_platform_subscription">%1s subscription</string>
+    <string name="title_platform_subscription">اشتراك %1s</string>
     <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">Active subscription</string>
+    <string name="title_active_subscription">اشتراك مفعل</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">لديك اشتراك ميغا MEGA مفعل مع %1$s. يجب عليك إلغاؤه بشكل منفصل في %2$s، لأن ميغا MEGA غير قادرة على إلغائه لك. تفضل بزيارة مركز المساعدة لدينا لمزيد من المعلومات.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription"></string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">لديك اشتراك ميغا MEGA مفعل مع آبل Apple. يجب عليك إلغاؤه بشكل منفصل في حساب آي تيونز  iTunes الخاص بك، لأن ميغا MEGA غير قادر على إلغائه من أجلك. قم بزيارة مركز المساعدة للحصول على مزيد من المعلومات.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
-    <string name="button_visit_platform">Visit %1s</string>
+    <string name="button_visit_platform">قم بزيارة %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">هذه هي الخطوة الأخيرة لحذف حسابك. سيتم حذف كل من حسابك واشتراكك وستفقد جميع البيانات المخزنة في السحابة بشكل دائم. الرجاء إدخال كلمة المرور الخاصة بك أدناه.</string>
     <!-- Title of timeline tab in photos section -->
@@ -4654,5 +4654,9 @@
     <!-- Text that indicates that there’s no media files to show in favourite album -->
     <string name="empty_hint_favourite_album">[B]لا يوجد[/B] [A]مفضلة[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
-    <string name="action_remove_favourites">Remove favourites</string>
+    <string name="action_remove_favourites">حذف المفضلة</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">نوع الملف غير مدعوم. لا يمكن فتح الملف.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
 </resources>

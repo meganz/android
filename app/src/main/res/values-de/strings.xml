@@ -2468,7 +2468,7 @@
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Öffnen in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Keine Authenticator-App installiert</string>
+    <string name="intent_not_available_2fa">Auf Ihrem Gerät ist keine App zur Aktivierung der Zwei-Faktor-Authentifizierung verfügbar.</string>
     <!-- Text button -->
     <string name="general_close">Schließen</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
@@ -3828,7 +3828,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s. %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload läuft, noch eine Datei</item>
@@ -4295,4 +4295,8 @@
     <string name="empty_hint_favourite_album">[B]Keine[/B] [A]Favoriten[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Favoriten entfernen</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Das Dateiformat wird nicht unterstützt. Die Datei kann nicht geöffnet werden.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Der ausgewählte Ordner ist leer. Es sind keine Dateien zum Hochladen vorhanden.</string>
 </resources>

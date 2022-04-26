@@ -12,5 +12,5 @@ interface FilesRepository {
      *
      * @return info
      */
-    suspend fun getFolderVersionInfo(): FolderVersionInfo
+    suspend fun getRootFolderVersionInfo(): FolderVersionInfo
 }

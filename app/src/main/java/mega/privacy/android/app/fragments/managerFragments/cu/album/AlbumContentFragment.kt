@@ -42,6 +42,7 @@ class AlbumContentFragment : BaseZoomFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         order = viewModel.getOrder()
+        showBottomNav = false
     }
 
     override fun onCreateView(

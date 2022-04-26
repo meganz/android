@@ -272,7 +272,7 @@
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
-    <string name="title_shared_items">Gedeelde bestanden</string>
+    <string name="title_shared_items">Gedeelde items</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="section_shared_items">Gedeelde mappen</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
@@ -2412,13 +2412,13 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Schrijf bericht naar %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Twee-Stap\’s Authenticatie</string>
+    <string name="settings_2fa">Twee-staps authenticatie</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Twee-Stap\’s Authenticatie is een tweede laag aan beveiliging voor uw account</string>
+    <string name="setting_subtitle_2fa">Twee-staps authenticatie is een tweede laag aan beveiliging voor uw account</string>
     <!-- Title of the screen Two-Factor Authentication -->
-    <string name="title_2fa">Waarom heeft u twee-stap\’s authenticatie nodig?</string>
+    <string name="title_2fa">Waarom heeft u twee-staps authenticatie nodig?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">Twee-stap authenticatie is een tweede laag aan beveiliging voor uw account. Wat betekent dat zelfs als iemand uw wachtwoord weet ze geen toegang kunnen krijgen, zonder ook toegang te hebben tot de 6 cijferige code waar alleen u toegang tot heeft.</string>
+    <string name="two_factor_authentication_explain">Twee-staps authenticatie is een tweede laag aan beveiliging voor uw account. Wat betekent dat zelfs als iemand uw wachtwoord weet ze geen toegang kunnen krijgen, zonder ook toegang te hebben tot de 6 cijferige code waar alleen u toegang tot heeft.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Begin het Instellen</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -2436,11 +2436,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Een fout heeft opgetreden bij het genereren van de seed of QR code, probeer nogmaals.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Twee-Stap\’s Authenticatie Ingeschakeld</string>
+    <string name="title_2fa_enabled">Twee-staps authenticatie ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Bewaar uw <b>Herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u de toegang tot uw applicatie verliest of als u Twee-staps Authenticatie wilt uitschakelen.</string>
+    <string name="recommendation_2fa_enabled">Bewaar uw <b>Herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u de toegang tot uw applicatie verliest of als u Twee-staps authenticatie wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Ongeldige code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2458,23 +2458,23 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Bent u uw Authenticatie apparaat verloren?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van Twee-stap Authenticatie.Probeer nogmaals</string>
+    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van Twee-staps authenticatie. Probeer nogmaals</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">Een fout heeft opgetreden tijdens het inschakelen van Twee-Stap Authenticatie. Probeer nogmaals.</string>
+    <string name="error_enable_2fa">Een fout heeft opgetreden tijdens het inschakelen van twee-stap authenticatie. Probeer nogmaals.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Twee-stap Authenticatie inschakelen</string>
+    <string name="title_enable_2fa">Twee-staps authenticatie inschakelen</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Twee-Stap Authenticatie Uitgeschakeld</string>
+    <string name="label_2fa_disabled">Twee-staps authenticatie uitgeschakeld</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Openen in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-Stap\’s Authenticatie op uw apparaat in te schakelen.</string>
+    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-staps authenticatie op uw apparaat in te schakelen.</string>
     <!-- Text button -->
     <string name="general_close">Sluiten</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Exporteer uw Herstelsleutel om te voltooien</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Twee-Factor Authenticatie Applicatie</string>
+    <string name="no_authentication_apps_title">Twee-staps authenticatie applicatie</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een Authenticatie Applicatie kunt installeren?</string>
     <!-- Label Play Store -->
@@ -2529,7 +2529,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Hersteld naar %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Er is een fout opgetreden. Artikel niet hersteld.</string>
+    <string name="context_no_restored">Er is een fout opgetreden. Item niet hersteld.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Bericht Versturen</string>
     <!-- Error message on opening a MEGAdrop folder link -->
@@ -3153,11 +3153,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud Schijf.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Creëer uw Netwerk</string>
+    <string name="title_tour_three">Creëer uw netwerk</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Contacten toevoegen, netwerk creëren, samenwerken, en spraak en video oproepen maken zonder MEGA ooit te verlaten</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Uw Foto’s in de Cloud</string>
+    <string name="title_tour_four">Uw foto’s in de cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Camera uploads zijn een essentiële functie voor elk mobiel apparaat en wij helpen u daarbij. Creëer uw account nu.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3826,9 +3826,9 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Jaren</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload in behandeling, 1 bestand wachtend</item>
@@ -3857,7 +3857,7 @@
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
     <string name="files_already_downloaded_and_files_pending_download">%1$d bestanden al gedownload. %2$d bestanden wachtend.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 artikel succesvol naar de Prullenbak verplaatst en 1 artikel was niet succesvol verzonden</string>
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item succesvol naar de Prullenbak verplaatst en 1 item was niet succesvol verzonden</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item succesvol verplaatst naar de Prullenbak en %d items waren niet succesvol verzonden</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
@@ -3865,7 +3865,7 @@
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
     <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items succesvol verplaatst naar de Prullenbak en %2$d items waren niet succesvol verzonden</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 artikel succesvol hersteld en 1 artikel was niet succesvol hersteld</string>
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item succesvol hersteld en 1 item was niet succesvol hersteld</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item succesvol hersteld en %d item waren niet succesvol hersteld</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
@@ -3884,8 +3884,8 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 artikel succesvol hersteld</item>
-        <item quantity="other">%d artikel succesvol hersteld</item>
+        <item quantity="one">1 item succesvol hersteld</item>
+        <item quantity="other">%d item succesvol hersteld</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tik om aan te sluiten tot de huidige vergadering.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Vergadering</string>
+    <string name="title_tour_five">MEGA vergadering</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">End-to-end gecodeerde video vergadering</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4193,7 +4193,7 @@
     <!-- when checking the input -->
     <string name="error_backup_confirm_dont_match">Ingevoerde tekst komt niet overeen</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Artikel toevoegen naar “%1s”</string>
+    <string name="backup_add_confirm_title">Item toevoegen naar “%1s”</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Back-up Instellen</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
@@ -4295,4 +4295,8 @@
     <string name="empty_hint_favourite_album">[B]Geen[/B] [A]Favorieten[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Favorieten verwijderen</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Bestandsindeling wordt niet ondersteund. Kan het bestand niet openen.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">De geselecteerde map is leeg. Geen bestanden om te uploaden.</string>
 </resources>

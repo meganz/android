@@ -4205,4 +4205,8 @@
     <string name="empty_hint_favourite_album">[A]お気に入り[/A]が[B]ありません[/B]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">お気に入りを削除</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">ファイル形式がサポートされていません。ファイルを開くことができません。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">選択したフォルダは空です。アップロードするファイルがありません。</string>
 </resources>

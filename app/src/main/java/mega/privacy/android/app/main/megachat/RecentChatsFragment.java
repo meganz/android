@@ -1,28 +1,52 @@
 package mega.privacy.android.app.main.megachat;
 
+import static android.app.Activity.RESULT_OK;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
+import static mega.privacy.android.app.main.AddContactActivity.FROM_RECENT;
+import static mega.privacy.android.app.utils.CallUtil.hintShown;
+import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
+import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
+import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
+import static mega.privacy.android.app.utils.ChatUtil.getPositionFromChatId;
+import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
+import static mega.privacy.android.app.utils.ChatUtil.shouldMuteOrUnmuteOptionsBeShown;
+import static mega.privacy.android.app.utils.ChatUtil.showConfirmationLeaveChats;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.KEY_HINT_IS_SHOWING;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_CHAT;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.isDarkMode;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.showAlert;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.snackbar.Snackbar;
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -42,15 +66,34 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.Snackbar;
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
-import androidx.lifecycle.Observer;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -67,31 +110,20 @@ import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
-import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
-
-import static android.app.Activity.RESULT_OK;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
-import static mega.privacy.android.app.main.AddContactActivity.FROM_RECENT;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class RecentChatsFragment extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
@@ -105,6 +137,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Inject
     PasscodeManagement passcodeManagement;
+
+    @Inject
+    SearchChatsUseCase searchChatsUseCase;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -122,7 +157,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     ArrayList<MegaChatListItem> chats = new ArrayList<>();
 
-    FilterChatsTask filterChatsTask;
+    CompositeDisposable filterDisposable = new CompositeDisposable();
 
     int lastFirstVisiblePosition;
 
@@ -1372,6 +1407,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     @Override
     public void onDestroy() {
         super.onDestroy();
+        filterDisposable.clear();
+
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
         }
@@ -1408,7 +1445,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         if (context instanceof ManagerActivity) {
             if (((ManagerActivity) context).isSearchOpen()) {
-                filterChats(((ManagerActivity) context).getSearchQuery());
+                filterChats(((ManagerActivity) context).getSearchQuery(), false);
             }
             ((ManagerActivity) context).invalidateOptionsMenu();
         }
@@ -1465,22 +1502,42 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         }
     }
 
-    public void filterChats(String s) {
+    public void filterChats(String query, Boolean archivedChats) {
         if (adapterList != null && adapterList.isMultipleSelect()) {
             hideMultipleSelect();
         }
+        filterDisposable.clear();
 
-        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
-            filterChatsTask.cancel(true);
-        }
-        filterChatsTask = new FilterChatsTask();
-        filterChatsTask.execute(s);
+        Disposable disposable = searchChatsUseCase.search(query, archivedChats)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((filteredChats, throwable) -> {
+                    if (throwable == null) {
+                        if (adapterList == null) return;
+                        adapterList.setChats(new ArrayList(filteredChats));
+
+                        if (filteredChats.isEmpty()) {
+                            listView.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                            inviteButton.setVisibility(View.GONE);
+
+                            CharSequence result = getSpannedMessageForEmptyChat(context.getString(R.string.recent_chat_empty).toUpperCase());
+                            emptyTextViewInvite.setText(result);
+                            emptyTextViewInvite.setVisibility(View.VISIBLE);
+                        } else {
+                            listView.setVisibility(View.VISIBLE);
+                            emptyLayout.setVisibility(View.GONE);
+                        }
+                    } else {
+                        logError(throwable.getMessage());
+                    }
+                });
+
+        filterDisposable.add(disposable);
     }
 
     public void closeSearch() {
-        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
-            filterChatsTask.cancel(true);
-        }
+        filterDisposable.clear();
 
         if (adapterList == null) {
             return;
@@ -1789,74 +1846,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private void loadMegaContacts() {
         contactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
-    }
-
-    class FilterChatsTask extends AsyncTask<String, Void, Void> {
-
-        ArrayList<MegaChatListItem> filteredChats = new ArrayList<>();
-        int archivedSize = 0;
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            ArrayList<MegaChatListItem> chatsToSearch = new ArrayList<>();
-            if (chats != null) {
-                chatsToSearch.addAll(chats);
-            }
-
-            if (context instanceof ManagerActivity) {
-                ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
-                if (archivedChats != null && !archivedChats.isEmpty()) {
-                    archivedSize = archivedChats.size();
-                    sortChats(archivedChats);
-                    chatsToSearch.addAll(archivedChats);
-                }
-            }
-
-            if (!chatsToSearch.isEmpty()) {
-                filteredChats.clear();
-                for (MegaChatListItem chat : chatsToSearch) {
-                    if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
-                        filteredChats.add(chat);
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (adapterList == null) {
-                return;
-            }
-            adapterList.setChats(filteredChats);
-
-            if (shouldShowEmptyState()) {
-                logDebug("adapterList.getItemCount() == 0");
-                listView.setVisibility(View.GONE);
-                emptyLayout.setVisibility(View.VISIBLE);
-                inviteButton.setVisibility(View.GONE);
-
-                CharSequence result = getSpannedMessageForEmptyChat(
-                        context.getString(R.string.recent_chat_empty).toUpperCase());
-                emptyTextViewInvite.setText(result);
-                emptyTextViewInvite.setVisibility(View.VISIBLE);
-            } else {
-                logDebug("adapterList.getItemCount() NOT = 0");
-                listView.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.GONE);
-            }
-        }
-
-        private boolean shouldShowEmptyState() {
-            if (context instanceof ManagerActivity) {
-                if ((adapterList.getItemCount() == 0 && archivedSize == 0) || (adapterList.getItemCount() == 1 && archivedSize > 0))
-                    return true;
-            } else if (context instanceof ArchivedChatsActivity) {
-                if (adapterList.getItemCount() == 0)
-                    return true;
-            }
-            return false;
-        }
     }
 
     public void setCustomisedActionBar() {

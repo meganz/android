@@ -1301,27 +1301,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            int ret = megaChatApi.getInitState();
-            logDebug("INIT STATE: " + ret);
-            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                ret = megaChatApi.init(null);
+            int initState = megaChatApi.getInitState();
+            logDebug("INIT STATE: " + initState);
+            if (initState == MegaChatApi.INIT_NOT_DONE || initState == MegaChatApi.INIT_ERROR) {
+                int ret = megaChatApi.init(null);
                 logDebug("result of init ---> " + ret);
-
                 switch (ret) {
                     case MegaChatApi.INIT_WAITING_NEW_SESSION:
-                        logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
                         disableLoginButton();
-                        megaApi.login(lastEmail, lastPassword, this);
+                        megaApi.login(email, password, this);
                         break;
                     case MegaChatApi.INIT_ERROR:
                         logWarning("ERROR INIT CHAT: " + ret);
                         megaChatApi.logout(new ChatLogoutListener(getContext()));
-
                         disableLoginButton();
-                        megaApi.login(lastEmail, lastPassword, this);
-                        break;
-                    default:
-                        logDebug("Chat correctly initialized");
+                        megaApi.login(email, password, this);
                         break;
                 }
             }
@@ -1940,6 +1934,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 logDebug("Terminate login process when fetch nodes");
                 return;
             }
+
             LoginActivity.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 

@@ -3153,11 +3153,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Chat interamente criptate con chiamate audio e video, messaggi di gruppo e condivisione di file integrata al tuo Cloud Drive.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Crea il tuo Network</string>
+    <string name="title_tour_three">Crea il tuo network</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Aggiungi contatti, crea un network, collabora, ed effettua chiamate audio e video senza lasciare mai MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Le tue foto nel Cloud</string>
+    <string name="title_tour_four">Le tue foto nel cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">I caricamenti dalla fotocamera sono una feature essenziale per qualsiasi dispositivo mobile e possiamo farlo per te. Crea il tuo account adesso.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -4295,4 +4295,8 @@
     <string name="empty_hint_favourite_album">[B]Nessun[/B] [A]preferito[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Rimuovi preferiti</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Formato file non supportato. Impossibile aprire il file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">La cartella selezionata è vuota. Nessun file da caricare.</string>
 </resources>

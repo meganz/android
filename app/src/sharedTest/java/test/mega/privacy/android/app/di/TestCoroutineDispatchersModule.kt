@@ -1,3 +1,4 @@
+@file:Suppress("Deprecation")
 package test.mega.privacy.android.app.di
 
 import android.os.AsyncTask
@@ -20,7 +21,6 @@ import mega.privacy.android.app.di.*
  * [Bug Report](https://github.com/Kotlin/kotlinx.coroutines/issues/242)
  *
  */
-@Suppress("Deprecation")
 @TestInstallIn(
     replaces = [CoroutinesDispatchersModule::class],
     components = [SingletonComponent::class]

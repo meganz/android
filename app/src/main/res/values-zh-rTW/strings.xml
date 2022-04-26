@@ -2468,7 +2468,7 @@
     <!-- Indicates that can type a contact email -->
     <string name="contact_email">聯絡人email</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">您已加入此連絡人。</string>
+    <string name="contact_not_added">您已加入此聯絡人。</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">訊息格式無效</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -4072,9 +4072,9 @@
     <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
     <string name="valid_chat_link">您已貼上一個對話連結。</string>
     <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
-    <string name="valid_contact_link">您已貼上一個連絡人連結。</string>
+    <string name="valid_contact_link">您已貼上一個聯絡人連結。</string>
     <!-- Action button to open a contact link.-->
-    <string name="action_open_contact_link">打開連絡人連結</string>
+    <string name="action_open_contact_link">打開聯絡人連結</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
@@ -4205,4 +4205,8 @@
     <string name="empty_hint_favourite_album">[B]沒有[/B][A]收藏[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">移除收藏</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">檔案格式不支援。無法開啟檔案。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">所選擇的資料夾是空的。沒有要上傳的檔案。</string>
 </resources>

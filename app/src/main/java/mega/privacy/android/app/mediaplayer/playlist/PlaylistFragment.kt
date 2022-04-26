@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
@@ -138,6 +139,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
         binding.playlist.run {
             setHasFixedSize(true)
+            // Avoid the item is flash when it is refreshed.
+            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             layoutManager = listLayoutManager
             adapter = this@PlaylistFragment.adapter
 

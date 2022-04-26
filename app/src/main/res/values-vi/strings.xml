@@ -391,7 +391,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Rời khỏi</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Trả lại về chủ sở hữu</string>
+    <string name="alert_leave_share">Từ bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Chấm dứt chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1549,7 +1549,7 @@
     <!-- Label of the modal bottom sheet to pause all transfers -->
     <string name="option_to_pause_transfers">Tạm dừng tất cả các truyền tải</string>
     <!-- Label of the modal bottom sheet to resume all transfers -->
-    <string name="option_to_resume_transfers">Tiếp tục tất cả các truyền tải</string>
+    <string name="option_to_resume_transfers">Tiếp tục tất cả phiên truyền tải</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
     <string name="option_to_clear_transfers">Dọn danh sách truyền tải</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
@@ -3084,11 +3084,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Toàn bộ chát, tin nhắn, thoại hay video đều được mã hóa hoàn toàn và hoạt động với khả năng chia sẻ thông qua Ổ Mây.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Tạo Kết Nối</string>
+    <string name="title_tour_three">Tạo kết nối</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Thêm tên liên lạc, tạo kết nối, cộng tác với nhau, trao đổi qua gọi thoại và video ngay trong MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Hình Ảnh được gửi lên Mây</string>
+    <string name="title_tour_four">Hình Ảnh được gửi lên mây</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Đăng Tải Camêra là tính năng thiết yếu cho mọi thiết bị di động, và MEGA có cung cấp cho mọi người dùng. Tạo tài khoản ngay.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3500,7 +3500,7 @@
     <!-- Title of a dialog to confirm the action of resume all transfers -->
     <string name="warning_resume_transfers">Tiếp tục các truyền tải?</string>
     <!-- Option to  resume all transfers -->
-    <string name="option_resume_transfers">Tiếp tục phiên truyền tải</string>
+    <string name="option_resume_transfers">Tiếp tục các truyền tải</string>
     <!-- Option to  cancel a transfer -->
     <string name="option_cancel_transfer">Hủy truyền tải</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
@@ -3972,7 +3972,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Chạm vào để tham gia cuộc gọi nhóm.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Họp Mặt</string>
+    <string name="title_tour_five">MEGA họp mặt</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Gọi họp mặt an ninh mã hóa đầu-cuối</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4205,4 +4205,8 @@
     <string name="empty_hint_favourite_album">[B]Không có[/B] [A]Mục Ưa Thích[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Loại bỏ ưa thích</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Dịnh dạng tệp tin không được hỗ trợ. Không thể mở được tệp tin.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Thư mục vừa chọn là thư mục trống. Không có tệp tin để tải lên.</string>
 </resources>

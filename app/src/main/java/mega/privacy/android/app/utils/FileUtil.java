@@ -60,7 +60,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -1174,25 +1173,6 @@ public class FileUtil {
             return file.delete();
         } catch (Exception ignored) {
             return false;
-        }
-    }
-
-    /**
-     * Return file fake handle
-     *
-     * @param file  File to get fake handle from
-     * @return      Fake handle or INVALID_HANDLE if it couldn't be created
-     */
-    public static long getFileFakeHandle(File file) {
-        try {
-            int hashCode = file.hashCode();
-            if (hashCode > 0) {
-                return hashCode * -1;
-            } else {
-                return hashCode;
-            }
-        } catch (Exception ignored) {
-            return INVALID_HANDLE;
         }
     }
 

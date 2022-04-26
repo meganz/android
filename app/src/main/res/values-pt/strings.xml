@@ -3157,7 +3157,7 @@
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Adicione contatos, crie uma rede, colabore e faça chamadas de voz e vídeo sem sair do MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">As suas fotos na Nuvem</string>
+    <string name="title_tour_four">As suas fotos na nuvem</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Sabemos que os Uploads da câmera são um recurso essencial para qualquer dispositivo móvel. Crie a sua conta agora.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toque para entrar na reunião atual.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">Reunião MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Videoconferência criptografada de ponta a ponta</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4295,4 +4295,8 @@
     <string name="empty_hint_favourite_album">[B]Não há[/B] [A]Favoritos[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remover favoritos</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
 </resources>
