@@ -94,6 +94,7 @@ class PhotosFragment : BaseFragment() {
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
+                        mManagerActivity.fromAlbumContent = false
                         with (timelineFragment) {
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()
