@@ -240,7 +240,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         zoomViewModel.setZoom(currentZoom)
         viewModel.mZoom = currentZoom
 
-//        setupOtherViews()
+        setupOtherViews()
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)

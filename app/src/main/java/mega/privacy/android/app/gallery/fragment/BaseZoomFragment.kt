@@ -765,8 +765,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     open fun whenStartActionMode() {
         if (this is AlbumContentFragment) return
         mManagerActivity.showHideBottomNavigationView(true)
-//            viewTypePanel.visibility = View.GONE
-
         animateBottomView(true)
     }
 
@@ -776,13 +774,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     open fun whenEndActionMode() {
         if (this is AlbumContentFragment) return
         mManagerActivity.showHideBottomNavigationView(!showBottomNav)
-//        viewTypePanel.visibility =
-//            if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
-//                View.VISIBLE
-//            } else {
-//                View.GONE
-//            }
-
         if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
             animateBottomView(false)
         } else {
