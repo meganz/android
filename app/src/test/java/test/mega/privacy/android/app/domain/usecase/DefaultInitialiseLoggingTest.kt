@@ -3,12 +3,17 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
+import mega.privacy.android.app.logging.loggers.FileLogMessage
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -16,16 +21,23 @@ import org.mockito.kotlin.*
 @ExperimentalCoroutinesApi
 class DefaultInitialiseLoggingTest {
     private lateinit var underTest: InitialiseLogging
-    private val loggingRepository = mock<LoggingRepository>()
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val sdkMessage = FileLogMessage(message = "sdk", priority = 1)
+    private val chatMessage = FileLogMessage(message = "chat", priority = 1)
+
+    private val loggingRepository = mock<LoggingRepository>{
+        on { getSdkLoggingFlow() }.thenReturn(flowOf(sdkMessage))
+        on { getChatLoggingFlow() }.thenReturn(flowOf(chatMessage))
+    }
 
     @Before
     fun setUp() {
         underTest = DefaultInitialiseLogging(
             loggingRepository = loggingRepository,
             areSdkLogsEnabled = areSdkLogsEnabled,
-            areChatLogsEnabled = areChatLogsEnabled
+            areChatLogsEnabled = areChatLogsEnabled,
+            coroutineDispatcher = UnconfinedTestDispatcher()
         )
     }
 
@@ -46,7 +58,8 @@ class DefaultInitialiseLoggingTest {
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).enableWriteSdkLogsToFile()
+        verify(loggingRepository, times(1)).getSdkLoggingFlow()
+        verify(loggingRepository, times(1)).logToSdkFile(sdkMessage)
 
         verifyNoMoreInteractions(loggingRepository)
     }
@@ -58,7 +71,8 @@ class DefaultInitialiseLoggingTest {
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).enableWriteChatLogsToFile()
+        verify(loggingRepository, times(1)).getChatLoggingFlow()
+        verify(loggingRepository, times(1)).logToChatFile(chatMessage)
 
         verifyNoMoreInteractions(loggingRepository)
     }
@@ -70,7 +84,7 @@ class DefaultInitialiseLoggingTest {
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).disableWriteSdkLogsToFile()
+        verify(loggingRepository, never()).logToSdkFile(any())
 
         verifyNoMoreInteractions(loggingRepository)
     }
@@ -82,7 +96,7 @@ class DefaultInitialiseLoggingTest {
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).disableWriteChatLogsToFile()
+        verify(loggingRepository, never()).logToChatFile(any())
 
         verifyNoMoreInteractions(loggingRepository)
     }

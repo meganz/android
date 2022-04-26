@@ -461,16 +461,16 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
     /**
      * Checks if the user is previewing the chat and if is moderator.
-     * If the user is moderator, they appears in the last position of the participants list.
+     * If the user is moderator, they appears in the first position of the participants list.
      *
      * @return True if the current chat is not a preview and if the user is moderator, false otherwise.
      */
-    private boolean isNotPreviewAndLastParticipantModerator() {
+    private boolean isNotPreviewAndFirstParticipantModerator() {
         if (participants.isEmpty()) {
             return false;
         }
 
-        return !isPreview && participants.get(participants.size() - 1).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
+        return !isPreview && participants.get(0).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
     }
 
     /**
@@ -487,7 +487,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      */
     @Override
     public int getItemCount() {
-        if (isNotPreviewAndLastParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator()) {
             return participants.size() + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return participants.size() + COUNT_HEADER_POSITION;
@@ -498,7 +498,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public int getItemViewType(int position) {
         if (position == HEADER_POSITION) {
             return ITEM_VIEW_TYPE_HEADER;
-        } else if (isNotPreviewAndLastParticipantModerator() && position == ADD_PARTICIPANTS_POSITION) {
+        } else if (isNotPreviewAndFirstParticipantModerator() && position == ADD_PARTICIPANTS_POSITION) {
             return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
         } else {
             return ITEM_VIEW_TYPE_NORMAL;
@@ -519,7 +519,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      * @return The position of the participant in the array.
      */
     public int getParticipantPositionInArray(int adapterPosition) {
-        if (isNotPreviewAndLastParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator()) {
             return adapterPosition - COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return adapterPosition - COUNT_HEADER_POSITION;
@@ -540,7 +540,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      * @return The position of the participant in the adapter.
      */
     private int getParticipantPositionInAdapter(int arrayPosition) {
-        if (isNotPreviewAndLastParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator()) {
             return arrayPosition + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return arrayPosition + COUNT_HEADER_POSITION;

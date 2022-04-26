@@ -1,7 +1,8 @@
 package mega.privacy.android.app.logging.loggers
 
-import mega.privacy.android.app.logging.ChatLogger
-import mega.privacy.android.app.logging.SdkLogger
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import mega.privacy.android.app.logging.TimberLegacyLog
 import mega.privacy.android.app.utils.LogUtil
 import timber.log.Timber
@@ -12,15 +13,22 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
- * Mega file log tree
+ * Sdk log flow tree
  *
- * Writes logs to the default log file, adding additional information for log messages
- * from the client app. (Identified by not having an existing tag)
+ * Implementation of [Timber.Tree] that converts logging events from the sdk listener to a flow
+ *
+ * @property logFlow a flow where all sdk log messages are emitted
  */
-class MegaFileLogTree @Inject constructor(
-    @SdkLogger private val sdkLogger: FileLogger,
-    @ChatLogger private val chatLogger: FileLogger,
+class SdkLogFlowTree @Inject constructor(
 ) : Timber.Tree() {
+
+    private val _logFlow =
+        MutableSharedFlow<FileLogMessage>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
+    val logFlow: SharedFlow<FileLogMessage> = _logFlow
 
     private val ignoredClasses = listOf(
         Timber::class.java.name,
@@ -29,24 +37,25 @@ class MegaFileLogTree @Inject constructor(
         Timber.DebugTree::class.java.name,
         TimberLegacyLog::class.java.name,
         LogUtil::class.java.name,
-        MegaFileLogTree::class.java.name,
+        SdkLogFlowTree::class.java.name,
     )
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (isSdkLog(tag)) {
-            sdkLogger.logToFile(tag, message, null, priority, t)
+            _logFlow.tryEmit(FileLogMessage(tag, message, null, priority, t))
         } else {
             val trace = Throwable().stackTrace
-            var megaTag: String? = null
-            var stackTrace: String? = null
-
             if (isAppLog(trace)) {
-                megaTag = createTag()
-                stackTrace = createTrace(trace)
-                sdkLogger.logToFile(megaTag, message, stackTrace, priority, t)
+                _logFlow.tryEmit(
+                    FileLogMessage(
+                        createTag(),
+                        message,
+                        createTrace(trace),
+                        priority,
+                        t
+                    )
+                )
             }
-
-            chatLogger.logToFile(megaTag, message, stackTrace, priority, t)
         }
     }
 

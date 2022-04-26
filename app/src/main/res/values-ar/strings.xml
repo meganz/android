@@ -4657,4 +4657,6 @@
     <string name="action_remove_favourites">حذف المفضلة</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">نوع الملف غير مدعوم. لا يمكن فتح الملف.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
 </resources>

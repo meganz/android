@@ -1202,7 +1202,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">관련된 이용자 계정이 여러 번의 이용 약관 위반으로 제거되었습니다.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 복호화 키가 잘못 되었습니다.</string>
+    <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 복호화 키가 잘못되었습니다.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
     <string name="my_account_my_credentials">내 자격 증명</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
@@ -3294,7 +3294,7 @@
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없습니다. 그러나 당신의 비즈니스 계정 관리자는 당신의 카메라 업로드에 접근할 수 있습니다.</string>
     <!-- General label to alert user that somehting went wrong -->
-    <string name="general_something_went_wrong_error">뭔가 잘못 됐습니다</string>
+    <string name="general_something_went_wrong_error">뭔가 잘못됐습니다</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
@@ -4207,4 +4207,6 @@
     <string name="action_remove_favourites">즐겨찾기 제거</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">지원 되지 않는 파일 형식입니다. 파일을 열 수 없습니다.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">선택한 폴더는 비어있습니다. 업로드할 파일이 없습니다.</string>
 </resources>
