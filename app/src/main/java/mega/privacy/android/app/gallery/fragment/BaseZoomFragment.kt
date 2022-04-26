@@ -106,6 +106,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
+    protected var showBottomNav = true
+
     protected var selectedView = ALL_VIEW
     protected open var adapterType = 0
 
@@ -121,14 +123,20 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      */
     abstract fun handleOnCreateOptionsMenu()
 
-    open fun animateBottomView() {
+    open fun animateBottomView(hide: Boolean) {
         // AlbumContentFragment doesn't have view type panel.
-        if(this is AlbumContentFragment) return
+        if (
+            this is AlbumContentFragment ||
+            !isInActionMode() ||
+            isInActionMode() && actionModeViewModel.selectedNodes.value?.count()!! > 1
+        ) {
+            return
+        }
 
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
-        if (viewTypePanel.isVisible) {
+        if (hide) {
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
@@ -417,7 +425,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             if (zoomViewModel.getCurrentZoom() != ZOOM_OUT_2X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
-                animateBottomView()
+
             }
         })
 
@@ -518,7 +526,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             callManager { manager ->
                 manager.showKeyboardForSearch()
             }
-            animateBottomView()
         })
 
     fun doIfOnline(operation: () -> Unit) {
@@ -755,12 +762,24 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     /**
      * Sub fragment can custom operation when start ActionMode
      */
-    open fun whenStartActionMode(){}
+    open fun whenStartActionMode() {
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(true)
+        animateBottomView(true)
+    }
 
     /**
      * Sub fragment can custom operation when end ActionMode
      */
-    open fun whenEndActionMode(){}
+    open fun whenEndActionMode() {
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(!showBottomNav)
+        if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
+            animateBottomView(false)
+        } else {
+            animateBottomView(true)
+        }
+    }
 
     /**
      * Check is in action mode.
