@@ -123,14 +123,20 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      */
     abstract fun handleOnCreateOptionsMenu()
 
-    open fun animateBottomView() {
+    open fun animateBottomView(hide: Boolean) {
         // AlbumContentFragment doesn't have view type panel.
-        if(this is AlbumContentFragment) return
+        if (
+            this is AlbumContentFragment ||
+            !isInActionMode() ||
+            isInActionMode() && actionModeViewModel.selectedNodes.value?.count()!! > 1
+        ) {
+            return
+        }
 
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
-        if (viewTypePanel.isVisible) {
+        if (hide) {
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
@@ -146,31 +152,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 .start()
         }
     }
-
-//    open fun animateViewType(hide: Boolean) {
-//        // AlbumContentFragment doesn't have view type panel.
-//        if(this is AlbumContentFragment) return
-//
-//        val deltaY =
-//            viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
-//
-//        if (hide) {
-//            viewTypePanel
-//                .animate()
-//                .translationYBy(deltaY)
-//                .setDuration(ANIMATION_DURATION)
-//                .withEndAction { viewTypePanel.visibility = View.GONE }
-//                .start()
-//        } else {
-//            viewTypePanel
-//                .animate()
-//                .translationYBy(-deltaY)
-//                .setDuration(ANIMATION_DURATION)
-//                .withStartAction { viewTypePanel.visibility = View.VISIBLE }
-//                .start()
-//        }
-//    }
-
 
     private fun getNodeCount() = viewModel.getRealPhotoCount()
 
@@ -782,26 +763,30 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      * Sub fragment can custom operation when start ActionMode
      */
     open fun whenStartActionMode() {
-        if(this is AlbumContentFragment) return
-        with (mManagerActivity) {
-            showHideBottomNavigationView(true)
-            viewTypePanel.visibility = View.GONE
-        }
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(true)
+//            viewTypePanel.visibility = View.GONE
+
+        animateBottomView(true)
     }
 
     /**
      * Sub fragment can custom operation when end ActionMode
      */
     open fun whenEndActionMode() {
-        if(this is AlbumContentFragment) return
-        with (mManagerActivity) {
-            showHideBottomNavigationView(!showBottomNav)
-            viewTypePanel.visibility =
-                if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(!showBottomNav)
+//        viewTypePanel.visibility =
+//            if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
+//                View.VISIBLE
+//            } else {
+//                View.GONE
+//            }
+
+        if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
+            animateBottomView(false)
+        } else {
+            animateBottomView(true)
         }
     }
 

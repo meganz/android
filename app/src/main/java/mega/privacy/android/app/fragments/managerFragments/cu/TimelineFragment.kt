@@ -240,7 +240,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         zoomViewModel.setZoom(currentZoom)
         viewModel.mZoom = currentZoom
 
-        setupOtherViews()
+//        setupOtherViews()
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
@@ -304,7 +304,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             }
 
             actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
-            viewTypePanel.visibility = if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
 
             updateOptionsButtons()
             mManagerActivity.fromAlbumContent = false
@@ -316,7 +315,18 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             binding.emptyHint.visibility = if (galleryItems.isEmpty()) View.VISIBLE else View.GONE
             listView.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
             binding.scroller.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
-            mManagerActivity.updateCUViewTypes(if (galleryItems.isEmpty() || (parentFragment as PhotosFragment).currentTab !is TimelineFragment || actionMode != null) View.GONE else View.VISIBLE)
+            mManagerActivity.updateCUViewTypes(
+                if (
+                    galleryItems.isEmpty() ||
+                    (parentFragment as PhotosFragment).tabIndex != 0 ||
+                    actionMode != null
+                ) {
+                    View.GONE
+                }
+                else {
+                    View.VISIBLE
+                }
+            )
         }
 
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
@@ -386,10 +396,10 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     public override fun setHideBottomViewScrollBehaviour() {
-//        if (!isInActionMode()) {
-//            mManagerActivity.showBottomView()
-//            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
-//        }
+        if (!isInActionMode()) {
+            mManagerActivity.showBottomView()
+            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        }
     }
 
     fun updateOptionsButtons() {
