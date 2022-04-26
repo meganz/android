@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.app.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -9,9 +9,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.logging.KARERE_LOGS
 import mega.privacy.android.app.logging.LOG_PREFERENCES
 import mega.privacy.android.app.logging.SDK_LOGS
@@ -26,11 +30,14 @@ private val Context.loggingDataStore: DataStore<Preferences> by preferencesDataS
         )
     })
 
-class LoggingSettingsGateway @Inject constructor(@ApplicationContext private val context: Context) {
+class LoggingPreferencesDataStore @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : LoggingPreferencesGateway {
     private val logPreferenceKey = booleanPreferencesKey(SDK_LOGS)
     private val chatLogPreferenceKey = booleanPreferencesKey(KARERE_LOGS)
 
-    fun isLoggingEnabled(): Flow<Boolean> =
+    override fun isLoggingPreferenceEnabled(): Flow<Boolean> =
         context.loggingDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -42,11 +49,15 @@ class LoggingSettingsGateway @Inject constructor(@ApplicationContext private val
                 preferences[logPreferenceKey] ?: false
             }
 
-    suspend fun setLoggingEnabled(enabled: Boolean) {
-        context.loggingDataStore.edit { it[logPreferenceKey] = enabled }
+    override suspend fun setLoggingEnabledPreference(enabled: Boolean) {
+        withContext(ioDispatcher) {
+            context.loggingDataStore.edit {
+                it[logPreferenceKey] = enabled
+            }
+        }
     }
 
-    fun isChatLoggingEnabled(): Flow<Boolean> =
+    override fun isChatLoggingPreferenceEnabled(): Flow<Boolean> =
         context.loggingDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -58,8 +69,12 @@ class LoggingSettingsGateway @Inject constructor(@ApplicationContext private val
                 preferences[chatLogPreferenceKey] ?: false
             }
 
-    suspend fun setChatLoggingEnabled(enabled: Boolean) {
-        context.loggingDataStore.edit { it[chatLogPreferenceKey] = enabled }
+    override suspend fun setChatLoggingEnabledPreference(enabled: Boolean) {
+        withContext(ioDispatcher) {
+            context.loggingDataStore.edit {
+                it[chatLogPreferenceKey] = enabled
+            }
+        }
     }
 
 }

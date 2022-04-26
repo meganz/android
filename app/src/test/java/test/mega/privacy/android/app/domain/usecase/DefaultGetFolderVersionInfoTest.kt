@@ -25,21 +25,21 @@ class DefaultGetFolderVersionInfoTest {
 
     @Test
     fun `test that negative version counts return null`() = runTest {
-        whenever(filesRepository.getFolderVersionInfo()).thenReturn(FolderVersionInfo(-1, 20))
+        whenever(filesRepository.getRootFolderVersionInfo()).thenReturn(FolderVersionInfo(-1, 20))
         assertThat(underTest()).isNull()
     }
 
     @Test
     fun `test that 0 versions return a value`() = runTest {
         val expected = FolderVersionInfo(0, 20)
-        whenever(filesRepository.getFolderVersionInfo()).thenReturn(expected)
+        whenever(filesRepository.getRootFolderVersionInfo()).thenReturn(expected)
         assertThat(underTest()).isEqualTo(expected)
     }
 
     @Test
     fun `test that a positive number of versions returns a value`() = runTest {
         val expected = FolderVersionInfo(8, 20)
-        whenever(filesRepository.getFolderVersionInfo()).thenReturn(expected)
+        whenever(filesRepository.getRootFolderVersionInfo()).thenReturn(expected)
         assertThat(underTest()).isEqualTo(expected)
     }
 
