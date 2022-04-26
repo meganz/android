@@ -98,9 +98,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -129,6 +131,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
     private static final int LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
@@ -168,8 +171,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean running, ignoreAttr;
     private Handler handler;
 
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(8);
-
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
 
@@ -177,7 +178,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean canceled;
     private boolean stopByNetworkStateChange;
 
-    private DatabaseHandler dbH;
+    @Inject
+    DatabaseHandler dbH;
 
     private MegaPreferences prefs;
     private String localPath = INVALID_NON_NULL_VALUE;
@@ -229,7 +231,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String tempRoot;
     private VideoCompressor mVideoCompressor;
 
-    private final BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
+    @Inject
+    ThreadPoolExecutor megaThreadPoolExecutor;
+
+    private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -272,6 +277,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onCreate() {
+        super.onCreate();
         startForegroundNotification();
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -317,18 +323,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public void onTypeChanges(int type) {
         logDebug("Network type change to: " + type);
-        DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
-        MegaPreferences prefs = handler.getPreferences();
-        if (prefs != null) {
-            stopByNetworkStateChange = type == MOBILE && Boolean.parseBoolean(prefs.getCamSyncWifi());
-            if (stopByNetworkStateChange) {
-                for (MegaTransfer transfer : cuTransfers) {
-                    megaApi.cancelTransfer(transfer, this);
+        megaThreadPoolExecutor.execute(() -> {
+            MegaPreferences prefs = dbH.getPreferences();
+            if (prefs != null) {
+                stopByNetworkStateChange = type == MOBILE && Boolean.parseBoolean(prefs.getCamSyncWifi());
+                if (stopByNetworkStateChange) {
+                    for (MegaTransfer transfer : cuTransfers) {
+                        megaApi.cancelTransfer(transfer, this);
+                    }
+                    stopped = true;
+                    finish();
                 }
-                stopped = true;
-                finish();
             }
-        }
+        });
     }
 
     @Override
@@ -1348,8 +1355,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return;
         }
 
-        initDbH();
-
         String previousIP = app.getLocalIpAddress();
         // the new logic implemented in NetworkStateReceiver
         String currentIP = getLocalIpAddress(getApplicationContext());
@@ -1370,16 +1375,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
 
         mPendingIntent = PendingIntent.getActivity(this, 0, mIntent, PendingIntent.FLAG_IMMUTABLE);
-        tempRoot = new File(getCacheDir(), CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
-        File root = new File(tempRoot);
-        if (!root.exists()) {
-            root.mkdirs();
-        }
 
-        if (dbH.shouldClearCamsyncRecords()) {
-            dbH.deleteAllSyncRecords(SyncRecordKt.TYPE_ANY);
-            dbH.saveShouldClearCamsyncRecords(false);
-        }
+        megaThreadPoolExecutor.execute(() -> {
+            tempRoot = new File(getCacheDir(), CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
+            File root = new File(tempRoot);
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+
+            if (dbH.shouldClearCamsyncRecords()) {
+                dbH.deleteAllSyncRecords(SyncRecordKt.TYPE_ANY);
+                dbH.saveShouldClearCamsyncRecords(false);
+            }
+        });
     }
 
     private void handleException(Exception e) {
@@ -1666,7 +1674,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + JPG_EXTENSION);
                     final SyncRecord finalRecord = record;
                     if (isVideoFile(transfer.getPath())) {
-                        threadPool.execute(() -> {
+                        megaThreadPoolExecutor.execute(() -> {
                             File img = new File(finalRecord.getLocalPath());
                             if (!preview.exists()) {
                                 createVideoPreview(CameraUploadsService.this, img, preview);
@@ -1674,7 +1682,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             createThumbnail(img, thumb);
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
-                        threadPool.execute(() -> {
+                        megaThreadPoolExecutor.execute(() -> {
                             if (!preview.exists()) {
                                 createImagePreview(src, preview);
                             }
@@ -2246,7 +2254,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean isChargingRequired(long queueSize) {
-        initDbH();
         MegaPreferences preferences = dbH.getPreferences();
         if (preferences != null && preferences.getConversionOnCharging() != null) {
             if (Boolean.parseBoolean(preferences.getConversionOnCharging())) {
@@ -2259,12 +2266,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         logDebug("isChargingRequired " + false);
         return false;
-    }
-
-    private void initDbH() {
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
     }
 
     private boolean isDeviceLowOnBattery(Intent intent) {

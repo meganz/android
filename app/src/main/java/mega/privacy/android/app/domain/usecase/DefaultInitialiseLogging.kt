@@ -1,15 +1,14 @@
 package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.LoggingRepository
-import mega.privacy.android.app.logging.ChatLogger
-import mega.privacy.android.app.logging.SdkLogger
-import mega.privacy.android.app.logging.loggers.FileLogMessage
-import mega.privacy.android.app.logging.loggers.FileLogger
 import javax.inject.Inject
 
 /**
@@ -26,32 +25,35 @@ class DefaultInitialiseLogging @Inject constructor(
     private val areChatLogsEnabled: AreChatLogsEnabled,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
+
     override suspend fun invoke(isDebug: Boolean) {
         if (isDebug) loggingRepository.enableLogAllToConsole()
 
         coroutineScope {
-            launch(coroutineDispatcher){ monitorSdkLoggingSetting() }
-            launch(coroutineDispatcher){ monitorChatLoggingSetting() }
+            launch(coroutineDispatcher) { monitorSdkLoggingSetting() }
+            launch(coroutineDispatcher) { monitorChatLoggingSetting() }
         }
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun monitorSdkLoggingSetting() {
         areSdkLogsEnabled()
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
                 if (enabled) loggingRepository.getSdkLoggingFlow() else emptyFlow()
-            }.collect{
+            }.collect {
                 loggingRepository.logToSdkFile(it)
             }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun monitorChatLoggingSetting() {
         areChatLogsEnabled()
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
                 if (enabled) loggingRepository.getChatLoggingFlow() else emptyFlow()
-            }.collect{
+            }.collect {
                 loggingRepository.logToChatFile(it)
             }
     }
