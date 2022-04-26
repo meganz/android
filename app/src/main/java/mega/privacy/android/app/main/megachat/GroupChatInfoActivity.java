@@ -313,6 +313,16 @@ public class GroupChatInfoActivity extends PasscodeActivity
         participantsCount = chat.getPeerCount();
         logDebug("Participants count: " + participantsCount);
 
+        if (!chat.isPreview() && chat.isActive()) {
+            String myFullName = megaChatApi.getMyFullname();
+            if (isTextEmpty(myFullName)) {
+                myFullName = megaChatApi.getMyEmail();
+            }
+
+            MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
+            participants.add(me);
+        }
+
         for (int i = 0; i < participantsCount; i++) {
             int peerPrivilege = chat.getPeerPrivilege(i);
             if (peerPrivilege == MegaChatRoom.PRIV_RM) {
@@ -327,16 +337,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                 megaChatApi.requestLastGreen(participant.getHandle(), null);
             }
-        }
-
-        if (!chat.isPreview() && chat.isActive()) {
-            String myFullName = megaChatApi.getMyFullname();
-            if (isTextEmpty(myFullName)) {
-                myFullName = megaChatApi.getMyEmail();
-            }
-
-            MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
-            participants.add(me);
         }
 
         logDebug("Number of participants with me: " + participants.size());

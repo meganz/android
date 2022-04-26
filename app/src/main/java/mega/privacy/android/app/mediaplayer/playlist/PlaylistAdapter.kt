@@ -9,6 +9,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
@@ -60,8 +61,15 @@ class PlaylistAdapter(
         val playlistItem = getItem(holder.absoluteAdapterPosition)
         val currentPosition = holder.absoluteAdapterPosition
 
-        if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
-            playingPosition = holder.absoluteAdapterPosition
+        with(holder.itemView.findViewById<TextView>(R.id.duration)) {
+            isVisible = playlistItem.duration != 0L
+
+            if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
+                playingPosition = holder.absoluteAdapterPosition
+                text = playlistItem.formatCurrentPositionAndDuration()
+            } else {
+                text = playlistItem.formatDuration()
+            }
         }
 
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =

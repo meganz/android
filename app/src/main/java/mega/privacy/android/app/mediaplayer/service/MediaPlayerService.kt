@@ -62,6 +62,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     private lateinit var trackSelector: DefaultTrackSelector
     lateinit var player: MediaMegaPlayer
         private set
+
+    private lateinit var exoPlayer: ExoPlayer
+
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
 
@@ -75,14 +78,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
-    private val resumePlayRunnable = object : Runnable {
-        override fun run() {
-            if (needPlayWhenReceiveResumeCommand) {
-                setPlayWhenReady(true)
-                needPlayWhenReceiveResumeCommand = false
-            }
+    private val resumePlayRunnable = Runnable {
+        if (needPlayWhenReceiveResumeCommand) {
+            setPlayWhenReady(true)
+            needPlayWhenReceiveResumeCommand = false
         }
-
     }
 
     private var audioManager: AudioManager? = null
@@ -100,6 +100,16 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                 }
             }
         }
+
+    private val positionUpdateHandler = Handler()
+    private val positionUpdateRunnable = object : Runnable {
+        override fun run() {
+            val currentPosition = exoPlayer.currentPosition
+            // Up the frequency of refresh, keeping in sync with Exoplayer.
+            positionUpdateHandler.postDelayed(this, 500)
+            viewModel.setCurrentPositionAndDuration(exoPlayer.duration, currentPosition)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -120,7 +130,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
 
-        val exoPlayer = ExoPlayer.Builder(this, renderersFactory)
+        exoPlayer = ExoPlayer.Builder(this, renderersFactory)
             .setTrackSelector(trackSelector)
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
@@ -151,6 +161,15 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                         if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
                             val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
                             _metadata.value = Metadata(null, null, null, nodeName)
+                        }
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        if (isPlaying) {
+                            positionUpdateHandler.post(positionUpdateRunnable)
+                        } else {
+                            positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                         }
                     }
 
@@ -196,6 +215,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
                     override fun onPlayerError(error: PlaybackException) {
                         viewModel.onPlayerError()
+                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                     }
                 })
 
@@ -423,6 +443,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
         viewModel.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
+        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
 
         if (initialized) {
             if (audioManager != null) {

@@ -4207,4 +4207,6 @@
     <string name="action_remove_favourites">ลบออกจากรายการโปรด</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
 </resources>
