@@ -412,6 +412,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     override fun whenStartActionMode() {
         if (!mManagerActivity.isInPhotosPage) return
         super.whenStartActionMode()
+        mManagerActivity.animateCULayout(true)
         with(parentFragment as PhotosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
@@ -424,6 +425,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
         super.whenEndActionMode()
+        mManagerActivity.animateCULayout(viewModel.isCUEnabled())
         with(parentFragment as PhotosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)

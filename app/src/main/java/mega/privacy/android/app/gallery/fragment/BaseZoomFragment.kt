@@ -127,8 +127,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         // AlbumContentFragment doesn't have view type panel.
         if (
             this is AlbumContentFragment ||
-            !isInActionMode() ||
-            isInActionMode() && actionModeViewModel.selectedNodes.value?.count()!! > 1
+            !isInActionMode() && viewTypePanel.isVisible ||
+            mManagerActivity.fromAlbumContent
         ) {
             return
         }
@@ -448,13 +448,12 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
+                    whenStartActionMode()
                 } else {
                     actionMode?.invalidate()  // Update the action items based on the selected nodes
                 }
 
                 actionMode?.title = it.size.toString()
-
-                whenStartActionMode()
             }
         }
 
