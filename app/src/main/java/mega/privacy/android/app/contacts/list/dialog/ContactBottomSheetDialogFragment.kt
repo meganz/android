@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -35,6 +34,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.setImageRequestFromUri
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
@@ -170,7 +170,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.header.txtLastSeen.text = contact.lastSeen
         binding.header.txtLastSeen.isVisible = !contact.lastSeen.isNullOrBlank()
         binding.header.imgThumbnail.hierarchy.setPlaceholderImage(contact.placeholder)
-        binding.header.imgThumbnail.setImageRequest(ImageRequest.fromUri(contact.avatarUri))
+        binding.header.imgThumbnail.setImageRequestFromUri(contact.avatarUri)
         contact.statusColor?.let { color ->
             binding.header.imgState.setColorFilter(ContextCompat.getColor(requireContext(), color))
         }

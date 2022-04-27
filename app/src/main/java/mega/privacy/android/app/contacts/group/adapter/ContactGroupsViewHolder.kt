@@ -2,9 +2,9 @@ package mega.privacy.android.app.contacts.group.adapter
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.ItemContactGroupBinding
+import mega.privacy.android.app.utils.setImageRequestFromUri
 
 /**
  * RecyclerView's ViewHolder to show ContactGroupItem.
@@ -20,7 +20,7 @@ class ContactGroupsViewHolder(
         binding.imgPrivate.isVisible = !item.isPublic
         binding.imgThumbnailFirst.hierarchy.setPlaceholderImage(item.firstUser.placeholder)
         binding.imgThumbnailLast.hierarchy.setPlaceholderImage(item.lastUser.placeholder)
-        binding.imgThumbnailFirst.setImageRequest(ImageRequest.fromUri(item.firstUser.avatar))
-        binding.imgThumbnailLast.setImageRequest(ImageRequest.fromUri(item.lastUser.avatar))
+        binding.imgThumbnailFirst.setImageRequestFromUri(item.firstUser.avatar)
+        binding.imgThumbnailLast.setImageRequestFromUri(item.lastUser.avatar)
     }
 }
