@@ -6,12 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.UploadService
@@ -306,11 +308,7 @@ class TextEditorViewModel @Inject constructor(
      * Starts the read action to get the content of the file.
      */
     fun readFileContent() {
-        try {
-            viewModelScope.launch { readFile() }
-        } catch (e: Exception) {
-            logError("Exception reading file content", e)
-        }
+        viewModelScope.launch { readFile() }
     }
 
     /**
@@ -336,8 +334,24 @@ class TextEditorViewModel @Inject constructor(
                 return@withContext
             }
 
+            val deferred = viewModelScope.async { createConnectionAndRead() }
+
+            try {
+                deferred.await()
+            } catch (e: Exception) {
+                logError("Creating connection for reading by streaming.", e)
+            }
+        }
+    }
+
+    /**
+     * Creates a connection for reading the file by streaming.
+     */
+    private suspend fun createConnectionAndRead() {
+        withContext(Dispatchers.IO) {
             val connection: HttpURLConnection =
                 streamingFileURL?.openConnection() as HttpURLConnection
+
             readFile(BufferedReader(InputStreamReader(connection.inputStream)))
         }
     }
@@ -424,7 +438,7 @@ class TextEditorViewModel @Inject constructor(
                 }
             )
 
-        activity.startService(uploadIntent)
+        ContextCompat.startForegroundService(activity, uploadIntent)
         activity.finish()
     }
 

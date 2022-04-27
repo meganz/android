@@ -23,16 +23,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/cab_menu_save_gallery"
-        android:icon="@drawable/ic_save_gallery"
-        android:orderInCategory="121"
-        android:title="@string/general_save_to_gallery"
-        android:visible="false"
-        app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always"
-        tools:visible="true" />
-
-    <item
         android:id="@+id/cab_menu_remove_link"
         android:icon="@drawable/ic_remove_link"
         android:orderInCategory="130"
@@ -148,5 +138,11 @@
         android:orderInCategory="230"
         android:title="@string/context_move_to_trash"
         app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_remove_favourites"
+        android:orderInCategory="240"
+        android:title="@string/action_remove_favourites"
         app:showAsAction="never" />
 </menu>

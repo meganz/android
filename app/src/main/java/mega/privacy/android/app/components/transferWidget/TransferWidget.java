@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.transferWidget;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isStorageOverQuota;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
@@ -19,7 +20,8 @@ import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.DrawerItem;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -78,8 +80,8 @@ public class TransferWidget {
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
     public void update(int transferType) {
-        if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+        if (context instanceof ManagerActivity) {
+            if (((ManagerActivity) context).getDrawerItem() == DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);
             }
 
@@ -108,15 +110,14 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+        DrawerItem drawerItem = ((ManagerActivity) context).getDrawerItem();
 
-        return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT
-                && drawerItem != ManagerActivityLollipop.DrawerItem.RUBBISH_BIN
-                && drawerItem != ManagerActivityLollipop.DrawerItem.PHOTOS
-                && !((ManagerActivityLollipop) context).isInImagesPage();
+        return drawerItem != DrawerItem.TRANSFERS
+                && drawerItem != DrawerItem.NOTIFICATIONS
+                && drawerItem != DrawerItem.CHAT
+                && drawerItem != DrawerItem.RUBBISH_BIN
+                && drawerItem != DrawerItem.PHOTOS
+                && !((ManagerActivity) context).isInImagesPage();
     }
 
     /**
@@ -125,7 +126,7 @@ public class TransferWidget {
     public void updateState() {
         if (MegaApplication.getTransfersManagement().areTransfersPaused()) {
             setPausedTransfers();
-        } else if (isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
+        } else if (isOverQuota()){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -139,7 +140,7 @@ public class TransferWidget {
     private void setProgressTransfers() {
         if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_error));
-        } else if (isOnTransferOverQuota()) {
+        } else if (isOverQuota()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
         } else if (status.getVisibility() != GONE){
             status.setVisibility(GONE);
@@ -149,10 +150,23 @@ public class TransferWidget {
     }
 
     /**
+     * Checks if should show transfer or storage over quota state.
+     *
+     * @return True if should show over quota state, false otherwise.
+     */
+    private boolean isOverQuota() {
+        boolean isTransferOverQuota = isOnTransferOverQuota();
+        boolean isStorageOverQuota = isStorageOverQuota();
+
+        return (isTransferOverQuota && (megaApi.getNumPendingUploads() <= 0 || isStorageOverQuota))
+                || (isStorageOverQuota && (megaApi.getNumPendingDownloads() <= 0));
+    }
+
+    /**
      * Sets the state of the widget as paused.
      */
     private void setPausedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_paused));
@@ -170,7 +184,7 @@ public class TransferWidget {
      * Sets the state of the widget as failed.
      */
     private void setFailedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);

@@ -25,6 +25,9 @@ open class TypedNodesFetcher(
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
+    val thumbnailFolder = File(context.cacheDir, CacheFolderManager.THUMBNAIL_FOLDER)
+    val previewFolder = File(context.cacheDir, CacheFolderManager.PREVIEW_FOLDER)
+
     /**
      * LinkedHashMap guarantees that the index order of elements is consistent with
      * the order of putting. Moreover, it has a quick element search[O(1)] (for
@@ -53,14 +56,14 @@ open class TypedNodesFetcher(
     }
 
     fun getThumbnailFile(node: MegaNode) = File(
-        ThumbnailUtilsLollipop.getThumbFolder(context),
+        thumbnailFolder,
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
     /**
      * Get the thumbnail of the file.
      */
-    private fun getThumbnail(node: MegaNode): File? {
+    protected fun getThumbnail(node: MegaNode): File? {
         val thumbFile = getThumbnailFile(node)
 
         return if (thumbFile.exists()) {
@@ -78,10 +81,12 @@ open class TypedNodesFetcher(
     }
 
     /**
-     * Get all nodes items
+     * Get all nodes items.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the fetch at any time.
      */
-    suspend fun getNodeItems() {
-        for (node in getMegaNodes(order, type)) {
+    suspend fun getNodeItems(cancelToken: MegaCancelToken) {
+        for (node in getMegaNodes(cancelToken, order, type)) {
             val thumbnail = getThumbnail(node)
             val dateString = ofPattern("MMMM uuuu").format(Util.fromEpoch(node.modificationTime))
             val selected = selectedNodesMap[node.handle]?.selected ?: false
@@ -116,7 +121,7 @@ open class TypedNodesFetcher(
 
                         request.let {
                             fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getThumbnailFile(item.key).absoluteFile
+                                thumbnail = getThumbnailFile(item.key)
                                 uiDirty = true
                             }
                         }
@@ -130,8 +135,15 @@ open class TypedNodesFetcher(
         }
     }
 
-    open fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
-        megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
+    /**
+     * Gets a list of nodes given an order and type.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
+     * @param order         Order to get nodes.
+     * @param type          Type of nodes.
+     */
+    fun getMegaNodes(cancelToken: MegaCancelToken, order: Int, type: Int): List<MegaNode> =
+        megaApi.searchByType(cancelToken, order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {
         const val UPDATE_DATA_THROTTLE_TIME =

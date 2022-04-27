@@ -1,84 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/upload_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:scrollbars="vertical">
 
-    <!-- Title -->
     <LinearLayout
-        android:id="@+id/upload_title_layout"
+        android:id="@+id/items_layout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Options -->
+        <TextView
+            android:id="@+id/upload_files"
+            style="@style/BottomSheetOption"
+            android:text="@string/upload_files"
+            app:drawableStartCompat="@drawable/ic_upload_file" />
 
         <TextView
-            android:id="@+id/upload_title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:text="@string/action_add"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+            android:id="@+id/upload_folder"
+            style="@style/BottomSheetOption"
+            android:text="@string/upload_folder"
+            app:drawableStartCompat="@drawable/ic_upload_folder" />
+
+        <include layout="@layout/view_linear_layout_72_margin_start_separator" />
+
+        <TextView
+            android:id="@+id/scan_document_option"
+            style="@style/BottomSheetOption"
+            android:text="@string/menu_scan_document"
+            app:drawableStartCompat="@drawable/ic_scan_document" />
+
+        <TextView
+            android:id="@+id/take_picture_option"
+            style="@style/BottomSheetOption"
+            android:layout_width="match_parent"
+            android:text="@string/menu_take_picture"
+            app:drawableStartCompat="@drawable/ic_capture" />
+
+        <include layout="@layout/view_linear_layout_72_margin_start_separator" />
+
+        <TextView
+            android:id="@+id/new_folder_option"
+            style="@style/BottomSheetOption"
+            android:text="@string/action_create_folder"
+            app:drawableStartCompat="@drawable/ic_new_folder" />
+
+        <TextView
+            android:id="@+id/new_txt_option"
+            style="@style/BottomSheetOption"
+            android:layout_width="match_parent"
+            android:text="@string/action_create_txt"
+            app:drawableStartCompat="@drawable/ic_new_text_file" />
 
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical">
-
-        <LinearLayout
-            android:id="@+id/items_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Options -->
-            <TextView
-                android:id="@+id/upload_from_device_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/attachment_upload_panel_photo"
-                app:drawableStartCompat="@drawable/ic_from_device" />
-
-            <include layout="@layout/view_linear_layout_72_margin_start_separator" />
-
-            <TextView
-                android:id="@+id/scan_document_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/menu_scan_document"
-                app:drawableStartCompat="@drawable/ic_scan_document"
-                app:drawableTint="?android:attr/textColorPrimary" />
-
-            <TextView
-                android:id="@+id/take_picture_option"
-                style="@style/BottomSheetOption"
-                android:layout_width="match_parent"
-                android:text="@string/menu_take_picture"
-                app:drawableStartCompat="@drawable/ic_media" />
-
-            <include layout="@layout/view_linear_layout_72_margin_start_separator" />
-
-            <TextView
-                android:id="@+id/new_folder_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/action_create_folder"
-                app:drawableStartCompat="@drawable/ic_new_folder" />
-
-            <TextView
-                android:id="@+id/new_txt_option"
-                style="@style/BottomSheetOption"
-                android:layout_width="match_parent"
-                android:text="@string/action_create_txt"
-                app:drawableStartCompat="@drawable/ic_new_txt" />
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

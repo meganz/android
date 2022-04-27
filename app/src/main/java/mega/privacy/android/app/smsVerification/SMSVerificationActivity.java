@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
+import mega.privacy.android.app.main.CountryCodePickerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.BackupToolsKt;
@@ -45,8 +45,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringListMap;
 
-import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.*;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
+import static mega.privacy.android.app.main.CountryCodePickerActivity.*;
+import static mega.privacy.android.app.main.LoginFragment.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -319,7 +319,7 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
     }
     
     private void launchCountryPicker() {
-        Intent intent = new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class);
+        Intent intent = new Intent(getApplicationContext(), CountryCodePickerActivity.class);
         intent.putStringArrayListExtra("country_code", this.countryCodeList);
         startActivityForResult(intent, Constants.REQUEST_CODE_COUNTRY_PICKER);
     }

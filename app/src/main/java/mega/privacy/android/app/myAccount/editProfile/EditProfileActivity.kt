@@ -28,7 +28,7 @@ import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
@@ -222,7 +223,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         allowNameAndEmailEdition()
 
         binding.changePassword.setOnClickListener {
-            startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
+            startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
 
         setupPhoneNumber()
@@ -536,6 +537,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             dialogBinding.firstNameLayout,
                             dialogBinding.firstNameErrorIcon
                         )
+                    }
+
+                    post {
+                        requestFocus()
+                        setSelection(length())
+                        showSoftKeyboard()
                     }
                 }
 

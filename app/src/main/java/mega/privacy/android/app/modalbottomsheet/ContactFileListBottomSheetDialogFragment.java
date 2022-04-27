@@ -17,9 +17,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.main.ContactFileListActivity;
+import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.main.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
@@ -40,26 +40,26 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
     private MegaNode node = null;
 
-    private ContactFileListActivityLollipop contactFileListActivity;
-    private ContactInfoActivityLollipop contactInfoActivity;
+    private ContactFileListActivity contactFileListActivity;
+    private ContactInfoActivity contactInfoActivity;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_file_list, null);
         itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
-        if (requireActivity() instanceof ContactFileListActivityLollipop) {
-            contactFileListActivity = (ContactFileListActivityLollipop) requireActivity();
-        } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
-            contactInfoActivity = (ContactInfoActivityLollipop) requireActivity();
+        if (requireActivity() instanceof ContactFileListActivity) {
+            contactFileListActivity = (ContactFileListActivity) requireActivity();
+        } else if (requireActivity() instanceof ContactInfoActivity) {
+            contactInfoActivity = (ContactInfoActivity) requireActivity();
         }
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-        } else if (requireActivity() instanceof ContactFileListActivityLollipop) {
+        } else if (requireActivity() instanceof ContactFileListActivity) {
             node = contactFileListActivity.getSelectedNode();
-        } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
+        } else if (requireActivity() instanceof ContactInfoActivity) {
             node = contactInfoActivity.getSelectedNode();
         }
 
@@ -105,7 +105,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         boolean firstLevel = node.isInShare();
         long parentHandle = INVALID_HANDLE;
-        if (requireActivity() instanceof ContactFileListActivityLollipop) {
+        if (requireActivity() instanceof ContactFileListActivity) {
             parentHandle = contactFileListActivity.getParentHandle();
         }
 
@@ -116,9 +116,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
             nodeInfo.setText(getMegaNodeFolderInfo(node));
 
-            if (firstLevel || parentHandle == INVALID_HANDLE) {
-                optionLeave.setVisibility(View.VISIBLE);
-
+            if (!node.isTakenDown() && (firstLevel || parentHandle == INVALID_HANDLE)) {
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL:
                         nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
@@ -132,8 +130,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                         nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                         break;
                 }
-
-                nodeIconLayout.setVisibility(View.VISIBLE);
             } else {
                 optionLeave.setVisibility(View.GONE);
                 nodeIconLayout.setVisibility(View.GONE);
@@ -155,13 +151,8 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         switch (accessLevel) {
             case MegaShare.ACCESS_FULL:
-                optionMove.setVisibility(View.GONE);
-                optionRename.setVisibility(View.VISIBLE);
-
                 if (firstLevel || parentHandle == INVALID_HANDLE) {
                     optionRubbish.setVisibility(View.GONE);
-                } else {
-                    optionRubbish.setVisibility(View.VISIBLE);
                 }
 
                 break;
@@ -172,6 +163,11 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 optionRename.setVisibility(View.GONE);
                 optionRubbish.setVisibility(View.GONE);
                 break;
+        }
+
+        if (node.isTakenDown()) {
+            optionDownload.setVisibility(View.GONE);
+            optionCopy.setVisibility(View.GONE);
         }
 
         if (optionInfo.getVisibility() == View.GONE || (optionDownload.getVisibility() == View.GONE && optionCopy.getVisibility() == View.GONE
@@ -211,15 +207,15 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         switch (v.getId()) {
             case R.id.download_option:
-                if (requireActivity() instanceof ContactFileListActivityLollipop) {
+                if (requireActivity() instanceof ContactFileListActivity) {
                     contactFileListActivity.downloadFile(Collections.singletonList(node));
-                } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
+                } else if (requireActivity() instanceof ContactInfoActivity) {
                     contactInfoActivity.downloadFile(Collections.singletonList(node));
                 }
                 break;
 
             case R.id.properties_option:
-                Intent i = new Intent(requireContext(), FileInfoActivityLollipop.class);
+                Intent i = new Intent(requireContext(), FileInfoActivity.class);
                 i.putExtra(HANDLE, node.getHandle());
                 i.putExtra("from", FROM_INCOMING_SHARES);
                 i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare());
@@ -238,25 +234,25 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case R.id.move_option:
-                if (requireActivity() instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.showMoveLollipop(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.showMoveLollipop(handleList);
+                if (requireActivity() instanceof ContactFileListActivity) {
+                    contactFileListActivity.showMove(handleList);
+                } else if (requireActivity() instanceof ContactInfoActivity) {
+                    contactInfoActivity.showMove(handleList);
                 }
                 break;
 
             case R.id.copy_option:
-                if (requireActivity() instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.showCopyLollipop(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.showCopyLollipop(handleList);
+                if (requireActivity() instanceof ContactFileListActivity) {
+                    contactFileListActivity.showCopy(handleList);
+                } else if (requireActivity() instanceof ContactInfoActivity) {
+                    contactInfoActivity.showCopy(handleList);
                 }
                 break;
 
             case R.id.rubbish_bin_option:
-                if (requireActivity() instanceof ContactFileListActivityLollipop) {
+                if (requireActivity() instanceof ContactFileListActivity) {
                     contactFileListActivity.askConfirmationMoveToRubbish(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
+                } else if (requireActivity() instanceof ContactInfoActivity) {
                     contactInfoActivity.askConfirmationMoveToRubbish(handleList);
                 }
                 break;

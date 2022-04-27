@@ -21,7 +21,7 @@
                 android:id="@+id/toolbar_achievements"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                tools:context=".ManagerActivityLollipop" />
+                tools:context=".main.ManagerActivity" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <FrameLayout

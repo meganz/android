@@ -35,9 +35,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,15 +50,15 @@ import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -78,8 +78,8 @@ import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -94,6 +94,9 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
     private static final int LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
@@ -120,6 +123,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
 
+    // If during camera upload setting process, set true to block the service running.
+    private static boolean bInCameraUploadsSetting = false;
+
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
 
@@ -130,8 +136,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean running, ignoreAttr;
     private Handler handler;
 
-    private ExecutorService threadPool = Executors.newFixedThreadPool(8);
-
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
 
@@ -139,7 +143,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean canceled;
     private boolean stopByNetworkStateChange;
 
-    private DatabaseHandler dbH;
+    @Inject
+    DatabaseHandler dbH;
 
     private MegaPreferences prefs;
     private String localPath = INVALID_NON_NULL_VALUE;
@@ -154,7 +159,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
-    private MegaChatApiAndroid megaChatApi;
     private MegaApplication app;
 
     private static final int LOGIN_IN = 12;
@@ -191,6 +195,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private PendingIntent mPendingIntent;
     private String tempRoot;
     private VideoCompressor mVideoCompressor;
+
+    @Inject
+    ThreadPoolExecutor megaThreadPoolExecutor;
 
     private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 
@@ -235,6 +242,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onCreate() {
+        super.onCreate();
         startForegroundNotification();
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -287,18 +295,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public void onTypeChanges(int type) {
         logDebug("Network type change to: " + type);
-        DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
-        MegaPreferences prefs = handler.getPreferences();
-        if (prefs != null) {
-            stopByNetworkStateChange = type == MOBILE && Boolean.parseBoolean(prefs.getCamSyncWifi());
-            if (stopByNetworkStateChange) {
-                for (MegaTransfer transfer : cuTransfers) {
-                    megaApi.cancelTransfer(transfer, this);
+        megaThreadPoolExecutor.execute(() -> {
+            MegaPreferences prefs = dbH.getPreferences();
+            if (prefs != null) {
+                stopByNetworkStateChange = type == MOBILE && Boolean.parseBoolean(prefs.getCamSyncWifi());
+                if (stopByNetworkStateChange) {
+                    for (MegaTransfer transfer : cuTransfers) {
+                        megaApi.cancelTransfer(transfer, this);
+                    }
+                    stopped = true;
+                    finish();
                 }
-                stopped = true;
-                finish();
             }
-        }
+        });
     }
 
     @Override
@@ -727,8 +736,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             finish();
                             String title = getString(R.string.title_out_of_space);
                             String message = getString(R.string.error_not_enough_free_space);
-                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+                            Intent intent = new Intent(this, ManagerActivity.class);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_IMMUTABLE);
                             showNotification(title, message, pendingIntent, true);
                             return;
                         }
@@ -996,6 +1005,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return BATTERY_STATE_LOW;
         }
 
+        if (isInCameraUploadsSetting()){
+            logWarning("Camera uploads setting is in progress");
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
         prefs = dbH.getPreferences();
         if (prefs == null) {
             logWarning("Not defined, so not enabled");
@@ -1069,6 +1083,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             running = true;
             setLoginState(true);
             megaApi.fastLogin(credentials.getSession(), this);
+
+            ChatUtil.initMegaChatApi(credentials.getSession());
+
             return LOGIN_IN;
         }
 
@@ -1093,11 +1110,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      */
     private void localFolderUnavailableNotification(int resId, int notiId) {
         boolean isShowing = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
-                if (notification.getId() == notiId) {
-                    isShowing = true;
-                }
+        for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
+            if (notification.getId() == notiId) {
+                isShowing = true;
             }
         }
         if (!isShowing) {
@@ -1283,14 +1298,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         megaApi = app.getMegaApi();
         megaApiFolder = app.getMegaApiFolder();
-        megaChatApi = app.getMegaChatApi();
 
         if (megaApi == null) {
             finish();
             return;
         }
-
-        initDbH();
 
         String previousIP = app.getLocalIpAddress();
         // the new logic implemented in NetworkStateReceiver
@@ -1306,22 +1318,25 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         }
         // end new logic
-        mIntent = new Intent(this, ManagerActivityLollipop.class);
+        mIntent = new Intent(this, ManagerActivity.class);
         mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
 
-        mPendingIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
-        tempRoot = new File(getCacheDir(), CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
-        File root = new File(tempRoot);
-        if (!root.exists()) {
-            root.mkdirs();
-        }
+        mPendingIntent = PendingIntent.getActivity(this, 0, mIntent, PendingIntent.FLAG_IMMUTABLE);
 
-        if (dbH.shouldClearCamsyncRecords()) {
-            dbH.deleteAllSyncRecords(TYPE_ANY);
-            dbH.saveShouldClearCamsyncRecords(false);
-        }
+        megaThreadPoolExecutor.execute(() -> {
+            tempRoot = new File(getCacheDir(), CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
+            File root = new File(tempRoot);
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+
+            if (dbH.shouldClearCamsyncRecords()) {
+                dbH.deleteAllSyncRecords(TYPE_ANY);
+                dbH.saveShouldClearCamsyncRecords(false);
+            }
+        });
     }
 
     private void handleException(Exception e) {
@@ -1608,7 +1623,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + JPG_EXTENSION);
                     final SyncRecord finalRecord = record;
                     if (isVideoFile(transfer.getPath())) {
-                        threadPool.execute(() -> {
+                        megaThreadPoolExecutor.execute(() -> {
                             File img = new File(finalRecord.getLocalPath());
                             if (!preview.exists()) {
                                 createVideoPreview(CameraUploadsService.this, img, preview);
@@ -1616,7 +1631,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             createThumbnail(img, thumb);
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
-                        threadPool.execute(() -> {
+                        megaThreadPoolExecutor.execute(() -> {
                             if (!preview.exists()) {
                                 createImagePreview(src, preview);
                             }
@@ -1780,9 +1795,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else {
             logDebug("Compression queue bigger than setting, show notification to user.");
             finish();
-            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            Intent intent = new Intent(this, ManagerActivity.class);
             intent.setAction(ACTION_SHOW_SETTINGS);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             String title = getString(R.string.title_compression_size_over_limit);
             String size = prefs.getChargingOnSize();
             String message = getString(R.string.message_compression_size_over_limit,
@@ -1803,8 +1818,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onInsufficientSpace() {
         logWarning("Insufficient space for video compression.");
         finish();
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        Intent intent = new Intent(this, ManagerActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         String title = getResources().getString(R.string.title_out_of_space);
         String message = getResources().getString(R.string.message_out_of_space);
         showNotification(title, message, pendingIntent, true);
@@ -1911,7 +1926,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         String info = getProgressSize(this, totalSizeTransferred, totalSizePendingTransfer);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, mIntent, PendingIntent.FLAG_IMMUTABLE);
         showProgressNotification(progressPercent, pendingIntent, message, info, getString(R.string.settings_camera_notif_title));
     }
 
@@ -1977,12 +1992,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         String contentText = getString(R.string.download_show_info);
         String message = getString(R.string.overquota_alert_title);
 
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setAction(ACTION_OVERQUOTA_STORAGE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
                 .setAutoCancel(true)
                 .setTicker(contentText)
                 .setContentTitle(message)
@@ -2188,7 +2203,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean isChargingRequired(long queueSize) {
-        initDbH();
         MegaPreferences preferences = dbH.getPreferences();
         if (preferences != null && preferences.getConversionOnCharging() != null) {
             if (Boolean.parseBoolean(preferences.getConversionOnCharging())) {
@@ -2203,12 +2217,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return false;
     }
 
-    private void initDbH() {
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
-    }
-
     private boolean isDeviceLowOnBattery(Intent intent) {
         if (intent == null) {
             return false;
@@ -2216,5 +2224,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         logDebug("Device battery level is " + level);
         return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
+    }
+
+    /**
+     * Check if camera uploads setting is in progress
+     * @return - true : During camera uploads setting
+     *         - false : not in camera uploads setting
+     */
+    private boolean isInCameraUploadsSetting() {
+        return bInCameraUploadsSetting;
+    }
+
+    /**
+     * Set to true if camera uploads setting is in progress, otherwise false.
+     */
+    static public void setInCameraUploadsSetting(boolean duringSettingProgress) {
+        bInCameraUploadsSetting = duringSettingProgress;
     }
 }

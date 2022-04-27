@@ -5,19 +5,17 @@ import android.content.*
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChooseUpgradeAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
@@ -25,6 +23,10 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import java.util.*
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
+
+    companion object {
+        private const val BILLING_WARNING_SHOWN = "BILLING_WARNING_SHOWN"
+    }
 
     protected lateinit var binding: ActivityChooseUpgradeAccountBinding
     protected val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
@@ -52,9 +54,15 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         setContentView(binding.root)
 
         viewModel.refreshAccountInfo()
-        initPayments()
         setupView()
         setupObservers()
+        initPayments()
+
+        if (savedInstanceState != null
+            && savedInstanceState.getBoolean(BILLING_WARNING_SHOWN, false)
+        ) {
+            showBillingWarning()
+        }
     }
 
     override fun onDestroy() {
@@ -77,6 +85,11 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(BILLING_WARNING_SHOWN, binding.billingWarningLayout.isVisible)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -86,9 +99,12 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                 .uppercase(Locale.getDefault())
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollView
-        ) { _: View?, _: Int, _: Int, _: Int, _: Int ->
+        binding.billingWarningClose.setOnClickListener {
+            binding.billingWarningLayout.isVisible = false
+            checkScroll()
+        }
+
+        binding.scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
         }
 
@@ -124,9 +140,15 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             }
         }
 
-        binding.semitransparentLayer.setOnClickListener { cancelClick() }
-
         refreshAccountInfo()
+        checkScroll()
+    }
+
+    /**
+     * Shows a warning when the billing is not available.
+     */
+    fun showBillingWarning() {
+        binding.billingWarningLayout.isVisible = true
         checkScroll()
     }
 
@@ -137,25 +159,12 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         )
     }
 
-    /**
-     * Hides the current selected payment plan.
-     */
-    protected fun cancelClick() {
-        checkScroll()
-
-        if (!Util.isDarkMode(this)) {
-            window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        }
-
-        binding.semitransparentLayer.isVisible = false
-        binding.availablePaymentMethods.isVisible = false
-    }
-
     override fun checkScroll() {
         if (!this::binding.isInitialized)
             return
 
         val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+                || binding.billingWarningLayout.isVisible
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
         ColorUtils.changeStatusBarColorForElevation(this, withElevation)
@@ -173,12 +182,12 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    protected open fun setPricingInfo() {
+    private fun setPricingInfo() {
         val productAccounts = viewModel.getProductAccounts()
 
         if (productAccounts == null) {
             LogUtil.logDebug("productAccounts == null")
-            app.askForPricing()
+            viewModel.refreshPricing()
             return
         }
 
@@ -281,10 +290,10 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
      * @param upgradeType Selected payment plan.
      */
     protected open fun onUpgradeClick(upgradeType: Int) {
-        val intent = Intent(this, ManagerActivityLollipop::class.java)
+        val intent = Intent(this, ManagerActivity::class.java)
             .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
             .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-            .putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true)
+            .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
             .putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, upgradeType != FREE)
             .putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, upgradeType)
 

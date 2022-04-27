@@ -2,6 +2,7 @@ package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
 import android.content.*
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,7 +27,8 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -38,8 +40,13 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
 import java.util.*
+import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback,
     SnackbarShower {
@@ -49,7 +56,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         private const val CANCEL_SUBSCRIPTIONS_SHOWN = "CANCEL_SUBSCRIPTIONS_SHOWN"
         private const val TYPED_FEEDBACK = "TYPED_FEEDBACK"
         private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
-        private const val CONFIRM_CANCEL_ACCOUNT_SHOWN = "CONFIRM_CANCEL_ACCOUNT_SHOWN"
         private const val CONFIRM_CHANGE_EMAIL_SHOWN = "CONFIRM_CHANGE_EMAIL_SHOWN"
         private const val CONFIRM_RESET_PASSWORD_SHOWN = "CONFIRM_RESET_PASSWORD_SHOWN"
         private const val TYPE_CHANGE_EMAIL = 1
@@ -111,9 +117,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     showConfirmationCancelSubscriptions()
                 }
-                savedInstanceState.getBoolean(CONFIRM_CANCEL_ACCOUNT_SHOWN, false) -> {
-                    showConfirmCancelAccountDialog()
-                }
                 savedInstanceState.getBoolean(CONFIRM_CHANGE_EMAIL_SHOWN, false) -> {
                     showConfirmChangeEmailDialog()
                 }
@@ -131,6 +134,8 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 Intent(this, UpgradeAccountActivity::class.java)
                     .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
             )
+
+            viewModel.setOpenUpgradeFrom()
 
             intent.removeExtra(EXTRA_ACCOUNT_TYPE)
         }
@@ -188,11 +193,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         )
 
         outState.putBoolean(
-            CONFIRM_CANCEL_ACCOUNT_SHOWN,
-            isAlertDialogShown(confirmCancelAccountDialog)
-        )
-
-        outState.putBoolean(
             CONFIRM_CHANGE_EMAIL_SHOWN,
             isAlertDialogShown(confirmChangeEmailDialog)
         )
@@ -239,7 +239,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
-        confirmCancelAccountDialog?.dismiss()
         confirmChangeEmailDialog?.dismiss()
         confirmResetPasswordDialog?.dismiss()
         super.onDestroy()
@@ -252,7 +251,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
-            R.id.action_upgrade_account -> navController.navigate(R.id.action_my_account_to_upgrade)
+            R.id.action_upgrade_account -> {
+                navController.navigate(R.id.action_my_account_to_upgrade)
+                viewModel.setOpenUpgradeFrom()
+            }
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> viewModel.logout(this)
         }
@@ -385,6 +387,26 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         )
 
         viewModel.checkElevation().observe(this, ::changeElevation)
+
+        lifecycleScope.launch {
+            viewModel.dialogVisibleState.collect { state ->
+                if (state is SubscriptionDialogState.Visible) {
+                    state.result.platformInfo?.run {
+                        showExistingSubscriptionDialog(this, state.result.typeID)
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.cancelAccountDialogState.collect { state ->
+                if (state is CancelAccountDialogState.VisibleDefault) {
+                    showConfirmCancelAccountDialog(R.string.delete_account_text_last_step)
+                } else if (state is CancelAccountDialogState.VisibleWithSubscription) {
+                    showConfirmCancelAccountDialog(R.string.delete_account_text_other_platform_last_step)
+                }
+            }
+        }
     }
 
     /**
@@ -497,20 +519,90 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     private fun showConfirmCancelAccountQueryResult(result: String) {
         if (matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
-            showConfirmCancelAccountDialog()
+            viewModel.checkSubscription()
         } else {
             showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
         }
     }
 
-    private fun showConfirmCancelAccountDialog() {
+    /**
+     * create the dialog if there is an active subscription
+     * @param platformInfo The information of current subscription platform
+     * @param type The type that which kind of dialog will be shown
+     */
+    private fun showExistingSubscriptionDialog(platformInfo: PlatformInfo, type: Int){
+        val message = when (type) {
+            TYPE_ANDROID_PLATFORM,
+            TYPE_ANDROID_PLATFORM_NO_NAVIGATION->
+                StringResourcesUtils.getString(
+                    R.string.message_android_platform_subscription,
+                    platformInfo.platformName,
+                    platformInfo.platformStoreName
+                )
+            TYPE_ITUNES ->
+                getString(R.string.message_itunes_platform_subscription)
+            else ->
+                getString(R.string.message_other_platform_subscription)
+        }
+
+        MaterialAlertDialogBuilder(this).apply {
+            setTitle(
+                StringResourcesUtils.getString(
+                    R.string.title_platform_subscription,
+                    platformInfo.platformName
+                )
+            )
+            setMessage(message)
+            setPositiveButton(getString(R.string.general_ok)) { dialog, _ ->
+                viewModel.setCancelAccountDialogState(isVisible = true)
+                dialog.dismiss()
+            }
+            if (type == TYPE_ANDROID_PLATFORM) {
+                setNegativeButton(
+                    StringResourcesUtils.getString(
+                        R.string.button_visit_platform,
+                        platformInfo.platformStoreAbbrName
+                    )
+                ) { dialog, _ ->
+                    if (BillingManagerImpl.PAYMENT_GATEWAY ==
+                        MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET && isAppStoreAvailable()
+                    ) {
+                        startActivity(Intent(BillingManagerImpl.SUBSCRIPTION_LINK_FOR_APP_STORE))
+                    } else {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(BillingManagerImpl.SUBSCRIPTION_LINK_FOR_BROWSER)
+                            )
+                        )
+                    }
+                    viewModel.setCancelAccountDialogState(isVisible = true)
+                    dialog.dismiss()
+                }
+            }
+            setOnDismissListener {
+                /* Clear the value of current state when the dialog is dismissed
+                to avoid the dialog open again when the screen is rotated. */
+                viewModel.restoreSubscriptionDialogState()
+            }
+        }
+            .create()
+            .show()
+    }
+
+    private fun showConfirmCancelAccountDialog(messageId: Int) {
         val errorInputBinding = DialogErrorPasswordInputEditTextBinding.inflate(layoutInflater)
         confirmCancelAccountDialog = MaterialAlertDialogBuilder(this)
             .setTitle(StringResourcesUtils.getString(R.string.delete_account))
-            .setMessage(StringResourcesUtils.getString(R.string.delete_account_text_last_step))
+            .setMessage(StringResourcesUtils.getString(messageId))
             .setView(errorInputBinding.root)
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
             .setPositiveButton(StringResourcesUtils.getString(R.string.delete_account), null)
+            .setOnDismissListener {
+                /* Clear the value of current CancelAccountDialogState when the dialog is dismissed
+                to avoid the dialog open again when the screen is rotated. */
+                viewModel.restoreCancelAccountDialogState()
+            }
             .create()
 
         showConfirmDialog(
@@ -628,7 +720,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 R.string.pin_lock_enter
             ) { _, _ ->
                 startActivity(
-                    Intent(this, ChangePasswordActivityLollipop::class.java)
+                    Intent(this, ChangePasswordActivity::class.java)
                         .setAction(ACTION_RESET_PASS_FROM_LINK)
                         .setData(intent.data)
                         .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())
@@ -648,6 +740,22 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             message,
             StringResourcesUtils.getString(R.string.general_error_word)
         )
+    }
+
+    /**
+     * The app store of current platform that app is installed whether is available.
+     * @return true is available
+     */
+    private fun isAppStoreAvailable(): Boolean {
+        return try {
+            packageManager.getPackageInfo(
+                BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                PackageManager.GET_ACTIVITIES
+            )
+            true
+        } catch (exception: PackageManager.NameNotFoundException) {
+            false
+        }
     }
 
     fun showSnackbar(text: String) {

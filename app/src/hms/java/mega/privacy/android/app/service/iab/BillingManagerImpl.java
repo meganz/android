@@ -105,7 +105,7 @@ public class BillingManagerImpl implements BillingManager {
     /**
      * Icon res id.
      */
-    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
+    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.ic_huawei_wallet;
 
     /**
      * Payment gatewat for HMS.
@@ -122,11 +122,15 @@ public class BillingManagerImpl implements BillingManager {
 
     private final List<MegaPurchase> mPurchases = new ArrayList<>();
 
+    public static final String SUBSCRIPTION_PLATFORM_PACKAGE_NAME = "com.huawei.appmarket";
+    public static final String SUBSCRIPTION_LINK_FOR_APP_STORE = "com.huawei.appmarket.intent.action.MainActivity";
+    public static final String SUBSCRIPTION_LINK_FOR_BROWSER = "https://appgallery.huawei.com";
+
     /**
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
      * it through BillingClient and caches temporary states/data if needed.
      *
-     * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
+     * @param activity        The Context, here's {@link mega.privacy.android.app.main.ManagerActivity}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
      */
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {
@@ -139,7 +143,10 @@ public class BillingManagerImpl implements BillingManager {
             logDebug("HMS IAP env is ready.");
             mBillingUpdatesListener.onBillingClientSetupFinished();
             queryPurchases();
-        }).addOnFailureListener(this::handleException);
+        }).addOnFailureListener(result -> {
+            handleException(result);
+            mBillingUpdatesListener.onBillingClientSetupFailed();
+        });
     }
 
     @Override

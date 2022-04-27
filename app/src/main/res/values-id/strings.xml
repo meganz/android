@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">Hanya Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi atau data plan</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Unggahan Kamera sedang berjalan</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Apakah anda ingin menghentikan Unggahan Kamera?</string>
@@ -1586,10 +1586,6 @@
     <string name="upload_service_notification">Mengunggah file: %1$d dari %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Mengunggah file: %1$d dari %2$d (dijeda)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Mengunggah folder: %1$d dari %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Mengunggah folder: %1$d dari %2$d (dijeda)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">%1$d file terunggah</item>
@@ -1597,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">%1$d file sudah diunggah</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">Folder %1$d yang diunggah</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Ukuran total: %1$s</string>
@@ -1734,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">Dari Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontak</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Dari perangkat</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Hapus akun</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2374,9 +2364,9 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Tulis pesan ke %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Autentikasi Dua Faktor</string>
+    <string name="settings_2fa">Otentikasi dua faktor</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Autentikasi Dua Faktor adalah lapisan keamanan kedua untuk akun anda.</string>
+    <string name="setting_subtitle_2fa">Otentikasi dua faktor adalah lapisan keamanan kedua untuk akun anda.</string>
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Mengapa anda membutuhkan otentikasi dua faktor?</string>
     <!--  -->
@@ -2398,11 +2388,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Terjadi kesalahan saat membuat benih atau kode QR, coba lagi.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Otentikasi Dua Faktor Diaktifkan</string>
+    <string name="title_2fa_enabled">Otentikasi dua faktor diaktifkan</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh Aplikasi Otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan Otentikasi Dua Faktor.</string>
+    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Kode salah</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2420,23 +2410,23 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Kehilangan perangkat Authenticator anda?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Terjadi kesalahan saat mencoba menonaktifkan Autentikasi Dua Faktor. Silakan coba lagi.</string>
+    <string name="error_disable_2fa">Terjadi kesalahan saat mencoba menonaktifkan otentikasi dua faktor. Silakan coba lagi.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">Terjadi kesalahan saat mencoba mengaktifkan Autentikasi Dua Faktor. Silakan coba lagi.</string>
+    <string name="error_enable_2fa">Terjadi kesalahan saat mencoba mengaktifkan otentikasi dua faktor. Silakan coba lagi.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Aktifkan Autentikasi Dua Faktor</string>
+    <string name="title_enable_2fa">Aktifkan otentikasi dua faktor</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Autentikasi Dua Faktor Dinonaktifkan</string>
+    <string name="label_2fa_disabled">Otentikasi dua faktor dinonaktifkan</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Buka di</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Tidak ada aplikasi apa pun yang tersedia untuk mengaktifkan Autentikasi Dua Faktor di perangkat anda</string>
+    <string name="intent_not_available_2fa">Tidak ada aplikasi apa pun yang tersedia untuk mengaktifkan otentikasi dua faktor di perangkat anda</string>
     <!-- Text button -->
     <string name="general_close">Tutup</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Ekspor Kunci Pemulihan anda untuk selesai</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Aplikasi Otentikasi Dua Faktor</string>
+    <string name="no_authentication_apps_title">Aplikasi otentikasi dua faktor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Apakah anda ingin membuka Google Play agar dapat memasang Aplikasi Authenticator?</string>
     <!-- Label Play Store -->
@@ -2542,7 +2532,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versi file</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">Versi file %1$d, mengambil total %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$dversi file, dengan total  %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Pengelolaan File</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2824,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Satu kali (tahun)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Bulanan[/A] %s/bulan</string>
+    <string name="billed_monthly_text">[A]Ditagih setiap bulan[/A] %s/bulan</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Tahunan[/A] %s/tahun</string>
+    <string name="billed_yearly_text">[A]Ditagih setiap tahun[/A] %s/tahun</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Batal</string>
     <!-- dialog option continue in alert dialog -->
@@ -3092,11 +3084,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Obrolan yang sepenuhnya terenkripsi dengan panggilan suara dan video, perpesanan grup, dan integrasi berbagi file dengan Cloud Drive anda.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Buat Jaringan anda</string>
+    <string name="title_tour_three">Buat jaringan anda</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Tambahkan kontak, buat jaringan, berkolaborasi, buat panggilan suara dan video tanpa harus meninggalkan MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Foto anda di Cloud</string>
+    <string name="title_tour_four">Foto anda di cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Unggahan Kamera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi anda. Buat akun anda sekarang.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3113,8 +3105,8 @@
     <string name="not_allow_play_alert">Memutar file media tidak dapat dilakukan saat ada panggilan yang sedang berlangsung.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Panggilan Berlangsung</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s memulai panggilan grup. Ketuk untuk bergabung.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Ketuk untuk bergabung dengan panggilan grup saat ini.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Ketuk untuk kembali ke panggilan</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3489,8 +3481,8 @@
     <string name="section_documents">Dokumen</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Obrolan baru</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Tidak ada foto yang ditemukan</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]Gambar[/A] [B]Ditemukan[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Tidak ada dokumen yang ditemukan</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3735,8 +3727,6 @@
     <string name="same_item_name_warning">Sudah ada item dengan nama yang sama</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Simpan ke galeri</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -3744,7 +3734,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Bermain di latar belakang</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A]</string>
+    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A] [B]Ditemukan[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Cadangkan foto dan video anda ke Penyimpanan Cloud anda secara otomatis.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3777,8 +3767,6 @@
     <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Kami sedang meningkatkan MEGAchat. Panggilan anda mungkin tidak terhubung karena ketidakcocokan versi kecuali semua pihak memperbarui aplikasi MEGA mereka ke versi terbaru.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file sudah diunduh. 1 file tertunda.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3899,7 +3887,7 @@
     <string name="general_mic_mute">Mikrofon anda dimatikan</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Mikrofon anda diaktifkan</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Kamera anda nyala.</string>
@@ -3981,10 +3969,10 @@
     <string name="be_new_moderator">Anda adalah moderator baru.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%smemulai sebuah pertemuan. Ketuk untuk bergabung.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Ketuk untuk bergabung dengan rapat saat ini.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Pertemuan</string>
+    <string name="title_tour_five">MEGA pertemuan</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Pertemuan video terenkripsi menyeluruh</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4057,4 +4045,168 @@
     <string name="disable_versioning_warning">Fitur pembuatan versi file kami memastikan bahwa kami menyimpan salinan lama dari file anda jika anda menggantinya dengan versi yang lebih baru. Jika anda menonaktifkan Pembuatan Versi File, anda tidak akan lagi memiliki perlindungan ini; salinan lama akan hilang saat anda menggantinya.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Lokasi ini tidak ada lagi.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Undangan berhasil dikirim. Lihat permintaan terkirim.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File tersedia Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File dihapus dari Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Buka tautan</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Tautan obrolan tidak valid</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Buka tautan obrolan</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Masukkan tautan obrolan</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Tempel tautan</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Tautan file atau folder tidak valid</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Silakan masukkan tautan file atau folder yang valid</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Silakan masukkan tautan obrolan yang valid</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Anda telah menempelkan tautan obrolan.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Anda telah menempelkan tautan kontak.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Buka tautan kontak</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Gunakan data seluler untuk melihat pratinjau gambar resolusi tinggi</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Izinkan penggunaan data seluler untuk memuat gambar resolusi tinggi saat melihat pratinjau. Jika dinonaktifkan, gambar asli hanya akan dimuat saat anda memperbesar.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Anda mengubah lokasi folder cadangan default. Ini dapat memengaruhi kemampuan anda untuk menemukan folder cadangan di masa mendatang. Harap ingat di mana letaknya sehingga anda dapat menemukannya di masa depan.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Memindahkan folder ini akan mengubah tujuan dari satu atau beberapa cadangan yang dikonfigurasi dan mungkin memiliki konsekuensi yang tidak diinginkan. Pencadangan akan dimatikan demi keselamatan anda. Pencadangan dapat diaktifkan kembali dengan Aplikasi Desktop MEGA. Apakah anda ingin melanjutkan??</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Anda menghapus folder cadangan anda. Ini akan menghapus semua cadangan yang telah anda atur. Apakah anda yakin ingin melakukan ini?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Apakah anda yakin ingin menghapus folder cadangan dan menonaktifkan cadangan terkait?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Pindahkan “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Pindahkan “%1s” ke Tempat Sampah</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Pindahkan folder cadangan</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Pindahkan folder cadangan ke Tempat Sampah</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Nonaktifkan cadangan</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Pindahkan cadangan</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Tolong ketik “%1s” untuk mengkonfirmasi tindakan ini</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">teks yang dimasukkan tidak cocok</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Tambahkan item ke “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Siapkan cadangan</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Untuk memastikan item yang ditambahkan ke folder cadangan anda secara otomatis disinkronkan ke MEGA Cloud, silakan atur di Aplikasi Desktop MEGA.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Hanya-baca</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena ini adalah folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan cadangan.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Item dalam folder ini adalah bagian dari cadangan yang dikonfigurasi dan disinkronkan ke folder lokal. Mengambil tindakan ini akan merusak sinkronisasi dan menonaktifkan pencadangan. Pencadangan dapat diaktifkan kembali di Aplikasi Desktop MEGA. Anda yakin ingin melanjutkan?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena merupakan folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan pencadangan.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Beberapa folder yang dibagikan adalah folder cadangan dan hanya-baca. Apakah anda ingin melanjutkan?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d perangkat</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Jawab panggilan</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Pilih trek</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Unggah berkas</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Unggah folder</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Batalkan unggahan?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Pembayaran</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Metode pembayaran</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Melanjutkan</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Terimakasih atas langganan %1$s anda!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite bulanan</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite tahunan</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I bulanan</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I tahunan</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II bulanan</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II tahunan</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III bulanan</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III tahunan</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Batalkan unggahan</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Jangan batalkan</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Hapus moderator</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">folder DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA mengunggah gambar anda dari galeri. Untuk mengubah lokasi unggahan, silakan buka pengaturan Unggah Kamera.</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Beli langganan baru?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Beli langganan baru</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini melalui %1$s. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dari akun iTunes anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi, anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dengan membuka MEGA di browser web desktop atau seluler. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Buka Pengaturan untuk memberikan izin kepada MEGA untuk mengakses perangkat terdekat anda menggunakan Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Kami tidak dapat melanjutkan penagihan. Jika anda menggunakan aplikasi ganda, harap pertimbangkan untuk masuk ke MEGA tanpa itu. Jika tidak, coba perbarui melalui browser web anda.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Langganan %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Langganan aktif</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Anda memiliki langganan MEGA aktif dengan %1$s. Anda harus membatalkannya secara terpisah di %2$s, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Anda memiliki langganan MEGA aktif dengan Apple. Anda harus membatalkannya secara terpisah dari akun iTunes anda, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Kunjungi %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Ini adalah langkah terakhir untuk menghapus akun anda. Akun dan langganan anda akan dihapus dan anda akan kehilangan semua data yang tersimpan di cloud secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Linimasa</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favorit</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Tidak ada[/B] [A]Favorit[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Hapus favorit</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format file tidak didukung. Tidak dapat membuka file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Folder yang dipilih kosong. Tidak ada file untuk diunggah.</string>
 </resources>

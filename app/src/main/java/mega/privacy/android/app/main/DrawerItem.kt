@@ -1,0 +1,5 @@
+package mega.privacy.android.app.main
+
+enum class DrawerItem {
+    CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
+}

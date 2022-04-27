@@ -3,14 +3,19 @@ package mega.privacy.android.app.imageviewer.usecase
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
@@ -18,6 +23,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -27,24 +33,26 @@ import javax.inject.Inject
  * @property megaApi                    MegaAPI required for node requests
  * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
+ * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
  */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getImageUseCase: GetImageUseCase
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
 ) {
 
     /**
-     * Use case to retrieve image node handles given different sources
+     * Use case to retrieve ImageItems given different sources
      *
      * @param nodeHandles       Image node handles
      * @param parentNodeHandle  Parent node to retrieve every other child
      * @param nodeFileLinks     Node public link
      * @param chatRoomId        Node Chat Message Room Id
      * @param chatMessageIds    Node Chat Message Ids
-     * @param imageUri          Image file uri
+     * @param imageFileUri      Image file uri
+     * @param showNearbyFiles   Show nearby image files from current parent file
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @return                  Single with image nodes
@@ -55,9 +63,10 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeFileLinks: List<String>? = null,
         chatRoomId: Long? = null,
         chatMessageIds: LongArray? = null,
-        imageUri: Uri? = null,
+        imageFileUri: Uri? = null,
+        showNearbyFiles: Boolean? = false,
         sortOrder: Int? = ORDER_PHOTO_ASC,
-        isOffline: Boolean = false
+        isOffline: Boolean? = false
     ): Single<List<ImageItem>> =
         Single.fromCallable {
             val items = mutableListOf<ImageItem>()
@@ -71,7 +80,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     }
                 }
                 nodeHandles?.isNotEmpty() == true -> {
-                    if (isOffline) {
+                    if (isOffline == true) {
                         items.addOfflineNodeHandles(nodeHandles)
                     } else {
                         items.addNodeHandles(nodeHandles)
@@ -81,16 +90,14 @@ class GetImageHandlesUseCase @Inject constructor(
                     items.addNodeFileLinks(nodeFileLinks)
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
-                imageUri != null ->
-                    items.addImageUri(imageUri)
+                imageFileUri != null ->
+                    items.addFileImageUris(imageFileUri, showNearbyFiles)
                 else -> {
                     error("Invalid parameters")
                 }
             }
 
-            if (items.isNotEmpty()) {
-                items
-            } else {
+            items.ifEmpty {
                 error("Invalid image handles")
             }
         }
@@ -104,7 +111,14 @@ class GetImageHandlesUseCase @Inject constructor(
     private fun MutableList<ImageItem>.addChildrenNodes(megaNode: MegaNode, sortOrder: Int) {
         megaApi.getChildren(megaNode, sortOrder).forEach { node ->
             if (node.isValidForImageViewer()) {
-                this.add(ImageItem(node.handle))
+                this.add(
+                    ImageItem.Node(
+                        id = node.handle,
+                        handle = node.handle,
+                        name = node.name,
+                        infoText = node.getInfoText()
+                    )
+                )
             }
         }
     }
@@ -118,7 +132,14 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeHandles.forEach { handle ->
             val node = getNodeUseCase.get(handle).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle))
+                this.add(
+                    ImageItem.Node(
+                        id = node.handle,
+                        handle = node.handle,
+                        name = node.name,
+                        infoText = node.getInfoText()
+                    )
+                )
             }
         }
     }
@@ -132,7 +153,15 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeHandles.forEach { nodeHandle ->
             val node = getNodeUseCase.getOfflineNode(nodeHandle).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle.toLong(), isOffline = true))
+                this.add(
+                    ImageItem.OfflineNode(
+                        id = node.handle.toLong(),
+                        handle = node.handle.toLong(),
+                        name = node.name,
+                        infoText = node.getInfoText(context),
+                        fileUri = OfflineUtils.getOfflineFile(context, node).toUri(),
+                    )
+                )
             }
         }
     }
@@ -146,7 +175,15 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeFileLinks.forEach { nodeFileLink ->
             val node = getNodeUseCase.getPublicNode(nodeFileLink).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle, nodePublicLink = nodeFileLink))
+                this.add(
+                    ImageItem.PublicNode(
+                        id = nodeFileLink.hashCode().toLong(),
+                        handle = node.handle,
+                        name = node.name,
+                        infoText = node.getInfoText(),
+                        nodePublicLink = nodeFileLink
+                    )
+                )
             }
         }
     }
@@ -161,34 +198,62 @@ class GetImageHandlesUseCase @Inject constructor(
         messageIds.forEach { messageId ->
             val node = getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle, chatRoomId = chatRoomId, chatMessageId = messageId))
+                val deletable = deleteChatMessageUseCase.check(chatRoomId, messageId).blockingGetOrNull() ?: false
+                this.add(
+                    ImageItem.ChatNode(
+                        id = (chatRoomId.hashCode() + messageId.hashCode()).toLong(),
+                        handle = node.handle,
+                        name = node.name,
+                        infoText = node.getInfoText(),
+                        chatRoomId = chatRoomId,
+                        chatMessageId = messageId,
+                        isDeletable = deletable
+                    )
+                )
             }
         }
     }
 
     /**
-     * Add Image Uri to a list of ImageItem given its image file uri
+     * Add Images to a list of ImageItem given an image file uri
      *
-     * @param imageUri  Image file uri to retrieve image from
+     * @param imageFileUri      Image file uri to retrieve images from
+     * @param showNearbyFiles   Show nearby image files from current parent file
      */
-    private fun MutableList<ImageItem>.addImageUri(imageUri: Uri) {
-        val file = imageUri.toFile()
-        if (file.exists()) {
-            val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
-            val fileSize = file.length().toString()
-            val nodeItem = MegaNodeItem(
-                handle = INVALID_HANDLE,
-                name = file.name,
-                infoText = TextUtil.getFileInfo(fileSize, fileTime)
-            )
+    private fun MutableList<ImageItem>.addFileImageUris(
+        imageFileUri: Uri,
+        showNearbyFiles: Boolean? = false
+    ) {
+        var imageUris = listOf(imageFileUri)
+        if (showNearbyFiles == true) {
+            try {
+                val nearbyImages = imageFileUri.toFile().parentFile?.listFiles()?.map(File::toUri)
+                if (!nearbyImages.isNullOrEmpty()) {
+                    imageUris = nearbyImages
+                }
+            } catch (ignored: Exception) {
+                logWarning(ignored.stackTraceToString())
+            }
+        }
 
-            this.add(
-                ImageItem(
-                    INVALID_HANDLE,
-                    nodeItem = nodeItem,
-                    imageResult = getImageUseCase.getImageUri(imageUri).blockingFirst()
+        imageUris.forEach { imageUri ->
+            val file = imageUri.toFile()
+            if (FileUtil.isValidForImageViewer(imageUri.toFile())) {
+                val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
+                val fileSize = file.length().toString()
+                val infoText = TextUtil.getFileInfo(fileSize, fileTime)
+
+                this.add(
+                    ImageItem.File(
+                        id = imageUri.hashCode().toLong(),
+                        name = file.name,
+                        infoText = infoText,
+                        fileUri = imageUri
+                    )
                 )
-            )
+            } else {
+                logWarning("File ($imageUri) can't be read or isn't valid for Image Viewer")
+            }
         }
     }
 }

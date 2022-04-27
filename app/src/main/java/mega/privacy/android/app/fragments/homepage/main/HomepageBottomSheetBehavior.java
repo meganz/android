@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Parcel;
@@ -316,9 +315,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         }
         createShapeValueAnimator();
 
-        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            this.elevation = a.getDimension(R.styleable.BottomSheetBehavior_Layout_android_elevation, -1);
-        }
+        this.elevation = a.getDimension(R.styleable.BottomSheetBehavior_Layout_android_elevation, -1);
 
         TypedValue value = a.peekValue(BottomSheetBehavior_Layout_behavior_peekHeight);
         if (value != null && value.data == PEEK_HEIGHT_AUTO) {
@@ -1495,11 +1492,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         }
     }
 
-    @VisibleForTesting
-    int getPeekHeightMin() {
-        return peekHeightMin;
-    }
-
     /**
      * Disables the shaped corner {@link ShapeAppearanceModel} interpolation transition animations.
      * Will have no effect unless the sheet utilizes a {@link MaterialShapeDrawable} with set shape
@@ -1674,9 +1666,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
             if (expanded) {
                 // Saves the important for accessibility value of the child view.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    importantForAccessibilityMap.put(child, child.getImportantForAccessibility());
-                }
+                importantForAccessibilityMap.put(child, child.getImportantForAccessibility());
                 if (updateImportantForAccessibilityOnSiblings) {
                     ViewCompat.setImportantForAccessibility(
                             child, ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);

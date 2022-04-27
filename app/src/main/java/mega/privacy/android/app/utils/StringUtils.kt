@@ -6,6 +6,7 @@ import android.util.Base64
 import androidx.annotation.ColorRes
 import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaStringMap
 
@@ -38,7 +39,11 @@ object StringUtils {
      * Decode the Base64-encoded data into a new formatted String
      */
     fun String.decodeBase64(): String =
-        Base64.decode(this, Base64.DEFAULT).toString(Charsets.UTF_8)
+        try {
+            Base64.decode(this.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
+        } catch (ignore: IllegalArgumentException) {
+            Base64.decode(this.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
+        }
 
     /**
      * Encode String to Base64
@@ -55,8 +60,11 @@ object StringUtils {
         for (i in 0 until keys.size()) {
             val base64Handle = keys[i]
             val handle = MegaApiJava.base64ToUserHandle(base64Handle)
-            val alias = get(base64Handle).decodeBase64()
-            aliases[handle] = alias
+            try {
+                aliases[handle] = get(base64Handle).decodeBase64()
+            } catch (error: IllegalArgumentException) {
+                logWarning(error.stackTraceToString())
+            }
         }
 
         return aliases
@@ -68,7 +76,7 @@ object StringUtils {
      * @param date String pair, which contains the whole date string.
      * @return Formatted Spanned can be set to TextView.
      */
-    fun  Pair<String?, String?>.formatDateTitle() : Spanned {
+    fun Pair<String?, String?>.formatDateTitle(): Spanned {
         var dateText =
             if (TextUtil.isTextEmpty(this.second)) "[B]" + this.first + "[/B]" else StringResourcesUtils.getString(
                 R.string.cu_month_year_date,

@@ -172,4 +172,5 @@ public class JobUtil {
 
         return Boolean.parseBoolean(cuEnabled);
     }
+
 }

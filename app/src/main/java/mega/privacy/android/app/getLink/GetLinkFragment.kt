@@ -23,7 +23,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -38,7 +37,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
+import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -120,9 +119,9 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollViewGetLink
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollViewGetLink.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         setThumbnail()
 
@@ -557,7 +556,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         val date = cal.time
         val dfTimestamp = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val dateString = dfTimestamp.format(date) + LAST_MINUTE
-        val timestamp = calculateTimestamp(dateString).toInt()
+        val timestamp = calculateTimestamp(dateString)
 
         viewModel.exportWithTimestamp(timestamp)
     }

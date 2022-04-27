@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Wi-Fi only</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Camera Uploads in progress</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Do you want to stop Camera Uploads?</string>
@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">From device</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Delete account</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2414,9 +2412,9 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Write message to %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Two-Factor Authentication</string>
+    <string name="settings_2fa">Two-factor authentication</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Two-Factor Authentication is a second layer of security for your account.</string>
+    <string name="setting_subtitle_2fa">Two-factor authentication is a second layer of security for your account.</string>
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Why do you need two-factor authentication?</string>
     <!--  -->
@@ -2438,11 +2436,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">An error occurred generating the seed or QR code, please try again.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Two-Factor Authentication Enabled</string>
+    <string name="title_2fa_enabled">Two-factor authentication enabled</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
+    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2460,23 +2458,23 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Lost your Authenticator device?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
+    <string name="error_disable_2fa">An error occurred trying to disable two-factor authentication. Please try again.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
+    <string name="error_enable_2fa">An error occurred trying to enable two-factor authentication. Please try again.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Enable Two-Factor Authentication</string>
+    <string name="title_enable_2fa">Enable two-factor authentication</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Two-Factor Authentication Disabled</string>
+    <string name="label_2fa_disabled">Two-factor authentication disabled</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Open in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">There isn’t any available app to enable Two-Factor Authentication on your device</string>
+    <string name="intent_not_available_2fa">There isn’t any available app to enable two-factor authentication on your device</string>
     <!-- Text button -->
     <string name="general_close">Close</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Export your Recovery Key to finish</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Two-factor authentication app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
     <!-- Label Play Store -->
@@ -2870,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]One-off (year)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Monthly[/A] %s/month</string>
+    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Yearly[/A] %s/year</string>
+    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancel</string>
     <!-- dialog option continue in alert dialog -->
@@ -2925,11 +2923,6 @@
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d folders · 1 file</item>
         <item quantity="other">%1$d folders · %2$d files</item>
-    </plurals>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
@@ -3160,11 +3153,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Create your Network</string>
+    <string name="title_tour_three">Create your network</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Your Photos in the Cloud</string>
+    <string name="title_tour_four">Your photos in the cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3814,8 +3807,6 @@
     <string name="same_item_name_warning">There is already an item with the same name</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -3837,7 +3828,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s, %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload in progress, 1 file pending</item>
@@ -3985,7 +3976,7 @@
     <string name="general_mic_mute">Your microphone is turned off</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Your microphone is turned on</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Your camera is turned on.</string>
@@ -4070,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA meeting</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">End-to-end encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4135,10 +4126,6 @@
     <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
-    <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
-    <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -4148,7 +4135,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">%1$s previously invited.</string>
+    <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
     <!-- Message when file available offline. -->
@@ -4177,18 +4164,22 @@
     <string name="valid_contact_link">You have pasted a contact link.</string>
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">Open contact link</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <string name="backup_move_root_folder">You are changing a default backup folder location. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Moving this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <string name="backup_move_sub_folder">Moving this folder changes the destination of one or more configured backups and may have unintended consequences. The backups will be turned off for your safety. Backups can be re-enabled with the MEGA Desktop App. Do you want to proceed?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable backup you set?</string>
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
     <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Move \"%1s\"</string>
+    <string name="backup_move_folder_title">Move “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <string name="backup_remove_folder_title">Move “%1s” to Rubbish Bin</string>
     <!-- The title of warning dialog for multi-folder moving -->
     <string name="backup_move_multiple_folder_title">Move backup folders</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -4198,23 +4189,116 @@
     <!-- The confirm information of warning dialog for moving "My backup" -->
     <string name="backup_move_confirm">Move backup</string>
     <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Please type \"%1s\" to confirm this action</string>
+    <string name="backup_action_confirm">Please type “%1s” to confirm this action</string>
     <!-- when checking the input -->
     <string name="error_backup_confirm_dont_match">Text entered does not match</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Add item to \"%1s\"</string>
+    <string name="backup_add_confirm_title">Add item to “%1s”</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Setup backup</string>
+    <string name="backup_add_item_title">Set up backup</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">To ensure this items added to your backup folder are automatically synchronised to the MEGA Cloud, please setup on desktop app.</string>
+    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Read-only</string>
-    <!-- If users want to share single backup folder, show below warning message -->
-    <string name="backup_share_permission_text">This folder can only be shared as read-only, as this is a backup folder, any changes to its content could disable the backup.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Adding items to this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled in the MEGA Desktop App. Are you sure you want to proceed?</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only, as they are backup folders, any changes to their content could disable the backups.</string>
+    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Upload files</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Upload folder</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel upload?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Payment</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Payment methods</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Proceed</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite monthly</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite yearly</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I monthly</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I yearly</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II monthly</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II yearly</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III monthly</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III yearly</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Cancel upload</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Don’t cancel</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings.</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Buy new subscription?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">We are unable to proceed with the billing. If you are using a dual app, please consider logging in to MEGA without it. If not, try to upgrade through your web browser.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subscription</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Active subscription</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription">You have an active MEGA subscription. It will be canceled automatically after the account is deleted. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visit %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Timeline</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favourites</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Remove favourites</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">You have entered your current password</string>
 </resources>

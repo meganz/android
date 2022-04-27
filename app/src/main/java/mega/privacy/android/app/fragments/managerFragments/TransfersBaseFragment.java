@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.main.adapters.RotatableAdapter;
+import mega.privacy.android.app.main.managerSections.RotatableFragment;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 
@@ -30,7 +30,7 @@ public class TransfersBaseFragment extends RotatableFragment {
     protected RecyclerView listView;
     protected LinearLayoutManager mLayoutManager;
 
-    protected ManagerActivityLollipop managerActivity;
+    protected ManagerActivity managerActivity;
 
     protected SimpleDividerItemDecoration itemDecoration;
 
@@ -54,7 +54,7 @@ public class TransfersBaseFragment extends RotatableFragment {
         emptyImage = v.findViewById(R.id.transfers_empty_image);
         emptyText = v.findViewById(R.id.transfers_empty_text);
         getMoreQuotaView = v.findViewById(R.id.get_more_quota_view);
-        v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivityLollipop) context).navigateToUpgradeAccount());
+        v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivity) context).navigateToUpgradeAccount());
 
         setGetMoreQuotaViewVisibility();
 
@@ -67,7 +67,7 @@ public class TransfersBaseFragment extends RotatableFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        managerActivity = (ManagerActivityLollipop) context;
+        managerActivity = (ManagerActivity) context;
     }
 
     public void checkScroll() {

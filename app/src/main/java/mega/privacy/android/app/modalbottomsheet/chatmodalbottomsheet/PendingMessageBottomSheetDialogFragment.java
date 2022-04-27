@@ -1,8 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaTransfer;
@@ -43,8 +41,8 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
-            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
+            chatId = ((ChatActivity) requireActivity()).idChat;
+            messageId = ((ChatActivity) requireActivity()).selectedMessageId;
         }
 
         logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
@@ -100,14 +98,14 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             case R.id.msg_not_sent_retry_layout:
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
                     megaApi.pauseTransfers(false);
-                    ((ChatActivityLollipop) requireActivity()).updatePausedUploadingMessages();
+                    ((ChatActivity) requireActivity()).updatePausedUploadingMessages();
                 } else {
-                    ((ChatActivityLollipop) requireActivity()).retryPendingMessage(messageId);
+                    ((ChatActivity) requireActivity()).retryPendingMessage(messageId);
                 }
                 break;
 
             case R.id.msg_not_sent_delete_layout:
-                ((ChatActivityLollipop) requireActivity()).removePendingMsg(messageId);
+                ((ChatActivity) requireActivity()).removePendingMsg(messageId);
                 break;
         }
 

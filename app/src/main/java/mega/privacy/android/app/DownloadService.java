@@ -24,7 +24,6 @@ import android.os.PowerManager.WakeLock;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -43,18 +42,17 @@ import java.util.Set;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -66,7 +64,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -97,7 +95,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static final String EXTRA_FROM_MV = "fromMV";
 	public static final String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
-	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP";
@@ -121,7 +118,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	MegaChatApiAndroid megaChatApi;
-	ChatSettings chatSettings;
 
 	ArrayList<Intent> pendingIntents = new ArrayList<Intent>();
 
@@ -362,25 +358,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (megaChatApi == null) {
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
-
-					int ret = megaChatApi.getInitState();
-
-					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-						ret = megaChatApi.init(gSession);
-						logDebug("result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-						} else if (ret == MegaChatApi.INIT_ERROR) {
-							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout();
-						} else {
-							logDebug("Chat correctly initialized");
-						}
-					}
+					ChatUtil.initMegaChatApi(gSession);
 
 					pendingIntents.add(intent);
 					if (type == null || (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER))) {
@@ -475,7 +453,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			} else if (currentFile.exists()) {
 				//Check the fingerprint
 				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
-				String megaFingerprint = megaApi.getFingerprint(currentDocument);
+				String megaFingerprint = currentDocument.getFingerprint();
 
 				if (!isTextEmpty(localFingerprint)
 						&& !isTextEmpty(megaFingerprint)
@@ -665,11 +643,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			size = getString(R.string.general_total_size, totalBytes);
 		}
 
-		Intent intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		Intent intent = new Intent(getApplicationContext(), ManagerActivity.class);
 		intent.setAction(ACTION_SHOW_TRANSFERS);
 		intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 		if (totalDownloads != 1) {
 			logDebug("Show notification");
@@ -683,26 +661,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mBuilderCompatO
 						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
-
-				mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 			}
 			else {
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-				}
 
 				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 			}
@@ -809,26 +783,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
-
-								mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 							}
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
-
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-									mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-								}
 
 								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 							}
@@ -846,26 +816,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 							mBuilderCompatO
 									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
-
-							mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 						}
 						else {
 							mBuilderCompat
 									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
-
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-							}
 
 							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 						}
@@ -884,26 +850,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						mBuilderCompatO
 								.setSmallIcon(R.drawable.ic_stat_notify)
+								.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
-
-						mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 					}
 					else {
 						mBuilderCompat
 								.setSmallIcon(R.drawable.ic_stat_notify)
+								.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
-
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-						}
 
 						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 					}
@@ -924,26 +886,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					mBuilderCompatO
 							.setSmallIcon(R.drawable.ic_stat_notify)
+							.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
-
-					mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 				}
 				else {
 					mBuilderCompat
 							.setSmallIcon(R.drawable.ic_stat_notify)
+							.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-					}
 
 					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 				}
@@ -1023,19 +981,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(dbH.getCredentials()==null){
 				contentText = getString(R.string.download_touch_to_cancel);
-				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
+				intent = new Intent(DownloadService.this, LoginActivity.class);
 				intent.setAction(ACTION_CANCEL_DOWNLOAD);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
-				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+				intent = new Intent(DownloadService.this, ManagerActivity.class);
 				intent.setAction(ACTION_SHOW_TRANSFERS);
 				intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 
-			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 				NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 				channel.setShowBadge(true);
@@ -1055,43 +1012,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				notification = mBuilderCompat.build();
 			}
-			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			else {
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
-						.setProgress(100, progressPercent, false)
-						.setContentIntent(pendingIntent)
-						.setOngoing(true).setContentTitle(message).setSubText(info)
-						.setContentText(contentText)
-						.setOnlyAlertOnce(true);
-				notification = mBuilder.build();
-			}
-			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-			{
-				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(contentText)
 						.setOnlyAlertOnce(true);
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-					mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-				}
-
-				notification = mBuilder.getNotification();
-			}
-			else
-			{
-				notification = new Notification(R.drawable.ic_stat_notify, null, 1);
-				notification.flags |= Notification.FLAG_ONGOING_EVENT;
-				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
-				notification.contentView.setTextViewText(R.id.status_text, message);
-				notification.contentView.setTextViewText(R.id.progress_text, info);
-				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+				notification = mBuilder.build();
 			}
 
 			if (!isForeground) {
@@ -1268,7 +1199,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (videoNode != null){
 							if(!videoNode.hasThumbnail()){
                                 logDebug("The video has not thumb");
-								ThumbnailUtilsLollipop.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
+								ThumbnailUtils.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
 							}
 						}
 						else{
@@ -1363,9 +1294,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
 
 	    	InputStream in = new FileInputStream(sourceLocation);
-//
-//	        OutputStream out = new FileOutputStream(targetLocation);
-//
+
 	        // Copy the bits from instream to outstream
 	        byte[] buf = new byte[1024];
 	        int len;
@@ -1373,10 +1302,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	        	fileOutputStream.write(buf, 0, len);
 	        }
 	        in.close();
-//	        out.close();
 
-
-//	        fileOutputStream.write(("Overwritten by MyCloud at " + System.currentTimeMillis() + "\n").getBytes());
 	        // Let the document provider know you're done by closing the stream.
 	        fileOutputStream.close();
 	        pfd.close();
@@ -1492,14 +1418,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
 			logDebug("TYPE_CANCEL_TRANSFERS finished");
-			if (e.getErrorCode() == MegaError.API_OK){
+			if (e.getErrorCode() == MegaError.API_OK) {
 				cancel();
 			}
-
-		}
-		else if (request.getType() == MegaRequest.TYPE_LOGIN){
+		} else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Logged in. Setting account auth token for folder links.");
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
@@ -1513,7 +1437,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-//				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1530,7 +1453,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-//				finish();
 			}
 		} else {
 			logDebug("Public node received");

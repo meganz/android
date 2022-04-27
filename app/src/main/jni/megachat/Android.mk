@@ -48,7 +48,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := megachat
 LOCAL_CFLAGS := -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections
-LOCAL_SRC_FILES := $(addprefix sdk/src/, megachatapi.cpp megachatapi_impl.cpp strongvelope/strongvelope.cpp presenced.cpp base64url.cpp chatClient.cpp chatd.cpp url.cpp karereCommon.cpp userAttrCache.cpp base/logger.cpp base/cservices.cpp net/websocketsIO.cpp karereDbSchema.cpp)
+LOCAL_SRC_FILES := $(addprefix sdk/src/, megachatapi.cpp megachatapi_impl.cpp strongvelope/strongvelope.cpp presenced.cpp base64url.cpp chatClient.cpp chatd.cpp kareredb.cpp url.cpp karereCommon.cpp userAttrCache.cpp base/logger.cpp base/cservices.cpp net/websocketsIO.cpp karereDbSchema.cpp)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_EXPORT_C_INCLUDES += $(local_c_includes)
 LOCAL_STATIC_LIBRARIES := curl cryptopp megasdk

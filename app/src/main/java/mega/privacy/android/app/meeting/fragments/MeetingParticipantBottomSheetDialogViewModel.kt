@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
 import mega.privacy.android.app.utils.Constants
@@ -124,11 +124,18 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     fun showDividerMakeModerator(): Boolean = showMakeModeratorItem() && showRemoveItem()
 
     /**
+     * Determine if show the divider between remove moderator item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerRemoveModerator(): Boolean = showRemoveModeratorItem() && showRemoveItem()
+
+    /**
      * Determine if show the `Edit Profile` item
      *
      * @return if should show `Edit Profile` item, return true, else false
      */
-    fun showEditProfile(): Boolean = !isGuest && !isParticipantGuest() && participant?.isMe == true
+    fun showEditProfile(): Boolean = !isGuest && !isParticipantGuest() && (participant?.isMe == true || participant?.peerId == megaChatApi.myUserHandle)
 
     /**
      * Determine if show the `Send Message` item
@@ -137,16 +144,16 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show `send Message` item, return true, else false
      */
     fun showSendMessage(): Boolean =
-        !isGuest && !isParticipantGuest() && participant?.isContact == true && participant?.isMe == false
+        !isGuest && !isParticipantGuest() && participant?.isContact == true && participant?.isMe == false && participant?.peerId != megaChatApi.myUserHandle
 
 
     /**
      * Determine if show the `Pin to speaker view` item
      * it will show if current mode is speaker mode
      *
-     * @return if it is speaker mode, return true, else false
+     * @return if it is speaker mode and I am not the participant, return true, else false
      */
-    fun showPinItem(): Boolean = isSpeakerMode
+    fun showPinItem(): Boolean = isSpeakerMode && participant?.isMe == false
 
     /**
      * Set the text for Contact Info item
@@ -156,7 +163,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      */
     fun getContactItemText(): String? {
         return StringResourcesUtils.getString(
-            if (participant?.isMe == true) R.string.group_chat_edit_profile_label
+            if (participant?.isMe == true || participant?.peerId == megaChatApi.myUserHandle) R.string.group_chat_edit_profile_label
             else R.string.contact_properties_activity
         )
     }
@@ -168,7 +175,16 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show `Make Moderator` item, return true, else false
      */
     fun showMakeModeratorItem(): Boolean =
-        !isGuest && isModerator && !(participant?.isMe == true || participant?.isModerator == true || isParticipantGuest())
+        isModerator && participant?.isMe == false && participant?.isModerator == false && participant?.peerId != megaChatApi.myUserHandle
+
+    /**
+     * Determine if show the `Remove Moderator` item
+     * When the current user is moderator, and not isMe && the target user is moderator
+     *
+     * @return if should show `Remove Moderator` item, return true, else false
+     */
+    fun showRemoveModeratorItem(): Boolean =
+        isModerator && participant?.isMe == false && participant?.isModerator == true && participant?.peerId != megaChatApi.myUserHandle
 
     /**
      * Determine if show the `Remove Participant` item
@@ -184,7 +200,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @param activity the current activity
      */
     fun editProfile(activity: Activity) {
-        val editProfile = Intent(activity, ManagerActivityLollipop::class.java)
+        val editProfile = Intent(activity, ManagerActivity::class.java)
         editProfile.putExtra(EXTRA_FROM_MEETING, true)
         editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
         activity.startActivity(editProfile)
@@ -204,7 +220,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
                 peers.addPeer(it, MegaChatPeerList.PRIV_STANDARD)
                 megaChatApi.createChat(false, peers, null)
             } else {
-                val intentOpenChat = Intent(activity, ChatActivityLollipop::class.java)
+                val intentOpenChat = Intent(activity, ChatActivity::class.java)
                 intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
                 intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
                 activity.startActivity(intentOpenChat)

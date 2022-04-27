@@ -19,8 +19,8 @@ import androidx.core.view.inputmethod.InputConnectionCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 
 import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
 
@@ -66,7 +66,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(mContext, getText(), emojiSize, defaultEmojiSize);
 
-        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof AddContactActivityLollipop) {
+        if (mContext instanceof GroupChatInfoActivity || mContext instanceof AddContactActivity) {
             setFilters(new InputFilter[]{new InputFilter.LengthFilter(getMaxAllowed(getText()))});
             super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
 

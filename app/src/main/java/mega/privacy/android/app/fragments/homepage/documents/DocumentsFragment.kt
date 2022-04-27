@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -30,11 +28,11 @@ import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -97,6 +95,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.cancelSearch()
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
     }
@@ -165,7 +164,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
                         it.node,
-                        if (viewModel.searchMode) MODE5 else MODE1
+                        if (viewModel.searchMode) SEARCH_MODE else CLOUD_DRIVE_MODE
                     )
                 }
             }
@@ -227,27 +226,28 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
-    ) { v: View?, _, _, _, _ ->
-        callManager { manager ->
-            manager.changeAppBarElevation(v!!.canScrollVertically(-1))
-        }
-    }
-
     private fun setupListView() {
         listView = binding.documentList
-        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
-        elevateToolbarWhenScrolling()
-        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
+        with(listView) {
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+            clipToPadding = false
+            setHasFixedSize(true)
+        }
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
-            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+            requireActivity() as ManagerActivity, actionModeViewModel, megaApi
         )
 
         observeItemLongClick()
@@ -262,7 +262,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -285,12 +285,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
                 actionMode?.title = it.size.toString()
             }
-        })
+        }
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -325,13 +325,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
-                            itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    requireContext(), R.color.new_multiselect_color
-                                )
-                            )
-                        }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
@@ -354,7 +347,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
-        })
+        }
     }
 
     private fun observeActionModeDestroy() =
@@ -443,7 +436,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         val localPath = FileUtil.getLocalFile(node)
 
         if (MimeTypeList.typeForName(node.name).isPdf) {
-            val intent = Intent(context, PdfViewerActivityLollipop::class.java)
+            val intent = Intent(context, PdfViewerActivity::class.java)
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
             if (viewModel.searchMode) {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_SEARCH_ADAPTER)
@@ -458,10 +451,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             val paramsSetSuccessfully =
                 if (FileUtil.isLocalFile(node, megaApi, localPath)) {
                     FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
-                        requireActivity() as ManagerActivityLollipop)
+                        requireActivity() as ManagerActivity
+                    )
                 } else {
                     FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
-                        requireActivity() as ManagerActivityLollipop)
+                        requireActivity() as ManagerActivity
+                    )
                 }
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
@@ -482,16 +477,16 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             onNodeTapped(
                 requireContext(),
                 node,
-                { (requireActivity() as ManagerActivityLollipop).saveNodeByTap(it) },
-                requireActivity() as ManagerActivityLollipop,
-                requireActivity() as ManagerActivityLollipop
+                { (requireActivity() as ManagerActivity).saveNodeByTap(it) },
+                requireActivity() as ManagerActivity,
+                requireActivity() as ManagerActivity
             )
         }
     }
 
     private fun setupAddFabButton() {
         binding.addFabButton.setOnClickListener {
-            (requireActivity() as ManagerActivityLollipop).showUploadPanel(DOCUMENTS_UPLOAD)
+            (requireActivity() as ManagerActivity).showUploadPanel(DOCUMENTS_UPLOAD)
         }
     }
 

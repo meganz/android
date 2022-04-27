@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.main.LoginActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -47,11 +47,11 @@ public class ChatLogoutListener extends ChatBaseListener{
         resetLoggerSDK();
 
         if (!isTextEmpty(accountBlockedString)) {
-            if (context instanceof LoginActivityLollipop) {
-                showErrorAlertDialog(accountBlockedString, false, (LoginActivityLollipop) context);
+            if (context instanceof LoginActivity) {
+                showErrorAlertDialog(accountBlockedString, false, (LoginActivity) context);
             } else {
                 MegaApplication app = MegaApplication.getInstance();
-                Intent loginIntent = new Intent(app.getApplicationContext(), LoginActivityLollipop.class)
+                Intent loginIntent = new Intent(app.getApplicationContext(), LoginActivity.class)
                         .setAction(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)

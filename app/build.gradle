@@ -4,6 +4,7 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'com.google.firebase.appdistribution'
 
 // Get the MEGA SDK commit hash using Git
 def getSdkGitHash = { ->
@@ -27,6 +28,52 @@ def getKarereGitHash = { ->
     return stdout.toString().trim()
 }
 
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * For Android builds in CD pipeline, read the environment variable and
+ * add to standard version name, in order to distinguish versions on Firebase.
+ * For normal builds, use default version name format.
+ * @return app's version name
+ */
+def readVersionName() {
+    def versionNameTag = System.getenv('APK_VERSION_NAME_FOR_CD')
+    if (versionNameTag != null && !versionNameTag.isEmpty()) {
+        return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
+    } else {
+        return  "$rootProject.appVersion (${rootProject.versionCode})"
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get release note string from environment variable.
+ * @return release note to be shown on Firebase. If environment variable is not set,
+ *         return "Release Note not available"
+ */
+def readReleaseNotes() {
+    def releaseNote = System.getenv('RELEASE_NOTES_FOR_CD')
+    if (releaseNote != null && !releaseNote.isEmpty()) {
+        return releaseNote
+    } else {
+        return "Release Notes not available"
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester list from environment. Tester list should be
+ * comma-separated list of email address.
+ * @returnn tester list or "" if there is no tester
+ */
+String readTesters() {
+    String testers = System.getenv("TESTERS_FOR_CD")
+    print("testers = " + testers)
+    if (testers == null || testers.trim().isEmpty()) {
+        testers = ""
+    }
+    return testers
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -36,15 +83,13 @@ android {
         viewBinding = true
     }
 
-
-
     defaultConfig {
         applicationId "mega.privacy.android.app"
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
-        versionName "$rootProject.appVersion ($rootProject.versionCode)"
+        versionName readVersionName()
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -54,17 +99,28 @@ android {
         resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
         resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
     }
 
-    sourceSets.main {
-        java {
-            srcDirs += 'src/main/jni/mega/sdk/bindings/java'
-            srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
-            exclude '**/MegaApiSwing.java'
+    sourceSets {
+         main {
+            java {
+                srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+                srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
+                exclude '**/MegaApiSwing.java'
+            }
+            jni.srcDirs = [] //disable automatic ndk-build
+            jniLibs.srcDir 'src/main/libs'
+            // This is not necessary unless you have precompiled libraries in your project.
         }
-        jni.srcDirs = [] //disable automatic ndk-build
-        jniLibs.srcDir 'src/main/libs' // This is not necessary unless you have precompiled libraries in your project.
+
+        testDebug {
+            java.srcDir 'src/sharedTest/java'
+        }
+
+        androidTest {
+            java.srcDir 'src/sharedTest/java'
+        }
     }
 
     buildTypes {
@@ -97,6 +153,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
@@ -126,7 +183,11 @@ android {
                 nativeSymbolUploadEnabled true
                 unstrippedNativeLibsDir 'src/main/obj/local'
             }
-
+            firebaseAppDistribution {
+                releaseNotes = readReleaseNotes()
+                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                testers = readTesters()
+            }
         }
         hms {
             dimension "service"
@@ -135,6 +196,17 @@ android {
                 // Disable @AddTrace annotation processing and automatic monitoring
                 // of HTTP/S network requests for HMS build
                 instrumentationEnabled false
+            }
+        }
+    }
+
+    configurations {
+        implementation.exclude module: 'protolite-well-known-types'
+        implementation.exclude module: 'protobuf-javalite'
+
+        all {
+            resolutionStrategy {
+                force 'androidx.test:monitor:1.4.0'
             }
         }
     }
@@ -170,12 +242,18 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+    implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
+
+
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+
     // Kotlin
     implementation "androidx.core:core-ktx:$ktxVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation 'androidx.preference:preference:1.1.1'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
@@ -191,7 +269,6 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
@@ -214,6 +291,7 @@ dependencies {
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
     implementation "com.facebook.fresco:animated-webp:$frescoVersion"
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
+    implementation "com.facebook.infer.annotation:infer-annotation:0.18.0"
     implementation files('src/main/libs/fresco-zoomable.aar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -229,6 +307,7 @@ dependencies {
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
+    implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'
@@ -243,16 +322,24 @@ dependencies {
     gmsImplementation 'com.google.firebase:firebase-perf-ktx'
     //HMS
     hmsImplementation "com.huawei.agconnect:agconnect-core:$huaweiServicesVersion"
-    hmsImplementation 'com.huawei.hms:push:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:location:6.2.0.300'
-    hmsImplementation 'com.huawei.hms:maps:6.0.1.304'
-    hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:hianalytics:5.2.0.301'
-    hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.5.1.300'
+    hmsImplementation 'com.huawei.hms:push:6.1.0.300'
+    hmsImplementation 'com.huawei.hms:location:6.3.0.300'
+    hmsImplementation 'com.huawei.hms:maps:6.3.0.302'
+    hmsImplementation 'com.huawei.hms:iap:6.3.0.300'
+    hmsImplementation 'com.huawei.hms:hianalytics:6.3.2.300'
+    hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.6.3.300'
 
     // Play Core
     implementation("com.google.android.play:core:1.10.0")
     implementation("com.google.android.play:core-ktx:1.8.1")
+
+    // protobuf-java for tombstone debug
+    implementation 'com.google.protobuf:protobuf-java:3.15.3'
+
+    // Logging
+    implementation "org.slf4j:slf4j-api:$slf4jVersion"
+    implementation "com.github.tony19:logback-android:$logbackVersion"
+    implementation "com.jakewharton.timber:timber:$timberVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
@@ -265,10 +352,37 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
+    testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
 import java.util.*
@@ -134,7 +135,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun setupView() {
-        logDebug("Update toolbar elements");
+        logDebug("Update toolbar elements")
         binding.btCancel.setOnClickListener { cancel() }
         binding.btOk.setOnClickListener { makeModerators() }
 
@@ -304,13 +305,12 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {
-            sharedModel.giveModeratorPermissions(it.peerId)
+            sharedModel.changeParticipantPermissions(it.peerId, MegaChatRoom.PRIV_MODERATOR)
         }
 
         disableLocalCamera()
         logDebug("Leave meeting")
         inMeetingViewModel.leaveMeeting()
-        finishActivity()
     }
 
     /**
@@ -319,9 +319,8 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     fun finishActivity() {
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else if (!inMeetingViewModel.checkIfAnotherCallShouldBeShown(passcodeManagement)) {
-            logDebug("Finish meeting activity")
-            meetingActivity.finish()
+        } else {
+            sharedModel.clickEndCall()
         }
     }
 

@@ -14,14 +14,11 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.interfaces.*
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
+import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.main.FileStorageActivity.*
+import mega.privacy.android.app.main.FileStorageActivity.Mode.PICK_FOLDER
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
@@ -30,7 +27,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
@@ -38,6 +34,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
@@ -128,7 +125,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether nodes should be downloaded into gallery
      */
     @JvmOverloads
     fun saveHandle(
@@ -136,16 +132,14 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         saveHandles(
             listOf(handle),
             highPriority,
             isFolderLink,
             fromMediaViewer,
-            needSerialize,
-            downloadToGallery
+            needSerialize
         )
     }
 
@@ -158,7 +152,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download to gallery or not
      */
     @JvmOverloads
     fun saveHandles(
@@ -166,8 +159,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -186,8 +178,7 @@ class NodeSaver(
                 isFolderLink = isFolderLink,
                 nodes = nodes,
                 fromMediaViewer = fromMediaViewer,
-                needSerialize = needSerialize,
-                downloadToGallery = downloadToGallery
+                needSerialize = needSerialize
             )
         }
     }
@@ -200,7 +191,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download to gallery or not
      */
     @JvmOverloads
     fun saveNode(
@@ -208,10 +198,9 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
-        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize, downloadToGallery)
+        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
     }
 
     /**
@@ -222,7 +211,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether nodes should be downloaded into gallery
      */
     @JvmOverloads
     fun saveNodeLists(
@@ -230,8 +218,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -244,7 +231,7 @@ class NodeSaver(
 
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize, downloadToGallery = downloadToGallery
+                needSerialize
             )
         }
     }
@@ -257,7 +244,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download is download to gallery
      * @param downloadByTap whether this download is triggered by tap
      */
     @JvmOverloads
@@ -267,13 +253,12 @@ class NodeSaver(
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false,
         downloadByTap: Boolean = false
     ) {
         save {
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize,  downloadToGallery = downloadToGallery, downloadByTap = downloadByTap
+                needSerialize, downloadByTap = downloadByTap
             )
         }
     }
@@ -369,18 +354,24 @@ class NodeSaver(
     }
 
     /**
-     * Handle app result from FileStorageActivityLollipop launched by requestLocalFolder,
+     * Handle app result from [FileStorageActivity] launched by requestLocalFolder,
      * and take actions according to the state and result.
      *
      * It should be called in onActivityResult.
      *
-     * @param requestCode the requestCode from onActivityResult
-     * @param resultCode the resultCode from onActivityResult
-     * @param intent the intent from onActivityResult
+     * @param activity      Activity required to show a confirmation dialog.
+     * @param requestCode   The requestCode from onActivityResult.
+     * @param resultCode    The resultCode from onActivityResult.
+     * @param intent        The intent from onActivityResult.
      * @return whether NodeSaver handles this result, if this method return false,
      * fragment/app should handle the result by other code.
      */
-    fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
+    fun handleActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        intent: Intent?
+    ): Boolean {
         if (saving == Saving.Companion.NOTHING) {
             return false
         }
@@ -397,7 +388,10 @@ class NodeSaver(
                 logWarning("parentPath null")
                 return false
             }
-            storeDownloadLocationIfNeeded(parentPath)
+
+            if (dbHandler.credentials != null && dbHandler.askSetDownloadLocation && activity is BaseActivity) {
+                activity.showConfirmationSaveInSameLocation(parentPath)
+            }
 
             Completable
                 .fromCallable {
@@ -528,13 +522,10 @@ class NodeSaver(
     }
 
     private fun doSave() {
-        if (!saving.downloadToGallery() && Util.askMe()) {
+        if (Util.askMe()) {
             requestLocalFolder(null, activityLauncher)
         } else {
-            checkSizeBeforeDownload(
-                if (saving.downloadToGallery()) getCameraFolder().absolutePath
-                else getDownloadLocation()
-            )
+            checkSizeBeforeDownload(getDownloadLocation())
         }
     }
 
@@ -542,9 +533,8 @@ class NodeSaver(
         prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
-        intent.putExtra(EXTRA_BUTTON_PREFIX, getString(R.string.general_select))
-        intent.putExtra(EXTRA_FROM_SETTINGS, false)
-        intent.setClass(app, FileStorageActivityLollipop::class.java)
+        intent.putExtra(PICK_FOLDER_TYPE, PickFolderType.DOWNLOAD_FOLDER.folderType)
+        intent.setClass(app, FileStorageActivity::class.java)
 
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)

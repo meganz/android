@@ -16,7 +16,7 @@ import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
-import mega.privacy.android.app.lollipop.InviteContactActivity
+import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView

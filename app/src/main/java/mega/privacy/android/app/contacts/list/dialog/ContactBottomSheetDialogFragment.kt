@@ -26,9 +26,9 @@ import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.EXTRA_SELECTED_FOLDER
-import mega.privacy.android.app.lollipop.controllers.NodeController
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER
+import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
@@ -203,7 +203,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.optionSendMessage.setOnClickListener {
             viewModel.getChatRoomId(megaUser.handle).observe(viewLifecycleOwner) { chatId ->
-                val intent = Intent(requireContext(), ChatActivityLollipop::class.java).apply {
+                val intent = Intent(requireContext(), ChatActivity::class.java).apply {
                     action = ACTION_CHAT_SHOW_MESSAGES
                     putExtra(CHAT_ID, chatId)
                 }

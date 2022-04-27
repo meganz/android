@@ -13,7 +13,6 @@ import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
@@ -65,10 +64,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private fun setupView() {
         viewModel.getFileVersionsOption()
-
-        ListenScrollChangesHelper().addViewToListen(
-            binding.usageLayout
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.usageLayout.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         usageBinding.root.background = ContextCompat.getDrawable(
             requireContext(),
@@ -76,20 +74,11 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         )
 
         paymentAlertBinding.renewExpiryText.setTextStyle(
-            requireContext(),
-            R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
-            R.color.grey_054_white_054,
-            false
+            textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
         )
 
         paymentAlertBinding.renewExpiryDateText.apply {
-            setTextStyle(
-                requireContext(),
-                R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White,
-                R.color.grey_087_white,
-                false
-            )
-
+            setTextStyle(textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White)
             (layoutParams as RelativeLayout.LayoutParams).topMargin = 0
         }
 

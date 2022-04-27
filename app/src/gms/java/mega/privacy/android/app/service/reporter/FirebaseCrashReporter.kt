@@ -1,7 +1,6 @@
 package mega.privacy.android.app.service.reporter
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.perf.FirebasePerformance
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 
 class FirebaseCrashReporter(

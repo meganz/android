@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.content.res.Configuration" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="0dp"
+                android:minHeight="?attr/actionBarSize" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:paddingBottom="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-5dp"
+                android:layout_marginBottom="-7dp"
+                android:progressTint="@color/teal_300_teal_200"
+                android:indeterminate="true" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ImageView
+            android:id="@+id/empty_hint_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? @drawable/empty_folder_landscape : @drawable/empty_folder_portrait}"
+            app:layout_constraintBottom_toTopOf="@id/empty_hint_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:src="@drawable/empty_folder_portrait" />
+
+        <TextView
+            android:id="@+id/empty_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/file_browser_empty_folder"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/empty_hint_image" />
+
+        <mega.privacy.android.app.components.NewGridRecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:columnWidth="@dimen/grid_node_item_width"
+            app:layout_constraintBottom_toTopOf="@+id/actions_view"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar"
+            tools:listitem="@layout/item_folder_content" />
+
+        <mega.privacy.android.app.components.scrollBar.FastScroller
+            android:id="@+id/fastscroll"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/list" />
+
+        <View
+            android:id="@+id/actions_view"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Button
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:text="@string/action_add"
+            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/cancel_button"
+            style="@style/Widget.Mega.Button.Transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/general_cancel"
+            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
+            app:layout_constraintEnd_toStartOf="@id/upload_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

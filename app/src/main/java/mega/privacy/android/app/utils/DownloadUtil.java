@@ -59,7 +59,7 @@ public class DownloadUtil {
         if (node != null && isVideoFile(parentPath + "/" + node.getName()) && !node.hasThumbnail()) {
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
             try {
-                ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, node.getHandle());
+                ThumbnailUtils.createThumbnailVideo(context, localPath, megaApi, node.getHandle());
             } catch (Exception e) {
                 logWarning("Exception creating video thumbnail", e);
             }

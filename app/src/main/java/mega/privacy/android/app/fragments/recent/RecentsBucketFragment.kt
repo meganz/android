@@ -21,12 +21,13 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
@@ -34,7 +35,6 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.*
 
 @AndroidEntryPoint
 class RecentsBucketFragment : BaseFragment() {
@@ -148,19 +148,19 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupToolbar() {
-        (activity as ManagerActivityLollipop).setToolbarTitle(
+        (activity as ManagerActivity).setToolbarTitle(
             "${viewModel.items.value?.size} ${getString(R.string.general_files)}"
         )
     }
 
     private fun checkScroll() {
         val canScroll = listView.canScrollVertically(-1)
-        (activity as ManagerActivityLollipop).changeAppBarElevation(canScroll)
+        (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {
-        if (isImage) {
-            MimeTypeList.typeForName(it.name).isImage
+    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? = viewModel.items.value?.filter {
+        if (isImageViewerValid) {
+            it.isValidForImageViewer()
         } else {
             FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
         }
@@ -197,10 +197,10 @@ class RecentsBucketFragment : BaseFragment() {
                     context,
                     node,
                     {
-                        (requireActivity() as ManagerActivityLollipop).saveNodeByTap(it)
+                        (requireActivity() as ManagerActivity).saveNodeByTap(it)
                     },
-                    (requireActivity() as ManagerActivityLollipop),
-                    (requireActivity() as ManagerActivityLollipop)
+                    (requireActivity() as ManagerActivity),
+                    (requireActivity() as ManagerActivity)
                 )
             }
         }
@@ -211,7 +211,7 @@ class RecentsBucketFragment : BaseFragment() {
         node: MegaNode,
         localPath: String?
     ) {
-        val intent = Intent(context, PdfViewerActivityLollipop::class.java)
+        val intent = Intent(context, PdfViewerActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
         putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
@@ -219,10 +219,12 @@ class RecentsBucketFragment : BaseFragment() {
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
                 FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
-                    requireActivity() as ManagerActivityLollipop)
+                    requireActivity() as ManagerActivity
+                )
             } else {
                 FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
-                    requireActivity() as ManagerActivityLollipop)
+                    requireActivity() as ManagerActivity
+                )
             }
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
@@ -254,10 +256,12 @@ class RecentsBucketFragment : BaseFragment() {
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
                 FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
-                    requireActivity() as ManagerActivityLollipop)
+                    requireActivity() as ManagerActivity
+                )
             } else {
                 FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
-                    requireActivity() as ManagerActivityLollipop)
+                    requireActivity() as ManagerActivity
+                )
             }
 
         if (paramsSetSuccessfully) {
@@ -280,7 +284,7 @@ class RecentsBucketFragment : BaseFragment() {
             activity?.startActivity(intent)
             activity?.overridePendingTransition(0, 0)
         } else {
-            (activity as ManagerActivityLollipop).showSnackbar(
+            (activity as ManagerActivity).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE

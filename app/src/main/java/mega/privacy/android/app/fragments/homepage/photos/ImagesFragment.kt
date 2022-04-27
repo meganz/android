@@ -8,16 +8,12 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
-import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.fragments.managerFragments.cu.*
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import java.util.*
 
 @AndroidEntryPoint
 class ImagesFragment : BaseZoomFragment() {
@@ -39,8 +35,14 @@ class ImagesFragment : BaseZoomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showBottomNav = false
         initViewCreated()
         subscribeObservers()
+    }
+
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
     }
 
     private fun setupBinding() {
@@ -68,6 +70,9 @@ class ImagesFragment : BaseZoomFragment() {
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
+        if (isInActionMode()) {
+            mManagerActivity.updateCUViewTypes(View.GONE)
+        }
     }
 
     override fun handleZoomChange(zoom: Int, needReload: Boolean) {
@@ -86,13 +91,15 @@ class ImagesFragment : BaseZoomFragment() {
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
+            if (isGridAdapterInitialized()){
+                gridAdapter.submitList(it)
+            }
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
+            viewTypePanel.visibility = if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
-                viewTypePanel.visibility = View.GONE
             } else {
                 handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-                viewTypePanel.visibility = View.VISIBLE
             }
             removeSortByMenu()
         }
@@ -137,13 +144,13 @@ class ImagesFragment : BaseZoomFragment() {
     fun loadPhotos() = viewModel.loadPhotos(true)
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
+        if (activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInImagesPage) {
             super.onCreateOptionsMenu(menu, inflater)
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
+        if (activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInImagesPage) {
             return super.onOptionsItemSelected(item)
         }
         return true

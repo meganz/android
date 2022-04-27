@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -54,14 +53,14 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.PdfViewerActivity;
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.main.adapters.RotatableAdapter;
+import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
+import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
+import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -70,8 +69,8 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
-import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
+import static mega.privacy.android.app.main.ManagerActivity.*;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -91,7 +90,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected
     SortOrderManagement sortOrderManagement;
 
-    protected ManagerActivityLollipop managerActivity;
+    protected ManagerActivity managerActivity;
 
     protected ActionMode actionMode;
 
@@ -152,7 +151,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             MenuInflater inflater = actionMode.getMenuInflater();
             inflater.inflate(R.menu.cloud_storage_action, menu);
-            if (context instanceof ManagerActivityLollipop) {
+            if (context instanceof ManagerActivity) {
                 managerActivity.hideFabButton();
                 managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
@@ -271,7 +270,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         public void onDestroyActionMode(ActionMode actionMode) {
             clearSelections();
             adapter.setMultipleSelect(false);
-            if (context instanceof ManagerActivityLollipop) {
+            if (context instanceof ManagerActivity) {
                 managerActivity.showFabButton();
                 managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
@@ -288,8 +287,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        if (context instanceof ManagerActivityLollipop) {
-            managerActivity = (ManagerActivityLollipop) context;
+        if (context instanceof ManagerActivity) {
+            managerActivity = (ManagerActivity) context;
         }
     }
 
@@ -545,7 +544,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             manageURLNode(context, megaApi, node);
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
-            intent = new Intent(context, PdfViewerActivityLollipop.class);
+            intent = new Intent(context, PdfViewerActivity.class);
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
@@ -689,9 +688,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private int getCurrentSharesTab() {
         int tab = ERROR_TAB;
 
-        if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
+        if (MegaNodeBaseFragment.this instanceof IncomingSharesFragment) {
             tab = INCOMING_TAB;
-        } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
+        } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragment) {
             tab = OUTGOING_TAB;
         } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
             tab = LINKS_TAB;

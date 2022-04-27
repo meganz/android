@@ -4,9 +4,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -14,7 +15,7 @@ import nz.mega.sdk.MegaShare
 import java.util.*
 
 class ActionModeCallback constructor(
-    private val mainActivity: ManagerActivityLollipop,
+    private val mainActivity: ManagerActivity,
     private val viewModel: ActionModeViewModel,
     private val megaApi: MegaApiAndroid
 ) : ActionMode.Callback {
@@ -45,13 +46,7 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
-                if (selectedNodes.size == 1) {
-                    selectedNodes[0].let {
-                        if (it.handle != MegaApiJava.INVALID_HANDLE) {
-                            mainActivity.showGetLinkActivity(it.handle)
-                        }
-                    }
-                }
+                LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
             }
             R.id.cab_menu_remove_link -> {
                 LogUtil.logDebug("Remove public link option")
@@ -69,6 +64,9 @@ class ActionModeCallback constructor(
                 )
             }
             R.id.cab_menu_select_all -> viewModel.selectAll()
+            R.id.cab_menu_remove_favourites -> {
+                viewModel.removeFavourites(megaApi, selectedNodes)
+            }
         }
 
         return true
@@ -87,19 +85,26 @@ class ActionModeCallback constructor(
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
         val control = CloudStorageOptionControlUtil.Control()
+        val areAllNotTakenDown = selectedNodes.areAllNotTakenDown()
 
         menu?.findItem(R.id.cab_menu_share_link)?.title =
             StringResourcesUtils.getQuantityString(R.plurals.get_links, selectedNodes.size)
 
-        if (selectedNodes.size == 1
-            && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
-            == MegaError.API_OK
-        ) {
-            if (selectedNodes[0]!!.isExported) {
-                control.manageLink().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                control.removeLink().isVisible = true
-            } else {
-                control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+        if (areAllNotTakenDown) {
+            if (selectedNodes.size == 1
+                && megaApi.checkAccessErrorExtended(
+                    selectedNodes[0],
+                    MegaShare.ACCESS_OWNER
+                ).errorCode
+                == MegaError.API_OK
+            ) {
+                if (selectedNodes[0]!!.isExported) {
+                    control.manageLink().setVisible(true).showAsAction =
+                        MenuItem.SHOW_AS_ACTION_ALWAYS
+                    control.removeLink().isVisible = true
+                } else {
+                    control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                }
             }
         }
 
@@ -113,14 +118,36 @@ class ActionModeCallback constructor(
             control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
         }
 
-        control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-        control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+        if(areAllNotTakenDown) {
+            control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+            control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+            control.copy().isVisible = true
+        } else {
+            control.saveToDevice().isVisible = false
+        }
+
         control.move().isVisible = true
-        control.copy().isVisible = true
+
+        if (mainActivity.isInAlbumContentPage) {
+            manageVisibilityForFavouriteAlbum(control)
+        }
 
         CloudStorageOptionControlUtil.applyControl(menu, control)
 
         return true
+    }
+
+    /**
+     * Manage Visibility when in Favourite Album page
+     */
+    private fun manageVisibilityForFavouriteAlbum(control: CloudStorageOptionControlUtil.Control) {
+        control.link.isVisible = false
+        control.move().isVisible = false
+        control.copy().isVisible = false
+        control.trash().isVisible = false
+        control.removeLink().isVisible = false
+        control.manageLink().isVisible = false
+        control.removeFavourites().isVisible = true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {

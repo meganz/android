@@ -1,12 +1,30 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.databinding.ItemPlaylistBinding
 
 /**
- * Base class for ViewHolder for PlaylistItem.
+ * ViewHolder for playlist item.
+ * @param binding ItemPlaylistBinding
  */
-abstract class PlaylistViewHolder(binding: ViewDataBinding) :
+class PlaylistViewHolder(private val binding: ItemPlaylistBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    abstract fun bind(paused: Boolean, item: PlaylistItem, itemOperation: PlaylistItemOperation)
+
+    fun bind(
+        paused: Boolean,
+        item: PlaylistItem,
+        itemOperation: PlaylistItemOperation,
+        holder: PlaylistViewHolder,
+        position: Int
+    ) {
+        with(binding) {
+            this.item = item
+            highlight = item.type == PlaylistItem.TYPE_NEXT
+            this.paused = paused
+            this.itemOperation = itemOperation
+            this.holder = holder
+            this.position = position
+            name = PlaylistItem.getHeaderName(item.type, paused)
+        }
+    }
 }

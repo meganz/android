@@ -28,26 +28,28 @@ class OfflineListViewHolder(
     override fun bind(position: Int, node: OfflineNode) {
         super.bind(position, node)
 
-        binding.thumbnail.isVisible = true
+        binding.thumbnail.apply {
+            isVisible = true
 
-        if (node.selected) {
-            binding.root.setBackgroundColor(
-                ContextCompat.getColor(binding.root.context, R.color.new_multiselect_color)
-            )
-
-            binding.thumbnail.setActualImageResource(R.drawable.ic_select_folder)
-        } else {
-            binding.root.setBackgroundColor(Color.TRANSPARENT)
-
-            val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
-
-            if (node.thumbnail != null) {
-                binding.thumbnail.setImageURI(Uri.fromFile(node.thumbnail))
+            if (node.selected) {
+                hierarchy.setOverlayImage(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_select_folder
+                    )
+                )
             } else {
-                binding.thumbnail.setActualImageResource(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
-            }
+                hierarchy.setOverlayImage(null)
+                val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
 
-            binding.thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)
+                if (node.thumbnail != null) {
+                    setImageURI(Uri.fromFile(node.thumbnail))
+                } else {
+                    setActualImageResource(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
+                }
+
+                hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)
+            }
         }
 
         val res = binding.root.resources.displayMetrics

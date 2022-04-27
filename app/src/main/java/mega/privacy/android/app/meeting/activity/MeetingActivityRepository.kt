@@ -9,8 +9,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.utils.*
@@ -241,23 +241,24 @@ class MeetingActivityRepository @Inject constructor(
     }
 
     /**
-     * Give moderator permissions to a call participant.
+     * Change permissions to a call participant.
      *
      * @param chatId Chat ID of the call
      * @param userHandle user handle of a participant
+     * @param permission type of permit to be assigned to the participant
      * @param listener MegaChatRequestListenerInterface
      */
-    fun giveModeratorPermissions(
+    fun changeParticipantPermissions(
         chatId: Long,
         userHandle: Long,
+        permission: Int,
         listener: MegaChatRequestListenerInterface?
     ) {
         megaChatApi.updateChatPermissions(
             chatId,
             userHandle,
-            MegaChatRoom.PRIV_MODERATOR,
+            permission,
             listener
         )
     }
-
 }

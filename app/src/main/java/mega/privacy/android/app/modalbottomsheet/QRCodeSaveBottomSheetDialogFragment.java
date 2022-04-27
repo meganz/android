@@ -12,11 +12,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.main.FileStorageActivity;
+import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -25,6 +25,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -69,23 +70,28 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             }
 
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
-            Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
-            intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-            intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-            intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-            intent.putExtra("qrfile", true);
-            getActivity().startService(intent);
-            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+
+            if (getActivity() != null && info != null) {
+                Intent intent = new Intent(getActivity(), UploadService.class);
+                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                intent.putExtra("qrfile", true);
+                ContextCompat.startForegroundService(getActivity(), intent);
+                ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+            }
         } else {
-            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
+            if (getActivity() != null) {
+                ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
+            }
         }
     }
 
     private void saveToFileSystem() {
-        Intent intent = new Intent(getActivity(), FileStorageActivityLollipop.class);
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        Intent intent = new Intent(getActivity(), FileStorageActivity.class);
+        intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE, FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
+        intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
         ((QRCodeActivity) getActivity()).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 }

@@ -681,6 +681,7 @@ object CuSyncManager {
      */
     fun doInactiveHeartbeat(onFinish: () -> Unit) {
         val cuBackup = databaseHandler.cuBackup
+
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
@@ -723,6 +724,7 @@ object CuSyncManager {
             }
         }
     }
+
 
     /**
      * Check if CU process is running by checking if there's a non-null active send heartbeat task.

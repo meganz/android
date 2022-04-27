@@ -23,9 +23,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -387,9 +386,7 @@ class PasscodeLockActivity : BaseActivity() {
      * Sets the necessary listeners to all available views in passcode screen.
      */
     private fun setListeners() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.passcodeScrollView
-        ) { _, _, _, _, _ ->
+        binding.passcodeScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             binding.toolbarPasscode.elevation =
                 if (binding.passcodeScrollView.canScrollVertically(-1)) {
                     dp2px(4F, resources.displayMetrics).toFloat()
@@ -711,11 +708,7 @@ class PasscodeLockActivity : BaseActivity() {
                 .build()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
-        } else {
-            biometricPrompt.authenticate(promptInfo)
-        }
+        biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
     }
 
     /**

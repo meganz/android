@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -720,7 +720,7 @@
     <string name="cam_sync_wifi">Только Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi или мобильные данные</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Выполняются загрузки из камеры</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Остановить загрузки из камеры?</string>
@@ -1655,10 +1655,6 @@
     <string name="upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Загружен %1$d файл</item>
@@ -1672,13 +1668,6 @@
         <item quantity="few">%1$d файла уже загружены</item>
         <item quantity="many">%1$d файлов уже загружено</item>
         <item quantity="other">%1$d файла уже загружено</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Загружена %1$d папка</item>
-        <item quantity="few">Загружено %1$d папки</item>
-        <item quantity="many">Загружено %1$d папок</item>
-        <item quantity="other">Загружено %1$d папки</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Полный объём: %1$s</string>
@@ -1842,8 +1831,6 @@
     <string name="attachment_upload_panel_from_cloud">Из облачного диска</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Контакт</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Из устройства</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Удалить аккаунт</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2414,7 +2401,7 @@
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Выйти</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Ключ Восстановления</string>
+    <string name="recovery_key_bottom_sheet">Ключ восстановления</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Сохранить в файловую систему</string>
     <!-- Message shown when something has been copied to clipboard -->
@@ -2692,7 +2679,12 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Версии файлов</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">Версии файлов: %1$d, всего %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 версия файлов, занимающая %2$s</item>
+        <item quantity="few">%1$d версии файлов, занимающие %2$s</item>
+        <item quantity="many">%1$d версий файлов, занимающих %2$s</item>
+        <item quantity="other">%1$d версии файлов, занимающие %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Управление файлами</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2980,9 +2972,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Единоразово (год)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Ежемесячно[/A] %s/месяц</string>
+    <string name="billed_monthly_text">[A]Оплачивается ежемесячно[/A] %s/месяц</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Ежегодно[/A] %s/год</string>
+    <string name="billed_yearly_text">[A]Оплачивается ежегодно[/A] %s/год</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Отмена</string>
     <!-- dialog option continue in alert dialog -->
@@ -3320,8 +3312,8 @@
     <string name="not_allow_play_alert">Невозможно воспроизвести мультимедийные файлы во время разговора.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Текущий звонок</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s начал групповой звонок. Коснитесь, чтобы присоединиться.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Присоединиться к текущему групповому звонку.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Коснитесь, чтобы вернуться</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3663,7 +3655,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Ваши Учетные Данные</string>
+    <string name="label_your_credentials">Ваши учётные данные</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Сбросить</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3708,8 +3700,8 @@
     <string name="section_documents">Документы</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Новый чат</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Фотографий не найдено</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[A]Изображения[/A] [B]не[/B] [B]найдены[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Документы не найдены</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3975,8 +3967,6 @@
     <string name="same_item_name_warning">Уже есть элемент с таким именем</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Информация</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Сохранить в галерее</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Медиа</string>
     <!-- settings title of the Media section -->
@@ -3984,7 +3974,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Воспроизведение в фоновом режиме</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Нет[/B] [A]фотографий[/A]</string>
+    <string name="photos_empty">[A]Фотографии[/A] [B]не[/B] [B]найдены[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Автоматически загружать фото и видео на облачный диск.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -4020,8 +4010,6 @@
     <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Мы обновляем MEGAchat. Ваши звонки могут не быть соединены из-за несовместимости версий, пока все участники не обновят свои приложения MEGA до последней версии.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 файл уже скачан. 1 файл в ожидании.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4166,7 +4154,7 @@
     <string name="general_mic_mute">Ваш микрофон выключен</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Ваш микрофон включён</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Камера</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Ваша камера включена.</string>
@@ -4175,7 +4163,7 @@
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Удержать</string>
     <!-- General label for speaker -->
-    <string name="general_speaker">Докладчик</string>
+    <string name="general_speaker">Динамик</string>
     <!-- General label for headphone-->
     <string name="general_headphone">Наушники</string>
     <!-- General label for headphone on-->
@@ -4248,8 +4236,8 @@
     <string name="be_new_moderator">Вы новый модератор.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s начал встречу. Нажмите, чтобы присоединиться.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Присоединиться к текущей встрече.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA-встреча</string>
     <!-- Content of fourth tour screen -->
@@ -4324,4 +4312,171 @@
     <string name="disable_versioning_warning">Наша функция управления версиями файлов гарантирует, что мы сохраним старые копии ваших файлов, если вы замените их более новыми версиями. Если вы отключите управление версиями файлов, у вас больше не будет этой защиты; при замене старая копия будет потеряна.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Эта папка больше не существует.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Вы уже пригласили %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Приглашение успешно отправлено. Смотрите отправленные запросы.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Файл доступен локально</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Файл удалён из локальных</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Открыть ссылку</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Неверная ссылка на чат</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Открыть ссылку на чат</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Введите ссылку на чат</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Вставьте ссылку</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Недействительная ссылка на файл или папку</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Введите действительную ссылку на файл или папку</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Введите действительную ссылку на чат</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Вы вставили ссылку на чат</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Вы вставили ссылку на контакт</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Открыть ссылку на контакт</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Использовать мобильные данные для превью изображений с высоким разрешением</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предварительном просмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Вы меняете расположение папки резервного копирования по умолчанию. Из-за этого её может быть сложнее найти в будущем. Пожалуйста, запомните, где она находится, чтобы не потерять.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Перемещение этой папки изменяет место назначения одной или нескольких настроенных резервных копий и может иметь непредвиденные последствия. Резервное копирование будет отключено в целях вашей безопасности. Резервное копирование можно повторно включить с помощью настольного приложения MEGA. Хотите продолжить?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Вы удаляете папку с резервными копиями. Это удалит все созданные вами резервные копии. Вы уверены, что хотите это сделать?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Вы действительно хотите удалить папку резервного копирования и отключить связанное резервное копирование?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Перемещение папки «%1s»</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Перемещение папки «%1s» в корзину</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Перемещение папок резервных копий</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Перемещение папки резервных копий в корзину</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Отключить</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Переместить</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Пожалуйста, введите «%1s», чтобы продолжить</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Введённый текст не подходит</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Добавление элемента в папку «%1s»</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Настройка резервного копирования</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Чтобы элементы в папке резервного копирования автоматически синхронизировались с облаком MEGA, настройте его в настольном приложении.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Только чтение</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Эта папка доступна только для чтения. Поскольку это папка резервных копий, любые изменения её содержимого могут отключить резервное копирование.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Элементы в этой папке являются частью настроенной резервной копии и синхронизируются с локальной папкой. Выполнение этого действия нарушит синхронизацию и отключит резервное копирование. Резервное копирование можно повторно включить в настольном приложении MEGA. Вы действительно хотите продолжить?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Эти папки могут быть доступны только для чтения; это папки резервных копий, поэтому любые изменения их содержимого могут отключить резервное копирование.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Некоторые папки, которыми вы собираетесь поделиться, являются папками резервных копий и предназначены только для чтения. Продолжить?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d устройство</item>
+        <item quantity="few">%d устройства</item>
+        <item quantity="many">%d устройств</item>
+        <item quantity="other">%d устройства</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Ответить на звонок</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Выбор треков</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Загрузить файлы</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Загрузить папку</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Отменить загрузку?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Платёж</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Способы оплаты</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Продолжить</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Спасибо за вашу подписку %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">месячный Pro Lite</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">годовой Pro Lite</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">месячный Pro I</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">годовой Pro I</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">месячный Pro II</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">годовой Pro II</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">месячный Pro III</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">годовой Pro III</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Отменить загрузку</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Не отменять</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Удалить модератора</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Папка DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA загружает ваши изображения из галереи. Чтобы изменить место загрузки, перейдите в настройки загрузки из камеры.</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Оформить ещё одну подписку?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Оформить ещё одну подписку</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку в %1$s. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку в своей учётной записи iTunes. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку, зайдя в MEGA в настольном или мобильном веб-браузере. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Перейдите в «Настройки», чтобы предоставить MEGA разрешение на доступ к устройствам поблизости с помощью Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Мы не можем продолжить выставление счёта. Если вы используете клонированное приложение, попробуйте войти в MEGA без него. Если нет, попробуйте улучшить аккаунт через веб-браузер.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Подписка %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Активная подписка</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">У вас есть активная подписка MEGA от %1$s. Вам нужно отменить её отдельно в %2$s, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">У вас есть активная подписка MEGA от Apple. Вам нужно отменить её отдельно в своей учётной записи iTunes, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Открыть %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Остался один шаг перед удалением аккаунта. Ваш аккаунт и подписка будут удалены, и вы навсегда потеряете все данные, хранящиеся в облаке. Пожалуйста, введите пароль.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Временная шкала</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Альбомы</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Избранное</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Нет[/B] [A]избранного[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Удалить из избранного</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Формат файла не поддерживается. Не удаётся открыть файл.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Выбранная папка пуста. Нет файлов для загрузки.</string>
 </resources>

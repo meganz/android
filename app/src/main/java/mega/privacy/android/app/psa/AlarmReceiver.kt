@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.PowerManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
@@ -15,7 +14,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
 class AlarmReceiver : BroadcastReceiver() {
-    private val megaApi = MegaApplication.getInstance().megaApi
+    private val megaApi by lazy { MegaApplication.getInstance().megaApi }
 
     override fun onReceive(context: Context, intent: Intent) {
         wakeLock.acquire(30 * SECOND)  // The wakelock will be held for at most 30 Secs
@@ -49,12 +48,16 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val CHECK_PSA_INTENT = "android.intent.action.checking.psa"
 
         /** The wake lock being held while getting the PSA with the Url */
-        val wakeLock: PowerManager.WakeLock =
-            (MegaApplication.getInstance().getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")}
+        val wakeLock: PowerManager.WakeLock by lazy {
+            (MegaApplication.getInstance()
+                .getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")
+            }
+        }
+
 
         /** the callback being called when getting the PSA with the Url finished */
-        var callback : ((Psa) -> Unit)? = null
+        var callback: ((Psa) -> Unit)? = null
 
         /**
          * Cancel the alarm of timed checking the PSA
@@ -80,19 +83,11 @@ class AlarmReceiver : BroadcastReceiver() {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             /* fire the broadcast */
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    time,
-                    pendingIntent
-                )
-            } else {
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    time,
-                    pendingIntent
-                )
-            }
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                time,
+                pendingIntent
+            )
         }
 
         /** The pending intent to send a broadcast when firing the alarm */
@@ -106,7 +101,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     context,
                     0,
                     alarmIntent,
-                    PendingIntent.FLAG_CANCEL_CURRENT
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             }
     }

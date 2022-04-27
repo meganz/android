@@ -17,7 +17,8 @@
             android:ellipsize="marquee"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
+            android:theme="@style/ThemeOverlay.ColorControlSecondary"
+            android:text="@string/rate_the_app_panel"/>
 
         <CheckedTextView
             android:id="@+id/send_feedback"
@@ -27,7 +28,8 @@
             android:ellipsize="marquee"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
+            android:theme="@style/ThemeOverlay.ColorControlSecondary"
+            android:text="@string/send_feedback_panel"/>
 
     </LinearLayout>
 </ScrollView>

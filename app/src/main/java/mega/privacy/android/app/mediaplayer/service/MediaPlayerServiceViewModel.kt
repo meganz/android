@@ -14,6 +14,9 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -21,6 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -33,7 +37,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
@@ -54,7 +58,7 @@ class MediaPlayerServiceViewModel(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
+) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
     private val preferences = context.defaultSharedPreferences
@@ -102,6 +106,16 @@ class MediaPlayerServiceViewModel(
     private val playlistItems = ArrayList<PlaylistItem>()
     private val playlistItemsMap = HashMap<String, PlaylistItem>()
 
+    private var _isActionMode = MutableLiveData<Boolean>()
+    val isActionMode: LiveData<Boolean>
+        get() = _isActionMode
+
+    private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
+
+    private var _itemsSelectedCount = MutableLiveData<Int>()
+    val itemsSelectedCount: LiveData<Int>
+        get() = _itemsSelectedCount
+
     var playlistSearchQuery: String? = null
         set(value) {
             field = value
@@ -120,7 +134,10 @@ class MediaPlayerServiceViewModel(
     var paused = false
         set(value) {
             field = value
-            postPlaylistItems()
+            postPlaylistItems(false)
+            _mediaPlaybackState.update {
+                value
+            }
         }
 
     var audioPlayer = false
@@ -130,6 +147,15 @@ class MediaPlayerServiceViewModel(
 
     private var needStopStreamingServer = false
 
+    private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
+    private var playingPosition = 0
+
+    private var cancelToken: MegaCancelToken? = null
+
+    private var _mediaPlaybackState = MutableStateFlow(false)
+    val mediaPlaybackState: StateFlow<Boolean>
+        get() = _mediaPlaybackState
+
     init {
         compositeDisposable.add(
             createThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
@@ -138,7 +164,7 @@ class MediaPlayerServiceViewModel(
                     logErr("AudioPlayerServiceViewModel creatingThumbnailFinished")
                 )
         )
-
+        _itemsSelectedCount.value = 0
         megaApi.addTransferListener(this)
     }
 
@@ -589,18 +615,29 @@ class MediaPlayerServiceViewModel(
 
     private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
     }
 
     private fun buildPlaylistForVideos(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
+    }
+
+    override fun initNewSearch(): MegaCancelToken {
+        cancelSearch()
+        return MegaCancelToken.createInstance()
+    }
+
+    override fun cancelSearch() {
+        cancelToken?.cancel()
     }
 
     private fun buildPlaylistFromHandles(handles: List<Long>, firstPlayHandle: Long) {
@@ -740,7 +777,6 @@ class MediaPlayerServiceViewModel(
 
         if (mediaItems.isNotEmpty()) {
             _playerSource.postValue(Triple(mediaItems, firstPlayIndex, null))
-
             postPlaylistItems()
         }
 
@@ -772,21 +808,26 @@ class MediaPlayerServiceViewModel(
         _playingThumbnail.postValue(thumbnail)
     }
 
-    private fun postPlaylistItems() {
+    /**
+     * Get playlist from playlistItems
+     * @param isScroll whether scroll to the specific position
+     */
+    private fun postPlaylistItems(isScroll: Boolean = true) {
         logDebug("postPlaylistItems")
-
-        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems() }
+        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems(isScroll) }
             .subscribeOn(Schedulers.single())
             .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
     }
 
-    private fun doPostPlaylistItems() {
+    /**
+     * Get playlist from playlistItems
+     * @param isScroll whether scroll to the specific position
+     */
+    private fun doPostPlaylistItems(isScroll: Boolean = true) {
         logDebug("doPostPlaylistItems ${playlistItems.size} items")
-
         if (playlistItems.isEmpty()) {
             return
         }
-
         var playingIndex = 0
         for ((index, item) in playlistItems.withIndex()) {
             if (item.nodeHandle == playingHandle) {
@@ -794,7 +835,6 @@ class MediaPlayerServiceViewModel(
                 break
             }
         }
-
         val order = shuffleOrder
 
         val items: ArrayList<PlaylistItem>
@@ -827,43 +867,55 @@ class MediaPlayerServiceViewModel(
             filterPlaylistItems(items, searchQuery!!)
             return
         }
-
         for ((index, item) in items.withIndex()) {
             val type = when {
                 index < playingIndex -> PlaylistItem.TYPE_PREVIOUS
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
-            items[index] = item.finalizeItem(index, type)
+            items[index] =
+                item.finalizeItem(
+                    index = index,
+                    type = type,
+                    isSelected = item.isSelected,
+                    duration = item.duration,
+                    currentPosition = item.currentPosition
+                )
         }
 
         val hasPrevious = playingIndex > 0
         val hasNext = playingIndex < playlistItems.size - 1
 
-        var offset = 0
         var scrollPosition = playingIndex
 
         if (hasPrevious) {
-            items.add(0, PlaylistItem.headerItem(PlaylistItem.TYPE_PREVIOUS_HEADER))
-            offset++
-            scrollPosition++
+            items[0].headerIsVisible = true
         }
 
-        items.add(
-            playingIndex + offset,
-            PlaylistItem.headerItem(PlaylistItem.TYPE_PLAYING_HEADER, paused)
-        )
-        offset += 2
-
+        items[playingIndex].headerIsVisible = true
         if (hasNext) {
-            items.add(
-                playingIndex + offset,
-                PlaylistItem.headerItem(PlaylistItem.TYPE_NEXT_HEADER)
-            )
+            playingPosition = playingIndex
         }
-
         logDebug("doPostPlaylistItems post ${items.size} items")
+        if (!isScroll) {
+            scrollPosition = -1
+        }
         _playlist.postValue(Pair(items, scrollPosition))
+    }
+
+    /**
+     * Set the duration for playing item
+     * @param duration the duration of audio
+     * @param currentPosition the current position of audio
+     */
+    fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
+        playlistItems.filter {
+            it.nodeHandle == playingHandle
+        }.firstNotNullOfOrNull {
+            it.duration = duration
+            it.currentPosition = currentPosition
+        }
+        postPlaylistItems(false)
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
@@ -892,6 +944,7 @@ class MediaPlayerServiceViewModel(
             if (item.nodeHandle == handle) {
                 playlistItems.removeAt(index)
                 _mediaItemToRemove.value = index
+                playSourceChanged.removeAt(index)
                 if (playlistItems.isEmpty()) {
                     _playlist.value = Pair(emptyList(), 0)
                     _error.value = MegaError.API_ENOENT
@@ -902,6 +955,67 @@ class MediaPlayerServiceViewModel(
                 }
                 return
             }
+        }
+    }
+
+    /**
+     * Remove the selected items
+     */
+    fun removeItems() {
+        if (itemsSelectedMap.isNotEmpty()) {
+            initPlayerSourceChanged()
+            itemsSelectedMap.forEach {
+                removeItem(it.value.nodeHandle)
+            }
+            itemsSelectedMap.clear()
+            if (playlistItems.isNotEmpty()) {
+                updatePlaySource()
+            }
+            _itemsSelectedCount.value = itemsSelectedMap.size
+            _isActionMode.value = false
+        }
+    }
+
+    /**
+     * Saved or remove the selected items
+     * @param handle node handle of selected item
+     */
+    fun itemSelected(handle: Long) {
+        playlistItems.forEach {
+            if (it.nodeHandle == handle) {
+                it.isSelected = !it.isSelected
+                if (it.isSelected) {
+                    itemsSelectedMap[handle] = it
+                } else {
+                    itemsSelectedMap.remove(handle)
+                }
+                _itemsSelectedCount.value = itemsSelectedMap.size
+                // Refresh the playlist
+                postPlaylistItems(false)
+            }
+        }
+    }
+
+    /**
+     * Clear the all selections
+     */
+    fun clearSelections() {
+        playlistItems.forEach{
+            it.isSelected = false
+            itemsSelectedMap.clear()
+            _isActionMode.value = false
+            postPlaylistItems()
+        }
+    }
+
+    /**
+     * Set the action mode
+     * @param isActionMode whether the action mode is activated
+     */
+    fun setActionMode(isActionMode: Boolean) {
+        _isActionMode.value = isActionMode
+        if (isActionMode) {
+            postPlaylistItems(false)
         }
     }
 
@@ -984,10 +1098,67 @@ class MediaPlayerServiceViewModel(
     private fun getApi(type: Int) =
         if (type == FOLDER_LINK_ADAPTER && dbHandler.credentials == null) megaApiFolder else megaApi
 
+    /**
+     * Swap the items
+     * @param current the position of from item
+     * @param target the position of to item
+     */
+    fun swapItems(current: Int, target: Int) {
+        playlistItems.run {
+            Collections.swap(this, current, target)
+            // Keep the index for swap items to keep the play order is correct
+            val index = this[current].index
+            this[current].index = this[target].index
+            this[target].index = index
+        }
+        initPlayerSourceChanged()
+        // Swap the items of play source
+        Collections.swap(playSourceChanged, current, target)
+    }
+
+    /**
+     * Get the index from playlistItems to keep the play order is correct after reordered
+     * @param item clicked item
+     * @return the index of clicked item in playlistItems
+     */
+    fun getIndexFromPlaylistItems(item: PlaylistItem) : Int {
+        return playlistItems.indexOfFirst {
+            it.nodeName == item.nodeName
+        }
+    }
+
+    /**
+     * Updated the play source of exoplayer after reordered.
+     */
+    fun updatePlaySource(){
+        val newPlayerSource = mutableListOf<MediaItem>()
+        newPlayerSource.addAll(playSourceChanged)
+        _playerSource.value?.run {
+            _playerSource.value =
+                copy(first = newPlayerSource, second = playingPosition)
+            playSourceChanged.clear()
+        }
+    }
+
+    /**
+     * Get the position of playing item
+     * @return the position of playing item
+     */
+    fun getPlayingPosition(): Int {
+        return playingPosition
+    }
+
+    private fun initPlayerSourceChanged() {
+        if (playSourceChanged.isEmpty()) {
+            // Get the play source
+            _playerSource.value?.run {
+                playSourceChanged.addAll(first)
+            }
+        }
+    }
+
     override fun onShuffleChanged(newShuffle: ShuffleOrder) {
         shuffleOrder = newShuffle
-
-        postPlaylistItems()
     }
 
     override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {

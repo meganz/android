@@ -1,32 +1,25 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.content.Intent
 import android.os.Bundle
-import android.text.Spanned
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
-import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.upgradeAccount.PaymentActivity.Companion.UPGRADE_TYPE
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import nz.mega.sdk.MegaApiJava
 import java.util.*
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
-    private var displayedAccountType = INVALID_VALUE
+    companion object {
+        const val SUBSCRIPTION_FROM_ITUNES = 10
+        const val SUBSCRIPTION_FROM_ANDROID_PLATFORM = 11
+        const val SUBSCRIPTION_FROM_OTHER_PLATFORM = 12
+    }
 
-    private var upgradeAlert: AlertDialog? = null
-
-    private val purchaseResultObserver =
-        Observer<Pair<String, String>> { content -> showQueryPurchasesResult(content) }
+    private var subscriptionWarningDialog: VerticalLayoutButtonDialog? = null
 
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
@@ -38,21 +31,13 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        displayedAccountType = intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
-
         setupView()
         setupObservers()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        upgradeAlert?.dismiss()
-
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
-            .removeObserver(purchaseResultObserver as Observer<Any>)
+        subscriptionWarningDialog?.dismiss()
     }
 
     override fun onBackPressed() {
@@ -71,16 +56,15 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     }
 
     private fun setupObservers() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
-            .observeForever(purchaseResultObserver as Observer<Any>)
-    }
+        viewModel.onUpgradeClick().observe(this) { upgradeType ->
+            startActivity(
+                Intent(this, PaymentActivity::class.java).putExtra(UPGRADE_TYPE, upgradeType)
+            )
+        }
+        viewModel.onUpgradeClickWithSubscription().observe(this) { warning ->
+            if (warning == null) return@observe
 
-    override fun setPricingInfo() {
-        super.setPricingInfo()
-
-        if (displayedAccountType != INVALID_VALUE) {
-            onUpgradeClick(displayedAccountType)
+            showSubscriptionDialog(warning.first, warning.second)
         }
     }
 
@@ -159,278 +143,61 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
      * @param upgradeType Selected payment plan.
      */
     override fun onUpgradeClick(upgradeType: Int) {
-        if (viewModel.getPaymentBitSet() == null) {
-            LogUtil.logWarning("PaymentBitSet Null")
-            return
-        }
-
-        binding.availablePaymentMethods.isVisible = true
-
-        var color = 0
-        var title = 0
-
-        when (upgradeType) {
-            PRO_LITE -> {
-                color = R.color.lite_account
-                title = R.string.prolite_account
-            }
-            PRO_I -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro1_account
-            }
-            PRO_II -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro2_account
-            }
-            PRO_III -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro3_account
-            }
-        }
-
-        binding.paymentTextPaymentTitle.apply {
-            setTextColor(ContextCompat.getColor(this@UpgradeAccountActivity, color))
-            text = StringResourcesUtils.getString(title)
-        }
-
-        binding.paymentMethodGoogleWalletLayer.isVisible = false
-
-        var textGoogleWallet = StringResourcesUtils.getString(BillingManagerImpl.PAY_METHOD_RES_ID)
-
-        try {
-            textGoogleWallet = textGoogleWallet.replace(
-                "[A]", "<font color='"
-                        + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
-                        + "'>"
-            )
-            textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>")
-        } catch (e: java.lang.Exception) {
-            LogUtil.logError("Exception formatting string", e)
-        }
-
-        binding.paymentMethodGoogleWalletText.text =
-            HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-        binding.paymentMethodGoogleWalletIcon.setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID)
-        binding.options.isVisible = false
-        binding.layoutButtons.isVisible = false
-
-        binding.cancelButton.setOnClickListener {
-            cancelClick()
-        }
-
-        binding.continueButton.apply {
-            setOnClickListener {
-                when (displayedAccountType) {
-                    PRO_I -> launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_I_MONTH
-                        else BillingManagerImpl.SKU_PRO_I_YEAR
-                    )
-                    PRO_II -> launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_II_MONTH
-                        else BillingManagerImpl.SKU_PRO_II_YEAR
-                    )
-                    PRO_III -> launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_III_MONTH
-                        else BillingManagerImpl.SKU_PRO_III_YEAR
-                    )
-                    PRO_LITE -> launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_LITE_MONTH
-                        else BillingManagerImpl.SKU_PRO_LITE_YEAR
-                    )
-                }
+        with(viewModel) {
+            if (!isBillingAvailable()) {
+                LogUtil.logWarning("Billing not available")
+                showBillingWarning()
+                return
             }
 
-            isEnabled = false
-
-            setTextColor(
-                ContextCompat.getColor(
-                    this@UpgradeAccountActivity,
-                    R.color.grey_700_026_grey_300_026
-                )
-            )
-        }
-
-        showPaymentMethods()
-        viewModel.refreshAccountInfo()
-
-        if (!viewModel.isInventoryFinished()) {
-            LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())")
-            binding.paymentMethodGoogleWallet.isVisible = false
-        }
-
-        binding.paymentMethodGoogleWalletIcon.isVisible = true
-        binding.semitransparentLayer.isVisible = true
-        window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_white_020)
-        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.white_dark_grey))
-        binding.toolbar.elevation = 0F
-        displayedAccountType = upgradeType
-        showDisplayedAccount()
-    }
-
-    private fun showPaymentMethods() {
-        viewModel.checkProductAccounts() ?: return
-        val paymentBitSet = viewModel.getPaymentBitSet()
-
-        if (paymentBitSet == null) {
-            LogUtil.logWarning("Not payment bit set received!!!")
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.no_available_payment_method)
-            binding.paymentMethodGoogleWallet.isVisible = false
-            return
-        }
-
-        if (!viewModel.isInventoryFinished()) {
-            LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())")
-            binding.paymentMethodGoogleWallet.isVisible = false
-        } else if (Util.isPaymentMethodAvailable(
-                paymentBitSet,
-                MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
-            )
-        ) {
-            binding.paymentMethodGoogleWallet.isVisible = true
-            binding.layoutButtons.isVisible = true
-            binding.options.isVisible = true
-
-            binding.continueButton.apply {
-                isEnabled = true
-                setTextColor(
-                    ColorUtils.getThemeColor(
-                        this@UpgradeAccountActivity,
-                        R.attr.colorSecondary
-                    )
-                )
+            if (getPaymentBitSet() == null) {
+                LogUtil.logWarning("PaymentBitSet Null")
+                return
             }
 
-            binding.billedMonthly.isVisible = true
-            binding.billedYearly.isVisible = true
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.payment_method)
-        } else {
-            binding.paymentMethodGoogleWallet.isVisible = false
-            binding.layoutButtons.isVisible = false
-            binding.options.isVisible = false
-            binding.billedMonthly.isVisible = false
-            binding.billedYearly.isVisible = false
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.no_available_payment_method)
-        }
-    }
-
-    private fun showDisplayedAccount() {
-        val accounts = viewModel.checkProductAccounts() ?: return
-
-        for (i in accounts.indices) {
-            val account = accounts[i]
-
-            if (account.level == displayedAccountType) {
-                val textToShow: Spanned = viewModel.getPriceString(this, account, false)
-
-                if (account.months == 1) {
-                    binding.billedMonthly.text = textToShow
-                } else if (account.months == 12) {
-                    binding.billedYearly.text = textToShow
-                }
-            }
-        }
-
-        when (displayedAccountType) {
-            PRO_I -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_II -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_III -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_LITE -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
+            refreshAccountInfo()
+            subscriptionCheck(upgradeType)
         }
     }
 
     /**
-     * Shows the result of a purchase as an alert.
-     *
-     * @param content First String to show as title alert, second String to show as message alert.
+     * Show the existing subscription dialog
+     * @param upgradeType upgrade type
+     * @param subscriptionMethod SubscriptionMethod
      */
-    private fun showQueryPurchasesResult(content: Pair<String, String>?) {
-        if (content == null) {
-            return
+    private fun showSubscriptionDialog(upgradeType: Int, subscriptionMethod: SubscriptionMethod?) {
+        subscriptionMethod?.run {
+            subscriptionWarningDialog = VerticalLayoutButtonDialog(
+                context = this@UpgradeAccountActivity,
+                title = StringResourcesUtils.getString(R.string.title_existing_subscription),
+                message = when (platformType) {
+                    SUBSCRIPTION_FROM_ANDROID_PLATFORM -> {
+                        StringResourcesUtils.getString(
+                            R.string.message_subscription_from_android_platform,
+                            methodName
+                        )
+                    }
+                    SUBSCRIPTION_FROM_ITUNES -> {
+                        StringResourcesUtils.getString(R.string.message_subscription_from_itunes)
+                    }
+                    else -> {
+                        StringResourcesUtils.getString(R.string.message_subscription_from_other_platform)
+                    }
+                },
+                positiveButtonTitle = StringResourcesUtils.getString(R.string.button_buy_new_subscription),
+                onPositiveButtonClicked = {
+                    startActivity(
+                        Intent(this@UpgradeAccountActivity, PaymentActivity::class.java)
+                            .putExtra(UPGRADE_TYPE, upgradeType)
+                    )
+                    viewModel.dismissSubscriptionWarningClicked()
+                    it.dismiss()
+                },
+                onDismissClicked = {
+                    viewModel.dismissSubscriptionWarningClicked()
+                    it.dismiss()
+                }
+            ).apply { show() }
         }
-
-        upgradeAlert = MaterialAlertDialogBuilder(this)
-            .setTitle(content.first)
-            .setMessage(content.second)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok)) { _, _ ->
-                finish()
-            }
-            .show()
-    }
-
-    /**
-     * Method to check if monthly billing period has been selected
-     *
-     * @return True if monthly billing period has been selected or false otherwise.
-     */
-    private fun isMonthlyBillingPeriodSelected(): Boolean {
-        return binding.billingPeriod.checkedRadioButtonId == R.id.billed_monthly
     }
 }

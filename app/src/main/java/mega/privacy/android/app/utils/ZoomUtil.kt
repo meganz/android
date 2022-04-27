@@ -28,6 +28,9 @@ object ZoomUtil {
     @JvmStatic
     var MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
 
+    @JvmStatic
+    var ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
+
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
     private const val SPAN_COUNT_PORTRAIT_OUT_1X = 5
@@ -36,9 +39,9 @@ object ZoomUtil {
 
     // Span count landscape
     private const val SPAN_COUNT_LANDSCAPE_OUT_2X = 24
-    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = 7
+    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = 9
     private const val SPAN_COUNT_LANDSCAPE_DEFAULT = 5
-    private const val SPAN_COUNT_LANDSCAPE_IN_1X = SPAN_COUNT_PORTRAIT_IN_1X
+    private const val SPAN_COUNT_LANDSCAPE_IN_1X = 2
 
     private fun getPortraitSpanCount(zoom: Int) = when (zoom) {
         ZOOM_IN_1X -> SPAN_COUNT_PORTRAIT_IN_1X
@@ -82,13 +85,13 @@ object ZoomUtil {
     }
 
     fun getSelectedFrameWidth(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
         else -> 0
     }
 
     fun getSelectedFrameMargin(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0
     }
@@ -108,19 +111,25 @@ object ZoomUtil {
         }
     }
 
-    fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int) =
-            if (zoom == ZOOM_IN_1X) {
-                outMetrics.widthPixels
-            } else {
-                ((outMetrics.widthPixels - getMargin(
-                        context,
-                        zoom
-                ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
-            }
+    fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int, isPortrait: Boolean) =
+        if (zoom == ZOOM_IN_1X && isPortrait) {
+            outMetrics.widthPixels
+        } else if (zoom == ZOOM_IN_1X) {
+            (outMetrics.widthPixels - getMargin(
+                context,
+                zoom
+            ) * spanCount * 2) / spanCount
+        } else {
+            ((outMetrics.widthPixels - getMargin(
+                context,
+                zoom
+            ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
+        }
 
     fun resetZoomLevel() {
         PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
         IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
         MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
+        ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
     }
 }

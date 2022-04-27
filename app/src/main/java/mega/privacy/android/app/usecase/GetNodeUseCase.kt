@@ -11,11 +11,13 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -88,10 +90,6 @@ class GetNodeUseCase @Inject constructor(
         Single.fromCallable {
             requireNotNull(node)
 
-            val nodeSizeText = Util.getSizeString(node.size)
-            val nodeDateText = TimeUtils.formatLongDateTime(node.getLastAvailableTime())
-            val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-
             var hasReadAccess = false
             var hasReadWriteAccess = false
             var hasFullAccess = false
@@ -118,8 +116,8 @@ class GetNodeUseCase @Inject constructor(
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
-            val isMine = node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandle.toLongOrNull()
-            val isExternalNode = node.isPublic || node.isForeign || !isMine
+            val isMine = hasOwnerAccess || (node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary)
+            val isExternalNode = !isMine && (node.isPublic || node.isForeign)
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare
             var isFromRubbishBin = false
@@ -134,7 +132,6 @@ class GetNodeUseCase @Inject constructor(
             MegaNodeItem(
                 name = node.name,
                 handle = node.handle,
-                infoText = infoText,
                 hasReadAccess = hasReadAccess,
                 hasReadWriteAccess = hasReadWriteAccess,
                 hasFullAccess = hasFullAccess,
@@ -177,14 +174,9 @@ class GetNodeUseCase @Inject constructor(
             if (offlineNode != null) {
                 val file = OfflineUtils.getOfflineFile(context, offlineNode)
                 if (file.exists()) {
-                    val nodeSizeText = Util.getSizeString(offlineNode.getSize(context))
-                    val nodeDateText = TimeUtils.formatLongDateTime(offlineNode.getModificationDate(context))
-                    val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-
                     MegaNodeItem(
                         name = offlineNode.name,
                         handle = offlineNode.handle.toLong(),
-                        infoText = infoText,
                         hasReadAccess = true,
                         hasReadWriteAccess = false,
                         hasFullAccess = false,

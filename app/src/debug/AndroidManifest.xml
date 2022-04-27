@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="mega.privacy.android.app"
+    android:installLocation="internalOnly">
+
+
+    <application>
+        <activity android:name=".HiltTestActivity"
+            android:exported="false" >
+        </activity>
+    </application>
+
+</manifest>

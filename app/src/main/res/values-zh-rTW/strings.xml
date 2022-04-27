@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">只在WiFi連線</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi或行動網路</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">相機上傳正在進行中</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">您想停用相機上傳功能嗎？</string>
@@ -1586,10 +1586,6 @@
     <string name="upload_service_notification">正在上傳檔案：%2$d之%1$d個</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">正在上傳檔案：%2$d之%1$d個（已暫停）</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">正在上傳資料夾：%2$d之%1$d個</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">正在上傳資料夾：%2$d之%1$d個（已暫停）</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">已上傳%1$d個檔案</item>
@@ -1597,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">已上傳%1$d個檔案</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">已上傳%1$d個資料夾</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">總空間：%1$s</string>
@@ -1734,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">從雲端空間</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">聯絡人</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">從裝置</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">刪除帳戶</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2478,7 +2468,7 @@
     <!-- Indicates that can type a contact email -->
     <string name="contact_email">聯絡人email</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">您已加入此連絡人。</string>
+    <string name="contact_not_added">您已加入此聯絡人。</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">訊息格式無效</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2542,7 +2532,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">檔案版本</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d個檔案版本，總共%2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$d個檔案版本，總共%2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">檔案管理</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3113,8 +3105,8 @@
     <string name="not_allow_play_alert">正在通話時無法播放影音檔案。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">正在進行中的通話</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s發起了群組通話。點擊即可加入。</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">點擊加入當前群組通話。</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">點擊即可返回通話</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3489,8 +3481,8 @@
     <string name="section_documents">文件</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">新的對話</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">找不到照片</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]沒有[/B][A]圖片[/A][B]被找到[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">找不到文件</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3624,15 +3616,15 @@
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">共享密碼</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">連結: %1$s\n\n金鑰: %2$s</string>
+    <string name="share_link_with_key">連結：%1$s\n\n金鑰：%2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
-    <string name="share_link_with_password">連結: %1$s\n\n密碼: %2$s</string>
+    <string name="share_link_with_password">連結： %1$s\n\n密碼： %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA需要您的授權才能存取您的檔案進行共享。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">喜歡</string>
+    <string name="file_properties_favourite">收藏</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">移除喜歡</string>
+    <string name="file_properties_unfavourite">移除收藏</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">標籤</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
@@ -3735,8 +3727,6 @@
     <string name="same_item_name_warning">已經有一個項目使用相同名稱</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">資訊</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">儲存至相簿</string>
     <!-- settings of the Media section -->
     <string name="settings_media">媒體</string>
     <!-- settings title of the Media section -->
@@ -3744,7 +3734,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">在背景中播放</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]沒有[/B] [A]相片[/A]</string>
+    <string name="photos_empty">[B]沒有[/B][A]相片[/A][B]被找到[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">自動備份相片與影片到您的MEGA雲端硬碟。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3777,8 +3767,6 @@
     <string name="error_share_owner_storage_quota">共享的擁有者已超出其空間配額。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由於接收者的儲存空間不足，您無法傳送此檔案。</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">我們正在升級MEGAchat。由於版本不相容，除非所有與會者將他們的MEGA應用程式更新至最新版本，否則您的通話可能無法接通。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1個檔案已下載。1個檔案待處理。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3899,7 +3887,7 @@
     <string name="general_mic_mute">您的麥克風已關閉</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">您的麥克風已開啟</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">相機</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">您的相機己開啟。</string>
@@ -3981,8 +3969,8 @@
     <string name="be_new_moderator">您是新的主持人。</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s發起一場會議。點擊加入。</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">點擊加入當前會議。</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA會議</string>
     <!-- Content of fourth tour screen -->
@@ -4057,4 +4045,168 @@
     <string name="disable_versioning_warning">我們的檔案版本管理功能確保當您用較新版本的檔案替換舊的版本時，我們仍保留您舊版本的檔案。如果您停用檔案版本管理功能，您將不再有此保護；當您用新的檔案替換舊檔案時，舊版本檔案將遺失。</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">此位置已不存在。</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">您已邀請過%1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">邀請發送成功。查看已發送的邀請。</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">檔案可離線存取</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">檔案已從離線存取移除</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">打開連結</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">無效的對話連結</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">開啟對話連結</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">輸入對話連結</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">貼上連結</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">無效的檔案或資料夾連結</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">請輸入有效的檔案或資料夾連結</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">請輸入有效的對話連結</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">您已貼上一個對話連結。</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">您已貼上一個聯絡人連結。</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">打開聯絡人連結</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度影像。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">您正在更改預設備份資料夾位置。這可能會影響您將來查找備份資料夾。所以請記住它的位置以便將來可以找到它。</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">移動此資料夾會更改一個或多個已設定備份的目的地，並可能導致不可預期情況。為了安全起見，備份將停止。您可以透過MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">您正在刪除您的備份資料夾。這將刪除您設定的所有備份。你確定要這麼做嗎？</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">您確定要刪除您的備份資料夾並且停用相關的備份嗎？</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">移動“%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">移動“%1s”至垃圾筒</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">移動備份資料夾</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">移動備份資料夾至垃圾筒</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">停用備份</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">移動備份</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">請輸入“%1s”確認此操作</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">輸入的文字不符</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">新增項目到“%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">設定備份</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">為確保加到您備份資料夾的這些項目有自動同步到MEGA雲端，請在MEGA桌面應用程式上進行設定。</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">僅能讀取</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">某些共享資料夾是備份資料夾而且只能讀取。您確定要繼續嗎？</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d個裝置</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">接聽來電</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">選擇曲目</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">上傳檔案</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">上傳資料夾</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">取消上傳？</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">付款</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">付款方式</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">繼續</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">感謝您訂閱%1$s！</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite 月方案</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite 年方案</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I 月方案</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I 年方案</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II 月方案</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II 年方案</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III 月方案</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III 年方案</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">取消上傳</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">不要取消</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">移除主持人</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM資料夾</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的照片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">購買新的訂閱？</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">購買新的訂閱？</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請透過%1$s來取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請從您的iTunes帳戶取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">請至設定授予MEGA使用藍牙連線存取您附近裝置的權限。</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">我們無法處理您的付款。如果您正在使用雙開應用程式，請嘗試不要使用它來登入MEGA。否則請透過網頁瀏覽器進行升級。</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s訂閱</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">現行的訂閱</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">您在Apple有一個現行的MEGA訂閱。您必須從您的iTunes帳戶中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">造訪%1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">這是刪除帳戶最後一個步驟。您的帳戶和訂閱都將被刪除，而且您將永久遺失所有儲存在雲端空間的資料。請在下方輸入您的密碼。</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">時間軸</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">相簿</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">收藏</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]沒有[/B][A]收藏[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">移除收藏</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">檔案格式不支援。無法開啟檔案。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">所選擇的資料夾是空的。沒有要上傳的檔案。</string>
 </resources>

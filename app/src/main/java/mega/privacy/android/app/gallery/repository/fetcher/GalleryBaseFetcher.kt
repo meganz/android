@@ -51,29 +51,9 @@ abstract class GalleryBaseFetcher(
     }
 
     private fun getPreviewFile(node: MegaNode) = File(
-        PreviewUtils.getPreviewFolder(context),
+        previewFolder,
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
-
-    /**
-     * Get the thumbnail of the file.
-     */
-    private fun getThumbnail(node: MegaNode): File? {
-        val thumbFile = getThumbnailFile(node)
-
-        return if (thumbFile.exists()) {
-            thumbFile
-        } else {
-            // Note down the nodes and going to get their thumbnails from the server
-            // as soon as the getGalleryItems finished. (Don't start the getting operation here
-            // for avoiding potential ConcurrentModification issue)
-            if (node.hasThumbnail()) {
-                getThumbnailNodes[node] = thumbFile.absolutePath
-            }
-
-            null
-        }
-    }
 
     /**
      * Get the preview of the file.
@@ -96,14 +76,16 @@ abstract class GalleryBaseFetcher(
     }
 
     /**
-     * Get all nodes items
+     * Get all nodes items.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
      */
-    suspend fun getGalleryItems() {
+    suspend fun getGalleryItems(cancelToken: MegaCancelToken) {
         var lastYearDate: LocalDate? = null
         var lastMonthDate: LocalDate? = null
         var lastDayDate: LocalDate? = null
 
-        for (node in getNodes()) {
+        for (node in getNodes(cancelToken)) {
             val thumbnail = if (zoom == ZoomUtil.ZOOM_IN_1X) {
                 getPreview(node)
             } else {
@@ -153,21 +135,20 @@ abstract class GalleryBaseFetcher(
                 }
             }
 
-
             val selected = selectedNodesMap[node.handle]?.selected ?: false
-            val mime = MimeTypeList.typeForName(node.name)
-            fileNodesMap[node.handle] = GalleryItem(
+            val galleryItem = GalleryItem(
                 node,
                 INVALID_POSITION,
                 INVALID_POSITION,
                 thumbnail,
-                if (mime.isImage) TYPE_IMAGE else TYPE_VIDEO,
+                if (node.duration == -1) TYPE_IMAGE else TYPE_VIDEO,
                 dateString,
                 null,
                 null,
                 selected,
                 true
             )
+            fileNodesMap[node.handle] = galleryItem
         }
 
         result.postValue(ArrayList(fileNodesMap.values))
@@ -247,6 +228,8 @@ abstract class GalleryBaseFetcher(
 
     /**
      * Sub class to implement their own get node method by their own strategy
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
      */
-    abstract fun getNodes(): List<MegaNode>
+    abstract fun getNodes(cancelToken: MegaCancelToken? = null): List<MegaNode>
 }

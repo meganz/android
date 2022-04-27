@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.main.FolderLinkActivity;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
@@ -34,8 +34,8 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-        } else if (requireActivity() instanceof FolderLinkActivityLollipop) {
-            node = ((FolderLinkActivityLollipop) requireActivity()).getSelectedNode();
+        } else if (requireActivity() instanceof FolderLinkActivity) {
+            node = ((FolderLinkActivity) requireActivity()).getSelectedNode();
         }
 
         return contentView;
@@ -89,11 +89,11 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         switch (v.getId()) {
 
             case R.id.option_download_layout:
-                ((FolderLinkActivityLollipop) requireActivity()).downloadNode();
+                ((FolderLinkActivity) requireActivity()).downloadNode();
                 break;
 
             case R.id.option_import_layout:
-                ((FolderLinkActivityLollipop) requireActivity()).importNode();
+                ((FolderLinkActivity) requireActivity()).importNode();
                 break;
 
         }

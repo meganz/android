@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -720,7 +720,7 @@
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi lub komórkowa transmisja danych</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Przesyłanie z kamery w toku</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Czy chcesz zatrzymać wysyłanie z aparatu?</string>
@@ -1655,10 +1655,6 @@
     <string name="upload_service_notification">Przesyłanie plików: %1$d z %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Przesyłanie plików: %1$d z %2$d (wstrzymane)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Przesyłanie folderów: %1$d z %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Przesyłanie folderów: %1$d z %2$d (wstrzymane)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Wgrano %1$d plik</item>
@@ -1672,13 +1668,6 @@
         <item quantity="few">%1$d plików już wgranych</item>
         <item quantity="many">%1$d plików już wgranych</item>
         <item quantity="other">%1$d plików już wgranych</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Wgrano %1$d katalog</item>
-        <item quantity="few">Wgrano %1$d katalogów</item>
-        <item quantity="many">Wgrano %1$d katalogów</item>
-        <item quantity="other">Wgrano %1$d katalogów</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Rozmiar: %1$s</string>
@@ -1842,8 +1831,6 @@
     <string name="attachment_upload_panel_from_cloud">Z dysku</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontakt</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Z urządzenia</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Usuń konto</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2168,7 +2155,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Wystąpił błąd i zaproszenie nie zostało wysłane.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generowanie kodu QR...</string>
+    <string name="generatin_qr">Generowanie kodu QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Skanowanie kodu QR</string>
     <!-- get the contact link and copy it -->
@@ -2692,7 +2679,12 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Wersje plików</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d wersje plików, łącznie w %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 wersja plików, co daje w sumie %2$s</item>
+        <item quantity="few">%1$d wersje plików, co daje w sumie %2$s</item>
+        <item quantity="many">%1$d wersje plików, co daje w sumie %2$s</item>
+        <item quantity="other">%1$d wersje plików, co daje w sumie %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Zarządzanie plikami</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2980,9 +2972,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Jednorazowo (rok)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Miesięcznie[/A] %s/miesiąc</string>
+    <string name="billed_monthly_text">[A]Rozliczane miesięcznie[/A] %s/miesiąc</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Rocznie[/A] %s/rok</string>
+    <string name="billed_yearly_text">[A]Rozliczane rocznie[/A] %s/rok</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Anuluj</string>
     <!-- dialog option continue in alert dialog -->
@@ -3320,8 +3312,8 @@
     <string name="not_allow_play_alert">Nie można odtwarzać plików multimedialnych w trakcie trwania połączenia.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Trwające połączenie</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s rozpoczął połączenie grupowe. Stuknij, aby dołączyć.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Kliknij , aby dołączyć do bieżącego połączenia grupowego.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Kliknij, aby powrócić do połączenia</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3708,8 +3700,8 @@
     <string name="section_documents">Dokumenty</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Nowy czat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Nie znaleziono żadnych zdjęć</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Nie[/B] [B]znaleziono[/B] [A]obrazów[/A]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Nie znaleziono dokumentów</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3908,7 +3900,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Twoja prywatność</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Używamy plików cookie i podobnych technologii (“pliki cookie”), aby zapewnić i poprawić jakość korzystania z naszych usług. Zaakceptuj używanie przez nas plików cookie od początku wizyty lub dostosuj pliki cookie w Ustawieniach plików cookie. Przeczytaj więcej w naszej [A]Polityce plików cookie[/A].</string>
+    <string name="dialog_cookie_alert_message">Używamy plików cookie i podobnych technologii (\“pliki cookie\“), aby zapewnić i poprawić jakość korzystania z naszych usług. Zaakceptuj używanie przez nas plików cookie od początku wizyty lub dostosuj pliki cookie w Ustawieniach plików cookie. Przeczytaj więcej w naszej [A]Polityce plików cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ustawienia ciasteczek nie zapisane.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3975,8 +3967,6 @@
     <string name="same_item_name_warning">Istnieje już element o tej samej nazwie</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Zapisz do galerii</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -3984,7 +3974,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Otwarzanie w tle</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Brak[/B] [A]zdjęć[/A]</string>
+    <string name="photos_empty">[B]Nie[/B] [B]znaleziono[/B] [A]zdjęć[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatyczne tworzenie kopii zapasowych zdjęć i filmów na dysku w chmurze.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -4020,8 +4010,6 @@
     <string name="error_share_owner_storage_quota">Właściciel przekroczył limit pamięci.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Plik nie może zostać wysłany, ponieważ użytkownik docelowy przekroczył limit pamięci.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Aktualizujemy MEGAchat. Twoje rozmowy mogą nie być połączone z powodu niezgodności wersji, chyba że wszystkie strony zaktualizują swoje aplikacje MEGA do najnowszej wersji.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 plik już pobrany. 1 plik oczekujący na pobranie.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4116,7 +4104,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Grupy</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Opcje takie jak “Wyślij klucz deszyfrujący osobno”, “Ustaw datę ważności” czy “Ustaw ochronę hasłem” są dostępne tylko dla pojedynczych elementów.</string>
+    <string name="warning_get_links">Opcje takie jak “Wyślij klucz deszyfrujący osobno”, \“Ustaw datę ważności\“ czy “Ustaw ochronę hasłem” są dostępne tylko dla pojedynczych elementów.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Skopiuj wszystko</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
@@ -4166,7 +4154,7 @@
     <string name="general_mic_mute">Mikrofon jest wyłączony</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Mikrofon jest włączony</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Aparat</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Aparat jest włączony.</string>
@@ -4248,10 +4236,10 @@
     <string name="be_new_moderator">Jesteś nowym moderatorem.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Skopiowany link do spotkania.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s rozpoczął spotkanie. Kliknij , aby dołączyć.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Kliknij , aby dołączyć do bieżącego spotkania.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA spotkanie</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4324,4 +4312,171 @@
     <string name="disable_versioning_warning">Nasza funkcja wersjonowania plików zapewnia, że zachowamy starsze kopie Twoich plików, jeśli zastąpisz je nowszymi wersjami. Jeśli wyłączysz funkcję wersjonowania plików, nie będziesz już miał tej ochrony; stara kopia zostanie utracona, gdy ją zastąpisz.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Zaprosiłeś już %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Przenieś foldery kopii zapasowejZaproszenie zostało wysłane pomyślnie. Zobacz wysłane żądania.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Plik dostępny offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Plik usunięty z offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Otwórz link</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Nieprawidłowy link do czatu</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Otwórz link do czatu</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Wpisz link do czatu</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Wklej link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Nieprawidłowy link do pliku lub folderu</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Wprowadź prawidłowy link do pliku lub folderu</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Wprowadź prawidłowy link do czatu</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Wkleiłeś link do czatu.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Wkleiłeś link do kontaktu.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Otwórz link do kontaktu</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Wykorzystaj dane mobilne do podglądu obrazów w wysokiej rozdzielczości</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Zezwalaj na używanie danych mobilnych do ładowania obrazów o wysokiej rozdzielczości podczas podglądu. Jeśli wyłączone, oryginalny obraz zostanie załadowany tylko po powiększeniu.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Zmieniasz domyślną lokalizację folderu kopii zapasowych. Może to wpłynąć na możliwość znalezienia folderu kopii zapasowych w przyszłości. Zapamiętaj, gdzie on się znajduje, aby móc go znaleźć w przyszłości.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Przeniesienie tego folderu zmienia miejsce docelowe jednej lub więcej skonfigurowanych kopii zapasowych i może mieć niezamierzone skutki. Kopie zapasowe zostaną wyłączone dla Twojego bezpieczeństwa. Kopie zapasowe mogą być ponownie włączone za pomocą aplikacji MEGA Desktop App. Czy chcesz kontynuować?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Usuwasz folder kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Czy na pewno chcesz usunąć folder kopii zapasowej i wyłączyć powiązaną z nim kopię zapasową?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Przenieś “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Przenieś “%1s”&#160;do kosza</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Przenoszenie folderów kopii zapasowych</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Przenieś foldery kopii zapasowych do Kosza</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Wyłączenie tworzenia kopii zapasowej</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Przenieść kopię zapasową</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Proszę wpisać “%1s”, aby potwierdzić tę czynność</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">wprowadzony tekst nie pasuje</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Dodaj element do “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Skonfiguruj kopię zapasową</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Aby te elementy dodane do folderu kopii zapasowych były automatycznie synchronizowane z MEGA Cloud, należy je skonfigurować w aplikacji MEGA Desktop App.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Tylko odczyt</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Ten folder może być udostępniony tylko do odczytu, ponieważ jest to folder kopii zapasowej, wszelkie zmiany jego zawartości mogą uniemożliwić tworzenie kopii zapasowej.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Elementy znajdujące się w tym folderze są częścią skonfigurowanej kopii zapasowej i są synchronizowane z folderem lokalnym. Podjęcie tego działania spowoduje przerwanie synchronizacji i wyłączenie kopii zapasowej. Kopia zapasowa może być ponownie włączona w aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Te foldery mogą być udostępniane tylko do odczytu, ponieważ są to foldery kopii zapasowych, wszelkie zmiany w ich zawartości mogą uniemożliwić tworzenie kopii zapasowych.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Niektóre udostępnione foldery to foldery kopii zapasowych i tylko do odczytu. Czy chcesz kontynuować?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d urządzenie</item>
+        <item quantity="few">%d urządzenia</item>
+        <item quantity="many">%d urządzenia</item>
+        <item quantity="other">%d urządzenia</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Odbierz połączenie</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Wybrane ścieżki</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Wgraj pliki</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Wgraj katalog</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Anulować wgrywanie?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Płatność</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Metody płatności</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Kontynuuj</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Dziękujemy za Twoją subskrypcję %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite miesięcznie</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite rocznie</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I miesięcznie</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I rocznie</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II miesięcznie</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II rocznie</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III miesięcznie</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III rocznie</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Anuluj wgrywanie</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Nie anuluj</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Usuń moderatora</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Katalog DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA ładuje twoje zdjęcia z galerii. Aby zmienić lokalizację wysyłania, proszę przejść do ustawień wysyłania aparatu.</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Kupić nową subskrypcję?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Kup nową subskrypcję?</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję za pośrednictwem %1$s. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, należy anulować bieżącą subskrypcję na swoim koncie iTunes. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">Masz już wykupioną subskrypcję. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję, wchodząc na stronę MEGA w przeglądarce internetowej na komputerze lub w telefonie komórkowym. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Przejdź do Ustawień, aby udzielić MEGA pozwolenia na dostęp do pobliskich urządzeń poprzez Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Nie możemy kontynuować rozliczenia. Jeśli używasz podwójnej aplikacji, rozważ możliwość zalogowania się do MEGA bez niej. Jeśli nie, spróbuj dokonać aktualizacji przez przeglądarkę internetową.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subskrypcja</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Aktywna subskrypcja</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Masz aktywną subskrypcję MEGA z %1$s. Musisz ją anulować oddzielnie w %2$s, ponieważ MEGA nie może jej anulować za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Masz aktywną subskrypcję MEGA w Apple. Musisz ją anulować oddzielnie ze swojego konta iTunes, ponieważ MEGA nie jest w stanie anulować jej za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Zobacz %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Jest to ostatni krok do usunięcia konta. Zarówno Twoje konto, jak i subskrypcja zostaną usunięte, a Ty trwale utracisz wszystkie dane przechowywane w chmurze. Wprowadź swoje hasło poniżej.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Oś czasu</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albumy</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Ulubione</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Brak[/B] [A]ulubionych[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Usuń ulubione</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Wybrany folder jest pusty. Brak plików do przesłania.</string>
 </resources>

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.zippreview.ui
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -20,39 +21,69 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel.StatusItemClicked.*
 import mega.privacy.android.app.zippreview.domain.FileType
 import nz.mega.sdk.MegaApiJava
 import java.io.File
 import java.util.*
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 
 /**
- * Display the zip file content, replacement of ZipBrowserActivityLollipop.java
+ * Display the zip file content
  */
 class ZipBrowserActivity : PasscodeActivity() {
     companion object {
         const val EXTRA_PATH_ZIP = "PATH_ZIP"
         const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
-        const val EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN"
-        const val ACTION_OPEN_ZIP_FILE = "OPEN_ZIP_FILE"
         const val MEGA_DOWNLOADS = "MEGA Downloads/"
 
         const val URI_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider"
         const val TYPE_AUDIO = "audio/*"
 
         const val RATIO_RECYCLE_VIEW = 85.0f / 548
+
+        /**
+         * Start ZipBrowserActivity and check the zip file if is error format
+         * @param context Context
+         * @param zipFilePath zip file full path
+         */
+        fun start(context: Context, zipFilePath: String) {
+            if (zipFileFormatCheck(zipFilePath)) {
+                context.startActivity(
+                    Intent(context, ZipBrowserActivity::class.java).apply {
+                        putExtra(EXTRA_PATH_ZIP, zipFilePath)
+                    })
+            } else {
+                Util.showSnackbar(context, context.getString(R.string.message_zip_format_error))
+            }
+        }
+
+        /**
+         * check the zip file if is error format
+         * @param zipFilePath zip file full path
+         */
+        fun zipFileFormatCheck(zipFilePath: String): Boolean {
+            var zipFile: ZipFile? = null
+            try {
+                zipFile = ZipFile(zipFilePath)
+            } catch (exception: ZipException) {
+                zipFile?.close()
+                return false
+            }
+            zipFile.close()
+            return true
+        }
     }
 
     private lateinit var zipBrowserBinding: ActivityZipBrowserBinding
@@ -108,7 +139,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
             it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
-            it.addItemDecoration(SimpleDividerItemDecoration(this))
+            it.addItemDecoration(ChatDividerItemDecoration(this, outMetrics))
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()
@@ -258,7 +289,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
 
-        val intent = ImageViewerActivity.getIntentForSingleFile(this, file.toUri())
+        val intent = ImageViewerActivity.getIntentForFile(this, file.toUri(), true)
         DragToExitSupport.putThumbnailLocation(
             intent,
             recyclerView,
@@ -363,7 +394,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun MimeTypeList.pdfFileOpen(file: File, position: Int) {
         logDebug("Pdf file")
         val pdfIntent =
-            Intent(this@ZipBrowserActivity, PdfViewerActivityLollipop::class.java)
+            Intent(this@ZipBrowserActivity, PdfViewerActivity::class.java)
         pdfIntent.apply {
             putExtra(INTENT_EXTRA_KEY_INSIDE, true)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)

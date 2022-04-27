@@ -79,6 +79,15 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/remove"
+        android:orderInCategory="145"
+        android:icon="@drawable/ic_remove"
+        android:title="@string/general_remove"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/rename"
         android:orderInCategory="120"
         android:title="@string/context_rename"
@@ -101,4 +110,11 @@
         android:orderInCategory="135"
         android:title="@string/context_move_to_trash"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/select"
+        android:orderInCategory="140"
+        android:title="@string/general_select"
+        app:showAsAction="never"
+        android:visible="false"/>
 </menu>

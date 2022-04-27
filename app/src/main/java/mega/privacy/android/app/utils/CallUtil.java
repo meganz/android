@@ -32,15 +32,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.InviteContactActivity;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.InviteContactActivity;
+import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
@@ -339,6 +339,24 @@ public class CallUtil {
     }
 
     /**
+     * Method to know if I am participating in the call with another client
+     *
+     * @param call The MegaChatCall
+     * @return True, if I am participating. False, if not
+     */
+    public static boolean CheckIfIAmParticipatingWithAnotherClient(MegaChatCall call) {
+        MegaHandleList listPeers = call.getPeeridParticipants();
+        if (listPeers != null && listPeers.size() > 0) {
+            for (int i = 0; i < listPeers.size(); i++) {
+                if (listPeers.get(i) == MegaApplication.getInstance().getMegaApi().getMyUserHandleBinary())
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Method to know if I can join a one-to-one call
      *
      * @param chatId The chat id of the call I want to join
@@ -415,12 +433,12 @@ public class CallUtil {
 
         callInProgressLayout.setVisibility(View.VISIBLE);
 
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(true,
-                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+        if (context instanceof ManagerActivity) {
+            ((ManagerActivity) context).changeAppBarElevation(true,
+                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
         }
-        if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        if (context instanceof ContactInfoActivity) {
+            ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
     }
 
@@ -474,12 +492,12 @@ public class CallUtil {
     private static void hideCallInProgressLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
         callInProgressLayout.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, null);
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(false,
-                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+        if (context instanceof ManagerActivity) {
+            ((ManagerActivity) context).changeAppBarElevation(false,
+                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
         }
-        if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        if (context instanceof ContactInfoActivity) {
+            ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
     }
 
@@ -566,12 +584,12 @@ public class CallUtil {
         }
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
             callInProgressLayout.setVisibility(View.GONE);
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).changeAppBarElevation(false,
-                        ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+            if (context instanceof ManagerActivity) {
+                ((ManagerActivity) context).changeAppBarElevation(false,
+                        ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
             }
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+            if (context instanceof ContactInfoActivity) {
+                ((ContactInfoActivity) context).changeToolbarLayoutElevation();
             }
         }
     }
@@ -692,7 +710,7 @@ public class CallUtil {
      * Method for showing the appropriate string depending on the value of termination code for the call
      *
      * @param termCode The termination code
-     * @return The appropriate string
+     * @return The appropriate string corresponding to the termination code
      */
     public static String terminationCodeForCallToString(int termCode) {
         switch (termCode) {
@@ -706,6 +724,8 @@ public class CallUtil {
                 return "TERM_CODE_ERROR";
             case MegaChatCall.TERM_CODE_REJECT:
                 return "TERM_CODE_REJECT";
+            case MegaChatCall.TERM_CODE_NO_PARTICIPATE:
+                return "TERM_CODE_NO_PARTICIPATE";
             default:
                 return String.valueOf(termCode);
         }
@@ -743,8 +763,8 @@ public class CallUtil {
 
     public static boolean checkConnection(Context context) {
         if (!isOnline(context)) {
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            if (context instanceof ContactInfoActivity) {
+                ((ContactInfoActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             }
             return false;
         }
@@ -818,13 +838,13 @@ public class CallUtil {
                 case DialogInterface.BUTTON_POSITIVE:
                     logDebug("Open camera and lost the camera in the call");
                     disableLocalCamera();
-                    if (activity instanceof ChatActivityLollipop && action.equals(ACTION_TAKE_PICTURE)) {
-                        ((ChatActivityLollipop) activity).controlCamera();
+                    if (activity instanceof ChatActivity && action.equals(ACTION_TAKE_PICTURE)) {
+                        ((ChatActivity) activity).controlCamera();
                     }
-                    if (activity instanceof ManagerActivityLollipop) {
+                    if (activity instanceof ManagerActivity) {
                         switch (action) {
                             case ACTION_OPEN_QR:
-                                ((ManagerActivityLollipop) activity).openQR(openScanQR);
+                                ((ManagerActivity) activity).openQR(openScanQR);
                                 break;
                             case ACTION_TAKE_PICTURE:
                                 takePicture(activity, TAKE_PHOTO_CODE);
@@ -834,8 +854,8 @@ public class CallUtil {
                                 break;
                         }
                     }
-                    if (activity instanceof AddContactActivityLollipop && action.equals(ACTION_OPEN_QR)) {
-                        ((AddContactActivityLollipop) activity).initScanQR();
+                    if (activity instanceof AddContactActivity && action.equals(ACTION_OPEN_QR)) {
+                        ((AddContactActivity) activity).initScanQR();
                     }
                     if (activity instanceof InviteContactActivity && action.equals(ACTION_OPEN_QR)) {
                         ((InviteContactActivity) activity).initScanQR();
@@ -1036,15 +1056,15 @@ public class CallUtil {
         intentMeeting.setAction(MEETING_ACTION_IN);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
         intentMeeting.putExtra(MEETING_IS_GUEST, isGuest);
-        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     public static PendingIntent getPendingIntentMeetingRinging(Context context, long chatIdCallToAnswer, int requestCode) {
-        Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        Intent intentMeeting = new Intent(context.getApplicationContext(), MeetingActivity.class);
         intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_RINGING);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
-        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
@@ -1122,8 +1142,8 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            if (activity instanceof ManagerActivity) {
+                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
             }
             requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
@@ -1134,8 +1154,8 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            if (activity instanceof ManagerActivity) {
+                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
             }
             requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
@@ -1316,7 +1336,8 @@ public class CallUtil {
     public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
         logDebug("Chat ID of incoming call is " + incomingCallChatId);
         if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
-                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
+                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId) ||
+                !CallUtil.areNotificationsSettingsEnabled()) {
             logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
         }
@@ -1450,5 +1471,19 @@ public class CallUtil {
         }
 
         return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
+    }
+
+    /**
+     * Method to find out if device's notification settings are enabled
+     *
+     * @return True, if they are enabled. False, if they are not.
+     */
+    public static boolean areNotificationsSettingsEnabled() {
+        NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return notificationManager.areNotificationsEnabled();
+        }
+
+        return true;
     }
 }

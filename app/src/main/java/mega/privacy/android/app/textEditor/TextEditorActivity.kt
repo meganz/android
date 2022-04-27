@@ -23,7 +23,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
@@ -31,8 +30,8 @@ import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
@@ -237,7 +236,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
             return
         }
 
@@ -436,9 +435,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             setOnClickListener { viewModel.nextClicked() }
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.fileEditorScrollView
-        ) { _, _, _, _, _ ->
+        binding.fileEditorScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
             hideUI()
             animatePaginationUI()
@@ -612,8 +609,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun importNode() {
-        val intent = Intent(this, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
     }
 
@@ -679,7 +676,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             animateBottom(false, ANIMATION_DURATION)
         } else {
             currentUIState = STATE_SHOWN
-            binding.editFab.show()
+
+            if (viewModel.canShowEditFab()) {
+                binding.editFab.show()
+            }
+
             animateToolbar(true, ANIMATION_DURATION)
             animateBottom(true, ANIMATION_DURATION)
         }

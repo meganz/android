@@ -40,7 +40,7 @@ import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.*
+import mega.privacy.android.app.main.*
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
@@ -56,7 +56,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import javax.inject.Inject
-import java.util.*
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
@@ -483,20 +482,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                     val imageView: ImageView? = when (rvAdapter.getItemViewType(pos)) {
                         OfflineAdapter.TYPE_LIST -> {
-                            itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    binding.root.context,
-                                    R.color.new_multiselect_color
-                                )
-                            )
                             val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
                             val param = thumbnail.layoutParams as FrameLayout.LayoutParams
-                            param.width = Util.dp2px(
+                            param.width = dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_WIDTH,
                                 resources.displayMetrics
                             )
                             param.height = param.width
-                            param.marginStart = Util.dp2px(
+                            param.marginStart = dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
                                 resources.displayMetrics
                             )
@@ -542,14 +535,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         when {
             mime.isZip -> {
                 logDebug("MimeTypeList ZIP")
-                val intentZip = Intent(context, ZipBrowserActivity::class.java)
-                intentZip.action = ZipBrowserActivity.ACTION_OPEN_ZIP_FILE
-                intentZip.putExtra(
-                    ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN,
-                    viewModel.path
-                )
-                intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, file.absolutePath)
-                startActivity(intentZip)
+                ZipBrowserActivity.start(requireActivity(), file.path)
             }
             mime.isImage -> {
                 val handles = adapter!!.getOfflineNodes().map { it.handle.toLong() }.toLongArray()
@@ -597,7 +583,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 if (!setLocalIntentParams(
                         context, node.node, mediaIntent, file.absolutePath,
-                        false, requireActivity() as ManagerActivityLollipop
+                        false, requireActivity() as ManagerActivity
                     )
                 ) {
                     return
@@ -624,7 +610,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     val intentShare = Intent(Intent.ACTION_SEND)
                     if (setLocalIntentParams(
                             context, node.node, intentShare, file.absolutePath,
-                            false, requireActivity() as ManagerActivityLollipop
+                            false, requireActivity() as ManagerActivity
                         )
                     ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -638,7 +624,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             mime.isPdf -> {
                 logDebug("PDF file")
 
-                val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
+                val pdfIntent = Intent(context, PdfViewerActivity::class.java)
 
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
@@ -650,7 +636,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 if (setLocalIntentParams(
                         context, node.node, pdfIntent, file.absolutePath, false,
-                        requireActivity() as ManagerActivityLollipop
+                        requireActivity() as ManagerActivity
                     )
                 ) {
                     pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -682,7 +668,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (!setLocalIntentParams(
                 context, file.name, viewIntent, file.absolutePath, false,
-                requireActivity() as ManagerActivityLollipop
+                requireActivity() as ManagerActivity
             )
         ) {
             return
@@ -697,7 +683,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
             if (!setLocalIntentParams(
                     context, file.name, intentShare, file.absolutePath, false,
-                    requireActivity() as ManagerActivityLollipop
+                    requireActivity() as ManagerActivity
                 )
             ) {
                 return

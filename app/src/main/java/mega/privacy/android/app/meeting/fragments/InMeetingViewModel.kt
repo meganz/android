@@ -12,20 +12,28 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
+import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
@@ -33,10 +41,11 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -48,9 +57,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
-    private val inMeetingRepository: InMeetingRepository
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    private val inMeetingRepository: InMeetingRepository,
+    private val getCallUseCase: GetCallUseCase
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
+
+    /**
+     * Enum defining the type of call subtitle.
+     */
+    enum class SubtitleCallType{
+        TYPE_CONNECTING, TYPE_CALLING, TYPE_ESTABLISHED
+    }
+
+    /**
+     * Enum defining the type of another call.
+     */
+    enum class AnotherCallType{
+        TYPE_NO_CALL, TYPE_IN_PROGRESS, TYPE_ON_HOLD
+    }
 
     var status = InMeetingFragment.NOT_TYPE
 
@@ -63,8 +87,14 @@ class InMeetingViewModel @Inject constructor(
 
     private var haveConnection: Boolean = false
 
+    private var callInProgressDisposable: Disposable? = null
+    private var anotherCallInProgressDisposable: Disposable? = null
+
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
+
+    private val _showCallDuration = MutableStateFlow(false)
+    val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -76,10 +106,18 @@ class InMeetingViewModel @Inject constructor(
     private val _callLiveData = MutableLiveData<MegaChatCall?>(null)
     val callLiveData: LiveData<MegaChatCall?> = _callLiveData
 
+    // Call ID
+    private val _updateCallId = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
+    val updateCallId: StateFlow<Long> get() = _updateCallId
+
     // Chat title
     private val _chatTitle: MutableLiveData<String> =
         MutableLiveData<String>(" ")
     val chatTitle: LiveData<String> = _chatTitle
+
+    // Call subtitle
+    private val _updateCallSubtitle = MutableStateFlow(SubtitleCallType.TYPE_CONNECTING)
+    val updateCallSubtitle: StateFlow<SubtitleCallType> get() = _updateCallSubtitle
 
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
@@ -91,6 +129,17 @@ class InMeetingViewModel @Inject constructor(
     // List of visible participants in the meeting
     var visibleParticipants: MutableList<Participant> = mutableListOf()
 
+    private val _allowClickingOnToolbar = MutableStateFlow(false)
+    val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
+
+    // Another call banner
+    private val _updateAnotherCallBannerType = MutableStateFlow(AnotherCallType.TYPE_NO_CALL)
+    val updateAnotherCallBannerType: StateFlow<AnotherCallType> get() = _updateAnotherCallBannerType
+
+    // Another chat title
+    private val _anotherChatTitle = MutableStateFlow(" ")
+    val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -99,14 +148,23 @@ class InMeetingViewModel @Inject constructor(
         }
 
     private val updateCallStatusObserver =
-        Observer<MegaChatCall> {
-            if (isSameChatRoom(it.chatid)) {
-                checkPreviousReconnectingStatus(it.status)
-                checkReconnectingStatus(it.status)
-                previousState = it.status
-
+        Observer<MegaChatCall> { call ->
+            if (isSameChatRoom(call.chatid)) {
+                checkSubtitleToolbar(call.status, call.isOutgoing)
+                checkPreviousReconnectingStatus(call.status)
+                checkReconnectingStatus(call.status)
+                previousState = call.status
             }
         }
+
+    private val noOutgoingCallObserver = Observer<Long> {
+        if (isSameCall(it)) {
+            getCall()?.let { call ->
+                logDebug("The call is no longer an outgoing call")
+                checkSubtitleToolbar(call.status, call.isOutgoing)
+            }
+        }
+    }
 
     init {
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
@@ -114,6 +172,100 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(updateCallStatusObserver)
+
+        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
+            .observeForever(noOutgoingCallObserver)
+    }
+
+    /**
+     * Method to check the subtitle in the toolbar
+     *
+     * @param callStatus The current status of the call
+     * @param isOutgoingCall If the current call is an outgoing call
+     */
+    private fun checkSubtitleToolbar(callStatus: Int, isOutgoingCall: Boolean) {
+        when (callStatus) {
+            CALL_STATUS_CONNECTING -> {
+                _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
+            }
+            CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
+                getChat()?.let { chat ->
+                    if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CALLING
+                        _showCallDuration.value = false
+                    } else if (callStatus == CALL_STATUS_JOINING) {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
+                        _showCallDuration.value = false
+                    } else {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_ESTABLISHED
+                        _showCallDuration.value = true
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to get the duration of the call
+     */
+    fun getCallDuration(): Long = getCall()?.duration ?: INVALID_VALUE.toLong()
+
+    /**
+     * Method that controls whether the another call banner should be visible or not
+     */
+    private fun checkAnotherCallBanner() {
+        anotherCallInProgressDisposable?.dispose()
+
+        anotherCallInProgressDisposable = getCallUseCase.checkAnotherCall(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    if (it == MEGACHAT_INVALID_HANDLE) {
+                        _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                    } else {
+                        val call: MegaChatCall? = getCallUseCase.getMegaChatCall(it).blockingGet()
+                        if (call != null) {
+                            if (call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
+                                _updateAnotherCallBannerType.value = AnotherCallType.TYPE_ON_HOLD
+                            } else if (!call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
+                                _updateAnotherCallBannerType.value =
+                                    AnotherCallType.TYPE_IN_PROGRESS
+                            }
+
+                            inMeetingRepository.getChatRoom(it)?.let { chat ->
+                                _anotherChatTitle.value = getTitleChat(chat)
+                            }
+                        } else {
+                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                        }
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            ).addTo(composite)
+    }
+
+    /**
+     * Method that controls whether the toolbar should be clickable or not.
+     */
+    private fun checkToolbarClickability() {
+        if (!isOneToOneCall()) {
+            callInProgressDisposable?.dispose()
+
+            callInProgressDisposable = getCallUseCase.isThereAnInProgressCall(currentChatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        _allowClickingOnToolbar.value = it
+                    },
+                    onError = { error ->
+                        LogUtil.logError(error.stackTraceToString())
+                    }
+                ).addTo(composite)
+        }
     }
 
     /**
@@ -178,6 +330,13 @@ class InMeetingViewModel @Inject constructor(
         if (isSameChatRoom(chatId)) {
             _callLiveData.value = inMeetingRepository.getMeeting(chatId)
             _callLiveData.value?.let {
+                if(_updateCallId.value != it.callId){
+                    _updateCallId.value = it.callId
+                    checkSubtitleToolbar(it.status, it.isOutgoing)
+                    checkAnotherCallBanner()
+                    checkToolbarClickability()
+                }
+
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
                     previousState = it.status
                 }
@@ -232,7 +391,7 @@ class InMeetingViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun setChatId(chatId: Long) {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
+        if (chatId == MEGACHAT_INVALID_HANDLE || currentChatId == chatId)
             return
 
         currentChatId = chatId
@@ -475,18 +634,61 @@ class InMeetingViewModel @Inject constructor(
     fun updateParticipantsNameOrAvatar(peerId: Long, typeChange: Int): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == peerId) {
-                        when (typeChange) {
-                            NAME_CHANGE -> it.name = getParticipantFullName(peerId)
-                            AVATAR_CHANGE -> it.avatar = getAvatarBitmap(peerId)
-                        }
-                        listWithChanges.add(it)
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.peerId == peerId && typeChange == NAME_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(
+                            name = getParticipantFullName(peerId),
+                            avatar = getAvatarBitmap(peerId)
+                        )
                     }
+
+                    participant.peerId == peerId && typeChange == AVATAR_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(avatar = getAvatarBitmap(peerId))
+                    }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
+        }
+
+        return listWithChanges
+    }
+
+    /**
+     * Method that makes the necessary changes to the participant list when my own privileges have changed.
+     */
+    fun updateOwnPrivileges() {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map participant.copy(
+                    hasOptionsAllowed = shouldParticipantsOptionBeVisible(
+                        participant.isMe,
+                        participant.isGuest
+                    )
+                )
+            }?.toMutableList()
+        }
+    }
+
+    /**
+     * Method for updating participant privileges
+     *
+     * @return list of participants with changes
+     */
+    fun updateParticipantsPrivileges(): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.isModerator != isParticipantModerator(participant.peerId) -> {
+                        listWithChanges.add(participant)
+                        participant.copy(isModerator = isParticipantModerator(participant.peerId))
+                    }
+                    else -> participant
+                }
+            }?.toMutableList()
         }
 
         return listWithChanges
@@ -699,8 +901,8 @@ class InMeetingViewModel @Inject constructor(
                                     session.peerid
                                 )
                             )
-                            return true
                         }
+                        return true
                     }
                 }
             }
@@ -793,15 +995,23 @@ class InMeetingViewModel @Inject constructor(
      * @param peerId User handle of a participant
      */
     fun isParticipantModerator(peerId: Long): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)
-            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR } ?: false
+        if (isMe(peerId))
+            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        else
+            inMeetingRepository.getChatRoom(currentChatId)
+                ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR }
+                ?: false
 
     /**
      * Method to know if the participant is my contact
      *
      * @param peerId User handle of a participant
      */
-    private fun isMyContact(peerId: Long): Boolean = inMeetingRepository.isMyContact(peerId)
+    private fun isMyContact(peerId: Long): Boolean =
+        if (isMe(peerId))
+            true
+        else
+            inMeetingRepository.isMyContact(peerId)
 
     /**
      * Method to update whether a user is my contact or not
@@ -819,29 +1029,6 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    /**
-     * Method for updating participant privileges
-     *
-     * @return list of participants with changes
-     */
-    fun updateParticipantsPrivileges(): MutableSet<Participant> {
-        val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    val isModerator = isParticipantModerator(it.peerId)
-                    if (it.isModerator != isModerator) {
-                        it.isModerator = isModerator
-                        listWithChanges.add(it)
-                    }
-                }
-            }
-        }
-
-        return listWithChanges
     }
 
     /**
@@ -959,9 +1146,9 @@ class InMeetingViewModel @Inject constructor(
             }
 
             val isModerator = isParticipantModerator(session.peerid)
+            val name = getParticipantName(session.peerid)
             val isContact = isMyContact(session.peerid)
             val hasHiRes = needHiRes(status)
-            val name = getParticipantName(session.peerid)
             val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
             val email = inMeetingRepository.getEmailParticipant(
                 session.peerid,
@@ -987,7 +1174,8 @@ class InMeetingViewModel @Inject constructor(
                 hasHiRes,
                 null,
                 false,
-                isGuest
+                isGuest,
+                hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
             )
         }
 
@@ -1162,7 +1350,10 @@ class InMeetingViewModel @Inject constructor(
      * @return the name of a participant
      */
     private fun getParticipantName(peerId: Long): String =
-        inMeetingRepository.participantName(peerId) ?: " "
+        if (isMe(peerId))
+            inMeetingRepository.getMyFullName()
+        else
+            inMeetingRepository.participantName(peerId) ?: " "
 
     /**
      * Method that marks a participant as a non-speaker
@@ -1242,17 +1433,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isVideoOn != session.hasVideo()) {
-                    it.isVideoOn = session.hasVideo()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isVideoOn != session.hasVideo() -> {
+                    hasChanged = true
+                    participant.copy(isVideoOn = session.hasVideo())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1262,17 +1454,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteAudioFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isAudioOn != session.hasAudio()) {
-                    it.isAudioOn = session.hasAudio()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isAudioOn != session.hasAudio() -> {
+                    hasChanged = true
+                    participant.copy(isAudioOn = session.hasAudio())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1345,6 +1538,12 @@ class InMeetingViewModel @Inject constructor(
      */
     fun leaveMeeting() {
         _callLiveData.value?.let {
+            if(amIAGuest()){
+                LiveEventBus.get(
+                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
+                    Long::class.java
+                ).post(it.callId)
+            }
             inMeetingRepository.leaveMeeting(
                 it.callId,
                 HangChatCallListener(MegaApplication.getInstance(), this)
@@ -1647,6 +1846,9 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .removeObserver(updateCallStatusObserver)
+
+        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
+            .removeObserver(noOutgoingCallObserver)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
@@ -1758,14 +1960,20 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param audio local audio
      * @param video local video
-     * @return
+     * @return Me as a Participant
      */
-    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
-        inMeetingRepository.getMyInfo(
+    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
+        val participant = inMeetingRepository.getMyInfo(
             getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
             audio,
             video
         )
+        participant.hasOptionsAllowed =
+            shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
+
+        return participant
+    }
+
 
     /**
      * Determine if should hide or show the share link and invite button
@@ -1818,6 +2026,13 @@ class InMeetingViewModel @Inject constructor(
     fun amIAGuest(): Boolean = inMeetingRepository.amIAGuest()
 
     /**
+     * Determine if I am a moderator
+     *
+     * @return True, if I am a moderator. False if not
+     */
+    fun amIAModerator(): Boolean = getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+
+    /**
      * Determine if the participant has standard privileges
      *
      * @param peerId User handle of a participant
@@ -1866,13 +2081,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     override fun onCallHungUp(callId: Long) {
-        _callLiveData.value?.let {
-            if (it.callId == callId) {
-                logDebug("Current call hung up")
-                _callLiveData.value = null
-                currentChatId = MEGACHAT_INVALID_HANDLE
-            }
-        }
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
@@ -1880,14 +2088,14 @@ class InMeetingViewModel @Inject constructor(
             return
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == handler) {
-                        it.isGuest = false
+            participants.value = participants.value?.map { participant ->
+                return@map when (participant.peerId) {
+                    handler -> {
+                        participant.copy(isGuest = false)
                     }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
         }
     }
 
@@ -2097,25 +2305,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Perform the necessary actions when the call is over.
-     * Check if exists another call in progress or on hold
-     */
-    fun checkIfAnotherCallShouldBeShown(passcodeManagement: PasscodeManagement): Boolean {
-        getAnotherCall()?.let {
-            logDebug("Show another call")
-            CallUtil.openMeetingInProgress(
-                MegaApplication.getInstance().applicationContext,
-                it.chatid,
-                false,
-                passcodeManagement
-            )
-            return true
-        }
-
-        return false
-    }
-
-    /**
      * Method to know if local video is activated
      *
      * @return True, if it's on. False, if it's off
@@ -2136,5 +2325,26 @@ class InMeetingViewModel @Inject constructor(
             meetingActivity,
             MegaApplication.getInstance().megaApi
         )
+    }
+
+    /**
+     * Method that controls whether a participant's options (3 dots) should be enabled or not
+     *
+     * @param participantIsMe If the participant is me
+     * @param participantIsGuest If the participant is a guest
+     * @return True, if should be enabled. False, if not
+     */
+    private fun shouldParticipantsOptionBeVisible(
+        participantIsMe: Boolean,
+        participantIsGuest: Boolean
+    ): Boolean {
+        if ((!amIAModerator() && participantIsGuest) ||
+            (amIAGuest() && participantIsMe) ||
+            (!amIAModerator() && amIAGuest() && !participantIsMe)
+        ) {
+            return false
+        }
+
+        return true
     }
 }

@@ -3,26 +3,20 @@ package mega.privacy.android.app.exportRK
 import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity.Companion.WRITE_STORAGE_TO_SAVE_RK
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.isAndroid11OrUpper
-import mega.privacy.android.app.utils.Util.isOffline
 import nz.mega.sdk.MegaApiAndroid
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -114,60 +108,14 @@ class ExportRecoveryKeyViewModel @Inject constructor(
             return
         }
 
-        if (isAndroid11OrUpper()) {
-            val exportedRK = exportRK()
-
-            saveRKAction?.invoke(
-                when {
-                    exportedRK.isNullOrEmpty() -> GENERAL_ERROR
-                    saveTextOnContentUri(
-                        activity.contentResolver,
-                        data.data,
-                        exportedRK
-                    ) -> RK_EXPORTED
-                    else -> GENERAL_ERROR
-                }
-            )
-        } else {
-            val parentPath: String =
-                data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
-
-            saveRKOnChosenPath(
-                activity,
-                parentPath + File.separator + getRecoveryKeyFileName(),
-                data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
-            )
-        }
-    }
-
-    /**
-     * Saves the Recovery Key on chosen path.
-     *
-     * @param context         Current context.
-     * @param path            The selected location to save the file.
-     * @param sdCardUriString If the selected location is on SD card,
-     *                        need the uri to grant SD card write permission.
-     */
-    private fun saveRKOnChosenPath(context: Context, path: String, sdCardUriString: String?) {
-        if (isOffline(context)) {
-            return
-        }
-
-        if (thereIsNotEnoughFreeSpace(path)) {
-            saveRKAction?.invoke(ERROR_NO_SPACE)
-            return
-        }
-
-        val textRK = exportRK()
-
-        if (isTextEmpty(textRK)) {
-            saveRKAction?.invoke(GENERAL_ERROR)
-            return
-        }
+        val exportedRK = exportRK()
 
         saveRKAction?.invoke(
-            if (saveTextOnFile(context, textRK, path, sdCardUriString)) RK_EXPORTED
-            else GENERAL_ERROR
+            when {
+                exportedRK.isNullOrEmpty() -> GENERAL_ERROR
+                saveTextOnContentUri(activity.contentResolver, data.data, exportedRK) -> RK_EXPORTED
+                else -> GENERAL_ERROR
+            }
         )
     }
 }

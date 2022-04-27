@@ -39,7 +39,7 @@ class MoveNodeUseCase @Inject constructor(
                     if (error.errorCode == API_OK) {
                         emitter.onComplete()
                     } else {
-                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                        emitter.onError(error.toMegaException())
                     }
                 })
             )
@@ -77,7 +77,7 @@ class MoveNodeUseCase @Inject constructor(
                     move(node, parentNode).blockingSubscribeBy(onError = { error ->
                         errorCount++
 
-                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
+                        if (error is QuotaExceededMegaException) {
                             isForeignNode = megaApi.isForeignNode(parentNode.handle)
                         }
                     })
@@ -117,6 +117,7 @@ class MoveNodeUseCase @Inject constructor(
                     move(node, rubbishNode).blockingSubscribeBy(onError = {
                         errorCount++
                     })
+                    megaApi.disableExport(node);
                 }
             }
 

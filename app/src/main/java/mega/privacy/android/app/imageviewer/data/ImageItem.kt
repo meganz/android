@@ -1,36 +1,151 @@
 package mega.privacy.android.app.imageviewer.data
 
-import androidx.recyclerview.widget.DiffUtil
+import android.net.Uri
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 
 /**
  * Data object that encapsulates an item representing an Image.
- *
- * @property handle         Image node handle.
- * @property nodePublicLink Node public link.
- * @property chatRoomId     Node Chat Message Room Id.
- * @property chatMessageId  Node Chat Message Id.
- * @property nodeItem       Image node item.
- * @property imageResult    Image result containing each Image Uri.
- * @property isOffline      Is Offline node.
  */
-data class ImageItem constructor(
-    val handle: Long,
-    val nodePublicLink: String? = null,
-    val chatRoomId: Long? = null,
-    val chatMessageId: Long? = null,
-    val nodeItem: MegaNodeItem? = null,
-    val imageResult: ImageResult? = null,
-    val isOffline: Boolean = false
-) {
+sealed class ImageItem {
 
-    class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
-        override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem) =
-            oldItem.handle == newItem.handle
+    abstract val id: Long
+    abstract val name: String
+    abstract val infoText: String
+    abstract val nodeItem: MegaNodeItem?
+    abstract val imageResult: ImageResult?
 
-        override fun areContentsTheSame(oldItem: ImageItem, newItem: ImageItem) =
-            oldItem == newItem
-                    && oldItem.nodeItem == newItem.nodeItem
-                    && oldItem.imageResult == newItem.imageResult
-    }
+    /**
+     * Data object that encapsulates an item representing an Image from a MegaNode.
+     *
+     * @property handle         MegaNode handle
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class Node constructor(
+        val handle: Long,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String,
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null
+    ) : ImageItem()
+
+    /**
+     * Data object that encapsulates an item representing an Image from a MegaOffline.
+     *
+     * @property handle         MegaOffline handle
+     * @property fileUri        MegaOffline file uri
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class OfflineNode constructor(
+        val handle: Long,
+        val fileUri: Uri,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String,
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null,
+    ) : ImageItem()
+
+    /**
+     * Data object that encapsulates an item representing an Image from a Public MegaNode.
+     *
+     * @property handle         MegaNode handle
+     * @property nodePublicLink MegaNode public link
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class PublicNode constructor(
+        val handle: Long,
+        val nodePublicLink: String,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String,
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null
+    ) : ImageItem()
+
+    /**
+     * Data object that encapsulates an item representing an Image from a Chat MegaNode.
+     *
+     * @property handle         MegaNode handle
+     * @property chatMessageId  Chat Message Id
+     * @property chatRoomId     Chat Room Id
+     * @property isDeletable    Flag to check if chat node is deletable
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class ChatNode constructor(
+        val handle: Long,
+        val chatMessageId: Long,
+        val chatRoomId: Long,
+        val isDeletable: Boolean = false,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String,
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null
+    ) : ImageItem()
+
+    /**
+     * Data object that encapsulates an item representing an Image from a File.
+     *
+     * @property fileUri        File uri
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class File constructor(
+        val fileUri: Uri,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String,
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null
+    ) : ImageItem()
+
+    /**
+     * Get MegaNode handle when ImageItem has one.
+     *
+     * @return  MegaNode handle
+     */
+    fun getNodeHandle(): Long? =
+        when (this) {
+            is Node -> handle
+            is ChatNode -> handle
+            is PublicNode -> handle
+            is OfflineNode -> handle
+            else -> null
+        }
+
+    /**
+     * Get a copy of an existing ImageItem by replacing nodeItem or imageResult fields.
+     *
+     * @param nodeItem      NodeItem to be replaced
+     * @param imageResult   ImageResult to be replaced
+     * @return              ImageItem with updated fields
+     */
+    fun copy(nodeItem: MegaNodeItem? = null, imageResult: ImageResult? = null): ImageItem =
+        when (this) {
+            is Node -> copy(handle, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is OfflineNode -> copy(handle, fileUri, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is ChatNode -> copy(handle, chatMessageId, chatRoomId, isDeletable, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is PublicNode -> copy(handle, nodePublicLink, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is File -> copy(fileUri, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+        }
 }

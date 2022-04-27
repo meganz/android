@@ -12,7 +12,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.main.LoginActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -141,7 +141,7 @@ object ChangeApiServerUtil {
         preferences.edit().putInt(API_SERVER, getApiServerValue(apiServer))
             .apply()
 
-        val intent = Intent(activity, LoginActivityLollipop::class.java)
+        val intent = Intent(activity, LoginActivity::class.java)
             .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
             .setAction(ACTION_REFRESH_API_SERVER)
 

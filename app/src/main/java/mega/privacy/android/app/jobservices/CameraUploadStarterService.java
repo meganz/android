@@ -30,4 +30,5 @@ public class CameraUploadStarterService extends JobService {
         logDebug("onStopJob");
         return false;
     }
+
 }

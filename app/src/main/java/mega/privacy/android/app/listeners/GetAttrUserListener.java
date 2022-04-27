@@ -6,10 +6,10 @@ import android.content.Intent;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
+import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -55,7 +55,6 @@ public class GetAttrUserListener extends BaseListener {
     }
 
     /**
-
      * Constructor to init a request for check the USER_ATTR_AVATAR user's attribute
      * and updates the holder of the adapter.
      *
@@ -202,21 +201,21 @@ public class GetAttrUserListener extends BaseListener {
             return;
         }
 
-        if (context instanceof FileExplorerActivityLollipop) {
-            FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
+        if (context instanceof FileExplorerActivity) {
+            FileExplorerActivity fileExplorerActivity = (FileExplorerActivity) context;
             if (myChatFolderFound) {
-                fileExplorerActivityLollipop.setMyChatFilesFolder(myChatFolderNode);
-                fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
+                fileExplorerActivity.setMyChatFilesFolder(myChatFolderNode);
+                fileExplorerActivity.checkIfFilesExistsInMEGA();
             }
-        } else if (context instanceof ChatActivityLollipop) {
-            ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
+        } else if (context instanceof ChatActivity) {
+            ChatActivity chatActivity = (ChatActivity) context;
             if (myChatFolderFound) {
-                chatActivityLollipop.setMyChatFilesFolder(myChatFolderNode);
+                chatActivity.setMyChatFilesFolder(myChatFolderNode);
 
-                if (chatActivityLollipop.isForwardingFromNC()) {
-                    chatActivityLollipop.handleStoredData();
+                if (chatActivity.isForwardingFromNC()) {
+                    chatActivity.handleStoredData();
                 } else {
-                    chatActivityLollipop.proceedWithAction();
+                    chatActivity.proceedWithAction();
                 }
             }
         } else if (context instanceof NodeAttachmentHistoryActivity) {
@@ -234,8 +233,8 @@ public class GetAttrUserListener extends BaseListener {
      * @param request   result of the request
      */
     private void updateAvatar(MegaRequest request) {
-        if (context instanceof GroupChatInfoActivityLollipop) {
-            ((GroupChatInfoActivityLollipop) context).updateParticipantAvatar(holderPosition, request.getEmail());
+        if (context instanceof GroupChatInfoActivity) {
+            ((GroupChatInfoActivity) context).updateParticipantAvatar(holderPosition, request.getEmail());
         }
     }
 }

@@ -1,14 +1,36 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
+import static android.text.format.Formatter.formatShortFileSize;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_AUTO_PLAY_SWITCH;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CACHE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CLEAR_VERSIONS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_DAYS_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ENABLE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ENABLE_VERSIONS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logInfo;
+import static mega.privacy.android.app.utils.Util.isOffline;
+import static mega.privacy.android.app.utils.Util.isOnline;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import javax.inject.Inject;
 
@@ -19,19 +41,12 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
-import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
+import mega.privacy.android.app.main.tasks.ManageCacheTask;
+import mega.privacy.android.app.main.tasks.ManageOfflineTask;
+import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel;
+import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
-
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 @AndroidEntryPoint
 public class SettingsFileManagementFragment extends SettingsBaseFragment {
@@ -40,6 +55,8 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
     @Inject
     MyAccountInfo myAccountInfo;
+
+    private FilePreferencesViewModel viewModel;
 
     private final static String INITIAL_VALUE = "0";
     private Preference offlineFileManagement;
@@ -101,12 +118,6 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
         rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, myAccountInfo.getFormattedUsedRubbish()));
 
-        if (myAccountInfo.getNumVersions() == INVALID_VALUE) {
-            fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
-            getPreferenceScreen().removePreference(clearVersionsFileManagement);
-        } else {
-            setVersionsInfo();
-        }
 
         taskGetSizeCache();
         taskGetSizeOffline();
@@ -116,6 +127,31 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         if (savedInstanceState != null
                 && savedInstanceState.getBoolean(IS_DISABLE_VERSIONS_SHOWN, false)) {
             showWarningDisableVersions();
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(FilePreferencesViewModel.class);
+        viewModel.getFilePreferencesStateLiveData().observe(getViewLifecycleOwner(), this::observeState);
+    }
+
+    private void observeState(FilePreferencesState filePreferencesState) {
+        Integer versions = filePreferencesState.getNumberOfPreviousVersions();
+        if (versions == null) {
+            fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+            getPreferenceScreen().removePreference(clearVersionsFileManagement);
+        } else {
+            String size = formatShortFileSize(requireActivity(), filePreferencesState.getSizeOfPreviousVersionsInBytes());
+            String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, versions, versions, size);
+            fileVersionsFileManagement.setSummary(text);
+
+            if (versions > 0) {
+                getPreferenceScreen().addPreference(clearVersionsFileManagement);
+            } else {
+                getPreferenceScreen().removePreference(clearVersionsFileManagement);
+            }
         }
     }
 
@@ -202,23 +238,6 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         super.onResume();
     }
 
-    /**
-     * Method for updating version information.
-     */
-    private void setVersionsInfo() {
-        int numVersions = myAccountInfo.getNumVersions();
-        logDebug("Num versions: " + numVersions);
-        String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
-        String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, numVersions, numVersions, previousVersions);
-        logDebug("Previous versions: " + previousVersions);
-        fileVersionsFileManagement.setSummary(text);
-
-        if (numVersions > 0) {
-            getPreferenceScreen().addPreference(clearVersionsFileManagement);
-        } else {
-            getPreferenceScreen().removePreference(clearVersionsFileManagement);
-        }
-    }
 
     /**
      * Method for reset the version information.

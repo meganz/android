@@ -19,7 +19,6 @@ import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
@@ -99,9 +98,9 @@ class MyAccountFragment : Fragment(), Scrollable {
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollView
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         checkScroll()
 
@@ -309,7 +308,10 @@ class MyAccountFragment : Fragment(), Scrollable {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
-            setOnClickListener { findNavController().navigate(R.id.action_my_account_to_upgrade) }
+            setOnClickListener {
+                findNavController().navigate(R.id.action_my_account_to_upgrade)
+                viewModel.setOpenUpgradeFrom()
+            }
         }
 
         binding.accountTypeText.isVisible = true

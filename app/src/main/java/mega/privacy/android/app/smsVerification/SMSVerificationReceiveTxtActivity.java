@@ -36,10 +36,8 @@ import java.util.TimerTask;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -48,8 +46,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.main.LoginFragment.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {

@@ -18,11 +18,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.main.megachat.ChatItemPreferences;
+import mega.privacy.android.app.main.megachat.ChatSettings;
+import mega.privacy.android.app.main.megachat.NonContactInfo;
+import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.sync.Backup;
 import mega.privacy.android.app.sync.BackupToolsKt;
@@ -2123,6 +2123,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ "' OR " + KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_FAILED +"") + "'"
 				+ " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
 		return getCompletedTransfers(selectQuery);
+	}
+
+	/**
+	 * Removes the completed transfers which have cancelled or failed as state .
+	 */
+	public void removeFailedOrCancelledTransfers() {
+		String whereCause = KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_CANCELLED + "")
+				+ "' OR " + KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_FAILED + "") + "'";
+		db.delete(TABLE_COMPLETED_TRANSFERS, whereCause, null);
 	}
 
     /**

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -38,8 +39,9 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-open class MediaPlayerService : LifecycleService(), LifecycleObserver {
+open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @MegaApi
     @Inject
@@ -60,6 +62,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     private lateinit var trackSelector: DefaultTrackSelector
     lateinit var player: MediaMegaPlayer
         private set
+
+    private lateinit var exoPlayer: ExoPlayer
+
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
 
@@ -73,14 +78,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
-    private val resumePlayRunnable = object : Runnable {
-        override fun run() {
-            if (needPlayWhenReceiveResumeCommand) {
-                setPlayWhenReady(true)
-                needPlayWhenReceiveResumeCommand = false
-            }
+    private val resumePlayRunnable = Runnable {
+        if (needPlayWhenReceiveResumeCommand) {
+            setPlayWhenReady(true)
+            needPlayWhenReceiveResumeCommand = false
         }
-
     }
 
     private var audioManager: AudioManager? = null
@@ -98,6 +100,16 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 }
             }
         }
+
+    private val positionUpdateHandler = Handler()
+    private val positionUpdateRunnable = object : Runnable {
+        override fun run() {
+            val currentPosition = exoPlayer.currentPosition
+            // Up the frequency of refresh, keeping in sync with Exoplayer.
+            positionUpdateHandler.postDelayed(this, 500)
+            viewModel.setCurrentPositionAndDuration(exoPlayer.duration, currentPosition)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -118,7 +130,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
 
-        val exoPlayer = ExoPlayer.Builder(this, renderersFactory)
+        exoPlayer = ExoPlayer.Builder(this, renderersFactory)
             .setTrackSelector(trackSelector)
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
@@ -126,6 +138,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     val nodeName =
                         viewModel.getPlaylistItem(player.currentMediaItem?.mediaId)?.nodeName
                             ?: ""
+
+                    if (title.isNullOrEmpty() && artist.isNullOrEmpty()
+                        && album.isNullOrEmpty() && nodeName.isEmpty()
+                    ) {
+                        return@MetadataExtractor
+                    }
+
                     _metadata.value = Metadata(title, artist, album, nodeName)
 
                     playerNotificationManager?.invalidate()
@@ -142,6 +161,15 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                         if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
                             val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
                             _metadata.value = Metadata(null, null, null, nodeName)
+                        }
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        if (isPlaying) {
+                            positionUpdateHandler.post(positionUpdateRunnable)
+                        } else {
+                            positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                         }
                     }
 
@@ -187,6 +215,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
                     override fun onPlayerError(error: PlaybackException) {
                         viewModel.onPlayerError()
+                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                     }
                 })
 
@@ -220,12 +249,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 return meta.title ?: meta.nodeName
             }
 
+            @SuppressLint("UnspecifiedImmutableFlag")
             @Nullable
             override fun createCurrentContentIntent(player: Player): PendingIntent? {
                 val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
                 return PendingIntent.getActivity(
-                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             }
 
@@ -411,7 +441,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     override fun onDestroy() {
         super.onDestroy()
 
+        viewModel.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
+        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
 
         if (initialized) {
             if (audioManager != null) {
@@ -426,7 +458,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     fun mainPlayerUIClosed() {
-        if (!playing() || !viewModel.audioPlayer) {
+        if (!viewModel.audioPlayer) {
             stopAudioPlayer()
         }
     }
@@ -457,7 +489,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         viewModel.resetRetryState()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
@@ -465,7 +496,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
             setPlayWhenReady(false)
@@ -549,6 +579,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
             context.startService(audioPlayerIntent)
+        }
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event){
+            Lifecycle.Event.ON_START -> onMoveToForeground()
+            Lifecycle.Event.ON_STOP -> onMoveToBackground()
+            else -> return
         }
     }
 }

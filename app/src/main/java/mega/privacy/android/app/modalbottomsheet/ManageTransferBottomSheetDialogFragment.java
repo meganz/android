@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -20,7 +19,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
@@ -37,7 +36,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     private static final String TRANSFER_ID = "TRANSFER_ID";
     private static final int MARGIN_TRANSFER_TYPE_ICON_WITH_THUMBNAIL = -12;
 
-    private ManagerActivityLollipop managerActivity;
+    private ManagerActivity managerActivity;
 
     private AndroidCompletedTransfer transfer;
     private long handle;
@@ -49,7 +48,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         contentView = binding.getRoot();
         itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
-        managerActivity = (ManagerActivityLollipop) requireActivity();
+        managerActivity = (ManagerActivity) requireActivity();
 
         if (savedInstanceState == null) {
             transfer = managerActivity.getSelectedTransfer();
@@ -66,7 +65,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (transfer == null) return;
 
-        managerActivity = (ManagerActivityLollipop) getActivity();
+        managerActivity = (ManagerActivity) getActivity();
 
         ImageView thumbnail = contentView.findViewById(R.id.manage_transfer_thumbnail);
         ImageView type = contentView.findViewById(R.id.manage_transfer_small_icon);
@@ -182,7 +181,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                     break;
                 }
 
-                managerActivity.retryTransfer(transfer);
+                managerActivity.retrySingleTransfer(transfer);
                 break;
         }
 

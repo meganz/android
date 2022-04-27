@@ -10,7 +10,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
-import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listenAction
@@ -105,8 +105,15 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.makeModerator) {
             // Make moderator
-            sharedViewModel.giveModeratorPermissions(
-                participantItem.peerId
+            sharedViewModel.changeParticipantPermissions(
+                participantItem.peerId, MegaChatRoom.PRIV_MODERATOR
+            )
+        }
+
+        listenAction(binding.removeModerator) {
+            // Remove moderator
+            sharedViewModel.changeParticipantPermissions(
+                participantItem.peerId, MegaChatRoom.PRIV_STANDARD
             )
         }
 

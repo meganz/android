@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:key="general_preference_screen">
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_appearance"
+        android:title="@string/settings_appearance"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <androidx.preference.ListPreference
+            android:key="settings_appearance_color_theme"
+            android:title="@string/set_color_theme_label"
+            app:defaultValue="default"
+            android:defaultValue="default"
+            app:entries="@array/theme_list_array"
+            app:entryValues="@array/theme_entry_array"
+            app:useSimpleSummaryProvider="true"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_features"
+        android:title="@string/settings_features"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+        <androidx.preference.Preference
+            android:key="settings_features_camera_upload"
+            android:title="@string/section_photo_sync"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_features_chat"
+            android:title="@string/section_chat"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_storage"
+        android:title="@string/settings_storage"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <androidx.preference.Preference
+            android:key="settings_storage_file_management"
+            android:title="@string/settings_file_management_category"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_ui"
+        android:title="@string/user_interface_setting"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <Preference
+            android:defaultValue="default"
+            android:key="settings_start_screen"
+            android:title="@string/start_screen_setting"
+            android:summary="@string/home_section"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="settings_hide_recent_activity"
+            android:summary="@string/hide_recent_setting_context"
+            android:title="@string/hide_recent_setting"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_media"
+        android:title="@string/settings_media"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_audio_background_play_enabled"
+            android:summary="@string/settings_background_play_hint"
+            android:title="@string/settings_media_audio_files"
+            android:defaultValue="true"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_security"
+        android:title="@string/settings_security_options_title"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <androidx.preference.Preference
+            android:key="settings_recovery_key"
+            android:title="@string/settings_recovery_key_title"
+            android:summary="@string/settings_recovery_key_summary"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_passcode_lock"
+            android:title="@string/settings_passcode_lock_switch"
+            android:defaultValue="false"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_change_password"
+            android:title="@string/my_account_change_password"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_2fa_activated"
+            android:title="@string/settings_2fa"
+            android:summary="@string/setting_subtitle_2fa"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_qrcode_autoaccept"
+            android:title="@string/section_qr_code"
+            android:summary="@string/setting_subtitle_qrcode_autoccept"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:fragment="mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment"
+            android:key="settings_security_advanced"
+            android:title="@string/settings_advanced_features"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_help"
+        android:title="@string/settings_help"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+        <androidx.preference.Preference
+            android:key="settings_help_centre"
+            android:title="@string/settings_help_centre"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+        <androidx.preference.Preference
+            android:key="settings_help_send_feedback"
+            android:title="@string/settings_help_preference"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_about"
+        android:title="@string/settings_about"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+
+        <androidx.preference.Preference
+            android:key="settings_about_privacy_policy"
+            android:title="@string/settings_about_privacy_policy"
+            android:summary=""
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_cookie_policy"
+            android:title="@string/settings_about_cookie_policy"
+            android:summary=""
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_cookie"
+            android:title="@string/settings_about_cookie_settings"
+            android:summary=""
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_terms_of_service"
+            android:title="@string/settings_about_terms_of_service"
+            android:summary=""
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_code_link"
+            android:title="@string/settings_about_code_link_title"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_sdk_version"
+            android:title="@string/settings_about_sdk_version"
+            android:summary="@string/sdk_version"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_karere_version"
+            android:title="@string/settings_about_karere_version"
+            android:summary="@string/karere_version"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_app_version"
+            android:title="@string/settings_about_app_version"
+            android:summary="@string/app_version"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
+            android:key="settings_about_cancel_account"
+            android:layout="@layout/cancel_account_preferences"
+            android:title="@string/settings_delete_account"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
+</androidx.preference.PreferenceScreen>
