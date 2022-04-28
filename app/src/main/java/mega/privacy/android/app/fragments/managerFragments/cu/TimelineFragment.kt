@@ -232,9 +232,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             return
         }
 
-        if (!mManagerActivity.fromAlbumContent) {
-            mManagerActivity.updateCUViewTypes(View.VISIBLE)
-        }
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)

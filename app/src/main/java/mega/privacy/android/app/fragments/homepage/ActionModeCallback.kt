@@ -151,8 +151,8 @@ class ActionModeCallback constructor(
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-        viewModel.actionModeDestroy()
         viewModel.clearSelection()
+        viewModel.actionModeDestroy()
         mainActivity.changeAppBarElevation(false)
     }
 }
