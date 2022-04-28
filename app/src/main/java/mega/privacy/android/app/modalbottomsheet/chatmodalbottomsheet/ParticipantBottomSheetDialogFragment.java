@@ -231,7 +231,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         switch (v.getId()) {
             case R.id.contact_info_group_participants_chat_layout:
                 ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.start_chat_group_participants_chat_layout:
@@ -258,7 +257,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 Intent editProfile = new Intent(requireActivity(), ManagerActivity.class);
                 editProfile.setAction(ACTION_SHOW_MY_ACCOUNT);
                 startActivity(editProfile);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.leave_group_participants_chat_layout:
@@ -270,7 +268,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
         }
 
-        setStateBottomSheetBehaviorHidden();
+        dismissAllowingStateLoss();
     }
 
     @Override

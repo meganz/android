@@ -956,9 +956,14 @@ public class ContactFileListActivity extends PasscodeActivity
 			}
 
 			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaNode folderNode = megaApi.getNodeByHandle(request.getNodeHandle());
+				if (folderNode == null) {
+					return;
+				}
+
 				if (contactFileListFragment != null && contactFileListFragment.isVisible()) {
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created));
-					contactFileListFragment.setNodes();
+					contactFileListFragment.navigateToFolder(folderNode);
 				}
 			} else {
 				if (contactFileListFragment != null && contactFileListFragment.isVisible()) {

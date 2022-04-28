@@ -311,7 +311,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         disableLocalCamera()
         logDebug("Leave meeting")
         inMeetingViewModel.leaveMeeting()
-        finishActivity()
     }
 
     /**
@@ -320,9 +319,8 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     fun finishActivity() {
         if (inMeetingViewModel.amIAGuest()) {
             inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else if (!inMeetingViewModel.checkIfAnotherCallShouldBeShown(passcodeManagement)) {
-            logDebug("Finish meeting activity")
-            meetingActivity.finish()
+        } else {
+            sharedModel.clickEndCall()
         }
     }
 
