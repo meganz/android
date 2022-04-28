@@ -7,6 +7,8 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.domain.exception.EmptySearchException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
@@ -15,7 +17,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
 import java.io.File
-import java.io.FileNotFoundException
 import java.lang.NullPointerException
 import java.security.InvalidParameterException
 import java.util.*
@@ -44,7 +45,7 @@ class GetFolderContentUseCase @Inject constructor(
         Single.create { emitter ->
             val listFiles = currentFolder.document.listFiles()
             if (listFiles.isNullOrEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
             } else {
                 val folderContentList = mutableListOf<FolderContent.Data>()
 
@@ -73,7 +74,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             get(currentFolder).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(
                         onError = { error -> emitter.onError(error) },
@@ -179,7 +180,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<ArrayList<UploadFolderResult>> =
         Single.create { emitter ->
             if (folderItems == null) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -226,7 +227,7 @@ class GetFolderContentUseCase @Inject constructor(
 
             when {
                 emitter.isDisposed -> return@create
-                results.isEmpty() -> emitter.onError(FileNotFoundException("Empty folder"))
+                results.isEmpty() -> emitter.onError(EmptyFolderException())
                 else -> emitter.onSuccess(results)
             }
         }
@@ -253,7 +254,7 @@ class GetFolderContentUseCase @Inject constructor(
             }
 
             reorder(results, order, isList).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
             )
         }
@@ -274,7 +275,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
             } else {
                 val folders = ArrayList<FolderContent.Data>()
                 val files = ArrayList<FolderContent.Data>()
@@ -345,7 +346,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -377,7 +378,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content."))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -434,7 +435,7 @@ class GetFolderContentUseCase @Inject constructor(
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder content"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
@@ -467,7 +468,7 @@ class GetFolderContentUseCase @Inject constructor(
             val searchResults = mutableListOf<FolderContent.Data>()
 
             get(currentFolder).blockingSubscribeBy(
-                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onError = { error -> emitter.onError(error) },
                 onSuccess = { folderContentList ->
                     folderContentList.forEach { item ->
                         if (item.isFolder) {
@@ -486,7 +487,7 @@ class GetFolderContentUseCase @Inject constructor(
             )
 
             if (searchResults.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty search"))
+                emitter.onError(EmptySearchException())
             } else {
                 emitter.onSuccess(searchResults)
             }
@@ -512,7 +513,7 @@ class GetFolderContentUseCase @Inject constructor(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(
-                        onError = { emitter.onError(FileNotFoundException("Empty search")) },
+                        onError = { error -> emitter.onError(error) },
                         onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
                     )
                 })

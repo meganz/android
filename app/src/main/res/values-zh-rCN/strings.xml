@@ -579,7 +579,7 @@
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">您将取消订阅MEGA。如果我们可以做些什么以改变您的心意，请让我们知道。</string>
     <!-- hint cancel subscriptions dialog -->
-    <string name="hint_cancel_subscriptions">在这里输入反馈意见</string>
+    <string name="hint_cancel_subscriptions">请在这里输入您的反馈意见</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">发送</string>
     <!-- confirmation cancel subscriptions dialog -->
@@ -1895,9 +1895,9 @@
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">发送反馈</string>
     <!-- mail subject -->
-    <string name="setting_feedback_subject">安卓反馈</string>
+    <string name="setting_feedback_subject">安卓反馈建议</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">请在此处提供您的反馈：</string>
+    <string name="setting_feedback_body">请在此处提供您的反馈意见：</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">设备型号</string>
     <!-- mail body -->
@@ -1975,7 +1975,7 @@
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">是的，评价应用程序</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">无发送反馈</string>
+    <string name="send_feedback_panel">不喜欢，我要发送反馈</string>
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">高级选项</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
@@ -3740,15 +3740,15 @@
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">全部</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
-    <string name="days_view_button">天</string>
+    <string name="days_view_button">日</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <string name="cu_month_year_date">%2$s[B]%1$s[/B]</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <string name="cu_day_month_year_date">%3$s[B]%2$s%1$s[/B]</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">正在上传，%1$d个文件待上传</item>
@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">您的麦克风已关闭</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">您的麦克风已开启</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">相机</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">您的摄像头已开启。</string>
@@ -4114,7 +4114,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">由于这是备份文件夹，只能以只读方式共享，对其内容的任何更改都可能会禁用备份。</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">此文件夹中的项目是配置备份的一部分并已同步到本地文件夹。执行此操作将中断同步并禁用备份。您可以通过MEGA桌面应用程序重新开启备份。您确定要继续吗？</string>
+    <string name="backup_add_item_text">此文件夹中的项目是配置备份的一部分并已同步到本地文件夹。执行此操作将中断同步并禁用备份。您可以在MEGA桌面应用程序中重新启用备份。您确定要继续吗？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">由于这些是备份文件夹，只能以只读方式共享，对其内容的任何更改都可能会禁用备份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4167,8 +4167,6 @@
     <string name="title_dcim_folder_dialog">DCIM文件夹</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA默认从图库上传您的照片。如需更改上传位置，请前往相机上传设置。</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">违反服务条款/使用限制政策</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">购买新订阅？</string>
     <!-- Text of buy new subscription button -->
@@ -4181,4 +4179,34 @@
     <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">前往“设置”并授予MEGA使用蓝牙访问附近设备的权限。</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">我们无法处理您的购买。如果您正在使用双应用程序，请尝试退出一个后登录MEGA。否则，请尝试通过网络浏览器进行升级。</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s订阅</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">当前的订阅</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">您当前在%1$s有一个MEGA订阅。您必须在%2$s中单独取消它，因为MEGA无法为您取消订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">您当前在Apple有一个MEGA订阅。您必须从iTunes账户中单独取消它，因为MEGA无法为您取消订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">访问%1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">这是删除帐户的最后一步。您的帐户和订阅都将被删除，您将永久丢失存储在云盘中的所有数据。请在下方输入您的密码。</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">时间线</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">相簿</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">收藏夹</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]无[/B][A]收藏[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">移除收藏</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">文件格式不支持。无法打开文件。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">所选文件夹为空。无可上传的文件。</string>
 </resources>

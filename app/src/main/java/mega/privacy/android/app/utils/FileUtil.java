@@ -60,7 +60,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -113,7 +112,7 @@ public class FileUtil {
     }
 
     public static boolean isLocalFile(MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        String fingerprintNode = megaApi.getFingerprint(node);
+        String fingerprintNode = node.getFingerprint();
         return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 
@@ -1178,32 +1177,13 @@ public class FileUtil {
     }
 
     /**
-     * Return file fake handle
-     *
-     * @param file  File to get fake handle from
-     * @return      Fake handle or INVALID_HANDLE if it couldn't be created
-     */
-    public static long getFileFakeHandle(File file) {
-        try {
-            int hashCode = file.hashCode();
-            if (hashCode > 0) {
-                return hashCode * -1;
-            } else {
-                return hashCode;
-            }
-        } catch (Exception ignored) {
-            return INVALID_HANDLE;
-        }
-    }
-
-    /**
      * Check if a specific file is valid for Image Viewer
      *
      * @param file  File to be checked
      * @return      True if it's valid, false otherwise
      */
     public static boolean isValidForImageViewer(File file) {
-        if (file.exists() && file.canRead()) {
+        if (file.isFile() && file.exists() && file.canRead()) {
             MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
             return mimeTypeList.isImage() || mimeTypeList.isGIF()
                     || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();

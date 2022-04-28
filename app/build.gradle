@@ -4,6 +4,7 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'com.google.firebase.appdistribution'
 
 // Get the MEGA SDK commit hash using Git
 def getSdkGitHash = { ->
@@ -27,6 +28,52 @@ def getKarereGitHash = { ->
     return stdout.toString().trim()
 }
 
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * For Android builds in CD pipeline, read the environment variable and
+ * add to standard version name, in order to distinguish versions on Firebase.
+ * For normal builds, use default version name format.
+ * @return app's version name
+ */
+def readVersionName() {
+    def versionNameTag = System.getenv('APK_VERSION_NAME_FOR_CD')
+    if (versionNameTag != null && !versionNameTag.isEmpty()) {
+        return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
+    } else {
+        return  "$rootProject.appVersion (${rootProject.versionCode})"
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get release note string from environment variable.
+ * @return release note to be shown on Firebase. If environment variable is not set,
+ *         return "Release Note not available"
+ */
+def readReleaseNotes() {
+    def releaseNote = System.getenv('RELEASE_NOTES_FOR_CD')
+    if (releaseNote != null && !releaseNote.isEmpty()) {
+        return releaseNote
+    } else {
+        return "Release Notes not available"
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester list from environment. Tester list should be
+ * comma-separated list of email address.
+ * @returnn tester list or "" if there is no tester
+ */
+String readTesters() {
+    String testers = System.getenv("TESTERS_FOR_CD")
+    print("testers = " + testers)
+    if (testers == null || testers.trim().isEmpty()) {
+        testers = ""
+    }
+    return testers
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -36,15 +83,13 @@ android {
         viewBinding = true
     }
 
-
-
     defaultConfig {
         applicationId "mega.privacy.android.app"
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
-        versionName "$rootProject.appVersion ($rootProject.versionCode)"
+        versionName readVersionName()
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -69,10 +114,10 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
-        test {
-//            Add this once Robolectric tests work
-//            java.srcDir 'src/sharedTest/java'
+        testDebug {
+            java.srcDir 'src/sharedTest/java'
         }
+
         androidTest {
             java.srcDir 'src/sharedTest/java'
         }
@@ -108,6 +153,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
@@ -137,7 +183,11 @@ android {
                 nativeSymbolUploadEnabled true
                 unstrippedNativeLibsDir 'src/main/obj/local'
             }
-
+            firebaseAppDistribution {
+                releaseNotes = readReleaseNotes()
+                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                testers = readTesters()
+            }
         }
         hms {
             dimension "service"
@@ -252,17 +302,12 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation files('src/main/libs/libwebrtc.jar')
+    implementation files('src/main/jni/megachat/webrtc/libwebrtc.jar')
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
     implementation "com.anggrayudi:storage:$simpleStorageVersion"
-
-    // (Java only)
-    implementation "androidx.work:work-runtime:$workVersion"
-    // Kotlin + coroutines
-    implementation "androidx.work:work-runtime-ktx:$workVersion"
 
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'
@@ -309,10 +354,18 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
     testImplementation "app.cash.turbine:turbine:$turbineVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
@@ -328,6 +381,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
 }
 

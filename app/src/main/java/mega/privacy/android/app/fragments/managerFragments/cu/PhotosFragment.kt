@@ -51,7 +51,11 @@ class PhotosFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
-        tabIndex = savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
+        tabIndex = if (mManagerActivity.fromAlbumContent) {
+            ALBUM_INDEX
+        } else {
+            savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
+        }
         setupPhotosViewPager()
         return binding.root
     }
@@ -82,21 +86,32 @@ class PhotosFragment : BaseFragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageSelected(position: Int) {
-                currentTab = childFragmentManager.findFragmentByTag("f$position") as? PhotosTabCallback
-                currentTab?.checkScroll()
+                currentTab =
+                    childFragmentManager.findFragmentByTag("f$position") as? PhotosTabCallback
+                currentTab?.let { currentTab->
+                    checkScroll()
 
-                if (currentTab is TimelineFragment) {
-                    tabIndex = TIMELINE_INDEX
-                    (currentTab as TimelineFragment).setHideBottomViewScrollBehaviour()
-
-                    if (!(currentTab as TimelineFragment).isEnablePhotosFragmentShown() && (currentTab as TimelineFragment).gridAdapterHasData()) {
-                        mManagerActivity.updateCUViewTypes(View.VISIBLE)
+                    if (currentTab is TimelineFragment) {
+                        tabIndex = TIMELINE_INDEX
+                        val timelineFragment = currentTab
+                        mManagerActivity.fromAlbumContent = false
+                        with (timelineFragment) {
+                            setHideBottomViewScrollBehaviour()
+                            updateOptionsButtons()
+                            if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
+                                mManagerActivity.updateCUViewTypes(View.GONE)
+                            } else {
+                                mManagerActivity.updateCUViewTypes(View.VISIBLE)
+                            }
+                        }
+                    } else {
+                        tabIndex = ALBUM_INDEX
+                        with(mManagerActivity) {
+                            updateCUViewTypes(View.GONE)
+                            enableHideBottomViewOnScroll(false)
+                            showBottomView()
+                        }
                     }
-                } else {
-                    tabIndex = ALBUM_INDEX
-                    mManagerActivity.updateCUViewTypes(View.GONE)
-                    mManagerActivity.enableHideBottomViewOnScroll(false)
-                    mManagerActivity.showBottomView()
                 }
             }
         })
@@ -130,10 +145,8 @@ class PhotosFragment : BaseFragment() {
      * Switch to AlbumFragment
      */
     fun switchToAlbum() {
-        viewPager.postDelayed({
-            viewPager.currentItem = ALBUM_INDEX
-            mManagerActivity.updateCUViewTypes(View.GONE)
-        }, 50)
+        viewPager.setCurrentItem(ALBUM_INDEX, false)
+        mManagerActivity.updateCUViewTypes(View.GONE)
     }
 
     /**
@@ -202,8 +215,8 @@ class PhotosFragment : BaseFragment() {
     /**
      * Check should show full info and options
      */
-    fun shouldShowFullInfoAndOptions():Boolean? {
-        return if (currentTab is TimelineFragment){
+    fun shouldShowFullInfoAndOptions(): Boolean? {
+        return if (currentTab is TimelineFragment) {
             (currentTab as? TimelineFragment)?.shouldShowFullInfoAndOptions()
         } else {
             false
@@ -222,5 +235,23 @@ class PhotosFragment : BaseFragment() {
      */
     fun loadPhotos() {
         (currentTab as? TimelineFragment)?.loadPhotos()
+    }
+
+    /**
+     * Should show or hide tabLayout in Timeline
+     *
+     * @param isVisible true, show; false hide
+     */
+    fun shouldShowTabLayout(isVisible: Boolean) {
+        binding.tabLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Should enable or disable viewPager2 in Timeline
+     *
+     * @param isEnabled true, enable; false disable
+     */
+    fun shouldEnableViewPager(isEnabled: Boolean) {
+        binding.viewPager.isUserInputEnabled = isEnabled
     }
 }

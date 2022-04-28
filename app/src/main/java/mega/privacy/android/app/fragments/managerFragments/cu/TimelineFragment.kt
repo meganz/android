@@ -232,7 +232,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             return
         }
 
-        mManagerActivity.updateCUViewTypes(View.VISIBLE)
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
@@ -288,36 +287,46 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
      * Subscribe Observers
      */
     private fun subscribeObservers() {
-        viewModel.items.observe(viewLifecycleOwner) {
+        viewModel.items.observe(viewLifecycleOwner) { galleryItems ->
             // On enable CU page, don't update layout and view.
             if (isEnablePhotosFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
             // Order changed.
             if (order != viewModel.getOrder()) {
-                setupListAdapter(getCurrentZoom(), it)
+                setupListAdapter(
+                    currentZoom = getCurrentZoom(),
+                    data = galleryItems,
+                )
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
-            if (it.isEmpty()) {
-                handleOptionsMenuUpdate(false)
-                viewTypePanel.visibility = View.GONE
-            } else {
-                handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-                viewTypePanel.visibility = View.VISIBLE
-            }
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
 
-            updateEnableCUButtons(gridAdapterHasData = it.isNotEmpty(), viewModel.isCUEnabled())
-            binding.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-            listView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
-            binding.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
-            mManagerActivity.updateCUViewTypes(if (it.isEmpty() || (parentFragment as PhotosFragment).currentTab !is TimelineFragment) View.GONE else View.VISIBLE)
+            updateOptionsButtons()
+
+            updateEnableCUButtons(
+                gridAdapterHasData = galleryItems.isNotEmpty(),
+                cuEnabled = viewModel.isCUEnabled()
+            )
+            binding.emptyHint.visibility = if (galleryItems.isEmpty()) View.VISIBLE else View.GONE
+            listView.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
+            binding.scroller.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
+            mManagerActivity.updateCUViewTypes(
+                if (
+                    galleryItems.isEmpty() ||
+                    (parentFragment as PhotosFragment).tabIndex != 0 ||
+                    actionMode != null
+                ) {
+                    View.GONE
+                }
+                else {
+                    View.VISIBLE
+                }
+            )
         }
 
-        viewModel.camSyncEnabled().observe(
-            viewLifecycleOwner
-        ) {
-            updateEnableCUButtons(cuEnabled = it)
+        viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
+            updateEnableCUButtons(cuEnabled = isEnabled)
         }
     }
 
@@ -346,11 +355,11 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     /**
      * this method handle is show menu.
      *
-     * @return false, when no photo here or in the action mode or not in all view, then will hide the menu.
+     * @return false, when no photo here or not in all view, then will hide the menu.
      * Otherwise, true, show menu.
      */
     private fun isShowMenu() =
-        gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
+        gridAdapterHasData() && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
 
     /**
      * Check is enable PhotosFragment showing
@@ -383,8 +392,42 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     public override fun setHideBottomViewScrollBehaviour() {
-        mManagerActivity.showBottomView()
-        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        if (!isInActionMode()) {
+            mManagerActivity.showBottomView()
+            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        }
+    }
+
+    fun updateOptionsButtons() {
+        if (viewModel.items.value?.isEmpty() == true || mManagerActivity.fromAlbumContent) {
+            handleOptionsMenuUpdate(shouldShow = false)
+        } else {
+            handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
+        }
+    }
+
+    override fun whenStartActionMode() {
+        if (!mManagerActivity.isInPhotosPage) return
+        super.whenStartActionMode()
+        mManagerActivity.animateCULayout(true)
+        with(parentFragment as PhotosFragment) {
+            shouldShowTabLayout(false)
+            shouldEnableViewPager(false)
+        }
+
+    }
+
+    override fun whenEndActionMode() {
+        if (!mManagerActivity.isInPhotosPage) return
+        // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
+        // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
+        super.whenEndActionMode()
+        mManagerActivity.animateCULayout(viewModel.isCUEnabled())
+        with(parentFragment as PhotosFragment) {
+            shouldShowTabLayout(true)
+            shouldEnableViewPager(true)
+        }
+
     }
 
     /**
@@ -456,14 +499,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         handleOptionsMenuUpdate(isShowMenu())
     }
 
-    override fun animateBottomView() {
-        val hide = actionMode != null
-        mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled())
-        mManagerActivity.animateBottomView(hide)
-        mManagerActivity.setDrawerLockMode(hide)
-        checkScroll()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!isInPhotosPage()) {
             return
@@ -498,7 +533,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onDestroyView() {
         viewModel.cancelSearch()
-        actionMode?.finish()
         super.onDestroyView()
     }
 }

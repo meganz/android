@@ -3157,7 +3157,7 @@
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Adicione contatos, crie uma rede, colabore e faça chamadas de voz e vídeo sem sair do MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">As suas fotos na Nuvem</string>
+    <string name="title_tour_four">As suas fotos na nuvem</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Sabemos que os Uploads da câmera são um recurso essencial para qualquer dispositivo móvel. Crie a sua conta agora.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">O seu microfone está desativado</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">O seu microfone está ativado</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Câmera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">A sua câmera está ativada.</string>
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toque para entrar na reunião atual.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">Reunião MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Videoconferência criptografada de ponta a ponta</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4257,8 +4257,6 @@
     <string name="title_dcim_folder_dialog">Pasta DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">O MEGA faz o upload das suas imagens da galeria. Para alterar o local de upload, acesse as configurações de Upload da câmera.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Violação de ToS/AUP</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Comprar uma nova assinatura?</string>
     <!-- Text of buy new subscription button -->
@@ -4271,4 +4269,34 @@
     <string name="message_subscription_from_other_platform">Você já tem uma assinatura. Se você comprar outra, você será cobrado duas vezes. Para evitar isso, cancele sua assinatura via MEGA para Desktop ou navegador móvel. Visite nossa Central de Ajuda para mais informações.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Acesse as Configurações para permitir que o MEGA acesse dispositivos próximos utilizando Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Não podemos seguir com o faturamento. Se você está utilizando um dual app, considere fazer login no MEGA sem ele. Caso contrário, tente fazer o upgrade através de um navegador.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Assinatura %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Assinatura ativa</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Você tem uma assinatura MEGA ativa com %1$s. Você deve cancelá-la separadamente em %2$s, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Você tem uma assinatura MEGA ativa com a Apple. Você deve cancelá-la separadamente em sua conta do iTunes, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visite %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Este é o último passo para excluir a sua conta. Tanto a sua conta quanto a sua assinatura serão excluídos e você perderá permanentemente todos os dados armazenados na nuvem. Por favor, digite a sua senha abaixo.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Linha do tempo</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Álbuns</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoritos</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Não há[/B] [A]Favoritos[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Remover favoritos</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
 </resources>

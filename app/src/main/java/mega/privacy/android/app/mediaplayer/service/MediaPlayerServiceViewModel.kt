@@ -14,6 +14,9 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -131,7 +134,10 @@ class MediaPlayerServiceViewModel(
     var paused = false
         set(value) {
             field = value
-            postPlaylistItems()
+            postPlaylistItems(false)
+            _mediaPlaybackState.update {
+                value
+            }
         }
 
     var audioPlayer = false
@@ -145,6 +151,10 @@ class MediaPlayerServiceViewModel(
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
+
+    private var _mediaPlaybackState = MutableStateFlow(false)
+    val mediaPlaybackState: StateFlow<Boolean>
+        get() = _mediaPlaybackState
 
     init {
         compositeDisposable.add(
@@ -863,7 +873,14 @@ class MediaPlayerServiceViewModel(
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
-            items[index] = item.finalizeItem(index, type, item.isSelected)
+            items[index] =
+                item.finalizeItem(
+                    index = index,
+                    type = type,
+                    isSelected = item.isSelected,
+                    duration = item.duration,
+                    currentPosition = item.currentPosition
+                )
         }
 
         val hasPrevious = playingIndex > 0
@@ -884,6 +901,21 @@ class MediaPlayerServiceViewModel(
             scrollPosition = -1
         }
         _playlist.postValue(Pair(items, scrollPosition))
+    }
+
+    /**
+     * Set the duration for playing item
+     * @param duration the duration of audio
+     * @param currentPosition the current position of audio
+     */
+    fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
+        playlistItems.filter {
+            it.nodeHandle == playingHandle
+        }.firstNotNullOfOrNull {
+            it.duration = duration
+            it.currentPosition = currentPosition
+        }
+        postPlaylistItems(false)
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {

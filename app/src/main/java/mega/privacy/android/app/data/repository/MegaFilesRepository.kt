@@ -1,34 +1,54 @@
 package mega.privacy.android.app.data.repository
 
-import mega.privacy.android.app.di.MegaApi
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
-import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaFolderInfo
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
-class MegaFilesRepository @Inject constructor(@MegaApi  private val sdk: MegaApiAndroid) : FilesRepository {
-    override suspend fun getFolderVersionInfo(): FolderVersionInfo {
-        return suspendCoroutine { continuation ->
-            sdk.getFolderInfo(sdk.rootNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        val info: MegaFolderInfo = request.megaFolderInfo
-                        continuation.resumeWith(Result.success(FolderVersionInfo(info.numVersions, info.versionsSize)))
-                    } else {
-                        continuation.resumeWith(Result.failure(
-                            MegaException(
-                                error.errorCode,
-                                error.errorString
-                            )
-                        ))
-                    }
-                }
-            ))
+/**
+ * Default implementation of [FilesRepository]
+ *
+ * @property megaApiGateway
+ * @property ioDispatcher
+ */
+class MegaFilesRepository @Inject constructor(
+    private val megaApiGateway: MegaApiGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : FilesRepository {
+    override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getFolderInfo(megaApiGateway.rootNode,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestFolderInfoCompleted(continuation)
+                    ))
+            }
         }
-    }
+
+    private fun onRequestFolderInfoCompleted(continuation: Continuation<FolderVersionInfo>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(
+                    Result.success(
+                        with(request.megaFolderInfo) {
+                            FolderVersionInfo(
+                                numVersions,
+                                versionsSize
+                            )
+                        }
+                    )
+                )
+            } else {
+                continuation.failWithError(error)
+            }
+        }
 }

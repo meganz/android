@@ -89,7 +89,7 @@
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
     <string name="remove_key_confirmation">Vous êtes en train de supprimer le fichier de Clé de récupération exporté précédemment</string>
     <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">Voulez-vous envoyer une invitation à %s ?</string>
+    <string name="confirmation_add_contact">Voulez-vous envoyer une invitation à %s ?</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Déconnexion</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -153,11 +153,11 @@
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%s sera à téléchargé.</string>
     <!-- Alert text before download -->
-    <string name="alert_no_app">Il n’y a aucune appli pour ouvrir le fichier %s. Voulez-vous poursuivre le téléchargement ?</string>
+    <string name="alert_no_app">Il n’y a aucune appli pour ouvrir le fichier %s. Voulez-vous poursuivre le téléchargement ?</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Ne plus afficher</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Voulez-vous vraiment annuler le processus de connexion actuel ?</string>
+    <string name="confirm_cancel_login">Voulez-vous vraiment annuler le processus de connexion actuel ?</string>
     <!-- Login button -->
     <string name="login_text">Connexion</string>
     <!-- email label -->
@@ -169,7 +169,7 @@
     <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
     <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
-    <string name="new_to_mega">Première fois sur MEGA ?</string>
+    <string name="new_to_mega">Première fois sur MEGA ?</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account">Créer un compte</string>
     <!-- when the user tries to log in MEGA without typing the email -->
@@ -229,7 +229,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Je comprends que [B]si je perds mon mot de passe, je pourrais perdre mes données[/B]. En apprendre davantage sur le [A]chiffrement de bout en bout de MEGA[/A].</string>
     <!-- Does the user already have a MEGA account -->
-    <string name="already_account">Avez-vous déjà un compte ?</string>
+    <string name="already_account">Avez-vous déjà un compte ?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Vous devez accepter nos Conditions générales d’utilisation</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -247,9 +247,9 @@
     <!--  -->
     <string name="create_account_creating_account">Connexion au serveur&#160;: création du compte</string>
     <!--  -->
-    <string name="cancel_transfer_confirmation">Supprimer ce transfert ?</string>
+    <string name="cancel_transfer_confirmation">Supprimer ce transfert ?</string>
     <!--  -->
-    <string name="cancel_all_transfer_confirmation">Supprimer tous les transferts ?</string>
+    <string name="cancel_all_transfer_confirmation">Supprimer tous les transferts ?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
     <string name="cancel_all_action">Tout annuler</string>
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
@@ -592,7 +592,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Envoyer</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement&#160;MEGA ?</string>
+    <string name="confirmation_cancel_subscriptions">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement&#160;MEGA ?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Votre abonnement n’a pas été annulé. Veuillez indiquer le motif de votre annulation.</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
@@ -651,7 +651,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Changer le mot de passe</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Vous avez dépassé votre limite de stockage. Voulez-vous surclasser votre compte ?</string>
+    <string name="overquota_alert_text">Vous avez dépassé votre limite de stockage. Voulez-vous surclasser votre compte ?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Dernière session</string>
     <!-- message displayed while the app is changing the password -->
@@ -703,7 +703,7 @@
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Les téléversements de l’appareil photo sont en cours</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les téléversements de l’appareil photo ?</string>
+    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les téléversements de l’appareil photo ?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Téléversement des fichiers des dossiers de médias</string>
     <!-- title of the notification when camera upload is checking files -->
@@ -781,7 +781,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">N’avez-vous pas reçu le code ?</string>
+    <string name="verify_account_resend_label">N’avez-vous pas reçu le code ?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Renvoyer</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -1032,17 +1032,17 @@
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">Non</string>
     <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">Mot de passe oublié ?</string>
+    <string name="forgot_pass_menu">Mot de passe oublié ?</string>
     <!-- Button in the Login screen to reset the password -->
-    <string name="forgot_pass">Mot de passe oublié ?</string>
+    <string name="forgot_pass">Mot de passe oublié ?</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
     <string name="forgot_pass_first_paragraph">Si vous avez une sauvegarde de votre Clé de récupération, vous pouvez réinitialiser votre mot de passe en sélectionnant OUI. Aucunes données ne seront perdues.</string>
     <!-- Second paragraph of the screen when the password has been forgotten -->
     <string name="forgot_pass_second_paragraph">Vous pouvez encore exporter votre Clé de récupération maintenant si vous avez une session MEGA active dans n’importe quel autre navigateur sur cet ordinateur ou sur un autre. Si ce n’est pas le cas, vous ne pourrez plus déchiffrer votre compte actuel, mais vous pourrez en créer un nouveau avec la même adresse courriel en choisissant NON.</string>
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">Avez-vous une sauvegarde de votre Clé de récupération ?</string>
+    <string name="forgot_pass_action">Avez-vous une sauvegarde de votre Clé de récupération ?</string>
     <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">Parfait !</string>
+    <string name="title_alert_reset_with_MK">Parfait !</string>
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">Saisissez votre adresse courriel ici</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
@@ -1084,7 +1084,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Remiser</string>
     <!-- Title of the screen to park an account -->
-    <string name="park_account_title">Oups !</string>
+    <string name="park_account_title">Oups !</string>
     <!-- First paragraph of the screen to park an account -->
     <string name="park_account_first_paragraph">En raison de notre modèle de chiffrement de bout en bout, vous ne pourrez pas accéder à vos données sans votre mot de passe ou une sauvegarde de votre Clé de récupération.</string>
     <!-- Second paragraph of the screen to park an account -->
@@ -1142,7 +1142,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">Votre nouvelle adresse courriel doit être validée. Veuillez vérifier vos courriels poursuivre.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
-    <string name="confirmation_delete_avatar">Supprimer votre image de profil ?</string>
+    <string name="confirmation_delete_avatar">Supprimer votre image de profil ?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Modifier</string>
     <!-- Alert Dialog to get link -->
@@ -1170,9 +1170,9 @@
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d réponses ont été supprimées avec succès, mais %2$d n’ont pas été supprimées.</string>
     <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">Voulez-vous supprimer l’invitation à %s ?</string>
+    <string name="confirmation_delete_contact_request">Voulez-vous supprimer l’invitation à %s ?</string>
     <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">Voulez-vous supprimer ces %d invitations ?</string>
+    <string name="confirmation_remove_multiple_contact_request">Voulez-vous supprimer ces %d invitations ?</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">%d réponses à une demande ont été envoyées.</string>
     <!-- error message when replying to multiple received request -->
@@ -1184,8 +1184,8 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">Le dossier est partagé avec %1$d contact. Supprimer le partage ?</item>
-        <item quantity="other">Le dossier est partagé avec %1$d contacts. Supprimer tous les partages ?</item>
+        <item quantity="one">Le dossier est partagé avec %1$d contact. Supprimer le partage ?</item>
+        <item quantity="other">Le dossier est partagé avec %1$d contacts. Supprimer tous les partages ?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">L’adresse courriel ou le mot de passe sont erronés. Veuillez réessayer.</string>
@@ -1358,9 +1358,9 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message_by">[A]Ce message a été supprimé par [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
-    <string name="confirmation_delete_several_messages">Supprimer les messages ?</string>
+    <string name="confirmation_delete_several_messages">Supprimer les messages ?</string>
     <!-- Confirmation before deleting one message -->
-    <string name="confirmation_delete_one_message">Supprimer le message ?</string>
+    <string name="confirmation_delete_one_message">Supprimer le message ?</string>
     <!-- Label for the sliding panel of a group chat -->
     <string name="group_chat_label">Conversation de groupe</string>
     <!-- Label for the option of the sliding panel to show the info of a chat group -->
@@ -1374,7 +1374,7 @@
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Participants</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
-    <string name="confirmation_remove_chat_contact">Supprimer %s de cette conversation ?</string>
+    <string name="confirmation_remove_chat_contact">Supprimer %s de cette conversation ?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="observer_permission_label_participants_panel">En lecture seule</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
@@ -1388,7 +1388,7 @@
     <!-- confirmation message before leaving a group chat -->
     <string name="confirmation_leave_group_chat">Si vous quittez cette conversation, vous ne pourrez plus lire les messages ni en envoyer.</string>
     <!-- title confirmation message before leaving a group chat -->
-    <string name="title_confirmation_leave_group_chat">Quitter cette conversation de groupe ?</string>
+    <string name="title_confirmation_leave_group_chat">Quitter cette conversation de groupe ?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Ce participant fait déjà partie de cette conversation de groupe</string>
     <!-- success message when inviting multiple contacts to a group chat -->
@@ -1420,7 +1420,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Déconnectez-vous[/A] pour changer de compte&#160;MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
+    <string name="confirm_logout_from_sms_verification">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Ce message a été supprimé par %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
@@ -1459,8 +1459,8 @@
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
-        <item quantity="one">Supprimer le contact ?</item>
-        <item quantity="other">Supprimer les contacts ?</item>
+        <item quantity="one">Supprimer le contact ?</item>
+        <item quantity="other">Supprimer les contacts ?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
     <string name="message_option_retry">Réessayer</string>
@@ -1506,7 +1506,7 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="my_account_of_string">%1$s [A]de %2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
-    <string name="confirmation_delete_from_save_for_offline">Supprimer de Hors&#160;ligne ?</string>
+    <string name="confirmation_delete_from_save_for_offline">Supprimer de Hors&#160;ligne ?</string>
     <!-- Label for the option of action menu to change the chat status -->
     <string name="set_status_option_label">Définir l’état</string>
     <!-- Label for the option of setting to change the colour theme -->
@@ -1555,7 +1555,7 @@
     <!-- Dialog to confirm the action of enabling logs -->
     <string name="enable_log_text_dialog">Les journaux peuvent contenir des renseignements relatifs à votre compte</string>
     <!-- Dialog to confirm the reconnect action -->
-    <string name="confirmation_to_reconnect">La connexion réseau a été restaurée. Se connecter à MEGA ?</string>
+    <string name="confirmation_to_reconnect">La connexion réseau a été restaurée. Se connecter à MEGA ?</string>
     <!-- Message shown meanwhile the app is waiting for a the chat status -->
     <string name="loading_status">Chargement de l’état&#8230;</string>
     <!-- Error when a message cannot be edited -->
@@ -1578,13 +1578,13 @@
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">Réessayer tous les transferts</string>
     <!-- Dialog to confirm the action of pausing one transfer -->
-    <string name="menu_pause_individual_transfer">Mettre le transfert en pause ?</string>
+    <string name="menu_pause_individual_transfer">Mettre le transfert en pause ?</string>
     <!-- Dialog to confirm the action of restarting one transfer -->
-    <string name="menu_resume_individual_transfer">Reprendre le transfert ?</string>
+    <string name="menu_resume_individual_transfer">Reprendre le transfert ?</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Reprendre</string>
     <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Effacer tous les transferts ?</string>
+    <string name="confirmation_to_clear_completed_transfers">Effacer tous les transferts ?</string>
     <!-- Title of the tab section for transfers in progress -->
     <string name="title_tab_in_progress_transfers">En cours</string>
     <!-- Title of the tab section for completed transfers -->
@@ -1796,7 +1796,7 @@
     <!--  -->
     <string name="contact_is_me">Aucune option n’est offerte, vous vous êtes sélectionné</string>
     <!-- Confirmation before deleting one attachment -->
-    <string name="confirmation_delete_one_attachment">Supprimer le fichier joint ?</string>
+    <string name="confirmation_delete_one_attachment">Supprimer le fichier joint ?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Visualiser les fichiers (%1$d supprimés)</string>
     <!-- Success message when the attachment has been sent to a chat -->
@@ -1836,15 +1836,15 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Suppression du contact du dossier partagé</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Déplacer vers la Corbeille ?</string>
+    <string name="confirmation_move_to_rubbish">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements des médias secondaires sera désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements des médias secondaires sera désactivée.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
+    <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_delete_from_mega">Supprimer de MEGA ?</string>
+    <string name="confirmation_delete_from_mega">Supprimer de MEGA ?</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state">Téléversement&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -2009,7 +2009,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Une erreur est survenue et l’appel ne peut pas être connecté.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Aimez-vous l’Appli&#160;MEGA mobile ?</string>
+    <string name="title_evaluate_the_app_panel">Aimez-vous l’Appli&#160;MEGA mobile ?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Oui, évaluer l’appli</string>
     <!-- Label to show send feedback -->
@@ -2214,8 +2214,8 @@
     <string name="menu_item_clear_versions">Effacer les versions précédentes</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
-        <item quantity="one">Supprimer la version ?</item>
-        <item quantity="other">Supprimer les versions ?</item>
+        <item quantity="one">Supprimer la version ?</item>
+        <item quantity="other">Supprimer les versions ?</item>
     </plurals>
     <!-- Content of the dialog to confirm that a version is going to be deleted -->
     <string name="content_dialog_delete_version">Cette version sera supprimée définitivement.</string>
@@ -2287,7 +2287,7 @@
     <!-- menu option to send a file to a chat -->
     <string name="context_send_file_to_chat">Envoyer vers une conversation</string>
     <!-- Title of the dialog ‘Do you remember your password?’ -->
-    <string name="remember_pwd_dialog_title">Vous souvenez-vous de votre mot de passe ?</string>
+    <string name="remember_pwd_dialog_title">Vous souvenez-vous de votre mot de passe ?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="remember_pwd_dialog_text_logout">Vous êtes sur le point de vous déconnecter. Veuillez essayer votre mot de passe pour vous assurer que vous en souvenez.\nSi vous perdez votre mot de passe, vous perdrez l’accès à vos données MEGA.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
@@ -2339,7 +2339,7 @@
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Chargement[/A] des [B]messages&#8230;[/B]</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">Le fichier ou dossier n’a pas été trouvé. Êtes-vous connecté avec un compte différent dans votre navigateur ? Vous ne pouvez qu’accéder aux fichiers ou dossiers du compte avec lequel vous êtes actuellement connecté dans l’appli.</string>
+    <string name="general_error_internal_node_not_found">Le fichier ou dossier n’a pas été trouvé. Êtes-vous connecté avec un compte différent dans votre navigateur ? Vous ne pouvez qu’accéder aux fichiers ou dossiers du compte avec lequel vous êtes actuellement connecté dans l’appli.</string>
     <!-- menu option to loop video or audio file -->
     <string name="context_loop_video">Lecture en boucle</string>
     <!-- Title of the category Security options on Settings section -->
@@ -2416,7 +2416,7 @@
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
     <string name="setting_subtitle_2fa">L’authentification à deux facteurs est un niveau supplémentaire de sécurité pour votre compte.</string>
     <!-- Title of the screen Two-Factor Authentication -->
-    <string name="title_2fa">Pourquoi avez-vous besoin de l’authentification à deux facteurs ?</string>
+    <string name="title_2fa">Pourquoi avez-vous besoin de l’authentification à deux facteurs ?</string>
     <!--  -->
     <string name="two_factor_authentication_explain">L’authentification à deux facteurs est un niveau supplémentaire de sécurité pour votre compte. Cela signifie que même si quelqu’un connaissait votre mot de passe, cette personne ne pourrait pas y accéder sans avoir aussi le code à 6&#160;chiffres auquel vous seul pourrez accéder.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
@@ -2444,7 +2444,7 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Le code est invalide</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="lost_your_authenticator_device">Avez-vous perdu votre appareil d’authentification ?</string>
+    <string name="lost_your_authenticator_device">Avez-vous perdu votre appareil d’authentification ?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Vérification de la connexion</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
@@ -2456,7 +2456,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Désactiver</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">Avez-vous perdu votre appareil d’authentification ?</string>
+    <string name="title_lost_authenticator_device">Avez-vous perdu votre appareil d’authentification ?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">Une erreur est survenue en tentant de désactiver l’authentification à deux facteurs. Veuillez réessayer.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2476,7 +2476,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Appli d’authentification à deux facteurs</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Voulez-vous ouvrir Google Play afin d’installer une appli d’authentification ?</string>
+    <string name="open_play_store_2fa">Voulez-vous ouvrir Google Play afin d’installer une appli d’authentification ?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Magasin Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2503,7 +2503,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Aperçus d’URL enrichis</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Vous désactivez les aperçus d’URL enrichis. Vous pourrez les réactiver dans vos Paramètres. Voulez-vous poursuivre ?</string>
+    <string name="text_confirmation_disable_rich_links">Vous désactivez les aperçus d’URL enrichis. Vous pourrez les réactiver dans vos Paramètres. Voulez-vous poursuivre ?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Un appel a été manqué[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2535,7 +2535,7 @@
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Les dossiers MEGAdrop ne sont pas encore pris en charge</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
-    <string name="pre_overquota_alert_text">Cette action ne peut pas être menée à bien, car elle vous ferait dépasser votre limite de stockage actuelle. Voulez-vous surclasser votre compte ?</string>
+    <string name="pre_overquota_alert_text">Cette action ne peut pas être menée à bien, car elle vous ferait dépasser votre limite de stockage actuelle. Voulez-vous surclasser votre compte ?</string>
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Conversations archivées</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
@@ -2577,7 +2577,7 @@
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
     <string name="hint_type_group">Nommez votre groupe</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
-    <string name="confirmation_delete_contact">Supprimer %s de cette conversation ?</string>
+    <string name="confirmation_delete_contact">Supprimer %s de cette conversation ?</string>
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versions de fichiers</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
@@ -2606,13 +2606,13 @@
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">Touchez, saisissez un nom ou une adresse courriel</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_invite_contact">Ajouter %s à vos contacts ?</string>
+    <string name="confirmation_invite_contact">Ajouter %s à vos contacts ?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_not_invite_contact">Vous avez déjà ajouté le contact %s.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_invite_contact_already_added">Vous avez déjà ajouté le contact %s.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_share_contact">Partager avec %s ?</string>
+    <string name="confirmation_share_contact">Partager avec %s ?</string>
     <!-- Text button for init a group chat -->
     <string name="new_group_chat_label">Nouvelle conversation de groupe</string>
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
@@ -2671,23 +2671,23 @@
         <item quantity="other">Choisir des fichiers</item>
     </plurals>
     <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Inviter %1$s ?</string>
+    <string name="title_confirm_send_invitation">Inviter %1$s ?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Choisir un dossier</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="login_warning_abort_transfers">Tous les transferts seront annulés, voulez-vous vous connecter ?</string>
+    <string name="login_warning_abort_transfers">Tous les transferts seront annulés, voulez-vous vous connecter ?</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="logout_warning_abort_transfers">Tous les transferts seront annulés, voulez-vous vous déconnecter ?</string>
+    <string name="logout_warning_abort_transfers">Tous les transferts seront annulés, voulez-vous vous déconnecter ?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">En lecture seule</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]sur %2$s sont utilisés[/B]</string>
     <!-- title of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_title">Changer pour un serveur de test ?</string>
+    <string name="staging_api_url_title">Changer pour un serveur de test ?</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_text">Voulez-vous vraiment changer vers un serveur de test ? Votre compte pourrait subir des problèmes irrécupérables.</string>
+    <string name="staging_api_url_text">Voulez-vous vraiment changer vers un serveur de test ? Votre compte pourrait subir des problèmes irrécupérables.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
-    <string name="title_confirmation_open_camera_on_chat">Ouvrir l’appareil photo ?</string>
+    <string name="title_confirmation_open_camera_on_chat">Ouvrir l’appareil photo ?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">Si vous ouvrez l’appareil photo, votre transmission vidéo sera mise en pause dans l’appel actuel.</string>
     <!-- Title of the notification when there is unknown activity on the Chat -->
@@ -2743,7 +2743,7 @@
     <!-- Text of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_text">Ceci vous déconnectera de toute autre session active, sauf celle-ci.</string>
     <!-- Title of the dialog to confirm after closing all other sessions -->
-    <string name="confirmation_close_sessions_title">Voulez-vous fermer toutes les autres sessions ?</string>
+    <string name="confirmation_close_sessions_title">Voulez-vous fermer toutes les autres sessions ?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <string name="number_of_participants">%d participants</string>
     <!-- Label of the button to join a chat by a chat link -->
@@ -3068,7 +3068,7 @@
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">Le GPS est désactivé</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
-    <string name="open_location_settings">Voulez-vous ouvrir les paramètres de position ?</string>
+    <string name="open_location_settings">Voulez-vous ouvrir les paramètres de position ?</string>
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
@@ -3103,7 +3103,7 @@
         <item quantity="other">%d contacts ont été trouvés sur MEGA</item>
     </plurals>
     <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">Inviter un contact maintenant ?</string>
+    <string name="no_local_contacts_on_mega">Inviter un contact maintenant ?</string>
     <!-- To see whom in your local contacts has been on MEGA -->
     <string name="see_local_contacts_on_mega">Découvrir vos contacts sur MEGA</string>
     <!-- In APP, text used to ask for access to contacts -->
@@ -3123,7 +3123,7 @@
     <!-- Action delete all file versions -->
     <string name="delete_versions">Supprimer les versions précédentes</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
-    <string name="title_delete_version_history">Supprimer les versions précédentes ?</string>
+    <string name="title_delete_version_history">Supprimer les versions précédentes ?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
     <string name="text_delete_version_history">Veuillez prendre note que le fichier actuel ne sera pas supprimé.</string>
     <!-- Alert shown when the version history was deleted correctly -->
@@ -3187,7 +3187,7 @@
     <!-- Description text of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_warning_text">La rotation de la clé chiffrée ne vous permet pas d’obtenir de lien vers une conversation sans en créer une nouvelle.</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">Voulez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
+    <string name="context_create_chat_link_question_text">Voulez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
@@ -3393,7 +3393,7 @@
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
     <string name="verify_email_and_follow_steps">Veuillez suivre les étapes du [A]courriel de confirmation[/A] afin de déverrouiller votre compte.</string>
     <!-- Question which takes the user to a help screen -->
-    <string name="why_am_i_seeing_this">Pourquoi vois-je ceci ?</string>
+    <string name="why_am_i_seeing_this">Pourquoi vois-je ceci ?</string>
     <!-- Label of a button which action is resend an email -->
     <string name="resend_email_label">Renvoyer le courriel</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
@@ -3431,17 +3431,17 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Erreur de droits</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">Vous n’avez pas les droits nécessaires pour modifier ce fichier. Voulez-vous créer un nouveau fichier ?</string>
+    <string name="alert_not_enough_permissions_revert">Vous n’avez pas les droits nécessaires pour modifier ce fichier. Voulez-vous créer un nouveau fichier ?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">La version a été créée avec succès en tant que nouveau fichier.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">le %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Voulez-vous vraiment cesser de partager ces %1$d dossiers ?</string>
+    <string name="alert_remove_several_shares">Voulez-vous vraiment cesser de partager ces %1$d dossiers ?</string>
     <!-- Download location label -->
     <string name="download_location">Emplacement de téléchargement</string>
     <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">Toujours enregistrer dans cet emplacement ?</string>
+    <string name="confirmation_download_location">Toujours enregistrer dans cet emplacement ?</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Afficher dans le dossier</string>
     <!-- Title of a screen to browse files -->
@@ -3473,7 +3473,7 @@
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">L’espace de stockage est saturé</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_title">Vos données courent un danger !</string>
+    <string name="over_disk_quota_paywall_title">Vos données courent un danger !</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="one">Nous vous avons contacté par courriel à l’adresse %1$s le %2$s, mais vous avez encore %3$s fichiers qui occupent %4$s dans votre compte&#160;MEGA, ce qui vous demande d’avoir un abonnement %5$s.</item>
@@ -3519,7 +3519,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Retrait&#8230;</string>
     <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
-    <string name="remove_phone_number">Supprimer votre numéro de téléphone ?</string>
+    <string name="remove_phone_number">Supprimer votre numéro de téléphone ?</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Votre numéro de téléphone a été supprimé avec succès.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3571,7 +3571,7 @@
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Fin[/A] des résultats</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
-    <string name="warning_resume_transfers">Reprendre les transferts ?</string>
+    <string name="warning_resume_transfers">Reprendre les transferts ?</string>
     <!-- Option to  resume all transfers -->
     <string name="option_resume_transfers">Reprendre les transferts</string>
     <!-- Option to  cancel a transfer -->
@@ -3615,7 +3615,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Supprimer automatiquement les messages de plus de&#160;:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Voulez-vous vraiment effacer l’historique entier de cette conversation ?</string>
+    <string name="confirmation_clear_chat_history">Voulez-vous vraiment effacer l’historique entier de cette conversation ?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3690,9 +3690,9 @@
     <!-- Reset password label -->
     <string name="reset_password_label">Réinitialiser le mot de passe</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">Partager la clé pour ce lien ?</string>
+    <string name="share_key_warning">Partager la clé pour ce lien ?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">Partager le mot de passe pour ce lien ?</string>
+    <string name="share_password_warning">Partager le mot de passe pour ce lien ?</string>
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">Partager le mot de passe</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
@@ -3774,7 +3774,7 @@
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Sélectionner la destination</string>
     <!-- Warning which alerts the user before discard changes -->
-    <string name="discard_changes_warning">Abandonner les changements et fermer l’éditeur ?</string>
+    <string name="discard_changes_warning">Abandonner les changements et fermer l’éditeur ?</string>
     <!-- Action discard -->
     <string name="discard_close_action">Abandonner et fermer</string>
     <!-- Label indicating saving a file is in progress -->
@@ -3905,7 +3905,7 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Ajouter votre numéro de téléphone</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">Vous souvenez-vous de votre mot de passe ?\nMEGA ne peut pas réinitialiser votre mot de passe si vous l’oubliez.</string>
+    <string name="backup_recovery_key_subtitle">Vous souvenez-vous de votre mot de passe ?\nMEGA ne peut pas réinitialiser votre mot de passe si vous l’oubliez.</string>
     <!-- Action to change name -->
     <string name="change_name_action">Changer le nom</string>
     <!-- Action to add photo -->
@@ -3951,7 +3951,7 @@
         <item quantity="other">Obtenir les liens</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
-    <string name="clear_offline_confirmation">Vider tous les fichiers hors ligne ?</string>
+    <string name="clear_offline_confirmation">Vider tous les fichiers hors ligne ?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Vous êtes la seule personne ici</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Votre microphone est désactivé</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Votre microphone est activé</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Caméra</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Votre caméra est activée.</string>
@@ -4005,7 +4005,7 @@
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Désigner comme modérateur</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Quitter la réunion maintenant ?</string>
+    <string name="title_end_meeting">Quitter la réunion maintenant ?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">Aucun modérateur</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4131,7 +4131,7 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Désactiver le versionnage des fichiers</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
+    <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Cet emplacement n’existe plus.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
@@ -4171,11 +4171,11 @@
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">Vous êtes en train de changer l’emplacement par défaut du dossier de sauvegarde. Cela pourrait affecter votre capacité à le trouver à l’avenir. Veuillez mémoriser son emplacement afin de pouvoir le trouver ultérieurement.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Déplacer ce dossier change la destination d’une ou de plusieurs sauvegardes configurées et pourrait avoir des conséquences inattendues. Les sauvegardes seront désactivées par sécurité. Les sauvegardes peuvent être réactivées grâce à l’appli&#160; MEGA pour ordinateur. Voulez-vous poursuivre ?</string>
+    <string name="backup_move_sub_folder">Déplacer ce dossier change la destination d’une ou de plusieurs sauvegardes configurées et pourrait avoir des conséquences inattendues. Les sauvegardes seront désactivées par sécurité. Les sauvegardes peuvent être réactivées grâce à l’appli&#160; MEGA pour ordinateur. Voulez-vous poursuivre ?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">Vous êtes en train de supprimer votre dossier de sauvegarde. Cela supprimera toutes les sauvegardes que vous avez définies. Confirmez-vous cette action ?</string>
+    <string name="backup_remove_root_folder">Vous êtes en train de supprimer votre dossier de sauvegarde. Cela supprimera toutes les sauvegardes que vous avez définies. Confirmez-vous cette action ?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Confirmez-vous que vous voulez supprimer votre dossier de sauvegarde et désactiver les sauvegardes qui y sont associées ?</string>
+    <string name="backup_remove_sub_folder">Confirmez-vous que vous voulez supprimer votre dossier de sauvegarde et désactiver les sauvegardes qui y sont associées ?</string>
     <!-- The title of warning dialog for single folder moving -->
     <string name="backup_move_folder_title">Déplacer «&#160;%1s&#160;»</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -4203,11 +4203,11 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée grâce à l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
+    <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
-    <string name="backup_share_with_root_permission_text">Certains dossiers partagés sont des dossiers de sauvegarde et en lecture seule. Souhaitez-vous poursuivre ?</string>
+    <string name="backup_share_with_root_permission_text">Certains dossiers partagés sont des dossiers de sauvegarde et en lecture seule. Souhaitez-vous poursuivre ?</string>
     <!-- Indicates the content of the backup folder -->
     <plurals name="num_devices">
         <item quantity="one">%d appareil</item>
@@ -4222,7 +4222,7 @@
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Téléverser un dossier</string>
     <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Annuler le téléversement ?</string>
+    <string name="cancel_uploads">Annuler le téléversement ?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Paiement</string>
     <!-- Label indicating payment methods -->
@@ -4257,10 +4257,8 @@
     <string name="title_dcim_folder_dialog">Dossier&#160;DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA téléverse vos images de la galerie. Pour changer l’emplacement de téléversement, veuillez accéder aux paramètres des Téléversements de l’appareil photo.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Non-respect des CGU/PUA</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Acheter un nouvel abonnement ?</string>
+    <string name="title_existing_subscription">Acheter un nouvel abonnement ?</string>
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Acheter un nouvel abonnement</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
@@ -4271,4 +4269,34 @@
     <string name="message_subscription_from_other_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement actuel en accédant à MEGA dans un navigateur Web mobile ou pour ordinateur. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Accédez aux Paramètres pour accorder à MEGA l’autorisation d’accéder par Bluetooth à vos appareils à proximité.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Il nous est impossible de procéder à la facturation. Si vous utilisez une double appli, veuillez envisager de vous connecter à MEGA sans elle. Si ce n’est pas le cas, essayez de surclasser votre compte dans un navigateur Web.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Abonnement&#160;%1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Un abonnement est actif</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Vous avez un abonnement MEGA actif auprès de %1$s. Vous devez l’annuler séparément dans %2$s, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte iTunes, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Accéder à %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Ceci est la dernière étape pour supprimer votre compte. Votre compte et votre abonnement seront tous deux supprimés et vous perdrez irrémédiablement toutes les données stockées dans le nuage. Veuillez saisir votre mot de passe ci-dessous.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Vue chronologique</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoris</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Aucun[/B] [A]favori[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Supprimer les favoris</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Le format de fichier n’est pas pris en charge. Impossible d’ouvrir le fichier.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Le dossier sélectionné est vide. Il n’y a aucun fichier à téléverser.</string>
 </resources>

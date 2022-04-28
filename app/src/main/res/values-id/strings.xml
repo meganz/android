@@ -2364,9 +2364,9 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Tulis pesan ke %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Autentikasi Dua Faktor</string>
+    <string name="settings_2fa">Otentikasi dua faktor</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Autentikasi Dua Faktor adalah lapisan keamanan kedua untuk akun anda.</string>
+    <string name="setting_subtitle_2fa">Otentikasi dua faktor adalah lapisan keamanan kedua untuk akun anda.</string>
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Mengapa anda membutuhkan otentikasi dua faktor?</string>
     <!--  -->
@@ -2388,11 +2388,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Terjadi kesalahan saat membuat benih atau kode QR, coba lagi.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Otentikasi Dua Faktor Diaktifkan</string>
+    <string name="title_2fa_enabled">Otentikasi dua faktor diaktifkan</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh Aplikasi Otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan Otentikasi Dua Faktor.</string>
+    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Kode salah</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2410,23 +2410,23 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Kehilangan perangkat Authenticator anda?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Terjadi kesalahan saat mencoba menonaktifkan Autentikasi Dua Faktor. Silakan coba lagi.</string>
+    <string name="error_disable_2fa">Terjadi kesalahan saat mencoba menonaktifkan otentikasi dua faktor. Silakan coba lagi.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">Terjadi kesalahan saat mencoba mengaktifkan Autentikasi Dua Faktor. Silakan coba lagi.</string>
+    <string name="error_enable_2fa">Terjadi kesalahan saat mencoba mengaktifkan otentikasi dua faktor. Silakan coba lagi.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Aktifkan Autentikasi Dua Faktor</string>
+    <string name="title_enable_2fa">Aktifkan otentikasi dua faktor</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Autentikasi Dua Faktor Dinonaktifkan</string>
+    <string name="label_2fa_disabled">Otentikasi dua faktor dinonaktifkan</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Buka di</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Tidak ada aplikasi apa pun yang tersedia untuk mengaktifkan Autentikasi Dua Faktor di perangkat anda</string>
+    <string name="intent_not_available_2fa">Tidak ada aplikasi apa pun yang tersedia untuk mengaktifkan otentikasi dua faktor di perangkat anda</string>
     <!-- Text button -->
     <string name="general_close">Tutup</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Ekspor Kunci Pemulihan anda untuk selesai</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Aplikasi Otentikasi Dua Faktor</string>
+    <string name="no_authentication_apps_title">Aplikasi otentikasi dua faktor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Apakah anda ingin membuka Google Play agar dapat memasang Aplikasi Authenticator?</string>
     <!-- Label Play Store -->
@@ -3084,11 +3084,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Obrolan yang sepenuhnya terenkripsi dengan panggilan suara dan video, perpesanan grup, dan integrasi berbagi file dengan Cloud Drive anda.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Buat Jaringan anda</string>
+    <string name="title_tour_three">Buat jaringan anda</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Tambahkan kontak, buat jaringan, berkolaborasi, buat panggilan suara dan video tanpa harus meninggalkan MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Foto anda di Cloud</string>
+    <string name="title_tour_four">Foto anda di cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Unggahan Kamera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi anda. Buat akun anda sekarang.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">Mikrofon anda dimatikan</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Mikrofon anda diaktifkan</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Kamera anda nyala.</string>
@@ -3972,7 +3972,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Ketuk untuk bergabung dengan rapat saat ini.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Pertemuan</string>
+    <string name="title_tour_five">MEGA pertemuan</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Pertemuan video terenkripsi menyeluruh</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4114,7 +4114,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena ini adalah folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan cadangan.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Item dalam folder ini adalah bagian dari cadangan yang dikonfigurasi dan disinkronkan ke folder lokal. Mengambil tindakan ini akan merusak sinkronisasi dan menonaktifkan pencadangan. Pencadangan dapat diaktifkan kembali dengan Aplikasi Desktop MEGA. Apakah anda yakin ingin melanjutkan??</string>
+    <string name="backup_add_item_text">Item dalam folder ini adalah bagian dari cadangan yang dikonfigurasi dan disinkronkan ke folder lokal. Mengambil tindakan ini akan merusak sinkronisasi dan menonaktifkan pencadangan. Pencadangan dapat diaktifkan kembali di Aplikasi Desktop MEGA. Anda yakin ingin melanjutkan?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena merupakan folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan pencadangan.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4167,18 +4167,46 @@
     <string name="title_dcim_folder_dialog">folder DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA mengunggah gambar anda dari galeri. Untuk mengubah lokasi unggahan, silakan buka pengaturan Unggah Kamera.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Buy new subscription?</string>
+    <string name="title_existing_subscription">Beli langganan baru?</string>
     <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <string name="button_buy_new_subscription">Beli langganan baru</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini melalui %1$s. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dari akun iTunes anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_other_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi, anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dengan membuka MEGA di browser web desktop atau seluler. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Buka Pengaturan untuk memberikan izin kepada MEGA untuk mengakses perangkat terdekat anda menggunakan Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Kami tidak dapat melanjutkan penagihan. Jika anda menggunakan aplikasi ganda, harap pertimbangkan untuk masuk ke MEGA tanpa itu. Jika tidak, coba perbarui melalui browser web anda.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Langganan %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Langganan aktif</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Anda memiliki langganan MEGA aktif dengan %1$s. Anda harus membatalkannya secara terpisah di %2$s, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Anda memiliki langganan MEGA aktif dengan Apple. Anda harus membatalkannya secara terpisah dari akun iTunes anda, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Kunjungi %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Ini adalah langkah terakhir untuk menghapus akun anda. Akun dan langganan anda akan dihapus dan anda akan kehilangan semua data yang tersimpan di cloud secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Linimasa</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favorit</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Tidak ada[/B] [A]Favorit[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Hapus favorit</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format file tidak didukung. Tidak dapat membuka file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Folder yang dipilih kosong. Tidak ada file untuk diunggah.</string>
 </resources>

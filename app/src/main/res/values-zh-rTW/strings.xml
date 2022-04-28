@@ -2468,7 +2468,7 @@
     <!-- Indicates that can type a contact email -->
     <string name="contact_email">聯絡人email</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">您已加入此連絡人。</string>
+    <string name="contact_not_added">您已加入此聯絡人。</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">訊息格式無效</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">您的麥克風已關閉</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">您的麥克風已開啟</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">相機</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">您的相機己開啟。</string>
@@ -4072,9 +4072,9 @@
     <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
     <string name="valid_chat_link">您已貼上一個對話連結。</string>
     <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
-    <string name="valid_contact_link">您已貼上一個連絡人連結。</string>
+    <string name="valid_contact_link">您已貼上一個聯絡人連結。</string>
     <!-- Action button to open a contact link.-->
-    <string name="action_open_contact_link">打開連絡人連結</string>
+    <string name="action_open_contact_link">打開聯絡人連結</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
@@ -4114,7 +4114,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以透過MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4167,8 +4167,6 @@
     <string name="title_dcim_folder_dialog">DCIM資料夾</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的照片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">違反服務條款/使用限制政策</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -4181,4 +4179,34 @@
     <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">請至設定授予MEGA使用藍牙連線存取您附近裝置的權限。</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">我們無法處理您的付款。如果您正在使用雙開應用程式，請嘗試不要使用它來登入MEGA。否則請透過網頁瀏覽器進行升級。</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s訂閱</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">現行的訂閱</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">您在Apple有一個現行的MEGA訂閱。您必須從您的iTunes帳戶中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">造訪%1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">這是刪除帳戶最後一個步驟。您的帳戶和訂閱都將被刪除，而且您將永久遺失所有儲存在雲端空間的資料。請在下方輸入您的密碼。</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">時間軸</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">相簿</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">收藏</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]沒有[/B][A]收藏[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">移除收藏</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">檔案格式不支援。無法開啟檔案。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">所選擇的資料夾是空的。沒有要上傳的檔案。</string>
 </resources>

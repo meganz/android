@@ -106,6 +106,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
+    protected var showBottomNav = true
+
     protected var selectedView = ALL_VIEW
     protected open var adapterType = 0
 
@@ -121,25 +123,30 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      */
     abstract fun handleOnCreateOptionsMenu()
 
-    open fun animateBottomView() {
+    open fun animateBottomView(hide: Boolean) {
         // AlbumContentFragment doesn't have view type panel.
-        if(this is AlbumContentFragment) return
+        if (
+            this is AlbumContentFragment ||
+            !isInActionMode() && viewTypePanel.isVisible
+        ) {
+            return
+        }
 
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
-        if (viewTypePanel.isVisible) {
+        if (hide) {
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction { viewTypePanel.visibility = View.GONE }
                 .start()
         } else {
             viewTypePanel
                 .animate()
                 .translationYBy(-deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withStartAction { viewTypePanel.visibility = View.VISIBLE }
                 .start()
         }
@@ -217,7 +224,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         DragToExitSupport.observeDragSupportEvents(
             viewLifecycleOwner,
             listView,
-            Constants.VIEWER_FROM_PHOTOS
+            VIEWER_FROM_PHOTOS
         )
     }
 
@@ -240,7 +247,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
                         it.node,
-                        NodeOptionsBottomSheetDialogFragment.MODE5
+                        NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
                     )
                 }
             }
@@ -336,7 +343,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     override fun onCardClicked(position: Int, card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
-                zoomViewModel.restoreDefaultZoom()
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
                 val photoPosition = gridAdapter.getNodePosition(card.node.handle)
@@ -398,7 +404,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                         intent,
                         listView,
                         nodeItem.index,
-                        Constants.VIEWER_FROM_PHOTOS,
+                        VIEWER_FROM_PHOTOS,
                         getter
                     )
                 }
@@ -418,15 +424,18 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             if (zoomViewModel.getCurrentZoom() != ZOOM_OUT_2X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
-                animateBottomView()
+
             }
         })
 
     private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
-                actionMode?.apply {
-                    finish()
+                if (actionMode != null) {
+                    actionMode?.apply {
+                        finish()
+                    }
+                    whenEndActionMode()
                 }
             } else {
                 actionModeCallback.nodeCount = getNodeCount()
@@ -439,6 +448,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
+                    whenStartActionMode()
                 } else {
                     actionMode?.invalidate()  // Update the action items based on the selected nodes
                 }
@@ -515,7 +525,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             callManager { manager ->
                 manager.showKeyboardForSearch()
             }
-            animateBottomView()
         })
 
     fun doIfOnline(operation: () -> Unit) {
@@ -526,7 +535,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -748,4 +757,33 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     fun isGridAdapterInitialized():Boolean{
         return this::gridAdapter.isInitialized
     }
+
+    /**
+     * Sub fragment can custom operation when start ActionMode
+     */
+    open fun whenStartActionMode() {
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(true)
+        animateBottomView(true)
+    }
+
+    /**
+     * Sub fragment can custom operation when end ActionMode
+     */
+    open fun whenEndActionMode() {
+        if (this is AlbumContentFragment) return
+        mManagerActivity.showHideBottomNavigationView(!showBottomNav)
+        if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
+            animateBottomView(false)
+        } else {
+            animateBottomView(true)
+        }
+    }
+
+    /**
+     * Check is in action mode.
+     *
+     * @return true in, false not in
+     */
+    fun isInActionMode() = actionMode != null
 }

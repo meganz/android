@@ -16,25 +16,21 @@ import kotlinx.coroutines.flow.callbackFlow
  * via this facade enables us to later refactor the code to be more explicit without having to
  * change the implementation in the consumer.
  *
- * @constructor Create Event bus facade
  */
 abstract class EventBusFacade<T> constructor(
     private val event: String,
     private val type: Class<T>
 ) {
 
+    /**
+     * Get events
+     *
+     * @return A flow of the requested events
+     */
     fun getEvents(): Flow<T> {
         return getEventFlow(event, type)
     }
 
-    /**
-     * Get flow of event notifications
-     *
-     * @param T event type
-     * @param event identifier of the event to observe
-     * @param type event type
-     * @return a flow that emits all events of the requested type
-     */
     private fun <T> getEventFlow(
         event: String,
         type: Class<T>

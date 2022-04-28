@@ -37,4 +37,35 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isMasterBusinessAccount
     override val rootNode: MegaNode?
         get() = megaApi.rootNode
+
+    override fun getFavourites(
+        node: MegaNode?,
+        count: Int,
+        listener: MegaRequestListenerInterface?
+    ) {
+        megaApi.getFavourites(node, count, listener)
+    }
+
+    override fun getMegaNodeByHandle(nodeHandle: Long): MegaNode =
+        megaApi.getNodeByHandle(nodeHandle)
+
+    override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
+
+    override fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode> =
+        megaApi.getChildren(parentNode)
+
+    override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
+
+    override fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
+
+    override fun setAutoAcceptContactsFromLink(
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.setContactLinksOption(disableAutoAccept, listener)
+
+    override fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface) =
+        megaApi.getContactLinksOption(listener)
+
+    override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
+        megaApi.getFolderInfo(node, listener)
 }

@@ -108,7 +108,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
-        MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
+        MegaChatNodeHistoryListenerInterface,
         StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -189,8 +189,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
         chatC = new ChatController(this);
 
-        logDebug("addChatListener");
-        megaChatApi.addChatListener(this);
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();
@@ -359,7 +357,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         unregisterReceiver(errorCopyingNodesReceiver);
 
         if (megaChatApi != null) {
-            megaChatApi.removeChatListener(this);
             megaChatApi.removeNodeHistoryListener(chatId, this);
             megaChatApi.closeNodeHistory(chatId, null);
         }
@@ -1205,36 +1202,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-    }
-
-    @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
     }
@@ -1510,7 +1477,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     public void checkScroll() {
         if (listView != null) {
-            changeViewElevation(aB, listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
+            changeToolBarElevation(this, tB, listView.canScrollVertically(-1)
+                    || (adapter != null && adapter.isMultipleSelect()));
         }
     }
 

@@ -40,7 +40,7 @@ class CreateFolderUseCase @Inject constructor(
                     when (error.errorCode) {
                         API_OK -> emitter.onSuccess(megaApi.getNodeByHandle(request.nodeHandle))
                         API_EEXIST -> emitter.onSuccess(megaApi.getChildNode(parent, folderName))
-                        else -> emitter.onError(MegaException(error.errorCode, error.errorString))
+                        else -> emitter.onError(error.toMegaException())
                     }
                 })
             )

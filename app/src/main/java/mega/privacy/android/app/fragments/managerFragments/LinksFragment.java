@@ -96,7 +96,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             }
 
             if (selected.size() == 1
-                && megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+                && megaApi.checkAccessErrorExtended(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
                 control.rename().setVisible(true);
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
                     control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -234,21 +234,26 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 updateActionModeTitle();
             }
         } else if (nodes.get(position).isFolder()) {
-            lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
-            managerActivity.hideTabs(true, LINKS_TAB);
-            managerActivity.increaseDeepBrowserTreeLinks();
-            managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
-            managerActivity.supportInvalidateOptionsMenu();
-            managerActivity.setToolbarTitle();
-
-            setNodes(megaApi.getChildren(nodes.get(position), getLinksOrderCloud(
-                    sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
-            recyclerView.scrollToPosition(0);
-            checkScroll();
-            managerActivity.showFabButton();
+            navigateToFolder(nodes.get(position));
         } else {
             openFile(nodes.get(position), LINKS_ADAPTER, position);
         }
+    }
+
+    @Override
+    public void navigateToFolder(MegaNode node) {
+        lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+        managerActivity.hideTabs(true, LINKS_TAB);
+        managerActivity.increaseDeepBrowserTreeLinks();
+        managerActivity.setParentHandleLinks(node.getHandle());
+        managerActivity.supportInvalidateOptionsMenu();
+        managerActivity.setToolbarTitle();
+
+        setNodes(megaApi.getChildren(node, getLinksOrderCloud(
+                sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
+        recyclerView.scrollToPosition(0);
+        checkScroll();
+        managerActivity.showFabButton();
     }
 
     @Override

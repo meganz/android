@@ -21,4 +21,11 @@ interface NetworkRepository {
      * @return a flow that emits a value anytime the connectivity state changes
      */
     fun monitorConnectivityChanges() : Flow<ConnectivityState>
+
+    /**
+     * Set use https
+     *
+     * @param enabled
+     */
+    fun setUseHttps(enabled: Boolean)
 }

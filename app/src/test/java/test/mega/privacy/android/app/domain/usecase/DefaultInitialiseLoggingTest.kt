@@ -3,87 +3,100 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.LoggingRepository
-import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
+import mega.privacy.android.app.logging.loggers.FileLogMessage
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class DefaultInitialiseLoggingTest {
-private lateinit var underTest: InitialiseLogging
-    private val loggingRepository = mock<LoggingRepository>()
+    private lateinit var underTest: InitialiseLogging
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val sdkMessage = FileLogMessage(message = "sdk", priority = 1)
+    private val chatMessage = FileLogMessage(message = "chat", priority = 1)
+
+    private val loggingRepository = mock<LoggingRepository>{
+        on { getSdkLoggingFlow() }.thenReturn(flowOf(sdkMessage))
+        on { getChatLoggingFlow() }.thenReturn(flowOf(chatMessage))
+    }
 
     @Before
     fun setUp() {
         underTest = DefaultInitialiseLogging(
             loggingRepository = loggingRepository,
             areSdkLogsEnabled = areSdkLogsEnabled,
-            areChatLogsEnabled = areChatLogsEnabled
+            areChatLogsEnabled = areChatLogsEnabled,
+            coroutineDispatcher = UnconfinedTestDispatcher()
         )
     }
 
     @Test
-    fun `test that debug enables console logs only`() = runTest{
+    fun `test that debug enables console logs`() = runTest {
+        whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
+        whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
         underTest(true)
 
         verify(loggingRepository, times(1)).enableLogAllToConsole()
         verifyNoMoreInteractions(loggingRepository)
-        verifyNoInteractions(areSdkLogsEnabled)
-        verifyNoInteractions(areChatLogsEnabled)
     }
 
     @Test
-    fun `test that setting sdk logs setting true, enables sdk logs`() = runTest{
+    fun `test that setting sdk logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).enableWriteSdkLogsToFile()
+        verify(loggingRepository, times(1)).getSdkLoggingFlow()
+        verify(loggingRepository, times(1)).logToSdkFile(sdkMessage)
 
         verifyNoMoreInteractions(loggingRepository)
     }
 
     @Test
-    fun `test that setting chat logs setting true, enables sdk logs`() = runTest{
+    fun `test that setting chat logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).enableWriteChatLogsToFile()
+        verify(loggingRepository, times(1)).getChatLoggingFlow()
+        verify(loggingRepository, times(1)).logToChatFile(chatMessage)
 
         verifyNoMoreInteractions(loggingRepository)
     }
 
     @Test
-    fun `test that setting sdk logs setting false, disables sdk logs`() = runTest{
+    fun `test that setting sdk logs setting false, disables sdk logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(false))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).disableWriteSdkLogsToFile()
+        verify(loggingRepository, never()).logToSdkFile(any())
 
         verifyNoMoreInteractions(loggingRepository)
     }
 
     @Test
-    fun `test that setting chat logs setting false, disables chat logs`() = runTest{
+    fun `test that setting chat logs setting false, disables chat logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
 
         underTest(false)
 
-        verify(loggingRepository, times(1)).disableWriteChatLogsToFile()
+        verify(loggingRepository, never()).logToChatFile(any())
 
         verifyNoMoreInteractions(loggingRepository)
     }

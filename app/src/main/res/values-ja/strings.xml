@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">マイクがオフになっています</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">マイクがオンになっています</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">カメラ</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">カメラがオンになっています。</string>
@@ -4167,8 +4167,6 @@
     <string name="title_dcim_folder_dialog">DCIMフォルダ</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGAはギャラリーからあなたの画像をアップロードします。アップロードの場所を変更するには、カメラアップロードの設定をご覧ください。</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS（ご利用規約）/AUP（ご利用規定） 違反</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">新規サブスクリプションをご購入いたしますか？</string>
     <!-- Text of buy new subscription button -->
@@ -4181,4 +4179,34 @@
     <string name="message_subscription_from_other_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、デスクトップまたはモバイルのウェブブラウザでMEGAにアクセスし、現在のサブスクリプションを解約してください。詳しくは、ヘルプセンターをご覧ください。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">設定から、MEGAにBluetoothを使用してお近くの機器にアクセスする権限を与えてください。</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">ご請求を進めることができません。デュアルアプリをお使いの方は、デュアルアプリなしでのログインをご検討ください。そうでない場合は、ウェブブラウザでアップグレードしてみてください。</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s サブスクリプション</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">アクティブサブスクリプション</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">%1$sとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、%2$sで別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">AppleとのアクティブなMEGAサブスクリプションをお持ちです。MEGAではそれをキャンセルできないため、iTunesアカウントから別にキャンセルする必要があります。詳細については、当社のヘルプセンターをご覧ください。</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">%1sにアクセス</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">これがアカウント削除の最後のステップです。アカウントとサブスクリプションの両方が削除され、クラウドに保存されているすべてのデータを恒久的に失うことになります。以下にパスワードを入力してください。</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">タイムライン</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">アルバム</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">お気に入り</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[A]お気に入り[/A]が[B]ありません[/B]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">お気に入りを削除</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">ファイル形式がサポートされていません。ファイルを開くことができません。</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">選択したフォルダは空です。アップロードするファイルがありません。</string>
 </resources>

@@ -55,4 +55,75 @@ interface MegaApiGateway {
      *
      */
     val rootNode: MegaNode?
+
+    /**
+     * Get favourites
+     * @param node Node and its children that will be searched for favourites. Search all nodes if null
+     * @param count if count is zero return all favourite nodes, otherwise return only 'count' favourite nodes
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getFavourites(node: MegaNode?, count: Int, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get MegaNode by node handle
+     * @param nodeHandle node handle
+     * @return MegaNode
+     */
+    fun getMegaNodeByHandle(nodeHandle: Long): MegaNode
+
+    /**
+     * Check the node if has version
+     * @param node node that is checked
+     * @return true is has version
+     */
+    fun hasVersion(node: MegaNode): Boolean
+
+    /**
+     * Get children nodes by node
+     * @param parentNode parent node
+     * @return children nodes list
+     */
+    fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode>
+
+    /**
+     * Get child folder number of current folder
+     * @param node current folder node
+     * @return child folder number
+     */
+    fun getNumChildFolders(node: MegaNode): Int
+
+    /**
+     * Get child files number of current folder
+     * @param node current folder node
+     * @return child files number
+     */
+    fun getNumChildFiles(node: MegaNode): Int
+
+
+    /**
+     * Set auto accept contacts from link
+     *
+     * @param disableAutoAccept pass true to stop auto accepting contacts
+     * @param listener
+     */
+    fun setAutoAcceptContactsFromLink(
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface
+    )
+
+    /**
+     * Is auto accept contacts from link enabled
+     *
+     * @param listener
+     */
+    fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface)
+
+
+    /**
+     * Get folder info
+     *
+     * @param node
+     * @param listener
+     */
+    fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
 }

@@ -45,6 +45,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
@@ -61,6 +65,7 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -69,9 +74,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -99,9 +102,15 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class GroupChatInfoActivity extends PasscodeActivity
-        implements MegaChatRequestListenerInterface, MegaChatListenerInterface,
+        implements MegaChatRequestListenerInterface,
         MegaRequestListenerInterface, SnackbarShower {
+
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
@@ -202,8 +211,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             return;
         }
 
-        logDebug("addChatListener");
-        megaChatApi.addChatListener(this);
+        checkChatChanges();
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -295,10 +303,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatListener(this);
-        }
-
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
@@ -308,6 +312,16 @@ public class GroupChatInfoActivity extends PasscodeActivity
         //Set the first element = me
         participantsCount = chat.getPeerCount();
         logDebug("Participants count: " + participantsCount);
+
+        if (!chat.isPreview() && chat.isActive()) {
+            String myFullName = megaChatApi.getMyFullname();
+            if (isTextEmpty(myFullName)) {
+                myFullName = megaChatApi.getMyEmail();
+            }
+
+            MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
+            participants.add(me);
+        }
 
         for (int i = 0; i < participantsCount; i++) {
             int peerPrivilege = chat.getPeerPrivilege(i);
@@ -323,16 +337,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                 megaChatApi.requestLastGreen(participant.getHandle(), null);
             }
-        }
-
-        if (!chat.isPreview() && chat.isActive()) {
-            String myFullName = megaChatApi.getMyFullname();
-            if (isTextEmpty(myFullName)) {
-                myFullName = megaChatApi.getMyEmail();
-            }
-
-            MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
-            participants.add(me);
         }
 
         logDebug("Number of participants with me: " + participants.size());
@@ -972,8 +976,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+    private void onChatListItemUpdate(MegaChatListItem item) {
         if (item.getChatId() != chatHandle) {
             return;
         }
@@ -1003,13 +1006,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        logDebug("New state: " + newState);
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
+    private void onChatOnlineStatusUpdate(long userHandle, int status, boolean inProgress) {
         logDebug("User Handle: " + userHandle + ", Status: " + status + ", inProgress: " + inProgress);
 
         if (inProgress) {
@@ -1047,17 +1044,11 @@ public class GroupChatInfoActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-        logDebug("onChatPresenceConfigUpdate");
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+   private void onChatConnectionStateUpdate(long chatid, int newState) {
         logDebug("Chat ID: " + chatid + ", New state: " + newState);
-        MegaChatRoom chatRoom = api.getChatRoom(chatid);
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatid);
         if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-            startCallWithChatOnline(this, api.getChatRoom(chatid));
+            startCallWithChatOnline(this, megaChatApi.getChatRoom(chatid));
         }
     }
 
@@ -1197,8 +1188,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
         logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if (state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
@@ -1432,5 +1422,44 @@ public class GroupChatInfoActivity extends PasscodeActivity
     @Override
     public void showSnackbar(int type, @Nullable String content, long chatId) {
         showSnackbar(type, containerLayout, content, chatId);
+    }
+
+    /**
+     * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and and OnChatPresenceLastGreen make the necessary changes
+     */
+    private void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((next) -> {
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
+                        MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
+                        if (item != null) {
+                            onChatListItemUpdate(item);
+                        }
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
+                        long userHandle = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component1();
+                        int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
+                        boolean inProgress = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component3();
+                        onChatOnlineStatusUpdate(userHandle, status, inProgress);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
+                        long chatId = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component1();
+                        int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
+                        onChatConnectionStateUpdate(chatId, newState);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
+                        long userHandle = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component1();
+                        int lastGreen = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component2();
+                        onChatPresenceLastGreen(userHandle, lastGreen);
+                    }
+
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
     }
 }

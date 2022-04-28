@@ -3826,9 +3826,9 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Años</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s de %2$s [/B]de %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s de %2$s[/B] de %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Subida en curso, 1 archivo pendiente</item>
@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Tu micrófono está apagado</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Tu micrófono está encendido</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Cámara</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">La cámara está encendida.</string>
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">Reunión MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Reunión cifrada punto a punto</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4181,9 +4181,9 @@
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
     <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Move backup folders</string>
+    <string name="backup_move_multiple_folder_title">Mover las carpetas de respaldo</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
+    <string name="backup_remove_multiple_folder_title">Mover las carpetas de respaldo a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Desactivar copia de seguridad</string>
     <!-- The confirm information of warning dialog for moving "My backup" -->
@@ -4201,11 +4201,11 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
+    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de respaldo, cualquier cambio en su contenido podría desactivar la copia de seguridad.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled with the MEGA Desktop App. Are you sure you want to proceed?</string>
+    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de una copia de seguridad sincronizada con una carpeta local. Realizar esta acción parará la sincronización y desactivará la copia de seguridad. Podrás volver a reactivar la copia de seguridad a través de la aplicación de escritorio de MEGA. ¿Estás seguro de que quieres continuar?</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
+    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de respaldo, cualquier cambio en su contenido podría desactivar las copia de seguridad.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Algunas carpetas compartidas son carpetas de respaldo y de solo lectura. ¿Quieres continuar?</string>
     <!-- Indicates the content of the backup folder -->
@@ -4216,7 +4216,7 @@
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Contestar llamada</string>
     <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
+    <string name="title_select_tracks">Seleccionar pistas</string>
     <!-- Action button to upload files. -->
     <string name="upload_files">Subir archivos</string>
     <!-- Action button to upload a folder. -->
@@ -4257,18 +4257,46 @@
     <string name="title_dcim_folder_dialog">Carpeta DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA sube tus imágenes desde la galería. Para cambiar la ubicación de las subidas, ve a los ajustes de las Subidas de la cámara.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Buy new subscription?</string>
+    <string name="title_existing_subscription">¿Quieres comprar una nueva suscripción?</string>
     <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <string name="button_buy_new_subscription">Comprar nueva suscripción</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual a través de %1$s. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual desde tu cuenta de iTunes. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_other_platform">Ya tienes una suscripción activa. Si compras otra, se te cobrará dos veces. Para evitarlo, cancela primero la suscripción actual accediendo a tu cuenta de MEGA desde el navegador. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Ve a los Ajustes para permitir a MEGA acceder a tus dispositivos cercanos mediante Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">No es posible proceder con el cobro. Si estás usando una aplicación dual, considera iniciar sesión en MEGA sin ella. Si no, realiza la compra desde el navegador.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Suscripción con %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Suscripción activa</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Tienes una suscripción a MEGA activa con %1$s. Debes cancelarla desde %2$s, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para obtener más información.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Tienes una suscripción a MEGA activa con Apple. Debes cancelarla desde los ajustes del dispositivo en tu cuenta de iTunes, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para más información.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Ir a %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Este es el último paso para eliminar tu cuenta. Tu suscripción se eliminará junto con tu cuenta y perderás de forma permanente todos los datos almacenados en la nube. Por favor, introduce tu contraseña a continuación.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Cronología</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Álbumes</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoritos</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]No hay[/B] [A]favoritos[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Eliminar favoritos</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">El formato de archivo no es compatible. No se puede abrir el archivo.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">La carpeta seleccionada está vacía. No hay archivos para subir.</string>
 </resources>

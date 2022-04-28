@@ -478,6 +478,7 @@ class HomepageFragment : Fragment() {
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
             BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
+            BottomSheetPagerAdapter.FAVOURITE_INDEX -> return resources.getString(R.string.title_favourites_album)
         }
 
         return ""

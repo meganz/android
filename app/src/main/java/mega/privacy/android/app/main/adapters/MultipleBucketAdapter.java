@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -281,7 +281,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                     ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
-                ((ManagerActivity) context).showNodeOptionsPanel(node, MODE6);
+                ((ManagerActivity) context).showNodeOptionsPanel(node, RECENTS_MODE);
                 break;
             }
             case R.id.multiple_bucket_layout: {

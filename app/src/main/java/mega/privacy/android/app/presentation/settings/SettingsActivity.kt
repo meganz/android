@@ -11,10 +11,10 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeFacade
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import org.jetbrains.anko.configuration
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class SettingsActivity : AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
-    lateinit var passCodeFacade: PasscodeFacade
+    lateinit var passCodeFacade: PasscodeCheck
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

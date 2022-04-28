@@ -163,10 +163,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
     private void startForeground() {
-        if (megaApi.getNumPendingUploads() <= 0) {
-            return;
-        }
-
         try {
             startForeground(NOTIFICATION_UPLOAD,
                     createInitialServiceNotification(NOTIFICATION_CHANNEL_UPLOAD_ID,
@@ -203,10 +199,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
-
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
-        stopForeground();
 
 		super.onDestroy();
 	}
@@ -217,6 +211,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		canceled = false;
 
 		if (intent == null) {
+		    canceled = true;
+		    stopForeground();
 			return START_NOT_STICKY;
 		}
 
@@ -225,6 +221,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				logDebug("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+				stopForeground();
 				return START_NOT_STICKY;
 			}
 		}

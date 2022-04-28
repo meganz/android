@@ -39,6 +39,8 @@ import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
+import mega.privacy.android.app.presentation.settings.SettingsActivity;
+import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -260,13 +262,9 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                 break;
             }
             case R.id.qr_code_settings: {
-                Intent intent = new Intent(this, ManagerActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("drawerItemQR", DrawerItem.SETTINGS);
-                intent.putExtras(bundle);
-                intent.putExtra("fromQR", true);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                Intent settingsIntent = SettingsActivity.Companion.getIntent(this, TargetPreference.QR.INSTANCE);
+                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(settingsIntent);
                 this.finish();
                 break;
             }

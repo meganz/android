@@ -4154,7 +4154,7 @@
     <string name="general_mic_mute">Mikrofon jest wyłączony</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Mikrofon jest włączony</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Aparat</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Aparat jest włączony.</string>
@@ -4239,7 +4239,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Kliknij , aby dołączyć do bieżącego spotkania.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA spotkanie</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4381,7 +4381,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Ten folder może być udostępniony tylko do odczytu, ponieważ jest to folder kopii zapasowej, wszelkie zmiany jego zawartości mogą uniemożliwić tworzenie kopii zapasowej.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Elementy w tym folderze są częścią skonfigurowanej kopii zapasowej i są synchronizowane z folderem lokalnym. Podjęcie tej akcji przerwie synchronizację i wyłączy kopię zapasową. Kopia zapasowa może być ponownie włączona za pomocą aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
+    <string name="backup_add_item_text">Elementy znajdujące się w tym folderze są częścią skonfigurowanej kopii zapasowej i są synchronizowane z folderem lokalnym. Podjęcie tego działania spowoduje przerwanie synchronizacji i wyłączenie kopii zapasowej. Kopia zapasowa może być ponownie włączona w aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Te foldery mogą być udostępniane tylko do odczytu, ponieważ są to foldery kopii zapasowych, wszelkie zmiany w ich zawartości mogą uniemożliwić tworzenie kopii zapasowych.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4437,18 +4437,46 @@
     <string name="title_dcim_folder_dialog">Katalog DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA ładuje twoje zdjęcia z galerii. Aby zmienić lokalizację wysyłania, proszę przejść do ustawień wysyłania aparatu.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Naruszenie zasad ToS/AUP</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Kupić nową subskrypcję?</string>
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Kup nową subskrypcję?</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję za pośrednictwem %1$s. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Masz już abonament. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, należy anulować bieżącą subskrypcję na swoim koncie iTunes. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Masz już wykupioną subskrypcję. Jeśli kupisz kolejną, zostaniesz obciążony podwójną opłatą. Aby tego uniknąć, anuluj swoją obecną subskrypcję, wchodząc na stronę MEGA w przeglądarce internetowej na komputerze lub w telefonie komórkowym. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Przejdź do Ustawień, aby udzielić MEGA pozwolenia na dostęp do pobliskich urządzeń poprzez Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Nie możemy kontynuować rozliczenia. Jeśli używasz podwójnej aplikacji, rozważ możliwość zalogowania się do MEGA bez niej. Jeśli nie, spróbuj dokonać aktualizacji przez przeglądarkę internetową.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subskrypcja</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Aktywna subskrypcja</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Masz aktywną subskrypcję MEGA z %1$s. Musisz ją anulować oddzielnie w %2$s, ponieważ MEGA nie może jej anulować za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Masz aktywną subskrypcję MEGA w Apple. Musisz ją anulować oddzielnie ze swojego konta iTunes, ponieważ MEGA nie jest w stanie anulować jej za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Zobacz %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Jest to ostatni krok do usunięcia konta. Zarówno Twoje konto, jak i subskrypcja zostaną usunięte, a Ty trwale utracisz wszystkie dane przechowywane w chmurze. Wprowadź swoje hasło poniżej.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Oś czasu</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albumy</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Ulubione</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Brak[/B] [A]ulubionych[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Usuń ulubione</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Wybrany folder jest pusty. Brak plików do przesłania.</string>
 </resources>

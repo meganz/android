@@ -91,6 +91,7 @@ import java.util.TimeZone;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.BuildConfig;
@@ -108,6 +109,8 @@ import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
+import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -250,12 +253,15 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class ChatActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
-        MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
+        MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
         SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
         HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
         SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
         LoadPreviewListener.OnChatPreviewLoadedCallback, ChatRoomToolbarBottomSheetDialogActionListener {
+
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int MIN_LINES_TO_EXPAND_INPUT_TEXT = 4;
@@ -341,6 +347,8 @@ public class ChatActivity extends PasscodeActivity
     GetAvatarUseCase getAvatarUseCase;
     @Inject
     GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
+    @Inject
+    GetPublicNodeUseCase getPublicNodeUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -780,7 +788,9 @@ public class ChatActivity extends PasscodeActivity
             }
 
             idChat = request.getChatHandle();
-            megaChatApi.addChatListener(ChatActivity.this);
+
+            composite.clear();
+            checkChatChanges();
 
             if (idChat != MEGACHAT_INVALID_HANDLE) {
                 dbH.setLastPublicHandle(idChat);
@@ -1239,7 +1249,7 @@ public class ChatActivity extends PasscodeActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -1808,7 +1818,10 @@ public class ChatActivity extends PasscodeActivity
                         megaChatApi.closeChatRoom(idChat, this);
                         idChat = newIdChat;
                     }
-                    megaChatApi.addChatListener(this);
+
+                    composite.clear();
+                    checkChatChanges();
+
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if(savedInstanceState!=null) {
@@ -2862,11 +2875,11 @@ public class ChatActivity extends PasscodeActivity
                 String link = getIntent().getDataString();
 
                 MegaApplication.getChatManagement().setPendingJoinLink(link);
-                loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+                loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(link));
             } else {
-                loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
+                loginIntent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
             }
 
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -6106,8 +6119,15 @@ public class ChatActivity extends PasscodeActivity
         ChatLinkInfoListener listener = null;
         if (isFileLink(link)) {
             logDebug("isFileLink");
-            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-            megaApi.getPublicNode(link, listener);
+            getPublicNodeUseCase.get(link)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((richLink, throwable) -> {
+                        if (throwable == null) {
+                            setRichLinkInfo(msg.getMsgId(), richLink);
+                        }
+                    });
+
             return MEGA_FILE_LINK;
         } else {
             logDebug("isFolderLink");
@@ -8201,7 +8221,6 @@ public class ChatActivity extends PasscodeActivity
         if (megaChatApi != null && idChat != -1) {
             megaChatApi.closeChatRoom(idChat, this);
             MegaApplication.setClosedChat(true);
-            megaChatApi.removeChatListener(this);
 
             if (chatRoom != null && chatRoom.isPreview()) {
                 megaChatApi.closeChatPreview(idChat);
@@ -8294,7 +8313,7 @@ public class ChatActivity extends PasscodeActivity
         }
 
         MegaApplication.setClosedChat(true);
-        megaChatApi.removeChatListener(this);
+        composite.clear();
 
         if (shouldLogout) {
             megaChatApi.logout();
@@ -8855,13 +8874,6 @@ public class ChatActivity extends PasscodeActivity
         MegaApplication.setOpenChatId(-1);
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            updateNavigationToolbarIcon();
-        }
-    }
-
     public void updateNavigationToolbarIcon(){
         if(!chatC.isInAnonymousMode()){
             int numberUnread = megaChatApi.getUnreadChats();
@@ -8888,25 +8900,7 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
-        logDebug("status: " + status + ", inProgress: " + inProgress);
-        setChatSubtitle();
-        requestLastGreen(status);
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+   private void onChatConnectionStateUpdate(long chatid, int newState) {
         logDebug("Chat ID: "+ chatid + ". New State: " + newState);
 
         if (idChat == chatid) {
@@ -8931,8 +8925,7 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
         logDebug("userhandle: " + userhandle + ", lastGreen: " + lastGreen);
 
         if (chatRoom == null) {
@@ -9970,5 +9963,43 @@ public class ChatActivity extends PasscodeActivity
                 break;
             }
         }
+    }
+
+    /**
+     * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
+     */
+    private void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((next) -> {
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
+                        MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
+                        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+                            updateNavigationToolbarIcon();
+                        }
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
+                        int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
+                        setChatSubtitle();
+                        requestLastGreen(status);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
+                        long chatId = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component1();
+                        int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
+                        onChatConnectionStateUpdate(chatId, newState);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
+                        long userHandle = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component1();
+                        int lastGreen = ((GetChatChangesUseCase.Result.OnChatPresenceLastGreen) next).component2();
+                        onChatPresenceLastGreen(userHandle, lastGreen);
+                    }
+
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
     }
 }
