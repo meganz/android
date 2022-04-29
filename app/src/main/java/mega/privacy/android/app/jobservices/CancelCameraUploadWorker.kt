@@ -10,20 +10,20 @@ import timber.log.Timber
 /**
  * Worker to cancel all camera upload transfers.
  */
-class CancelUploadsWorker(val appContext: Context, val workerParams: WorkerParameters) :
+class CancelCameraUploadWorker(val appContext: Context, val workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
 
     override fun doWork(): Result {
         if (isStopped) return Result.failure()
-        Timber.d("CancelUploadsWorker: doWork()")
+        Timber.d("CancelCameraUploadWorker: doWork()")
         return try {
-            Timber.d("CancelUploadsWorker: Sending cancel all action")
+            Timber.d("CancelCameraUploadWorker: Sending cancel all action")
             val cancelIntent = Intent(appContext, CameraUploadsService::class.java)
             cancelIntent.action = CameraUploadsService.ACTION_CANCEL_ALL
             ContextCompat.startForegroundService(appContext, cancelIntent)
             Result.success()
         } catch (throwable: Throwable) {
-            Timber.d("CancelUploadsWorker: doWork() fail")
+            Timber.d("CancelCameraUploadWorker: doWork() fail")
             Result.failure()
         }
     }

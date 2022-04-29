@@ -93,11 +93,11 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.jobservices.SyncRecordKt;
+import mega.privacy.android.app.domain.entity.SyncRecordKt;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
 import nz.mega.sdk.MegaNode;
@@ -1174,7 +1174,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 resetCUTimestampsAndCache();
                 rescheduleCameraUpload(context);
                 // Update sync when primary local folder changed.
-                CuSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
                 break;
 
             case REQUEST_MEGA_CAMERA_FOLDER:
@@ -1212,7 +1212,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 dbH.setSecVideoSyncTimeStamp(0);
                 rescheduleCameraUpload(context);
                 // Update sync when secondary local folder changed.
-                CuSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
                 break;
 
             case REQUEST_MEGA_SECONDARY_MEDIA_FOLDER:

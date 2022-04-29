@@ -15,7 +15,11 @@ import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import timber.log.Timber
 
 /**
- * Worker for upload images task
+ * Worker for upload images task.
+ * Starts if:
+ * 1. The service is not already running
+ * 2. The storage is not over quota
+ * 3. The app has READ_EXTERNAL_STORAGE permission
  */
 @HiltWorker
 class StartCameraUploadWorker @AssistedInject constructor(

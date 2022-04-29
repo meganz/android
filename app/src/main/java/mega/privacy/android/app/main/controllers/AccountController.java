@@ -28,7 +28,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.jobservices.SyncRecordKt;
+import mega.privacy.android.app.domain.entity.SyncRecordKt;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;

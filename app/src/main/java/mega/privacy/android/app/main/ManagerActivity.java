@@ -103,7 +103,7 @@ import static mega.privacy.android.app.utils.FileUtil.buildExternalStorageFile;
 import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.fireCancelUploadsJob;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
@@ -383,7 +383,7 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.DownloadNodeUseCase;
@@ -9550,11 +9550,11 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // Update CU backup state.
                 int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP
-                        : CuSyncManager.State.CU_SYNC_STATE_ACTIVE;
+                        ? CameraUploadSyncManager.State.CU_SYNC_STATE_PAUSE_UP
+                        : CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE;
 
-                CuSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
-                CuSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
@@ -10192,7 +10192,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    fireCancelUploadsJob(ManagerActivity.this);
+                    fireCancelCameraUploadJob(ManagerActivity.this);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })

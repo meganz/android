@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.domain.entity
 
 const val STATUS_PENDING = 0
 const val STATUS_TO_COMPRESS = 3

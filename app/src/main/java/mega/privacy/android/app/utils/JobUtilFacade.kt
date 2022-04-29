@@ -10,4 +10,6 @@ import javax.inject.Inject
 class JobUtilFacade @Inject constructor() : JobUtilWrapper {
 
     override fun isOverQuota(context: Context): Boolean = JobUtil.isOverQuota(context)
+    override fun fireCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean): Int =
+        JobUtil.fireCameraUploadJob(context, shouldIgnoreAttributes)
 }

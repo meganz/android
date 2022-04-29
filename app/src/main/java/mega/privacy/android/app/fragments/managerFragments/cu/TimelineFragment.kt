@@ -3,7 +3,12 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 import android.Manifest
 import android.app.Activity
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -14,15 +19,18 @@ import mega.privacy.android.app.databinding.FragmentTimelineBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
+import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaChatApiJava
-import timber.log.Timber
 
 /**
  * TimelineFragment is a sub fragment of PhotosFragment. Its sibling is AlbumsFragment
@@ -138,19 +146,10 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
-        startCameraUploadJob()
-    }
-
-    /**
-     * User enabled Camera Upload, so a periodic job should be scheduled if not already running
-     */
-    private fun startCameraUploadJob() {
         callManager {
             it.refreshTimelineFragment()
         }
-
-        Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
-        JobUtil.fireCameraUploadJob(context, false)
+        viewModel.startCameraUploadJob()
     }
 
     /**
@@ -318,8 +317,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
                     actionMode != null
                 ) {
                     View.GONE
-                }
-                else {
+                } else {
                     View.VISIBLE
                 }
             )

@@ -1,5 +1,29 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.Constants.PIN_4;
+import static mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID;
+import static mega.privacy.android.app.utils.LogUtil.areKarereLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.areSDKLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logInfo;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.LogUtil.updateKarereLogs;
+import static mega.privacy.android.app.utils.LogUtil.updateSDKLogs;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.aes_decrypt;
+import static mega.privacy.android.app.utils.Util.aes_encrypt;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,8 +41,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.jobservices.SyncRecordKt;
+import mega.privacy.android.app.domain.entity.SyncRecord;
+import mega.privacy.android.app.domain.entity.SyncRecordKt;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatItemPreferences;
 import mega.privacy.android.app.main.megachat.ChatSettings;
@@ -27,20 +51,10 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.sync.Backup;
 import mega.privacy.android.app.sync.BackupToolsKt;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
-
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.aes_decrypt;
-import static mega.privacy.android.app.utils.Util.aes_encrypt;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -2967,9 +2981,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 			if (enabled) {
-				CuSyncManager.INSTANCE.setPrimaryBackup();
+				CameraUploadSyncManager.INSTANCE.setPrimaryBackup();
 			} else {
-				CuSyncManager.INSTANCE.removePrimaryBackup();
+				CameraUploadSyncManager.INSTANCE.removePrimaryBackup();
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -2990,9 +3004,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			// Set or remove corresponding MU backup.
 			if (enabled) {
-				CuSyncManager.INSTANCE.setSecondaryBackup();
+				CameraUploadSyncManager.INSTANCE.setSecondaryBackup();
 			} else {
-				CuSyncManager.INSTANCE.removeSecondaryBackup();
+				CameraUploadSyncManager.INSTANCE.removeSecondaryBackup();
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -3013,7 +3027,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			logDebug("Set new primary handle: " + handle);
 			//Update CU backup when CU target folder changed.
-			CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
+			CameraUploadSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
@@ -3034,7 +3048,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			logDebug("Set new secondary handle: " + handle);
 			//Update MU backup when MU target folder changed.
-			CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
+			CameraUploadSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}

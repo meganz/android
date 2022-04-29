@@ -18,10 +18,10 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.jobservices.CancelUploadsWorker;
+import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
-import mega.privacy.android.app.jobservices.SyncHeartbeatWorker;
+import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker;
 import nz.mega.sdk.MegaApiJava;
 import timber.log.Timber;
 
@@ -47,17 +47,17 @@ public class JobUtil {
     /**
      * Worker tags
      */
-    private static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
+    private static final String CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG";
 
     private static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
 
-    private static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
+    private static final String HEART_BEAT_TAG = "HEART_BEAT_TAG";
 
-    private static final String SINGLE_HEART_BEAT_TAG = "MEGA_SINGLE_HEART_BEAT_TAG";
+    private static final String SINGLE_HEART_BEAT_TAG = "SINGLE_HEART_BEAT_TAG";
 
-    private static final String STOP_CAMERA_UPLOAD_TAG = "MEGA_STOP_CAMERA_UPLOAD_TAG";
+    private static final String STOP_CAMERA_UPLOAD_TAG = "STOP_CAMERA_UPLOAD_TAG";
 
-    private static final String CANCEL_UPLOADS_TAG = "MEGA_CANCEL_UPLOADS_TAG";
+    private static final String CANCEL_UPLOADS_TAG = "CANCEL_UPLOADS_TAG";
 
     /**
      * Schedule job of camera upload
@@ -96,7 +96,7 @@ public class JobUtil {
         Timber.d("JobUtil: scheduleCameraUploadSyncActiveHeartbeat()");
         // periodic work that runs during the last 10 minutes of every half an hour period
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(SyncHeartbeatWorker.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(HEART_BEAT_TAG)
                         .build();
 
@@ -113,7 +113,7 @@ public class JobUtil {
     public static synchronized void fireSingleHeartbeat(Context context) {
         Timber.d("JobUtil: sendSingleHeartbeat()");
         OneTimeWorkRequest heartbeatWorkRequest =
-                new OneTimeWorkRequest.Builder(SyncHeartbeatWorker.class).addTag(SINGLE_HEART_BEAT_TAG).build();
+                new OneTimeWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class).addTag(SINGLE_HEART_BEAT_TAG).build();
 
         WorkManager.getInstance(context).
                 enqueueUniqueWork(SINGLE_HEART_BEAT_TAG, ExistingWorkPolicy.KEEP, heartbeatWorkRequest);
@@ -168,10 +168,15 @@ public class JobUtil {
         Timber.d("Stop CameraUpload Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG));
     }
 
-    public static synchronized void fireCancelUploadsJob(Context context) {
-        Timber.d("JobUtil: fireCancelUploadsJob()");
+    /**
+     * Cancel all camera upload related jobs immediately, e.g. when all transfers are cancelled.
+     *
+     * @param context From which the action is done.
+     */
+    public static synchronized void fireCancelCameraUploadJob(Context context) {
+        Timber.d("JobUtil: fireCancelCameraUploadJob()");
         OneTimeWorkRequest cancelWorkRequest =
-                new OneTimeWorkRequest.Builder(CancelUploadsWorker.class).addTag(CANCEL_UPLOADS_TAG).build();
+                new OneTimeWorkRequest.Builder(CancelCameraUploadWorker.class).addTag(CANCEL_UPLOADS_TAG).build();
 
         WorkManager.getInstance(context).
                 enqueueUniqueWork(CANCEL_UPLOADS_TAG, ExistingWorkPolicy.KEEP, cancelWorkRequest);

@@ -7,4 +7,5 @@ import android.content.Context
  */
 interface JobUtilWrapper {
     fun isOverQuota(context: Context): Boolean
+    fun fireCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean): Int
 }

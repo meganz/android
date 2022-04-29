@@ -1,4 +1,4 @@
-package mega.privacy.android.app.sync.cusync.callback
+package mega.privacy.android.app.sync.camerauploads.callback
 
 import mega.privacy.android.app.sync.SyncEventCallback
 import mega.privacy.android.app.utils.Constants

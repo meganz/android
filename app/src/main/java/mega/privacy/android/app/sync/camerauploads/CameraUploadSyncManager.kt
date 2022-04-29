@@ -1,4 +1,4 @@
-package mega.privacy.android.app.sync.cusync
+package mega.privacy.android.app.sync.camerauploads
 
 import android.content.Intent
 import io.reactivex.rxjava3.core.Observable
@@ -10,23 +10,25 @@ import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.jobservices.SyncRecord
+import mega.privacy.android.app.domain.entity.SyncRecord
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.SyncListener
-import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
-import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
-import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
+import mega.privacy.android.app.sync.camerauploads.callback.RemoveBackupCallback
+import mega.privacy.android.app.sync.camerauploads.callback.SetBackupCallback
+import mega.privacy.android.app.sync.camerauploads.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
+import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_INVALID
+import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -38,26 +40,24 @@ import java.util.concurrent.TimeUnit.SECONDS
  * CU refers to Camera Uploads, primary.
  * MU refers to Media Uploads, secondary.
  */
-object CuSyncManager {
+object CameraUploadSyncManager {
 
     private const val PROGRESS_FINISHED = 100
 
     /**
      * Backup state,
      * originally defined in heartbeats.h
-        enum State {
-            STATE_NOT_INITIALIZED,
-            ACTIVE = 1,             // Working fine (enabled)
-            FAILED = 2,             // Failed (permanently disabled)
-            TEMPORARY_DISABLED = 3, // Temporarily disabled due to a transient situation (e.g: account blocked). Will be resumed when the condition passes
-            DISABLED = 4,           // Disabled by the user
-            PAUSE_UP = 5,           // Active but upload transfers paused in the SDK
-            PAUSE_DOWN = 6,         // Active but download transfers paused in the SDK
-            PAUSE_FULL = 7,         // Active but transfers paused in the SDK
-        };
+    enum State {
+    ACTIVE = 1,             // Working fine (enabled)
+    FAILED = 2,             // Failed (permanently disabled)
+    TEMPORARY_DISABLED = 3, // Temporarily disabled due to a transient situation (e.g: account blocked). Will be resumed when the condition passes
+    DISABLED = 4,           // Disabled by the user
+    PAUSE_UP = 5,           // Active but upload transfers paused in the SDK
+    PAUSE_DOWN = 6,         // Active but download transfers paused in the SDK
+    PAUSE_FULL = 7,         // Active but transfers paused in the SDK
+    };
      */
     object State {
-        const val CU_SYNC_STATE_NOT_INITIALIZED = -1
         const val CU_SYNC_STATE_ACTIVE = 1
         const val CU_SYNC_STATE_FAILED = 2
         const val CU_SYNC_STATE_TEMPORARY_DISABLED = 3
@@ -70,14 +70,14 @@ object CuSyncManager {
     /**
      * Heartbeat status,
      * originally defined in heartbeats.h
-        enum Status {
-            STATE_NOT_INITIALIZED,
-            UPTODATE = 1, // Up to date: local and remote paths are in sync
-            SYNCING = 2, // The sync engine is working, transfers are in progress
-            PENDING = 3, // The sync engine is working, e.g: scanning local folders
-            INACTIVE = 4, // Sync is not active. A state != ACTIVE should have been sent through '''sp'''
-            UNKNOWN = 5, // Unknown status
-        };
+    enum Status {
+    STATE_NOT_INITIALIZED,
+    UPTODATE = 1, // Up to date: local and remote paths are in sync
+    SYNCING = 2, // The sync engine is working, transfers are in progress
+    PENDING = 3, // The sync engine is working, e.g: scanning local folders
+    INACTIVE = 4, // Sync is not active. A state != ACTIVE should have been sent through '''sp'''
+    UNKNOWN = 5, // Unknown status
+    };
      */
     object Status {
         const val CU_SYNC_STATUS_NOT_INITIALIZED = -1
@@ -703,14 +703,14 @@ object CuSyncManager {
     }
 
     /**
-     * When the CU service has nothing to upload, send heartbeat as well.
+     * When the Camera Upload Service has nothing to upload, send heartbeat as well.
      */
     private fun sendRegularHeartbeat() {
         val cuBackup = databaseHandler.cuBackup
 
-        Timber.d("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
+        Timber.d("sendRegularHeartbeat() in progress")
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
+            Timber.d("Sending CameraUploads Heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_UPTODATE,
@@ -725,7 +725,7 @@ object CuSyncManager {
 
         val muBackup = databaseHandler.muBackup
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("doActiveHeartbeat Send MU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
+            Timber.d("Sending MediaUploads Heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_UPTODATE,
@@ -746,15 +746,16 @@ object CuSyncManager {
      *
      * @return MegaRequestListenerInterface object listen to the request.
      */
-    private fun createOnFinishListener(onFinish: (() -> Unit)?) = OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
-        Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+    private fun createOnFinishListener(onFinish: (() -> Unit)?) =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
+            Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
 
-        if(e.errorCode == MegaError.API_OK) {
-            onFinish?.invoke()
-        } else {
-            Timber.e("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
-        }
-    })
+            if (e.errorCode == MegaError.API_OK) {
+                onFinish?.invoke()
+            } else {
+                Timber.e("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
+            }
+        })
 
 
     /**
