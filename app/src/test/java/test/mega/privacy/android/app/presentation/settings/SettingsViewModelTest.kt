@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
@@ -22,7 +21,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestSettingsModule
 
 @ExperimentalCoroutinesApi
 class SettingsViewModelTest {
@@ -49,6 +47,7 @@ class SettingsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         runBlocking {
             whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
+            whenever(fetchMultiFactorAuthSetting()).thenReturn(emptyFlow())
         }
         underTest = SettingsViewModel(
             getAccountDetails = mock { on { invoke(any()) }.thenReturn(userAccount) },
