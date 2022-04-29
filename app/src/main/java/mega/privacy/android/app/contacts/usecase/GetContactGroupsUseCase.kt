@@ -189,7 +189,7 @@ class GetContactGroupsUseCase @Inject constructor(
             .height(context.resources.getDimensionPixelSize(R.dimen.image_group_size))
             .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_group_text_size))
             .withBorder(context.resources.getDimensionPixelSize(R.dimen.image_group_border_size))
-            .borderColor(ContextCompat.getColor(context, R.color.white))
+            .borderColor(ContextCompat.getColor(context, R.color.white_dark_grey))
             .bold()
             .toUpperCase()
             .endConfig()
