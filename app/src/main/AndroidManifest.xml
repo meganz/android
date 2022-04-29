@@ -556,6 +556,7 @@
 
 <!--    remove default WorkManager initializer-->
         <provider
+            tools:replace="android:authorities"
             android:name="androidx.startup.InitializationProvider"
             android:authorities="mega.privacy.android.app.androidx-startup"
             tools:node="remove">
