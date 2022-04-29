@@ -13,6 +13,7 @@ import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.NoLoggedInUserException
 import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.app.domain.repository.AccountRepository
@@ -67,6 +68,7 @@ class DefaultAccountRepository @Inject constructor(
 
     override fun isMultiFactorAuthAvailable() = apiFacade.multiFactorAuthAvailable()
 
+    @Throws(MegaException::class)
     override suspend fun isMultiFactorAuthEnabled(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             apiFacade.multiFactorAuthEnabled(
