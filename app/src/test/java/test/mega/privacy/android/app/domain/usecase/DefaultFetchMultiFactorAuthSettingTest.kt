@@ -6,11 +6,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.DefaultFetchMultiFactorAuthSetting
 import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -26,7 +28,7 @@ class DefaultFetchMultiFactorAuthSettingTest {
 
 
     @Test
-    fun `test initial value`() = runTest{
+    fun `test initial value`() = runTest {
         whenever(accountRepository.isMultiFactorAuthEnabled()).thenReturn(true)
         whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf())
 
@@ -37,7 +39,7 @@ class DefaultFetchMultiFactorAuthSettingTest {
     }
 
     @Test
-    fun `test updates are returned`() = runTest{
+    fun `test updates are returned`() = runTest {
         whenever(accountRepository.isMultiFactorAuthEnabled()).thenReturn(true)
         whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf(false, true))
 
@@ -45,6 +47,16 @@ class DefaultFetchMultiFactorAuthSettingTest {
             assertThat(awaitItem()).isTrue()
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that fetch multi factor auth settings return false when an exception from the api is thrown`() = runTest {
+        whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(any(), any()))
+
+        underTest().test {
+            assertThat(awaitItem()).isFalse()
             awaitComplete()
         }
     }

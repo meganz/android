@@ -10,8 +10,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
+import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
@@ -20,6 +22,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestSettingsModule
 
 @ExperimentalCoroutinesApi
 class SettingsViewModelTest {
@@ -27,6 +30,7 @@ class SettingsViewModelTest {
 
     private val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
     private val toggleAutoAcceptQRLinks = mock<ToggleAutoAcceptQRLinks>()
+    private val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
 
     private val userAccount = UserAccount(
         email = "",
@@ -56,7 +60,7 @@ class SettingsViewModelTest {
             rootNodeExists = mock { on { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
             fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
-            fetchMultiFactorAuthSetting = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            fetchMultiFactorAuthSetting = fetchMultiFactorAuthSetting,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
@@ -143,6 +147,40 @@ class SettingsViewModelTest {
 
         underTest.uiState
             .map { it.autoAcceptChecked }
+            .test {
+                assertThat(awaitItem()).isFalse()
+            }
+    }
+
+    @Test
+    fun `test that multi factor is disabled by default`() = runTest {
+        underTest.uiState
+            .map { it.multiFactorAuthChecked }
+            .test {
+                assertThat(awaitItem()).isFalse()
+            }
+    }
+
+    @Test
+    fun `test that multi factor is enabled when fetching multi factor enabled returns true`() = runTest {
+        whenever(fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
+
+        underTest.uiState
+            .map { it.multiFactorAuthChecked }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+            }
+    }
+
+    @Test
+    fun `test that multi factor is disabled when fetching multi factor enabled returns false`() = runTest {
+        whenever(fetchMultiFactorAuthSetting()).thenReturn(flowOf(false))
+
+        underTest.uiState
+            .map { it.multiFactorAuthChecked }
+            .distinctUntilChanged()
             .test {
                 assertThat(awaitItem()).isFalse()
             }
