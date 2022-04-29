@@ -9714,20 +9714,39 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
             dismissAlertDialogIfExists(statusDialog);
+
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 
+                MegaNode folderNode =  megaApi.getNodeByHandle(request.getNodeHandle());
+                if (folderNode == null) {
+                    return;
+                }
+
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser),
-                                sortOrderManagement.getOrderCloud());
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
+                        fileBrowserFragment.setFolderInfoNavigation(folderNode);
                     }
                 } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    onNodesSharedUpdate();
-                } else if (drawerItem == DrawerItem.SEARCH) {
-                    refreshFragment(FragmentTag.SEARCH.getTag());
+                    switch (getTabItemShares()) {
+                        case INCOMING_TAB:
+                            if (isIncomingAdded()) {
+                                incomingSharesFragment.navigateToFolder(folderNode);
+                            }
+                            break;
+
+                        case OUTGOING_TAB:
+                            if (isOutgoingAdded()) {
+                                outgoingSharesFragment.navigateToFolder(folderNode);
+                            }
+                            break;
+
+                        case LINKS_TAB:
+                            if (isLinksAdded()) {
+                                linksFragment.navigateToFolder(folderNode);
+                            }
+                            break;
+                    }
                 }
             } else {
                 logError("TYPE_CREATE_FOLDER ERROR: " + e.getErrorCode() + " " + e.getErrorString());

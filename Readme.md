@@ -50,7 +50,7 @@ export JAVA_HOME=/path/to/jdk
 ln -s /path/to/jdk ${HOME}/android-java
 ```
 
-6. Download the link https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+6. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
 
 7. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
 
