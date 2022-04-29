@@ -257,6 +257,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
+    implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
 
     // Other libs
     implementation 'androidx.exifinterface:exifinterface:1.3.0'

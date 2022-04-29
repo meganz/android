@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly">
 
@@ -551,6 +552,13 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
+        </provider>
+
+<!--    remove default WorkManager initializer-->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="mega.privacy.android.app.androidx-startup"
+            tools:node="remove">
         </provider>
 
         <activity

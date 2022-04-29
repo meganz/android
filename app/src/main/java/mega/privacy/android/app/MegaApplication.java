@@ -111,8 +111,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.hilt.work.HiltWorkerFactory;
 import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
+import androidx.work.Configuration;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -199,7 +201,7 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -233,6 +235,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     PerformanceReporter performanceReporter;
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
+    @Inject
+    HiltWorkerFactory workerFactory;
 
 
     String localIpAddress = "";
@@ -956,6 +960,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
         if (!legacyLoggingUtil.isLoggerKarereInitialized()) {
             legacyLoggingUtil.initLoggerKarere();
         }
+    }
+
+    @NonNull
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build();
     }
 
     public void askForFullAccountInfo() {

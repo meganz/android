@@ -4,20 +4,23 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import mega.privacy.android.app.utils.JobUtil.SHOULD_IGNORE_ATTRIBUTES
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Worker for upload images task
  */
-class StartCameraUploadWorker @Inject constructor(
-    private val appContext: Context,
-    workerParams: WorkerParameters,
+@HiltWorker
+class StartCameraUploadWorker @AssistedInject constructor(
+    @Assisted private val appContext: Context,
+    @Assisted workerParams: WorkerParameters,
     private val permissionUtilWrapper: PermissionUtilWrapper,
     private val jobUtilWrapper: JobUtilWrapper,
     private val cameraUploadsServiceWrapper: CameraUploadsServiceWrapper
