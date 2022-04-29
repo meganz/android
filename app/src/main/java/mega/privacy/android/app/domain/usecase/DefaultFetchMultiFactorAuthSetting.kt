@@ -20,7 +20,7 @@ class DefaultFetchMultiFactorAuthSetting @Inject constructor(private val account
             emit(accountRepository.isMultiFactorAuthEnabled())
             emitAll(accountRepository.monitorMultiFactorAuthChanges())
         }.catch { e ->
-            Timber.w(e)
+            Timber.e(e)
             emit(false)
         }
     }
