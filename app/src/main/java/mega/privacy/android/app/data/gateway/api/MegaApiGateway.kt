@@ -126,4 +126,13 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get thumbnail from server
+     *
+     * @param node
+     * @param dstFilePath thumbnail file path
+     * @param listener
+     */
+    fun getThumbnail(node: MegaNode, dstFilePath: String, listener: MegaRequestListenerInterface)
 }

@@ -43,4 +43,7 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
+
+    @Binds
+    abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
 }

@@ -1,10 +1,11 @@
-package mega.privacy.android.app.fragments.managerFragments.cu.album
+package mega.privacy.android.app.presentation.photos.albums.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
+import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 
 /**
  * Adapter to show albums grid list.
@@ -13,23 +14,18 @@ class AlbumCoverAdapter(
     private val coverWidth: Int,
     private val coverMargin: Int,
     private val listener: Listener
-) : ListAdapter<AlbumCover, AlbumCoverViewHolder>(AlbumCoverDiffCallback()) {
+) : ListAdapter<AlbumCoverItem, AlbumCoverViewHolder>(AlbumCoverDiffCallback()) {
 
     /**
      * DiffCallback for comparing AlbumCover
      */
-    class AlbumCoverDiffCallback : DiffUtil.ItemCallback<AlbumCover>() {
-        override fun areItemsTheSame(oldItem: AlbumCover, newItem: AlbumCover) =
+    class AlbumCoverDiffCallback : DiffUtil.ItemCallback<AlbumCoverItem>() {
+        override fun areItemsTheSame(oldItem: AlbumCoverItem, newItem: AlbumCoverItem) =
             oldItem == newItem
 
-        override fun areContentsTheSame(oldItem: AlbumCover, newItem: AlbumCover) =
-            oldItem.count == newItem.count && oldItem.thumbnail == newItem.thumbnail && oldItem.title == newItem.title
+        override fun areContentsTheSame(oldItem: AlbumCoverItem, newItem: AlbumCoverItem) =
+            oldItem.itemCount == newItem.itemCount && oldItem.node?.handle == newItem.node?.handle && oldItem.albumId == newItem.albumId
     }
-
-    /**
-     * Item Dimen
-     */
-    private var itemDimen = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumCoverViewHolder =
         AlbumCoverViewHolder(
@@ -46,18 +42,11 @@ class AlbumCoverAdapter(
         holder.bind(getItem(position), listener)
     }
 
-    /**
-     * Set Item Dimen
-     */
-    fun setItemDimen(dimen: Int) {
-        if (dimen > 0) itemDimen = dimen
-    }
-
     interface Listener {
 
         /**
          * When cover gets to be click
          */
-        fun onCoverClicked(album: AlbumCover)
+        fun onCoverClicked(album: AlbumCoverItem)
     }
 }
