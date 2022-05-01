@@ -238,7 +238,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     @Inject
     HiltWorkerFactory workerFactory;
 
-
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
     final static public String APP_KEY = "6tioyn8ka5l6hty";

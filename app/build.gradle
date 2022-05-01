@@ -184,6 +184,7 @@ android {
                 unstrippedNativeLibsDir 'src/main/obj/local'
             }
             firebaseAppDistribution {
+                appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
                 groups = "internal_qa, internal_dev, external_qa, external_dev"
                 testers = readTesters()
@@ -196,6 +197,13 @@ android {
                 // Disable @AddTrace annotation processing and automatic monitoring
                 // of HTTP/S network requests for HMS build
                 instrumentationEnabled false
+            }
+            firebaseAppDistribution {
+                // This appId value comes from src/hms/google-services.json
+                appId = "1:268821755439:android:fdd31226b477cf614e78da"
+                releaseNotes = readReleaseNotes()
+                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                testers = readTesters()
             }
         }
     }
@@ -303,7 +311,7 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation files('src/main/libs/libwebrtc.jar')
+    implementation files('src/main/jni/megachat/webrtc/libwebrtc.jar')
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 

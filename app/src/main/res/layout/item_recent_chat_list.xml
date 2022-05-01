@@ -127,31 +127,31 @@
 
         <RelativeLayout
             android:id="@+id/second_line_layout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/first_line_layout">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/recent_chat_list_unread_circle"
                 android:orientation="horizontal"
+                android:paddingEnd="8dp"
                 android:visibility="visible"
                 android:weightSum="1">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/recent_chat_list_content"
+                    style="@style/TextAppearance.Mega.Body2.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:layout_weight="0"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-                    app:emojiSize="12sp"
                     app:layout_constraintWidth_max="wrap"
-                    tools:text="last message" />
+                    tools:text="Last message" />
 
                 <LinearLayout
                     android:id="@+id/last_message_voice_clip_or_location"
@@ -196,7 +196,6 @@
                     android:layout_centerInParent="true"
                     android:paddingBottom="1dp"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
-
             </RelativeLayout>
         </RelativeLayout>
 

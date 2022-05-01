@@ -19,7 +19,7 @@ pipeline {
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
-        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '1'))
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '1'))
         timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
@@ -42,7 +42,10 @@ pipeline {
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
         APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
-        RELEASE_NOTES_FOR_CD = "($gitlabUserName)Branch: $gitlabSourceBranch \nLast 5 git commits:\n ${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
+        RELEASE_NOTES_FOR_CD = "Triggered by: $gitlabUserName" +
+                "\nTrigger Reason: ${getTriggerReason()}" +
+                "\nBranch: $gitlabSourceBranch " +
+                "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
         TESTERS_FOR_CD = getTesterList()
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
@@ -219,32 +222,31 @@ pipeline {
                 }
             }
         }
-        stage('Build APK (GMS)') {
+        stage('Build APK(GMS)') {
             steps {
                 script {
-                    BUILD_STEP = 'Build APK (GMS+HMS)'
+                    BUILD_STEP = 'Build APK (GMS)'
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS)') {
-                    // Finish building and packaging the APK
                     sh './gradlew clean app:assembleGmsRelease'
                 }
             }
         }
-        stage('Sign APK (GMS)') {
+        stage('Sign APK(GMS)') {
             steps {
                 script {
-                    BUILD_STEP = 'Sign APK (GMS)'
+                    BUILD_STEP = 'Sign APK(GMS)'
                 }
-                gitlabCommitStatus(name: 'Sign APK (GMS)') {
+                gitlabCommitStatus(name: 'Sign APK(GMS)') {
                     withCredentials([
-                            string(credentialsId: 'ANDROID_APK_GMS_SIGN_PASSWORD', variable: 'ANDROID_APK_GMS_SIGN_PASSWORD'),
-                            file(credentialsId: 'ANDROID_APK_GMS_KEYSTORE', variable: 'ANDROID_APK_GMS_KEYSTORE')
+                            string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
+                            file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
                     ]) {
                         script {
                             sh '''
                                 cd app/build/outputs/apk/gms/release
                                 zipalign -v -p 4 app-*-unsigned.apk app-gms-release-unsigned-aligned.apk
-                                apksigner sign --ks "$ANDROID_APK_GMS_KEYSTORE" --ks-pass "pass:$ANDROID_APK_GMS_SIGN_PASSWORD" --out app-gms-release-signed.apk app-gms-release-unsigned-aligned.apk
+                                apksigner sign --ks "$ANDROID_QA_KEYSTORE" --ks-pass "pass:$ANDROID_QA_SIGN_PASSWORD" --out app-gms-release-signed.apk app-gms-release-unsigned-aligned.apk
                                 ls -lh
                                 rm -fv *unsigned*.apk
                                 pwd
@@ -256,23 +258,83 @@ pipeline {
                 }
             }
         }
-        stage('Upload APK to Firebase') {
+        stage('Upload APK(GMS) to Firebase') {
             //            environment {
             //SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
             //SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
             //            }
             steps {
                 script {
-                    BUILD_STEP = 'Upload APK to Firebase'
+                    BUILD_STEP = 'Upload APK(GMS) to Firebase'
                 }
-                // Build the app in release mode, and sign the APK using the environment variables
                 withCredentials([
                         file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
                 ]) {
                     script {
                         withEnv(["GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG"]) {
-//                            sh './gradlew app:assembleGmsDebug appDistributionUploadGmsDebug'
                             sh './gradlew appDistributionUploadGmsRelease'
+                        }
+                    }
+                }
+
+                // Archive the APKs so that they can be downloaded from Jenkins
+                // archiveArtifacts '**/*.apk'
+
+                // Upload the APK to Google Play
+                //androidApkUpload googleCredentialsId: 'Google Play', apkFilesPattern: '**/*-release.apk', trackName: 'beta'
+            }
+        }
+        stage('Build APK(HMS)') {
+            steps {
+                script {
+                    BUILD_STEP = 'Build APK(HMS)'
+                }
+                gitlabCommitStatus(name: 'Build APK(HMS)') {
+                    sh './gradlew clean app:assembleHmsRelease'
+                }
+            }
+        }
+        stage('Sign APK(HMS)') {
+            steps {
+                script {
+                    BUILD_STEP = 'Sign APK(HMS)'
+                }
+                gitlabCommitStatus(name: 'Sign APK(HMS)') {
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
+                            file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
+                    ]) {
+                        script {
+                            sh '''
+                                cd app/build/outputs/apk/hms/release
+                                zipalign -v -p 4 app-*-unsigned.apk app-hms-release-unsigned-aligned.apk
+                                apksigner sign --ks "$ANDROID_QA_KEYSTORE" --ks-pass "pass:$ANDROID_QA_SIGN_PASSWORD" --out app-hms-release-signed.apk app-hms-release-unsigned-aligned.apk
+                                ls -lh
+                                rm -fv *unsigned*.apk
+                                pwd
+                                ls -lh
+                                cd -
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+        stage('Upload HMS APK to Firebase') {
+            //            environment {
+            //SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
+            //SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
+            //            }
+            steps {
+                script {
+                    BUILD_STEP = 'Upload HMS APK to Firebase'
+                }
+                withCredentials([
+                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
+                ]) {
+                    script {
+                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG"]) {
+                            sh './gradlew appDistributionUploadHmsRelease'
                         }
                     }
                 }
@@ -503,18 +565,28 @@ private void sendMRComment(String message) {
  * @return The success message to be sent
  */
 private String successMessage(String lineBreak) {
-    String message = ":rocket: Android APK Build uploaded successfully to Firebase Crashlytics!" +
+    return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!" +
             "${lineBreak}Version:\t${readAppVersion()}${APK_VERSION_NAME_FOR_CD}" +
+            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
+            "${lineBreak}Commit:\t${GIT_COMMIT}" +
+            "${lineBreak}Trigger Reason: ${getTriggerReason()}"
+}
+
+/**
+ * get trigger reason
+ * @return description for the trigger reason
+ */
+private String getTriggerReason() {
     if (env.gitlabActionType == "PUSH") {
-        message += "${lineBreak}Trigger Reason: git PUSH"
+        return "git PUSH into develop branch"
     } else if (env.gitlabActionType == "NOTE") {
-        message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
+        return "Manually by comment in GitLab MR(${gitlabTriggerPhrase})"
+    } else {
+        return "Other reasons${env.gitlabActionType}"
     }
-    return message
 }
 
 /**
@@ -562,3 +634,13 @@ private String readAppVersion() {
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
     return versionName + "(" + versionCode + ")"
 }
+
+/**
+ * read the last git commit message
+ * @return last git commit message
+ */
+private String lastCommitMessage() {
+    return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
+}
+
+
