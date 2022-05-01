@@ -10,7 +10,10 @@ import timber.log.Timber
 /**
  * Worker to cancel all camera upload transfers.
  */
-class CancelCameraUploadWorker(val appContext: Context, val workerParams: WorkerParameters) :
+class CancelCameraUploadWorker(
+    private val appContext: Context,
+    workerParams: WorkerParameters
+) :
     Worker(appContext, workerParams) {
 
     override fun doWork(): Result {
