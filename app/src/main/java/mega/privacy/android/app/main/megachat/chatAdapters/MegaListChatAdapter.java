@@ -1902,13 +1902,12 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 					logDebug("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.black));
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 					((ViewHolderNormalChatList)holder).textViewContent.setText("");
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.word_me)+" ");
-						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
 					}
 					else{
 						logDebug("The last message NOT mine" + lastMsgSender);
@@ -1936,26 +1935,10 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(fullNameAction+": ");
-							if(chat.getUnreadCount()==0){
-								logDebug("Message READ");
-								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
-							}
-							else{
-								logDebug("Message NOt read");
-								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, false);
-							}
-						}
-						else{
-							if(chat.getUnreadCount()==0){
-								logDebug("Message READ");
-								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
-							}
-							else{
-								logDebug("Message NOt read");
-								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, false);
-							}
 						}
 					}
+
+					setVoiceClipOrLocationLayout(((ViewHolderNormalChatList) holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList) holder).voiceClipOrLocationText, ((ViewHolderNormalChatList) holder).textViewContent, R.drawable.ic_location_small, chat.getUnreadCount() == 0);
 				}
 				else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
 					logDebug("Rich link message");
@@ -2258,7 +2241,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 
 						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 					}
 				}
 				else{
@@ -2292,39 +2274,23 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						Spannable contactMessage = new SpannableString(lastMessageString);
 
-						boolean isRead;
 						if(chat.getUnreadCount()==0){
 							logDebug("Message READ");
 							contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-							isRead = true;
 						}
 						else{
 							logDebug("Message NOT read");
 							contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
-							isRead = false;
 						}
 						CharSequence indexedText = TextUtils.concat(name, contactMessage);
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, isRead);
-
 					}
 					else{
-						if(chat.getUnreadCount()==0){
-							logDebug("Message READ");
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
-						}
-						else{
-							logDebug("Message NOT read");
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
-							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
-						}
-
 						((ViewHolderNormalChatList) holder).textViewContent.setText(lastMessageString);
 					}
 				}
+
+				setVoiceClipOrLocationLayout(((ViewHolderNormalChatList) holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList) holder).voiceClipOrLocationText, ((ViewHolderNormalChatList) holder).textViewContent, R.drawable.ic_mic_on_small, chat.getUnreadCount() == 0);
 			}
 		}
 		else{
@@ -2333,14 +2299,16 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 		}
 	}
 
-	private void setVoiceClipOrLocationLayout(ImageView image, TextView text, int resource, boolean isRead) {
+	private void setVoiceClipOrLocationLayout(ImageView image, TextView text, TextView senderText, int resource, boolean isRead) {
 		if (isRead) {
 			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.grey_300_grey_600));
 			text.setTextColor(ContextCompat.getColor(context, R.color.grey_300_grey_600));
+			senderText.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 		}
 		else {
 			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.teal_300_teal_200));
 			text.setTextColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
+			senderText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 		}
 	}
 
