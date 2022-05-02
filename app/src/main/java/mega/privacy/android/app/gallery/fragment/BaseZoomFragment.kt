@@ -157,7 +157,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     private fun updateUiWhenAnimationEnd() {
         viewModel.items.value?.let {
             val newList = ArrayList(it)
-            gridAdapter.submitList(newList)
+            if (isGridAdapterInitialized()) {
+                gridAdapter.submitList(newList)
+            }
         }
     }
 
