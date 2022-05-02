@@ -61,7 +61,7 @@ class AlbumsFragment : Fragment(), PhotosTabCallback {
         display.getMetrics(outMetrics)
     }
 
-    fun getOutMetrics(): DisplayMetrics? {
+    fun getOutMetrics(): DisplayMetrics {
         return outMetrics
     }
 

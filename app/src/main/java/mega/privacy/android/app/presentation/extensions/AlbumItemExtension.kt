@@ -16,7 +16,8 @@ fun List<AlbumItemInfo>.toAlbumCoverList(): List<AlbumCoverItem> {
     val newList = ArrayList<AlbumCoverItem>()
     val newAlbumCoverItem = createEmptyFavAlbum()
     if (this.isNotEmpty()) {
-        newAlbumCoverItem.node = this[0].node
+        newAlbumCoverItem.handle = this[0].handle
+        newAlbumCoverItem.nodeBase64Handle = this[0].base64Handle
         newAlbumCoverItem.itemCount = this.size
     }
     newList.add(newAlbumCoverItem)
@@ -41,13 +42,13 @@ fun AlbumCoverItem.mapAlbumTitle(context: Context): String {
 }
 
 
-fun AlbumCoverItem.getThumbnailFile(context: Context): File? {
-    if (this.node == null)
+fun AlbumCoverItem.getThumbnailPath(context: Context): String? {
+    if (this.nodeBase64Handle.isNullOrBlank())
         return null
     val thumbnailFolder = File(context.cacheDir, CacheFolderManager.THUMBNAIL_FOLDER)
-    return File(
+    return "file://" + File(
         thumbnailFolder,
-        this.node!!.base64Handle.plus(FileUtil.JPG_EXTENSION)
-    )
+        nodeBase64Handle.plus(FileUtil.JPG_EXTENSION)
+    ).absolutePath
 }
 

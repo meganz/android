@@ -8,7 +8,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
-import mega.privacy.android.app.presentation.extensions.getThumbnailFile
+import mega.privacy.android.app.presentation.extensions.getThumbnailPath
 import mega.privacy.android.app.presentation.extensions.mapAlbumTitle
 import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.utils.Util
@@ -50,16 +50,15 @@ class AlbumCoverViewHolder(
             listener.onCoverClicked(albumCover)
         }
 
-        val coverImage = albumCover.getThumbnailFile(binding.title.context)
-        if(coverImage == null) {
+        val coverImagePath = albumCover.getThumbnailPath(binding.title.context)
+        if(coverImagePath.isNullOrBlank()) {
             if (Util.isDarkMode(itemView.context)) {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover_d)
             } else {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover)
             }
         } else {
-
-            val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(coverImage)).build()
+            val request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(coverImagePath)).build()
             val controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request)
                 .setOldController(binding.cover.controller)

@@ -19,17 +19,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
-    //val sortOrderManagement: SortOrderManagement,
-    private val getAllFavorites: GetFavouriteAlbumItems,
+    private val getFavouriteAlbumItems: GetFavouriteAlbumItems
 ) : ViewModel() {
 
     private val _favouritesState =
         MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Loading)
     val favouritesState = _favouritesState.asStateFlow()
-    /**
-     * Get current sort rule from SortOrderManagement
-     */
-    //fun getOrder() = sortOrderManagement.getOrderCamera()
 
     init {
         getAllFavourites()
@@ -48,7 +43,7 @@ class AlbumsViewModel @Inject constructor(
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
             runCatching {
-                getAllFavorites()
+                getFavouriteAlbumItems()
             }.onSuccess { flow ->
                 flow.collect { list ->
                     val newAlbumList = list.toAlbumCoverList()

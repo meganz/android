@@ -1,11 +1,10 @@
 package mega.privacy.android.app.domain.entity
 
-import nz.mega.sdk.MegaNode
-
 /**
  * The entity for AlbumItem info
- * @param node current favourite node
+ * @param handle current favourite node handle
  */
 data class AlbumItemInfo(
-    val node: MegaNode
+    val handle:Long,
+    val base64Handle:String
 )

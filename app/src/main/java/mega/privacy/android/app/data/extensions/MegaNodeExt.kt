@@ -32,6 +32,7 @@ fun MegaNode.toFavouriteInfo(
  */
 fun MegaNode.toAlbumItemInfo(): AlbumItemInfo {
     return AlbumItemInfo(
-        node = this
+        handle = this.handle,
+        base64Handle = this.base64Handle
     )
 }
