@@ -1,13 +1,10 @@
 package mega.privacy.android.app.presentation.photos.albums
 
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,11 +15,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAlbumBinding
+import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
-import mega.privacy.android.app.presentation.photos.albums.adapter.AlbumCoverAdapter
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.photos.albums.adapter.AlbumCoverAdapter
 import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.utils.Constants
@@ -33,16 +31,12 @@ import timber.log.Timber
  * AlbumsFragment is a sub fragment of PhotosFragment. Its sibling is TimelineFragment
  */
 @AndroidEntryPoint
-class AlbumsFragment : Fragment(), PhotosTabCallback {
+class AlbumsFragment : BaseFragment(), PhotosTabCallback {
 
     private lateinit var mManagerActivity: ManagerActivity
-
     private lateinit var binding: FragmentAlbumBinding
-
     private lateinit var albumList: RecyclerView
     private lateinit var albumCoverAdapter: AlbumCoverAdapter
-    private lateinit var outMetrics: DisplayMetrics
-
     val viewModel by viewModels<AlbumsViewModel>()
 
     /**
@@ -53,16 +47,9 @@ class AlbumsFragment : Fragment(), PhotosTabCallback {
         const val SPAN_LANDSCAPE = 4
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         mManagerActivity = activity as ManagerActivity
-        val display = mManagerActivity.windowManager.defaultDisplay
-        outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-    }
-
-    fun getOutMetrics(): DisplayMetrics {
-        return outMetrics
     }
 
     override fun onCreateView(
