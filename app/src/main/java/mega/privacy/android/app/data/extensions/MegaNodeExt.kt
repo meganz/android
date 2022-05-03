@@ -33,6 +33,7 @@ fun MegaNode.toFavouriteInfo(
 fun MegaNode.toAlbumItemInfo(): AlbumItemInfo {
     return AlbumItemInfo(
         handle = this.handle,
-        base64Handle = this.base64Handle
+        base64Handle = this.base64Handle,
+        modifiedTime = modificationTime
     )
 }

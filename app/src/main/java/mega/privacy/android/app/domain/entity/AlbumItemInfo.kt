@@ -6,5 +6,6 @@ package mega.privacy.android.app.domain.entity
  */
 data class AlbumItemInfo(
     val handle:Long,
-    val base64Handle:String
+    val base64Handle:String,
+    val modifiedTime: Long
 )

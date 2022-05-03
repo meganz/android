@@ -55,9 +55,11 @@ class AlbumsViewModelTest {
         val node = mock<MegaNode>()
         whenever(node.handle).thenReturn(12345)
         whenever(node.base64Handle).thenReturn("12345")
+        whenever(node.modificationTime).thenReturn(1234567890)
         val albumItemInfo = AlbumItemInfo(
             handle = node.handle,
-            base64Handle = node.base64Handle
+            base64Handle = node.base64Handle,
+            modifiedTime = node.modificationTime
         )
         val list = listOf(albumItemInfo)
         whenever(getFavouriteAlbumItems()).thenReturn(

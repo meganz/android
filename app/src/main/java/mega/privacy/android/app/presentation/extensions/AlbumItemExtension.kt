@@ -16,8 +16,11 @@ fun List<AlbumItemInfo>.toAlbumCoverList(): List<AlbumCoverItem> {
     val newList = ArrayList<AlbumCoverItem>()
     val newAlbumCoverItem = createEmptyFavAlbum()
     if (this.isNotEmpty()) {
-        newAlbumCoverItem.handle = this[0].handle
-        newAlbumCoverItem.nodeBase64Handle = this[0].base64Handle
+        val sortedList = this.sortedByDescending {
+            it.modifiedTime
+        }
+        newAlbumCoverItem.handle = sortedList[0].handle
+        newAlbumCoverItem.nodeBase64Handle = sortedList[0].base64Handle
         newAlbumCoverItem.itemCount = this.size
     }
     newList.add(newAlbumCoverItem)
