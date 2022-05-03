@@ -239,6 +239,7 @@ class GetContactsUseCase @Inject constructor(
         } else {
             null
         }
+        val isNew = wasRecentlyAdded() && megaChatApi.getChatRoomByUser(handle) == null
 
         return ContactItem.Data(
             handle = handle,
@@ -249,7 +250,7 @@ class GetContactsUseCase @Inject constructor(
             statusColor = getUserStatusColor(userStatus),
             avatarUri = userAvatar,
             placeholder = placeholder,
-            isNew = wasRecentlyAdded()
+            isNew = isNew
         )
     }
 
