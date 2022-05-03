@@ -15,4 +15,8 @@ class FirebaseCrashReporter(
     override fun setEnabled(enabled: Boolean) {
         crashlytics.setCrashlyticsCollectionEnabled(enabled)
     }
+
+    override fun log(message: String) {
+        crashlytics.log(message)
+    }
 }

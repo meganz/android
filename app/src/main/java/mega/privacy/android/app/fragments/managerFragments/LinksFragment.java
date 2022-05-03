@@ -234,21 +234,26 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 updateActionModeTitle();
             }
         } else if (nodes.get(position).isFolder()) {
-            lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
-            managerActivity.hideTabs(true, LINKS_TAB);
-            managerActivity.increaseDeepBrowserTreeLinks();
-            managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
-            managerActivity.supportInvalidateOptionsMenu();
-            managerActivity.setToolbarTitle();
-
-            setNodes(megaApi.getChildren(nodes.get(position), getLinksOrderCloud(
-                    sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
-            recyclerView.scrollToPosition(0);
-            checkScroll();
-            managerActivity.showFabButton();
+            navigateToFolder(nodes.get(position));
         } else {
             openFile(nodes.get(position), LINKS_ADAPTER, position);
         }
+    }
+
+    @Override
+    public void navigateToFolder(MegaNode node) {
+        lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+        managerActivity.hideTabs(true, LINKS_TAB);
+        managerActivity.increaseDeepBrowserTreeLinks();
+        managerActivity.setParentHandleLinks(node.getHandle());
+        managerActivity.supportInvalidateOptionsMenu();
+        managerActivity.setToolbarTitle();
+
+        setNodes(megaApi.getChildren(node, getLinksOrderCloud(
+                sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
+        recyclerView.scrollToPosition(0);
+        checkScroll();
+        managerActivity.showFabButton();
     }
 
     @Override

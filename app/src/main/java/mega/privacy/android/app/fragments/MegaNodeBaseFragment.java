@@ -120,6 +120,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected abstract void itemClick(int position);
 
+    /**
+     * Navigates to a new child folder.
+     *
+     * @param node The folder node.
+     */
+    protected abstract void navigateToFolder(MegaNode node);
+
     protected abstract void refresh();
 
     public MegaNodeBaseFragment() {

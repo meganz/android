@@ -16,6 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,6 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -62,6 +62,20 @@ class InMeetingViewModel @Inject constructor(
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
+    /**
+     * Enum defining the type of call subtitle.
+     */
+    enum class SubtitleCallType{
+        TYPE_CONNECTING, TYPE_CALLING, TYPE_ESTABLISHED
+    }
+
+    /**
+     * Enum defining the type of another call.
+     */
+    enum class AnotherCallType{
+        TYPE_NO_CALL, TYPE_IN_PROGRESS, TYPE_ON_HOLD
+    }
+
     var status = InMeetingFragment.NOT_TYPE
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
@@ -74,9 +88,13 @@ class InMeetingViewModel @Inject constructor(
     private var haveConnection: Boolean = false
 
     private var callInProgressDisposable: Disposable? = null
+    private var anotherCallInProgressDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
+
+    private val _showCallDuration = MutableStateFlow(false)
+    val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -88,10 +106,18 @@ class InMeetingViewModel @Inject constructor(
     private val _callLiveData = MutableLiveData<MegaChatCall?>(null)
     val callLiveData: LiveData<MegaChatCall?> = _callLiveData
 
+    // Call ID
+    private val _updateCallId = MutableStateFlow(MEGACHAT_INVALID_HANDLE)
+    val updateCallId: StateFlow<Long> get() = _updateCallId
+
     // Chat title
     private val _chatTitle: MutableLiveData<String> =
         MutableLiveData<String>(" ")
     val chatTitle: LiveData<String> = _chatTitle
+
+    // Call subtitle
+    private val _updateCallSubtitle = MutableStateFlow(SubtitleCallType.TYPE_CONNECTING)
+    val updateCallSubtitle: StateFlow<SubtitleCallType> get() = _updateCallSubtitle
 
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
@@ -106,6 +132,14 @@ class InMeetingViewModel @Inject constructor(
     private val _allowClickingOnToolbar = MutableStateFlow(false)
     val allowClickingOnToolbar: StateFlow<Boolean> get() = _allowClickingOnToolbar
 
+    // Another call banner
+    private val _updateAnotherCallBannerType = MutableStateFlow(AnotherCallType.TYPE_NO_CALL)
+    val updateAnotherCallBannerType: StateFlow<AnotherCallType> get() = _updateAnotherCallBannerType
+
+    // Another chat title
+    private val _anotherChatTitle = MutableStateFlow(" ")
+    val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -114,14 +148,23 @@ class InMeetingViewModel @Inject constructor(
         }
 
     private val updateCallStatusObserver =
-        Observer<MegaChatCall> {
-            if (isSameChatRoom(it.chatid)) {
-                checkPreviousReconnectingStatus(it.status)
-                checkReconnectingStatus(it.status)
-                previousState = it.status
-
+        Observer<MegaChatCall> { call ->
+            if (isSameChatRoom(call.chatid)) {
+                checkSubtitleToolbar(call.status, call.isOutgoing)
+                checkPreviousReconnectingStatus(call.status)
+                checkReconnectingStatus(call.status)
+                previousState = call.status
             }
         }
+
+    private val noOutgoingCallObserver = Observer<Long> {
+        if (isSameCall(it)) {
+            getCall()?.let { call ->
+                logDebug("The call is no longer an outgoing call")
+                checkSubtitleToolbar(call.status, call.isOutgoing)
+            }
+        }
+    }
 
     init {
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
@@ -129,6 +172,79 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(updateCallStatusObserver)
+
+        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
+            .observeForever(noOutgoingCallObserver)
+    }
+
+    /**
+     * Method to check the subtitle in the toolbar
+     *
+     * @param callStatus The current status of the call
+     * @param isOutgoingCall If the current call is an outgoing call
+     */
+    private fun checkSubtitleToolbar(callStatus: Int, isOutgoingCall: Boolean) {
+        when (callStatus) {
+            CALL_STATUS_CONNECTING -> {
+                _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
+            }
+            CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
+                getChat()?.let { chat ->
+                    if (!chat.isMeeting && isRequestSent() && isOutgoingCall) {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CALLING
+                        _showCallDuration.value = false
+                    } else if (callStatus == CALL_STATUS_JOINING) {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
+                        _showCallDuration.value = false
+                    } else {
+                        _updateCallSubtitle.value = SubtitleCallType.TYPE_ESTABLISHED
+                        _showCallDuration.value = true
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to get the duration of the call
+     */
+    fun getCallDuration(): Long = getCall()?.duration ?: INVALID_VALUE.toLong()
+
+    /**
+     * Method that controls whether the another call banner should be visible or not
+     */
+    private fun checkAnotherCallBanner() {
+        anotherCallInProgressDisposable?.dispose()
+
+        anotherCallInProgressDisposable = getCallUseCase.checkAnotherCall(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    if (it == MEGACHAT_INVALID_HANDLE) {
+                        _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                    } else {
+                        val call: MegaChatCall? = getCallUseCase.getMegaChatCall(it).blockingGet()
+                        if (call != null) {
+                            if (call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_ON_HOLD) {
+                                _updateAnotherCallBannerType.value = AnotherCallType.TYPE_ON_HOLD
+                            } else if (!call.isOnHold && _updateAnotherCallBannerType.value != AnotherCallType.TYPE_IN_PROGRESS) {
+                                _updateAnotherCallBannerType.value =
+                                    AnotherCallType.TYPE_IN_PROGRESS
+                            }
+
+                            inMeetingRepository.getChatRoom(it)?.let { chat ->
+                                _anotherChatTitle.value = getTitleChat(chat)
+                            }
+                        } else {
+                            _updateAnotherCallBannerType.value = AnotherCallType.TYPE_NO_CALL
+                        }
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            ).addTo(composite)
     }
 
     /**
@@ -148,11 +264,7 @@ class InMeetingViewModel @Inject constructor(
                     onError = { error ->
                         LogUtil.logError(error.stackTraceToString())
                     }
-                )
-
-            callInProgressDisposable?.let {
-                composite.add(it)
-            }
+                ).addTo(composite)
         }
     }
 
@@ -218,6 +330,13 @@ class InMeetingViewModel @Inject constructor(
         if (isSameChatRoom(chatId)) {
             _callLiveData.value = inMeetingRepository.getMeeting(chatId)
             _callLiveData.value?.let {
+                if(_updateCallId.value != it.callId){
+                    _updateCallId.value = it.callId
+                    checkSubtitleToolbar(it.status, it.isOutgoing)
+                    checkAnotherCallBanner()
+                    checkToolbarClickability()
+                }
+
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
                     previousState = it.status
                 }
@@ -281,8 +400,6 @@ class InMeetingViewModel @Inject constructor(
             setCall(it.chatId)
             _chatTitle.value = getTitleChat(it)
         }
-
-        checkToolbarClickability()
     }
 
     /**
@@ -784,8 +901,8 @@ class InMeetingViewModel @Inject constructor(
                                     session.peerid
                                 )
                             )
-                            return true
                         }
+                        return true
                     }
                 }
             }
@@ -1729,6 +1846,9 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .removeObserver(updateCallStatusObserver)
+
+        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
+            .removeObserver(noOutgoingCallObserver)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
@@ -1961,13 +2081,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     override fun onCallHungUp(callId: Long) {
-        _callLiveData.value?.let {
-            if (it.callId == callId) {
-                logDebug("Current call hung up")
-                _callLiveData.value = null
-                currentChatId = MEGACHAT_INVALID_HANDLE
-            }
-        }
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
@@ -2189,25 +2302,6 @@ class InMeetingViewModel @Inject constructor(
         }
 
         return null
-    }
-
-    /**
-     * Perform the necessary actions when the call is over.
-     * Check if exists another call in progress or on hold
-     */
-    fun checkIfAnotherCallShouldBeShown(passcodeManagement: PasscodeManagement): Boolean {
-        getAnotherCall()?.let {
-            logDebug("Show another call")
-            CallUtil.openMeetingInProgress(
-                MegaApplication.getInstance().applicationContext,
-                it.chatid,
-                false,
-                passcodeManagement
-            )
-            return true
-        }
-
-        return false
     }
 
     /**

@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -26,8 +27,10 @@ import javax.inject.Inject
  * @param zipFileRepository ZipFileRepo
  */
 @HiltViewModel
-class ZipBrowserViewModel @Inject constructor(private val zipFileRepository: ZipFileRepository) :
-    ViewModel() {
+class ZipBrowserViewModel @Inject constructor(
+    private val zipFileRepository: ZipFileRepository,
+    private val crashReporter: CrashReporter
+) : ViewModel() {
     companion object {
         private const val TITLE_ZIP = "ZIP "
         private const val SUFFIX_ZIP = ".zip"
@@ -145,6 +148,8 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepository: Zip
     fun viewModelInit(zipFullPath: String, unzipRootPath: String) {
         this.zipFullPath = zipFullPath
         this.unzipRootPath = "${unzipRootPath}${File.separator}"
+        // Log the zip file path
+        crashReporter.log("Path of ZipFile(viewModelInit) is $zipFullPath")
         zipFile = ZipFile(zipFullPath)
         rootFolderPath = unzipRootPath.split("/").last()
         viewModelScope.launch(handler) {
