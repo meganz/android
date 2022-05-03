@@ -461,6 +461,11 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
+        if (mode.value == EDIT_MODE) {
+            uploadFile(activity, fromHome, tempFile, parentHandle)
+            return
+        }
+
         checkNameCollisionUseCase.check(tempFile.name, parentHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -475,20 +480,37 @@ class TextEditorViewModel @Inject constructor(
                             logError(error.message)
                         }
                         is MegaNodeException.ChildDoesNotExistsException -> {
-                            val uploadIntent = Intent(activity, UploadService::class.java)
-                                .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-                                .putExtra(FROM_HOME_PAGE, fromHome)
-                                .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
-                                .putExtra(UploadService.EXTRA_NAME, fileName.value)
-                                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-
-                            activity.startService(uploadIntent)
-                            activity.finish()
+                            uploadFile(activity, fromHome, tempFile, parentHandle)
                         }
                     }
                 }
             )
             .addTo(composite)
+    }
+
+    /**
+     * Uploads the file.
+     *
+     * @param activity Current activity.
+     * @param fromHome True if is creating file from Home page, false otherwise.
+     * @param tempFile  The file to upload.
+     * @param parentHandle  The handle of the folder in which the file will be uploaded.
+     */
+    private fun uploadFile(
+        activity: Activity,
+        fromHome: Boolean,
+        tempFile: File,
+        parentHandle: Long
+    ) {
+        activity.startService(
+            Intent(activity, UploadService::class.java)
+                .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+                .putExtra(FROM_HOME_PAGE, fromHome)
+                .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
+                .putExtra(UploadService.EXTRA_NAME, fileName.value)
+                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+        )
+        activity.finish()
     }
 
     /**
