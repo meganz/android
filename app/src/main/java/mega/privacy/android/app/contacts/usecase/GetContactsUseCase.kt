@@ -17,8 +17,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatPresenceLastGreen
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.*
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -116,7 +115,7 @@ class GetContactsUseCase @Inject constructor(
             )
 
             val chatSubscription = getChatChangesUseCase.get()
-                .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen }
+                .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen || it is OnChatConnectionStateUpdate }
                 .subscribeBy(
                     onNext = { change ->
                         if (emitter.isCancelled) return@subscribeBy
@@ -149,6 +148,17 @@ class GetContactsUseCase @Inject constructor(
                                             context,
                                             change.lastGreen
                                         )
+                                    )
+
+                                    emitter.onNext(contacts.sortedAlphabetically())
+                                }
+                            }
+                            is OnChatConnectionStateUpdate -> {
+                                val index = contacts.indexOfFirst { it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId }
+                                if (index != INVALID_POSITION) {
+                                    val currentContact = contacts[index]
+                                    contacts[index] = currentContact.copy(
+                                        isNew = false
                                     )
 
                                     emitter.onNext(contacts.sortedAlphabetically())
