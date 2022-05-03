@@ -52,11 +52,13 @@ class DefaultFetchMultiFactorAuthSettingTest {
     }
 
     @Test
-    fun `test that fetch multi factor auth settings return false when an exception from the api is thrown`() = runTest {
-        whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(any(), any()))
+    fun `test that subsequent changes are returned when an exception from the api is thrown`() = runTest {
+        whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(null, null))
+        whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf(true))
 
         underTest().test {
             assertThat(awaitItem()).isFalse()
+            assertThat(awaitItem()).isTrue()
             awaitComplete()
         }
     }

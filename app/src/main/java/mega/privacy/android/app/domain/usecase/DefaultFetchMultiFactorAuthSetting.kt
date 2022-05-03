@@ -17,11 +17,16 @@ class DefaultFetchMultiFactorAuthSetting @Inject constructor(private val account
     FetchMultiFactorAuthSetting {
     override fun invoke(): Flow<Boolean> {
         return flow {
-            emit(accountRepository.isMultiFactorAuthEnabled())
+            kotlin.runCatching {
+                accountRepository.isMultiFactorAuthEnabled()
+            }.fold(
+                onSuccess = { emit(it) },
+                onFailure = {
+                    Timber.e(it)
+                    emit(false)
+                }
+            )
             emitAll(accountRepository.monitorMultiFactorAuthChanges())
-        }.catch { e ->
-            Timber.e(e)
-            emit(false)
         }
     }
 }
