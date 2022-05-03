@@ -77,6 +77,8 @@ class MegaNodeSaving(
 
         var theOnlyLocalFilePath = ""
 
+        app.transfersManagement.isProcessingTransfers = true
+
         for (node in nodes) {
             if (app.transfersManagement.shouldBreakTransfersProcessing()) {
                 return AutoPlayInfo.NO_AUTO_PLAY
@@ -174,6 +176,7 @@ class MegaNodeSaving(
             }
         }
 
+        app.transfersManagement.isProcessingTransfers = false
         app.transfersManagement.setIsProcessingFolders(false)
 
         val message = when {

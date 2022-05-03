@@ -190,6 +190,7 @@ class TransfersManagement @Inject constructor(
     private val scanningTransfers = ArrayList<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
     private var isProcessingFolders = false
+    var isProcessingTransfers = false
     private var shouldBreakTransfersProcessing = false
 
     init {
@@ -211,6 +212,7 @@ class TransfersManagement @Inject constructor(
         scanningTransfers.clear()
         scanningTransfersToken = null
         isProcessingFolders = false
+        isProcessingTransfers = false
         shouldBreakTransfersProcessing = false
     }
 
@@ -477,7 +479,9 @@ class TransfersManagement @Inject constructor(
      * Cancels all the scanning transfers.
      */
     fun cancelScanningTransfers() {
-        shouldBreakTransfersProcessing = true
+        if (isProcessingTransfers) {
+            shouldBreakTransfersProcessing = true
+        }
         isProcessingFolders = false
         scanningTransfersToken?.cancel()
         scanningTransfersToken = null
@@ -603,6 +607,7 @@ class TransfersManagement @Inject constructor(
     fun updateShouldBreakTransfersProcessing() {
         Handler(Looper.getMainLooper()).postDelayed({
             shouldBreakTransfersProcessing = false
+            isProcessingTransfers = false
             LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java).post(true)
         }, WAIT_TIME_BEFORE_UPDATE)
     }
