@@ -1595,7 +1595,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         nodeHandle: Long
     ) {
-        if (ZipBrowserActivity.zipFileFormatCheck(zipFilePath)) {
+        if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
             activityLauncher.launchActivity(Intent(context, ZipBrowserActivity::class.java).apply {
                 putExtra(
                     ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
