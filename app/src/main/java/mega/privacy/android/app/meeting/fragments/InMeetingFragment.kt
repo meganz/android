@@ -680,9 +680,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Set parent activity can receive the orientation changes
-        meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-
         pauseAudioPlayer(meetingActivity)
 
         // Keep screen on
