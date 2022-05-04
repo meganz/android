@@ -919,10 +919,11 @@ class MediaPlayerServiceViewModel(
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
-        val filteredItems = ArrayList<PlaylistItem>()
+        if (items.isEmpty()) return
 
-        for ((index, item) in items.withIndex()) {
-            if (item.nodeName.lowercase(Locale.ROOT).contains(filter)) {
+        val filteredItems = ArrayList<PlaylistItem>()
+        items.forEachIndexed { index, item ->
+            if (item.nodeName.contains(filter, true)) {
                 // Filter only affects displayed playlist, it doesn't affect what
                 // ExoPlayer is playing, so we still need use the index before filter.
                 filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))

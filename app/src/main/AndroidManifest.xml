@@ -456,7 +456,7 @@
         <activity
             android:name=".meeting.activity.MeetingActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".meeting.activity.LeftMeetingActivity"

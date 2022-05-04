@@ -255,41 +255,44 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
 				updateActionModeTitle();
 			}
 		} else if (nodes.get(position).isFolder()) {
-			managerActivity.hideTabs(true, OUTGOING_TAB);
-			managerActivity.increaseDeepBrowserTreeOutgoing();
-			logDebug("deepBrowserTree after clicking folder" + managerActivity.deepBrowserTreeOutgoing);
-
-			MegaNode n = nodes.get(position);
-
-			int lastFirstVisiblePosition = 0;
-			if (managerActivity.isList) {
-				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-			} else {
-				lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
-				if (lastFirstVisiblePosition == -1) {
-					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
-				}
-			}
-
-			lastPositionStack.push(lastFirstVisiblePosition);
-
-			managerActivity.setParentHandleOutgoing(n.getHandle());
-
-			managerActivity.supportInvalidateOptionsMenu();
-			managerActivity.setToolbarTitle();
-
-			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
-
-			adapter.setNodes(nodes);
-			recyclerView.scrollToPosition(0);
-			visibilityFastScroller();
-			setEmptyView();
-			checkScroll();
-			managerActivity.showFabButton();
+			navigateToFolder(nodes.get(position));
 		} else {
 			//Is file
 			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position);
 		}
+	}
+
+	@Override
+	public void navigateToFolder(MegaNode node) {
+		managerActivity.hideTabs(true, OUTGOING_TAB);
+		managerActivity.increaseDeepBrowserTreeOutgoing();
+		logDebug("deepBrowserTree after clicking folder" + managerActivity.deepBrowserTreeOutgoing);
+
+		int lastFirstVisiblePosition = 0;
+		if (managerActivity.isList) {
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		} else {
+			lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+			if (lastFirstVisiblePosition == -1) {
+				lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+			}
+		}
+
+		lastPositionStack.push(lastFirstVisiblePosition);
+
+		managerActivity.setParentHandleOutgoing(node.getHandle());
+
+		managerActivity.supportInvalidateOptionsMenu();
+		managerActivity.setToolbarTitle();
+
+		nodes = megaApi.getChildren(node, sortOrderManagement.getOrderCloud());
+
+		adapter.setNodes(nodes);
+		recyclerView.scrollToPosition(0);
+		visibilityFastScroller();
+		setEmptyView();
+		checkScroll();
+		managerActivity.showFabButton();
 	}
 
 	@Override

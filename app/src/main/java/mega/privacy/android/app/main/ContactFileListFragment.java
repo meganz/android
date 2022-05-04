@@ -493,68 +493,8 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
 		}
 		else{
 			if (contactNodes.get(position).isFolder()) {
-				MegaNode n = contactNodes.get(position);
-
-				int lastFirstVisiblePosition = 0;
-
-				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-
-				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-				lastPositionStack.push(lastFirstVisiblePosition);
-
-				((ContactFileListActivity)context).setTitleActionBar(n.getName());
-				((ContactFileListActivity)context).supportInvalidateOptionsMenu();
-
-				parentHandleStack.push(parentHandle);
-				parentHandle = contactNodes.get(position).getHandle();
-				adapter.setParentHandle(parentHandle);
-				((ContactFileListActivity)context).setParentHandle(parentHandle);
-
-				contactNodes = megaApi.getChildren(contactNodes.get(position));
-				adapter.setNodes(contactNodes);
-				listView.scrollToPosition(0);
-
-				// If folder has no files
-				if (adapter.getItemCount() == 0) {
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
-					try{
-						textToShow = textToShow.replace(
-								"[A]", "<font color=\'"
-										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
-										+ "\'>"
-						).replace("[/A]", "</font>").replace(
-								"[B]", "<font color=\'"
-										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
-										+ "\'>"
-						).replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextView.setText(result);
-
-
-				} else {
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
-				showFabButton(n);
-			}
-			else {
+				navigateToFolder(contactNodes.get(position));
+			} else {
 				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
 					Intent intent = ImageViewerActivity.getIntentForParentNode(
 							requireContext(),
@@ -717,6 +657,73 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Navigates to a child folder.
+	 *
+	 * @param node	The folder node.
+	 */
+	public void navigateToFolder(MegaNode node) {
+		int lastFirstVisiblePosition = 0;
+
+		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
+		lastPositionStack.push(lastFirstVisiblePosition);
+
+		((ContactFileListActivity) context).setTitleActionBar(node.getName());
+		((ContactFileListActivity) context).supportInvalidateOptionsMenu();
+
+		parentHandleStack.push(parentHandle);
+		parentHandle = node.getHandle();
+		adapter.setParentHandle(parentHandle);
+		((ContactFileListActivity) context).setParentHandle(parentHandle);
+
+		contactNodes = megaApi.getChildren(node);
+		adapter.setNodes(contactNodes);
+		listView.scrollToPosition(0);
+
+		// If folder has no files
+		if (adapter.getItemCount() == 0) {
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+
+			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+			} else {
+				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+			}
+			String textToShow = String.format(context.getString(R.string.context_empty_incoming));
+			try {
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
+			} catch (Exception e) {
+			}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextView.setText(result);
+
+
+		} else {
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
+
+		showFabButton(node);
 	}
 
 	public int onBackPressed() {
