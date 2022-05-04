@@ -218,11 +218,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOfflineNode(imageItem.handle).toFlowable()
+                getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri).toFlowable()
+                getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
 
         subscription

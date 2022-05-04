@@ -9,10 +9,12 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSource
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.common.Priority
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
@@ -355,9 +357,10 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given an offline node handle.
      *
      * @param nodeHandle    Image Node handle to request.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Single with the ImageResult
      */
-    fun getOfflineNode(nodeHandle: Long): Single<ImageResult> =
+    fun getOfflineNode(nodeHandle: Long, highPriority: Boolean): Single<ImageResult> =
         Single.fromCallable {
             val offlineNode = getNodeUseCase.getOfflineNode(nodeHandle).blockingGetOrNull()
             when {
@@ -375,7 +378,7 @@ class GetImageUseCase @Inject constructor(
                             previewFile = if (isVideo) {
                                 getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
                             } else {
-                                getImageThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                                getImageThumbnail(thumbnailFileName, file.toUri(), highPriority).blockingGetOrNull()?.toFile()
                             }
                         }
 
@@ -397,9 +400,10 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given an Image file uri.
      *
      * @param imageUri      Image file uri
+     * @param highPriority  Flag to request image with high priority.
      * @return              Single with the ImageResult
      */
-    fun getImageUri(imageUri: Uri): Single<ImageResult> =
+    fun getImageUri(imageUri: Uri, highPriority: Boolean): Single<ImageResult> =
         Single.fromCallable {
             val file = imageUri.toFile()
             if (file.exists() && file.canRead()) {
@@ -409,7 +413,7 @@ class GetImageUseCase @Inject constructor(
                 val previewUri = if (isVideo) {
                     getVideoThumbnail(previewName, file.toUri()).blockingGetOrNull()
                 } else {
-                    getImageThumbnail(previewName, file.toUri()).blockingGetOrNull()
+                    getImageThumbnail(previewName, file.toUri(), highPriority).blockingGetOrNull()
                 }
 
                 ImageResult(
@@ -458,11 +462,12 @@ class GetImageUseCase @Inject constructor(
     /**
      * Generate a thumbnail given an image file
      *
-     * @param fileName  Thumbnail file name
-     * @param imageUri  Image to get thumbnail from
-     * @return          Single with generated file uri
+     * @param fileName      Thumbnail file name
+     * @param imageUri      Image to get thumbnail from
+     * @param highPriority  Flag to request image with high priority.
+     * @return              Single with generated file uri
      */
-    fun getImageThumbnail(fileName: String, imageUri: Uri): Single<Uri> =
+    fun getImageThumbnail(fileName: String, imageUri: Uri, highPriority: Boolean): Single<Uri> =
         Single.create { emitter ->
             val imageFile = imageUri.toFile()
             require(imageFile.exists())
@@ -477,6 +482,7 @@ class GetImageUseCase @Inject constructor(
             val screenSize = context.getScreenSize()
             val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageUri)
                 .setRotationOptions(RotationOptions.autoRotate())
+                .setRequestPriority(if (highPriority) Priority.HIGH else Priority.LOW)
                 .setResizeOptions(ResizeOptions.forDimensions(screenSize.width, screenSize.height))
                 .build()
 
