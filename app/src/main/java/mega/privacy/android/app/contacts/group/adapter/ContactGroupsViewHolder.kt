@@ -18,8 +18,8 @@ class ContactGroupsViewHolder(
     fun bind(item: ContactGroupItem) {
         binding.txtTitle.text = item.title
         binding.imgPrivate.isVisible = !item.isPublic
-        binding.imgThumbnailFirst.hierarchy.setPlaceholderImage(item.firstUser.placeholder)
-        binding.imgThumbnailLast.hierarchy.setPlaceholderImage(item.lastUser.placeholder)
+        binding.imgThumbnailFirst.hierarchy.setPlaceholderImage(item.firstUser.getImagePlaceholder(itemView.context))
+        binding.imgThumbnailLast.hierarchy.setPlaceholderImage(item.lastUser.getImagePlaceholder(itemView.context))
         binding.imgThumbnailFirst.setImageRequestFromUri(item.firstUser.avatar)
         binding.imgThumbnailLast.setImageRequestFromUri(item.lastUser.avatar)
     }
