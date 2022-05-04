@@ -7,9 +7,17 @@ import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.annotation.RequiresApi
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import com.facebook.common.executors.CallerThreadExecutor
+import com.facebook.common.references.CloseableReference
+import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.common.RotationOptions
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
+import com.facebook.imagepipeline.image.CloseableImage
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Completable
@@ -364,10 +372,10 @@ class GetImageUseCase @Inject constructor(
                         var previewFile = buildPreviewFile(context, thumbnailFileName)
 
                         if (!previewFile.exists()) {
-                            if (isVideo) {
-                                previewFile = getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
-                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                previewFile = getImageThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                            previewFile = if (isVideo) {
+                                getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                            } else {
+                                getImageThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
                             }
                         }
 
@@ -398,11 +406,10 @@ class GetImageUseCase @Inject constructor(
                 val isVideo = MimeTypeList.typeForName(file.name).isVideo
 
                 val previewName = "${(file.name + file.length()).encodeBase64()}$JPG_EXTENSION"
-                var previewUri: Uri? = null
-                if (isVideo) {
-                    previewUri = getVideoThumbnail(previewName, file.toUri()).blockingGetOrNull()
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    previewUri = getImageThumbnail(previewName, file.toUri()).blockingGetOrNull()
+                val previewUri = if (isVideo) {
+                    getVideoThumbnail(previewName, file.toUri()).blockingGetOrNull()
+                } else {
+                    getImageThumbnail(previewName, file.toUri()).blockingGetOrNull()
                 }
 
                 ImageResult(
@@ -455,26 +462,44 @@ class GetImageUseCase @Inject constructor(
      * @param imageUri  Image to get thumbnail from
      * @return          Single with generated file uri
      */
-    @RequiresApi(Build.VERSION_CODES.Q)
     fun getImageThumbnail(fileName: String, imageUri: Uri): Single<Uri> =
-        Single.fromCallable {
-            require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-
+        Single.create { emitter ->
             val imageFile = imageUri.toFile()
             require(imageFile.exists())
             require(imageFile.length() > SIZE_1_MB) { "Image too small" }
 
             val previewFile = buildPreviewFile(context, fileName)
-            if (previewFile.exists()) return@fromCallable previewFile.toUri()
-
-            val bitmap = ThumbnailUtils.createImageThumbnail(imageFile, context.getScreenSize(), null)
-            BufferedOutputStream(FileOutputStream(previewFile)).apply {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
-                close()
+            if (previewFile.exists()) {
+                emitter.onSuccess(previewFile.toUri())
+                return@create
             }
-            bitmap.recycle()
 
-            previewFile.toUri()
+            val screenSize = context.getScreenSize()
+            val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageUri)
+                .setRotationOptions(RotationOptions.autoRotate())
+                .setResizeOptions(ResizeOptions.forDimensions(screenSize.width, screenSize.height))
+                .build()
+
+            val dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest, imageUri)
+            dataSource.subscribe(object : BaseBitmapDataSubscriber() {
+                override fun onNewResultImpl(bitmap: Bitmap?) {
+                    if (bitmap != null) {
+                        BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
+                            close()
+                        }
+                        emitter.onSuccess(previewFile.toUri())
+                    } else {
+                        emitter.onError(NullPointerException())
+                    }
+                    dataSource.close()
+                }
+
+                override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+                    emitter.onError(dataSource.failureCause!!)
+                    dataSource.close()
+                }
+            }, CallerThreadExecutor.getInstance())
         }
 
     /**

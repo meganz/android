@@ -519,8 +519,10 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun onLowMemory() {
-        getCurrentImageItem()?.imageResult?.fullSizeUri?.let { fullSizeUri ->
-            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll { !it.containsUri(fullSizeUri) }
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.lastPathSegment?.let { fileName ->
+            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll {
+                !it.uriString.contains(fileName)
+            }
         }
     }
 
