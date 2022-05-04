@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Access</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">Register now and get 20&#160;GB of free storage</string>
     <!--  -->
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <!--  -->
@@ -383,7 +383,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">View transfers</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4GB. Your download will probably fail</string>
+    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">There isn’t any available app to execute this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Folder link unavailable</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS or AUP violation.</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link unavailable</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS or AUP violation.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2177,21 +2177,21 @@
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2828,8 +2828,8 @@
     <string name="error_download_takendown_node">Not accessible due to ToS or AUP violation</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item quantity="one">%d file was not downloaded as they violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Start chatting securely with your contacts using end-to-end encryption</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20 GB of free cloud storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20&#160;GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">No chat link available.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4073,7 +4073,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Get 20 GB for free</string>
+    <string name="left_meeting_bonus_title">Get 20&#160;GB for free</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
