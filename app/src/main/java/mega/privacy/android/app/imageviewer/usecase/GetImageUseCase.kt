@@ -349,8 +349,8 @@ class GetImageUseCase @Inject constructor(
      * @param nodeHandle    Image Node handle to request.
      * @return              Single with the ImageResult
      */
-    fun getOfflineNode(nodeHandle: Long): Flowable<ImageResult> =
-        Flowable.fromCallable {
+    fun getOfflineNode(nodeHandle: Long): Single<ImageResult> =
+        Single.fromCallable {
             val offlineNode = getNodeUseCase.getOfflineNode(nodeHandle).blockingGetOrNull()
             when {
                 offlineNode == null -> error("Offline node was not found")
@@ -391,8 +391,8 @@ class GetImageUseCase @Inject constructor(
      * @param imageUri      Image file uri
      * @return              Single with the ImageResult
      */
-    fun getImageUri(imageUri: Uri): Flowable<ImageResult> =
-        Flowable.fromCallable {
+    fun getImageUri(imageUri: Uri): Single<ImageResult> =
+        Single.fromCallable {
             val file = imageUri.toFile()
             if (file.exists() && file.canRead()) {
                 val isVideo = MimeTypeList.typeForName(file.name).isVideo

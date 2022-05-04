@@ -218,11 +218,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOfflineNode(imageItem.handle)
+                getImageUseCase.getOfflineNode(imageItem.handle).toFlowable()
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri)
+                getImageUseCase.getImageUri(imageItem.fileUri).toFlowable()
         }
 
         subscription
@@ -500,23 +500,27 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun stopImageLoading(itemId: Long, aggressive: Boolean) {
+    fun stopImageLoading(itemId: Long) {
         images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
+            imageResult.transferTag?.let { tag ->
+                cancelTransferUseCase.cancel(tag)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onError = { error ->
+                            logError(error.stackTraceToString())
+                        }
+                    )
+            }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
             }
-            if (aggressive) {
-                imageResult.transferTag?.let { tag ->
-                    cancelTransferUseCase.cancel(tag)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                            onError = { error ->
-                                logError(error.stackTraceToString())
-                            }
-                        )
-                }
-            }
+        }
+    }
+
+    fun onLowMemory() {
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.let { fullSizeUri ->
+            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll { !it.containsUri(fullSizeUri) }
         }
     }
 
