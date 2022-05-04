@@ -189,27 +189,34 @@ class MegaNodeSaving(
                     numberOfNodesPending
                 )
             }
-            numberOfNodesAlreadyDownloaded == 1 && numberOfNodesPending == 1 -> {
-                getString(R.string.file_already_downloaded_and_file_pending_download)
-            }
             numberOfNodesAlreadyDownloaded == 1 -> {
-                getString(
-                    R.string.file_already_downloaded_and_files_pending_download,
+                getQuantityString(
+                    R.plurals.file_already_downloaded_and_files_pending_download,
+                    numberOfNodesPending,
                     numberOfNodesPending
                 )
             }
             numberOfNodesPending == 1 -> {
-                getString(
-                    R.string.files_already_downloaded_and_file_pending_download,
+                getQuantityString(
+                    R.plurals.files_already_downloaded_and_file_pending_download,
+                    numberOfNodesAlreadyDownloaded,
                     numberOfNodesAlreadyDownloaded
                 )
             }
             else -> {
-                getString(
-                    R.string.files_already_downloaded_and_files_pending_download,
-                    numberOfNodesAlreadyDownloaded,
-                    numberOfNodesPending
-                )
+                StringBuilder().append(
+                    getQuantityString(
+                        R.plurals.file_already_downloaded,
+                        numberOfNodesAlreadyDownloaded,
+                        numberOfNodesAlreadyDownloaded
+                    )
+                ).append(" ").append(
+                    getQuantityString(
+                        R.plurals.file_pending_download,
+                        numberOfNodesPending,
+                        numberOfNodesPending
+                    )
+                ).toString()
             }
         }
 
