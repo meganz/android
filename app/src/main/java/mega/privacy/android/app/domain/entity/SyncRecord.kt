@@ -1,12 +1,5 @@
 package mega.privacy.android.app.domain.entity
 
-const val STATUS_PENDING = 0
-const val STATUS_TO_COMPRESS = 3
-
-const val TYPE_PHOTO = 1
-const val TYPE_VIDEO = 2
-const val TYPE_ANY = -1
-
 data class SyncRecord(
     val id: Int = 0,
     val localPath: String? = null,
@@ -17,7 +10,7 @@ data class SyncRecord(
     var fileName: String? = null,
     val longitude: Float? = null,
     val latitude: Float? = null,
-    val status: Int = STATUS_PENDING,
+    val status: Int = SyncStatus.STATUS_PENDING.value,
     val type: Int = 0,
     val nodeHandle: Long? = null,
     val isCopyOnly: Boolean = false,

@@ -42,7 +42,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.domain.entity.SyncRecord;
-import mega.privacy.android.app.domain.entity.SyncRecordKt;
+import mega.privacy.android.app.domain.entity.SyncRecordType;
+import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatItemPreferences;
 import mega.privacy.android.app.main.megachat.ChatSettings;
@@ -1028,7 +1029,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void updateVideoState(int state) {
         String sql = "UPDATE " + TABLE_SYNC_RECORDS + " SET " + KEY_SYNC_STATE + " = " + state + "  WHERE "
-                + KEY_SYNC_TYPE + " = " + SyncRecordKt.TYPE_VIDEO;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue();
         db.execSQL(sql);
     }
 
@@ -1036,7 +1037,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
-        if (fileType != SyncRecordKt.TYPE_ANY) {
+        if (fileType != SyncRecordType.TYPE_ANY.getValue()) {
             selectQuery += " AND " + KEY_SYNC_TYPE + " = " + fileType;
         }
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
@@ -1048,7 +1049,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
-        if (fileType != SyncRecordKt.TYPE_ANY) {
+        if (fileType != SyncRecordType.TYPE_ANY.getValue()) {
             selectQuery += " AND " + KEY_SYNC_TYPE + " = " + fileType;
         }
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
@@ -1073,7 +1074,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public List<SyncRecord> findAllPendingSyncRecords() {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
-                + KEY_SYNC_STATE + " = " + SyncRecordKt.STATUS_PENDING;
+                + KEY_SYNC_STATE + " = " + SyncStatus.STATUS_PENDING.getValue();
 		List<SyncRecord> records = new ArrayList<>();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
@@ -1091,7 +1092,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<SyncRecord> findVideoSyncRecordsByState(int state) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
-                + KEY_SYNC_TYPE + " = " + SyncRecordKt.TYPE_VIDEO ;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue() ;
 		List<SyncRecord> records = new ArrayList<>();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
@@ -1108,7 +1109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteAllSyncRecords(int type){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS;
-        if(type != SyncRecordKt.TYPE_ANY) {
+        if(type != SyncRecordType.TYPE_ANY.getValue()) {
             sql += " WHERE " + KEY_SYNC_TYPE + " = " + type;
         }
         db.execSQL(sql);
@@ -1116,7 +1117,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteAllSecondarySyncRecords(int type){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS +" WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("true") + "'";
-        if(type != SyncRecordKt.TYPE_ANY) {
+        if(type != SyncRecordType.TYPE_ANY.getValue()) {
             sql += " AND " + KEY_SYNC_TYPE + " = " + type;
         }
         db.execSQL(sql);
@@ -1124,7 +1125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void deleteAllPrimarySyncRecords(int type) {
 		String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("false") + "'";
-		if (type != SyncRecordKt.TYPE_ANY) {
+		if (type != SyncRecordType.TYPE_ANY.getValue()) {
 			sql += " AND " + KEY_SYNC_TYPE + " = " + type;
 		}
 		db.execSQL(sql);
@@ -1133,7 +1134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void deleteVideoRecordsByState(int state){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
-                + KEY_SYNC_TYPE + " = " + SyncRecordKt.TYPE_VIDEO ;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue() ;
         db.execSQL(sql);
     }
 

@@ -93,7 +93,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.domain.entity.SyncRecordKt;
+import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
@@ -897,11 +897,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 if (value == VIDEO_QUALITY_ORIGINAL) {
                     disableChargingSettings();
-                    dbH.updateVideoState(SyncRecordKt.STATUS_PENDING);
+                    dbH.updateVideoState(SyncStatus.STATUS_PENDING.getValue());
                 } else {
                     dbH.setConversionOnCharging(true);
                     enableChargingSettings();
-                    dbH.updateVideoState(SyncRecordKt.STATUS_TO_COMPRESS);
+                    dbH.updateVideoState(SyncStatus.STATUS_TO_COMPRESS.getValue());
                 }
 
                 videoQuality.setSummary(videoQuality.getEntry());

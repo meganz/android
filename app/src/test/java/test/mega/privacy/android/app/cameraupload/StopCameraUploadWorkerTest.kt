@@ -67,7 +67,7 @@ class StopCameraUploadWorkerTest {
     }
 
     @Test
-    fun testStopWorkerSuccess() {
+    fun `test that the stop camera upload worker is successful if the camera upload service is running`() {
         whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             true
         )
@@ -76,7 +76,7 @@ class StopCameraUploadWorkerTest {
     }
 
     @Test
-    fun testStopWorkerFailureNoServiceRunning() {
+    fun `test that the stop camera upload worker fails if there is no camera upload service running`() {
         whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
