@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
@@ -13,6 +14,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
 class DefaultAccountRepositoryTest{
     private lateinit var underTest: AccountRepository
