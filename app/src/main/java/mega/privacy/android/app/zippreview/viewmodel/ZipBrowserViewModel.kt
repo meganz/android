@@ -43,7 +43,7 @@ class ZipBrowserViewModel @Inject constructor(
 
     private lateinit var rootFolderPath: String
 
-    private lateinit var currentZipInfo: ZipInfoUIO
+    private var currentZipInfo: ZipInfoUIO? = null
 
     private var _title = MutableLiveData<String>()
     val title: LiveData<String>
@@ -167,7 +167,9 @@ class ZipBrowserViewModel @Inject constructor(
             return true
         }
         if (zipInfoList.value.isNullOrEmpty()) {
-            return backUpdateZipInfoList(currentZipInfo.path, true)
+            return currentZipInfo?.run {
+                backUpdateZipInfoList(this.path, true)
+            } ?: true
         } else {
             _zipInfoList.value?.get(0)?.path?.apply {
                 return backUpdateZipInfoList(this, false)
