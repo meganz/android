@@ -21,6 +21,8 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
@@ -28,8 +30,12 @@ import androidx.exifinterface.media.ExifInterface;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,8 +43,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase;
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,10 +76,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
+import javax.inject.Inject;
+
 /*
  * Service to Upload files
  */
-public class UploadService extends Service implements MegaTransferListenerInterface {
+@AndroidEntryPoint
+public class UploadService extends Service {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
 	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
@@ -80,6 +93,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
     public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
+
+    @Inject
+    GetGlobalTransferUseCase getGlobalTransferUseCase;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -124,7 +140,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		megaApi.addTransferListener(this);
 		megaChatApi = app.getMegaChatApi();
 		mapProgressFileTransfers = new HashMap<>();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -160,6 +175,28 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
         };
         registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
+        Disposable subscription = getGlobalTransferUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((event) -> {
+                    if (event instanceof Result.OnTransferStart) {
+                        MegaTransfer transfer = ((Result.OnTransferStart) event).getTransfer();
+                        doOnTransferStart(transfer);
+                    } else if (event instanceof Result.OnTransferUpdate) {
+                        MegaTransfer transfer = ((Result.OnTransferUpdate) event).getTransfer();
+                        doOnTransferUpdate(transfer);
+                    } else if (event instanceof Result.OnTransferFinish) {
+                        MegaTransfer transfer = ((Result.OnTransferFinish) event).getTransfer();
+                        MegaError error = ((Result.OnTransferFinish) event).getError();
+                        doOnTransferFinish(transfer, error);
+                    } else if (event instanceof Result.OnTransferTemporaryError) {
+                        MegaTransfer transfer = ((Result.OnTransferTemporaryError) event).getTransfer();
+                        MegaError error = ((Result.OnTransferTemporaryError) event).getError();
+                        doOnTransferTemporaryError(transfer, error);
+                    }
+                }, (error) -> logError("Error " + error));
+        rxSubscriptions.add(subscription);
 	}
 
     private void startForeground() {
@@ -190,10 +227,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onDestroy(){
 		logDebug("onDestroy");
         releaseLocks();
-
-		if(megaApi != null) {
-            megaApi.removeTransferListener(this);
-		}
 
         if (megaChatApi != null){
             megaChatApi.saveCurrentState();
@@ -298,10 +331,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         acquireLock();
 
-        rxSubscriptions.add(Single.just(true)
-            .observeOn(Schedulers.single())
-            .subscribe(ignored -> doHandleIntent(intent, filePath),
-                throwable -> logError("doHandleIntent onError", throwable)));
+        doHandleIntent(intent, filePath);
     }
 
     private void doHandleIntent(Intent intent, String filePath) {
@@ -621,15 +651,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         return progress;
     }
 
-	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-      rxSubscriptions.add(Single.just(transfer)
-          .observeOn(Schedulers.single())
-          .subscribe(this::doOnTransferStart,
-              throwable -> logError("doOnTransferStart onError", throwable)));
-    }
+    private void doOnTransferStart(@Nullable MegaTransfer transfer) {
+        if (transfer == null) return;
 
-    private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 		    if (isCUOrChatTransfer(transfer)) return;
@@ -651,15 +675,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 	}
 
-	@Override
-	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
-      rxSubscriptions.add(Single.just(true)
-          .observeOn(Schedulers.single())
-          .subscribe(ignored -> doOnTransferFinish(transfer, error),
-              throwable -> logError("doOnTransferFinish onError", throwable)));
-    }
-
-    private void doOnTransferFinish(MegaTransfer transfer, MegaError error) {
+    private void doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
+        if (transfer == null) return;
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
         if (isCUOrChatTransfer(transfer)) return;
 
@@ -895,15 +912,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 	}
 
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-      rxSubscriptions.add(Single.just(transfer)
-          .observeOn(Schedulers.single())
-          .subscribe(this::doOnTransferUpdate,
-              throwable -> logError("doOnTransferUpdate onError", throwable)));
-    }
-
-    private void doOnTransferUpdate(MegaTransfer transfer) {
+    private void doOnTransferUpdate(@Nullable MegaTransfer transfer) {
+        if (transfer == null) return;
 		logDebug("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
             if (isCUOrChatTransfer(transfer)) return;
@@ -932,15 +942,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 	}
 
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-      rxSubscriptions.add(Single.just(true)
-          .observeOn(Schedulers.single())
-          .subscribe(ignored -> doOnTransferTemporaryError(transfer, e),
-              throwable -> logError("doOnTransferTemporaryError onError", throwable)));
-    }
-
-    private void doOnTransferTemporaryError(MegaTransfer transfer, MegaError e) {
+    private void doOnTransferTemporaryError(@Nullable MegaTransfer transfer, MegaError e) {
+        if (transfer == null) return;
 		logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
@@ -972,11 +975,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 	}
-
-    @Override
-    public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
-        return true;
-    }
 
     private void showStorageOverQuotaNotification(){
 		logDebug("showStorageOverQuotaNotification");
