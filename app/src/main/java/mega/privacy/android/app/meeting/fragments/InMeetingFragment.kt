@@ -278,10 +278,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.isCallOnHold()
                     )
 
-                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                        checkCurrentParticipants()
-                    }
-
                     checkMenuItemsVisibility()
                     checkChildFragments()
                     controlVideoLocalOneToOneCall(it.hasLocalVideo())
@@ -574,8 +570,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Set on page tapping listener.
         setPageOnClickListener(view)
         checkChildFragments()
-        checkCurrentParticipants()
-        inMeetingViewModel.getCall()?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
     }
 
     /**
@@ -983,6 +977,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (it != MEGACHAT_INVALID_HANDLE) {
                     checkButtonsStatus()
                     showMuteBanner()
+                    inMeetingViewModel.getCall()?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
                 }
             }
         }
@@ -1303,16 +1298,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             } else {
                 initGroupCall(call.chatid)
             }
-        }
-    }
-
-    /**
-     * Method to check if there are already participants in the call
-     */
-    private fun checkCurrentParticipants() {
-        inMeetingViewModel.getCall()?.let {
-            logDebug("Check current call participants")
-            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid)
         }
     }
 
