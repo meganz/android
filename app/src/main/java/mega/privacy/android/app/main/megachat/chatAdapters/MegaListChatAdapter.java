@@ -304,6 +304,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 				return;
 			}
 
+			holder.itemView.setVisibility(View.VISIBLE);
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
 			((ViewHolderArchivedChatList)holder).textViewArchived.setTag(holder);
 
