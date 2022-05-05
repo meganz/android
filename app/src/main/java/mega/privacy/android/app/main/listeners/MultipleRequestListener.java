@@ -81,14 +81,13 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         logDebug("Move to rubbish request finished");
                         int success_items = max_items - error;
                         if (error > 0 && (success_items > 0)) {
-                            if (error == 1 && (success_items == 1)) {
-                                message = getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish);
-                            } else if (error == 1) {
-                                message = getString(R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items);
+                            if (error == 1) {
+                                message = getQuantityString(R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items, success_items);
                             } else if (success_items == 1) {
-                                message = getString(R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error);
+                                message = getQuantityString(R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error, error);
                             } else {
-                                message = getString(R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish, success_items, error);
+                                message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items)
+                                        + ". " + getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
                             }
                         } else if (error > 0) {
                             message = getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);

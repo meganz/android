@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -160,13 +161,15 @@ public class AndroidMegaRichLinkMessage {
      * @return The contact link if exists.
      */
     public static String extractContactLink(String content) {
-        Matcher m = Patterns.WEB_URL.matcher(content);
+        if (!TextUtil.isTextEmpty(content)) {
+            Matcher m = Patterns.WEB_URL.matcher(content);
 
-        while (m.find()) {
-            String url = decodeURL(m.group());
+            while (m.find()) {
+                String url = decodeURL(m.group());
 
-            if (isContactLink(url)) {
-                return url;
+                if (isContactLink(url)) {
+                    return url;
+                }
             }
         }
 

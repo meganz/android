@@ -335,6 +335,7 @@ class InMeetingViewModel @Inject constructor(
                     checkSubtitleToolbar(it.status, it.isOutgoing)
                     checkAnotherCallBanner()
                     checkToolbarClickability()
+                    checkParticipantsList()
                 }
 
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
@@ -1085,14 +1086,22 @@ class InMeetingViewModel @Inject constructor(
         )
 
     /**
+     * Method to update the current participants list
+     */
+    fun checkParticipantsList() {
+        callLiveData.value?.let {
+            createCurrentParticipants(it.sessionsClientid)
+        }
+    }
+
+    /**
      * Method for creating participants already on the call
      *
      * @param list list of participants
      */
-    fun createCurrentParticipants(list: MegaHandleList?) {
+    private fun createCurrentParticipants(list: MegaHandleList?) {
         list?.let { listParticipants ->
             if (listParticipants.size() > 0) {
-                _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
                 for (i in 0 until list.size()) {
                     getSession(list[i])?.let { session ->
                         createParticipant(session)?.let { participantCreated ->

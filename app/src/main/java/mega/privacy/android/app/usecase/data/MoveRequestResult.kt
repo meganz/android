@@ -91,27 +91,34 @@ sealed class MoveRequestResult(
                         errorCount
                     )
                 }
-                errorCount == 1 && successCount == 1 -> {
-                    getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish)
-                }
                 errorCount == 1 -> {
-                    getString(
-                        R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
+                    getQuantityString(
+                        R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
+                        successCount,
                         successCount
                     )
                 }
                 successCount == 1 -> {
-                    getString(
-                        R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                    getQuantityString(
+                        R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                        errorCount,
                         errorCount
                     )
                 }
                 else -> {
-                    getString(
-                        R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
-                        successCount,
-                        errorCount
-                    )
+                    StringBuilder().append(
+                        getQuantityString(
+                            R.plurals.number_correctly_moved_to_rubbish,
+                            successCount,
+                            successCount
+                        )
+                    ).append(". ").append(
+                        getQuantityString(
+                            R.plurals.number_incorrectly_moved_to_rubbish,
+                            errorCount,
+                            errorCount
+                        )
+                    ).toString()
                 }
             }
     }
@@ -154,27 +161,34 @@ sealed class MoveRequestResult(
                         errorCount
                     )
                 }
-                errorCount == 1 && successCount == 1 -> {
-                    getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish)
-                }
                 errorCount == 1 -> {
-                    getString(
-                        R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
+                    getQuantityString(
+                        R.plurals.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
+                        successCount,
                         successCount
                     )
                 }
                 successCount == 1 -> {
-                    getString(
-                        R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                    getQuantityString(
+                        R.plurals.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                        errorCount,
                         errorCount
                     )
                 }
                 else -> {
-                    getString(
-                        R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                        successCount,
-                        errorCount
-                    )
+                    StringBuilder().append(
+                        getQuantityString(
+                            R.plurals.number_correctly_restored_from_rubbish,
+                            successCount,
+                            successCount
+                        )
+                    ).append(". ").append(
+                        getQuantityString(
+                            R.plurals.number_incorrectly_restored_from_rubbish,
+                            errorCount,
+                            errorCount
+                        )
+                    ).toString()
                 }
             }
     }

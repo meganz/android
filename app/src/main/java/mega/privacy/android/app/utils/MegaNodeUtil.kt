@@ -21,7 +21,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.*
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -43,21 +47,68 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
+import mega.privacy.android.app.utils.Constants.BUFFER_COMP
+import mega.privacy.android.app.utils.Constants.DISPUTE_URL
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_HANDLES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_URL
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
+import mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
+import mega.privacy.android.app.utils.Constants.SEPARATOR
+import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_INDICATOR
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.getTappedNodeLocalFile
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtil.shareFile
+import mega.privacy.android.app.utils.FileUtil.shareFiles
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
-import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.getMediaIntent
+import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -65,6 +116,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 
 object MegaNodeUtil {
@@ -137,7 +190,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun getNodeFolderPath(nodeFolder: MegaNode?): String {
         if (nodeFolder == null) {
-            logWarning("Node is null, cannot get its path.")
+            Timber.w("Node is null, cannot get its path.")
             return ""
         }
 
@@ -174,7 +227,7 @@ object MegaNodeUtil {
      * @param node    Node to share.
      */
     @JvmStatic
-    fun shareNode(context: Context, node: MegaNode) {
+    fun shareNode(context: Context, node: MegaNode?) {
         shareNode(context, node, null)
     }
 
@@ -191,13 +244,13 @@ object MegaNodeUtil {
     @JvmStatic
     fun shareNode(
         context: Context,
-        node: MegaNode,
+        node: MegaNode?,
         onExportFinishedListener: ExportListener.OnExportFinishedListener?
     ) {
-        if (shouldContinueWithoutError(context, "sharing node", node)) {
+        if (shouldContinueWithoutError(context, node)) {
             val path = getLocalFile(node)
 
-            if (!isTextEmpty(path) && !node.isFolder) {
+            if (!path.isNullOrBlank() && !node.isFolder) {
                 shareFile(context, File(path))
             } else if (node.isExported) {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
@@ -224,14 +277,14 @@ object MegaNodeUtil {
         for (node in listNodes) {
             val path = if (node.isFolder) null else getLocalFile(node)
 
-            if (isTextEmpty(path)) {
+            if (path.isNullOrBlank()) {
                 return false
             } else {
-                downloadedFiles.add(File(path!!))
+                downloadedFiles.add(File(path))
             }
         }
 
-        logDebug("All nodes are downloaded, so share the files")
+        Timber.d("All nodes are downloaded, so share the files")
         shareFiles(context, downloadedFiles)
 
         return true
@@ -269,7 +322,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun shareNodes(context: Context, nodes: List<MegaNode>) {
-        if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
+        if (!shouldContinueWithoutError(context, nodes)) {
             return
         }
 
@@ -331,23 +384,21 @@ object MegaNodeUtil {
      * Checks if there is any error before continues any action.
      *
      * @param context   current Context.
-     * @param message   action being taken.
      * @param node      node involved in the action.
      * @return True if there is not any error, false otherwise.
      */
+    @OptIn(ExperimentalContracts::class)
     @JvmStatic
     fun shouldContinueWithoutError(
         context: Context,
-        message: String,
         node: MegaNode?
     ): Boolean {
-        val error = "Error $message. "
-
+        contract { returns(true) implies (node != null) }
         if (node == null) {
-            LogUtil.logError(error + "Node == NULL")
+            Timber.e("Error sharing node: Node == NULL")
             return false
         } else if (!isOnline(context)) {
-            LogUtil.logError(error + "No network connection")
+            Timber.e("Error sharing node: No network connection")
             showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
@@ -359,22 +410,19 @@ object MegaNodeUtil {
      * Checks if there is any error before continues any action.
      *
      * @param context   current Context.
-     * @param message   action being taken.
      * @param nodes      nodes involved in the action.
      * @return True if there is not any error, false otherwise.
      */
     @JvmStatic
     fun shouldContinueWithoutError(
-        context: Context, message: String,
+        context: Context,
         nodes: List<MegaNode>?
     ): Boolean {
-        val error = "Error $message. "
-
         if (nodes == null || nodes.isEmpty()) {
-            LogUtil.logError(error + "no nodes")
+            Timber.e("Error sharing nodes: No nodes")
             return false
         } else if (!isOnline(context)) {
-            LogUtil.logError(error + "No network connection")
+            Timber.e("Error sharing nodes: No network connection")
             showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
@@ -507,7 +555,7 @@ object MegaNodeUtil {
             getMyBackupSubFolderIcon(node)
         } else if (isSubRootBackupFolder(node)) {
             val nodeType = checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi, node)
-            if(nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
+            if (nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
                 R.drawable.ic_folder_backup
             } else {
                 R.drawable.ic_folder_list
@@ -524,8 +572,10 @@ object MegaNodeUtil {
      * @return True if the node is a device folder, false otherwise
      */
     private fun isDeviceBackupFolder(node: MegaNode): Boolean {
-        logDebug("MyBackup + isDeviceBackupFolder node.handle = ${node.handle}")
-        return (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId) && !isNodeInRubbishOrDeleted(node.handle))
+        Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node.handle}")
+        return (node.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeleted(
+            node.handle
+        ))
     }
 
     /**
@@ -537,19 +587,20 @@ object MegaNodeUtil {
     private fun isSubRootBackupFolder(node: MegaNode): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         var p = node
-        if (isNodeInRubbishOrDeleted(node.handle)){
+        if (isNodeInRubbishOrDeleted(node.handle)) {
             return false
         }
 
         while (megaApi.getParentNode(p) != null) {
             p = megaApi.getParentNode(p)
             if (p != null && p.parentHandle == myBackupHandle) {
-                logDebug("isSubRootBackupFolder")
+                Timber.d("isSubRootBackupFolder")
                 return true
             }
         }
         return false
     }
+
     /**
      * Checks if a node is the MyBackup folder.
      *
@@ -557,7 +608,7 @@ object MegaNodeUtil {
      * @return True if the node is the MyBackup folder, false otherwise
      */
     private fun isRootBackupFolder(node: MegaNode): Boolean {
-        logDebug("MyBackup + isRootBackupFolder node.handle = ${node.handle}")
+        Timber.d("MyBackup + isRootBackupFolder node.handle = ${node.handle}")
         return (node.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
     }
 
@@ -568,7 +619,7 @@ object MegaNodeUtil {
      * @return The resource ID
      */
     private fun getMyBackupSubFolderIcon(node: MegaNode): Int {
-        if (isTextEmpty(node.deviceId)) return R.drawable.ic_folder_list
+        if (node.deviceId.isNullOrBlank()) return R.drawable.ic_folder_list
 
         val folderName = node.name
         return when {
@@ -710,7 +761,11 @@ object MegaNodeUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkMoveErrorExtended(node, megaApi.rubbishNode).errorCode != MegaError.API_OK) {
+            if (megaApi.checkMoveErrorExtended(
+                    node,
+                    megaApi.rubbishNode
+                ).errorCode != MegaError.API_OK
+            ) {
                 return false
             }
         }
@@ -761,7 +816,11 @@ object MegaNodeUtil {
     fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_FULL).errorCode != MegaError.API_OK) {
+            if (megaApi.checkAccessErrorExtended(
+                    node,
+                    MegaShare.ACCESS_FULL
+                ).errorCode != MegaError.API_OK
+            ) {
                 return false
             }
         }
@@ -780,8 +839,12 @@ object MegaNodeUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
-                || node?.isTakenDown == true) {
+            if (megaApi.checkAccessErrorExtended(
+                    node,
+                    MegaShare.ACCESS_OWNER
+                ).errorCode != MegaError.API_OK
+                || node?.isTakenDown == true
+            ) {
                 return false
             }
         }
@@ -865,7 +928,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         node: MegaNode
     ) {
-        logDebug("Node handle: " + node.handle)
+        Timber.d("Node handle: ${node.handle}")
         MegaApplication.getInstance().megaApi.remove(
             node, RemoveListener(snackbarShower, true)
         )
@@ -883,7 +946,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         handles: List<Long>
     ) {
-        logDebug("Leaving ${handles.size} incoming shares")
+        Timber.d("Leaving ${handles.size} incoming shares")
 
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -1452,7 +1515,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         nodeHandle: Long
     ) {
-        if (ZipBrowserActivity.zipFileFormatCheck(zipFilePath)) {
+        if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
             activityLauncher.launchActivity(Intent(context, ZipBrowserActivity::class.java).apply {
                 putExtra(
                     ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
@@ -1690,7 +1753,7 @@ object MegaNodeUtil {
                     emitter.onComplete()
                     return@create
                 } else {
-                    logDebug("Not expected format: Exception on processing url file")
+                    Timber.d("Not expected format: Exception on processing url file")
                 }
             }
 
@@ -1704,7 +1767,7 @@ object MegaNodeUtil {
                 onComplete = { progressDialog.dismiss() },
                 onError = { error ->
                     progressDialog.dismiss()
-                    LogUtil.logError(error.message)
+                    Timber.e(error.message)
                 }
             )
     }
@@ -1722,14 +1785,14 @@ object MegaNodeUtil {
     fun onNodeTapped(
         context: Context,
         node: MegaNode,
-        nodeDownloader : (node: MegaNode) -> Unit,
+        nodeDownloader: (node: MegaNode) -> Unit,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower
     ) {
         val possibleLocalFile = getTappedNodeLocalFile(node)
 
         if (possibleLocalFile != null) {
-            logDebug("The node is already downloaded, found in local.")
+            Timber.d("The node is already downloaded, found in local.")
 
             // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
             if (MimeTypeList.typeForName(node.name).isZip && !SDCardUtils.isLocalFolderOnSDCard(
@@ -1737,7 +1800,7 @@ object MegaNodeUtil {
                     possibleLocalFile
                 )
             ) {
-                logDebug("The file is zip, open in-app.")
+                Timber.d("The file is zip, open in-app.")
                 openZip(
                     context = context,
                     activityLauncher = activityLauncher,
@@ -1746,7 +1809,7 @@ object MegaNodeUtil {
                     nodeHandle = node.handle
                 )
             } else {
-                logDebug("The file cannot be opened in-app.")
+                Timber.d("The file cannot be opened in-app.")
                 launchActionView(
                     context,
                     node.name,
@@ -1859,12 +1922,12 @@ object MegaNodeUtil {
         var nodeType = BACKUP_NONE
 
         if (node != null) {
-            logDebug("MyBackup + node.handle = ${node.handle}")
-            if(isNodeInRubbishOrDeleted(node.handle)){
+            Timber.d("MyBackup + node.handle = ${node.handle}")
+            if (isNodeInRubbishOrDeleted(node.handle)) {
                 nodeType = BACKUP_NONE
             } else if (node.handle == myBackupHandle) {
                 nodeType = BACKUP_ROOT
-            } else if (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId)) {
+            } else if (node.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank()) {
                 nodeType = BACKUP_DEVICE
             } else {
                 var index = 0
@@ -1872,7 +1935,7 @@ object MegaNodeUtil {
                 var q = megaApi.getParentNode(p)
                 var isInBackupFolder = false
                 if (q != null && q.parentHandle == myBackupHandle) {
-                    nodeType = if (!isTextEmpty(p.deviceId)) {
+                    nodeType = if (!p.deviceId.isNullOrBlank()) {
                         BACKUP_FOLDER
                     } else {
                         BACKUP_NONE
@@ -1884,8 +1947,9 @@ object MegaNodeUtil {
                         index++
                         if (p != null
                             && p.parentHandle == myBackupHandle
-                            && !isTextEmpty(p.deviceId)
-                            && !isTextEmpty(q.deviceId)) {
+                            && !p.deviceId.isNullOrBlank()
+                            && !q.deviceId.isNullOrBlank()
+                        ) {
                             isInBackupFolder = true
                             break
                         }
@@ -1896,7 +1960,7 @@ object MegaNodeUtil {
                     } else {
                         if (index > 1) {
                             BACKUP_FOLDER_CHILD
-                        } else if (!isTextEmpty(node.deviceId) && index == 1) {
+                        } else if (!node.deviceId.isNullOrBlank() && index == 1) {
                             BACKUP_FOLDER
                         } else {
                             BACKUP_NONE
@@ -1905,7 +1969,7 @@ object MegaNodeUtil {
                 }
             }
         }
-        logDebug("MyBackup + checkBackupNodeTypeByHandle return nodeType = $nodeType")
+        Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $nodeType")
         return nodeType
     }
 
@@ -1963,9 +2027,11 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun MegaOffline.isValidForImageViewer(): Boolean =
-            !isFolder && (MimeTypeList.typeForName(name).isImage
-                    || MimeTypeList.typeForName(name).isGIF
-                    || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
+        !isFolder && (MimeTypeList.typeForName(name).isImage
+                || MimeTypeList.typeForName(name).isGIF
+                || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(
+            name
+        ).isMp4Video))
 
     /**
      * Check if provided node File is valid for the specified MegaNode
