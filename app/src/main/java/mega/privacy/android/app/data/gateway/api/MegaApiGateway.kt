@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.api
 
+import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 
@@ -126,4 +127,34 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+
+
+    /**
+     * Add logger
+     *
+     * @param logger
+     */
+    fun addLogger(logger: MegaLoggerInterface)
+
+    /**
+     * Remove logger
+     *
+     * @param logger
+     */
+    fun removeLogger(logger: MegaLoggerInterface)
+
+
+    /**
+     * Set logging level
+     *
+     * @param logLevel
+     */
+    fun setLogLevel(logLevel: Int)
+
+    /**
+     * Set use https only
+     *
+     * @param enabled
+     */
+    fun setUseHttpsOnly(enabled: Boolean)
 }
