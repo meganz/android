@@ -676,7 +676,7 @@ public class ChatActivity extends PasscodeActivity
                 call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
-        MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), false, true, false, new AnswerChatCallListener(this, this));
+        answerCall(chatRoom.getChatId(), false, true, false);
     }
 
     @Override
@@ -705,7 +705,7 @@ public class ChatActivity extends PasscodeActivity
                 return;
 
         logDebug("Active call on hold. Answer call.");
-        MegaApplication.getChatManagement().answerChatCall(idChat, false, true, false, new AnswerChatCallListener(this, this));
+        answerCall(idChat, false, true, false);
     }
 
     @Override
@@ -829,6 +829,10 @@ public class ChatActivity extends PasscodeActivity
 
             emptyScreen(text);
         }
+    }
+
+    private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
+        MegaApplication.getChatManagement().answerChatCall(chatId, video, audio, speaker, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -3223,7 +3227,7 @@ public class ChatActivity extends PasscodeActivity
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 callInProgressLayout.setEnabled(false);
-                MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo, new AnswerChatCallListener(this, this));
+                answerCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo);
             }
             return;
         }
@@ -3863,7 +3867,7 @@ public class ChatActivity extends PasscodeActivity
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                                 callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
-                            MegaApplication.getChatManagement().answerChatCall(callInThisChat, false, true, false, new AnswerChatCallListener(this, this));
+                            answerCall(callInThisChat, false, true, false);
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));

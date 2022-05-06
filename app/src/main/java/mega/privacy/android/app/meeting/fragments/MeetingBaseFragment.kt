@@ -206,7 +206,7 @@ open class MeetingBaseFragment : BaseFragment() {
     protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.CAMERA)) {
             logDebug("user requires the Camera permissions")
-            sharedModel.setRecordAudioPermission(true)
+            sharedModel.setCameraPermission(true)
         }
     }
 

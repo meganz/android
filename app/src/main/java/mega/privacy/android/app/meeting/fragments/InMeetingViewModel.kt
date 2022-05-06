@@ -1945,26 +1945,6 @@ class InMeetingViewModel @Inject constructor(
         inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
 
     /**
-     * Method for answer a call
-     *
-     * @param videoEnable if video should be on
-     * @param audioEnable if audio should be on
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun answerChatCall(
-        videoEnable: Boolean,
-        audioEnable: Boolean,
-        speakerStatus:Boolean,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            logDebug("The chat exists")
-            MegaApplication.getChatManagement().answerChatCall(it.chatId, videoEnable, audioEnable, speakerStatus, listener)
-            return
-        }
-    }
-
-    /**
      * Get my own information
      *
      * @param audio local audio
