@@ -520,7 +520,7 @@ object CameraUploadSyncManager {
         var muTotalUploadBytes = 0L
 
         for (record in records) {
-            val bytes = File(record.localPath).length()
+            val bytes = record.localPath?.let { File(it).length() } ?: 0L
             if (record.isSecondary) {
                 muPendingUploads++
                 muTotalUploadBytes += bytes
