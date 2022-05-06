@@ -47,5 +47,5 @@
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">%1$sVoorbereiden. Wacht alstublieft&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">De volgende tekens zijn niet toegestaan: ”* /: &lt;&gt;?​\ |</string>
+    <string name="scan_snackbar_invalid_characters">De volgende tekens zijn niet toegestaan: ” * / : &lt; &gt; ? \ |</string>
 </resources>

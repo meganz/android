@@ -211,7 +211,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Acces</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">Înregistrează-te acum și obține 20&#160;GB spațiu gratuit.</string>
     <!--  -->
     <string name="tour_speed_text">Încărcările sunt rapide. Partajează rapid fișiere cu toți.</string>
     <!--  -->
@@ -391,7 +391,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vezi transferurile</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Majoritatea dispozitivelor nu pot descărca fișiere mai mari de 4GB. Descărcarea ta probabil va eșua</string>
+    <string name="error_file_size_greater_than_4gb">Majoritatea dispozitivelor nu pot descărca fișiere mai mari de 4&#160;GB. Descărcarea ta probabil va eșua</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe dispozitiv</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1212,11 +1212,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Linkul folderului indisponibil</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Linkul folderului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Linkul fișierului indisponibil</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Linkul fișierului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2217,7 +2217,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2227,7 +2227,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -2878,9 +2878,8 @@
     <string name="error_download_takendown_node">Indisponibil din cauza încălcării ToS/AUP</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d fișier nu a fost descărcat din cauza încălcării ToS/AUP.</item>
-        <item quantity="few">%d fișiere nu au fost descărcate din cauza încălcării ToS/AUP.</item>
-        <item quantity="other">%d de fișiere nu au fost descărcate din cauza încălcării ToS/AUP.</item>
+        <item quantity="one">%d file was not downloaded as they violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
@@ -3305,7 +3304,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Începe să chatuiești în siguranță cu contactele tale folosind criptarea capăt-la-capăt</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bună. Conversează securizat pe MEGA cu mine și obține 20 GB spațiu de stocare în cloud gratuit. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bună. Conversează securizat pe MEGA cu mine și obține 20&#160;GB spațiu de stocare în cloud gratuit. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Niciun link de chat disponibil.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3411,7 +3410,7 @@
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Plată necesară</string>
     <!-- Business expired account Overdue payment page header. -->
-    <string name="payment_overdue_label">Plata este întârziată</string>
+    <string name="payment_overdue_label">Plata este scadentă</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <!-- Title of the usage tab in My Account Section -->
@@ -4161,7 +4160,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Alătură-te celei mai mari platforme de stocare în cloud și colaborare securizate din lume.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Obține 20 GB gratuit</string>
+    <string name="left_meeting_bonus_title">Obține 20&#160;GB gratuit</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Înscrie-te acum și bucură-te gratuit de funcțiile avansate de colaborare.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4387,4 +4386,6 @@
     <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">You have entered your current password</string>
 </resources>

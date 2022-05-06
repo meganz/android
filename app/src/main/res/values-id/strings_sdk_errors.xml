@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Tidak selesai</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Kunci salah/Dekripsi salah</string>
+    <string name="api_ekey">Kunci salah atau dekripsi salah</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Sesi ID buruk</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
