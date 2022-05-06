@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -112,8 +113,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text =
-            StringResourcesUtils.getString(R.string.homepage_empty_hint_audio)
+        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
+            TextUtil.formatEmptyScreenText(
+                context,
+                StringResourcesUtils.getString(R.string.homepage_empty_hint_audio)
+            ),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

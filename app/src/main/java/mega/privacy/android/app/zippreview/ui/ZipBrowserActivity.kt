@@ -1,5 +1,6 @@
 package mega.privacy.android.app.zippreview.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -18,6 +19,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -26,6 +32,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -38,53 +45,15 @@ import java.io.File
 import java.util.*
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
+import javax.inject.Inject
 
 /**
  * Display the zip file content
  */
+@AndroidEntryPoint
 class ZipBrowserActivity : PasscodeActivity() {
-    companion object {
-        const val EXTRA_PATH_ZIP = "PATH_ZIP"
-        const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
-        const val MEGA_DOWNLOADS = "MEGA Downloads/"
-
-        const val URI_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider"
-        const val TYPE_AUDIO = "audio/*"
-
-        const val RATIO_RECYCLE_VIEW = 85.0f / 548
-
-        /**
-         * Start ZipBrowserActivity and check the zip file if is error format
-         * @param context Context
-         * @param zipFilePath zip file full path
-         */
-        fun start(context: Context, zipFilePath: String) {
-            if (zipFileFormatCheck(zipFilePath)) {
-                context.startActivity(
-                    Intent(context, ZipBrowserActivity::class.java).apply {
-                        putExtra(EXTRA_PATH_ZIP, zipFilePath)
-                    })
-            } else {
-                Util.showSnackbar(context, context.getString(R.string.message_zip_format_error))
-            }
-        }
-
-        /**
-         * check the zip file if is error format
-         * @param zipFilePath zip file full path
-         */
-        fun zipFileFormatCheck(zipFilePath: String): Boolean {
-            var zipFile: ZipFile? = null
-            try {
-                zipFile = ZipFile(zipFilePath)
-            } catch (exception: ZipException) {
-                zipFile?.close()
-                return false
-            }
-            zipFile.close()
-            return true
-        }
-    }
+    @Inject
+    lateinit var crashReporter: CrashReporter
 
     private lateinit var zipBrowserBinding: ActivityZipBrowserBinding
     private var actionBar: ActionBar? = null
@@ -169,6 +138,8 @@ class ZipBrowserActivity : PasscodeActivity() {
             openFile.observe(this@ZipBrowserActivity) { openFile ->
                 openFile(openFile.second, openFile.first)
             }
+            // Log the zip file path
+            crashReporter.log("Path of ZipFile(setupViewModel) is $zipFullPath")
             //Open current zip file content
             viewModelInit(
                 zipFullPath,
@@ -468,6 +439,70 @@ class ZipBrowserActivity : PasscodeActivity() {
             val toastMessage =
                 "${getString(R.string.general_already_downloaded)}:${file.absolutePath}"
             Toast.makeText(this@ZipBrowserActivity, toastMessage, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    companion object {
+        /**
+         * Use for companion object injection
+         */
+        @EntryPoint
+        @InstallIn(SingletonComponent::class)
+        interface CrashReporterEntryPoint {
+            fun crashReporter(): CrashReporter
+        }
+
+        const val EXTRA_PATH_ZIP = "PATH_ZIP"
+        const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
+        const val MEGA_DOWNLOADS = "MEGA Downloads/"
+
+        const val URI_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider"
+        const val TYPE_AUDIO = "audio/*"
+
+        const val RATIO_RECYCLE_VIEW = 85.0f / 548
+
+        /**
+         * Start ZipBrowserActivity and check the zip file if is error format
+         * @param context Context
+         * @param zipFilePath zip file full path
+         */
+        fun start(context: Context, zipFilePath: String) {
+            if (zipFileFormatCheck(context, zipFilePath)) {
+                context.startActivity(
+                    Intent(context, ZipBrowserActivity::class.java).apply {
+                        putExtra(EXTRA_PATH_ZIP, zipFilePath)
+                    })
+            } else {
+                Util.showSnackbar(context, context.getString(R.string.message_zip_format_error))
+            }
+        }
+
+        /**
+         * check the zip file if is error format
+         * @param context context
+         * @param zipFilePath zip file full path
+         */
+        fun zipFileFormatCheck(context: Context, zipFilePath: String): Boolean {
+            val hiltEntryPoint =
+                EntryPointAccessors.fromApplication(context, CrashReporterEntryPoint::class.java)
+
+            (context as Activity?)?.run {
+                // Log the Activity name that opens ZipBrowserActivity
+                hiltEntryPoint.crashReporter().log("Activity name is $localClassName")
+            }
+            // Log the zip file path
+            hiltEntryPoint.crashReporter()
+                .log("Path of ZipFile(zipFileFormatCheck) is $zipFilePath")
+            var zipFile: ZipFile? = null
+            try {
+                zipFile = ZipFile(zipFilePath)
+            } catch (exception: ZipException) {
+
+                zipFile?.close()
+                return false
+            }
+            zipFile.close()
+            return true
         }
     }
 }

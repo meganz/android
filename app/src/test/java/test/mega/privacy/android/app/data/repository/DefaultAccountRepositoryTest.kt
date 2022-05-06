@@ -14,7 +14,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
 class DefaultAccountRepositoryTest{
     private lateinit var underTest: AccountRepository
