@@ -217,8 +217,8 @@ object AlertsAndWarnings {
     @JvmStatic
     fun showTakenDownAlert(activity: Activity): AlertDialog =
         MaterialAlertDialogBuilder(activity)
-            .setTitle(getString(R.string.general_not_available))
-            .setMessage(getString(R.string.error_download_takendown_node))
+            .setTitle(getString(R.string.error_file_not_available))
+            .setMessage(getString(R.string.error_takendown_file))
             .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
                 if (!activity.isFinishing) activity.finish()
             }
