@@ -4301,6 +4301,12 @@
     <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">You have entered your current password</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">File no longer available</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">File removed as it violated our Terms of Service.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Violated Terms of Service</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Please do not close the application.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->

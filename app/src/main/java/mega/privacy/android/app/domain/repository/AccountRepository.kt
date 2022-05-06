@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 
@@ -50,6 +51,7 @@ interface AccountRepository {
      *
      * @return true if multi-factor auth is enabled for the current user, else false
      */
+    @Throws(MegaException::class)
     suspend fun isMultiFactorAuthEnabled(): Boolean
 
     /**
