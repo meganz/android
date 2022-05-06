@@ -10,6 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
@@ -24,7 +26,6 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
-import mega.privacy.android.app.utils.MegaUserUtils.isRequestedChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
 import mega.privacy.android.app.utils.StringUtils.getDecodedAliases
 import mega.privacy.android.app.utils.TimeUtils
@@ -55,6 +56,7 @@ class GetContactsUseCase @Inject constructor(
 
     fun get(): Flowable<List<ContactItem.Data>> =
         Flowable.create({ emitter ->
+            val disposable = CompositeDisposable()
             val contacts = megaApi.contacts
                 .filter { it.visibility == VISIBILITY_VISIBLE }
                 .map { it.toContactItem() }
@@ -114,7 +116,7 @@ class GetContactsUseCase @Inject constructor(
                 }
             )
 
-            val chatSubscription = getChatChangesUseCase.get()
+            getChatChangesUseCase.get()
                 .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen || it is OnChatConnectionStateUpdate }
                 .subscribeBy(
                     onNext = { change ->
@@ -154,7 +156,9 @@ class GetContactsUseCase @Inject constructor(
                                 }
                             }
                             is OnChatConnectionStateUpdate -> {
-                                val index = contacts.indexOfFirst { it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId }
+                                val index = contacts.indexOfFirst {
+                                    it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId
+                                }
                                 if (index != INVALID_POSITION) {
                                     val currentContact = contacts[index]
                                     contacts[index] = currentContact.copy(
@@ -172,9 +176,9 @@ class GetContactsUseCase @Inject constructor(
                     onError = { error ->
                         logError(error.stackTraceToString())
                     }
-            )
+                ).addTo(disposable)
 
-            val globalSubscription = getGlobalChangesUseCase.get()
+            getGlobalChangesUseCase.get()
                 .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
                 .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
                 .subscribeBy(
@@ -183,39 +187,41 @@ class GetContactsUseCase @Inject constructor(
 
                         users.forEach { user ->
                             val index = contacts.indexOfFirst { it.email == user.email }
-                            if (index != INVALID_POSITION) {
-                                when {
-                                    user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
-                                        megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
-                                        megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
-                                        megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
-                                    user.visibility != VISIBILITY_VISIBLE -> {
-                                        contacts.removeAt(index)
-                                        emitter.onNext(contacts.sortedAlphabetically())
+                            when {
+                                index != INVALID_POSITION -> {
+                                    when {
+                                        user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
+                                            megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
+                                        user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
+                                            megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                        user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
+                                            megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
+                                        user.visibility != VISIBILITY_VISIBLE -> {
+                                            contacts.removeAt(index)
+                                            emitter.onNext(contacts.sortedAlphabetically())
+                                        }
                                     }
                                 }
-                            } else if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
-                                megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
-                            } else if (user.isRequestedChange() && user.visibility == VISIBILITY_VISIBLE) { // New contact
-                                val contact = user.toContactItem().apply { requestMissingFields(userAttrsListener) }
-                                contacts.add(contact)
-                                emitter.onNext(contacts.sortedAlphabetically())
+                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) -> {
+                                    megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
+                                }
+                                user.visibility == VISIBILITY_VISIBLE -> { // New contact
+                                    val contact = user.toContactItem()
+                                    contacts.add(contact)
+                                    emitter.onNext(contacts.sortedAlphabetically())
+                                    contact.requestMissingFields(userAttrsListener)
+                                }
                             }
                         }
                     },
                     onError = { error ->
                         logError(error.stackTraceToString())
                     }
-                )
+                ).addTo(disposable)
 
             contacts.forEach { it.requestMissingFields(userAttrsListener) }
 
-            emitter.setCancellable {
-                globalSubscription.dispose()
-                chatSubscription.dispose()
-            }
+            emitter.setCancellable { disposable.clear() }
         }, BackpressureStrategy.LATEST)
 
     /**
