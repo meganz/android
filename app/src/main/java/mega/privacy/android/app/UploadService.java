@@ -33,15 +33,19 @@ import com.shockwave.pdfium.PdfiumCore;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.CompletableSource;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
@@ -182,18 +186,31 @@ public class UploadService extends Service {
                 .subscribe((event) -> {
                     if (event instanceof Result.OnTransferStart) {
                         MegaTransfer transfer = ((Result.OnTransferStart) event).getTransfer();
-                        doOnTransferStart(transfer);
+                        doOnTransferStart(transfer)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> { }, (error) -> logError("Error " + error));
+                        ;
                     } else if (event instanceof Result.OnTransferUpdate) {
                         MegaTransfer transfer = ((Result.OnTransferUpdate) event).getTransfer();
-                        doOnTransferUpdate(transfer);
+                        doOnTransferUpdate(transfer)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> { }, (error) -> logError("Error " + error));
                     } else if (event instanceof Result.OnTransferFinish) {
                         MegaTransfer transfer = ((Result.OnTransferFinish) event).getTransfer();
                         MegaError error = ((Result.OnTransferFinish) event).getError();
-                        doOnTransferFinish(transfer, error);
+                        doOnTransferFinish(transfer, error)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> { }, (throwable) -> logError("Error " + throwable));
                     } else if (event instanceof Result.OnTransferTemporaryError) {
                         MegaTransfer transfer = ((Result.OnTransferTemporaryError) event).getTransfer();
                         MegaError error = ((Result.OnTransferTemporaryError) event).getError();
-                        doOnTransferTemporaryError(transfer, error);
+                        doOnTransferTemporaryError(transfer, error)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> { }, (throwable) -> logError("Error " + throwable));
                     }
                 }, (error) -> logError("Error " + error));
         rxSubscriptions.add(subscription);
@@ -651,18 +668,18 @@ public class UploadService extends Service {
         return progress;
     }
 
-    private void doOnTransferStart(@Nullable MegaTransfer transfer) {
-        if (transfer == null) return;
-
-		logDebug("Upload start: " + transfer.getFileName());
-		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-		    if (isCUOrChatTransfer(transfer)) return;
+    private Completable doOnTransferStart(@Nullable MegaTransfer transfer) {
+        return Completable.fromCallable(() -> {
+        if (transfer == null) return null;
+        logDebug("Upload start: " + transfer.getFileName());
+        if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+            if (isCUOrChatTransfer(transfer)) return null;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			String appData = transfer.getAppData();
 
 			if(appData!=null){
-				return;
+                return null;
 			}
 
 			pendingToAddInQueue--;
@@ -672,13 +689,17 @@ public class UploadService extends Service {
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 updateProgressNotification();
             }
-		}
+        }
+        return null;
+        });
 	}
 
-    private void doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
-        if (transfer == null) return;
+    private Completable doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
+        return Completable.fromCallable(() -> {
+
+        if (transfer == null) return null;
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
-        if (isCUOrChatTransfer(transfer)) return;
+        if (isCUOrChatTransfer(transfer)) return null;
 
 		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -708,7 +729,7 @@ public class UploadService extends Service {
                     onQueueComplete(false);
                 }
 
-                return;
+                return null;
             }
 
             if (!transfer.isFolderTransfer()) {
@@ -835,7 +856,7 @@ public class UploadService extends Service {
 
 						if (pdfNode == null){
 							logError("pdf is NULL");
-							return;
+							return null;
 						}
 
 						File previewDir = getPreviewFolder(this);
@@ -910,20 +931,23 @@ public class UploadService extends Service {
                 }
 			}
 		}
-	}
+            return null;
+        });
+    }
 
-    private void doOnTransferUpdate(@Nullable MegaTransfer transfer) {
-        if (transfer == null) return;
-		logDebug("onTransferUpdate");
-		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
-            if (isCUOrChatTransfer(transfer)) return;
+    private Completable doOnTransferUpdate(@Nullable MegaTransfer transfer) {
+        return Completable.fromCallable(() -> {
+        if (transfer == null) return null;
+        logDebug("onTransferUpdate");
+        if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+            if (isCUOrChatTransfer(transfer)) return null;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 			String appData = transfer.getAppData();
 
 			if(appData!=null){
-				return;
+				return null;
 			}
 
             if (canceled) {
@@ -931,8 +955,8 @@ public class UploadService extends Service {
                 releaseLocks();
                 megaApi.cancelTransfer(transfer);
                 UploadService.this.cancel();
-				logDebug("After cancel");
-                return;
+                logDebug("After cancel");
+                return null;
             }
 
             if(!transfer.isFolderTransfer()){
@@ -940,11 +964,14 @@ public class UploadService extends Service {
                 updateProgressNotification();
             }
         }
-	}
+        return null;
+        });
+    }
 
-    private void doOnTransferTemporaryError(@Nullable MegaTransfer transfer, MegaError e) {
-        if (transfer == null) return;
-		logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
+    private Completable doOnTransferTemporaryError(@Nullable MegaTransfer transfer, MegaError e) {
+        return Completable.fromCallable(() -> {
+        if (transfer == null) return null;
+        logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
             if (isCUOrChatTransfer(transfer)) return;
@@ -974,6 +1001,8 @@ public class UploadService extends Service {
 					break;
 			}
 		}
+            return null;
+        });
 	}
 
     private void showStorageOverQuotaNotification(){
