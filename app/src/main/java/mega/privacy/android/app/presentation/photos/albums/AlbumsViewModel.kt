@@ -4,14 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetFavouriteAlbumItems
-import mega.privacy.android.app.presentation.extensions.toAlbumCoverList
+import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.presentation.extensions.*
+import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.usecase.MegaException
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import javax.inject.Inject
 
 /**
@@ -19,15 +20,18 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
-    private val getFavouriteAlbumItems: GetFavouriteAlbumItems
+    private val getAllFavorites: GetAllFavorites,
+    private val cameraUploadFolder: GetCameraUploadFolder,
+    private val mediaUploadFolder: GetMediaUploadFolder,
+    private val getThumbnail: GetThumbnail
 ) : ViewModel() {
 
     private val _favouritesState =
-        MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Loading)
+        MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Empty(listOf(createEmptyFavAlbum())))
     val favouritesState = _favouritesState.asStateFlow()
 
     init {
-        getAllFavourites()
+        getFavouriteAlbumCover()
     }
 
     private var currentNodeJob: Job? = null
@@ -35,29 +39,59 @@ class AlbumsViewModel @Inject constructor(
     /**
      * Get all favourites
      */
-    private fun getAllFavourites() {
+    private fun getFavouriteAlbumCover() {
         _favouritesState.update {
             AlbumsLoadState.Loading
         }
-        // Cancel the previous job avoid to repeatedly observed
-        currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            runCatching {
-                getFavouriteAlbumItems()
-            }.onSuccess { flow ->
-                flow.collect { list ->
-                    val newAlbumList = list.toAlbumCoverList()
-                    _favouritesState.update {
-                        AlbumsLoadState.Success(newAlbumList)
+            getAllFavorites()
+                .onCompletion { error ->
+                    if (error is MegaException) {
+                        _favouritesState.update {
+                            AlbumsLoadState.Error(error)
+                        }
                     }
                 }
-            }.onFailure { exception ->
-                if (exception is MegaException) {
+                .collectLatest { favList ->
+                    if (favList.isEmpty())
+                        return@collectLatest
+                    val sortList = favList.filter {
+                        it.node.isImage() || (it.node.isVideo() && isInSyncFolder(it.parentId))
+                    }.sortedByDescending {
+                        it.modificationTime
+                    }
+                    val newList = ArrayList<AlbumCoverItem>()
+                    val latestFavouriteItem = sortList[0]
+                    val thumbnail =
+                        getThumbnail(latestFavouriteItem.id, latestFavouriteItem.base64Id)
+                    val favoriteAlbum =
+                        latestFavouriteItem.toFavoriteAlbumCoverItem(thumbnail, sortList.size)
+                    newList.add(favoriteAlbum)
                     _favouritesState.update {
-                        AlbumsLoadState.Error(exception)
+                        AlbumsLoadState.Success(newList)
                     }
                 }
-            }
         }
     }
+
+
+    /**
+     * Check the file is in Camera Uploads(CU) or Media Uploads(MU) folder, if it is in, the parent handle will be camSyncHandle or secondaryMediaFolderEnabled
+     *
+     * @return True, the file is in CU or MU folder. False, it is not in.
+     */
+    private fun isInSyncFolder(parentId: Long): Boolean {
+        // check node in Camera Uploads Folder if camSyncHandle existed
+        cameraUploadFolder()?.let { camSyncHandle ->
+            if (parentId == camSyncHandle.toLong())
+                return true
+        }
+        //  check node in  Media Uploads Folder if megaHandleSecondaryFolder handle existed
+        mediaUploadFolder()?.let { megaHandleSecondaryFolder ->
+            if (parentId == megaHandleSecondaryFolder.toLong())
+                return true
+        }
+        return false
+    }
+
 }

@@ -1,14 +1,17 @@
 package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
+import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.utils.MegaNodeUtil
 import nz.mega.sdk.MegaNode
+import java.io.File
 
 /**
  * Convert FavouriteInfo to Favourite
@@ -81,7 +84,7 @@ private fun FavouriteInfo.createFile(
  * android.text.format.Formatter.formatShortFileSize(activityContext, bytes) for size
  * @param stringUtil StringUtilWrapper
  * @return file info
-*/
+ */
 private fun FavouriteInfo.getFileInfo(stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
@@ -97,3 +100,15 @@ private fun FavouriteInfo.getFileInfo(stringUtil: StringUtilWrapper) =
 private fun FavouriteInfo.getFolderInfo(stringUtil: StringUtilWrapper) =
     stringUtil.getFolderInfo(numChildFolders, numChildFiles)
 
+/**
+ * FavouriteInfo to FavoriteAlbumCoverItem
+ *
+ * @param itemCount
+ * @return AlbumCoverItem.
+ */
+fun FavouriteInfo.toFavoriteAlbumCoverItem(coverThumbnail: File?,itemCount: Int): AlbumCoverItem =
+    AlbumCoverItem(
+        titleResId = R.string.title_favourites_album,
+        coverThumbnail = coverThumbnail,
+        itemCount = itemCount.toString()
+    )

@@ -7,7 +7,9 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.facade.MegaApiFacade
+import mega.privacy.android.app.data.facade.MegaDBHandlerFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaDBHandlerGateway
 
 /**
  * Gateway module
@@ -28,4 +30,6 @@ abstract class GatewayModule {
     @Binds
     abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
 
+    @Binds
+    abstract fun bindMegaDBHandlerWrapper(implementation: MegaDBHandlerFacade): MegaDBHandlerGateway
 }

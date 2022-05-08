@@ -1,6 +1,5 @@
 package mega.privacy.android.app.data.extensions
 
-import mega.privacy.android.app.domain.entity.AlbumItemInfo
 import mega.privacy.android.app.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 
@@ -17,23 +16,13 @@ fun MegaNode.toFavouriteInfo(
     numChildFiles: Int
 ): FavouriteInfo {
     return FavouriteInfo(
+        id = handle,
+        parentId = parentHandle,
+        base64Id = base64Handle,
+        modificationTime = modificationTime,
         node = this,
         hasVersion = hasVersion,
         numChildFolders = numChildFolders,
         numChildFiles = numChildFiles
-    )
-}
-
-
-/**
- * Convert MegaNode to AlbumItemInfo
- *
- * @return AlbumItemInfo
- */
-fun MegaNode.toAlbumItemInfo(): AlbumItemInfo {
-    return AlbumItemInfo(
-        handle = this.handle,
-        base64Handle = this.base64Handle,
-        modifiedTime = modificationTime
     )
 }

@@ -24,7 +24,7 @@ class AlbumCoverAdapter(
             oldItem == newItem
 
         override fun areContentsTheSame(oldItem: AlbumCoverItem, newItem: AlbumCoverItem) =
-            oldItem.itemCount == newItem.itemCount && oldItem.nodeBase64Handle == newItem.nodeBase64Handle && oldItem.albumId == newItem.albumId
+            oldItem.itemCount == newItem.itemCount && oldItem.coverThumbnail == newItem.coverThumbnail && oldItem.titleResId == newItem.titleResId
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumCoverViewHolder =

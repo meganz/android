@@ -131,8 +131,8 @@ interface MegaApiGateway {
      * Get thumbnail from server
      *
      * @param node
-     * @param dstFilePath thumbnail file path
+     * @param thumbnailFilePath thumbnail file path
      * @param listener
      */
-    fun getThumbnail(node: MegaNode, dstFilePath: String, listener: MegaRequestListenerInterface)
+    fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
 }
