@@ -1770,7 +1770,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             case MegaChatMessage.TYPE_NORMAL: {
                 logDebug("TYPE_NORMAL");
-                String contactLink = extractContactLink(androidMessage.getMessage().getContent());
+                String contactLink = extractContactLink(message.getContent());
 
                 if (androidMessage.getRichLinkMessage() != null) {
                     bindMegaLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);

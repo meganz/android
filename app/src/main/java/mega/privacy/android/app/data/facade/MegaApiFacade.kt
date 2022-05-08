@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.facade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject
@@ -68,6 +69,15 @@ class MegaApiFacade @Inject constructor(
 
     override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
         megaApi.getFolderInfo(node, listener)
+
+    override fun addLogger(logger: MegaLoggerInterface) = MegaApiAndroid.addLoggerObject(logger)
+
+    override fun removeLogger(logger: MegaLoggerInterface) =
+        MegaApiAndroid.removeLoggerObject(logger)
+
+    override fun setLogLevel(logLevel: Int) = MegaApiAndroid.setLogLevel(logLevel)
+
+    override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
 
     override fun getThumbnail(
         node: MegaNode,

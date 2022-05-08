@@ -14,4 +14,7 @@ class AppGalleryCrashReporter(
     override fun setEnabled(enabled: Boolean) {
         agConnectCrash.enableCrashCollection(enabled)
     }
+
+    override fun log(message: String) {
+    }
 }
