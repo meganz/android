@@ -81,7 +81,7 @@ class MegaApiFacade @Inject constructor(
 
     override fun getThumbnail(
         node: MegaNode,
-        dstFilePath: String,
+        thumbnailFilePath: String,
         listener: MegaRequestListenerInterface
-    ) = megaApi.getThumbnail(node, dstFilePath, listener)
+    ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 }
