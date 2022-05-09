@@ -72,12 +72,7 @@ class FavouritesFragmentTest {
     @Test
     fun test_that_the_recycler_view_is_displayed_when_favourites_is_not_empty() {
         val node = mock<MegaNode>()
-        whenever(node.handle).thenReturn(123)
-        whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
-        whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.isFolder).thenReturn(true)
-        whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
         val favouriteInfo = FavouriteInfo(
             id = node.handle,
@@ -109,13 +104,10 @@ class FavouritesFragmentTest {
     fun test_that_clicked_folder_item_and_navigate_to_favourite_folder_fragment() {
         val mockNavController = mock<NavController>()
         val node = mock<MegaNode>()
-        whenever(node.handle).thenReturn(123)
-        whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
-        whenever(node.modificationTime).thenReturn(1234567890)
+        whenever(node.name).thenReturn("test folder")
         whenever(node.isFolder).thenReturn(true)
         whenever(node.isInShare).thenReturn(true)
-        whenever(node.name).thenReturn("testName.txt")
         val favouriteInfo = FavouriteInfo(
             id = node.handle,
             parentId = node.parentHandle,
@@ -158,8 +150,6 @@ class FavouritesFragmentTest {
         whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
         whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.isFolder).thenReturn(true)
-        whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
         val favouriteInfo = FavouriteInfo(
             id = node.handle,

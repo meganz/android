@@ -52,9 +52,7 @@ class FavouriteFolderFragmentTest {
         whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
         whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.isFolder).thenReturn(true)
-        whenever(node.isInShare).thenReturn(true)
-        whenever(node.name).thenReturn("testName.txt")
+        whenever(node.name).thenReturn("test name")
         val favouriteInfo = FavouriteInfo(
             id = node.handle,
             parentId = node.parentHandle,
@@ -116,9 +114,6 @@ class FavouriteFolderFragmentTest {
         whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
         whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.isFolder).thenReturn(true)
-        whenever(node.isInShare).thenReturn(true)
-        whenever(node.name).thenReturn("testName.txt")
         val favouriteInfo = FavouriteInfo(
             id = node.handle,
             parentId = node.parentHandle,
@@ -129,6 +124,7 @@ class FavouriteFolderFragmentTest {
             numChildFolders = 0,
             numChildFiles = 0
         )
+        whenever(node.name).thenReturn("test folder")
         whenever(FavouritesTestModule.megaUtilWrapper.isOnline(any())).thenReturn(false)
         val favourites = listOf(
             favouriteInfo
