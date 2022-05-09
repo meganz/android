@@ -22,8 +22,7 @@ data class FavouriteInfo(
     val node: MegaNode,
     val hasVersion: Boolean,
     val numChildFolders: Int,
-    val numChildFiles: Int
-){
-    fun isImage() = node.isImage()
-    fun isVideo() = node.isVideo()
-}
+    val numChildFiles: Int,
+    val isImage: Boolean = node.isImage(),
+    val isVideo: Boolean = node.isVideo()
+)
