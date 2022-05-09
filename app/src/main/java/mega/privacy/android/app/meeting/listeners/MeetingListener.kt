@@ -21,6 +21,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
+import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaChatApiJava
@@ -65,6 +66,12 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
             logDebug("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
+            if (call.callCompositionChange == TYPE_LEFT &&
+                call.numParticipants == 1 &&
+                call.peeridParticipants.get(0) == api.myUserHandle
+            ) {
+                api.disableAudio(call.chatid, null)
+            }
         }
 
         // Call is set onHold
