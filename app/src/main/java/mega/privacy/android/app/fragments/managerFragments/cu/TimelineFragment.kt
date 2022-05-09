@@ -317,7 +317,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             mManagerActivity.updateCUViewTypes(
                 if (
                     galleryItems.isEmpty() ||
-                    (parentFragment as PhotosFragment).tabIndex != 0 ||
+                    photosFragment.tabIndex != 0 ||
                     actionMode != null
                 ) {
                     View.GONE
@@ -412,7 +412,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!mManagerActivity.isInPhotosPage) return
         super.whenStartActionMode()
         mManagerActivity.animateCULayout(true)
-        with(parentFragment as PhotosFragment) {
+        with(photosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
         }
@@ -425,7 +425,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
         super.whenEndActionMode()
         mManagerActivity.animateCULayout(viewModel.isCUEnabled())
-        with(parentFragment as PhotosFragment) {
+        with(photosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
         }
