@@ -41,7 +41,6 @@ import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -101,7 +100,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
 import nz.mega.sdk.MegaNode;
-import timber.log.Timber;
 
 public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
@@ -1007,10 +1005,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
         //set cu enabled and start the service
         dbH.setCamSyncEnabled(true);
-
-        Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
-        fireCameraUploadJob(context, false);
-
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
