@@ -37,6 +37,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     private lateinit var binding: FragmentTimelineBinding
 
+    private lateinit var photosFragment: PhotosFragment
+
     /**
      * Current order.
      */
@@ -76,6 +78,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        photosFragment = parentFragment as PhotosFragment
         initAfterViewCreated()
     }
 
@@ -318,8 +321,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
                     actionMode != null
                 ) {
                     View.GONE
-                }
-                else {
+                } else {
                     View.VISIBLE
                 }
             )
@@ -348,7 +350,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (!cuEnabled) {
-            hideCUProgress()
+            photosFragment.hideCUProgress()
         }
     }
 
@@ -386,8 +388,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (selectedView != ALL_VIEW) {
-            hideCUProgress()
-            binding.uploadProgress.visibility = View.GONE
+            photosFragment.hideCUProgress()
+            photosFragment.setUploadProgressTextVisibility(View.GONE)
         }
     }
 
@@ -430,32 +432,11 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     }
 
-    /**
-     * Hides CU progress bar and checks the scroll
-     * in order to hide elevation if the list is not scrolled.
-     */
-    private fun hideCUProgress() {
-        mManagerActivity.hideCUProgress()
-        checkScroll()
-    }
-
     override fun checkScroll() {
         if (!this::binding.isInitialized || !listViewInitialized()) return
 
         val isScrolled = listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-        mManagerActivity.changeAppBarElevation(binding.uploadProgress.isVisible || isScrolled)
-    }
-
-    /**
-     * update progress UI
-     */
-    fun updateProgress(visibility: Int, pending: Int) {
-        if (binding.uploadProgress.visibility != visibility) {
-            binding.uploadProgress.visibility = visibility
-            checkScroll()
-        }
-        binding.uploadProgress.text = StringResourcesUtils
-            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
+        mManagerActivity.changeAppBarElevation(photosFragment.getUploadProgressText().isVisible || isScrolled)
     }
 
     /**
