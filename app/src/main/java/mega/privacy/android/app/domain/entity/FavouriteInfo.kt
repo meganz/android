@@ -1,5 +1,7 @@
 package mega.privacy.android.app.domain.entity
 
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import nz.mega.sdk.MegaNode
 
 /**
@@ -21,4 +23,7 @@ data class FavouriteInfo(
     val hasVersion: Boolean,
     val numChildFolders: Int,
     val numChildFiles: Int
-)
+){
+    fun isImage() = node.isImage()
+    fun isVideo() = node.isVideo()
+}

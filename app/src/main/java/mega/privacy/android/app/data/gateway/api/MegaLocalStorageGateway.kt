@@ -10,9 +10,9 @@ interface MegaLocalStorageGateway {
     /**
      * Camera Uploads handle
      */
-    val camSyncHandle: String?
+    val camSyncHandle: Long?
     /**
      * Media Uploads handle
      */
-    val megaHandleSecondaryFolder: String?
+    val megaHandleSecondaryFolder: Long?
 }

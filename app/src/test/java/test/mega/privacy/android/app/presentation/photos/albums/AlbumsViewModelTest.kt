@@ -8,10 +8,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetCameraUploadFolder
-import mega.privacy.android.app.domain.usecase.GetMediaUploadFolder
-import mega.privacy.android.app.domain.usecase.GetThumbnail
+import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import nz.mega.sdk.MegaNode
@@ -25,19 +22,13 @@ import kotlin.test.assertTrue
 class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
-    private val getAllFavorites = mock<GetAllFavorites>()
-    private val cameraUploadFolder = mock<GetCameraUploadFolder>()
-    private val mediaUploadFolder = mock<GetMediaUploadFolder>()
-    private val getThumbnail = mock<GetThumbnail>()
+    private val getAlbums = mock<GetAlbums>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = AlbumsViewModel(
-            getAllFavorites = getAllFavorites,
-            cameraUploadFolder = cameraUploadFolder,
-            mediaUploadFolder = mediaUploadFolder,
-            getThumbnail = getThumbnail
+            getAlbums = getAlbums,
         )
     }
 
@@ -50,7 +41,7 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that start with loading state and there is no favourite item`() = runTest {
-        whenever(getAllFavorites()).thenReturn(
+        whenever(getAlbums()).thenReturn(
             flowOf(emptyList())
         )
     }
@@ -76,8 +67,5 @@ class AlbumsViewModelTest {
             numChildFiles = 0
         )
         val list = listOf(favourite)
-        whenever(getAllFavorites()).thenReturn(
-            flowOf(list)
-        )
     }
 }

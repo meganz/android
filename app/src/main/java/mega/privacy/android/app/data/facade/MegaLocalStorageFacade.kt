@@ -15,9 +15,9 @@ class MegaLocalStorageFacade @Inject constructor(
     val dbHandler: DatabaseHandler
 ) : MegaLocalStorageGateway {
 
-    override val camSyncHandle: String? = dbHandler.preferences?.camSyncHandle
+    override val camSyncHandle: Long? = dbHandler.preferences?.camSyncHandle?.toLongOrNull()
 
-    override val megaHandleSecondaryFolder: String? =
-        dbHandler.preferences?.megaHandleSecondaryFolder
+    override val megaHandleSecondaryFolder: Long? =
+        dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
 
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.model
 
+import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.usecase.MegaException
 
 /**
@@ -10,7 +11,7 @@ sealed interface AlbumsLoadState {
      * Get album list success
      * @param albums album list
      */
-    data class Success(val albums: List<AlbumCoverItem>) : AlbumsLoadState
+    data class Success(val albums: List<Album>) : AlbumsLoadState
 
     /**
      * Loading state
@@ -20,7 +21,7 @@ sealed interface AlbumsLoadState {
     /**
      * album list is empty
      */
-    data class Empty(val albums: List<AlbumCoverItem>) : AlbumsLoadState
+    object Empty : AlbumsLoadState
 
     /**
      * Get album list error

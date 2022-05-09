@@ -7,5 +7,5 @@ interface GetThumbnail {
      * get thumbnail from server
      * @return File
      */
-    suspend operator  fun invoke(nodeId: Long, thumbnailName: String): File
+    suspend operator fun invoke(nodeId: Long): File
 }

@@ -15,13 +15,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAlbumBinding
+import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.photos.albums.adapter.AlbumCoverAdapter
-import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.callManager
@@ -79,9 +79,6 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
                         is AlbumsLoadState.Success -> {
                             albumCoverAdapter.submitList(favouritesState.albums)
                         }
-                        is AlbumsLoadState.Empty -> {
-                            albumCoverAdapter.submitList(favouritesState.albums)
-                        }
                         is AlbumsLoadState.Error -> {
                             Timber.e(favouritesState.exception)
                         }
@@ -128,8 +125,13 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
         albumCoverAdapter =
             AlbumCoverAdapter(coverWidth, coverMargin, object : AlbumCoverAdapter.Listener {
 
-                override fun onCoverClicked(album: AlbumCoverItem) {
-                    mManagerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
+                override fun onCoverClicked(album: Album) {
+                    when (album) {
+                        is Album.FavouriteAlbum -> {
+                            mManagerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
+                        }
+                    }
+
                 }
             })
         albumList.adapter = albumCoverAdapter

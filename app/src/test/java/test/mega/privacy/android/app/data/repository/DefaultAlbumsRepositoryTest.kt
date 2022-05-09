@@ -1,17 +1,17 @@
 package test.mega.privacy.android.app.data.repository
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.AlbumsRepository
 import mega.privacy.android.app.utils.CacheFolderManager
 import nz.mega.sdk.*
 import org.junit.Before
 import org.junit.Test
-import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.domain.exception.MegaException
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -21,7 +21,7 @@ class DefaultAlbumsRepositoryTest {
     private lateinit var underTest: AlbumsRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val megaDBHandlerGateway = mock<MegaLocalStorageGateway>()
 
     private val cacheDir = File("cache")
 
@@ -30,7 +30,7 @@ class DefaultAlbumsRepositoryTest {
         underTest = DefaultAlbumsRepository(
             apiFacade = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            megaLocalStorageFacade = megaLocalStorageGateway,
+            megaLocalStorageFacade = megaDBHandlerGateway,
             context = mock { on { cacheDir }.thenReturn(cacheDir) } // Should be using CacheFolderGateway to retrieve cache dir once DK's MR is merged
         )
     }
@@ -54,7 +54,7 @@ class DefaultAlbumsRepositoryTest {
                 )
             }
 
-            val actual = underTest.getThumbnailFromServer(1L, thumbnailName)
+            val actual = underTest.getThumbnailFromServer(1L)
             assertThat(actual.path).isEqualTo("${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName")
         }
 
@@ -77,6 +77,6 @@ class DefaultAlbumsRepositoryTest {
                 )
             }
 
-            underTest.getThumbnailFromServer(1L, thumbnailName)
+            underTest.getThumbnailFromServer(1L)
         }
 }

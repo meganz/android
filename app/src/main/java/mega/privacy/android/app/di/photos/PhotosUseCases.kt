@@ -11,10 +11,7 @@ import mega.privacy.android.app.domain.usecase.*
 abstract class PhotosUseCases {
 
     @Binds
-    abstract fun bindGetCameraUploadFolder(useCase: DefaultGetCameraUploadFolder): GetCameraUploadFolder
-
-    @Binds
-    abstract fun bindGetMediaUploadFolder(useCase: DefaultGetMediaUploadFolder): GetMediaUploadFolder
+    abstract fun bindGetAlbums(useCase: DefaultGetAlbums): GetAlbums
 
     @Binds
     abstract fun bindGetThumbnailFromServer(useCase: DefaultGetThumbnail): GetThumbnail

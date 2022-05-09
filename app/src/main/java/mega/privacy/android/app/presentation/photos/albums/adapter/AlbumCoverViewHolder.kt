@@ -8,7 +8,8 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
-import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
+import mega.privacy.android.app.domain.entity.Album
+import mega.privacy.android.app.presentation.photos.model.titleId
 import mega.privacy.android.app.utils.Util
 
 /**
@@ -43,19 +44,19 @@ class AlbumCoverViewHolder(
     /**
      * Handler Album Cover UI logic and listener
      */
-    fun bind(albumCover: AlbumCoverItem, listener: AlbumCoverAdapter.Listener) {
+    fun bind(album: Album, listener: AlbumCoverAdapter.Listener) {
         itemView.setOnClickListener {
-            listener.onCoverClicked(albumCover)
+            listener.onCoverClicked(album)
         }
 
-        if(albumCover.coverThumbnail == null) {
+        if(album.thumbnail == null) {
             if (Util.isDarkMode(itemView.context)) {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover_d)
             } else {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover)
             }
         } else {
-            val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(albumCover.coverThumbnail)).build()
+            val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(album.thumbnail)).build()
             val controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request)
                 .setOldController(binding.cover.controller)
@@ -63,7 +64,7 @@ class AlbumCoverViewHolder(
             binding.cover.controller = controller
         }
 
-        binding.number.text = albumCover.itemCount
-        binding.title.text = binding.title.context.getText(albumCover.titleResId)
+        binding.number.text = album.itemCount.toString()
+        binding.title.text = binding.title.context.getText(album.titleId)
     }
 }
