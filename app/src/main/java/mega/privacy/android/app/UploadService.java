@@ -974,7 +974,7 @@ public class UploadService extends Service {
         logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-            if (isCUOrChatTransfer(transfer)) return;
+            if (isCUOrChatTransfer(transfer)) return null;
 
 			switch (e.getErrorCode())
 			{
