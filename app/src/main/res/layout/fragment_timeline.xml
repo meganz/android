@@ -75,24 +75,10 @@
 
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/upload_progress"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_marginBottom="8dp"
-                android:clipToPadding="false"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
-                android:visibility="gone"
-                tools:text="Upload in progress, 300 files pending" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cu_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/upload_progress"
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/grid_node_list_padding_bottom"
                 app:galleryItems="@{viewModel.items}"
