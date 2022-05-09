@@ -59,8 +59,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -600,7 +598,7 @@ public class ThumbnailUtils {
 	 */
 	public static File getThumbFolder(Context context) {
         if(!isFileAvailable(thumbDir)) {
-            thumbDir = getCacheFolder(context, THUMBNAIL_FOLDER);
+            thumbDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.THUMBNAIL_FOLDER);
         }
 		logDebug("getThumbFolder(): thumbDir= " + thumbDir);
         return thumbDir;
