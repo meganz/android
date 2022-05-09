@@ -1,6 +1,5 @@
 package mega.privacy.android.app.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.repository.AlbumsRepository
 import java.io.File
 import javax.inject.Inject
@@ -12,7 +11,12 @@ import javax.inject.Inject
 class DefaultGetThumbnail @Inject constructor(private val repository: AlbumsRepository) :
     GetThumbnail {
 
-    override suspend fun invoke(nodeId: Long, base64Handle: String): File =
-        repository.getThumbnail(nodeId, base64Handle)
+    override suspend fun invoke(nodeId: Long, thumbnailName: String): File {
+        return repository.getThumbnailFromLocal(thumbnailName) ?: repository.getThumbnailFromServer(
+            nodeId,
+            thumbnailName
+        )
+    }
+
 
 }

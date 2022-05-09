@@ -6,12 +6,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.api.MegaDBHandlerGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.AlbumsRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaError
 import java.io.File
 import javax.inject.Inject
@@ -20,46 +19,35 @@ import kotlin.coroutines.suspendCoroutine
 class DefaultAlbumsRepository @Inject constructor(
     private val apiFacade: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    val megaDBHandlerFacade: MegaDBHandlerGateway,
+    val megaLocalStorageFacade: MegaLocalStorageGateway,
     @ApplicationContext val context: Context
 ) : AlbumsRepository {
 
-    override fun getCameraUploadFolder(): String? = megaDBHandlerFacade.camSyncHandle
+    override fun getCameraUploadFolder(): String? = megaLocalStorageFacade.camSyncHandle
 
-    override fun getMediaUploadFolder(): String? = megaDBHandlerFacade.megaHandleSecondaryFolder
+    override fun getMediaUploadFolder(): String? = megaLocalStorageFacade.megaHandleSecondaryFolder
 
-    override suspend fun getThumbnail(nodeId: Long, base64Handle: String): File {
-        return if (hasThumbnailFile(base64Handle)) {
-            getThumbnailFileFromLocal(base64Handle)
-        } else {
-            getThumbnailFromServer(nodeId,base64Handle)
-        }
+    override fun getThumbnailFromLocal(thumbnailName: String): File? {
+        return getThumbnailFile(thumbnailName).takeIf{ it.exists() }
     }
 
-    fun getThumbnailFileFromLocal(base64Handle: String): File {
+    private fun getThumbnailFile(thumbnailName: String): File {
         val thumbnailFolder = File(context.cacheDir, CacheFolderManager.THUMBNAIL_FOLDER)
         return File(
             thumbnailFolder,
-            base64Handle.plus(FileUtil.JPG_EXTENSION)
+            thumbnailName
         )
     }
 
-    fun hasThumbnailFile(
-        base64Handle: String,
-    ): Boolean {
-        val thumbnail = getThumbnailFileFromLocal(base64Handle)
-        return thumbnail.exists()
-    }
-
-    suspend fun getThumbnailFromServer(nodeId: Long,base64Handle:String): File =
+    override suspend fun getThumbnailFromServer(nodeId: Long,thumbnailName: String): File =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 val node = apiFacade.getMegaNodeByHandle(nodeId)
-                apiFacade.getThumbnail(node, getThumbnailFileFromLocal(base64Handle).absolutePath,
+                apiFacade.getThumbnail(node, getThumbnailFile(thumbnailName).absolutePath,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { request, error ->
                             if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(getThumbnailFileFromLocal(base64Handle)))
+                                continuation.resumeWith(Result.success(getThumbnailFile(thumbnailName)))
                             } else {
                                 continuation.failWithError(error)
                             }

@@ -1,19 +1,19 @@
 package mega.privacy.android.app.data.facade
 
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.data.gateway.api.MegaDBHandlerGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import javax.inject.Inject
 
 /**
  * Mega preferences facade
  *
- * Implements [MegaDBHandlerGateway] and provides a facade over [DatabaseHandler]
+ * Implements [MegaLocalStorageGateway] and provides a facade over [DatabaseHandler]
  *
  * @property dbHandler
  */
-class MegaDBHandlerFacade @Inject constructor(
+class MegaLocalStorageFacade @Inject constructor(
     val dbHandler: DatabaseHandler
-) : MegaDBHandlerGateway {
+) : MegaLocalStorageGateway {
 
     override val camSyncHandle: String? = dbHandler.preferences?.camSyncHandle
 

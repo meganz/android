@@ -5,7 +5,7 @@ package mega.privacy.android.app.data.gateway.api
  *
  * The gateway interface to the Mega DBhandler functionality
  */
-interface MegaDBHandlerGateway {
+interface MegaLocalStorageGateway {
 
     /**
      * Camera Uploads handle

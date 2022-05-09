@@ -1,6 +1,5 @@
 package mega.privacy.android.app.domain.repository
 
-import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface AlbumsRepository {
@@ -21,7 +20,12 @@ interface AlbumsRepository {
 
 
     /**
-     * Check thumbnail
+     * Check thumbnail from local
      */
-    suspend fun getThumbnail(nodeId: Long, base64Handle: String): File
+    fun getThumbnailFromLocal(thumbnailName: String): File?
+
+    /**
+     * Check thumbnail from server
+     */
+    suspend fun getThumbnailFromServer(nodeId: Long,thumbnailName: String): File
 }

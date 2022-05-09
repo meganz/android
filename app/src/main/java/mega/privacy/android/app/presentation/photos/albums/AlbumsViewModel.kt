@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.extensions.*
 import mega.privacy.android.app.presentation.photos.model.AlbumCoverItem
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.usecase.MegaException
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import javax.inject.Inject
@@ -63,7 +64,8 @@ class AlbumsViewModel @Inject constructor(
                     val newList = ArrayList<AlbumCoverItem>()
                     val latestFavouriteItem = sortList[0]
                     val thumbnail =
-                        getThumbnail(latestFavouriteItem.id, latestFavouriteItem.base64Id)
+                        getThumbnail(latestFavouriteItem.id, latestFavouriteItem.base64Id.plus(
+                            FileUtil.JPG_EXTENSION))
                     val favoriteAlbum =
                         latestFavouriteItem.toFavoriteAlbumCoverItem(thumbnail, sortList.size)
                     newList.add(favoriteAlbum)

@@ -75,10 +75,16 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.favouritesState.collect { favouritesState ->
-                    if (favouritesState is AlbumsLoadState.Success) {
-                        albumCoverAdapter.submitList(favouritesState.albums)
-                    } else if (favouritesState is AlbumsLoadState.Error) {
-                        Timber.e(favouritesState.exception)
+                    when (favouritesState) {
+                        is AlbumsLoadState.Success -> {
+                            albumCoverAdapter.submitList(favouritesState.albums)
+                        }
+                        is AlbumsLoadState.Empty -> {
+                            albumCoverAdapter.submitList(favouritesState.albums)
+                        }
+                        is AlbumsLoadState.Error -> {
+                            Timber.e(favouritesState.exception)
+                        }
                     }
                 }
             }
