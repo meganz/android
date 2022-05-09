@@ -93,7 +93,7 @@ abstract class GalleryBaseFetcher(
             }
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = ofPattern("MMMM uuuu").format(modifyDate)
+            val dateString = ofPattern("LLLL uuuu").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             // Photo "Month-Year" section headers
@@ -127,7 +127,7 @@ abstract class GalleryBaseFetcher(
                         lastMonthDate = modifyDate
                         addPhotoDateTitle(
                             dateString, Pair(
-                                ofPattern("MMMM").format(modifyDate),
+                                ofPattern("LLLL").format(modifyDate),
                                 if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
                             )
                         )
