@@ -17,4 +17,10 @@ interface CrashReporter {
      * @param enabled true, if allowed, false otherwise.
      */
     fun setEnabled(enabled: Boolean)
+
+    /**
+     * Add custom log using BreadCrumbs of Firebase Crashlytics
+     * @param message log message
+     */
+    fun log(message: String)
 }

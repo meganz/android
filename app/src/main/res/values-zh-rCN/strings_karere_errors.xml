@@ -3,7 +3,7 @@
     <!-- Label to show that an SDK operation has been complete successfully. -->
     <string name="error_ok">无错误</string>
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-    <string name="error_args">无效参数</string>
+    <string name="error_args">参数无效</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
     <string name="error_access">访问被拒绝</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->

@@ -5,7 +5,7 @@
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="error_args">引数無効</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="error_access">アクセスは拒否されました。</string>
+    <string name="error_access">アクセスは拒否されました</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
     <string name="error_noent">リソースが存在しません。</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->

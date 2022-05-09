@@ -1,8 +1,13 @@
 package mega.privacy.android.app.domain.usecase
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import javax.inject.Inject
 
@@ -12,43 +17,44 @@ import javax.inject.Inject
  * @property loggingRepository
  * @property areSdkLogsEnabled
  * @property areChatLogsEnabled
+ * @property coroutineDispatcher
  */
 class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
+
     override suspend fun invoke(isDebug: Boolean) {
         if (isDebug) loggingRepository.enableLogAllToConsole()
 
         coroutineScope {
-            launch { monitorSdkLoggingSetting() }
-            launch { monitorChatLoggingSetting() }
+            launch(coroutineDispatcher) { monitorSdkLoggingSetting() }
+            launch(coroutineDispatcher) { monitorChatLoggingSetting() }
         }
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun monitorSdkLoggingSetting() {
         areSdkLogsEnabled()
             .distinctUntilChanged()
-            .collect { enabled ->
-                if (enabled) {
-                    loggingRepository.enableWriteSdkLogsToFile()
-                } else {
-                    loggingRepository.disableWriteSdkLogsToFile()
-                }
+            .flatMapLatest { enabled ->
+                if (enabled) loggingRepository.getSdkLoggingFlow() else emptyFlow()
+            }.collect {
+                loggingRepository.logToSdkFile(it)
             }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun monitorChatLoggingSetting() {
         areChatLogsEnabled()
             .distinctUntilChanged()
-            .collect { enabled ->
-                if (enabled) {
-                    loggingRepository.enableWriteChatLogsToFile()
-                } else {
-                    loggingRepository.disableWriteChatLogsToFile()
-                }
+            .flatMapLatest { enabled ->
+                if (enabled) loggingRepository.getChatLoggingFlow() else emptyFlow()
+            }.collect {
+                loggingRepository.logToChatFile(it)
             }
     }
 }

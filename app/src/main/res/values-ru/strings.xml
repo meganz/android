@@ -213,7 +213,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA-доступ</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 20 ГБ свободного места</string>
+    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 20&#160;ГБ свободного места</string>
     <!--  -->
     <string name="tour_speed_text">Быстрая загрузка в облако и обмен файлами с кем угодно</string>
     <!--  -->
@@ -399,7 +399,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Просмотр передач</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4 ГБ. Возможно, скачивание не удастся</string>
+    <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4&#160;ГБ. Возможно, скачивание не удастся</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1226,11 +1226,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Ссылка на папку недоступна</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Файл удален по причине нарушения условий предоставления услуг (ToS) или политики допустимого использования (AUP).</string>
+    <string name="folder_link_unavaible_ToS_violation">Ссылка на папку была удалёна, поскольку она нарушала наши условия обслуживания.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Ссылка на файл недоступна</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Ссылка на файл была удалена из-за нарушения УИ/ПДИ.</string>
+    <string name="file_link_unavaible_ToS_violation">Ссылка на файл была удалёна, поскольку она нарушала наши условия обслуживания.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Этот адрес повреждён или изменён. Ссылка, по которой вы пытаетесь получить доступ, не существует.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2255,7 +2255,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s МБ</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s ГБ</string>
+    <string name="label_file_size_giga_byte">%s&#160;ГБ</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s ТБ</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2265,7 +2265,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s МБ/с</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s ГБ/с</string>
+    <string name="label_file_speed_giga_byte">%s&#160;ГБ/с</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s ТБ/с</string>
     <!-- Size in megabytes. -->
@@ -2881,7 +2881,7 @@
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Сохранить на устройстве</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">Загрузить на MEGA</string>
+    <string name="title_upload_explorer">Загрузить в MEGA</string>
     <!-- Label choose destination -->
     <string name="choose_destionation">Выберите назначение</string>
     <!-- Label that indicates show more items -->
@@ -2921,19 +2921,19 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Ваша общедоступная папка [/A][B]%s[/B][C] была заблокирована.[/C]</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">К этому файлу предъявлено требование о снятии.</string>
+    <string name="message_file_takedown_pop_out_notification">К этому файлу предъявлено заявление на изъятие.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">К этой папке предъявлено требование о снятии.</string>
+    <string name="message_folder_takedown_pop_out_notification">К этой папке предъявлено заявления на изъятие.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Оспорить блокировку</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Недоступно из-за нарушения условий предоставления услуг/политики допустимого использования</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d файл не был загружен из-за нарушения условий предоставления услуг/политики допустимого использования</item>
-        <item quantity="few">%d файла не были загружены из-за нарушения условий предоставления услуг/политики допустимого использования</item>
-        <item quantity="many">%d файлов не было загружено из-за нарушения условий предоставления услуг/политики допустимого использования</item>
-        <item quantity="other">%d файла не было загружено из-за нарушения условий предоставления услуг/политики допустимого использования</item>
+        <item quantity="one">%d файл не был скачан из-за нарушения наших условий обслуживания.</item>
+        <item quantity="few">%d файла не было скачано из-за нарушения наших условий обслуживания.</item>
+        <item quantity="many">%d файлов не было скачано из-за нарушения наших условий обслуживания.</item>
+        <item quantity="other">%d файла не было скачано из-за нарушения наших условий обслуживания.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Ваш общедоступный файл [/A][B]%s[/B][C] был восстановлен.[/C]</string>
@@ -3375,7 +3375,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Начните безопасное общение со своими контактами благодаря сквозному шифрованию.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Привет. Начните зашифрованное общение со мной с помощью MEGA и получите 20 ГБ на диске бесплатно. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Привет. Начните зашифрованное общение со мной с помощью MEGA и получите 20&#160;ГБ на диске бесплатно. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Нет доступной ссылки на чат</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4251,7 +4251,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Присоединяйтесь к самой крупной в мире безопасной облачной платформе хранения и совместной работы.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Получите 20 ГБ бесплатно</string>
+    <string name="left_meeting_bonus_title">Получите 20&#160;ГБ бесплатно</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Зарегистрируйтесь сейчас и наслаждайтесь расширенными функциями совместной работы бесплатно.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4458,7 +4458,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">У вас есть активная подписка MEGA от %1$s. Вам нужно отменить её отдельно в %2$s, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">У вас есть активная подписка MEGA. Она будет отменена автоматически после удаления аккаунта. Посетите наш Справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">У вас есть активная подписка MEGA от Apple. Вам нужно отменить её отдельно в своей учётной записи iTunes, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4479,4 +4479,6 @@
     <string name="message_zip_format_error">Формат файла не поддерживается. Не удаётся открыть файл.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">Выбранная папка пуста. Нет файлов для загрузки.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Вы ввели текущий пароль</string>
 </resources>

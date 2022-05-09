@@ -2,7 +2,6 @@ package mega.privacy.android.app.data.gateway.api
 
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
-import java.util.ArrayList
 
 /**
  * Mega api gateway
@@ -99,4 +98,32 @@ interface MegaApiGateway {
      * @return child files number
      */
     fun getNumChildFiles(node: MegaNode): Int
+
+
+    /**
+     * Set auto accept contacts from link
+     *
+     * @param disableAutoAccept pass true to stop auto accepting contacts
+     * @param listener
+     */
+    fun setAutoAcceptContactsFromLink(
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface
+    )
+
+    /**
+     * Is auto accept contacts from link enabled
+     *
+     * @param listener
+     */
+    fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface)
+
+
+    /**
+     * Get folder info
+     *
+     * @param node
+     * @param listener
+     */
+    fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
 }

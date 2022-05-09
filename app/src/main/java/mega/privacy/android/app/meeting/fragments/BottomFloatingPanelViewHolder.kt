@@ -601,8 +601,7 @@ class BottomFloatingPanelViewHolder(
      * @param isHold True, if it is an on hold button. False, if it is switch call button
      */
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
-        floatingPanelView.fabHold.enable = isEnabled
-        disableEnableButtons(inMeetingViewModel.isCallEstablished(), isHold)
+        disableEnableButtons(isEnabled, isHold)
     }
 
     /**
