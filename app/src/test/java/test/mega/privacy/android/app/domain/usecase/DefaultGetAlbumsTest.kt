@@ -1,5 +1,3 @@
-@file:OptIn(FlowPreview::class)
-
 package test.mega.privacy.android.app.domain.usecase
 
 import app.cash.turbine.test
@@ -21,20 +19,19 @@ import mega.privacy.android.app.domain.usecase.GetAllFavorites
 import mega.privacy.android.app.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaNode
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(FlowPreview::class)
+@ExperimentalCoroutinesApi
 class DefaultGetAlbumsTest {
     private lateinit var underTest: GetAlbums
 
     val flow = flow<List<FavouriteInfo>> {
-        emit(emptyList<FavouriteInfo>())
+        emit(emptyList())
         awaitCancellation()
     }
     private val getAllFavorites = mock<GetAllFavorites> {

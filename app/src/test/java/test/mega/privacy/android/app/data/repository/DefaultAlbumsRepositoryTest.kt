@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
@@ -17,6 +18,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultAlbumsRepositoryTest {
     private lateinit var underTest: AlbumsRepository
 

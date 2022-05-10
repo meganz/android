@@ -46,7 +46,7 @@ class DefaultAlbumsRepository @Inject constructor(
 
                 apiFacade.getThumbnail(node, thumbnail.absolutePath,
                     OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request, error ->
+                        onRequestFinish = { _, error ->
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(thumbnail))
                             } else {

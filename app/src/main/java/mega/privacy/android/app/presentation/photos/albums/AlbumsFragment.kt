@@ -82,6 +82,9 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
                         is AlbumsLoadState.Error -> {
                             Timber.e(favouritesState.exception)
                         }
+                        else -> {
+                            // current do nothing
+                        }
                     }
                 }
             }
