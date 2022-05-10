@@ -47,6 +47,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -65,7 +66,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.main.ManagerActivity.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1160,7 +1160,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				if (isVoiceClip) {
 					resultTransfersVoiceClip(transfer.getNodeHandle(), ERROR_VOICE_CLIP_TRANSFER);
-					File localFile = buildVoiceClipFile(this, transfer.getFileName());
+					File localFile = CacheFolderManager.buildVoiceClipFile(this, transfer.getFileName());
 					if (isFileAvailable(localFile)) {
 						logDebug("Delete own voiceclip : exists");
 						localFile.delete();
@@ -1243,7 +1243,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					logError("Download ERROR: " + transfer.getNodeHandle());
 					if(isVoiceClip){
 						resultTransfersVoiceClip(transfer.getNodeHandle(), ERROR_VOICE_CLIP_TRANSFER);
-						File localFile = buildVoiceClipFile(this, transfer.getFileName());
+						File localFile = CacheFolderManager.buildVoiceClipFile(this, transfer.getFileName());
 						if (isFileAvailable(localFile)) {
 							logDebug("Delete own voice clip : exists");
 							localFile.delete();
@@ -1285,7 +1285,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("alterUri");
 	    try {
 
-	    	File tempFolder = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
+	    	File tempFolder = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 	    	if (!isFileAvailable(tempFolder)) return;
 
 	    	String sourceLocation = tempFolder.getAbsolutePath() + File.separator +fileName;

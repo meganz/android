@@ -23,7 +23,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityWebViewBinding
-import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
@@ -345,7 +345,7 @@ class WebViewActivity : BaseActivity() {
                 @SuppressLint("SimpleDateFormat")
                 val fileName = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
-                file = buildTempFile(this, fileName + getContentExtension(contentType))
+                file = CacheFolderManager.buildTempFile(this, fileName + getContentExtension(contentType))
             } catch (e: IOException) {
                 logError("Error creating temp file.", e)
             }

@@ -33,11 +33,8 @@ import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -45,10 +42,10 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.API_EARGS
 import nz.mega.sdk.MegaError.API_OK
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -282,17 +279,19 @@ class MyAccountViewModel @Inject constructor(
      * @param action  Action to perform after the avatar has been get.
      */
     fun getAvatar(context: Context, action: (Boolean) -> Unit) {
-        getMyAvatarUseCase.get(buildAvatarFile(context, megaApi.myEmail).absolutePath)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { action.invoke(true) },
-                onError = { error ->
-                    logWarning(error.message)
-                    action.invoke(false)
-                }
-            )
-            .addTo(composite)
+        CacheFolderManager.buildAvatarFile(context, megaApi.myEmail)?.absolutePath?.let {
+            getMyAvatarUseCase.get(it)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { action.invoke(true) },
+                    onError = { error ->
+                        logWarning(error.message)
+                        action.invoke(false)
+                    }
+                )
+                .addTo(composite)
+        }
     }
 
     /**
@@ -592,7 +591,7 @@ class MyAccountViewModel @Inject constructor(
         val imgFile = if (!path.isNullOrEmpty()) File(path)
         else CacheFolderManager.getCacheFile(
             app,
-            CacheFolderManager.TEMPORAL_FOLDER,
+            CacheFolderManager.TEMPORARY_FOLDER,
             "picture.jpg"
         )
 
@@ -601,7 +600,7 @@ class MyAccountViewModel @Inject constructor(
             return
         }
 
-        val newFile = buildAvatarFile(app, myEmail + "Temp.jpg")
+        val newFile = CacheFolderManager.buildAvatarFile(app, myEmail + "Temp.jpg")
 
         if (newFile != null) {
             MegaUtilsAndroid.createAvatar(imgFile, newFile)
@@ -628,11 +627,11 @@ class MyAccountViewModel @Inject constructor(
      * @param snackbarShower Callback to show the request result.
      */
     fun deleteProfileAvatar(context: Context, snackbarShower: SnackbarShower) {
-        val avatar = buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)
-
-        if (FileUtil.isFileAvailable(avatar)) {
-            logDebug("Avatar to delete: " + avatar.absolutePath)
-            avatar.delete()
+        CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.let {
+            if (FileUtil.isFileAvailable(it)) {
+                Timber.d("Avatar to delete: " + it.absolutePath)
+                it.delete()
+            }
         }
 
         setAvatarUseCase.remove()

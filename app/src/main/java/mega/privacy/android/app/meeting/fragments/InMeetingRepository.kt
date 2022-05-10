@@ -509,7 +509,7 @@ class InMeetingRepository @Inject constructor(
                 CacheFolderManager.buildAvatarFile(
                     context,
                     mail + FileUtil.JPG_EXTENSION
-                ).absolutePath, MeetingAvatarListener(context, peerId)
+                )?.absolutePath, MeetingAvatarListener(context, peerId)
             )
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
@@ -570,7 +570,7 @@ class InMeetingRepository @Inject constructor(
             CacheFolderManager.buildAvatarFile(
                 context,
                 email + FileUtil.JPG_EXTENSION
-            ).absolutePath, MeetingAvatarListener(context, peerId)
+            )?.absolutePath, MeetingAvatarListener(context, peerId)
         )
     }
 }

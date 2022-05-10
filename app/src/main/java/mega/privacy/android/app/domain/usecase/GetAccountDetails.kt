@@ -13,5 +13,5 @@ interface GetAccountDetails {
      * @param forceRefresh
      * @return
      */
-    operator fun invoke(forceRefresh: Boolean): UserAccount
+    suspend operator fun invoke(forceRefresh: Boolean): UserAccount
 }

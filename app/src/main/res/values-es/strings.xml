@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">Acceso a MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Regístrate ahora y obtén 20 GB de almacenamiento gratuito</string>
+    <string name="tour_space_text">Regístrate ahora y obtén 20&#160;GB de almacenamiento gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Subidas rápidas. Comparte archivos rápidamente con todo el mundo</string>
     <!--  -->
@@ -383,7 +383,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver transferencias</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4 GB. Es probable que la descarga falle</string>
+    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4&#160;GB. Es probable que la descarga falle</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">No dispones de una aplicación en tu dispositivo para reproducir este archivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -2179,7 +2179,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2189,7 +2189,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Chatea de forma segura con tus contactos mediante el cifrado punto a punto</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura en MEGA y obtén 20 GB de almacenamiento gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura en MEGA y obtén 20&#160;GB de almacenamiento gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4073,7 +4073,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Únete a la plataforma segura de colaboración y almacenamiento en la nube más grande del mundo.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Obtén 20 GB gratis</string>
+    <string name="left_meeting_bonus_title">Obtén 20&#160;GB gratis</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Regístrate ahora y disfruta gratis de las características más avanzadas de colaboración.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4278,7 +4278,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Tienes una suscripción a MEGA activa con %1$s. Debes cancelarla desde %2$s, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Tienes una suscripción a MEGA activa. Se cancelará automáticamente al eliminar tu cuenta de MEGA. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Tienes una suscripción a MEGA activa con Apple. Debes cancelarla desde los ajustes del dispositivo en tu cuenta de iTunes, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para más información.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4299,4 +4299,6 @@
     <string name="message_zip_format_error">El formato de archivo no es compatible. No se puede abrir el archivo.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">La carpeta seleccionada está vacía. No hay archivos para subir.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Has introducido tu contraseña actual</string>
 </resources>
