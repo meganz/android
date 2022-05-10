@@ -98,8 +98,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 @AndroidEntryPoint
 public class InboxFragment extends RotatableFragment {
 
@@ -549,8 +547,6 @@ public class InboxFragment extends RotatableFragment {
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		LiveEventBus.get(EVENT_VAULT_ACTION, Integer.class)
-				.observe(getViewLifecycleOwner(),this::backupActionObserver);
 		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_INBOX);
 	}
 
@@ -999,17 +995,5 @@ public class InboxFragment extends RotatableFragment {
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-
-	/**
-	 * Process the action for backup nodes.
-	 *
-	 * @param action The actions for backup nodes
-	 */
-	private void backupActionObserver(int action) {
-		if (action == ACTION_BACKUP_REMOVE && fileBackupManager != null) {
-			// Show the warning dialog
-			fileBackupManager.actWithBackupTips(ACTION_BACKUP_REMOVE);
-		}
 	}
 }

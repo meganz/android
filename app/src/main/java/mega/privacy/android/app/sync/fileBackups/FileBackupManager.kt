@@ -161,9 +161,6 @@ class FileBackupManager(
         ?: currentParentHandle
 
 
-    fun actWithBackupTips(actionType: Int) {
-        backupWarningDialog = showTipDialogWithBackup(activity, actionType)
-    }
     /**
      * Show the warning dialog when acting with "My backups" folder
      *

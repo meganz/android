@@ -3577,8 +3577,6 @@
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
-    <!-- If users want to remove the backup folder, Warning dialog will show to confirm -->
-    <string name="backup_remove_warning">Please stop the backup first if you want to remove this folder. You can stop the backup via Backup Centre in web browser or desktopApp of the computer you backed up.</string>
     <!-- The title of warning dialog for single folder moving -->
     <string name="backup_move_folder_title">Move “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
