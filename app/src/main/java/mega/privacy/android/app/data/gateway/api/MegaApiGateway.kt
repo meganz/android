@@ -1,7 +1,10 @@
 package mega.privacy.android.app.data.gateway.api
 
+import nz.mega.sdk.MegaLoggerInterface
+import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
 
 /**
  * Mega api gateway
@@ -126,4 +129,55 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+
+
+    /**
+     * Add logger
+     *
+     * @param logger
+     */
+    fun addLogger(logger: MegaLoggerInterface)
+
+    /**
+     * Remove logger
+     *
+     * @param logger
+     */
+    fun removeLogger(logger: MegaLoggerInterface)
+
+
+    /**
+     * Set logging level
+     *
+     * @param logLevel
+     */
+    fun setLogLevel(logLevel: Int)
+
+    /**
+     * Set use https only
+     *
+     * @param enabled
+     */
+    fun setUseHttpsOnly(enabled: Boolean)
+
+    /**
+     * Add global listener
+     *
+     * @param listener
+     */
+    fun addGlobalListener(listener: MegaGlobalListenerInterface)
+
+    /**
+     * Remove global listener
+     *
+     * @param listener
+     */
+    fun removeGlobalListener(listener: MegaGlobalListenerInterface)
+
+    /**
+     * Get logged in user
+     *
+     * @return the current user if logged in, otherwise null
+     */
+    suspend fun getLoggedInUser(): MegaUser?
 }

@@ -39,6 +39,7 @@ import java.util.Iterator;
 
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -55,7 +56,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
@@ -386,7 +386,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logDebug("After stopSelf");
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+			CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
         }
 
 	}
@@ -705,7 +705,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 releaseLocks();
 				UploadService.this.cancel();
 				logDebug("After cancel");
-				deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+				CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -869,13 +869,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 				String qrFileName = megaApi.getMyEmail() + QR_IMAGE_FILE_NAME;
 
-				File localFile = buildQrFile(getApplicationContext(),transfer.getFileName());
+				File localFile = CacheFolderManager.buildQrFile(getApplicationContext(),transfer.getFileName());
                 if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
 					logDebug("Delete file!: " + localFile.getAbsolutePath());
                     localFile.delete();
                 }
 
-                File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
+                File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 				logDebug("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
 				if (isFileAvailable(tempPic) && transfer.getPath() != null) {
 					if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {

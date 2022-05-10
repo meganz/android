@@ -36,7 +36,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.app.utils.CacheFolderManager.*
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.FileUtil
@@ -157,137 +157,138 @@ class GetImageUseCase @Inject constructor(
                         else -> false
                     }
 
-                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
-                    val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
-                    val fullFile = buildTempFile(context, node.getFileName())
+                    val thumbnailFile = if (node.hasThumbnail()) CacheFolderManager.buildThumbnailFile(context, node.getThumbnailFileName()) else null
+                    val previewFile = if (node.hasPreview() || node.isVideo()) CacheFolderManager.buildPreviewFile(context, node.getThumbnailFileName()) else null
 
-                    if (!megaApi.checkValidNodeFile(node, fullFile)) {
-                        FileUtil.deleteFileSafely(fullFile)
-                    }
+                    CacheFolderManager.buildTempFile(context, node.getFileName())?.let { nonNullFullFile ->
+                        if (!megaApi.checkValidNodeFile(node, nonNullFullFile)) {
+                            FileUtil.deleteFileSafely(nonNullFullFile)
+                        }
 
-                    val image = ImageResult(
-                        isVideo = node.isVideo(),
-                        thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
-                        previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
-                        fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
-                    )
-
-                    if (image.isVideo && fullFile?.exists() == true && previewFile == null) {
-                        image.previewUri = getVideoThumbnail(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
-                    }
-
-                    if ((!fullSizeRequired && previewFile?.exists() == true) || megaApi.checkValidNodeFile(node, fullFile)) {
-                        image.isFullyLoaded = true
-                        emitter.onNext(image)
-                        emitter.onComplete()
-                        return@create
-                    } else {
-                        emitter.onNext(image)
-                    }
-
-                    if (thumbnailFile != null && !thumbnailFile.exists()) {
-                        getThumbnailImage(node, thumbnailFile.absolutePath).subscribeBy(
-                            onComplete = {
-                                image.thumbnailUri = thumbnailFile.toUri()
-                                emitter.onNext(image)
-                            },
-                            onError = { error ->
-                                logWarning(error.stackTraceToString())
-                            }
+                        val image = ImageResult(
+                            isVideo = node.isVideo(),
+                            thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
+                            previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
+                            fullSizeUri = if (nonNullFullFile.exists()) nonNullFullFile.toUri() else null
                         )
-                    }
 
-                    if (previewFile != null && !previewFile.exists()) {
-                        getPreviewImage(node, previewFile.absolutePath).subscribeBy(
-                            onComplete = {
-                                image.previewUri = previewFile.toUri()
-                                if (fullSizeRequired) {
+                        if (image.isVideo && nonNullFullFile.exists() && previewFile == null) {
+                            image.previewUri = getVideoThumbnail(node.getThumbnailFileName(), nonNullFullFile.toUri()).blockingGetOrNull()
+                        }
+
+                        if ((!fullSizeRequired && previewFile?.exists() == true) || megaApi.checkValidNodeFile(node, nonNullFullFile)) {
+                            image.isFullyLoaded = true
+                            emitter.onNext(image)
+                            emitter.onComplete()
+                            return@create
+                        } else {
+                            emitter.onNext(image)
+                        }
+
+                        if (thumbnailFile != null && !thumbnailFile.exists()) {
+                            getThumbnailImage(node, thumbnailFile.absolutePath).subscribeBy(
+                                onComplete = {
+                                    image.thumbnailUri = thumbnailFile.toUri()
                                     emitter.onNext(image)
-                                } else {
-                                    image.isFullyLoaded = true
-                                    emitter.onNext(image)
-                                    emitter.onComplete()
-                                }
-                            },
-                            onError = { error ->
-                                if (!fullSizeRequired) {
-                                    emitter.onError(error)
-                                } else {
+                                },
+                                onError = { error ->
                                     logWarning(error.stackTraceToString())
                                 }
-                            }
-                        )
-                    }
+                            )
+                        }
 
-                    if (fullSizeRequired && !fullFile.exists()) {
-                        val listener = OptionalMegaTransferListenerInterface(
-                            onTransferStart = { transfer ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
-
-                                image.transferTag = transfer.tag
-                                emitter.onNext(image)
-                            },
-                            onTransferFinish = { _: MegaTransfer, error: MegaError ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
-
-                                image.transferTag = null
-
-                                when (val megaException = error.toMegaException()) {
-                                    is SuccessMegaException -> {
-                                        image.fullSizeUri = fullFile.toUri()
+                        if (previewFile != null && !previewFile.exists()) {
+                            getPreviewImage(node, previewFile.absolutePath).subscribeBy(
+                                onComplete = {
+                                    image.previewUri = previewFile.toUri()
+                                    if (fullSizeRequired) {
+                                        emitter.onNext(image)
+                                    } else {
                                         image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
                                     }
-                                    is ResourceAlreadyExistsMegaException -> {
-                                        if (megaApi.checkValidNodeFile(node, fullFile)) {
-                                            image.fullSizeUri = fullFile.toUri()
+                                },
+                                onError = { error ->
+                                    if (!fullSizeRequired) {
+                                        emitter.onError(error)
+                                    } else {
+                                        logWarning(error.stackTraceToString())
+                                    }
+                                }
+                            )
+                        }
+
+                        if (fullSizeRequired && !nonNullFullFile.exists()) {
+                            val listener = OptionalMegaTransferListenerInterface(
+                                onTransferStart = { transfer ->
+                                    if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+
+                                    image.transferTag = transfer.tag
+                                    emitter.onNext(image)
+                                },
+                                onTransferFinish = { _: MegaTransfer, error: MegaError ->
+                                    if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+
+                                    image.transferTag = null
+
+                                    when (val megaException = error.toMegaException()) {
+                                        is SuccessMegaException -> {
+                                            image.fullSizeUri = nonNullFullFile.toUri()
                                             image.isFullyLoaded = true
                                             emitter.onNext(image)
                                             emitter.onComplete()
-                                        } else {
-                                            FileUtil.deleteFileSafely(fullFile)
-                                            emitter.onError(megaException)
                                         }
+                                        is ResourceAlreadyExistsMegaException -> {
+                                            if (megaApi.checkValidNodeFile(node, nonNullFullFile)) {
+                                                image.fullSizeUri = nonNullFullFile.toUri()
+                                                image.isFullyLoaded = true
+                                                emitter.onNext(image)
+                                                emitter.onComplete()
+                                            } else {
+                                                FileUtil.deleteFileSafely(nonNullFullFile)
+                                                emitter.onError(megaException)
+                                            }
+                                        }
+                                        is ResourceDoesNotExistMegaException -> {
+                                            image.isFullyLoaded = true
+                                            emitter.onNext(image)
+                                            emitter.onComplete()
+                                        }
+                                        else ->
+                                            emitter.onError(megaException)
                                     }
-                                    is ResourceDoesNotExistMegaException -> {
-                                        image.isFullyLoaded = true
-                                        emitter.onNext(image)
-                                        emitter.onComplete()
-                                    }
-                                    else ->
+
+                                    resetTotalDownloadsIfNeeded()
+                                },
+                                onTransferTemporaryError = { _, error ->
+                                    if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+                                    val megaException = error.toMegaException()
+
+                                    if (megaException is QuotaExceededMegaException) {
                                         emitter.onError(megaException)
+                                    }
                                 }
+                            )
 
-                                resetTotalDownloadsIfNeeded()
-                            },
-                            onTransferTemporaryError = { _, error ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
-                                val megaException = error.toMegaException()
-
-                                if (megaException is QuotaExceededMegaException) {
-                                    emitter.onError(megaException)
-                                }
+                            if (highPriority) {
+                                megaApi.startDownloadWithTopPriority(
+                                    node,
+                                    nonNullFullFile.absolutePath,
+                                    Constants.APP_DATA_BACKGROUND_TRANSFER,
+                                    listener
+                                )
+                            } else {
+                                megaApi.startDownloadWithData(
+                                    node,
+                                    nonNullFullFile.absolutePath,
+                                    Constants.APP_DATA_BACKGROUND_TRANSFER,
+                                    listener
+                                )
                             }
-                        )
-
-                        if (highPriority) {
-                            megaApi.startDownloadWithTopPriority(
-                                node,
-                                fullFile.absolutePath,
-                                Constants.APP_DATA_BACKGROUND_TRANSFER,
-                                listener
-                            )
-                        } else {
-                            megaApi.startDownloadWithData(
-                                node,
-                                fullFile.absolutePath,
-                                Constants.APP_DATA_BACKGROUND_TRANSFER,
-                                listener
-                            )
                         }
                     }
-                }
+                    }
             }
         }, BackpressureStrategy.LATEST)
 
@@ -371,24 +372,27 @@ class GetImageUseCase @Inject constructor(
                     if (file.exists()) {
                         val isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo
                         val thumbnailFileName = "${offlineNode.handle.encodeBase64()}$JPG_EXTENSION"
-                        val thumbnailFile = buildThumbnailFile(context, thumbnailFileName)
-                        var previewFile = buildPreviewFile(context, thumbnailFileName)
+                        val thumbnailFile = CacheFolderManager.buildThumbnailFile(context, thumbnailFileName)
+                        var previewFile = CacheFolderManager.buildPreviewFile(context, thumbnailFileName)
 
-                        if (!previewFile.exists()) {
-                            previewFile = if (isVideo) {
+                        previewFile?.let { nonNullPreviewFile ->
+                            if (!nonNullPreviewFile.exists()) {
+                                previewFile = if (isVideo) {
                                 getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
                             } else {
                                 getImageThumbnail(thumbnailFileName, file.toUri(), highPriority).blockingGetOrNull()?.toFile()
+                                }
+                            }
+                            thumbnailFile?.let { nonNullThumbNailFile ->
+                                ImageResult(
+                                    isVideo = isVideo,
+                                    thumbnailUri = if (nonNullThumbNailFile.exists()) nonNullThumbNailFile.toUri() else null,
+                                    previewUri = if (nonNullPreviewFile.exists()) nonNullPreviewFile.toUri() else null,
+                                    fullSizeUri = file.toUri(),
+                                    isFullyLoaded = true
+                                )
                             }
                         }
-
-                        ImageResult(
-                            isVideo = isVideo,
-                            thumbnailUri = if (thumbnailFile.exists()) thumbnailFile.toUri() else null,
-                            previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
-                            fullSizeUri = file.toUri(),
-                            isFullyLoaded = true
-                        )
                     } else {
                         error("Offline file doesn't exist")
                     }
@@ -440,23 +444,24 @@ class GetImageUseCase @Inject constructor(
             val videoFile = videoUri.toFile()
             require(videoFile.exists())
 
-            val previewFile = buildPreviewFile(context, fileName)
-            if (previewFile.exists()) return@fromCallable previewFile.toUri()
+            CacheFolderManager.buildPreviewFile(context, fileName)?.let { previewFile->
+                if (previewFile.exists()) return@fromCallable previewFile.toUri()
 
-            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ThumbnailUtils.createVideoThumbnail(videoFile, context.getScreenSize(), null)
-            } else {
-                ThumbnailUtils.createVideoThumbnail(videoFile.path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND)
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ThumbnailUtils.createVideoThumbnail(videoFile, context.getScreenSize(), null)
+                } else {
+                    ThumbnailUtils.createVideoThumbnail(videoFile.path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND)
+                }
+                requireNotNull(bitmap)
+
+                BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
+                    close()
+                }
+                bitmap.recycle()
+
+                previewFile.toUri()
             }
-            requireNotNull(bitmap)
-
-            BufferedOutputStream(FileOutputStream(previewFile)).apply {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
-                close()
-            }
-            bitmap.recycle()
-
-            previewFile.toUri()
         }
 
     /**
@@ -473,8 +478,8 @@ class GetImageUseCase @Inject constructor(
             require(imageFile.exists())
             require(imageFile.length() > SIZE_1_MB) { "Image too small" }
 
-            val previewFile = buildPreviewFile(context, fileName)
-            if (previewFile.exists()) {
+            CacheFolderManager.buildPreviewFile(context, fileName)?.let { previewFile->
+                if (previewFile.exists()) {
                 emitter.onSuccess(previewFile.toUri())
                 return@create
             }
