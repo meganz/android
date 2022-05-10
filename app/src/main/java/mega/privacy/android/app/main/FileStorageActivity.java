@@ -327,7 +327,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
 	 */
 	private void showOpenDocumentWarningAndFinish(ActivityNotFoundException e) {
 		Timber.e(e, "Error launching ACTION_OPEN_DOCUMENT_TREE.");
-		showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.intent_not_available));
+		showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.general_warning_no_picker));
 		new Handler().postDelayed(this::finish, LONG_SNACKBAR_DURATION);
 	}
 
