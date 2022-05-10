@@ -64,10 +64,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedP
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
-import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.createCacheFolders;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
 import static mega.privacy.android.app.utils.CallUtil.checkPermissionsCall;
 import static mega.privacy.android.app.utils.CallUtil.hideCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.hideCallWidget;
@@ -402,6 +398,7 @@ import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException;
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AvatarUtil;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -1690,7 +1687,7 @@ public class ManagerActivity extends TransfersManagementActivity
         cC = new ContactController(this);
         aC = new AccountController(this);
 
-        createCacheFolders(this);
+        CacheFolderManager.createCacheFolders(this);
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -3518,9 +3515,10 @@ public class ManagerActivity extends TransfersManagementActivity
         if (circleAvatar.first) {
             nVPictureProfile.setImageBitmap(circleAvatar.second);
         } else {
-            megaApi.getUserAvatar(megaApi.getMyUser(),
-                    buildAvatarFile(this, megaApi.getMyEmail() + JPG_EXTENSION).getAbsolutePath(),
-                    this);
+            File avatarFile = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + JPG_EXTENSION);
+            if(avatarFile != null && avatarFile.exists()) {
+                megaApi.getUserAvatar(megaApi.getMyUser(), avatarFile.getAbsolutePath(), this);
+            }
         }
     }
 
@@ -8226,7 +8224,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 Intent service = new Intent(this, DownloadService.class);
                 service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
                 service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-                File tempFolder = getCacheFolder(this, TEMPORAL_FOLDER);
+                File tempFolder = CacheFolderManager.getCacheFolder(this, CacheFolderManager.TEMPORARY_FOLDER);
                 if (!isFileAvailable(tempFolder)) {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
                     return;
@@ -9865,18 +9863,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         logDebug("Changes: " + user.getChanges());
 
-                        if (megaApi.getMyUser() != null) {
-                            if (user.getHandle() == megaApi.getMyUser().getHandle()) {
-                                logDebug("Change on my account from another client");
-
-
-                                if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
-                                    logDebug("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
-                                    megaApi.getContactLinksOption(this);
-                                }
-                            }
-                        }
-
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
                             if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 logDebug("I change my first name");
@@ -9905,7 +9891,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)) {
                             logDebug("The user: " + user.getHandle() + "changed his AVATAR");
 
-                            File avatar = buildAvatarFile(this, user.getEmail() + ".jpg");
+                            File avatar = CacheFolderManager.buildAvatarFile(this, user.getEmail() + ".jpg");
                             Bitmap bitmap = null;
                             if (isFileAvailable(avatar)) {
                                 avatar.delete();
@@ -9913,7 +9899,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                             if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 logDebug("I change my avatar");
-                                String destinationPath = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath();
+                                String destinationPath = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath();
                                 megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
                             }
                         }
@@ -10020,9 +10006,9 @@ public class ManagerActivity extends TransfersManagementActivity
         if (oldEmail != null) {
             logDebug("Old email: " + oldEmail);
             try {
-                File avatarFile = buildAvatarFile(this, oldEmail + ".jpg");
+                File avatarFile = CacheFolderManager.buildAvatarFile(this, oldEmail + ".jpg");
                 if (isFileAvailable(avatarFile)) {
-                    File newFile = buildAvatarFile(this, email + ".jpg");
+                    File newFile = CacheFolderManager.buildAvatarFile(this, email + ".jpg");
                     if (newFile != null) {
                         boolean result = avatarFile.renameTo(newFile);
                         if (result) {

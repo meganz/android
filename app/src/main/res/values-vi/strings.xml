@@ -207,7 +207,7 @@
     <!--  -->
     <string name="tour_access_title">Truy Cập MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Đăng ký ngay và nhận miễn phí ngay 20 GB không gian lưu trữ</string>
+    <string name="tour_space_text">Đăng ký ngay và nhận miễn phí ngay 20&#160;GB không gian lưu trữ</string>
     <!--  -->
     <string name="tour_speed_text">Upload cực nhanh. Chia sẻ dữ liệu với mọi người thật nhanh chóng</string>
     <!--  -->
@@ -375,7 +375,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Xem các truyền tải</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Đa số các thiết bị di động không đủ khả năng đăng tải dữ liệu lớn hơn 4GB. Phiên tải xuống này có thể sẽ thất bại</string>
+    <string name="error_file_size_greater_than_4gb">Đa số các thiết bị di động không đủ khả năng đăng tải dữ liệu lớn hơn 4&#160;GB. Phiên tải xuống này có thể sẽ thất bại</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Điện thoại của bạn không có ứng dụng nào có thể mở được tệp này</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1184,11 +1184,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Liên kết thư mục bất khả dụng</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Liên kết thư mục đã bị xóa bỏ bởi vì vi phạm Điều Khoản DV hay Chính Sách SD.</string>
+    <string name="folder_link_unavaible_ToS_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Đường liên kết này không còn tồn tại</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Đường liên kết đã bị xóa bỏ do vi phạm Điều Khoản DV hay Chính Sách SD.</string>
+    <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Đường liên kết URL vừa nhập không đúng hoặc bị viết sai. Không thể sử dụng để truy cập được.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2141,7 +2141,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2151,7 +2151,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/giây</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/giây</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/giây</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/giây</string>
     <!-- Size in megabytes. -->
@@ -2777,7 +2777,7 @@
     <string name="error_download_takendown_node">Không truy cập được do vi phạm ĐKDV/CSSD</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">%d tệp tin không được tải xuống do vi phạm ĐKDV/CSSD.</item>
+        <item quantity="other">%d tệp tin không được tải xuống do vi phạm Điều Khoản Dịch Vụ của MEGA.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B][C] đã được khôi phục.[/C]</string>
@@ -3168,7 +3168,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mở một cuộc trò chuyện với các tên liên lạc nằm trong danh sách, với tính bảo mật tối ưu</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 20 GB không gian lưu trữ đám mây miễn phí. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 20&#160;GB không gian lưu trữ đám mây miễn phí. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết chát nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3984,7 +3984,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Tham gia vào dịch vụ lưu trữ điện toán đám mây lớn và an ninh nhất với nền tảng cộng tác toàn cầu.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Nhận 20 GB miễn phí</string>
+    <string name="left_meeting_bonus_title">Nhận 20&#160;GB miễn phí</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Đăng ký ngay và tận hưởng các tính năng cộng tác hữu dụng và miễn phí.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4209,4 +4209,6 @@
     <string name="message_zip_format_error">Dịnh dạng tệp tin không được hỗ trợ. Không thể mở được tệp tin.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">Thư mục vừa chọn là thư mục trống. Không có tệp tin để tải lên.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Bạn vừa mới nhập mật khẩu đang sử dụng hiện tại</string>
 </resources>

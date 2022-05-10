@@ -12,9 +12,6 @@ import java.io.File;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -30,7 +27,7 @@ public class UploadUtil {
      */
     public static File getTemporalTakePictureFile(Context context) {
         logDebug("uploadTakePicture");
-        File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
+        File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
             Util.showSnackbar(context, StringResourcesUtils.getString(R.string.general_error));
             return null;
@@ -38,7 +35,7 @@ public class UploadUtil {
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
         logDebug("Taken picture Name: "+name);
-        File newFile = buildTempFile(context, name);
+        File newFile = CacheFolderManager.buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
         return newFile;

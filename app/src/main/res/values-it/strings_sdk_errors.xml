@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID di sessione invalido</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Non accessibile a causa di una violazione dei TdS o della PUA.</string>
+    <string name="api_eblocked_ec_import_ec_download">Non accessibile a causa di una violazione dei TdS o della PUA</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bloccato</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

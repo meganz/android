@@ -34,7 +34,6 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
-import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
@@ -432,7 +431,7 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val tempFile = buildTempFile(activity, fileName.value)
+        val tempFile = CacheFolderManager.buildTempFile(activity, fileName.value)
         if (tempFile == null) {
             logError("Cannot get temporal file.")
             return

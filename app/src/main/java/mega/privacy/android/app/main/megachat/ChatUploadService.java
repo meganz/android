@@ -41,6 +41,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -67,7 +68,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESS
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -455,8 +455,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			logDebug("DATA connection is Mp4Video");
 
 			try {
-				File chatTempFolder = getCacheFolder(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
-				File outFile = buildChatTempFile(getApplicationContext(), file.getName());
+				File chatTempFolder = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.CHAT_TEMPORARY_FOLDER);
+				File outFile = CacheFolderManager.buildChatTempFile(getApplicationContext(), file.getName());
 				int index = 0;
 
 				if (outFile != null) {
@@ -611,14 +611,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		logDebug("After stopSelf");
 
 		try{
-			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+			CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 		}
 		catch (Exception e){
 			logError("EXCEPTION: pathSelfie not deleted", e);
 		}
 
 		try{
-			deleteCacheFolderIfEmpty(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
+			CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.CHAT_TEMPORARY_FOLDER);
 		}
 		catch (Exception e){
 			logError("EXCEPTION: pathVideoDownsampling not deleted", e);
@@ -1007,13 +1007,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					logDebug("After cancel");
 
 					if(isVoiceClip(appData)) {
-						File localFile = buildVoiceClipFile(this, transfer.getFileName());
+						File localFile = CacheFolderManager.buildVoiceClipFile(this, transfer.getFileName());
 						if (isFileAvailable(localFile) && !localFile.getName().equals(transfer.getFileName())) {
 							localFile.delete();
 						}
 					}else {
 						//Delete recursively all files and folder-??????
-						deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
+						CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 					}
 				}
 				else{
@@ -1143,7 +1143,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							}
 						}
 					}
-					File tempPic = getCacheFolder(getApplicationContext(), TEMPORAL_FOLDER);
+					File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
 					logDebug("IN Finish: " + transfer.getNodeHandle());
 					if (isFileAvailable(tempPic) && transfer.getPath() != null) {
 						if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {

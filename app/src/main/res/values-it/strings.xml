@@ -153,7 +153,7 @@
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%s verrà scaricato.</string>
     <!-- Alert text before download -->
-    <string name="alert_no_app">Non hai applicazioni che possano aprire il file %s Continuare lo stesso il download?</string>
+    <string name="alert_no_app">Non hai applicazioni che possano aprire il file %s. Continuare lo stesso il download?</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Non mostrare più</string>
     <!-- Press back while login to cancel current login process. -->
@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">Accesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Registrati adesso e ottieni 20GB di spazio gratuito</string>
+    <string name="tour_space_text">Registrati adesso e ottieni 20&#160;GB di spazio gratuito</string>
     <!--  -->
     <string name="tour_speed_text">I caricamenti sono veloci. Condividere rapidamente i file con tutti</string>
     <!--  -->
@@ -383,13 +383,13 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La maggior parte dei dispositivi non possono scaricare file più grandi di 4GB. Il tuo download probabilmente fallirà</string>
+    <string name="error_file_size_greater_than_4gb">La maggior parte dei dispositivi non possono scaricare file più grandi di 4&#160;GB. Il tuo download probabilmente fallirà</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Non c’è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">Non c’è nessuna app disponibile sul tuo dispositivo per aprire questa posizione</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
-    <string name="intent_not_available_file">Potresti non avere alcuna app installata che supporta questo tipo di file.</string>
+    <string name="intent_not_available_file">Potresti non avere alcuna app installata che supporta questo tipo di file</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Condividi foto usando</string>
     <!-- create a link of a file and send it using an app from the device -->
@@ -482,11 +482,11 @@
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contatto cancellato</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">Contatto non cancellato a causa di un errore</string>
+    <string name="context_contact_not_removed">Errore. Contatto non rimosso</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Permessi cambiati</string>
     <!-- error message -->
-    <string name="context_permissions_not_changed">Permessi non cambiati a causa di un errore</string>
+    <string name="context_permissions_not_changed">Errore. Permessi non cambiati</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">Una cartella con lo stesso nome esiste già</string>
     <!-- message when trying to create a invite a contact already that is already added -->
@@ -500,7 +500,7 @@
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">Rinominato</string>
     <!-- error message -->
-    <string name="context_no_renamed">Rinominazione fallita a causa di un errore</string>
+    <string name="context_no_renamed">Errore. Rinominazione fallita</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Copiatto corretamente</string>
     <!-- success message when sending a node to Inbox -->
@@ -508,7 +508,7 @@
     <!-- error message when sending a node to Inbox -->
     <string name="context_no_sent_node">Errore. Non inviata nella Posta in arrivo</string>
     <!-- error message -->
-    <string name="context_no_copied">Copia fallita a causa di un errore</string>
+    <string name="context_no_copied">Errore. Copia fallita</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Per favore, scegli una cartella di destinazione</string>
     <!-- success message when moving a node -->
@@ -520,7 +520,7 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Spostamento nel Cestino avvenuto con successo</string>
     <!-- error message -->
-    <string name="context_no_moved">Spostamento fallito a causa di un errore</string>
+    <string name="context_no_moved">Errore. Spostamento fallito</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Condiviso</string>
     <!-- error message when sharing a folder -->
@@ -530,7 +530,7 @@
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number_removed">Errore. %d processo di rimozione delle condivisioni non completato</string>
     <!-- error message -->
-    <string name="context_no_shared">Condivisione fallita a causa di un errore</string>
+    <string name="context_no_shared">Errore. Condivisione fallita</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Errore. Condivisione non rimossa</string>
     <!-- success message when removing a sharing -->
@@ -540,7 +540,7 @@
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Cancellato</string>
     <!-- error message -->
-    <string name="context_no_removed">Cancellazione fallita a causa di un errore</string>
+    <string name="context_no_removed">Errore. Cancellazione fallita</string>
     <!-- success message when moving a node -->
     <string name="number_correctly_removed">%d oggetti rimossi con successo da MEGA</string>
     <!-- error message when moving a node -->
@@ -942,9 +942,9 @@
     <!-- title of the My Account screen -->
     <string name="my_account_title">Tipo di account</string>
     <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Si rinnova il &#160;</string>
+    <string name="renews_on">Si rinnova il&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Scade il &#160;</string>
+    <string name="expires_on">Scade il&#160;</string>
     <!--  -->
     <string name="free_account">Gratis</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1020,7 +1020,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un attaccante esterno non può accedere al tuo account solo con la chiave. Un reset della password richiede sia la chiave e l’accesso alla tua e-mail.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copia la tua Chiave di Recupero negli appunti o salvala come file di testo</string>
+    <string name="backup_action">Copia la tua Chiave di Recupero negli appunti o salvala come file di testo.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Salva</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1174,7 +1174,7 @@
     <!-- confirmation message before removing mutiple contact request -->
     <string name="confirmation_remove_multiple_contact_request">Vuoi rimuovere queste %d richieste di invito?</string>
     <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d risposte inviate</string>
+    <string name="number_correctly_invitation_reply_sent">%d risposte inviate.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d risposte inviate con successo ma %2$d non sono state inviate.</string>
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
@@ -1440,7 +1440,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiato negli appunti</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Errore della chat!</string>
+    <string name="chat_error_open_title">Errore della chat</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Non è stato possibile aprire la chat con successo</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1782,7 +1782,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Leggi e scrivi</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">Trasferimenti in pausa!</string>
+    <string name="attachment_uploading_state_paused">Trasferimenti in pausa</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
     <!--  -->
@@ -2175,23 +2175,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2255,8 +2255,8 @@
     <string name="messages_forwarded_error">Errore. Non inoltrato correttamente</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Errore %1$d messaggio non inoltrato con successo</item>
-        <item quantity="other">Errore %1$d messaggi non inoltrati con successo</item>
+        <item quantity="one">Errore. %1$d messaggio non inoltrato con successo</item>
+        <item quantity="other">Errore. %1$d messaggi non inoltrati con successo</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2339,7 +2339,7 @@
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Caricamento[/A] [B]Messaggi&#8230;[/B]</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">File o cartella non trovata.Hai effettuato l’accesso con un altro account nel tuo browser? Puoi accedere ai tuoi file e cartelle solamente dall’account con cui hai effettuato l’accesso nell’app</string>
+    <string name="general_error_internal_node_not_found">File o cartella non trovata. Hai effettuato l’accesso con un altro account nel tuo browser? Puoi accedere ai tuoi file e cartelle solamente dall’account con cui hai effettuato l’accesso nell’app</string>
     <!-- menu option to loop video or audio file -->
     <string name="context_loop_video">Loop</string>
     <!-- Title of the category Security options on Settings section -->
@@ -2490,7 +2490,7 @@
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Nessuna connessione. Il file non è stato scaricato e non è stato possibile avviare lo stream.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
-    <string name="error_fail_to_open_file_general">Impossibile aprire il file</string>
+    <string name="error_fail_to_open_file_general">Impossibile aprire il file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Nessuna connessione. Per favore, connettiti per aprire il file.</string>
     <!-- message when trying to save for offline a file that already exists -->
@@ -2697,7 +2697,7 @@
     <!-- When app is retrieving push message -->
     <string name="retrieving_message_title">Recupero del messaggio in corso</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Programmazione svuotamento Cestino:</string>
+    <string name="settings_rb_scheduler_enable_title">Programmazione svuotamento Cestino</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">Il Cestino viene svuotato per te automaticamente.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2761,7 +2761,7 @@
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A] [B]ha attivato la rotazione della Chiave di criptazione.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
-    <string name="invalid_chat_link">Questa conversazione non è più disponibile.</string>
+    <string name="invalid_chat_link">Questa conversazione non è più disponibile</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotazione della chiave di criptazione</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2825,7 +2825,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contesta chiusura</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Non accessibile a causa di una violazione dei TdS o della PUA.</string>
+    <string name="error_download_takendown_node">Non accessibile a causa di una violazione dei TdS o della PUA</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d file non è stato scaricato a causa di una violazione dei Termini di Servizio.</item>
@@ -3084,7 +3084,7 @@
     <string name="title_geolocation_message">Posizione fissata</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
-        <item quantity="one">%d file non è stato inviato a %d chat.</item>
+        <item quantity="one">%d file non è stato inviato a %d chat</item>
         <item quantity="other">%d file sono sono stati inviati a %d chat</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
@@ -3099,8 +3099,8 @@
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
-        <item quantity="one">%d contatto trovato su MEGA.</item>
-        <item quantity="other">%d contatti trovati su MEGA.</item>
+        <item quantity="one">%d contatto trovato su MEGA</item>
+        <item quantity="other">%d contatti trovati su MEGA</item>
     </plurals>
     <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
     <string name="no_local_contacts_on_mega">Invitare contatto adesso?</string>
@@ -3117,7 +3117,7 @@
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">In corso</string>
     <!-- Label indicating some content has been sent as message -->
-    <string name="sent_as_message">Inviato come messaggio</string>
+    <string name="sent_as_message">Inviato come messaggio.</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
     <string name="error_sent_as_message">Errore. Il file non è stato inviato a nessuna delle chat selezionate</string>
     <!-- Action delete all file versions -->
@@ -3171,7 +3171,7 @@
     <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
     <string name="unknownn_file">Non è possibile aprire il file. È di un formato sconosciuto o non è stato possibile estrarre lo zip con successo.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
-    <string name="not_allow_play_alert">Non è possibile mettere play ai media mentre c’è una chiamata in corso</string>
+    <string name="not_allow_play_alert">Non è possibile mettere play ai media mentre c’è una chiamata in corso.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Chiamata in corso</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Inizia a chattare in sicurezza con i tuoi contatti utilizzando la criptazione end-to-end</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Ciao, inizia una conversazione sicura con me su MEGA ed ottieni 20GB di spazio di archiviazione cloud gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Ciao, inizia una conversazione sicura con me su MEGA ed ottieni 20&#160;GB di spazio di archiviazione cloud gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Nessun link della chat disponibile.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3469,7 +3469,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">La cartella non esiste.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Non è stato possibile trovare il file nel tuo Cloud Drive</string>
+    <string name="warning_node_not_exists_in_cloud">Non è stato possibile trovare il file nel tuo Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Archivio pieno</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3658,7 +3658,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Seleziona trasferimenti</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Impossibile cambiare la priorità del trasferimento ”%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Impossibile cambiare la priorità del trasferimento “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Invia la chiave di decriptazione separatamente</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3742,7 +3742,7 @@
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Utilizziamo Cookie e tecnologie simili (\“cookie\“) per fornirti e migliorare la tua esperienza con i nostri servizi. Accetta l\’utilizzo dei nostri Cookie dall\’inizio della tua visita o personalizza i Cookie nelle loro Impostazioni. Leggi di più nella nostra [A]Politica dei Cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Impostazioni dei cookie non salvate</string>
+    <string name="dialog_cookie_alert_unsaved">Impostazioni dei cookie non salvate.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">I cambiamenti delle impostazioni dei cookie sono stati salvati</string>
     <!-- Preference screen item title -->
@@ -3770,7 +3770,7 @@
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Impostato dal Risparmio energetico</string>
     <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">Per favore, seleziona il root della SD</string>
+    <string name="ask_for_select_sdcard_root">Per favore, seleziona il root della SD.</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Seleziona destinazione</string>
     <!-- Warning which alerts the user before discard changes -->
@@ -3899,9 +3899,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Aggiungi il tuo numero di telefono</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -4029,7 +4029,7 @@
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Unisciti al meeting come ospite</string>
     <!-- The title of the paste meeting link dialog for guest-->
-    <string name="paste_meeting_link_guest_dialog_title">Ti hanno invitato ad un meeting</string>
+    <string name="paste_meeting_link_guest_dialog_title">Ti hanno invitato ad un meeting.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Clicca sul link del meeting che ti è stato inviato o incollalo qui</string>
     <!-- Banner text to indicate poor network quality-->
@@ -4073,7 +4073,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Unisciti alla più grande piattaforma sicura di archiviazione cloud e collaborazione del mondo.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Ottieni 20GB gratuitamente</string>
+    <string name="left_meeting_bonus_title">Ottieni 20&#160;GB gratuitamente</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Registrati ora ed utilizza la collaborazione avanzata gratuitamente.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4278,7 +4278,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Hai già un abbonamento MEGA attivo con %1$s. Devi annullarlo separatamente su %2$s, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Hai un abbonamento MEGA attivo. Verrà annullato automaticamente dopo che l\’account viene eliminato. Visita il nostro Centro di Assistenza per maggiori informazioni.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Hai già un abbonamento MEGA attivo con Apple. Devi annullarlo separatamente tramite il tuo account iTunes, in quanto MEGA non può farlo al posto tuo. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4299,4 +4299,6 @@
     <string name="message_zip_format_error">Formato file non supportato. Impossibile aprire il file.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">La cartella selezionata è vuota. Nessun file da caricare.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Hai inserito la tua password corrente</string>
 </resources>
