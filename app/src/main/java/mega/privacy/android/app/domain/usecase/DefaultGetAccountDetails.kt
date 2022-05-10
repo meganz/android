@@ -10,7 +10,7 @@ import javax.inject.Inject
  * @property accountsRepository
  */
 class DefaultGetAccountDetails @Inject constructor(private val accountsRepository: AccountRepository): GetAccountDetails {
-    override fun invoke(forceRefresh: Boolean): UserAccount {
+    override suspend fun invoke(forceRefresh: Boolean): UserAccount {
         if (accountsRepository.isAccountDataStale() || forceRefresh) accountsRepository.requestAccount()
         return accountsRepository.getUserAccount()
     }

@@ -9811,18 +9811,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         logDebug("Changes: " + user.getChanges());
 
-                        if (megaApi.getMyUser() != null) {
-                            if (user.getHandle() == megaApi.getMyUser().getHandle()) {
-                                logDebug("Change on my account from another client");
-
-
-                                if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
-                                    logDebug("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
-                                    megaApi.getContactLinksOption(this);
-                                }
-                            }
-                        }
-
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
                             if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 logDebug("I change my first name");

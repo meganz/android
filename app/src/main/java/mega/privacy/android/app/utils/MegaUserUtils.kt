@@ -11,7 +11,7 @@ import java.time.ZoneId
 
 object MegaUserUtils {
 
-    private const val RECENTLY_ADDED_MIN_HOURS = 24
+    private const val RECENTLY_ADDED_MIN_DAYS = 3
 
     /**
      * Get user status color based on user status code
@@ -40,7 +40,7 @@ object MegaUserUtils {
         val addedTime = Instant.ofEpochSecond(timestamp)
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime()
-        return Duration.between(addedTime, now).toHours() < RECENTLY_ADDED_MIN_HOURS
+        return Duration.between(addedTime, now).toDays() < RECENTLY_ADDED_MIN_DAYS
     }
 
     /**
