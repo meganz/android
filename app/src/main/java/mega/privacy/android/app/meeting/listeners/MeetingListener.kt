@@ -1,8 +1,11 @@
 package mega.privacy.android.app.meeting.listeners
 
 import android.util.Pair
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
@@ -21,6 +24,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -30,6 +34,9 @@ import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatSession
 
 class MeetingListener : MegaChatCallListenerInterface {
+
+    val timerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val customCountDownTimer = CustomCountDownTimer(timerLiveData)
 
     override fun onChatCallUpdate(api: MegaChatApiJava?, call: MegaChatCall?) {
         if (api == null || call == null) {
@@ -48,6 +55,10 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
             logDebug("Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}. Call is Ringing ${call.isRinging}")
             sendCallEvent(EVENT_CALL_STATUS_CHANGE, call)
+            checkFirstParticipant(api, call)
+            if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                cancelCountDown()
+            }
         }
 
         // Local audio/video flags has changed
@@ -66,12 +77,7 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
             logDebug("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
-            if (call.callCompositionChange == TYPE_LEFT &&
-                call.numParticipants == 1 &&
-                call.peeridParticipants.get(0) == api.myUserHandle
-            ) {
-                api.disableAudio(call.chatid, null)
-            }
+            checkLastParticipant(api, call)
         }
 
         // Call is set onHold
@@ -122,6 +128,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
+            cancelCountDown()
             logDebug("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, callid)
         }
@@ -176,5 +183,56 @@ class MeetingListener : MegaChatCallListenerInterface {
             type,
             Pair::class.java
         ).post(sessionAndCall)
+    }
+
+    /**
+     * Control when I am the last participant in the call and the microphone should be muted
+     *
+     * @param call MegaChatCall
+     * @param api MegaChatApiJava
+     */
+    private fun checkLastParticipant(api: MegaChatApiJava, call: MegaChatCall) {
+        if (call.hasLocalAudio() && call.callCompositionChange == TYPE_LEFT &&
+            call.numParticipants == 1 &&
+            call.peeridParticipants.get(0) == api.myUserHandle
+        ) {
+            api.getChatRoom(call.chatid)?.let { chat ->
+                if (chat.isMeeting || chat.isGroup) {
+                    api.disableAudio(call.chatid, null)
+                }
+            }
+        }
+    }
+
+    /**
+     * Control when I am the only one on the call, no one has joined and more than 1 minute has expired
+     *
+     * @param call MegaChatCall
+     * @param api MegaChatApiJava
+     */
+    private fun checkFirstParticipant(api: MegaChatApiJava, call: MegaChatCall) {
+        if (call.hasLocalAudio() && call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS &&
+            MegaApplication.getChatManagement().isRequestSent(call.callId)
+        ) {
+            api.getChatRoom(call.chatid)?.let { chat ->
+                if (chat.isMeeting || chat.isGroup) {
+                    customCountDownTimer.start(SECONDS_IN_MINUTE)
+                    customCountDownTimer.mutableLiveData.observeForever(Observer { counterState ->
+                        counterState?.let { isFinished ->
+                            if (isFinished) {
+                                api.disableAudio(call.chatid, null)
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    /**
+    * Cancel count down timer
+    */
+    private fun cancelCountDown(){
+        customCountDownTimer.stop()
     }
 }
