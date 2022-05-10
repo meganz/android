@@ -3,8 +3,8 @@ package mega.privacy.android.app.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.exception.MegaException
+import mega.privacy.android.app.domain.entity.user.UserUpdate
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequestListenerInterface
 
 /**
  * Account repository
@@ -15,7 +15,7 @@ interface AccountRepository {
      *
      * @return the user account for the current user
      */
-    fun getUserAccount(): UserAccount
+    suspend fun getUserAccount(): UserAccount
 
     /**
      * Is account data stale
@@ -68,4 +68,11 @@ interface AccountRepository {
      *
      */
     suspend fun requestDeleteAccountLink()
+
+    /**
+     * Monitor user updates
+     *
+     * @return a flow of all global user updates
+     */
+    fun monitorUserUpdates(): Flow<UserUpdate>
 }
