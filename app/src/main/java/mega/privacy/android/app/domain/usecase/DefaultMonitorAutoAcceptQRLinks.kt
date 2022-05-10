@@ -24,14 +24,19 @@ class DefaultMonitorAutoAcceptQRLinks @Inject constructor(
 
             emit(fetchAutoAcceptQRLinks())
 
-            emitAll(accountRepository.monitorUserUpdates()
-                .flatMapConcat { (changes) ->
-                    changes
-                        .filter { it.key == loggedInUser }
-                        .values.flatten().asFlow()
-                }
-                .filter { it == UserChanges.ContactLinkVerification }
-                .map { fetchAutoAcceptQRLinks() })
+            emitAll(
+                accountRepository.monitorUserUpdates()
+                    .map { (changes) ->
+                        changes
+                            .filter { (key, value) ->
+                                key == loggedInUser && value.contains(
+                                    UserChanges.ContactLinkVerification
+                                )
+                            }
+                    }
+                    .filter { it.isNotEmpty() }
+                    .map { fetchAutoAcceptQRLinks() }
+            )
 
             awaitCancellation()
         }
