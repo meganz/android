@@ -51,4 +51,8 @@ abstract class SettingsUseCases {
     @Binds
     abstract fun bindFetchMultiFactorAuthSetting(useCase: DefaultFetchMultiFactorAuthSetting): FetchMultiFactorAuthSetting
 
+    @Binds
+    abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
+
+
 }

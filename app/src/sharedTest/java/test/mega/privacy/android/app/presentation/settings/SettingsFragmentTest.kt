@@ -20,11 +20,13 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.entity.user.UserId
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
@@ -100,14 +102,17 @@ class SettingsFragmentTest {
     @Test
     fun test_that_when_can_delete_changes_to_true_preference_is_added_again() {
         val refreshUserAccount = UserAccount(
+            userId = UserId(2),
             email = "refreshEmail",
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
             accountTypeIdentifier = Constants.FREE
         )
 
-        whenever(TestSettingsModule.getAccountDetails(false)).thenReturn(TEST_USER_ACCOUNT)
-        whenever(TestSettingsModule.getAccountDetails(true)).thenReturn(refreshUserAccount)
+        runBlocking{
+            whenever(TestSettingsModule.getAccountDetails(false)).thenReturn(TEST_USER_ACCOUNT)
+            whenever(TestSettingsModule.getAccountDetails(true)).thenReturn(refreshUserAccount)
+        }
 
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(false)
         whenever(TestSettingsModule.canDeleteAccount(refreshUserAccount)).thenReturn(true)
