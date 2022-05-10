@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4314,5 +4314,5 @@
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Violated Terms of Service</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to selects folders.</string>
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
 </resources>
