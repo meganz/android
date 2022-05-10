@@ -209,8 +209,6 @@
     <string name="section_recents">Recents</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
-    <!-- Section name for the "My Backups" and "old index files" section. Preferably one word. There is little space for this word. -->
-    <string name="section_restricted_folder">Restricted Folder</string>
     <!-- title of the screen that shows the files saved for offline in the device -->
     <string name="section_saved_for_offline">Saved for Offline</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1659,10 +1657,6 @@
     <string name="context_share">Share using</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
-    <!-- Text of the empty screen when there are not elements in restricted folder -->
-    <string name="context_empty_restricted_folder">[B]No files in your [/B][A]RESTRICTED FOLDER[/A]</string>
-    <!-- Text of the description of restricted folder -->
-    <string name="empty_restricted_folder_tip">This is a place where backed up folders are stored. They are read-only files. You can back up items such as important documents, from your computer to MEGA using the MEGA Desktop App.</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -4030,4 +4024,10 @@
     <string name="permissions_notifications_title">Get notified</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Backups</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]No items in [/B][A]backups[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">This is where your backed up files and folders are stored. Your backed up items are “read-only” to protect them from being accidentally modified in your cloud drive.\nYou can back up items from your computer to MEGA using our desktop app.</string>
 </resources>

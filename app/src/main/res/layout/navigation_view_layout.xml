@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/section_restricted_folder"
+                    android:text="@string/home_side_menu_backups_title"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View

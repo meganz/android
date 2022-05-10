@@ -927,7 +927,7 @@ public class InboxFragment extends RotatableFragment {
                     emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
                 }
 
-                String textToShow = StringResourcesUtils.getString(R.string.context_empty_restricted_folder);
+                String textToShow = StringResourcesUtils.getString(R.string.backups_empty_state_title);
                 try {
                     textToShow = textToShow.replace(
                             "[A]", "<font color=\'"

@@ -1361,7 +1361,7 @@ object MegaNodeUtil {
         return when (parent.handle) {
             megaApi.rootNode.handle -> getString(R.string.section_cloud_drive)
             megaApi.rubbishNode.handle -> getString(R.string.section_rubbish_bin)
-            megaApi.inboxNode.handle -> getString(R.string.section_restricted_folder)
+            megaApi.inboxNode.handle -> getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }
     }

@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/inbox_storage_text"
-                android:text="@string/section_restricted_folder"
+                android:text="@string/home_side_menu_backups_title"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
 
             <TextView

@@ -39,7 +39,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="20dp"
 				android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
-				android:text="@string/empty_restricted_folder_tip" />
+				android:text="@string/backups_empty_state_body" />
 		</LinearLayout>
     </RelativeLayout>
 </RelativeLayout>
