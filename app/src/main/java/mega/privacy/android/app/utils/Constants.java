@@ -934,4 +934,6 @@ public class Constants {
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
     public static final int FIRST_NAVIGATION_LEVEL = 0;
+
+    public static final int LONG_SNACKBAR_DURATION = 2750;
 }
