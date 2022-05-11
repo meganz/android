@@ -67,10 +67,11 @@ class DateCardsProvider {
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val day = DateTimeFormatter.ofPattern("dd").format(modifyDate)
-            val month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
+            var month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
                 Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             )
             val year = DateTimeFormatter.ofPattern("uuuu").format(modifyDate)
+            val monthForDayCard = DateTimeFormatter.ofPattern("MMMM").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             if (lastDayDate == null || lastDayDate!!.dayOfYear != modifyDate.dayOfYear) {
@@ -80,7 +81,7 @@ class DateCardsProvider {
                     DateTimeFormatter.ofPattern(if (sameYear) "dd MMMM" else "dd MMMM uuuu").format(lastDayDate)
                 days.add(
                     GalleryCard(
-                        node, if (preview.exists()) preview else null, day, month,
+                        node, if (preview.exists()) preview else null, day, monthForDayCard,
                         if (sameYear) null else year, date, modifyDate, 0
                     )
                 )
