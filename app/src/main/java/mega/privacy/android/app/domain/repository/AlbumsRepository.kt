@@ -12,20 +12,20 @@ interface AlbumsRepository {
      *
      * @return
      */
-    fun getCameraUploadFolderId(): Long?
+    suspend fun getCameraUploadFolderId(): Long?
 
     /**
      * Get Media Upload Folder handle
      *
      * @return
      */
-    fun getMediaUploadFolderId(): Long?
+    suspend fun getMediaUploadFolderId(): Long?
 
 
     /**
      * Check thumbnail from local
      */
-    fun getThumbnailFromLocal(nodeId: Long): File?
+    suspend fun getThumbnailFromLocal(nodeId: Long): File?
 
     /**
      * Check thumbnail from server

@@ -50,7 +50,7 @@ class DefaultGetAlbums @Inject constructor(
         }
     }
 
-    private fun inSyncFolder(parentId: Long): Boolean =
+    private suspend fun inSyncFolder(parentId: Long): Boolean =
             parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
     
 }

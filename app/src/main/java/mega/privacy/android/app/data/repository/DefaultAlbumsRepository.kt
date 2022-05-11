@@ -32,25 +32,25 @@ class DefaultAlbumsRepository @Inject constructor(
         private val cacheFolderFacade: CacheFolderGateway,
 ) : AlbumsRepository {
 
-    override fun getCameraUploadFolderId(): Long? = megaLocalStorageFacade.camSyncHandle
+    override suspend fun getCameraUploadFolderId(): Long? = megaLocalStorageFacade.camSyncHandle
 
-    override fun getMediaUploadFolderId(): Long? = megaLocalStorageFacade.megaHandleSecondaryFolder
+    override suspend fun getMediaUploadFolderId(): Long? = megaLocalStorageFacade.megaHandleSecondaryFolder
 
-    override fun getThumbnailFromLocal(nodeId: Long): File? {
+    override suspend fun getThumbnailFromLocal(nodeId: Long): File? {
         return getThumbnailFile(apiFacade.getMegaNodeByHandle(nodeId)).takeIf {
             it?.exists() ?: false
         }
     }
 
-    private fun getThumbnailFile(node: MegaNode): File? =
+    // Mark as suspend function, and later will CacheFolderGateway functions to suspend as well
+    private suspend fun getThumbnailFile(node: MegaNode): File? =
             cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${node.base64Handle}${FileUtil.JPG_EXTENSION}")
 
     override suspend fun getThumbnailFromServer(nodeId: Long): File =
             withContext(ioDispatcher) {
+                val node = apiFacade.getMegaNodeByHandle(nodeId)
+                val thumbnail = getThumbnailFile(node)
                 suspendCoroutine { continuation ->
-                    val node = apiFacade.getMegaNodeByHandle(nodeId)
-                    val thumbnail = getThumbnailFile(node)
-
                     thumbnail?.let {
                         apiFacade.getThumbnail(node, it.absolutePath,
                                 OptionalMegaRequestListenerInterface(
