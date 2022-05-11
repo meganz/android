@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.util.Pair
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
@@ -217,13 +216,13 @@ class MeetingListener : MegaChatCallListenerInterface {
             api.getChatRoom(call.chatid)?.let { chat ->
                 if (chat.isMeeting || chat.isGroup) {
                     customCountDownTimer.start(SECONDS_IN_MINUTE)
-                    customCountDownTimer.mutableLiveData.observeForever(Observer { counterState ->
+                    customCountDownTimer.mutableLiveData.observeForever{ counterState ->
                         counterState?.let { isFinished ->
                             if (isFinished) {
                                 api.disableAudio(call.chatid, null)
                             }
                         }
-                    })
+                    }
                 }
             }
         }
