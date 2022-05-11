@@ -6,6 +6,10 @@ import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -175,6 +179,23 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
+
+        getCallUseCase.getCallEnded()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { chatIdOfCallEnded ->
+                    currentChatId.value.let { currentChatId ->
+                        if(chatIdOfCallEnded == currentChatId) {
+                            _finishMeetingActivity.value = true
+                        }
+                    }
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
 
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)

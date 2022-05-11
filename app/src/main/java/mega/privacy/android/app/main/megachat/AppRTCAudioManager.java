@@ -38,6 +38,7 @@ import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
@@ -52,10 +53,16 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermi
 
 import androidx.annotation.RequiresApi;
 
+import javax.inject.Inject;
+
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
+
+    @Inject
+    CallSoundsController soundsController;
+
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
     // Handles all tasks related to Bluetooth headset devices.
@@ -213,7 +220,7 @@ public class AppRTCAudioManager {
     }
 
     private void setValues() {
-        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING)
+        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING && typeAudioManager != AUDIO_MANAGER_CALL_ENDED)
                 || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE)
                 || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)) {
             return;
@@ -232,6 +239,9 @@ public class AppRTCAudioManager {
             stopAudioSignals();
             incomingCallSound();
             checkVibration();
+        } else if (typeAudioManager == AUDIO_MANAGER_CALL_ENDED) {
+            stopAudioSignals();
+            soundsController.playSound(CallSoundsController.TypeSound.CALL_ENDED);
         }
     }
 
