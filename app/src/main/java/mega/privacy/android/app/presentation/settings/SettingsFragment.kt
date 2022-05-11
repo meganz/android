@@ -376,8 +376,8 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     private fun showEvaluatedAppDialog() {
         FeedBackDialog.newInstance(
-            viewModel.email,
-            viewModel.accountType
+            viewModel.uiState.value.email,
+            viewModel.uiState.value.accountType
         ).show(childFragmentManager, FeedBackDialog.TAG)
     }
 

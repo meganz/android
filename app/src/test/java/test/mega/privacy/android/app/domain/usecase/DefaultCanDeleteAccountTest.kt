@@ -2,13 +2,10 @@ package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.CanDeleteAccount
 import mega.privacy.android.app.domain.usecase.DefaultCanDeleteAccount
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class DefaultCanDeleteAccountTest {
     lateinit var underTest: CanDeleteAccount
@@ -23,11 +20,9 @@ class DefaultCanDeleteAccountTest {
 
         assertThat(
             underTest(
-                UserAccount(
-                    email = "",
+                userAccount(
                     isBusinessAccount = false,
                     isMasterBusinessAccount = false,
-                    accountTypeIdentifier = 0
                 )
             )
         ).isTrue()
@@ -37,11 +32,9 @@ class DefaultCanDeleteAccountTest {
     fun `test that business accounts can not be deleted`() {
         assertThat(
             underTest(
-                UserAccount(
-                    email = "",
+                userAccount(
                     isBusinessAccount = true,
-                    isMasterBusinessAccount = false,
-                    accountTypeIdentifier = 0
+                    isMasterBusinessAccount = false
                 )
             )
         ).isFalse()
@@ -51,14 +44,23 @@ class DefaultCanDeleteAccountTest {
     fun `test that master business accounts can be deleted`() {
         assertThat(
             underTest(
-                UserAccount(
-                    email = "",
+                userAccount(
                     isBusinessAccount = true,
-                    isMasterBusinessAccount = true,
-                    accountTypeIdentifier = 0
+                    isMasterBusinessAccount = true
                 )
             )
         ).isTrue()
     }
+
+    private fun userAccount(
+        isBusinessAccount: Boolean = false,
+        isMasterBusinessAccount: Boolean = false
+    ) = UserAccount(
+        userId = null,
+        email = "",
+        isBusinessAccount = isBusinessAccount,
+        isMasterBusinessAccount = isMasterBusinessAccount,
+        accountTypeIdentifier = 0
+    )
 }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.requests.dialog
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +7,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.setImageRequestFromUri
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact request information.
@@ -58,7 +57,7 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
             binding.header.txtTitle.text = if (isOutgoing) item.email else item.name
             binding.header.txtSubtitle.text = if (isOutgoing) item.createdTime else item.email
             binding.header.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
-            binding.header.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.avatarUri))
+            binding.header.imgThumbnail.setImageRequestFromUri(item.avatarUri)
             binding.groupReceived.isVisible = !item.isOutgoing
             binding.groupSent.isVisible = item.isOutgoing
 

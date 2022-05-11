@@ -17,9 +17,11 @@ import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import java.io.File
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
 
@@ -93,7 +95,9 @@ abstract class GalleryBaseFetcher(
             }
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = ofPattern("LLLL uuuu").format(modifyDate)
+            val dateString = SimpleDateFormat("LLLL yyyy", Locale.getDefault()).format(
+                Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            )
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             // Photo "Month-Year" section headers
@@ -127,7 +131,9 @@ abstract class GalleryBaseFetcher(
                         lastMonthDate = modifyDate
                         addPhotoDateTitle(
                             dateString, Pair(
-                                ofPattern("LLLL").format(modifyDate),
+                                SimpleDateFormat("LLLL", Locale.getDefault()).format(
+                                    Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                                ),
                                 if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
                             )
                         )

@@ -59,6 +59,13 @@
                 android:text="@string/context_send_file"
                 app:drawableStartCompat="@drawable/ic_send_to_contact" />
 
+            <View
+                android:id="@+id/divider_send"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
             <TextView
                 android:id="@+id/option_share_contact"
                 style="@style/BottomSheetOption"

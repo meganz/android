@@ -6,6 +6,8 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaGlobalListenerInterface
+import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
 /**
@@ -78,6 +80,14 @@ class MegaApiFacade @Inject constructor(
     override fun setLogLevel(logLevel: Int) = MegaApiAndroid.setLogLevel(logLevel)
 
     override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
+
+    override fun addGlobalListener(listener: MegaGlobalListenerInterface) =
+        megaApi.addGlobalListener(listener)
+
+    override fun removeGlobalListener(listener: MegaGlobalListenerInterface) =
+        megaApi.removeGlobalListener(listener)
+
+    override suspend fun getLoggedInUser(): MegaUser? = megaApi.myUser
 
     override fun getThumbnail(
         node: MegaNode,
