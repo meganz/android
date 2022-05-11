@@ -36,7 +36,7 @@ class DefaultGetAlbumsTest {
     }
     private val getAllFavorites = mock<GetAllFavorites> {
         on { invoke() }.thenReturn(
-            flow
+                flow
         )
     }
 
@@ -46,45 +46,45 @@ class DefaultGetAlbumsTest {
     private val mediaUploadFolderId = 20L
 
     private val albumsRepository = mock<AlbumsRepository> {
-        on { getCameraUploadFolderId() }.thenReturn(cameraUploadFolderId)
-        on { getMediaUploadFolderId() }.thenReturn(mediaUploadFolderId)
+        onBlocking { getCameraUploadFolderId() }.thenReturn(cameraUploadFolderId)
+        onBlocking { getMediaUploadFolderId() }.thenReturn(mediaUploadFolderId)
     }
 
     @Before
     fun setUp() {
         underTest = DefaultGetAlbums(
-            getAllFavorites = getAllFavorites,
-            getThumbnail = getThumbnail,
-            albumsRepository = albumsRepository
+                getAllFavorites = getAllFavorites,
+                getThumbnail = getThumbnail,
+                albumsRepository = albumsRepository
         )
     }
 
     @Test
     fun `test that a favourite album is returned`() = runTest {
         underTest()
-            .flatMapConcat { it.asFlow() }
-            .test {
-                assertThat(awaitItem()).isInstanceOf(Album.FavouriteAlbum::class.java)
-                cancelAndIgnoreRemainingEvents()
-            }
+                .flatMapConcat { it.asFlow() }
+                .test {
+                    assertThat(awaitItem()).isInstanceOf(Album.FavouriteAlbum::class.java)
+                    cancelAndIgnoreRemainingEvents()
+                }
     }
 
     @Test
     fun `test that only image or video thumbnails are used for the favourite album cover`() =
-        runTest {
-            val nonImageFavouriteItem = createFavouriteItem()
-            val thumbnail = File("NotExpectedThumbnail")
+            runTest {
+                val nonImageFavouriteItem = createFavouriteItem()
+                val thumbnail = File("NotExpectedThumbnail")
 
-            whenever(getAllFavorites()).thenReturn(flowOf(listOf(nonImageFavouriteItem)))
-            whenever(getThumbnail(any())).thenReturn(thumbnail)
+                whenever(getAllFavorites()).thenReturn(flowOf(listOf(nonImageFavouriteItem)))
+                whenever(getThumbnail(any())).thenReturn(thumbnail)
 
-            underTest()
-                .flatMapConcat { it.asFlow() }
-                .test {
-                    assertThat(awaitItem().thumbnail).isNull()
-                    cancelAndIgnoreRemainingEvents()
-                }
-        }
+                underTest()
+                        .flatMapConcat { it.asFlow() }
+                        .test {
+                            assertThat(awaitItem().thumbnail).isNull()
+                            cancelAndIgnoreRemainingEvents()
+                        }
+            }
 
     @Test
     fun `test that favourite image thumbnail is used as cover if present`() = runTest {
@@ -96,73 +96,73 @@ class DefaultGetAlbumsTest {
         whenever(getThumbnail(nodeId)).thenReturn(thumbnail)
 
         underTest()
-            .flatMapConcat { it.asFlow() }
-            .test {
-                assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
-                cancelAndIgnoreRemainingEvents()
-            }
+                .flatMapConcat { it.asFlow() }
+                .test {
+                    assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
+                    cancelAndIgnoreRemainingEvents()
+                }
     }
 
     @Test
     fun `test that favourite video thumbnail is used if it is in the camera upload folder`() =
-        runTest {
-            val parentId = cameraUploadFolderId
-            val favouriteImage = createFavouriteItem(
-                parentId = parentId,
-                isVideo = true
-            )
-            val thumbnail = File("ExpectedThumbnail")
+            runTest {
+                val parentId = cameraUploadFolderId
+                val favouriteImage = createFavouriteItem(
+                        parentId = parentId,
+                        isVideo = true
+                )
+                val thumbnail = File("ExpectedThumbnail")
 
-            whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
-            whenever(getThumbnail(any())).thenReturn(thumbnail)
+                whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
+                whenever(getThumbnail(any())).thenReturn(thumbnail)
 
-            underTest()
-                .flatMapConcat { it.asFlow() }
-                .test {
-                    assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
-                    cancelAndIgnoreRemainingEvents()
-                }
-        }
+                underTest()
+                        .flatMapConcat { it.asFlow() }
+                        .test {
+                            assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
+                            cancelAndIgnoreRemainingEvents()
+                        }
+            }
 
     @Test
     fun `test that favourite video thumbnail is used if it is in the media upload folder`() =
-        runTest {
-            val parentId = mediaUploadFolderId
-            val favouriteImage = createFavouriteItem(
-                parentId = parentId,
-                isVideo = true
-            )
-            val thumbnail = File("ExpectedThumbnail")
+            runTest {
+                val parentId = mediaUploadFolderId
+                val favouriteImage = createFavouriteItem(
+                        parentId = parentId,
+                        isVideo = true
+                )
+                val thumbnail = File("ExpectedThumbnail")
 
-            whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
-            whenever(getThumbnail(any())).thenReturn(thumbnail)
+                whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
+                whenever(getThumbnail(any())).thenReturn(thumbnail)
 
-            underTest()
-                .flatMapConcat { it.asFlow() }
-                .test {
-                    assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
-                    cancelAndIgnoreRemainingEvents()
-                }
-        }
+                underTest()
+                        .flatMapConcat { it.asFlow() }
+                        .test {
+                            assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
+                            cancelAndIgnoreRemainingEvents()
+                        }
+            }
 
     @Test
     fun `test that video is not used for the thumbnail if not in camera upload or media folder`() =
-        runTest {
-            val favouriteImage = createFavouriteItem(
-                isVideo = true
-            )
-            val thumbnail = File("NotExpectedThumbnail")
+            runTest {
+                val favouriteImage = createFavouriteItem(
+                        isVideo = true
+                )
+                val thumbnail = File("NotExpectedThumbnail")
 
-            whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
-            whenever(getThumbnail(any())).thenReturn(thumbnail)
+                whenever(getAllFavorites()).thenReturn(flowOf(listOf(favouriteImage)))
+                whenever(getThumbnail(any())).thenReturn(thumbnail)
 
-            underTest()
-                .flatMapConcat { it.asFlow() }
-                .test {
-                    assertThat(awaitItem().thumbnail).isNull()
-                    cancelAndIgnoreRemainingEvents()
-                }
-        }
+                underTest()
+                        .flatMapConcat { it.asFlow() }
+                        .test {
+                            assertThat(awaitItem().thumbnail).isNull()
+                            cancelAndIgnoreRemainingEvents()
+                        }
+            }
 
     @Test
     fun `test that only latest favourite thumbnail is used for favourite album cover`() = runTest {
@@ -172,14 +172,14 @@ class DefaultGetAlbumsTest {
         val favouriteImage4 = createFavouriteItem(id = 4, lastModified = 4, isImage = true)
 
         whenever(getAllFavorites()).thenReturn(
-            flowOf(
-                listOf(
-                    favouriteImage2,
-                    favouriteImage4,
-                    favouriteImage1,
-                    favouriteImage3,
+                flowOf(
+                        listOf(
+                                favouriteImage2,
+                                favouriteImage4,
+                                favouriteImage1,
+                                favouriteImage3,
+                        )
                 )
-            )
         )
 
         val expectedThumbnail = File("ExpectedThumbnail")
@@ -189,11 +189,11 @@ class DefaultGetAlbumsTest {
         whenever(getThumbnail(4L)).thenReturn(expectedThumbnail)
 
         underTest()
-            .flatMapConcat { it.asFlow() }
-            .test {
-                assertThat(awaitItem().thumbnail).isSameInstanceAs(expectedThumbnail)
-                cancelAndIgnoreRemainingEvents()
-            }
+                .flatMapConcat { it.asFlow() }
+                .test {
+                    assertThat(awaitItem().thumbnail).isSameInstanceAs(expectedThumbnail)
+                    cancelAndIgnoreRemainingEvents()
+                }
     }
 
     @Test
@@ -204,9 +204,9 @@ class DefaultGetAlbumsTest {
         }
 
         whenever(getAllFavorites()).thenReturn(
-            flowOf(
-                favourites
-            )
+                flowOf(
+                        favourites
+                )
         )
 
         val thumbnail = File("Thumbnail")
@@ -214,11 +214,11 @@ class DefaultGetAlbumsTest {
         whenever(getThumbnail(any())).thenReturn(thumbnail)
 
         underTest()
-            .flatMapConcat { it.asFlow() }
-            .test {
-                assertThat(awaitItem().itemCount).isEqualTo(favourites.size)
-                cancelAndIgnoreRemainingEvents()
-            }
+                .flatMapConcat { it.asFlow() }
+                .test {
+                    assertThat(awaitItem().itemCount).isEqualTo(favourites.size)
+                    cancelAndIgnoreRemainingEvents()
+                }
     }
 
     @Test
@@ -227,24 +227,24 @@ class DefaultGetAlbumsTest {
     }
 
     private fun createFavouriteItem(
-        node: MegaNode = mock(),
-        id: Long = 1L,
-        parentId: Long = 2L,
-        lastModified: Long = 3L,
-        isImage: Boolean = false,
-        isVideo: Boolean = false,
+            node: MegaNode = mock(),
+            id: Long = 1L,
+            parentId: Long = 2L,
+            lastModified: Long = 3L,
+            isImage: Boolean = false,
+            isVideo: Boolean = false,
     ): FavouriteInfo {
         return FavouriteInfo(
-            id = id,
-            parentId = parentId,
-            base64Id = "",
-            modificationTime = lastModified,
-            node = node,
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
-            isImage = isImage,
-            isVideo = isVideo
+                id = id,
+                parentId = parentId,
+                base64Id = "",
+                modificationTime = lastModified,
+                node = node,
+                hasVersion = false,
+                numChildFolders = 0,
+                numChildFiles = 0,
+                isImage = isImage,
+                isVideo = isVideo
         )
     }
 
