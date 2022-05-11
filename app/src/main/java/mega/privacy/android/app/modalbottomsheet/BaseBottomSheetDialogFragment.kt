@@ -135,7 +135,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
         BottomSheetBehavior.from(contentView.parent as View).apply {
             state = when {
-                savedState != INVALID_VALUE -> {
+                savedState >= BottomSheetBehavior.STATE_EXPANDED -> {
                     peekHeight = customPeekHeight
                     savedState
                 }
