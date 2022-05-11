@@ -43,6 +43,7 @@ class DefaultAlbumsRepository @Inject constructor(
     }
 
     // Mark as suspend function, and later will CacheFolderGateway functions to suspend as well
+    @Suppress("RedundantSuspendModifier")
     private suspend fun getThumbnailFile(node: MegaNode): File? =
             cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${node.base64Handle}${FileUtil.JPG_EXTENSION}")
 
