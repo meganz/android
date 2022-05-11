@@ -67,7 +67,7 @@ class DateCardsProvider {
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val day = DateTimeFormatter.ofPattern("dd").format(modifyDate)
-            var month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
+            val month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
                 Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             )
             val year = DateTimeFormatter.ofPattern("uuuu").format(modifyDate)
