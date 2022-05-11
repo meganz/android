@@ -2,6 +2,9 @@ package mega.privacy.android.app.domain.repository
 
 import java.io.File
 
+/**
+ * Albums repository
+ */
 interface AlbumsRepository {
 
     /**

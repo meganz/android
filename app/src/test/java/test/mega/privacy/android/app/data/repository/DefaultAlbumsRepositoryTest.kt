@@ -13,9 +13,9 @@ import mega.privacy.android.app.domain.repository.AlbumsRepository
 import mega.privacy.android.app.utils.CacheFolderManager
 import nz.mega.sdk.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -45,8 +45,10 @@ class DefaultAlbumsRepositoryTest {
             runTest {
                 val node = mock<MegaNode>()
                 val thumbnailName = "Test"
+                val thumbnail = File("${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName")
                 whenever(node.base64Handle).thenReturn(thumbnailName)
                 whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(node)
+                whenever(cacheFolderGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
 
                 val api = mock<MegaApiJava>()
                 val request = mock<MegaRequest>()
@@ -68,8 +70,10 @@ class DefaultAlbumsRepositoryTest {
             runTest {
                 val node = mock<MegaNode>()
                 val thumbnailName = "Test"
+                val thumbnail = File("${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName")
                 whenever(node.base64Handle).thenReturn(thumbnailName)
                 whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(node)
+                whenever(cacheFolderGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
 
                 val api = mock<MegaApiJava>()
                 val request = mock<MegaRequest>()

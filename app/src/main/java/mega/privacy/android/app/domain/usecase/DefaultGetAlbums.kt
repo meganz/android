@@ -9,18 +9,25 @@ import mega.privacy.android.app.domain.repository.AlbumsRepository
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Default get albums
+ *
+ * @property getAllFavorites
+ * @property getThumbnail
+ * @property albumsRepository
+ */
 class DefaultGetAlbums @Inject constructor(
-    private val getAllFavorites: GetAllFavorites,
-    private val getThumbnail: GetThumbnail,
-    private val albumsRepository: AlbumsRepository,
+        private val getAllFavorites: GetAllFavorites,
+        private val getThumbnail: GetThumbnail,
+        private val albumsRepository: AlbumsRepository,
 ) : GetAlbums {
 
     override fun invoke(): Flow<List<Album>> {
         return flow {
             emit(
-                listOf(
-                    getFavouriteAlbum()
-                )
+                    listOf(
+                            getFavouriteAlbum()
+                    )
             )
         }
     }
@@ -30,8 +37,8 @@ class DefaultGetAlbums @Inject constructor(
             favItem.isImage || (favItem.isVideo && inSyncFolder(favItem.parentId))
         }
         return Album.FavouriteAlbum(
-            thumbnail = getThumbnailOrNull(favouriteList),
-            itemCount = favouriteList?.size ?: 0
+                thumbnail = getThumbnailOrNull(favouriteList),
+                itemCount = favouriteList?.size ?: 0
         )
     }
 
@@ -44,7 +51,6 @@ class DefaultGetAlbums @Inject constructor(
     }
 
     private fun inSyncFolder(parentId: Long): Boolean =
-        parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
-
-
+            parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
+    
 }
