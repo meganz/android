@@ -46,7 +46,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +53,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.constraintlayout.widget.Group;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -89,12 +89,10 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
-import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -115,10 +113,10 @@ public class InboxFragment extends RotatableFragment {
 
 	ArrayList<MegaNode> nodes;
 	
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
-	TextView folderDescription;
+	ImageView emptyFolderImageView;
+	TextView emptyFolderTitleTextView;
+	TextView emptyFolderDescriptionTextView;
+	Group emptyFolderContentGroup;
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
@@ -139,12 +137,9 @@ public class InboxFragment extends RotatableFragment {
     protected RotatableAdapter getAdapter() {
         return adapter;
     }
-	final boolean vaultReadOnly = true;
-
-	private FileBackupManager fileBackupManager;
 
     public void activateActionMode() {
-        Timber.d("activateActionMode");
+        Timber.d("activateActionMode()");
         if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
@@ -254,7 +249,7 @@ public class InboxFragment extends RotatableFragment {
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            Timber.d("onDestroyActionMode");
+            Timber.d("onDestroyActionMode()");
             clearSelections();
             adapter.setMultipleSelect(false);
             checkScroll();
@@ -294,25 +289,8 @@ public class InboxFragment extends RotatableFragment {
                     unselect.setVisible(true);
                 }
 
-				if (!vaultReadOnly) {
-					showRename = selected.size() == 1;
-				}
-
 				showDownload = areAllNotTakenDown;
 				showCopy = areAllNotTakenDown;
-
-				if (!vaultReadOnly) {
-					showTrash = true;
-					showMove = true;
-
-					for(int i = 0; i < selected.size(); i++)	{
-						if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
-							showTrash = false;
-							showMove = false;
-							break;
-						}
-					}
-				}
 
 				//showSendToChat
 				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
@@ -392,7 +370,7 @@ public class InboxFragment extends RotatableFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.d("onCreate");
+        Timber.d("onCreate()");
 
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
@@ -402,7 +380,6 @@ public class InboxFragment extends RotatableFragment {
 		if (megaApi == null) {
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		fileBackupManager = new FileBackupManager(requireActivity(), null);
 	}
 
     public void checkScroll() {
@@ -417,7 +394,7 @@ public class InboxFragment extends RotatableFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Timber.d("onCreateView");
+        Timber.d("onCreateView()");
 
         SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
                 .get(SortByHeaderViewModel.class);
@@ -461,9 +438,10 @@ public class InboxFragment extends RotatableFragment {
         ((ManagerActivity) context).setToolbarTitle();
 
         if (((ManagerActivity) context).isList) {
+			Timber.d("InboxFragment is on a ListView");
             View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
-            recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
+            recyclerView = v.findViewById(R.id.inbox_list_recycler_view);
             mLayoutManager = new LinearLayoutManager(context);
             //Add bottom padding for recyclerView like in other fragments.
             recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -479,10 +457,10 @@ public class InboxFragment extends RotatableFragment {
                 }
             });
 
-			emptyImageView = v.findViewById(R.id.inbox_list_empty_image);
-			emptyTextView = v.findViewById(R.id.inbox_list_empty_text);
-			emptyTextViewFirst = v.findViewById(R.id.inbox_list_empty_text_first);
-			folderDescription = v.findViewById(R.id.restricted_folder_description);
+			emptyFolderImageView = v.findViewById(R.id.empty_list_folder_image_view);
+			emptyFolderContentGroup = v.findViewById(R.id.empty_list_folder_content_group);
+			emptyFolderTitleTextView = v.findViewById(R.id.empty_list_folder_title_text_view);
+			emptyFolderDescriptionTextView = v.findViewById(R.id.empty_list_folder_description_text_view);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context, this, nodes,
@@ -495,32 +473,30 @@ public class InboxFragment extends RotatableFragment {
             }
 
             adapter.setMultipleSelect(false);
-
             recyclerView.setAdapter(adapter);
-
             setNodes(nodes);
+
             return v;
         } else {
-            Timber.d("Grid View");
-            View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
+            Timber.d("InboxFragment is on a GridView");
+			View v = inflater.inflate(R.layout.fragment_inbox_grid, container, false);
 
-            recyclerView = (NewGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    checkScroll();
-                }
-            });
-            gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+			recyclerView = v.findViewById(R.id.inbox_grid_recycler_view);
+			recyclerView.setHasFixedSize(true);
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-			emptyImageView = v.findViewById(R.id.inbox_grid_empty_image);
-			emptyTextView = v.findViewById(R.id.inbox_grid_empty_text);
-			emptyTextViewFirst = v.findViewById(R.id.inbox_grid_empty_text_first);
-			folderDescription = v.findViewById(R.id.restricted_folder_description);
+			emptyFolderImageView = v.findViewById(R.id.empty_grid_folder_image_view);
+			emptyFolderContentGroup = v.findViewById(R.id.empty_grid_folder_content_group);
+			emptyFolderTitleTextView = v.findViewById(R.id.empty_grid_folder_text_view);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context, this, nodes,
@@ -532,13 +508,10 @@ public class InboxFragment extends RotatableFragment {
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             }
 
-            gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
-
-            recyclerView.setAdapter(adapter);
-
-            setNodes(nodes);
-
-            setContentText();
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
+			recyclerView.setAdapter(adapter);
+			setNodes(nodes);
+			setContent();
 
             return v;
         }
@@ -551,7 +524,7 @@ public class InboxFragment extends RotatableFragment {
 	}
 
     public void refresh() {
-        Timber.d("refresh");
+        Timber.d("refresh()");
         if (inboxNode != null && (((ManagerActivity) context).getParentHandleInbox() == -1 || ((ManagerActivity) context).getParentHandleInbox() == inboxNode.getHandle())) {
             nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud());
         } else {
@@ -637,10 +610,10 @@ public class InboxFragment extends RotatableFragment {
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
-                    Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
+                    Timber.d("Total memory: %d allocate 32 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                 } else {
-                    Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
+                    Timber.d("Total memory: %d allocate 16 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
@@ -696,10 +669,10 @@ public class InboxFragment extends RotatableFragment {
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
-                    Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
+                    Timber.d("Total memory: %d allocate 32 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                 } else {
-                    Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
+                    Timber.d("Total memory: %d allocate 16 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
@@ -729,10 +702,10 @@ public class InboxFragment extends RotatableFragment {
     }
 
     public void itemClick(int position) {
-        Timber.d("itemClick");
+        Timber.d("itemClick()");
 
         if (adapter.isMultipleSelect()) {
-            Timber.d("multiselect ON");
+            Timber.d("Multi Select is Enabled");
             adapter.toggleSelection(position);
 
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -765,7 +738,7 @@ public class InboxFragment extends RotatableFragment {
                 nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
                 adapter.setNodes(nodes);
 
-                setContentText();
+				setContent();
 
                 recyclerView.scrollToPosition(0);
                 checkScroll();
@@ -826,7 +799,7 @@ public class InboxFragment extends RotatableFragment {
      * Disable selection
      */
     public void hideMultipleSelect() {
-        Timber.d("hideMultipleSelect");
+        Timber.d("hideMultipleSelect()");
         adapter.setMultipleSelect(false);
         if (actionMode != null) {
             actionMode.finish();
@@ -834,13 +807,13 @@ public class InboxFragment extends RotatableFragment {
     }
 
     public static InboxFragment newInstance() {
-        Timber.d("newInstance");
+        Timber.d("newInstance()");
         InboxFragment fragment = new InboxFragment();
         return fragment;
     }
 
     public int onBackPressed() {
-        Timber.d("onBackPressed");
+        Timber.d("onBackPressed()");
 
         if (adapter == null) {
             return 0;
@@ -902,86 +875,94 @@ public class InboxFragment extends RotatableFragment {
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        Timber.d("setNodes");
+        Timber.d("setNodes()");
         this.nodes = nodes;
         if (adapter != null) {
             adapter.setNodes(nodes);
-            setContentText();
+            setContent();
         }
     }
 
-    public void setContentText() {
-        Timber.d("setContentText");
+	/**
+	 * Sets all content of the feature.
+	 *
+	 * If no nodes are available, empty folder information will be displayed. Otherwise, it will
+	 * display all available nodes.
+	 */
+	public void setContent(){
+		Timber.d("setContent()");
 
-        if (adapter.getItemCount() == 0) {
-
+		if (adapter.getItemCount() == 0) {
 			recyclerView.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
-			folderDescription.setVisibility(View.VISIBLE);
+			emptyFolderContentGroup.setVisibility(View.VISIBLE);
 
-            if (megaApi.getInboxNode().getHandle() == ((ManagerActivity) context).getParentHandleInbox() || ((ManagerActivity) context).getParentHandleInbox() == -1) {
-                if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-                } else {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-                }
+			if (megaApi.getInboxNode().getHandle() == ((ManagerActivity) context).getParentHandleInbox() || ((ManagerActivity) context).getParentHandleInbox() == -1) {
+				setEmptyFolderTextContent(context.getString(R.string.backups_empty_state_title), StringResourcesUtils.getString(R.string.backups_empty_state_body));
 
-                String textToShow = StringResourcesUtils.getString(R.string.backups_empty_state_title);
-                try {
-                    textToShow = textToShow.replace(
-                            "[A]", "<font color=\'"
-                                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                                    + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                            "[B]", "<font color=\'"
-                                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                                    + "\'>"
-                    ).replace("[/B]", "</font>");
-                } catch (Exception e) {
-                }
-                Spanned result;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
-                emptyTextViewFirst.setText(result);
+				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					emptyFolderImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+				} else {
+					emptyFolderImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+				}
+			} else {
+				setEmptyFolderTextContent(context.getString(R.string.file_browser_empty_folder_new), "");
 
-            } else {
-                if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-                } else {
-                    emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-                }
-                String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-                try {
-                    textToShow = textToShow.replace(
-                            "[A]", "<font color=\'"
-                                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                                    + "\'>"
-                    ).replace("[/A]", "</font>").replace(
-                            "[B]", "<font color=\'"
-                                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                                    + "\'>"
-                    ).replace("[/B]", "</font>");
-                } catch (Exception e) {
-                }
-                Spanned result;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
-                emptyTextViewFirst.setText(result);
-
-            }
-        } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyImageView.setVisibility(View.GONE);
-            emptyTextView.setVisibility(View.GONE);
-			folderDescription.setVisibility(View.GONE);
+				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					emptyFolderImageView.setImageResource(R.drawable.empty_folder_landscape);
+				} else {
+					emptyFolderImageView.setImageResource(R.drawable.empty_folder_portrait);
+				}
+			}
 		}
+		else {
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyFolderContentGroup.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * Sets the title and description text when the folder is empty
+	 * Null checking exists for the description since this only exists on the list configuration
+	 * of the feature
+	 *
+	 * @param title Empty folder title
+	 * @param description Empty folder description
+	 */
+	private void setEmptyFolderTextContent(String title, String description) {
+		emptyFolderTitleTextView.setText(formatEmptyFolderTitleString(title));
+		if (emptyFolderDescriptionTextView != null) {
+			emptyFolderDescriptionTextView.setText(description);
+		}
+	}
+
+	/**
+	 * Formats a String through a specified color formatting, which is then used for the title
+	 * message when the folder is empty
+	 * @param textToFormat String to format
+	 * @return Spanned String to be immediately used by the {@link TextView}
+	 */
+	private Spanned formatEmptyFolderTitleString(String textToFormat) {
+		try {
+			textToFormat = textToFormat.replace(
+					"[A]", "<font color='"
+							+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+							+ "'>"
+			).replace("[/A]", "</font>").replace(
+					"[B]", "<font color='"
+							+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+							+ "'>"
+			).replace("[/B]", "</font>");
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		Spanned result;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToFormat, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToFormat);
+		}
+
+		return result;
 	}
 
     public void notifyDataSetChanged() {
