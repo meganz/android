@@ -54,6 +54,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -66,7 +67,6 @@ import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
@@ -130,7 +130,7 @@ public class UploadService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		logDebug("onCreate");
+		Timber.d("onCreate");
 
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
@@ -179,30 +179,30 @@ public class UploadService extends Service {
                         doOnTransferStart(transfer)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (error) -> logError("Error " + error));
+                                .subscribe(() -> { }, (error) -> Timber.e("Error " + error));
                         ;
                     } else if (event instanceof Result.OnTransferUpdate) {
                         MegaTransfer transfer = ((Result.OnTransferUpdate) event).getTransfer();
                         doOnTransferUpdate(transfer)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (error) -> logError("Error " + error));
+                                .subscribe(() -> { }, (error) -> Timber.e("Error " + error));
                     } else if (event instanceof Result.OnTransferFinish) {
                         MegaTransfer transfer = ((Result.OnTransferFinish) event).getTransfer();
                         MegaError error = ((Result.OnTransferFinish) event).getError();
                         doOnTransferFinish(transfer, error)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (throwable) -> logError("Error " + throwable));
+                                .subscribe(() -> { }, (throwable) -> Timber.e("Error " + throwable));
                     } else if (event instanceof Result.OnTransferTemporaryError) {
                         MegaTransfer transfer = ((Result.OnTransferTemporaryError) event).getTransfer();
                         MegaError error = ((Result.OnTransferTemporaryError) event).getError();
                         doOnTransferTemporaryError(transfer, error)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (throwable) -> logError("Error " + throwable));
+                                .subscribe(() -> { }, (throwable) -> Timber.e("Error " + throwable));
                     }
-                }, (error) -> logError("Error " + error));
+                }, (error) -> Timber.e("Error " + error));
         rxSubscriptions.add(subscription);
 	}
 
@@ -217,7 +217,7 @@ public class UploadService extends Service {
 
             isForeground = true;
         } catch (Exception e) {
-            logWarning("Error starting foreground.", e);
+            Timber.w(e, "Error starting foreground.");
             isForeground = false;
         }
     }
@@ -232,7 +232,7 @@ public class UploadService extends Service {
 
 	@Override
 	public void onDestroy(){
-		logDebug("onDestroy");
+		Timber.d("onDestroy");
         releaseLocks();
 
         if (megaChatApi != null){
@@ -247,7 +247,7 @@ public class UploadService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		logDebug("onStartCommand");
+		Timber.d("onStartCommand");
 		canceled = false;
 
 		if (intent == null) {
@@ -258,7 +258,7 @@ public class UploadService extends Service {
 
 		if ((intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_CANCEL)) {
-				logDebug("Cancel intent");
+				Timber.d("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
 				stopForeground();
@@ -271,10 +271,10 @@ public class UploadService extends Service {
 	}
 
 	private synchronized void onHandleIntent(final Intent intent) {
-		logDebug("onHandleIntent");
+		Timber.d("onHandleIntent");
 
         String action = intent.getAction();
-        logDebug("Action is " + action);
+        Timber.d("Action is " + action);
         if (action != null) {
             switch (action) {
                 case ACTION_OVERQUOTA_STORAGE:
@@ -332,7 +332,7 @@ public class UploadService extends Service {
 
         String filePath = intent.getStringExtra(EXTRA_FILEPATH);
         if (isTextEmpty(filePath)) {
-            logWarning("Error: File path is NULL or EMPTY");
+            Timber.w("Error: File path is NULL or EMPTY");
             return;
         }
 
@@ -343,7 +343,7 @@ public class UploadService extends Service {
 
     private void doHandleIntent(Intent intent, String filePath) {
         final File file = new File(filePath);
-        logDebug("File to manage: " + file.getAbsolutePath());
+        Timber.d("File to manage: " + file.getAbsolutePath());
 
         String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
@@ -383,7 +383,7 @@ public class UploadService extends Service {
 	 * Stop uploading service
 	 */
 	private void cancel() {
-		logDebug("cancel");
+		Timber.d("cancel");
 		canceled = true;
 		stopForeground();
 	}
@@ -399,7 +399,7 @@ public class UploadService extends Service {
      * @param showSnackbar True if should show finish snackbar, false otherwise.
 	 */
 	private void onQueueComplete(boolean showSnackbar) {
-		logDebug("onQueueComplete");
+		Timber.d("onQueueComplete");
         releaseLocks();
         if (isOverquota != NOT_OVERQUOTA_STATE) {
             showStorageOverQuotaNotification();
@@ -412,15 +412,15 @@ public class UploadService extends Service {
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
-			logDebug("Reset total uploads");
+			Timber.d("Reset total uploads");
             megaApi.resetTotalUploads();
         }
 
         resetUploadNumbers();
 
-		logDebug("Stopping service!");
+		Timber.d("Stopping service!");
         stopForeground();
-		logDebug("After stopSelf");
+		Timber.d("After stopSelf");
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
@@ -484,7 +484,7 @@ public class UploadService extends Service {
      * Show complete success notification.
      */
     private void showUploadCompleteNotification() {
-        logDebug("showUploadCompleteNotification");
+        Timber.d("showUploadCompleteNotification");
 
         if (isOverquota == NOT_OVERQUOTA_STATE) {
             String notificationTitle = "";
@@ -568,13 +568,13 @@ public class UploadService extends Service {
         }
 
         if (!isForeground) {
-			logDebug("Starting foreground");
+			Timber.d("Starting foreground");
             try {
                 startForeground(NOTIFICATION_UPLOAD, notification);
                 isForeground = true;
             }
             catch (Exception e){
-				logError("Start foreground exception", e);
+				Timber.e(e, "Start foreground exception");
                 isForeground = false;
             }
         } else {
@@ -598,7 +598,7 @@ public class UploadService extends Service {
         }
 
         String message = getMessageForProgressNotification(inProgress);
-        logDebug("updateProgressNotification" + progressPercent + " " + message);
+        Timber.d("updateProgressNotification" + progressPercent + " " + message);
         String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
@@ -619,7 +619,7 @@ public class UploadService extends Service {
     }
 
     private String getMessageForProgressNotification(long inProgress) {
-        logDebug("inProgress: " + inProgress);
+        Timber.d("inProgress: " + inProgress);
         String message;
         if (isOverquota != NOT_OVERQUOTA_STATE) {
             message = getString(R.string.overquota_alert_title);
@@ -635,7 +635,7 @@ public class UploadService extends Service {
     }
 
     private UploadProgress getInProgressNotification(Collection<MegaTransfer> transfers){
-		logDebug("getInProgressNotification");
+		Timber.d("getInProgressNotification");
         UploadProgress progress = new UploadProgress();
         long total = 0;
         long inProgress = 0;
@@ -660,343 +660,339 @@ public class UploadService extends Service {
 
     private Completable doOnTransferStart(@Nullable MegaTransfer transfer) {
         return Completable.fromCallable(() -> {
-        if (transfer == null) return null;
-        logDebug("Upload start: " + transfer.getFileName());
-        if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
-            if (isCUOrChatTransfer(transfer)) return null;
+            if (transfer == null) return null;
+            Timber.d("Upload start: " + transfer.getFileName());
+            if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                if (isCUOrChatTransfer(transfer)) return null;
 
-		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
-			String appData = transfer.getAppData();
-
-			if(appData!=null){
-                return null;
-			}
-
-			pendingToAddInQueue--;
-
-			if (!transfer.isFolderTransfer()) {
-                uploadCount++;
-                mapProgressFileTransfers.put(transfer.getTag(), transfer);
-                updateProgressNotification();
-            }
-        }
-        return null;
-        });
-	}
-
-    private Completable doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
-        return Completable.fromCallable(() -> {
-
-        if (transfer == null) return null;
-		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
-        if (isCUOrChatTransfer(transfer)) return null;
-
-		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
-
-		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
-		}
-
-		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-		    if (!transfer.isFolderTransfer()) {
-		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
-                addCompletedTransfer(completedTransfer);
-
+                launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
                 String appData = transfer.getAppData();
 
-                if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
-                    sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
-                            .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
+                if (appData != null) {
+                    return null;
                 }
 
-                if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-                    MegaApplication.getTransfersManagement().setFailedTransfers(true);
-                }
-            }
+                pendingToAddInQueue--;
 
-            if (transfer.getAppData() != null) {
-                if (megaApi.getNumPendingUploads() == 0) {
-                    onQueueComplete(false);
-                }
-
-                return null;
-            }
-
-            if (!transfer.isFolderTransfer()) {
-                completed++;
-                mapProgressFileTransfers.put(transfer.getTag(), transfer);
-            }
-
-			if (canceled) {
-				logDebug("Upload canceled: " + transfer.getFileName());
-
-                releaseLocks();
-				UploadService.this.cancel();
-				logDebug("After cancel");
-				CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
-
-			} else {
-				if (error.getErrorCode() == MegaError.API_OK) {
-                    if (!transfer.isFolderTransfer()) {
-                        if (transfer.getTransferredBytes() == 0) {
-                            alreadyUploaded++;
-                        } else {
-                            completedSuccessfully++;
-                        }
-                    }
-
-					if (isVideoFile(transfer.getPath())) {
-						logDebug("Is video!!!");
-
-						File previewDir = getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
-						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-						if (node != null) {
-							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							String location = null;
-							try {
-								retriever.setDataSource(transfer.getPath());
-								location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-							} catch (Exception ex) {
-								logError("Exception is thrown", ex);
-							}
-
-							if(location!=null){
-								logDebug("Location: " + location);
-
-								boolean secondTry = false;
-								try{
-									final int mid = location.length() / 2; //get the middle of the String
-									String[] parts = {location.substring(0, mid),location.substring(mid)};
-
-									Double lat = Double.parseDouble(parts[0]);
-									Double lon = Double.parseDouble(parts[1]);
-									logDebug("Lat: " + lat); //first part
-									logDebug("Long: " + lon); //second part
-
-									megaApi.setNodeCoordinates(node, lat, lon, null);
-								}
-								catch (Exception e){
-									secondTry = true;
-									logError("Exception, second try to set GPS coordinates", e);
-								}
-
-								if(secondTry){
-									try{
-										String latString = location.substring(0,7);
-										String lonString = location.substring(8,17);
-
-										Double lat = Double.parseDouble(latString);
-										Double lon = Double.parseDouble(lonString);
-										logDebug("Lat: " + lat); //first part
-										logDebug("Long: " + lon); //second part
-
-										megaApi.setNodeCoordinates(node, lat, lon, null);
-									}
-									catch (Exception e){
-										logError("Exception again, no chance to set coordinates of video", e);
-									}
-								}
-							}
-							else{
-								logDebug("No location info");
-							}
-						}
-					} else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
-						logDebug("Is image!!!");
-
-						File previewDir = getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
-						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-						if (node != null) {
-							try {
-								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-								double[] latLong = exifInterface.getLatLong();
-								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
-							} catch (Exception e) {
-								logWarning("Couldn't read exif info: " + transfer.getPath(), e);
-							}
-						}
-					} else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
-						logDebug("Is pdf!!!");
-
-						try {
-							createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-						} catch(Exception e) {
-							logWarning("Pdf thumbnail could not be created", e);
-						}
-
-						int pageNumber = 0;
-						FileOutputStream out = null;
-
-						try {
-						PdfiumCore pdfiumCore = new PdfiumCore(this);
-						MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-						if (pdfNode == null){
-							logError("pdf is NULL");
-							return null;
-						}
-
-						File previewDir = getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						File file = new File(transfer.getPath());
-
-							PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
-							pdfiumCore.openPage(pdfDocument, pageNumber);
-							int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
-							int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
-							Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-							pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-							Bitmap resizedBitmap = resizeBitmapUpload(bmp, width, height);
-							out = new FileOutputStream(preview);
-							boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-							if(result){
-								logDebug("Compress OK!");
-								megaApi.setPreview(pdfNode, preview.getAbsolutePath());
-							}
-							else{
-								logWarning("Not Compress");
-							}
-							pdfiumCore.closeDocument(pdfDocument);
-						} catch(Exception e) {
-							logWarning("Pdf preview could not be created", e);
-						} finally {
-							try {
-								if (out != null)
-									out.close();
-							} catch (Exception e) {
-
-							}
-						}
-
-					} else {
-						logDebug("NOT video, image or pdf!");
-					}
-				} else {
-					logError("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-
-					if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
-						isOverquota = OVERQUOTA_STORAGE_STATE;
-					}
-					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
-					}
-				}
-
-				String qrFileName = megaApi.getMyEmail() + QR_IMAGE_FILE_NAME;
-
-				File localFile = CacheFolderManager.buildQrFile(getApplicationContext(),transfer.getFileName());
-                if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
-					logDebug("Delete file!: " + localFile.getAbsolutePath());
-                    localFile.delete();
-                }
-
-                File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
-				logDebug("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
-				if (isFileAvailable(tempPic) && transfer.getPath() != null) {
-					if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
-						File f = new File(transfer.getPath());
-						f.delete();
-					}
-				} else {
-					logError("transfer.getPath() is NULL or temporal folder unavailable");
-				}
-
-                if (completed == uploadCount && pendingToAddInQueue == 0) {
-                    onQueueComplete(true);
-                } else {
+                if (!transfer.isFolderTransfer()) {
+                    uploadCount++;
+                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
                     updateProgressNotification();
                 }
-			}
-		}
+            }
             return null;
         });
     }
 
-    private Completable doOnTransferUpdate(@Nullable MegaTransfer transfer) {
+    private Completable doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
         return Completable.fromCallable(() -> {
-        if (transfer == null) return null;
-        logDebug("onTransferUpdate");
-        if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+            if (transfer == null) return null;
+            Timber.d("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
             if (isCUOrChatTransfer(transfer)) return null;
 
-		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
-			String appData = transfer.getAppData();
+            if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+                sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+            }
 
-			if(appData!=null){
-				return null;
-			}
+            if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+                if (!transfer.isFolderTransfer()) {
+                    AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
+                    addCompletedTransfer(completedTransfer);
 
-            if (canceled) {
-				logDebug("Transfer cancel: " + transfer.getFileName());
-                releaseLocks();
-                megaApi.cancelTransfer(transfer);
-                UploadService.this.cancel();
-                logDebug("After cancel");
+                    String appData = transfer.getAppData();
+
+                    if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
+                        sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
+                                .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
+                    }
+
+                    if (transfer.getState() == MegaTransfer.STATE_FAILED) {
+                        MegaApplication.getTransfersManagement().setFailedTransfers(true);
+                    }
+                }
+
+                if (transfer.getAppData() != null) {
+                    if (megaApi.getNumPendingUploads() == 0) {
+                        onQueueComplete(false);
+                    }
+
+                    return null;
+                }
+
+                if (!transfer.isFolderTransfer()) {
+                    completed++;
+                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                }
+
+                if (canceled) {
+                    Timber.d("Upload canceled: " + transfer.getFileName());
+
+                    releaseLocks();
+                    UploadService.this.cancel();
+                    Timber.d("After cancel");
+                    CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
+
+                } else {
+                    if (error.getErrorCode() == MegaError.API_OK) {
+                        if (!transfer.isFolderTransfer()) {
+                            if (transfer.getTransferredBytes() == 0) {
+                                alreadyUploaded++;
+                            } else {
+                                completedSuccessfully++;
+                            }
+                        }
+
+                        if (isVideoFile(transfer.getPath())) {
+                            Timber.d("Is video!!!");
+
+                            File previewDir = getPreviewFolder(this);
+                            File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                            File thumbDir = ThumbnailUtils.getThumbFolder(this);
+                            File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                            megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+                            megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+
+                            MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+                            if (node != null) {
+                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                                String location = null;
+                                try {
+                                    retriever.setDataSource(transfer.getPath());
+                                    location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+                                } catch (Exception ex) {
+                                    Timber.e(ex, "Exception is thrown");
+                                }
+
+                                if(location!=null){
+                                    Timber.d("Location: " + location);
+
+                                    boolean secondTry = false;
+                                    try{
+                                        final int mid = location.length() / 2; //get the middle of the String
+                                        String[] parts = {location.substring(0, mid),location.substring(mid)};
+
+                                        Double lat = Double.parseDouble(parts[0]);
+                                        Double lon = Double.parseDouble(parts[1]);
+                                        Timber.d("Lat: " + lat); //first part
+                                        Timber.d("Long: " + lon); //second part
+
+                                        megaApi.setNodeCoordinates(node, lat, lon, null);
+                                    }
+                                    catch (Exception e){
+                                        secondTry = true;
+                                        Timber.e(e, "Exception, second try to set GPS coordinates");
+                                    }
+
+                                    if(secondTry){
+                                        try{
+                                            String latString = location.substring(0,7);
+                                            String lonString = location.substring(8,17);
+
+                                            Double lat = Double.parseDouble(latString);
+                                            Double lon = Double.parseDouble(lonString);
+                                            Timber.d("Lat: " + lat); //first part
+                                            Timber.d("Long: " + lon); //second part
+
+                                            megaApi.setNodeCoordinates(node, lat, lon, null);
+                                        }
+                                        catch (Exception e){
+                                            Timber.e(e, "Exception again, no chance to set coordinates of video");
+                                        }
+                                    }
+                                }
+                                else{
+                                    Timber.d("No location info");
+                                }
+                            }
+                        } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+                            Timber.d("Is image!!!");
+
+                            File previewDir = getPreviewFolder(this);
+                            File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                            File thumbDir = ThumbnailUtils.getThumbFolder(this);
+                            File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                            megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+                            megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+
+                            MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                            if (node != null) {
+                                try {
+                                    final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+                                    double[] latLong = exifInterface.getLatLong();
+                                    megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+                                } catch (Exception e) {
+                                    Timber.w("Couldn't read exif info: " + transfer.getPath(), e);
+                                }
+                            }
+                        } else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+                            Timber.d("Is pdf!!!");
+
+                            try {
+                                createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+                            } catch(Exception e) {
+                                Timber.w(e, "Pdf thumbnail could not be created");
+                            }
+
+                            int pageNumber = 0;
+                            FileOutputStream out = null;
+
+                            try {
+                            PdfiumCore pdfiumCore = new PdfiumCore(this);
+                            MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+                            if (pdfNode == null){
+                                Timber.e("pdf is NULL");
+                                return null;
+                            }
+
+                            File previewDir = getPreviewFolder(this);
+                            File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                            File file = new File(transfer.getPath());
+
+                                PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+                                pdfiumCore.openPage(pdfDocument, pageNumber);
+                                int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+                                int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+                                Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                                pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+                                Bitmap resizedBitmap = resizeBitmapUpload(bmp, width, height);
+                                out = new FileOutputStream(preview);
+                                boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                                if(result){
+                                    Timber.d("Compress OK!");
+                                    megaApi.setPreview(pdfNode, preview.getAbsolutePath());
+                                }
+                                else{
+                                    Timber.w("Not Compress");
+                                }
+                                pdfiumCore.closeDocument(pdfDocument);
+                            } catch(Exception e) {
+                                Timber.w(e, "Pdf preview could not be created");
+                            } finally {
+                                try {
+                                    if (out != null)
+                                        out.close();
+                                } catch (Exception e) {
+
+                                }
+                            }
+
+                        } else {
+                            Timber.d("NOT video, image or pdf!");
+                        }
+                    } else {
+                        Timber.e("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+
+                        if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
+                            isOverquota = OVERQUOTA_STORAGE_STATE;
+                        }
+                        else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+                            isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
+                        }
+                    }
+
+                    String qrFileName = megaApi.getMyEmail() + QR_IMAGE_FILE_NAME;
+
+                    File localFile = CacheFolderManager.buildQrFile(getApplicationContext(),transfer.getFileName());
+                    if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
+                        Timber.d("Delete file!: " + localFile.getAbsolutePath());
+                        localFile.delete();
+                    }
+
+                    File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
+                    Timber.d("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
+                    if (isFileAvailable(tempPic) && transfer.getPath() != null) {
+                        if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
+                            File f = new File(transfer.getPath());
+                            f.delete();
+                        }
+                    } else {
+                        Timber.e("transfer.getPath() is NULL or temporal folder unavailable");
+                    }
+
+                    if (completed == uploadCount && pendingToAddInQueue == 0) {
+                        onQueueComplete(true);
+                    } else {
+                        updateProgressNotification();
+                    }
+                }
+            }
                 return null;
-            }
-
-            if(!transfer.isFolderTransfer()){
-                mapProgressFileTransfers.put(transfer.getTag(), transfer);
-                updateProgressNotification();
-            }
+            });
         }
-        return null;
+
+    private Completable doOnTransferUpdate(@Nullable MegaTransfer transfer) {
+        return Completable.fromCallable(() -> {
+            if (transfer == null) return null;
+            Timber.d("onTransferUpdate");
+            if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                if (isCUOrChatTransfer(transfer)) return null;
+
+                launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+
+                String appData = transfer.getAppData();
+
+                if (appData != null) {
+                    return null;
+                }
+
+                if (canceled) {
+                    Timber.d("Transfer cancel: " + transfer.getFileName());
+                    releaseLocks();
+                    megaApi.cancelTransfer(transfer);
+                    UploadService.this.cancel();
+                    Timber.d("After cancel");
+                    return null;
+                }
+
+                if (!transfer.isFolderTransfer()) {
+                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                    updateProgressNotification();
+                }
+            }
+            return null;
         });
     }
 
     private Completable doOnTransferTemporaryError(@Nullable MegaTransfer transfer, MegaError e) {
         return Completable.fromCallable(() -> {
-        if (transfer == null) return null;
-        logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
+            if (transfer == null) return null;
+            Timber.w("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
-		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-            if (isCUOrChatTransfer(transfer)) return null;
+            if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                if (isCUOrChatTransfer(transfer)) return null;
 
-			switch (e.getErrorCode())
-			{
-				case MegaError.API_EOVERQUOTA:
-				case MegaError.API_EGOINGOVERQUOTA:
-				    if (transfer.isForeignOverquota()) {
-				        break;
-                    }
+                switch (e.getErrorCode()) {
+                    case MegaError.API_EOVERQUOTA:
+                    case MegaError.API_EGOINGOVERQUOTA:
+                        if (transfer.isForeignOverquota()) {
+                            break;
+                        }
 
-					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-						isOverquota = OVERQUOTA_STORAGE_STATE;
-					}
-					else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
-					}
+                        if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+                            isOverquota = OVERQUOTA_STORAGE_STATE;
+                        } else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+                            isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
+                        }
 
-					if (e.getValue() != 0) {
-						logWarning("TRANSFER OVER QUOTA ERROR: " + e.getErrorCode());
-					}
-					else {
-						logWarning("STORAGE OVER QUOTA ERROR: " + e.getErrorCode());
-                        updateProgressNotification();
-					}
-					break;
-			}
-		}
+                        if (e.getValue() != 0) {
+                            Timber.w("TRANSFER OVER QUOTA ERROR: " + e.getErrorCode());
+                        } else {
+                            Timber.w("STORAGE OVER QUOTA ERROR: " + e.getErrorCode());
+                            updateProgressNotification();
+                        }
+                        break;
+                }
+            }
             return null;
         });
-	}
+    }
 
     private void showStorageOverQuotaNotification(){
-		logDebug("showStorageOverQuotaNotification");
+		Timber.d("showStorageOverQuotaNotification");
         String contentText = getString(R.string.download_show_info);
 		String message = getString(R.string.overquota_alert_title);
 
@@ -1038,7 +1034,7 @@ public class UploadService extends Service {
 	}
 
 	private void acquireLock(){
-		logDebug("acquireLock");
+		Timber.d("acquireLock");
         if (wl != null && !wl.isHeld()) {
             wl.acquire();
         }
@@ -1048,25 +1044,25 @@ public class UploadService extends Service {
     }
 
 	private void releaseLocks(){
-		logDebug("releaseLocks");
+		Timber.d("releaseLocks");
         if ((lock != null) && (lock.isHeld())) {
             try {
                 lock.release();
             } catch (Exception ex) {
-				logError("EXCEPTION", ex);
+				Timber.e(ex, "EXCEPTION");
             }
         }
         if ((wl != null) && (wl.isHeld())) {
             try {
                 wl.release();
             } catch (Exception ex) {
-				logError("EXCEPTION", ex);
+				Timber.e(ex, "EXCEPTION");
             }
         }
     }
 
     private void resetUploadNumbers(){
-		logDebug("resetUploadNumbers");
+		Timber.d("resetUploadNumbers");
 		pendingToAddInQueue = 0;
         completed = 0;
         completedSuccessfully = 0;

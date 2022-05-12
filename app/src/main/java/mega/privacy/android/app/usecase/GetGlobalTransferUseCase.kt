@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Use case to subscribe to global events related to MegaApi.
+ * Use case to subscribe to global transfers related to MegaApi.
  *
  * @property megaApi    MegaApi required to call the SDK
  */
