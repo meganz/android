@@ -1,14 +1,27 @@
 package mega.privacy.android.app.data.facade
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaUser
+import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Mega api facade
@@ -17,8 +30,10 @@ import javax.inject.Inject
  *
  * @property megaApi
  */
+@Singleton
 class MegaApiFacade @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
     override fun multiFactorAuthAvailable(): Boolean {
         return megaApi.multiFactorAuthAvailable()
@@ -41,10 +56,62 @@ class MegaApiFacade @Inject constructor(
     override val rootNode: MegaNode?
         get() = megaApi.rootNode
 
+    override val globalUpdates: Flow<GlobalUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaGlobalListenerInterface {
+                override fun onUsersUpdate(
+                    api: MegaApiJava?,
+                    users: java.util.ArrayList<MegaUser>?,
+                ) {
+                    trySend(GlobalUpdate.OnUsersUpdate(users))
+                }
+
+                override fun onUserAlertsUpdate(
+                    api: MegaApiJava?,
+                    userAlerts: java.util.ArrayList<MegaUserAlert>?,
+                ) {
+                    trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
+                }
+
+                override fun onNodesUpdate(
+                    api: MegaApiJava?,
+                    nodeList: java.util.ArrayList<MegaNode>?,
+                ) {
+                    trySend(GlobalUpdate.OnNodesUpdate(nodeList))
+                }
+
+                override fun onReloadNeeded(api: MegaApiJava?) {
+                    trySend(GlobalUpdate.OnReloadNeeded)
+                }
+
+                override fun onAccountUpdate(api: MegaApiJava?) {
+                    trySend(GlobalUpdate.OnAccountUpdate)
+                }
+
+                override fun onContactRequestsUpdate(
+                    api: MegaApiJava?,
+                    requests: java.util.ArrayList<MegaContactRequest>?,
+                ) {
+                    trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
+                }
+
+                override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
+                    trySend(GlobalUpdate.OnEvent(event))
+                }
+            }
+
+            megaApi.addGlobalListener(listener)
+
+            awaitClose { megaApi.removeGlobalListener(listener) }
+        }.shareIn(
+            sharingScope,
+            SharingStarted.WhileSubscribed()
+        )
+
     override fun getFavourites(
         node: MegaNode?,
         count: Int,
-        listener: MegaRequestListenerInterface?
+        listener: MegaRequestListenerInterface?,
     ) {
         megaApi.getFavourites(node, count, listener)
     }
@@ -63,7 +130,7 @@ class MegaApiFacade @Inject constructor(
 
     override fun setAutoAcceptContactsFromLink(
         disableAutoAccept: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.setContactLinksOption(disableAutoAccept, listener)
 
     override fun isAutoAcceptContactsFromLinkEnabled(listener: MegaRequestListenerInterface) =
@@ -80,12 +147,6 @@ class MegaApiFacade @Inject constructor(
     override fun setLogLevel(logLevel: Int) = MegaApiAndroid.setLogLevel(logLevel)
 
     override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
-
-    override fun addGlobalListener(listener: MegaGlobalListenerInterface) =
-        megaApi.addGlobalListener(listener)
-
-    override fun removeGlobalListener(listener: MegaGlobalListenerInterface) =
-        megaApi.removeGlobalListener(listener)
 
     override suspend fun getLoggedInUser(): MegaUser? = megaApi.myUser
 }

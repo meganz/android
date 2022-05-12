@@ -17,6 +17,8 @@ import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
@@ -36,10 +38,10 @@ class ContactListFragment : Fragment() {
         ContactActionsListAdapter(::onRequestsClick, ::onGroupsClick)
     }
     private val recentlyAddedAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
+        ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
     }
     private val contactsAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
+        ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
     }
 
     override fun onCreateView(
@@ -109,11 +111,21 @@ class ContactListFragment : Fragment() {
         }
     }
 
-    private fun onContactClick(userEmail: String) {
+    private fun onContactClick(userHandle: Long) {
+        viewModel.getChatRoomId(userHandle).observe(viewLifecycleOwner) { chatId ->
+            val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                putExtra(Constants.CHAT_ID, chatId)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun onContactInfoClick(userEmail: String) {
         ContactUtil.openContactInfoActivity(context, userEmail)
     }
 
-    private fun onContactMoreInfoClick(userHandle: Long) {
+    private fun onContactMoreClick(userHandle: Long) {
         ContactBottomSheetDialogFragment.newInstance(userHandle).show(childFragmentManager)
     }
 

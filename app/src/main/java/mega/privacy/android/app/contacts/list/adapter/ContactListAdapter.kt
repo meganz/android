@@ -14,11 +14,13 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
  * RecyclerView's ListAdapter to show ContactItem.
  *
  * @property itemCallback       Callback to be called when the view item is clicked.
- * @property itemInfoCallback   Callback to be called when the "more button" is clicked.
+ * @property itemInfoCallback   Callback to be called when the avatar is clicked.
+ * @property itemMoreCallback   Callback to be called when the "more button" is clicked.
  */
 class ContactListAdapter(
-    private val itemCallback: (String) -> Unit,
-    private val itemInfoCallback: (Long) -> Unit
+    private val itemCallback: (Long) -> Unit,
+    private val itemInfoCallback: (String) -> Unit,
+    private val itemMoreCallback: (Long) -> Unit
 ) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()),
     SectionTitleProvider {
 
@@ -45,14 +47,20 @@ class ContactListAdapter(
                 ContactListDataViewHolder(binding).apply {
                     binding.root.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
+                            val handle = (getItem(bindingAdapterPosition) as ContactItem.Data).handle
+                            itemCallback.invoke(handle)
+                        }
+                    }
+                    binding.imgThumbnail.setOnClickListener {
+                        if (isValidPosition(bindingAdapterPosition)) {
                             val email = (getItem(bindingAdapterPosition) as ContactItem.Data).email
-                            itemCallback.invoke(email)
+                            itemInfoCallback.invoke(email)
                         }
                     }
                     binding.btnMore.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
                             val handle = (getItem(bindingAdapterPosition) as ContactItem.Data).handle
-                            itemInfoCallback.invoke(handle)
+                            itemMoreCallback.invoke(handle)
                         }
                     }
                 }
