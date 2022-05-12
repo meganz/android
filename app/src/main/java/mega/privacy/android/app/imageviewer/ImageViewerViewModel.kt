@@ -56,6 +56,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
@@ -470,7 +471,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.copyNode(
+        moveNodeUseCase.copyNode(
             node = getExistingNode(nodeHandle),
             nodeHandle = nodeHandle,
             toParentHandle = newParentHandle
@@ -480,21 +481,21 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.moveNode(nodeHandle, newParentHandle)
+        moveNodeUseCase.move(nodeHandle, newParentHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_moved)
             }
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
-        getNodeUseCase.moveToRubbishBin(nodeHandle)
+        moveNodeUseCase.moveToRubbishBin(nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
-        getNodeUseCase.removeNode(nodeHandle)
+        moveNodeUseCase.remove(nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }

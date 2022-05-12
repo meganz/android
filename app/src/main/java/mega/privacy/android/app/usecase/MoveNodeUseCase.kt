@@ -6,12 +6,13 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EOVERQUOTA
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 /**
@@ -20,8 +21,21 @@ import javax.inject.Inject
  * @property megaApi MegaApiAndroid instance to move nodes..
  */
 class MoveNodeUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val getNodeUseCase: GetNodeUseCase
 ) {
+
+    /**
+     * Moves a node to other location.
+     *
+     * @param nodeHandle        Node handle to be moved
+     * @param toParentHandle    Parent node handle to be moved to
+     * @return                  Completable
+     */
+    fun move(nodeHandle: Long, toParentHandle: Long): Completable =
+        Single.fromCallable {
+            getNodeUseCase.get(nodeHandle).blockingGet() to getNodeUseCase.get(toParentHandle).blockingGet()
+        }.flatMapCompletable { result -> move(result.first, result.second) }
 
     /**
      * Moves a node to other location.
@@ -36,6 +50,8 @@ class MoveNodeUseCase @Inject constructor(
                 node,
                 parentNode,
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     if (error.errorCode == API_OK) {
                         emitter.onComplete()
                     } else {
@@ -54,23 +70,18 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult> =
         Single.create { emitter ->
-            val parentNode = megaApi.getNodeByHandle(newParentHandle)
-
-            if (parentNode == null) {
-                emitter.onError(IllegalArgumentException("New parent node is not valid"))
-            }
+            val parentNode = getNodeUseCase.get(newParentHandle).blockingGet()
 
             var errorCount = 0
             var isForeignNode = false
             val oldParentHandle = if (handles.size == 1) {
-                megaApi.getNodeByHandle(handles[0]).parentHandle
+                getNodeUseCase.get(handles.first()).blockingGet().parentHandle
             } else {
                 INVALID_HANDLE
             }
 
             handles.forEach { handle ->
-                val node = megaApi.getNodeByHandle(handle)
-
+                val node = getNodeUseCase.get(handle).blockingGetOrNull()
                 if (node == null) {
                     errorCount++
                 } else {
@@ -93,6 +104,16 @@ class MoveNodeUseCase @Inject constructor(
         }
 
     /**
+     * Move a node to the Rubbish bin
+     *
+     * @param nodeHandle    Node handle to be moved
+     * @return              Completable
+     */
+    fun moveToRubbishBin(nodeHandle: Long): Completable =
+        Single.fromCallable { requireNotNull(megaApi.rubbishNode.handle) }
+            .flatMapCompletable { rubbishModeHandle -> move(nodeHandle, rubbishModeHandle) }
+
+    /**
      * Moves nodes to the Rubbish Bin.
      *
      * @param handles   List of MegaNode handles to move.
@@ -103,14 +124,13 @@ class MoveNodeUseCase @Inject constructor(
             var errorCount = 0
             val rubbishNode = megaApi.rubbishNode
             val oldParentHandle = if (handles.size == 1) {
-                megaApi.getNodeByHandle(handles[0]).parentHandle
+                getNodeUseCase.get(handles.first()).blockingGet().parentHandle
             } else {
                 INVALID_HANDLE
             }
 
             handles.forEach { handle ->
-                val node = megaApi.getNodeByHandle(handle)
-
+                val node = getNodeUseCase.get(handle).blockingGetOrNull()
                 if (node == null) {
                     errorCount++
                 } else {
@@ -129,6 +149,56 @@ class MoveNodeUseCase @Inject constructor(
         }
 
     /**
+     * Copy node to a different location, either passing handles or node itself.
+     *
+     * @param nodeHandle        Node handle to be copied
+     * @param toParentHandle    Parent node handle to be copied to
+     * @param node              Node to be copied
+     * @param toParentNode      Parent node to be copied to
+     * @return                  Completable
+     */
+    fun copyNode(
+        nodeHandle: Long? = null,
+        toParentHandle: Long? = null,
+        node: MegaNode? = null,
+        toParentNode: MegaNode? = null
+    ): Completable =
+        Completable.fromCallable {
+            require((node != null || nodeHandle != null) && (toParentNode != null || toParentHandle != null))
+            copyNode(
+                node ?: getNodeUseCase.get(nodeHandle!!).blockingGet(),
+                toParentNode ?: getNodeUseCase.get(toParentHandle!!).blockingGet()
+            ).blockingAwait()
+        }
+
+    /**
+     * Copy node to a different location.
+     *
+     * @param currentNode   Node to be copied
+     * @param toParentNode  Parent node to be copied to
+     * @return              Completable
+     */
+    fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
+        Completable.create { emitter ->
+            if (currentNode == null || toParentNode == null) {
+                emitter.onError(IllegalArgumentException("Null nodes"))
+                return@create
+            }
+
+            megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
+                    if (error.errorCode == MegaError.API_OK) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(error.toMegaException())
+                    }
+                }
+            ))
+        }
+
+    /**
      * Moves nodes from the Rubbish Bin to their original parent if it still exists.
      *
      * @param nodes List of MegaNode to restore.
@@ -139,14 +209,13 @@ class MoveNodeUseCase @Inject constructor(
             var errorCount = 0
             var isForeignNode = false
             val destination: MegaNode? = if (nodes.size == 1) {
-                megaApi.getNodeByHandle(nodes[0].restoreHandle)
+                getNodeUseCase.get(nodes.first().restoreHandle).blockingGet()
             } else {
                 null
             }
 
             nodes.forEach { node ->
-                val parent = megaApi.getNodeByHandle(node.restoreHandle)
-
+                val parent = getNodeUseCase.get(node.restoreHandle).blockingGetOrNull()
                 if (parent == null) {
                     errorCount++
                 } else {
@@ -166,5 +235,40 @@ class MoveNodeUseCase @Inject constructor(
                 isForeignNode,
                 destination
             ).apply { resetAccountDetailsIfNeeded() })
+        }
+
+    /**
+     * Remove a node
+     *
+     * @param nodeHandle    Node handle to be removed
+     * @return              Completable
+     */
+    fun remove(nodeHandle: Long): Completable =
+        getNodeUseCase.get(nodeHandle).flatMapCompletable { node -> remove(node) }
+
+    /**
+     * Remove a node
+     *
+     * @param node  Node to be removed
+     * @return      Completable
+     */
+    fun remove(node: MegaNode?): Completable =
+        Completable.create { emitter ->
+            if (node == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
+
+            megaApi.remove(node, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
+                    if (error.errorCode == API_OK) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(error.toMegaException())
+                    }
+                }
+            ))
         }
 }
