@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.domain.repository.AlbumsRepository
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -46,11 +47,16 @@ class DefaultGetAlbums @Inject constructor(
         return favouriteList?.maxByOrNull { favItem ->
             favItem.modificationTime
         }?.let {
-            getThumbnail(it.id)
+            try {
+                getThumbnail(it.id)
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
         }
     }
 
     private suspend fun inSyncFolder(parentId: Long): Boolean =
             parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
-    
+
 }

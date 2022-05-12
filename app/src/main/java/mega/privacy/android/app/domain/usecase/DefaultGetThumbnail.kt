@@ -9,13 +9,11 @@ import javax.inject.Inject
  * @param repository AlbumsRepository
  */
 class DefaultGetThumbnail @Inject constructor(private val repository: AlbumsRepository) :
-    GetThumbnail {
+        GetThumbnail {
 
     override suspend fun invoke(nodeId: Long): File {
         return repository.getThumbnailFromLocal(nodeId) ?: repository.getThumbnailFromServer(
-            nodeId
+                nodeId
         )
     }
-
-
 }

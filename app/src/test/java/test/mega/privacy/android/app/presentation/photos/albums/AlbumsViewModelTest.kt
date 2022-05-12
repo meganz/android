@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.domain.usecase.GetAlbums
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
@@ -26,7 +27,7 @@ class AlbumsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = AlbumsViewModel(
-            getAlbums = getAlbums,
+                getAlbums = getAlbums,
         )
     }
 
@@ -38,14 +39,25 @@ class AlbumsViewModelTest {
     }
 
     @Test
-    fun `test that start with loading state and there is no favourite item`() = runTest {
+    fun `test that start with loading state and load albums success`() = runTest {
         whenever(getAlbums()).thenReturn(
-            flowOf(emptyList())
+                flowOf(
+                        createAlbums()
+                )
         )
+        underTest.favouritesState.test {
+            assertTrue(awaitItem() is AlbumsLoadState.Loading)
+            assertTrue(awaitItem() is AlbumsLoadState.Success)
+        }
     }
 
-    @Test
-    fun `test that start with loading state and load favourites success`() = runTest {
-
+    private fun createAlbums(): List<Album> {
+        val favouriteAlbum = Album.FavouriteAlbum(
+                null,
+                0
+        )
+        return listOf(
+                favouriteAlbum
+        )
     }
 }

@@ -32,9 +32,9 @@ class DefaultAlbumsRepository @Inject constructor(
         private val cacheFolderFacade: CacheFolderGateway,
 ) : AlbumsRepository {
 
-    override suspend fun getCameraUploadFolderId(): Long? = megaLocalStorageFacade.camSyncHandle
+    override suspend fun getCameraUploadFolderId(): Long? = megaLocalStorageFacade.getCamSyncHandle()
 
-    override suspend fun getMediaUploadFolderId(): Long? = megaLocalStorageFacade.megaHandleSecondaryFolder
+    override suspend fun getMediaUploadFolderId(): Long? = megaLocalStorageFacade.getMegaHandleSecondaryFolder()
 
     override suspend fun getThumbnailFromLocal(nodeId: Long): File? {
         return getThumbnailFile(apiFacade.getMegaNodeByHandle(nodeId)).takeIf {
@@ -67,5 +67,4 @@ class DefaultAlbumsRepository @Inject constructor(
                     }
                 }
             }
-
 }

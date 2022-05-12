@@ -12,12 +12,11 @@ import javax.inject.Inject
  * @property dbHandler
  */
 class MegaLocalStorageFacade @Inject constructor(
-    val dbHandler: DatabaseHandler
+        val dbHandler: DatabaseHandler
 ) : MegaLocalStorageGateway {
 
-    override val camSyncHandle: Long? = dbHandler.preferences?.camSyncHandle?.toLongOrNull()
+    override suspend fun getCamSyncHandle(): Long? = dbHandler.preferences?.camSyncHandle?.toLongOrNull()
 
-    override val megaHandleSecondaryFolder: Long? =
-        dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
+    override suspend fun getMegaHandleSecondaryFolder(): Long? = dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
 
 }

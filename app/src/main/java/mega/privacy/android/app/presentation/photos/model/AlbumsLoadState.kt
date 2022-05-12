@@ -22,10 +22,4 @@ sealed interface AlbumsLoadState {
      * album list is empty
      */
     object Empty : AlbumsLoadState
-
-    /**
-     * Get album list error
-     * @param exception MegaException
-     */
-    data class Error(val exception: MegaException) : AlbumsLoadState
 }
