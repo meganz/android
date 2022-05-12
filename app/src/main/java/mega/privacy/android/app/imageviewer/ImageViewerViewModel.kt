@@ -475,28 +475,28 @@ class ImageViewerViewModel @Inject constructor(
             node = getExistingNode(nodeHandle),
             nodeHandle = nodeHandle,
             toParentHandle = newParentHandle
-        ).subscribeAndComplete {
+        ).subscribeAndComplete(false) {
             snackbarMessage.value = getString(R.string.context_correctly_copied)
         }
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         moveNodeUseCase.move(nodeHandle, newParentHandle)
-            .subscribeAndComplete {
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_moved)
             }
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         moveNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeAndComplete {
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
         moveNodeUseCase.remove(nodeHandle)
-            .subscribeAndComplete {
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
@@ -585,7 +585,7 @@ class ImageViewerViewModel @Inject constructor(
             .addTo(composite)
     }
 
-    private fun Completable.subscribeAndComplete(completeAction: (() -> Unit)? = null) {
+    private fun Completable.subscribeAndComplete(addToComposite: Boolean = false, completeAction: (() -> Unit)? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -595,7 +595,8 @@ class ImageViewerViewModel @Inject constructor(
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
-            )
-            .addTo(composite)
+            ).also {
+                if (addToComposite) it.addTo(composite)
+            }
     }
 }
