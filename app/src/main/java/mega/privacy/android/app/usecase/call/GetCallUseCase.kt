@@ -81,6 +81,11 @@ class GetCallUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Method to get the destroyed call
+     *
+     * @return Chat ID of the call
+     */
     fun getCallEnded(): Flowable<Long> =
         Flowable.create({ emitter ->
             val callStatusObserver = Observer<MegaChatCall> { call ->

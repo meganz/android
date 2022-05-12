@@ -54,13 +54,10 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermi
 
 import androidx.annotation.RequiresApi;
 
-import javax.inject.Inject;
-
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
-
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
     // Handles all tasks related to Bluetooth headset devices.

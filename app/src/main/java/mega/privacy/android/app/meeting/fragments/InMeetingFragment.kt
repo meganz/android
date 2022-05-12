@@ -2405,7 +2405,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to navigate to the Make moderator screen
      */
     private val showAssignModeratorFragment = fun() {
-        logDebug("****************+ showAssignModeratorFragment")
         val isPanelExpanded =
             bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded

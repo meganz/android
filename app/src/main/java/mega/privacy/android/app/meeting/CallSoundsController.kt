@@ -9,6 +9,10 @@ import mega.privacy.android.app.R
 import timber.log.Timber
 import java.io.IOException
 
+/**
+ * Class responsible for playing call-related sounds
+ * @param audioManager AudioManager
+ */
 class CallSoundsController(val audioManager: AudioManager) {
 
     private var mMediaPlayer: MediaPlayer? = null
