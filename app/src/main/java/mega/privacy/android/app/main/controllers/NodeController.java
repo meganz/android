@@ -181,17 +181,17 @@ public class NodeController {
         return null;
     }
 
-    public boolean nodeComesFromIncoming (MegaNode node) {
-        MegaNode parent = getParent(node);
-
-        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
-                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
-                parent.getHandle() == megaApi.getInboxNode().getHandle()){
-            return false;
-        }
-        else {
-            return true;
-        }
+    /**
+     * Checks if the node is inside an incoming folder.
+     *
+     * @param node The node to check.
+     * @return True if the node comes from an incoming folder, false otherwise.
+     */
+    public boolean nodeComesFromIncoming(MegaNode node) {
+        return node != null
+                && !megaApi.isInCloud(node)
+                && !megaApi.isInRubbish(node)
+                && !megaApi.isInInbox(node);
     }
 
     public MegaNode getParent(MegaNode node) {

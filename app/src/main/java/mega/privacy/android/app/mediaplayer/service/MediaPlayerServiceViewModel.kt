@@ -909,20 +909,25 @@ class MediaPlayerServiceViewModel(
      * @param currentPosition the current position of audio
      */
     fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
-        playlistItems.filter {
-            it.nodeHandle == playingHandle
-        }.firstNotNullOfOrNull {
-            it.duration = duration
-            it.currentPosition = currentPosition
-        }
+        val list = mutableListOf<PlaylistItem>()
+        list.addAll(playlistItems.map { playListItem ->
+            if (playListItem.nodeHandle == playingHandle) {
+                playListItem.copy(duration = duration, currentPosition = currentPosition)
+            } else {
+                playListItem
+            }
+        })
+        playlistItems.clear()
+        playlistItems.addAll(list)
         postPlaylistItems(false)
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
-        val filteredItems = ArrayList<PlaylistItem>()
+        if (items.isEmpty()) return
 
-        for ((index, item) in items.withIndex()) {
-            if (item.nodeName.lowercase(Locale.ROOT).contains(filter)) {
+        val filteredItems = ArrayList<PlaylistItem>()
+        items.forEachIndexed { index, item ->
+            if (item.nodeName.contains(filter, true)) {
                 // Filter only affects displayed playlist, it doesn't affect what
                 // ExoPlayer is playing, so we still need use the index before filter.
                 filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))

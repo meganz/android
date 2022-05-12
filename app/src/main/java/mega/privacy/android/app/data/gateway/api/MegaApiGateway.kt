@@ -1,7 +1,11 @@
 package mega.privacy.android.app.data.gateway.api
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.GlobalUpdate
+import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
 
 /**
  * Mega api gateway
@@ -55,6 +59,11 @@ interface MegaApiGateway {
      *
      */
     val rootNode: MegaNode?
+
+    /**
+     * Global updates
+     */
+    val globalUpdates: Flow<GlobalUpdate>
 
     /**
      * Get favourites
@@ -126,4 +135,42 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+
+
+    /**
+     * Add logger
+     *
+     * @param logger
+     */
+    fun addLogger(logger: MegaLoggerInterface)
+
+    /**
+     * Remove logger
+     *
+     * @param logger
+     */
+    fun removeLogger(logger: MegaLoggerInterface)
+
+
+    /**
+     * Set logging level
+     *
+     * @param logLevel
+     */
+    fun setLogLevel(logLevel: Int)
+
+    /**
+     * Set use https only
+     *
+     * @param enabled
+     */
+    fun setUseHttpsOnly(enabled: Boolean)
+
+    /**
+     * Get logged in user
+     *
+     * @return the current user if logged in, otherwise null
+     */
+    suspend fun getLoggedInUser(): MegaUser?
+
 }

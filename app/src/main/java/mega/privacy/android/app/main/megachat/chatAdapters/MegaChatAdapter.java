@@ -96,6 +96,7 @@ import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -123,7 +124,6 @@ import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.
 import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat.getFormattedText;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -348,7 +348,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 previewCache.put(node.getHandle(), preview);
                 return 0;
             } else {
-                destination = buildPreviewFile(context, node.getName());
+                destination = CacheFolderManager.buildPreviewFile(context, node.getName());
 
                 if (isFileAvailable(destination)) {
                     if (destination.length() == node.getSize()) {
@@ -1500,7 +1500,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
 
             String path = message.getPendingMessage().getFilePath();
-            File voiceClipDir = getCacheFolder(context, VOICE_CLIP_FOLDER);
+            File voiceClipDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.VOICE_CLIP_FOLDER);
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
 
@@ -1748,7 +1748,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             case MegaChatMessage.TYPE_NORMAL: {
                 logDebug("TYPE_NORMAL");
-                String contactLink = extractContactLink(androidMessage.getMessage().getContent());
+                String contactLink = extractContactLink(message.getContent());
 
                 if (androidMessage.getRichLinkMessage() != null) {
                     bindMegaLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -5370,7 +5370,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }else{
                     logDebug("myMessage: SENT -> available ");
                     boolean isDownloaded = false;
-                    File vcFile = buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
+                    File vcFile = CacheFolderManager.buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
                     if(isFileAvailable(vcFile) && vcFile.length() == message.getMegaNodeList().get(0).getSize()){
                         isDownloaded = true;
                     }
@@ -5530,7 +5530,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 boolean isDownloaded = false;
 
-                File vcFile = buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
+                File vcFile = CacheFolderManager.buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
                 if(isFileAvailable(vcFile) && vcFile.length() == message.getMegaNodeList().get(0).getSize()){
                     isDownloaded = true;
                 }
@@ -6683,7 +6683,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.othersContactLinkAvatar.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
         }
 
-        File avatar = buildAvatarFile(context, result.getEmail() + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(context, result.getEmail() + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -6726,7 +6726,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.contentContactMessageContactThumb.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
         }
 
-        File avatar = buildAvatarFile(context, email + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(context, email + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -6756,7 +6756,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .getDefaultAvatarDrawable(context, name, getColorAvatar(userHandle), GetAvatarUseCase.AvatarType.MINI));
 
         /*Avatar*/
-        File avatar = buildAvatarFile(context, userHandleEncoded + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(context, userHandleEncoded + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -8127,7 +8127,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
                 if(nodeList.size()<1 || !isVoiceClip(nodeList.get(0).getName())) break;
 
-                File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
+                File vcFile = CacheFolderManager.buildVoiceClipFile(context, nodeList.get(0).getName());
                 if(!isFileAvailable(vcFile) || vcFile.length() != nodeList.get(0).getSize()) downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
 
                 playVoiceClip(m, vcFile.getAbsolutePath());

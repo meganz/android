@@ -1,15 +1,11 @@
 package mega.privacy.android.app.contacts.usecase
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
@@ -19,9 +15,11 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.view.TextDrawable
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
+import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest.TYPE_GET_USER_EMAIL
 import java.io.File
 import javax.inject.Inject
@@ -73,10 +71,8 @@ class GetContactGroupsUseCase @Inject constructor(
                                     val user = if (isFirstUser) currentGroup.firstUser else currentGroup.lastUser
 
                                     val newFirstname = request.text
-                                    val newPlaceholder = getImagePlaceholder(newFirstname, user.avatarColor)
                                     val newUser = user.copy(
-                                        firstName = newFirstname,
-                                        placeholder = newPlaceholder
+                                        firstName = newFirstname
                                     )
 
                                     groups[index] = if (isFirstUser) {
@@ -145,10 +141,6 @@ class GetContactGroupsUseCase @Inject constructor(
         val userName = megaChatApi.getUserFirstnameFromCache(userHandle)
         val userEmail = megaChatApi.getUserEmailFromCache(userHandle)
         val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString()).toColorInt()
-        val userPlaceholder = getImagePlaceholder(
-            userName ?: userEmail ?: userHandle.toString(),
-            userAvatarColor
-        )
 
         if (userName.isNullOrBlank()) {
             megaApi.getUserAttribute(userHandle.toString(), USER_ATTR_FIRSTNAME, listener)
@@ -170,30 +162,9 @@ class GetContactGroupsUseCase @Inject constructor(
             email = userEmail,
             firstName = userName,
             avatar = userAvatar?.toUri(),
-            avatarColor = userAvatarColor,
-            placeholder = userPlaceholder
+            avatarColor = userAvatarColor
         )
     }
-
-    /**
-     * Build Avatar placeholder Drawable given a Title and a Color
-     *
-     * @param title     Title string
-     * @param color     Background color
-     * @return          Drawable with the placeholder
-     */
-    private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
-        TextDrawable.builder()
-            .beginConfig()
-            .width(context.resources.getDimensionPixelSize(R.dimen.image_group_size))
-            .height(context.resources.getDimensionPixelSize(R.dimen.image_group_size))
-            .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_group_text_size))
-            .withBorder(context.resources.getDimensionPixelSize(R.dimen.image_group_border_size))
-            .borderColor(ContextCompat.getColor(context, R.color.white))
-            .bold()
-            .toUpperCase()
-            .endConfig()
-            .buildRound(AvatarUtil.getFirstLetter(title), color)
 
     private fun MutableList<ContactGroupItem>.sortedAlphabetically(): List<ContactGroupItem> =
         sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactGroupItem::title))

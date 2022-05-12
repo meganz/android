@@ -1,5 +1,7 @@
 package test.mega.privacy.android.app.domain.usecase
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.app.domain.usecase.GetAccountDetails
@@ -10,6 +12,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAccountDetailsTest {
 private lateinit var underTest: GetAccountDetails
     private val accountRepository = mock<AccountRepository>()
@@ -20,7 +23,7 @@ private lateinit var underTest: GetAccountDetails
     }
 
     @Test
-    fun `test that account details are refreshed if stale`() {
+    fun `test that account details are refreshed if stale`() = runTest {
         whenever(accountRepository.isAccountDataStale()).thenReturn(true)
         underTest(false)
 
@@ -28,7 +31,7 @@ private lateinit var underTest: GetAccountDetails
     }
 
     @Test
-    fun `test that account details are refreshed if forced`() {
+    fun `test that account details are refreshed if forced`() = runTest {
         whenever(accountRepository.isAccountDataStale()).thenReturn(false)
         underTest(true)
 
@@ -36,7 +39,7 @@ private lateinit var underTest: GetAccountDetails
     }
 
     @Test
-    fun `test that account details are not refreshed if not stale or forced`() {
+    fun `test that account details are not refreshed if not stale or forced`() = runTest {
         whenever(accountRepository.isAccountDataStale()).thenReturn(false)
         underTest(false)
 

@@ -108,11 +108,6 @@ class ImagesFragment : BaseZoomFragment() {
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
-        ColorUtils.setImageViewAlphaIfDark(
-            context,
-            binding.emptyHint.emptyHintImage,
-            ColorUtils.DARK_IMAGE_ALPHA
-        )
         binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
                 context,

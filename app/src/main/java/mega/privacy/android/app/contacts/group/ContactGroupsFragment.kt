@@ -26,7 +26,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.LogUtil
@@ -45,7 +44,7 @@ class ContactGroupsFragment : Fragment() {
     private lateinit var binding: FragmentContactGroupsBinding
 
     private val viewModel by viewModels<ContactGroupsViewModel>()
-    private val groupsAdapter by lazy { ContactGroupsAdapter(::onGroupClick) }
+    private val groupsAdapter by lazy { ContactGroupsAdapter(::openGroupChatScreen) }
     private lateinit var createGroupChatLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,14 +79,7 @@ class ContactGroupsFragment : Fragment() {
                                 StringResourcesUtils.getString(R.string.create_chat_error)
                             )
                         } else {
-                            Intent(
-                                requireContext(),
-                                ChatActivity::class.java
-                            ).apply {
-                                action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                                putExtra(Constants.CHAT_ID, chatId)
-                                startActivity(this)
-                            }
+                            openGroupChatScreen(chatId)
                         }
                     }
             }
@@ -178,13 +170,14 @@ class ContactGroupsFragment : Fragment() {
     }
 
     /**
-     * Callback method called when a Contact Group Item is clicked
+     * Open group chat screen
      *
-     * @param groupId   Group Id that has been clicked
+     * @param groupId   Group Id to be opened
      */
-    private fun onGroupClick(groupId: Long) {
-        startActivity(Intent(context, GroupChatInfoActivity::class.java).apply {
-            putExtra(Constants.HANDLE, groupId)
+    private fun openGroupChatScreen(groupId: Long) {
+        startActivity(Intent(context, ChatActivity::class.java).apply {
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            putExtra(Constants.CHAT_ID, groupId)
         })
     }
 }
