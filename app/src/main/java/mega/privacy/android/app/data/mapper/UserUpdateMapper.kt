@@ -1,19 +1,29 @@
 package mega.privacy.android.app.data.mapper
 
 import mega.privacy.android.app.domain.entity.user.UserChanges
+import mega.privacy.android.app.domain.entity.user.UserId
+import mega.privacy.android.app.domain.entity.user.UserUpdate
 import nz.mega.sdk.MegaUser
 
 /**
- * Mapper to convert changed flags from sdk into a list of [UserChanges]
+ * Mapper to convert list of updated users from sdk into a [UserUpdate] entity
  */
-typealias UserChangesMapper = (@JvmSuppressWildcards Int) -> @JvmSuppressWildcards List<UserChanges>
+typealias UserUpdateMapper = (@JvmSuppressWildcards List<@JvmSuppressWildcards MegaUser>) -> UserUpdate
+
 
 /**
- * Maps mega user change flags to a list of [UserChanges]
+ * Maps from mega user list to UserUpdate
  *
- * @param changeFlags
+ * @param userList
  */
-internal fun fromMegaUserChangeFlags(changeFlags: Int) = userChangesMap.filter {
+internal fun mapMegaUserListToUserUpdate(userList: List<MegaUser>) = UserUpdate(
+    userList.groupBy { user -> UserId(user.handle) }
+        .mapValues { (_, users) ->
+            users.map { i -> fromMegaUserChangeFlags(i.changes) }.flatten()
+        }
+)
+
+private fun fromMegaUserChangeFlags(changeFlags: Int) = userChangesMap.filter {
     it.key and changeFlags != 0
 }.values.toList()
 

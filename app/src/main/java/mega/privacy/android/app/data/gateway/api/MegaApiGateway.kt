@@ -1,7 +1,8 @@
 package mega.privacy.android.app.data.gateway.api
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaLoggerInterface
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
@@ -58,6 +59,11 @@ interface MegaApiGateway {
      *
      */
     val rootNode: MegaNode?
+
+    /**
+     * Global updates
+     */
+    val globalUpdates: Flow<GlobalUpdate>
 
     /**
      * Get favourites
@@ -161,23 +167,10 @@ interface MegaApiGateway {
     fun setUseHttpsOnly(enabled: Boolean)
 
     /**
-     * Add global listener
-     *
-     * @param listener
-     */
-    fun addGlobalListener(listener: MegaGlobalListenerInterface)
-
-    /**
-     * Remove global listener
-     *
-     * @param listener
-     */
-    fun removeGlobalListener(listener: MegaGlobalListenerInterface)
-
-    /**
      * Get logged in user
      *
      * @return the current user if logged in, otherwise null
      */
     suspend fun getLoggedInUser(): MegaUser?
+
 }
