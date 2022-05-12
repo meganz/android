@@ -1,15 +1,12 @@
 package mega.privacy.android.app.main.managerSections;
 
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -21,8 +18,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -38,8 +43,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class NotificationsFragment extends Fragment implements View.OnClickListener {
 
@@ -346,7 +349,7 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
-    public void updateNotifications(ArrayList<MegaUserAlert> updatedUserAlerts) {
+    public void updateNotifications(List<MegaUserAlert> updatedUserAlerts) {
         logDebug("updateNotifications");
 
         if(!isAdded()){
