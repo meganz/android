@@ -685,7 +685,6 @@ public class Constants {
     public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 2;
     public static final int AUDIO_MANAGER_CALL_OUTGOING = 3;
     public static final int AUDIO_MANAGER_CREATING_JOINING_MEETING = 4;
-    public static final int AUDIO_MANAGER_CALL_ENDED = 5;
 
     public static final int CHECK_LINK_TYPE_UNKNOWN_LINK = 0;
     public static final int CHECK_LINK_TYPE_CHAT_LINK = 1;

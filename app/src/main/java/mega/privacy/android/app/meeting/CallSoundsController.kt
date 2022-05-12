@@ -8,21 +8,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import timber.log.Timber
 import java.io.IOException
-import javax.inject.Singleton
 
-
-@Singleton
-class CallSoundsController constructor(
-    private val audioManager: AudioManager
-) {
-
-    enum class TypeSound {
-        INCOMING_CALL, OUTGOING_CALL, CALL_ENDED
-    }
+class CallSoundsController(val audioManager: AudioManager) {
 
     private var mMediaPlayer: MediaPlayer? = null
 
-    fun playSound(type: TypeSound) {
+    fun playSound(type: CallSoundType) {
         if (mMediaPlayer == null)
             mMediaPlayer = MediaPlayer()
 
@@ -33,30 +24,7 @@ class CallSoundsController constructor(
             val res = MegaApplication.getInstance().baseContext.resources
             var afd: AssetFileDescriptor? = null
             when (type) {
-                TypeSound.INCOMING_CALL -> {
-
-                    mp.isLooping = true
-
-                }
-                TypeSound.OUTGOING_CALL -> {
-                    audioManager.setStreamVolume(
-                        AudioManager.STREAM_VOICE_CALL,
-                        audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL),
-                        0
-                    )
-                    afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call)
-
-                    mp.apply {
-                        isLooping = false
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION_SIGNALLING)
-                                .build()
-                        )
-                    }
-                }
-                TypeSound.CALL_ENDED -> {
+                CallSoundType.CALL_ENDED -> {
                     audioManager.setStreamVolume(
                         AudioManager.STREAM_VOICE_CALL,
                         audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL),

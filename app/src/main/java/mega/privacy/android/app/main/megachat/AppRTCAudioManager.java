@@ -38,6 +38,7 @@ import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.meeting.CallSoundType;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 
@@ -59,9 +60,6 @@ import javax.inject.Inject;
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
-
-    @Inject
-    CallSoundsController soundsController;
 
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
@@ -106,11 +104,14 @@ public class AppRTCAudioManager {
     // Callback method for changes in audio focus.
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
+    private CallSoundsController soundsController;
+
     private AppRTCAudioManager(Context context, boolean statusSpeaker, int type) {
         ThreadUtils.checkIsOnMainThread();
         apprtcContext = context;
         startBluetooth();
         audioManager = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE));
+        soundsController = new CallSoundsController(audioManager);
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
         this.typeAudioManager = type;
@@ -220,7 +221,7 @@ public class AppRTCAudioManager {
     }
 
     private void setValues() {
-        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING && typeAudioManager != AUDIO_MANAGER_CALL_ENDED)
+        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING)
                 || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE)
                 || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)) {
             return;
@@ -239,10 +240,17 @@ public class AppRTCAudioManager {
             stopAudioSignals();
             incomingCallSound();
             checkVibration();
-        } else if (typeAudioManager == AUDIO_MANAGER_CALL_ENDED) {
-            stopAudioSignals();
-            soundsController.playSound(CallSoundsController.TypeSound.CALL_ENDED);
         }
+    }
+
+    /**
+     * Method of reproducing a sound depending on the type
+     *
+     * @param type Type of sound
+     */
+    public void playSound(CallSoundType type) {
+        stopAudioSignals();
+        soundsController.playSound(type);
     }
 
     private void outgoingCallSound() {

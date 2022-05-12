@@ -24,7 +24,6 @@ import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFro
 import static mega.privacy.android.app.utils.Constants.ACTION_CONFIRM;
 import static mega.privacy.android.app.utils.Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION;
 import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
-import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_ENDED;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
@@ -163,6 +162,8 @@ import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
+import mega.privacy.android.app.meeting.CallSoundType;
+import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
@@ -732,7 +733,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
             if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED && !chat.isGroup() &&
                     !chat.isMeeting() && session.getTermCode() == MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE) {
-                updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_ENDED);
+                rtcAudioManager.playSound(CallSoundType.CALL_ENDED);
             }
         }
     };
@@ -1897,7 +1898,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param callStatus Call status.
      */
     private void updateRTCAudioMangerTypeStatus(int callStatus) {
-        logDebug("*****************+ updateRTCAudioMangerTypeStatus callStatus "+callStatus);
         removeRTCAudioManagerRingIn();
         stopSounds();
         if (rtcAudioManager != null) {
