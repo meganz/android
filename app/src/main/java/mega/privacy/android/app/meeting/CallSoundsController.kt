@@ -11,6 +11,7 @@ import java.io.IOException
 
 /**
  * Class responsible for playing call-related sounds
+ *
  * @param audioManager AudioManager
  */
 class CallSoundsController(val audioManager: AudioManager) {
@@ -61,6 +62,7 @@ class CallSoundsController(val audioManager: AudioManager) {
 
                     mp.prepareAsync()
                 }
+
             } catch (e: IOException) {
                 Timber.e("IOException preparing mediaPlayer", e)
             }
