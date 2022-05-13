@@ -53,22 +53,6 @@ class ManagerViewModel @Inject constructor(
             .filterNot { it.isEmpty() }
             .asLiveData()
 
-    val needReload: LiveData<Unit> =
-        globalUpdatesRepository.monitorGlobalUpdates()
-            .filterIsInstance<GlobalUpdate.OnReloadNeeded>()
-            .also { Timber.d("onReloadNeeded") }
-            .map { }
-            .filterNotNull()
-            .asLiveData()
-
-    val updateAccount: LiveData<Unit> =
-        globalUpdatesRepository.monitorGlobalUpdates()
-            .filterIsInstance<GlobalUpdate.OnAccountUpdate>()
-            .also { Timber.d("onContactRequestsUpdate") }
-            .map { }
-            .filterNotNull()
-            .asLiveData()
-
     val updateContactsRequests: LiveData<List<MegaContactRequest>> =
         globalUpdatesRepository.monitorGlobalUpdates()
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
@@ -76,14 +60,6 @@ class ManagerViewModel @Inject constructor(
             .map { it.requests?.toList() }
             .filterNotNull()
             .filterNot { it.isEmpty() }
-            .asLiveData()
-
-    val onEvent: LiveData<MegaEvent> =
-        globalUpdatesRepository.monitorGlobalUpdates()
-            .filterIsInstance<GlobalUpdate.OnEvent>()
-            .also { Timber.d("onEvent") }
-            .map { it.event }
-            .filterNotNull()
             .asLiveData()
 
 }

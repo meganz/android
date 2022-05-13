@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.*
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import nz.mega.sdk.MegaEvent
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
@@ -56,25 +55,11 @@ class ManagerViewModelTest {
         }
         assertThat(updateNodesException.message?.contains("LiveData value was never set."))
 
-        val reloadException = assertThrows(TimeoutException::class.java) {
-            underTest.needReload.getOrAwaitValue { advanceUntilIdle() }
-        }
-        assertThat(reloadException.message?.contains("LiveData value was never set."))
-
-        val updateAccountException = assertThrows(TimeoutException::class.java) {
-            underTest.updateAccount.getOrAwaitValue { advanceUntilIdle() }
-        }
-        assertThat(updateAccountException.message?.contains("LiveData value was never set."))
-
         val updateContactsRequestsException = assertThrows(TimeoutException::class.java) {
             underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
         }
         assertThat(updateContactsRequestsException.message?.contains("LiveData value was never set."))
 
-        val eventException = assertThrows(TimeoutException::class.java) {
-            underTest.onEvent.getOrAwaitValue { advanceUntilIdle() }
-        }
-        assertThat(eventException.message?.contains("LiveData value was never set."))
     }
 
     @Test
@@ -95,25 +80,9 @@ class ManagerViewModelTest {
             assertEquals(updateNodes.size, 1)
         }
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnReloadNeeded)) {
-            val needReload = underTest.needReload.getOrAwaitValue { advanceUntilIdle() }
-            assertEquals(needReload, Unit)
-
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnAccountUpdate)) {
-            val updateAccount = underTest.updateAccount.getOrAwaitValue { advanceUntilIdle() }
-            assertEquals(updateAccount, Unit)
-        }
-        triggerRepositoryUpdate(
             listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
             val updateContactRequests = underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateContactRequests.size, 1)
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnEvent(mock()))) {
-            val event = underTest.onEvent.getOrAwaitValue { advanceUntilIdle() }
-            assertThat(event).isInstanceOf(MegaEvent::class.java)
         }
     }
 
