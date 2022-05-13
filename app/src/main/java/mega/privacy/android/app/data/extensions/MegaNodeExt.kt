@@ -10,8 +10,16 @@ import nz.mega.sdk.MegaNode
  * @param numChildFiles child files number
  * @return FavouriteInfo
  */
-fun MegaNode.toFavouriteInfo(hasVersion: Boolean, numChildFolders: Int, numChildFiles: Int): FavouriteInfo {
+fun MegaNode.toFavouriteInfo(
+    hasVersion: Boolean,
+    numChildFolders: Int,
+    numChildFiles: Int
+): FavouriteInfo {
     return FavouriteInfo(
+        id = handle,
+        parentId = parentHandle,
+        base64Id = base64Handle,
+        modificationTime = modificationTime,
         node = this,
         hasVersion = hasVersion,
         numChildFolders = numChildFolders,

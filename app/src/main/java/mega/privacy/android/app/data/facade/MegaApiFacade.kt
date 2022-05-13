@@ -149,4 +149,10 @@ class MegaApiFacade @Inject constructor(
     override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
 
     override suspend fun getLoggedInUser(): MegaUser? = megaApi.myUser
+
+    override fun getThumbnail(
+        node: MegaNode,
+        thumbnailFilePath: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 }
