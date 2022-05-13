@@ -5,13 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultGlobalUpdatesRepository
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
+import mega.privacy.android.app.domain.usecase.MonitorUserUpdates
 import nz.mega.sdk.*
 import timber.log.Timber
 import java.util.*
@@ -33,6 +32,7 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onUsersUpdate") }
             .map { it.users?.toList() }
             .filterNotNull()
+            .filterNot { it.isEmpty() }
             .asLiveData()
 
     val updateUserAlerts: LiveData<List<MegaUserAlert>> =
@@ -41,6 +41,7 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onUserAlertsUpdate") }
             .map { it.userAlerts?.toList() }
             .filterNotNull()
+            .filterNot { it.isEmpty() }
             .asLiveData()
 
     val updateNodes: LiveData<List<MegaNode>> =
@@ -49,9 +50,10 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onNodesUpdate") }
             .map { it.nodeList?.toList() }
             .filterNotNull()
+            .filterNot { it.isEmpty() }
             .asLiveData()
 
-    val reloadNode: LiveData<Unit> =
+    val needReload: LiveData<Unit> =
         globalUpdatesRepository.monitorGlobalUpdates()
             .filterIsInstance<GlobalUpdate.OnReloadNeeded>()
             .also { Timber.d("onReloadNeeded") }
@@ -73,6 +75,7 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onContactRequestsUpdate") }
             .map { it.requests?.toList() }
             .filterNotNull()
+            .filterNot { it.isEmpty() }
             .asLiveData()
 
     val onEvent: LiveData<MegaEvent> =
