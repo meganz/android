@@ -1,8 +1,11 @@
 package mega.privacy.android.app.data.gateway.api
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
 
 /**
  * Mega api gateway
@@ -58,6 +61,11 @@ interface MegaApiGateway {
     val rootNode: MegaNode?
 
     /**
+     * Global updates
+     */
+    val globalUpdates: Flow<GlobalUpdate>
+
+    /**
      * Get favourites
      * @param node Node and its children that will be searched for favourites. Search all nodes if null
      * @param count if count is zero return all favourite nodes, otherwise return only 'count' favourite nodes
@@ -108,8 +116,8 @@ interface MegaApiGateway {
      * @param listener
      */
     fun setAutoAcceptContactsFromLink(
-        disableAutoAccept: Boolean,
-        listener: MegaRequestListenerInterface
+            disableAutoAccept: Boolean,
+            listener: MegaRequestListenerInterface
     )
 
     /**
@@ -127,7 +135,6 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
-
 
     /**
      * Add logger
@@ -157,4 +164,20 @@ interface MegaApiGateway {
      * @param enabled
      */
     fun setUseHttpsOnly(enabled: Boolean)
+
+    /**
+     * Get logged in user
+     *
+     * @return the current user if logged in, otherwise null
+     */
+    suspend fun getLoggedInUser(): MegaUser?
+
+    /**
+     * Get thumbnail from server
+     *
+     * @param node
+     * @param thumbnailFilePath thumbnail file path
+     * @param listener
+     */
+    fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
 }

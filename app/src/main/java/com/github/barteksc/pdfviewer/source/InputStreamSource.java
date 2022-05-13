@@ -42,8 +42,9 @@ public class InputStreamSource implements DocumentSource {
     @Override
     public PdfDocument createDocument(Context context, PdfiumCore core, String password)
             throws IOException {
-        File tmpFolder =
-                CacheFolderManager.getCacheFolder(context, CacheFolderManager.TEMPORAL_FOLDER);
+
+        File tmpFolder = CacheFolderManager
+                .getCacheFolder(context, CacheFolderManager.TEMPORARY_FOLDER);
         if (tmpFolder == null || tmpFileName == null) {
             // fail to create tmp folder, or no tmpFileName provided, fallback to old behavior
             return core.newDocument(Util.toByteArray(inputStream), password);

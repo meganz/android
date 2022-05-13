@@ -118,6 +118,8 @@ import androidx.work.Configuration;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.memory.PoolConfig;
+import com.facebook.imagepipeline.memory.PoolFactory;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ContextUtils;
@@ -172,6 +174,7 @@ import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
 import mega.privacy.android.app.utils.ThemeHelper;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -912,9 +915,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         ContextUtils.initialize(getApplicationContext());
 
-		Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
-				.setDownsampleEnabled(true)
-				.build());
+        initFresco();
 
         if (PurgeLogsToggle.INSTANCE.getEnabled() == false) {// Try to initialize the loggers again in order to avoid have them uninitialized
             // in case they failed to initialize before for some reason.
@@ -967,6 +968,23 @@ public class MegaApplication extends MultiDexApplication implements Application.
         return new Configuration.Builder()
                 .setWorkerFactory(workerFactory)
                 .build();
+    }
+
+    /**
+     * Initialize Fresco library
+     */
+    private void initFresco() {
+        long maxMemory = mega.privacy.android.app.utils.ContextUtils.getAvailableMemory(this);
+        PoolFactory poolFactory = new PoolFactory(
+                PoolConfig.newBuilder()
+                        .setNativeMemoryChunkPoolParams(FrescoNativeMemoryChunkPoolParams.get(maxMemory))
+                        .build()
+        );
+
+        Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
+                .setPoolFactory(poolFactory)
+                .setDownsampleEnabled(true)
+                .build());
     }
 
     public void askForFullAccountInfo() {

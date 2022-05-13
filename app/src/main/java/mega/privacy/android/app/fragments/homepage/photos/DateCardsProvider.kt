@@ -7,11 +7,15 @@ import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaNode
 import java.io.File
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.ArrayList
+import java.util.Locale
+import java.util.Date
 
 /**
  * Tool class used to organize MegaNode list by years, months and days.
@@ -63,8 +67,11 @@ class DateCardsProvider {
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val day = DateTimeFormatter.ofPattern("dd").format(modifyDate)
-            val month = DateTimeFormatter.ofPattern("MMMM").format(modifyDate)
+            val month = SimpleDateFormat("LLLL", Locale.getDefault()).format(
+                Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            )
             val year = DateTimeFormatter.ofPattern("uuuu").format(modifyDate)
+            val monthForDayCard = DateTimeFormatter.ofPattern("MMMM").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             if (lastDayDate == null || lastDayDate!!.dayOfYear != modifyDate.dayOfYear) {
@@ -74,7 +81,7 @@ class DateCardsProvider {
                     DateTimeFormatter.ofPattern(if (sameYear) "dd MMMM" else "dd MMMM uuuu").format(lastDayDate)
                 days.add(
                     GalleryCard(
-                        node, if (preview.exists()) preview else null, day, month,
+                        node, if (preview.exists()) preview else null, day, monthForDayCard,
                         if (sameYear) null else year, date, modifyDate, 0
                     )
                 )
@@ -86,7 +93,9 @@ class DateCardsProvider {
             ) {
                 shouldGetPreview = true
                 lastMonthDate = modifyDate
-                val date = if (sameYear) month else DateTimeFormatter.ofPattern("MMMM yyyy").format(modifyDate)
+                val date = if (sameYear) month else SimpleDateFormat("LLLL yyyy", Locale.getDefault()).format(
+                    Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                )
                 months.add(
                     GalleryCard(
                         node, if (preview.exists()) preview else null, null, month,
