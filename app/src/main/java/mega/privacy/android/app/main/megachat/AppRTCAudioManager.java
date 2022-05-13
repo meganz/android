@@ -101,7 +101,7 @@ public class AppRTCAudioManager {
     // Callback method for changes in audio focus.
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
-    private CallSoundsController soundsController;
+    private final CallSoundsController soundsController;
 
     private AppRTCAudioManager(Context context, boolean statusSpeaker, int type) {
         ThreadUtils.checkIsOnMainThread();
