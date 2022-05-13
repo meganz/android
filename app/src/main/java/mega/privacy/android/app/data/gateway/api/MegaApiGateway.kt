@@ -116,8 +116,8 @@ interface MegaApiGateway {
      * @param listener
      */
     fun setAutoAcceptContactsFromLink(
-        disableAutoAccept: Boolean,
-        listener: MegaRequestListenerInterface
+            disableAutoAccept: Boolean,
+            listener: MegaRequestListenerInterface
     )
 
     /**
@@ -135,7 +135,6 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
-
 
     /**
      * Add logger
@@ -173,4 +172,12 @@ interface MegaApiGateway {
      */
     suspend fun getLoggedInUser(): MegaUser?
 
+    /**
+     * Get thumbnail from server
+     *
+     * @param node
+     * @param thumbnailFilePath thumbnail file path
+     * @param listener
+     */
+    fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
 }

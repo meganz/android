@@ -132,7 +132,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
             adapter = PlaylistAdapter(
                 it,
                 this,
-                dragStartListener = this
+                dragStartListener = this,
+                isAudio = isAudioPlayer
             )
         }
         listLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
