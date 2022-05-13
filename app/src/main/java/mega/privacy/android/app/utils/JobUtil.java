@@ -128,6 +128,17 @@ public class JobUtil {
      * @return The result of the job
      */
     public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
+        return fireCameraUploadJob(context, shouldIgnoreAttributes, 0);
+    }
+
+    /**
+     * Fire a one time work request of camera upload to upload with a delay;
+     * It will also schedule the camera upload job inside of {@link CameraUploadsService}
+     *
+     * @param context From which the action is done.
+     * @return The result of the job
+     */
+    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes, long delayInSeconds) {
         if (isCameraUploadDisabled(context)) {
             Timber.d("Firing CameraUpload request failed as CameraUpload not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
@@ -137,6 +148,7 @@ public class JobUtil {
         OneTimeWorkRequest cameraUploadWorkRequest =
                 new OneTimeWorkRequest.Builder(StartCameraUploadWorker.class)
                         .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                        .setInitialDelay(delayInSeconds, TimeUnit.SECONDS)
                         .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes).build())
                         .build();
 

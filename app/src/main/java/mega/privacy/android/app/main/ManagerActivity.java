@@ -2602,6 +2602,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             checkCurrentStorageStatus(true);
+            fireCameraUploadJob(ManagerActivity.this, false);
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
