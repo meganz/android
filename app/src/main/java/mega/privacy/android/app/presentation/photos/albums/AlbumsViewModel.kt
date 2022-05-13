@@ -23,12 +23,12 @@ class AlbumsViewModel @Inject constructor(
         private val getAlbums: GetAlbums
 ) : ViewModel() {
 
-    private val _favouritesState =
+    private val _albumsState =
             MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Empty)
-    val favouritesState = _favouritesState.asStateFlow()
+    val albumsState = _albumsState.asStateFlow()
 
     init {
-        getFavouriteAlbumCover()
+        getAlbumCover()
     }
 
     private var currentNodeJob: Job? = null
@@ -36,22 +36,23 @@ class AlbumsViewModel @Inject constructor(
     /**
      * Get all favourites
      */
-    private fun getFavouriteAlbumCover() {
-        _favouritesState.update {
+    private fun getAlbumCover() {
+        _albumsState.update {
             AlbumsLoadState.Loading
         }
         currentNodeJob = viewModelScope.launch {
             runCatching {
-                getAlbums()
-            }.onSuccess {
-                it.collectLatest { albums ->
-                    _favouritesState.update {
+                getAlbums().collectLatest { albums ->
+                    _albumsState.update {
                         AlbumsLoadState.Success(albums)
                     }
                 }
             }.onFailure { exception ->
                 if (exception is MegaException) {
                     Timber.e(exception)
+                }
+                _albumsState.update {
+                    AlbumsLoadState.Empty
                 }
             }
         }

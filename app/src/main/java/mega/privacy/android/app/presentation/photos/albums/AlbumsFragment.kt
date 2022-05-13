@@ -73,7 +73,7 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.favouritesState.collect { favouritesState ->
+                viewModel.albumsState.collect { favouritesState ->
                     when (favouritesState) {
                         is AlbumsLoadState.Success -> {
                             albumCoverAdapter.submitList(favouritesState.albums)

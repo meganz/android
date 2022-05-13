@@ -1,8 +1,10 @@
 package test.mega.privacy.android.app.presentation.photos.albums
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -33,7 +35,7 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test default state`() = runTest {
-        underTest.favouritesState.test {
+        underTest.albumsState.test {
             assertTrue(awaitItem() is AlbumsLoadState.Loading)
         }
     }
@@ -45,9 +47,19 @@ class AlbumsViewModelTest {
                         createAlbums()
                 )
         )
-        underTest.favouritesState.test {
+        underTest.albumsState.test {
             assertTrue(awaitItem() is AlbumsLoadState.Loading)
             assertTrue(awaitItem() is AlbumsLoadState.Success)
+        }
+    }
+
+    @Test
+    fun `test that an error in the flow returns an empty state`() = runTest {
+        whenever(getAlbums()).thenReturn(flow { throw Exception("Error") })
+
+        underTest.albumsState.test {
+            assertThat(awaitItem()).isSameInstanceAs(AlbumsLoadState.Loading)
+            assertThat(awaitItem()).isSameInstanceAs(AlbumsLoadState.Empty)
         }
     }
 
