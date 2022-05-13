@@ -7,9 +7,13 @@ import nz.mega.sdk.MegaNode
 typealias FavouriteInfoMapper = (@JvmSuppressWildcards MegaNode, @JvmSuppressWildcards MegaApiGateway) -> @JvmSuppressWildcards FavouriteInfo
 
 internal fun toFavouriteInfo(megaNode: MegaNode, megaApiGateway: MegaApiGateway) =
-    FavouriteInfo(
-        node = megaNode,
-        hasVersion = megaApiGateway.hasVersion(megaNode),
-        numChildFolders = megaApiGateway.getNumChildFolders(megaNode),
-        numChildFiles = megaApiGateway.getNumChildFiles(megaNode)
-    )
+        FavouriteInfo(
+                node = megaNode,
+                id = megaNode.handle,
+                parentId = megaNode.parentHandle,
+                base64Id = megaNode.base64Handle,
+                modificationTime = megaNode.modificationTime,
+                hasVersion = megaApiGateway.hasVersion(megaNode),
+                numChildFolders = megaApiGateway.getNumChildFolders(megaNode),
+                numChildFiles = megaApiGateway.getNumChildFiles(megaNode),
+        )
