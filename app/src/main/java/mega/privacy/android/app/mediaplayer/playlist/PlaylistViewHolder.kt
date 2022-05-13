@@ -15,6 +15,7 @@ class PlaylistViewHolder(private val binding: ItemPlaylistBinding) :
         item: PlaylistItem,
         itemOperation: PlaylistItemOperation,
         holder: PlaylistViewHolder,
+        isAudio: Boolean,
         position: Int
     ) {
         with(binding) {
@@ -23,8 +24,9 @@ class PlaylistViewHolder(private val binding: ItemPlaylistBinding) :
             this.paused = paused
             this.itemOperation = itemOperation
             this.holder = holder
+            this.isAudio = isAudio
             this.position = position
-            name = PlaylistItem.getHeaderName(item.type, paused)
+            name = PlaylistItem.getHeaderName(isAudio, item.type, paused)
         }
     }
 }
