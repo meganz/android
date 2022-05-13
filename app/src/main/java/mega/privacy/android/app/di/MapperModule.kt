@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 
@@ -17,4 +19,6 @@ class MapperModule {
     @Provides
     fun provideUserUpdateMapper(): UserUpdateMapper = ::mapMegaUserListToUserUpdate
 
+    @Provides
+    fun provideFavouriteInfoMapper(): FavouriteInfoMapper = ::toFavouriteInfo
 }
