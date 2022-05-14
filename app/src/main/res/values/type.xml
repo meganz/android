@@ -565,6 +565,10 @@
         <item name="android:textColor">@color/grey_054_white_060</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Teal200">
+        <item name="android:textColor">@color/teal_200</item>
+    </style>
+
     <!-- Regular, 12sp, 0px, chat own file info -->
     <style name="TextAppearance.Mega.Caption.Variant">
         <item name="android:textColor">@color/white</item>

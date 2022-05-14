@@ -73,7 +73,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     private fun setupButtons() {
         binding.optionGallery.setOnClickListener {
-            listener.onShowGalleryOptionClicked()
+            listener.onRecordVoiceClipClicked()
             dismiss()
         }
 

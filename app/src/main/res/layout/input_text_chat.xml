@@ -1,198 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/write_and_options_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:gravity="bottom">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
-        android:id="@+id/more_options_rl"
-        android:layout_width="wrap_content"
-        android:layout_height="56dp"
-        android:layout_alignBottom="@id/layout"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_add" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/input_text_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/more_options_rl"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/write_msg_rl"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="10dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                tools:ignore="NestedWeights">
-
-                <RelativeLayout
-                    android:id="@+id/edit_msg_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:gravity="center_vertical"
-                    android:paddingStart="0dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="14dp">
-
-                    <View
-                        android:id="@+id/edit_icon"
-                        android:layout_width="2dp"
-                        android:layout_height="31dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@color/teal_200"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@id/edit_icon">
-
-                        <TextView
-                            android:id="@+id/edit_msg_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="@string/edit_chat_message"
-                            android:textColor="@color/teal_200"
-                            android:textSize="12sp" />
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/edit_msg_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/edit_msg_title"
-                            android:ellipsize="end"
-                            android:fontFamily="sans-serif"
-                            android:singleLine="true"
-                            android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
-                            android:textSize="13sp" />
-                    </RelativeLayout>
-                </RelativeLayout>
-
-                <mega.privacy.android.app.components.twemoji.EmojiEditText
-                    android:id="@+id/input_text_chat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|top"
-                    android:background="@null"
-                    android:gravity="start"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:maxLines="5"
-                    android:minHeight="38dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="8dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
-                    android:textSize="14sp"
-                    app:emojiSize="18sp"
-                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-            </LinearLayout>
+            app:layout_constraintBottom_toTopOf="@id/keyboard_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="10dp">
 
             <RelativeLayout
+                android:id="@+id/more_options_rl"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end">
-
-                <RelativeLayout
-                    android:id="@+id/cancel_edit"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true">
-
-                    <ImageButton
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:background="@null"
-                        android:src="@drawable/ic_remove_chat_toolbar"
-                        tools:ignore="SpeakableTextPresentCheck" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/emoji_rl"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignParentBottom="true">
-
-                    <ImageButton
-                        android:id="@+id/emoji_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:background="@null"
-                        android:src="@drawable/ic_emoji_unchecked"
-                        tools:ignore="SpeakableTextPresentCheck" />
-                </RelativeLayout>
-
-            </RelativeLayout>
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="48dp"
-            android:layout_height="match_parent">
-
-            <RelativeLayout
-                android:id="@+id/expand_input_text_rl"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:gravity="center_horizontal"
-                android:paddingTop="18dp"
-                android:paddingBottom="10dp">
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/layout"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent">
 
-                <ImageButton
-                    android:id="@+id/expand_input_text_icon"
+                <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_expand_text_input"
-                    android:visibility="visible"
-                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_add"
+                    tools:ignore="ContentDescription" />
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/record_and_send_rl"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/more_options_rl"
+                app:layout_constraintWidth_default="spread">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/write_msg_rl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/expand_input_text_layout"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <LinearLayout
+                        android:id="@+id/edit_msg_rl"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/cancel_edit_rl"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="NestedWeights,RtlSymmetry">
+
+                        <RelativeLayout
+                            android:id="@+id/edit_msg_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:gravity="center_vertical"
+                            android:paddingStart="0dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="14dp"
+                            android:visibility="visible">
+
+                            <View
+                                android:id="@+id/edit_icon"
+                                android:layout_width="2dp"
+                                android:layout_height="31dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="@color/teal_200"
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
+
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_toEndOf="@id/edit_icon">
+
+                                <TextView
+                                    android:id="@+id/edit_msg_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="@string/edit_chat_message"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Teal200"
+                                    android:textColor="@color/teal_200" />
+
+                                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                                    android:id="@+id/edit_msg_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/edit_msg_title"
+                                    android:ellipsize="end"
+                                    android:fontFamily="sans-serif"
+                                    android:singleLine="true"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp" />
+                            </RelativeLayout>
+                        </RelativeLayout>
+
+                        <mega.privacy.android.app.components.twemoji.EmojiEditText
+                            android:id="@+id/input_text_chat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|top"
+                            android:background="@null"
+                            android:gravity="start"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:maxLines="5"
+                            android:minHeight="38dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="8dp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2"
+                            app:emojiSize="18sp" />
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/cancel_edit_rl"
+                        android:layout_width="40dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <RelativeLayout
+                            android:id="@+id/cancel_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerInParent="true"
+                            android:layout_centerHorizontal="true">
+
+                            <ImageButton
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_centerHorizontal="true"
+                                android:layout_centerVertical="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_remove_chat_toolbar"
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/emoji_rl"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_alignParentBottom="true">
+
+                            <ImageButton
+                                android:id="@+id/emoji_icon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerInParent="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_emoji_unchecked"
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck" />
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <RelativeLayout
+                    android:id="@+id/expand_input_text_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RelativeLayout
+                        android:id="@+id/expand_input_text_rl"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:gravity="center_horizontal"
+                        android:paddingTop="18dp"
+                        android:paddingBottom="10dp"
+                        android:visibility="visible">
+
+                        <ImageButton
+                            android:id="@+id/expand_input_text_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:background="@null"
+                            android:src="@drawable/ic_expand_text_input"
+                            android:visibility="visible"
+                            tools:ignore="ContentDescription, SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:gravity="center_horizontal"
+                        android:paddingBottom="12dp"
+                        android:visibility="visible">
+
+                        <ImageButton
+                            android:id="@+id/send_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:src="@drawable/ic_send_white"
+                            android:visibility="visible"
+                            tools:ignore="ContentDescription" />
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <RelativeLayout
+            android:id="@+id/keyboard_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <mega.privacy.android.app.components.twemoji.EmojiKeyboard
+                android:id="@+id/emojiView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_horizontal"
-                android:paddingBottom="18dp">
-
-                <ImageButton
-                    android:id="@+id/record_and_send_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:visibility="visible" />
-            </RelativeLayout>
+                android:animateLayoutChanges="true"
+                android:visibility="gone" />
         </RelativeLayout>
-    </LinearLayout>
-</RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

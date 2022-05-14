@@ -145,20 +145,13 @@
 
             </com.google.android.material.appbar.MaterialToolbar>
 
-
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <LinearLayout
-                    android:id="@+id/bottom_items_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                android:visibility="visible"
+                android:orientation="vertical">
 
                     <RelativeLayout
                         android:id="@+id/call_on_hold_layout"
@@ -200,99 +193,8 @@
 
                     <include
                         layout="@layout/input_text_chat"
-                        android:gravity="bottom" />
-
-                    <LinearLayout
-                        android:id="@+id/separator_layout_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/grey_012_white_012"
-                        android:orientation="horizontal"
-                        android:visibility="gone" />
-
-                    <LinearLayout
-                        android:id="@+id/linear_layout_options"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:orientation="horizontal"
-                        android:visibility="gone"
-                        android:baselineAligned="false">
-
-                        <RelativeLayout
-                            android:id="@+id/rl_keyboard_twemoji_chat"
-                            android:layout_width="56dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-
-                            <ImageButton
-                                android:id="@+id/keyboard_twemoji_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:background="@null"
-                                android:src="@drawable/ic_emoji_checked"/>
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rl_media_icon_chat"
-                            android:layout_width="56dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-
-                            <ImageButton
-                                android:id="@+id/media_icon_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:background="@null"
-                                android:src="@drawable/ic_capture"
-                                app:tint="@color/grey_054_white_054" />
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rl_pick_file_storage_icon_chat"
-                            android:layout_width="56dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-
-                            <ImageButton
-                                android:id="@+id/pick_file_storage_icon_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:background="@null"
-                                android:src="@drawable/ic_gif_toolbar"
-                                app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rl_attach_icon_chat"
-                            android:layout_width="56dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-
-                            <ImageButton
-                                android:id="@+id/pick_attach_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:background="@null"
-                                android:src="@drawable/attach_file"
-                                app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
-
-                    </LinearLayout>
-
-                    <mega.privacy.android.app.components.twemoji.EmojiKeyboard
-                        android:id="@+id/emojiView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:animateLayoutChanges="true"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-            </RelativeLayout>
+                        android:gravity="bottom"/>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/join_chat_layout_chat_layout"
@@ -485,7 +387,9 @@
             <RelativeLayout
                 android:id="@+id/voice_clip_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:layout_marginBottom="5dp">
                 <FrameLayout
                     android:id="@+id/fragment_voice_clip"
                     android:layout_width="match_parent"
@@ -506,7 +410,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@null"
-                        android:visibility="gone">
+                        android:visibility="visible">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                        </RelativeLayout>
 
                         <RelativeLayout
                             android:id="@+id/record_button_layout"
@@ -519,8 +429,8 @@
 
                             <mega.privacy.android.app.components.voiceClip.RecordButton
                                 android:id="@+id/record_button"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_record_voice_clip"

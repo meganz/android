@@ -309,9 +309,12 @@ public class ChatUtil {
     }
 
     public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
+        if (drawableA == null || drawableB == null)
+            return false;
+
         Drawable.ConstantState stateA = drawableA.getConstantState();
         Drawable.ConstantState stateB = drawableB.getConstantState();
-        return (stateA != null && stateB != null && stateA.equals(stateB)) || getBitmap(drawableA).sameAs(getBitmap(drawableB));
+        return (stateA != null && stateA.equals(stateB)) || getBitmap(drawableA).sameAs(getBitmap(drawableB));
     }
 
     private static Bitmap getBitmap(Drawable drawable) {

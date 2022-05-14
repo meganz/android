@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/new_messages_icon"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
@@ -17,7 +18,8 @@
             android:layout_height="32dp"
             android:layout_gravity="end"
             android:layout_marginTop="10dp"
-            android:src="@drawable/ic_jump_to_latest" />
+            android:src="@drawable/ic_jump_to_latest"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/badge_rl"
@@ -37,15 +39,9 @@
                 android:layout_marginTop="1dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="1dp"
-                android:fontFamily="sans-serif"
                 android:gravity="center"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.PrimaryColor"
-                android:textSize="11sp"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2"
                 android:textStyle="bold" />
         </RelativeLayout>
-
-
     </FrameLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

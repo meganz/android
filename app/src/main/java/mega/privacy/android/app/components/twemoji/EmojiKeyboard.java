@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class EmojiKeyboard extends LinearLayout {
 
@@ -138,7 +137,6 @@ public class EmojiKeyboard extends LinearLayout {
     //KEYBOARDS:
     public void showLetterKeyboard() {
         if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
-        logDebug("showLetterKeyboard");
 
         hideEmojiKeyboard();
         View view = (View) editInterface;
@@ -160,7 +158,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void showEmojiKeyboard() {
         if (isEmojiKeyboardShown || !(editInterface instanceof View)) return;
-        logDebug("showEmojiKeyboard");
+
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
@@ -173,7 +171,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void hideBothKeyboard(Activity activity) {
         if (activity == null) return;
-        logDebug("hideBothKeyboard()");
+
         hideEmojiKeyboard();
         hideLetterKeyboard();
         changeKeyboardIcon();
@@ -228,7 +226,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void hideEmojiKeyboard() {
         if (!isEmojiKeyboardShown) return;
-        logDebug("hideEmojiKeyboard() ");
+
         recentEmoji.persist();
         variantEmoji.persist();
         setVisibility(GONE);

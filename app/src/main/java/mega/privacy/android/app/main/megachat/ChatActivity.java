@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -31,7 +32,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -191,10 +194,8 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatGeolocation;
 import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -210,7 +211,6 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
-import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
@@ -438,9 +438,8 @@ public class ChatActivity extends PasscodeActivity
     private MegaChatMessage messageToEdit = null;
 
     private CoordinatorLayout fragmentContainer;
-    private RelativeLayout writingContainerLayout;
-    private RelativeLayout inputTextLayout;
-    private LinearLayout bottomItems;
+    private LinearLayout writingContainerLayout;
+    private ConstraintLayout inputTextLayout;
 
     private RelativeLayout joinChatLinkLayout;
     private Button joinButton;
@@ -455,16 +454,8 @@ public class ChatActivity extends PasscodeActivity
     long userTypingTimeStamp = -1;
     private ImageButton keyboardTwemojiButton;
 
-    private ImageButton mediaButton;
-    private ImageButton pickFileStorageButton;
-    private ImageButton pickAttachButton;
-
     private EmojiKeyboard emojiKeyboard;
     private RelativeLayout rLKeyboardTwemojiButton;
-
-    private RelativeLayout rLMediaButton;
-    private RelativeLayout rLPickFileStorageButton;
-    private RelativeLayout rLPickAttachButton;
 
     private RelativeLayout returnCallOnHoldButton;
     private ImageView returnCallOnHoldButtonIcon;
@@ -480,7 +471,11 @@ public class ChatActivity extends PasscodeActivity
     private EmojiEditText textChat;
     private ImageButton sendIcon;
     private RelativeLayout expandCollapseInputTextLayout;
-    private LinearLayout writeMsgLayout;
+    private ConstraintLayout writeMsgLayout;
+    private ConstraintLayout layoutLayout;
+    private ConstraintLayout layout;
+    private LinearLayout editMsgLinearLayout;
+
     private ImageButton expandCollapseInputTextIcon;
 
     RelativeLayout messagesContainerLayout;
@@ -537,7 +532,6 @@ public class ChatActivity extends PasscodeActivity
     private LinearLayout bubbleLayout;
     private RecordView recordView;
     private FrameLayout fragmentVoiceClip;
-    private RelativeLayout voiceClipLayout;
     private boolean isShareLinkDialogDismissed = false;
     private RelativeLayout recordingLayout;
     private TextView recordingChrono;
@@ -870,12 +864,12 @@ public class ChatActivity extends PasscodeActivity
 
             private boolean alreadyOpen;
             private final int defaultKeyboardHeightDP = 100;
-            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
             private final Rect rect = new Rect();
 
             @Override
             public void onGlobalLayout() {
-                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
+                int estimatedKeyboardDP = defaultKeyboardHeightDP + 48;
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, estimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
                 parentView.getWindowVisibleDisplayFrame(rect);
                 int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
@@ -892,17 +886,17 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onShowGalleryOptionClicked() {
-
-    }
-
-    @Override
     public void onScanDocumentOptionClicked() {
         String[] saveDestinations = {
                 StringResourcesUtils.getString(R.string.section_chat)
         };
         Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
         scanDocumentLauncher.launch(intent);
+    }
+
+    @Override
+    public void onRecordVoiceClipClicked() {
+
     }
 
     @Override
@@ -922,6 +916,14 @@ public class ChatActivity extends PasscodeActivity
                 takePictureLauncher.launch(intent);
             }
         }
+
+          /* if (recordView.isRecordingNow()) break;
+    hideKeyboard();
+    if(isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE){
+        showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
+        break;
+    }
+    controlCamera();*/
     }
 
     @Override
@@ -956,22 +958,17 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onSendContactOptionClicked() {
-        if (megaApi == null || megaApi.getRootNode() == null) {
-            showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        ArrayList<MegaUser> contacts = megaApi.getContacts();
+
+        if (contacts == null || contacts.isEmpty()) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), MEGACHAT_INVALID_HANDLE);
             return;
         }
 
-        ArrayList<MegaUser> contacts = megaApi.getContacts();
-
-        if(contacts == null || contacts.isEmpty()){
-             showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), MEGACHAT_INVALID_HANDLE);
-             return;
-        }
-
-       Intent in = new Intent(this, AddContactActivity.class);
-                    in.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA);
-                    in.putExtra(INTENT_EXTRA_KEY_CHAT, true);
-                    in.putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE, getString(R.string.send_contacts));
+        Intent in = new Intent(this, AddContactActivity.class);
+        in.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA);
+        in.putExtra(INTENT_EXTRA_KEY_CHAT, true);
+        in.putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE, getString(R.string.send_contacts));
         sendContactLauncher.launch(in);
     }
 
@@ -1404,6 +1401,8 @@ public class ChatActivity extends PasscodeActivity
         expandCollapseInputTextLayout = findViewById(R.id.expand_input_text_rl);
         expandCollapseInputTextIcon = findViewById(R.id.expand_input_text_icon);
         writeMsgLayout = findViewById(R.id.write_msg_rl);
+        editMsgLinearLayout = findViewById(R.id.edit_msg_rl);
+
         editMsgLayout = findViewById(R.id.edit_msg_layout);
         editMsgText = findViewById(R.id.edit_msg_text);
         cancelEdit = findViewById(R.id.cancel_edit);
@@ -1420,9 +1419,11 @@ public class ChatActivity extends PasscodeActivity
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
-        bottomItems = findViewById(R.id.bottom_items_layout);
 
-        inputTextLayout = findViewById(R.id.write_and_options_layout);
+        inputTextLayout = findViewById(R.id.input_text_layout);
+        layoutLayout = findViewById(R.id.layout_layout);
+        layout = findViewById(R.id.layout);
+
 
         titleToolbar.setText("");
         individualSubtitleToobar.setText("");
@@ -1459,14 +1460,8 @@ public class ChatActivity extends PasscodeActivity
         unreadBadgeText = findViewById(R.id.badge_text);
 
         rLKeyboardTwemojiButton = findViewById(R.id.emoji_rl);
-        rLMediaButton = findViewById(R.id.rl_media_icon_chat);
-        rLPickFileStorageButton = findViewById(R.id.rl_pick_file_storage_icon_chat);
-        rLPickAttachButton = findViewById(R.id.rl_attach_icon_chat);
 
         keyboardTwemojiButton = findViewById(R.id.emoji_icon);
-        mediaButton = findViewById(R.id.media_icon_chat);
-        pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
-        pickAttachButton = findViewById(R.id.pick_attach_chat);
 
         marginBottomDeactivated = dp2px(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
         marginBottomActivated = dp2px(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
@@ -1500,19 +1495,16 @@ public class ChatActivity extends PasscodeActivity
         recordingLayout.setVisibility(View.GONE);
 
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
-        enableButton(rLMediaButton, mediaButton);
-        enableButton(rLPickAttachButton, pickAttachButton);
 
         unreadMsgsLayout.setOnClickListener(this);
 
         chatRelativeLayout  = findViewById(R.id.relative_chat_layout);
 
-        sendIcon = findViewById(R.id.record_and_send_icon);
+        sendIcon = findViewById(R.id.send_icon);
         sendIcon.setOnClickListener(this);
         sendIcon.setEnabled(true);
 
         //Voice clip elements
-        voiceClipLayout =  findViewById(R.id.voice_clip_layout);
         fragmentVoiceClip = findViewById(R.id.fragment_voice_clip);
         recordLayout = findViewById(R.id.layout_button_layout);
         recordButtonLayout = findViewById(R.id.record_button_layout);
@@ -1533,7 +1525,7 @@ public class ChatActivity extends PasscodeActivity
         bubbleLayout.setVisibility(View.GONE);
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
-        showInputText();
+
         //Input text:
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
@@ -1586,22 +1578,20 @@ public class ChatActivity extends PasscodeActivity
         });
 
         textChat.setOnTouchListener((v, event) -> {
-            if (event.getAction() == ACTION_DOWN) {
-                showLetterKB();
-            }
-            return true;
+            showLetterKB();
+            return false;
         });
 
         textChat.setOnLongClickListener(v -> {
             showLetterKB();
-            return false;
+            return true;
         });
 
         textChat.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 showLetterKB();
             }
-            return false;
+            return true;
         });
 
         textChat.setMediaListener(path -> uploadPictureOrVoiceClip(path));
@@ -1769,26 +1759,6 @@ public class ChatActivity extends PasscodeActivity
         }
 
         emojiKeyboard.showLetterKeyboard();
-    }
-
-    /*
-     * Hide input text when file storage is shown
-     */
-
-    private void hideInputText(){
-        inputTextLayout.setVisibility(View.GONE);
-        voiceClipLayout.setVisibility(View.GONE);
-       if(emojiKeyboard!=null)
-        emojiKeyboard.hideKeyboardFromFileStorage();
-    }
-
-    /*
-     * Show input text when file storage is hidden
-     */
-
-    private void showInputText(){
-        inputTextLayout.setVisibility(View.VISIBLE);
-        voiceClipLayout.setVisibility(View.VISIBLE);
     }
 
     public void checkScroll() {
@@ -3150,17 +3120,14 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    /*
-     *Hide chat options while recording
+    /**
+     * Hide chat options while recording
      */
     private void hideChatOptions(){
-        logDebug("hideChatOptions");
         textChat.setVisibility(View.INVISIBLE);
         sendIcon.setVisibility(View.GONE);
+        chatRoomOptions.setVisibility(View.GONE);
         disableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
-        disableButton(rLMediaButton, mediaButton);
-        disableButton(rLPickAttachButton, pickAttachButton);
-        disableButton(rLPickFileStorageButton, pickFileStorageButton);
         emojiKeyboard.changeKeyboardIcon();
     }
 
@@ -3171,15 +3138,13 @@ public class ChatActivity extends PasscodeActivity
         button.setVisibility(View.INVISIBLE);
     }
 
-    /*
-     *Show chat options when not being recorded
+    /**
+     * Show chat options when not being recorded
      */
     private void showChatOptions(){
-        logDebug("showChatOptions");
         textChat.setVisibility(View.VISIBLE);
+        chatRoomOptions.setVisibility(View.VISIBLE);
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
-        enableButton(rLMediaButton, mediaButton);
-        enableButton(rLPickAttachButton, pickAttachButton);
     }
 
     private void enableButton(RelativeLayout layout, ImageButton button){
@@ -3233,7 +3198,8 @@ public class ChatActivity extends PasscodeActivity
 
             recordButton.activateOnTouchListener(false);
             recordButton.activateOnClickListener(true);
-            recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
+            recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white,
+                    ColorUtils.getThemeColor(this, android.R.attr.colorAccent)));
         }
     }
 
@@ -3247,8 +3213,8 @@ public class ChatActivity extends PasscodeActivity
         currentRecordButtonState = recordButtonState;
         recordLayout.setVisibility(View.VISIBLE);
         recordButtonLayout.setVisibility(View.VISIBLE);
-        if((currentRecordButtonState == RECORD_BUTTON_SEND) || (currentRecordButtonState == RECORD_BUTTON_ACTIVATED)){
-            logDebug("SEND||ACTIVATED");
+
+        if(currentRecordButtonState == RECORD_BUTTON_SEND || currentRecordButtonState == RECORD_BUTTON_ACTIVATED){
             recordView.setVisibility(View.VISIBLE);
             hideChatOptions();
             if(recordButtonState == RECORD_BUTTON_SEND){
@@ -3261,7 +3227,6 @@ public class ChatActivity extends PasscodeActivity
             }
 
         }else if(currentRecordButtonState == RECORD_BUTTON_DEACTIVATED){
-            logDebug("DESACTIVATED");
             showChatOptions();
             recordView.setVisibility(View.GONE);
             recordButton.activateOnTouchListener(true);
@@ -3278,42 +3243,28 @@ public class ChatActivity extends PasscodeActivity
         bubbleLayout.animate().alpha(0).setDuration(DURATION_BUBBLE);
         cancelRecording();
     }
-    /*
-    *Place the record button with the corresponding margins
-    */
+
+    /**
+     * Place the record button
+     */
     public void placeRecordButton(int recordButtonState) {
-        logDebug("recordButtonState: " + recordButtonState);
-        int marginBottomVoicleLayout;
-        recordView.recordButtonTranslation(recordButtonLayout,0,0);
-        marginBottomVoicleLayout = marginBottomDeactivated;
+        recordView.recordButtonTranslation(recordButtonLayout, 0, 0);
 
-        int value = 0;
-        int marginBottom = marginBottomVoicleLayout;
-        int marginRight = 0;
-        if(recordButtonState == RECORD_BUTTON_SEND || recordButtonState == RECORD_BUTTON_DEACTIVATED) {
-            logDebug("SEND||DESACTIVATED");
-            value = MARGIN_BUTTON_DEACTIVATED;
-            if(recordButtonState == RECORD_BUTTON_DEACTIVATED) {
-                logDebug("DESACTIVATED");
-                marginRight = dp2px(14, getOutMetrics());
-            }
+        int size = dp2px(48, getOutMetrics());
+        int margin = 0;
+
+        if (recordButtonState == RECORD_BUTTON_ACTIVATED) {
+            size = dp2px(80, getOutMetrics());
+            margin = dp2px(-15, getOutMetrics());
         }
-        else if(recordButtonState == RECORD_BUTTON_ACTIVATED) {
-            logDebug("ACTIVATED");
-            value = MARGIN_BOTTOM;
-            marginBottom = marginBottomActivated;
-        }
+
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
-        params.height = dp2px(value, getOutMetrics());
-        params.width = dp2px(value, getOutMetrics());
-        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.setMargins(0, 0, marginRight, marginBottom);
+        params.height = size;
+        params.width = size;
+        params.setMargins(0, 0, margin, margin);
         recordButtonLayout.setLayoutParams(params);
-
-        FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
-        paramsRecordView.setMargins(0,0,0, marginBottomVoicleLayout);
-        recordView.setLayoutParams(paramsRecordView);
     }
 
     public boolean isRecordingNow(){
@@ -3679,7 +3630,6 @@ public class ChatActivity extends PasscodeActivity
 
             importNodes(toHandle, importMessagesHandles);
         }
-
         else if (requestCode == REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
             if (contactsData != null) {
@@ -3977,7 +3927,12 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    private void setSizeInputText(boolean isEmpty){
+    /**
+     * Method to update the input text size
+     *
+     * @param isEmpty True, if text is empty. False, otherwise
+     */
+    private void setSizeInputText(boolean isEmpty) {
         textChat.setMinLines(1);
         if (isEmpty) {
             textChat.setMaxLines(1);
@@ -3993,8 +3948,14 @@ public class ChatActivity extends PasscodeActivity
             textChat.setMaxLines(maxLines);
         }
     }
-    private void endCall(long callId){
-        if(megaChatApi!=null){
+
+    /**
+     * Method to hang chat call
+     *
+     * @param callId The call ID
+     */
+    private void endCall(long callId) {
+        if (megaChatApi != null) {
             megaChatApi.hangChatCall(callId, new HangChatCallListener(this, this));
         }
     }
@@ -4083,6 +4044,7 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         logDebug("onClick");
@@ -4156,7 +4118,7 @@ public class ChatActivity extends PasscodeActivity
                 checkExpandOrCollapseInputText();
                 break;
 
-            case R.id.record_and_send_icon:
+            case R.id.send_icon:
                 String text = textChat.getText().toString();
                 if(text.trim().isEmpty()) break;
                 if (editingMessage) {
@@ -4194,19 +4156,6 @@ public class ChatActivity extends PasscodeActivity
                 changeKeyboard();
                 break;
 
-
-            case R.id.media_icon_chat:
-            case R.id.rl_media_icon_chat:
-                logDebug("media_icon_chat");
-                if (recordView.isRecordingNow()) break;
-                hideKeyboard();
-                if(isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE){
-                    showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
-                    break;
-                }
-                controlCamera();
-                break;
-
             case R.id.toolbar_chat:
                 logDebug("toolbar_chat");
                 if(recordView.isRecordingNow()) break;
@@ -4216,12 +4165,6 @@ public class ChatActivity extends PasscodeActivity
 
             case R.id.new_messages_icon:
                 goToEnd();
-                break;
-
-            case R.id.pick_attach_chat:
-            case R.id.rl_attach_icon_chat:
-                logDebug("Show attach bottom sheet");
-                hideKeyboard();
                 break;
 
             case R.id.join_button:
@@ -4237,23 +4180,26 @@ public class ChatActivity extends PasscodeActivity
 		}
     }
 
+    /**
+     * Method to show the letter keyboard or emoji keyboard
+     */
     private void changeKeyboard(){
         Drawable currentDrawable = keyboardTwemojiButton.getDrawable();
-        Drawable emojiDrawableLight = getDrawable(R.drawable.ic_emoji_unchecked);
-        Drawable emojiDrawableDark = getDrawable(R.drawable.ic_emoji_checked);
-        Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+        Drawable emojiDrawableLight = AppCompatResources.getDrawable(this, R.drawable.ic_emoji_unchecked);
+        Drawable emojiDrawableDark = AppCompatResources.getDrawable(this, R.drawable.ic_emoji_checked);
+        Drawable keyboardDrawable = AppCompatResources.getDrawable(this, R.drawable.ic_keyboard_white);
         if ((areDrawablesIdentical(currentDrawable, emojiDrawableLight) ||
                 areDrawablesIdentical(currentDrawable, emojiDrawableDark)) &&
                 !emojiKeyboard.getEmojiKeyboardShown()) {
-            if(emojiKeyboard.getLetterKeyboardShown()){
+            if (emojiKeyboard.getLetterKeyboardShown()) {
                 emojiKeyboard.hideLetterKeyboard();
                 handlerKeyboard.postDelayed(() -> {
                     emojiKeyboard.showEmojiKeyboard();
-                },250);
-            }else{
+                }, 250);
+            } else {
                 emojiKeyboard.showEmojiKeyboard();
             }
-        }else if(areDrawablesIdentical(currentDrawable, keyboardDrawable) && !emojiKeyboard.getLetterKeyboardShown()){
+        } else if (areDrawablesIdentical(currentDrawable, keyboardDrawable) && !emojiKeyboard.getLetterKeyboardShown()) {
             showLetterKB();
         }
     }
@@ -4530,13 +4476,16 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    private void hideEditMsgLayout(){
+    /**
+     * Method to hide the UI for editing a message
+     */
+    private void hideEditMsgLayout() {
         editMsgLayout.setVisibility(View.GONE);
         cancelEdit.setVisibility(View.GONE);
     }
 
     /**
-     * Method to display the UI for editing a message
+     * Method to show the UI for editing a message
      *
      * @param written text to be edited
      */
@@ -4552,10 +4501,7 @@ public class ChatActivity extends PasscodeActivity
         setSizeInputText(false);
         showSendIcon();
 
-        handlerKeyboard.postDelayed(() -> {
-            showLetterKB();
-        }, 250);
-
+        handlerKeyboard.postDelayed(this::showLetterKB, 250);
         checkExpandOrCollapseInputText();
     }
 
@@ -7814,6 +7760,9 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    /**
+     * Method to show the bottom panel
+     */
     public void showChatRoomToolbarByPanel() {
         if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             return;
@@ -9397,15 +9346,26 @@ public class ChatActivity extends PasscodeActivity
         return new File(storageDir, imageFileName + ".jpg");
     }
 
+    /**
+     * Method to control whether or not the expand text view icon should be displayed.
+     *
+     * @param linesCount number of lines written
+     */
     private void controlExpandableInputText(int linesCount) {
         expandCollapseInputTextLayout.setVisibility(linesCount >= MIN_LINES_TO_EXPAND_INPUT_TEXT ? View.VISIBLE : View.GONE);
     }
 
-    private void collapseInputText(){
+    /**
+     * Method for collapsing the input text.
+     */
+    private void collapseInputText() {
         isInputTextExpanded = false;
         checkExpandOrCollapseInputText();
     }
 
+    /**
+     * Method to control whether to expand or collapse the input text.
+     */
     private void checkExpandOrCollapseInputText() {
         if (!isInputTextExpanded) {
             expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
@@ -9418,35 +9378,65 @@ public class ChatActivity extends PasscodeActivity
 
             tB.setVisibility(View.VISIBLE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_expand_text_input);
+
             writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
-            bottomItems.getLayoutParams().height = WRAP_CONTENT;
             inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
+
+            layoutLayout.getLayoutParams().height = WRAP_CONTENT;
+            ConstraintLayout constraintLayout = findViewById(R.id.input_text_layout);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.START, R.id.input_text_layout, ConstraintSet.START, 0);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.END, R.id.input_text_layout, ConstraintSet.END, 0);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.BOTTOM, R.id.keyboard_layout, ConstraintSet.TOP, 0);
+            constraintSet.applyTo(constraintLayout);
+
+            layout.getLayoutParams().height = WRAP_CONTENT;
             writeMsgLayout.getLayoutParams().height = WRAP_CONTENT;
+            editMsgLinearLayout.getLayoutParams().height = WRAP_CONTENT;
             textChat.getLayoutParams().height = WRAP_CONTENT;
+
             textChat.setPadding(0, dp2px(10, getOutMetrics()), 0, dp2px(8, getOutMetrics()));
         } else {
             expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
                     71 : 18, getOutMetrics()), 0, 0);
 
             ColorUtils.changeStatusBarColor(this, R.color.dark_grey_alpha_050);
-            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.dark_grey_alpha_050));
+            writingContainerLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_grey_alpha_050));
             inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
 
             tB.setVisibility(View.GONE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_collapse_text_input);
+
             writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
-            bottomItems.getLayoutParams().height = MATCH_PARENT;
             inputTextLayout.getLayoutParams().height = MATCH_PARENT;
+
+            layoutLayout.getLayoutParams().height = 0;
+            ConstraintLayout constraintLayout = findViewById(R.id.input_text_layout);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.TOP, R.id.input_text_layout, ConstraintSet.TOP, 0);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.START, R.id.input_text_layout, ConstraintSet.START, 0);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.END, R.id.input_text_layout, ConstraintSet.END, 0);
+            constraintSet.connect(R.id.layout_layout, ConstraintSet.BOTTOM, R.id.keyboard_layout, ConstraintSet.TOP, 0);
+            constraintSet.applyTo(constraintLayout);
+
+            layout.getLayoutParams().height = MATCH_PARENT;
             writeMsgLayout.getLayoutParams().height = MATCH_PARENT;
+            editMsgLinearLayout.getLayoutParams().height = MATCH_PARENT;
             textChat.getLayoutParams().height = MATCH_PARENT;
+
             textChat.setPadding(0, dp2px(10, getOutMetrics()), 0, dp2px(40, getOutMetrics()));
         }
 
         writingContainerLayout.requestLayout();
-        bottomItems.requestLayout();
         inputTextLayout.requestLayout();
+        layoutLayout.requestLayout();
+
+        layout.requestLayout();
         writeMsgLayout.requestLayout();
+        editMsgLinearLayout.requestLayout();
         textChat.requestLayout();
 
         setSizeInputText(isTextEmpty(textChat.getText().toString()));

@@ -15,9 +15,9 @@ interface ChatRoomToolbarBottomSheetDialogActionListener {
     fun onTakePictureOptionClicked()
 
     /**
-     * Called when the take picture option is clicked.
+     * Called when the record voice clip option is clicked.
      */
-    fun onShowGalleryOptionClicked()
+    fun onRecordVoiceClipClicked()
 
     /**
      * Called when send file option is clicked.
