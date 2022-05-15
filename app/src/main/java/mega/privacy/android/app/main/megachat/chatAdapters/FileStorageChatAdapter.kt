@@ -15,7 +15,8 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
  */
 class FileStorageChatAdapter(
         private val onTakePictureCallback: () -> Unit,
-        private val onClickItemCallback: (FileGalleryItem) -> Unit
+        private val onClickItemCallback: (FileGalleryItem) -> Unit,
+        private val onLongClickItemCallback: (FileGalleryItem) -> Unit
 ) : ListAdapter<FileGalleryItem, FileStorageChatHolder>(FileGalleryItem.DiffCallback()) {
 
     init {
@@ -26,6 +27,13 @@ class FileStorageChatAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemFileStorageBinding.inflate(layoutInflater, parent, false)
         return FileStorageChatHolder(binding).apply {
+            binding.root.setOnLongClickListener {
+                if (isValidPosition(bindingAdapterPosition)) {
+                    val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
+                    onLongClickItemCallback.invoke(file)
+                }
+                true
+            }
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
                     val file = (getItem(bindingAdapterPosition) as FileGalleryItem)

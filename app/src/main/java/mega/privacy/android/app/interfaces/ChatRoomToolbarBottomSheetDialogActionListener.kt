@@ -1,5 +1,7 @@
 package mega.privacy.android.app.interfaces
 
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+
 /*
  * This interface is to define what methods should
  * implement when having ChatRoomToolbarBottomSheetDialogFragment
@@ -17,7 +19,7 @@ interface ChatRoomToolbarBottomSheetDialogActionListener {
     /**
      * Called when file is clicked.
      */
-    fun onSendFileClicked(filePath: String)
+    fun onSendFilesSelected(files: ArrayList<FileGalleryItem>)
 
     /**
      * Called when the record voice clip option is clicked.

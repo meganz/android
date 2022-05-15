@@ -4,7 +4,9 @@ import android.content.Intent
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.StringUtils.toThrowable
+import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -47,4 +49,22 @@ class FilePrepareUseCase @Inject constructor() {
                 emitter.onError("Error preparing files".toThrowable())
             }
         }
+
+    /**
+     * Prepares files to be managed in the app and gets all their info.
+     *
+     * @param files list of FileGalleryItem
+     * @return Single<List<ShareInfo>> List<ShareInfo> with all the file info if everything goes well,
+     * onError if not.
+     */
+    fun prepareFilesFromGallery(files: ArrayList<FileGalleryItem>): Single<List<ShareInfo>> =
+            Single.create { emitter ->
+                val shareInfo = ShareInfo.processUploadFile(MegaApplication.getInstance(), files)
+
+                if (shareInfo.isNotEmpty()) {
+                    emitter.onSuccess(shareInfo)
+                } else {
+                    emitter.onError("Error preparing files".toThrowable())
+                }
+            }
 }

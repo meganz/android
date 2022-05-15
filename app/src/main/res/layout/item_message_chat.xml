@@ -664,17 +664,17 @@
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_portrait"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignEnd="@+id/content_own_message_thumb_portrait"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5"
-                            android:layout_marginBottom="4dp"
-                            android:layout_marginEnd="4dp"
-                            android:paddingEnd="5dp"
-                            android:paddingStart="5dp"
-                            android:paddingBottom="2dp"
-                            android:paddingTop="2dp"
                             android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
                             tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
@@ -794,17 +794,17 @@
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:layout_alignEnd="@+id/content_own_message_thumb_landscape"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5"
-                            android:layout_marginBottom="4dp"
-                            android:layout_marginEnd="4dp"
-                            android:paddingEnd="5dp"
-                            android:paddingStart="5dp"
-                            android:paddingBottom="2dp"
-                            android:paddingTop="2dp"
                             android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
                             tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
@@ -1600,17 +1600,17 @@
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_portrait"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                             android:layout_alignEnd="@+id/content_contact_message_thumb_portrait"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5"
-                            android:layout_marginBottom="4dp"
-                            android:layout_marginEnd="4dp"
-                            android:paddingEnd="5dp"
-                            android:paddingStart="5dp"
-                            android:paddingBottom="2dp"
-                            android:paddingTop="2dp"
                             android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
                             tools:ignore="SmallSp"/>
 
                         <!--Icon to PDF with preview-->
@@ -1672,18 +1672,18 @@
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_landscape"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                             android:layout_alignEnd="@+id/content_contact_message_thumb_landscape"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5"
-                            android:layout_marginBottom="4dp"
-                            android:layout_marginEnd="4dp"
-                            android:paddingEnd="5dp"
-                            android:paddingStart="5dp"
-                            android:paddingBottom="2dp"
-                            android:paddingTop="2dp"
                             android:background="@drawable/background_video_duration_message"
-                            tools:ignore="SmallSp" /> />
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+                            tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
                         <ImageView

@@ -4,10 +4,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
-import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.fragments.homepage.getRoundingParamsWithoutBorder
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
 /**
@@ -24,7 +22,7 @@ class FileStorageChatHolder(
             takePictureButton.isVisible = position == 0
             icSelected.isVisible = item.isSelected
 
-            if(item.isImage) {
+            if (item.isImage) {
                 imageThumbnail.setImageRequestFromUri(item.fileUri)
                 imageThumbnail.isVisible = true
                 imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(MegaApplication.getInstance().applicationContext)

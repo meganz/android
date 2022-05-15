@@ -37,8 +37,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
 
+    private var isMultiselectMode = false
+
     private val filesAdapter by lazy {
-        FileStorageChatAdapter(::onTakePictureClick, ::onItemClick)
+        FileStorageChatAdapter(::onTakePictureClick, ::onClickItem, ::onLongClickItem)
     }
 
     override fun onCreateView(
@@ -65,13 +67,20 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         setupButtons()
 
         lifecycleScope.launchWhenStarted {
-            viewModel.gallery.collect { filesList ->
+            viewModel.filesGallery.collect { filesList ->
                 binding.emptyGallery.isVisible = filesList.isNullOrEmpty()
                 binding.list.isVisible = !filesList.isNullOrEmpty()
-
                 filesAdapter.submitList(filesList)
             }
         }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.showSendImagesButton.collect { visibility ->
+                isMultiselectMode = visibility
+                binding.sendFilesButton.isVisible = visibility
+            }
+        }
+
         setupView()
         super.onViewCreated(view, savedInstanceState)
     }
@@ -93,6 +102,14 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Setup option buttons of the toolbar.
      */
     private fun setupButtons() {
+        binding.sendFilesButton.setOnClickListener {
+            val list = viewModel.getSelectedFiles()
+            if (list.isNotEmpty()) {
+                listener.onSendFilesSelected(list)
+                dismiss()
+            }
+        }
+
         binding.optionVoiceClip.setOnClickListener {
             listener.onRecordVoiceClipClicked()
             dismiss()
@@ -164,11 +181,18 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         dismiss()
     }
 
-    private fun onItemClick(file: FileGalleryItem) {
-        file.filePath?.let { path ->
-            listener.onSendFileClicked(path)
+    private fun onClickItem(file: FileGalleryItem) {
+        if (isMultiselectMode) {
+            viewModel.longClickItem(file)
+        } else {
+            val files = ArrayList<FileGalleryItem>()
+            files.add(file)
+            listener.onSendFilesSelected(files)
+            dismiss()
         }
+    }
 
-        dismiss()
+    private fun onLongClickItem(file: FileGalleryItem) {
+        viewModel.longClickItem(file)
     }
 }

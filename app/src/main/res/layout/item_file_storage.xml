@@ -32,8 +32,6 @@
             android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
             android:src="@drawable/ic_select_folder"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />

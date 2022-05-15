@@ -110,6 +110,7 @@ import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActio
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
@@ -902,8 +903,15 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onSendFileClicked(String filePath) {
-        uploadPictureOrVoiceClip(filePath);
+    public void onSendFilesSelected(ArrayList<FileGalleryItem> files) {
+        filePrepareUseCase.prepareFilesFromGallery(files)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((shareInfo, throwable) -> {
+                    if (throwable == null) {
+                        onIntentProcessed(shareInfo);
+                    }
+                });
     }
 
     @Override
@@ -923,14 +931,6 @@ public class ChatActivity extends PasscodeActivity
                 takePictureLauncher.launch(intent);
             }
         }
-
-          /* if (recordView.isRecordingNow()) break;
-    hideKeyboard();
-    if(isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE){
-        showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
-        break;
-    }
-    controlCamera();*/
     }
 
     @Override
@@ -3678,7 +3678,6 @@ public class ChatActivity extends PasscodeActivity
             }
 
             intent.setAction(Intent.ACTION_GET_CONTENT);
-
             try {
                 statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
                 statusDialog.show();

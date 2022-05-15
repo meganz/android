@@ -41,6 +41,17 @@
             android:scrollbars="horizontal"
             android:visibility="visible"
             tools:listitem="@layout/item_file_storage" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/send_files_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_send_white"
+            app:tint="@color/black"
+            tools:ignore="ContentDescription" />
+
     </RelativeLayout>
 
     <LinearLayout
