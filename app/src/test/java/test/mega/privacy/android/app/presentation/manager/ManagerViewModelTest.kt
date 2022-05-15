@@ -36,6 +36,22 @@ class ManagerViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
     }
 
+    /**
+     * Simulate a repository emission and setup the [ManagerViewModel]
+     *
+     * @param updates the values to emit from the repository
+     * @param after a lambda function to call after setting up the viewmodel
+     */
+    private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
+        whenever(globalUpdateRepository.monitorGlobalUpdates()).thenReturn(
+            flow {
+                updates.forEach { emit(it) }
+            }
+        )
+        underTest = ManagerViewModel(globalUpdateRepository)
+        after()
+    }
+
     @Test
     fun `test that live data are not set when no updates are triggered from api`() = runTest {
         underTest = ManagerViewModel(globalUpdateRepository)
@@ -65,22 +81,26 @@ class ManagerViewModelTest {
     @Test
     fun `test that live data is dispatched when updates triggered from api`() = runTest {
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))) {
+            listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))
+        ) {
             val updateUsers = underTest.updateUsers.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateUsers.size, 1)
         }
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))) {
+            listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))
+        ) {
             val updateUserAlerts = underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateUserAlerts.size, 1)
         }
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnNodesUpdate(arrayListOf(mock())))) {
+            listOf(GlobalUpdate.OnNodesUpdate(arrayListOf(mock())))
+        ) {
             val updateNodes = underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateNodes.size, 1)
         }
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
+            listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))
+        ) {
             val updateContactRequests = underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateContactRequests.size, 1)
         }
@@ -92,7 +112,8 @@ class ManagerViewModelTest {
             listOf(
                 GlobalUpdate.OnUsersUpdate(null),
                 GlobalUpdate.OnUsersUpdate(arrayListOf()),
-            )) {
+            )
+        ) {
             val updateUserException = assertThrows(TimeoutException::class.java) {
                 underTest.updateUsers.getOrAwaitValue { advanceUntilIdle() }
             }
@@ -102,7 +123,8 @@ class ManagerViewModelTest {
             listOf(
                 GlobalUpdate.OnUserAlertsUpdate(null),
                 GlobalUpdate.OnUserAlertsUpdate(arrayListOf()),
-            )) {
+            )
+        ) {
             val updateUserAlerts = assertThrows(TimeoutException::class.java) {
                 underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
             }
@@ -112,7 +134,8 @@ class ManagerViewModelTest {
             listOf(
                 GlobalUpdate.OnNodesUpdate(null),
                 GlobalUpdate.OnNodesUpdate(arrayListOf()),
-            )) {
+            )
+        ) {
             val updateNodesException = assertThrows(TimeoutException::class.java) {
                 underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
             }
@@ -122,29 +145,20 @@ class ManagerViewModelTest {
             listOf(
                 GlobalUpdate.OnContactRequestsUpdate(null),
                 GlobalUpdate.OnContactRequestsUpdate(arrayListOf()),
-            )) {
+            )
+        ) {
             val updateContactsRequestsException = assertThrows(TimeoutException::class.java) {
                 underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
             }
             assertThat(updateContactsRequestsException.message?.contains("LiveData value was never set."))
         }
         triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnEvent(null))) {
+            listOf(GlobalUpdate.OnEvent(null))
+        ) {
             val eventException = assertThrows(TimeoutException::class.java) {
                 underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
             }
             assertThat(eventException.message?.contains("LiveData value was never set."))
         }
     }
-
-    private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
-        whenever(globalUpdateRepository.monitorGlobalUpdates()).thenReturn(
-            flow {
-                updates.forEach { emit(it) }
-            }
-        )
-        underTest = ManagerViewModel(globalUpdateRepository)
-        after()
-    }
-
 }
