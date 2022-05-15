@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
-import mega.privacy.android.app.utils.LogUtil.logDebug
 
 /**
  * RecyclerView's ListAdapter to show FileGalleryItem.
@@ -16,7 +15,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
  */
 class FileStorageChatAdapter(
         private val onTakePictureCallback: () -> Unit,
-        private val onClickItemCallback: () -> Unit
+        private val onClickItemCallback: (FileGalleryItem) -> Unit
 ) : ListAdapter<FileGalleryItem, FileStorageChatHolder>(FileGalleryItem.DiffCallback()) {
 
     init {
@@ -29,7 +28,8 @@ class FileStorageChatAdapter(
         return FileStorageChatHolder(binding).apply {
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
-                    onClickItemCallback.invoke()
+                    val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
+                    onClickItemCallback.invoke(file)
                 }
             }
             binding.takePictureButton.setOnClickListener {

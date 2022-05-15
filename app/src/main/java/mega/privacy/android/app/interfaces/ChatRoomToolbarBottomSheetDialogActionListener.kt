@@ -17,7 +17,7 @@ interface ChatRoomToolbarBottomSheetDialogActionListener {
     /**
      * Called when file is clicked.
      */
-    fun onSendFileClicked()
+    fun onSendFileClicked(filePath: String)
 
     /**
      * Called when the record voice clip option is clicked.

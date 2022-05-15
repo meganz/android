@@ -902,8 +902,8 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onSendFileClicked() {
-       logDebug("************ send file");
+    public void onSendFileClicked(String filePath) {
+        uploadPictureOrVoiceClip(filePath);
     }
 
     @Override

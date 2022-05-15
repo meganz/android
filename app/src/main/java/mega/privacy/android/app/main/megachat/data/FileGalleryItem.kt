@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.megachat.data
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 
@@ -12,8 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
  * @property title      File title
  * @property fileUri    File URI
  * @property dateAdded  Date added
- * @property thumbnail  Image/Video thumbnail
  * @property duration   Video duration
+ * @property filePath   File Path
  */
 data class FileGalleryItem constructor(
         val id: Long,
@@ -21,9 +20,9 @@ data class FileGalleryItem constructor(
         val title: String? = null,
         var fileUri: Uri? = null,
         var dateAdded: String? = null,
-        var thumbnail: Bitmap? = null,
         var duration: String? = "",
-        var isSelected: Boolean = false
+        var isSelected: Boolean = false,
+        var filePath: String? = null
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<FileGalleryItem>() {

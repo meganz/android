@@ -6,14 +6,13 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
 import android.net.Uri
 import android.provider.MediaStore
+import com.facebook.common.util.UriUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TimeUtils
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -73,6 +72,10 @@ class GetGalleryFilesUseCase @Inject constructor(
                         queryUri,
                         id
                 )
+                val path = UriUtil.getRealPathFromUri(
+                        context.contentResolver,
+                        contentUri
+                )
 
                 val file = FileGalleryItem(
                         id = id,
@@ -80,9 +83,9 @@ class GetGalleryFilesUseCase @Inject constructor(
                         title = title,
                         fileUri = contentUri,
                         dateAdded = date,
-                        thumbnail = null,
                         duration = "",
-                        isSelected = false
+                        isSelected = false,
+                        filePath = path
                 )
 
                 imageList.add(file)
@@ -133,6 +136,11 @@ class GetGalleryFilesUseCase @Inject constructor(
                         id
                 )
 
+                val path = UriUtil.getRealPathFromUri(
+                        context.contentResolver,
+                        contentUri
+                )
+
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(context, contentUri)
                 val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
@@ -145,9 +153,9 @@ class GetGalleryFilesUseCase @Inject constructor(
                         title = title,
                         fileUri = contentUri,
                         dateAdded = date,
-                        thumbnail = null,
                         duration = durationText,
-                        isSelected = false
+                        isSelected = false,
+                        filePath = path
                 )
                 videoList.add(file)
             }

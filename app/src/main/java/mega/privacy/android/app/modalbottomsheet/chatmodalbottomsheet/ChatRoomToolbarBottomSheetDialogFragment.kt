@@ -22,8 +22,8 @@ import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
 
 /**
  * Bottom Sheet Dialog which shows the chat options
@@ -164,9 +164,11 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         dismiss()
     }
 
-    private fun onItemClick() {
-        logDebug("**********+ Recibido el onItemClick")
-        listener.onSendFileClicked()
+    private fun onItemClick(file: FileGalleryItem) {
+        file.filePath?.let { path ->
+            listener.onSendFileClicked(path)
+        }
+
         dismiss()
     }
 }
