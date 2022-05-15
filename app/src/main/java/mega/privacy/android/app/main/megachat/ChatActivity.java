@@ -375,6 +375,7 @@ public class ChatActivity extends PasscodeActivity
     AlertDialog statusDialog;
 
     boolean retryHistory = false;
+    boolean isStartAndRecordVoiceClip = false;
 
     private long lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
     private long generalUnreadCount;
@@ -439,7 +440,7 @@ public class ChatActivity extends PasscodeActivity
 
     private CoordinatorLayout fragmentContainer;
     private LinearLayout writingContainerLayout;
-    private ConstraintLayout inputTextLayout;
+    private ConstraintLayout inputTextContainer;
 
     private RelativeLayout joinChatLinkLayout;
     private Button joinButton;
@@ -472,8 +473,8 @@ public class ChatActivity extends PasscodeActivity
     private ImageButton sendIcon;
     private RelativeLayout expandCollapseInputTextLayout;
     private ConstraintLayout writeMsgLayout;
-    private ConstraintLayout layoutLayout;
-    private ConstraintLayout layout;
+    private ConstraintLayout inputTextLayout;
+    private ConstraintLayout writeMsgAndExpandLayout;
     private LinearLayout editMsgLinearLayout;
 
     private ImageButton expandCollapseInputTextIcon;
@@ -896,7 +897,8 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onRecordVoiceClipClicked() {
-
+        isStartAndRecordVoiceClip = true;
+        recordView.startRecord();
     }
 
     @Override
@@ -1420,9 +1422,9 @@ public class ChatActivity extends PasscodeActivity
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
+        inputTextContainer = findViewById(R.id.input_text_container);
         inputTextLayout = findViewById(R.id.input_text_layout);
-        layoutLayout = findViewById(R.id.layout_layout);
-        layout = findViewById(R.id.layout);
+        writeMsgAndExpandLayout = findViewById(R.id.write_msg_and_expand_rl);
 
 
         titleToolbar.setText("");
@@ -3009,7 +3011,12 @@ public class ChatActivity extends PasscodeActivity
         }
         myAudioRecorder.start();
         setRecordingNow(true);
-        recordView.startRecordingTime();
+        if (isStartAndRecordVoiceClip){
+            recordView.startAndLockRecordingTime();
+        }else{
+            recordView.startRecordingTime();
+        }
+
         handlerVisualizer.post(updateVisualizer);
         initRecordingItems(IS_LOW);
         recordingLayout.setVisibility(View.VISIBLE);
@@ -3279,7 +3286,7 @@ public class ChatActivity extends PasscodeActivity
 
         recordView.setRecordingNow(recordingNow);
         if (recordView.isRecordingNow()) {
-            recordButtonStates(RECORD_BUTTON_ACTIVATED);
+
             int screenRotation = getWindowManager().getDefaultDisplay().getRotation();
             switch (screenRotation) {
                 case ROTATION_PORTRAIT: {
@@ -3303,6 +3310,11 @@ public class ChatActivity extends PasscodeActivity
                 }
             }
             if (emojiKeyboard != null) emojiKeyboard.setListenerActivated(false);
+
+            if (!isStartAndRecordVoiceClip) {
+                recordButtonStates(RECORD_BUTTON_ACTIVATED);
+            }
+
             return;
         }
 
@@ -9373,25 +9385,25 @@ public class ChatActivity extends PasscodeActivity
 
             ColorUtils.changeStatusBarColor(this, R.color.white_transparent);
             writingContainerLayout.setBackgroundResource(android.R.color.transparent);
-            inputTextLayout.setBackground(null);
+            inputTextContainer.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
 
             tB.setVisibility(View.VISIBLE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_expand_text_input);
 
             writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
-            inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
+            inputTextContainer.getLayoutParams().height = WRAP_CONTENT;
 
-            layoutLayout.getLayoutParams().height = WRAP_CONTENT;
-            ConstraintLayout constraintLayout = findViewById(R.id.input_text_layout);
+            inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
+            ConstraintLayout constraintLayout = findViewById(R.id.input_text_container);
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.START, R.id.input_text_layout, ConstraintSet.START, 0);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.END, R.id.input_text_layout, ConstraintSet.END, 0);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.BOTTOM, R.id.keyboard_layout, ConstraintSet.TOP, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.START, R.id.input_text_container, ConstraintSet.START, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.END, R.id.input_text_container, ConstraintSet.END, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.BOTTOM, R.id.input_text_container, ConstraintSet.BOTTOM, 0);
             constraintSet.applyTo(constraintLayout);
 
-            layout.getLayoutParams().height = WRAP_CONTENT;
+            writeMsgAndExpandLayout.getLayoutParams().height = WRAP_CONTENT;
             writeMsgLayout.getLayoutParams().height = WRAP_CONTENT;
             editMsgLinearLayout.getLayoutParams().height = WRAP_CONTENT;
             textChat.getLayoutParams().height = WRAP_CONTENT;
@@ -9403,26 +9415,27 @@ public class ChatActivity extends PasscodeActivity
 
             ColorUtils.changeStatusBarColor(this, R.color.dark_grey_alpha_050);
             writingContainerLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_grey_alpha_050));
-            inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
+            inputTextContainer.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
+
             writeMsgLayout.setBackground(null);
 
             tB.setVisibility(View.GONE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_collapse_text_input);
 
             writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
-            inputTextLayout.getLayoutParams().height = MATCH_PARENT;
+            inputTextContainer.getLayoutParams().height = MATCH_PARENT;
 
-            layoutLayout.getLayoutParams().height = 0;
-            ConstraintLayout constraintLayout = findViewById(R.id.input_text_layout);
+            inputTextLayout.getLayoutParams().height = 0;
+            ConstraintLayout constraintLayout = findViewById(R.id.input_text_container);
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.TOP, R.id.input_text_layout, ConstraintSet.TOP, 0);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.START, R.id.input_text_layout, ConstraintSet.START, 0);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.END, R.id.input_text_layout, ConstraintSet.END, 0);
-            constraintSet.connect(R.id.layout_layout, ConstraintSet.BOTTOM, R.id.keyboard_layout, ConstraintSet.TOP, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.TOP, R.id.input_text_container, ConstraintSet.TOP, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.START, R.id.input_text_container, ConstraintSet.START, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.END, R.id.input_text_container, ConstraintSet.END, 0);
+            constraintSet.connect(R.id.input_text_layout, ConstraintSet.BOTTOM, R.id.input_text_container, ConstraintSet.BOTTOM, 0);
             constraintSet.applyTo(constraintLayout);
 
-            layout.getLayoutParams().height = MATCH_PARENT;
+            writeMsgAndExpandLayout.getLayoutParams().height = MATCH_PARENT;
             writeMsgLayout.getLayoutParams().height = MATCH_PARENT;
             editMsgLinearLayout.getLayoutParams().height = MATCH_PARENT;
             textChat.getLayoutParams().height = MATCH_PARENT;
@@ -9431,10 +9444,10 @@ public class ChatActivity extends PasscodeActivity
         }
 
         writingContainerLayout.requestLayout();
+        inputTextContainer.requestLayout();
         inputTextLayout.requestLayout();
-        layoutLayout.requestLayout();
 
-        layout.requestLayout();
+        writeMsgAndExpandLayout.requestLayout();
         writeMsgLayout.requestLayout();
         editMsgLinearLayout.requestLayout();
         textChat.requestLayout();

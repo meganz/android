@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/input_text_layout"
+        android:id="@+id/input_text_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_layout"
+            android:id="@+id/input_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/keyboard_layout"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginBottom="10dp">
+            app:layout_constraintStart_toStartOf="parent">
 
             <RelativeLayout
                 android:id="@+id/more_options_rl"
@@ -24,7 +24,7 @@
                 android:gravity="center_vertical"
                 android:paddingBottom="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/layout"
+                app:layout_constraintEnd_toStartOf="@id/write_msg_and_expand_rl"
                 app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -38,7 +38,7 @@
             </RelativeLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout"
+                android:id="@+id/write_msg_and_expand_rl"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +101,8 @@
                                     android:fontFamily="sans-serif-medium"
                                     android:text="@string/edit_chat_message"
                                     android:textAppearance="@style/TextAppearance.Mega.Caption.Teal200"
-                                    android:textColor="@color/teal_200" />
+                                    android:textColor="@color/teal_200"
+                                    tools:ignore="TextContrastCheck" />
 
                                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                                     android:id="@+id/edit_msg_text"
@@ -128,7 +129,8 @@
                             android:paddingTop="10dp"
                             android:paddingBottom="8dp"
                             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2"
-                            app:emojiSize="18sp" />
+                            app:emojiSize="18sp"
+                            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                     </LinearLayout>
 
@@ -151,11 +153,10 @@
                             <ImageButton
                                 android:layout_width="12dp"
                                 android:layout_height="12dp"
-                                android:layout_centerHorizontal="true"
-                                android:layout_centerVertical="true"
+                                android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_remove_chat_toolbar"
-                                tools:ignore="ContentDescription, SpeakableTextPresentCheck" />
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck,TouchTargetSizeCheck" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -171,7 +172,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_emoji_unchecked"
-                                tools:ignore="ContentDescription, SpeakableTextPresentCheck" />
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
                         </RelativeLayout>
 
                     </RelativeLayout>
@@ -220,7 +221,7 @@
                             android:background="@null"
                             android:src="@drawable/ic_send_white"
                             android:visibility="visible"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
                     </RelativeLayout>
 
                 </RelativeLayout>
@@ -228,22 +229,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <RelativeLayout
-            android:id="@+id/keyboard_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <mega.privacy.android.app.components.twemoji.EmojiKeyboard
-                android:id="@+id/emojiView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:visibility="gone" />
-        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

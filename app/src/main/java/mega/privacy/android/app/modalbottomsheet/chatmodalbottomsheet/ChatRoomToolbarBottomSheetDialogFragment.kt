@@ -34,9 +34,9 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         listener = requireActivity() as ChatRoomToolbarBottomSheetDialogActionListener
         binding = BottomSheetChatRoomToolbarBinding.inflate(layoutInflater, container, false)
@@ -49,7 +49,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         val dialog = dialog ?: return
         BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
-            BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,7 +72,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Setup option buttons of the toolbar.
      */
     private fun setupButtons() {
-        binding.optionGallery.setOnClickListener {
+        binding.optionVoiceClip.setOnClickListener {
             listener.onRecordVoiceClipClicked()
             dismiss()
         }
@@ -120,14 +120,14 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         val chatActivity = requireActivity() as ChatActivity
 
         val hasStoragePermission = ContextCompat.checkSelfPermission(
-            chatActivity,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+                chatActivity,
+                Manifest.permission.READ_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
         if (!hasStoragePermission) {
             ActivityCompat.requestPermissions(
-                chatActivity,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                Constants.REQUEST_READ_STORAGE
+                    chatActivity,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    Constants.REQUEST_READ_STORAGE
             )
         } else {
             //uploadGallery()

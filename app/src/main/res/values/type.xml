@@ -639,6 +639,12 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant5">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- Medium, Accent -->
     <style name="TextAppearance.Mega.Caption.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>

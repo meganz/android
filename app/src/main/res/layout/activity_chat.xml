@@ -149,9 +149,10 @@
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
-                android:visibility="visible"
-                android:orientation="vertical">
+                android:layout_above="@+id/keyboard_layout"
+                android:gravity="bottom"
+                android:orientation="vertical"
+                android:visibility="visible">
 
                     <RelativeLayout
                         android:id="@+id/call_on_hold_layout"
@@ -378,18 +379,26 @@
                 android:layout_height="48dp"
                 android:layout_below="@id/toolbar_chat"/>
 
-            <include
-                layout="@layout/item_recording"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_centerInParent="true"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/keyboard_layout">
+
+                <include
+                    layout="@layout/item_recording"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/voice_clip_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible"
-                android:layout_marginBottom="5dp">
+                android:layout_above="@+id/keyboard_layout"
+                android:paddingBottom="5dp"
+                android:visibility="visible">
+
                 <FrameLayout
                     android:id="@+id/fragment_voice_clip"
                     android:layout_width="match_parent"
@@ -463,6 +472,23 @@
                     </RelativeLayout>
                 </FrameLayout>
             </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/keyboard_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <mega.privacy.android.app.components.twemoji.EmojiKeyboard
+                    android:id="@+id/emojiView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:visibility="gone" />
+            </RelativeLayout>
         </RelativeLayout>
+
+
     </RelativeLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -55,42 +55,6 @@
             android:orientation="horizontal">
 
             <RelativeLayout
-                android:id="@+id/option_gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <RelativeLayout
-                    android:id="@+id/gallery_icon"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/rounded_background">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_centerInParent="true"
-                        android:adjustViewBounds="true"
-                        android:background="@null"
-                        android:src="@drawable/ic_picture"
-                        app:tint="?android:attr/textColorSecondary" />
-                </RelativeLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/gallery_icon"
-                    android:layout_centerHorizontal="true"
-                    android:text="@string/chat_room_toolbar_gallery_option"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
-            </RelativeLayout>
-
-            <RelativeLayout
                 android:id="@+id/option_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,8 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_icon"
                     android:layout_centerHorizontal="true"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -158,8 +121,7 @@
                     android:layout_below="@id/voice_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/chat_room_toolbar_voice_call_option"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -194,17 +156,8 @@
                     android:layout_below="@id/video_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/upload_to_video"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="86dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/option_scan"
@@ -228,8 +181,7 @@
                         android:layout_centerInParent="true"
                         android:adjustViewBounds="true"
                         android:background="@null"
-                        android:src="@drawable/ic_scan_toolbar"
-                        app:tint="?android:attr/textColorSecondary" />
+                        android:src="@drawable/ic_scan_toolbar" />
                 </RelativeLayout>
 
                 <TextView
@@ -238,9 +190,16 @@
                     android:layout_below="@id/scan_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/chat_room_toolbar_scan_option"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="86dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/option_gif"
@@ -274,8 +233,7 @@
                     android:layout_below="@id/gif_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/chat_room_toolbar_gif_option"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -310,8 +268,7 @@
                     android:layout_below="@id/location_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/file_properties_info_location"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -346,8 +303,41 @@
                     android:layout_below="@id/contact_icon"
                     android:layout_centerHorizontal="true"
                     android:text="@string/attachment_upload_panel_contact"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/option_voice_clip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <RelativeLayout
+                    android:id="@+id/voice_clip_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerInParent="true"
+                        android:adjustViewBounds="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_record_voice_clip" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/voice_clip_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/chat_room_toolbar_voice_call_option"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
             </RelativeLayout>
 
         </LinearLayout>
