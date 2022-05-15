@@ -8,8 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -18,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
@@ -32,6 +36,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetChatRoomToolbarBinding
 
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
+
+    private val filesAdapter by lazy {
+        FileStorageChatAdapter(::onTakePictureClick, ::onItemClick)
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -53,18 +61,32 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        checkPermissionsDialog()
+        setupButtons()
 
         lifecycleScope.launchWhenStarted {
-            viewModel.gallery.collect {
+            viewModel.gallery.collect { filesList ->
+                binding.emptyGallery.isVisible = filesList.isNullOrEmpty()
+                binding.list.isVisible = !filesList.isNullOrEmpty()
+
+                filesAdapter.submitList(filesList)
             }
         }
-
-        setupButtons()
-        checkPermissionsDialog()
-        //setupListView()
-        //setupListAdapter()
-
+        setupView()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun setupView() {
+        val mLayoutManager: RecyclerView.LayoutManager =
+                GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
+
+        binding.list.apply {
+            clipToPadding = false
+            setHasFixedSize(true)
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+            layoutManager = mLayoutManager
+            adapter = filesAdapter
+        }
     }
 
     /**
@@ -129,28 +151,22 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     Constants.REQUEST_READ_STORAGE
             )
         } else {
-            //uploadGallery()
+            loadGallery()
         }
-
     }
 
-    /*  private fun setupListView() {
-          val mLayoutManager: RecyclerView.LayoutManager =
-              GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
+    fun loadGallery() {
+        viewModel.loadGallery()
+    }
 
-          binding.recyclerViewGallery?.apply {
-              clipToPadding = false
-              setHasFixedSize(true)
-              setItemAnimator(Util.noChangeRecyclerViewItemAnimator())
-              setLayoutManager(mLayoutManager)
-          }
-      }*/
+    private fun onTakePictureClick() {
+        listener.onTakePictureOptionClicked()
+        dismiss()
+    }
 
-    /*  private fun setupListAdapter() {
-          context?.let {
-              //adapter = FileStorageAdapter(it)
-          }
-          adapter.setHasStableIds(true)
-          binding.recyclerViewGallery.adapter = adapter
-      }*/
+    private fun onItemClick() {
+        logDebug("**********+ Recibido el onItemClick")
+        listener.onSendFileClicked()
+        dismiss()
+    }
 }

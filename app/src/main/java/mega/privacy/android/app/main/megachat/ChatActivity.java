@@ -902,6 +902,11 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
+    public void onSendFileClicked() {
+       logDebug("************ send file");
+    }
+
+    @Override
     public void onTakePictureOptionClicked() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(getPackageManager()) != null) {
@@ -3469,6 +3474,9 @@ public class ChatActivity extends PasscodeActivity
             }
             case REQUEST_READ_STORAGE:
                 logDebug("Permission Read storage granted");
+                if (isBottomSheetDialogShown(bottomSheetDialogFragment) && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).loadGallery();
+                }
                 break;
 
             case LOCATION_PERMISSION_REQUEST_CODE: {

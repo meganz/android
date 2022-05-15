@@ -2,14 +2,18 @@ package mega.privacy.android.app.main.megachat.usecase
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
 import android.net.Uri
 import android.provider.MediaStore
-import com.facebook.common.util.UriUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.TimeUtils
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -70,20 +74,17 @@ class GetGalleryFilesUseCase @Inject constructor(
                         id
                 )
 
-                val path = "file://" + UriUtil.getRealPathFromUri(
-                        context.contentResolver,
-                        contentUri
+                val file = FileGalleryItem(
+                        id = id,
+                        isImage = true,
+                        title = title,
+                        fileUri = contentUri,
+                        dateAdded = date,
+                        thumbnail = null,
+                        duration = "",
+                        isSelected = false
                 )
 
-                val file = FileGalleryItem(
-                        id,
-                        true,
-                        title,
-                        path,
-                        date,
-                        null,
-                        0
-                )
                 imageList.add(file)
             }
 
@@ -108,8 +109,7 @@ class GetGalleryFilesUseCase @Inject constructor(
         val projection = arrayOf(
                 MediaStore.Video.Media._ID,
                 MediaStore.Video.Media.DATE_ADDED,
-                MediaStore.Video.Media.TITLE,
-                MediaStore.Video.Media.DURATION
+                MediaStore.Video.Media.TITLE
         )
 
         context.contentResolver.query(
@@ -122,32 +122,32 @@ class GetGalleryFilesUseCase @Inject constructor(
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE)
-            val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val date = cursor.getString(dateColumn)
                 val title = cursor.getString(titleColumn)
-                val duration = cursor.getInt(durationColumn)
 
                 val contentUri = ContentUris.withAppendedId(
                         queryUri,
                         id
                 )
 
-                val path = "file://" + UriUtil.getRealPathFromUri(
-                        context.contentResolver,
-                        contentUri
-                )
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(context, contentUri)
+                val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
+                retriever.release()
+                val durationText = TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
 
                 val file = FileGalleryItem(
-                        id,
-                        false,
-                        title,
-                        path,
-                        date,
-                        null,
-                        duration
+                        id = id,
+                        isImage = false,
+                        title = title,
+                        fileUri = contentUri,
+                        dateAdded = date,
+                        thumbnail = null,
+                        duration = durationText,
+                        isSelected = false
                 )
                 videoList.add(file)
             }

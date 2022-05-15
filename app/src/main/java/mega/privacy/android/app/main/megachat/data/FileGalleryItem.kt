@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat.data
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 
 /**
@@ -18,10 +19,11 @@ data class FileGalleryItem constructor(
         val id: Long,
         var isImage: Boolean,
         val title: String? = null,
-        var fileUri: String? = null,
+        var fileUri: Uri? = null,
         var dateAdded: String? = null,
         var thumbnail: Bitmap? = null,
-        var duration: Int? = null
+        var duration: String? = "",
+        var isSelected: Boolean = false
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<FileGalleryItem>() {

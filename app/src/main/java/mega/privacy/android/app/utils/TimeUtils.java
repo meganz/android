@@ -39,6 +39,8 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
+    public static final int TIME_HH_MM_SS = 9;
+
 
     public static final long SECOND = 1000;
     public static final long MINUTE = 60 * SECOND;
@@ -289,7 +291,6 @@ public class TimeUtils implements Comparator<Calendar> {
             return formattedDate;
         }
         else if(tc.compare(calGreen, calToday)==0) {
-
             TimeZone tz = calGreen.getTimeZone();
 
             java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -405,6 +406,27 @@ public class TimeUtils implements Comparator<Calendar> {
             Date date = cal.getTime();
             return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
         }
+    }
+
+    /**
+     * Method of getting the appropriate string from a given duration
+     *
+     * @param duration The duration
+     * @return The appropriate string
+     */
+    public static String getGalleryVideoDuration(long duration) {
+        long hours = TimeUnit.MILLISECONDS.toHours(duration);
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toSeconds(hours);
+
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) -
+                TimeUnit.MINUTES.toSeconds(minutes);
+
+        if (hours > 0) {
+            return String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds);
+        }
+
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
     }
 
     public static String getVideoDuration(int duration) {
