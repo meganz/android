@@ -13,52 +13,49 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import javax.inject.Inject
 
 /**
- * Use Coroutines To Load Images
+ * Use case to retrieve images and videos from the gallery.
  */
 class GetGalleryFilesUseCase @Inject constructor(
-    @ApplicationContext private val context: Context
+        @ApplicationContext private val context: Context
 ) {
 
     fun get(): Flowable<List<FileGalleryItem>> =
-        Flowable.create({ emitter ->
-            val files = mutableListOf<FileGalleryItem>().apply {
-                getFiles()
-            }
+            Flowable.create({ emitter ->
+                val files = mutableListOf<FileGalleryItem>().apply {
+                    addAll(fetchImages())
+                    addAll(fetchVideos())
+                }
 
-            val requestFiles = files
-                .sortedByDescending { it.dateAdded }
-                .toMutableList()
+                val requestFiles = files
+                        .sortedByDescending { it.dateAdded }
+                        .toMutableList()
 
-            emitter.onNext(requestFiles)
+                emitter.onNext(requestFiles)
 
-            emitter.setCancellable {
-
-            }
-        }, BackpressureStrategy.LATEST)
+            }, BackpressureStrategy.LATEST)
 
     /**
-     * Getting All Images Path.
+     * Method to get the images from the gallery
      *
-     * Required Storage Permission
-     *
-     * @return ArrayList with images Path
+     * @return ArrayList<FileGalleryItem> List of images
      */
-    private fun getFiles(): ArrayList<FileGalleryItem>? {
-        val files: ArrayList<FileGalleryItem> = ArrayList()
+    fun fetchImages(): ArrayList<FileGalleryItem> {
+        val imageList: ArrayList<FileGalleryItem> = ArrayList()
+
         val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
         val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DATE_ADDED,
-            MediaStore.Images.Media.TITLE
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATE_ADDED,
+                MediaStore.Images.Media.TITLE
         )
 
         context.contentResolver.query(
-            queryUri,
-            projection,
-            "",
-            null,
-            sortOrder
+                queryUri,
+                projection,
+                "",
+                null,
+                sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
@@ -69,30 +66,96 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val date = cursor.getString(dateColumn)
                 val title = cursor.getString(titleColumn)
                 val contentUri = ContentUris.withAppendedId(
-                    queryUri,
-                    id
+                        queryUri,
+                        id
                 )
 
                 val path = "file://" + UriUtil.getRealPathFromUri(
-                    context.contentResolver,
-                    contentUri
+                        context.contentResolver,
+                        contentUri
                 )
 
                 val file = FileGalleryItem(
-                    id,
-                    title,
-                    path,
-                    date,
-                    null
+                        id,
+                        true,
+                        title,
+                        path,
+                        date,
+                        null,
+                        0
                 )
-                files.add(file)
+                imageList.add(file)
             }
 
         } ?: kotlin.run {
             logError("Cursor is null")
-            return null
         }
 
-        return files
+        return imageList
+    }
+
+    /**
+     * Method to get the videos from the gallery
+     *
+     * @return ArrayList<FileGalleryItem> List of videos
+     */
+    fun fetchVideos(): ArrayList<FileGalleryItem> {
+        val videoList: ArrayList<FileGalleryItem> = ArrayList()
+
+        val queryUri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
+        val projection = arrayOf(
+                MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.DATE_ADDED,
+                MediaStore.Video.Media.TITLE,
+                MediaStore.Video.Media.DURATION
+        )
+
+        context.contentResolver.query(
+                queryUri,
+                projection,
+                "",
+                null,
+                sortOrder
+        )?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
+            val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+            val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE)
+            val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val date = cursor.getString(dateColumn)
+                val title = cursor.getString(titleColumn)
+                val duration = cursor.getInt(durationColumn)
+
+                val contentUri = ContentUris.withAppendedId(
+                        queryUri,
+                        id
+                )
+
+                val path = "file://" + UriUtil.getRealPathFromUri(
+                        context.contentResolver,
+                        contentUri
+                )
+
+                val file = FileGalleryItem(
+                        id,
+                        false,
+                        title,
+                        path,
+                        date,
+                        null,
+                        duration
+                )
+                videoList.add(file)
+            }
+
+        } ?: kotlin.run {
+            logError("Cursor is null")
+        }
+
+        return videoList
     }
 }

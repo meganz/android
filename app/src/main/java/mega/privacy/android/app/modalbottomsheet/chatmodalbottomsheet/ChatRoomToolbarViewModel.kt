@@ -19,13 +19,13 @@ import javax.inject.Inject
 class ChatRoomToolbarViewModel @Inject constructor(
     getGalleryFilesUseCase: GetGalleryFilesUseCase,
 ) : BaseRxViewModel() {
+
     private val _imagesGallery =
         MutableStateFlow<List<FileGalleryItem>>(ArrayList())
+
     val gallery: StateFlow<List<FileGalleryItem>>
         get() = _imagesGallery
 
-
-   // private val imagesGallery: MutableLiveData<List<FileGalleryItem>> = MutableLiveData()
 
     init {
         getGalleryFilesUseCase.get()

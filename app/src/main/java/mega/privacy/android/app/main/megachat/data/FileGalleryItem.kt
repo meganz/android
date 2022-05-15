@@ -7,28 +7,32 @@ import androidx.recyclerview.widget.DiffUtil
  * View item that represents a Contact Request at UI level.
  *
  * @property id         File id
- * @property title       File title
+ * @property isImage    True, if it's image. False, if it's video.
+ * @property title      File title
  * @property fileUri    File URI
  * @property dateAdded  Date added
- * @property thumbnail  Image thumbnail
+ * @property thumbnail  Image/Video thumbnail
+ * @property duration   Video duration
  */
 data class FileGalleryItem constructor(
-    val id: Long,
-    val title: String? = null,
-    var fileUri: String? = null,
-    var dateAdded: String? = null,
-    var thumbnail: Bitmap? = null
+        val id: Long,
+        var isImage: Boolean,
+        val title: String? = null,
+        var fileUri: String? = null,
+        var dateAdded: String? = null,
+        var thumbnail: Bitmap? = null,
+        var duration: Int? = null
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<FileGalleryItem>() {
 
         override fun areItemsTheSame(oldItem: FileGalleryItem, newItem: FileGalleryItem): Boolean =
-            oldItem.id == newItem.id
+                oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: FileGalleryItem,
-            newItem: FileGalleryItem
+                oldItem: FileGalleryItem,
+                newItem: FileGalleryItem
         ): Boolean =
-            oldItem == newItem
+                oldItem == newItem
     }
 }

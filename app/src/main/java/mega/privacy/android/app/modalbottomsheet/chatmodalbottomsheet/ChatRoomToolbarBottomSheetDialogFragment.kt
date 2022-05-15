@@ -56,7 +56,6 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launchWhenStarted {
             viewModel.gallery.collect {
-                logDebug("Recovered gallery. Num items ${it.size}")
             }
         }
 
