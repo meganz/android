@@ -970,6 +970,16 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        if (cameraUpload && !Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+            Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
+            prefs.setCamSyncEnabled(Boolean.toString(cameraUpload));
+            fireCameraUploadJob(context, false);
+        }
+        super.onPause();
+    }
+
     private void setupVideoOptionsForCameraUpload() {
         if (prefs.getCamSyncFileUpload() == null) {
             disableVideoQualitySettings();
@@ -1005,10 +1015,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //secondary upload
         setupSecondaryUpload();
 
-        //set cu enabled and start the service
+        //set camera upload enabled
         dbH.setCamSyncEnabled(true);
-        Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
-        fireCameraUploadJob(context, false, 3);
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
