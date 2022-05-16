@@ -181,6 +181,7 @@ public class Constants {
     public static final int BUSINESS = 100;
 
     public static final long DISABLED_RETENTION_TIME = 0;
+    public static final long SECONDS_IN_MINUTE = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
     public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
