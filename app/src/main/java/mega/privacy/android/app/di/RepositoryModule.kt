@@ -35,7 +35,7 @@ abstract class RepositoryModule {
     abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
 
     @Binds
-    abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
+    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
