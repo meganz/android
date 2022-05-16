@@ -126,7 +126,7 @@ fun getRoundingParamsWithoutBorder(context: Context): RoundingParams? {
 
     roundingParams = RoundingParams.fromCornersRadius(
             Util.dp2px(
-                    context.resources.getDimension(R.dimen.photo_selected_icon_round_corner_radius),
+                    context.resources.getDimension(R.dimen.chat_gallery_files_round_corner_radius),
             ).toFloat()
     )
 

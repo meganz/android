@@ -26,7 +26,6 @@ class FileStorageChatHolder(
                 imageThumbnail.setImageRequestFromUri(item.fileUri)
                 imageThumbnail.isVisible = true
                 imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(MegaApplication.getInstance().applicationContext)
-
                 videoDuration.isVisible = false
                 videoThumbnail.isVisible = false
             } else {

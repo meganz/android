@@ -1,6 +1,7 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
+import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +14,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -24,6 +25,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 
 /**
  * Bottom Sheet Dialog which shows the chat options
@@ -41,6 +43,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private val filesAdapter by lazy {
         FileStorageChatAdapter(::onTakePictureClick, ::onClickItem, ::onLongClickItem)
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireContext(), R.style.BottomSheetFragmentWithTransparentBackground)
     }
 
     override fun onCreateView(
@@ -85,6 +91,9 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    /**
+     * Setup recycler view
+     */
     private fun setupView() {
         val mLayoutManager: RecyclerView.LayoutManager =
                 GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
@@ -172,6 +181,9 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Load files from gallery
+     */
     fun loadGallery() {
         viewModel.loadGallery()
     }

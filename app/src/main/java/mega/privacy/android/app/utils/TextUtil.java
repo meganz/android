@@ -9,8 +9,8 @@ import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -66,9 +66,18 @@ public class TextUtil {
         String colorEnd = isOwnMessage ?
                 ColorUtils.getColorHexString(context, R.color.grey_500_grey_400) :
                 ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary);
+
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 
+    /**
+     * Add appropriate formatting to text on empty screens with chosen colours.
+     *
+     * @param textToShow The message text
+     * @param colorStart Color
+     * @param colorEnd   Color
+     * @return The formatted text
+     */
     public static Spanned replaceFormatText(String textToShow, String colorStart, String colorEnd) {
         try {
             textToShow = textToShow.replace("[A]", "<font color=" + colorStart + ">");
@@ -76,7 +85,7 @@ public class TextUtil {
             textToShow = textToShow.replace("[B]", "<font color=" + colorEnd + ">");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
-            logError(e.getStackTrace().toString());
+            Timber.e(e.getStackTrace().toString());
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
@@ -161,6 +170,14 @@ public class TextUtil {
         return replaceFormatText(textToShow, colorStart, colorEnd).toString();
     }
 
+    /**
+     * Formats a String of recent chats empty screen.
+     *
+     * @param context     Current Context object, to get a resource(for example, color)
+     *                    should not use application context, need to pass it from the caller.
+     * @param textToShow The text to format.
+     * @return The string formatted.
+     */
     public static Spanned formatEmptyRecentChatsScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
         String colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);

@@ -3159,7 +3159,7 @@ public class ChatActivity extends PasscodeActivity
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
     }
 
-    private void enableButton(RelativeLayout layout, ImageButton button){
+    private void enableButton(RelativeLayout layout, ImageButton button) {
         logDebug("enableButton");
         layout.setOnClickListener(this);
         button.setOnClickListener(this);
@@ -3174,9 +3174,9 @@ public class ChatActivity extends PasscodeActivity
             return;
 
         sendIcon.setEnabled(true);
-        if(editingMessage){
+        if (editingMessage) {
             sendIcon.setImageResource(R.drawable.ic_select_folder);
-        }else{
+        } else {
             sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white,
                     ColorUtils.getThemeColor(this, android.R.attr.colorAccent)));
         }
@@ -3258,6 +3258,8 @@ public class ChatActivity extends PasscodeActivity
 
     /**
      * Place the record button
+     *
+     * @param recordButtonState RECORD_BUTTON_SEND, RECORD_BUTTON_ACTIVATED or RECORD_BUTTON_DEACTIVATED
      */
     public void placeRecordButton(int recordButtonState) {
         recordView.recordButtonTranslation(recordButtonLayout, 0, 0);
@@ -4202,7 +4204,7 @@ public class ChatActivity extends PasscodeActivity
     /**
      * Method to show the letter keyboard or emoji keyboard
      */
-    private void changeKeyboard(){
+    private void changeKeyboard() {
         Drawable currentDrawable = keyboardTwemojiButton.getDrawable();
         Drawable emojiDrawableLight = AppCompatResources.getDrawable(this, R.drawable.ic_emoji_unchecked);
         Drawable emojiDrawableDark = AppCompatResources.getDrawable(this, R.drawable.ic_emoji_checked);
@@ -6512,6 +6514,7 @@ public class ChatActivity extends PasscodeActivity
                     showScrollToLastMsgButton();
                 }
             }
+
             return;
         }
 
@@ -8176,7 +8179,6 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
-
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
@@ -8829,7 +8831,6 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause(){
         super.onPause();
-
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 

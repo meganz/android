@@ -39,8 +39,6 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
-    public static final int TIME_HH_MM_SS = 9;
-
 
     public static final long SECOND = 1000;
     public static final long MINUTE = 60 * SECOND;
