@@ -2,14 +2,16 @@ package test.mega.privacy.android.app.presentation.manager
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
@@ -25,6 +27,7 @@ class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
     private val globalUpdateRepository = mock<GlobalUpdatesRepository>()
+    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -48,13 +51,16 @@ class ManagerViewModelTest {
                 updates.forEach { emit(it) }
             }
         )
-        underTest = ManagerViewModel(globalUpdateRepository)
+        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
         after()
     }
 
     @Test
     fun `test that live data are not set when no updates are triggered from api`() = runTest {
-        underTest = ManagerViewModel(globalUpdateRepository)
+        underTest = ManagerViewModel(
+            monitorNodeUpdates,
+            globalUpdateRepository
+        )
 
         val updateUserException = assertThrows(TimeoutException::class.java) {
             underTest.updateUsers.getOrAwaitValue { advanceUntilIdle() }
@@ -79,6 +85,25 @@ class ManagerViewModelTest {
     }
 
     @Test
+    fun `test that live data value is set when node updates is triggered from api`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
+        val updateNodes = underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
+        assertEquals(updateNodes.size, 1)
+    }
+
+    @Test
+    fun `test that live data value is not set when node updates is triggered from api with an empty list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
+
+        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
+        val updateNodesException = assertThrows(TimeoutException::class.java) {
+            underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
+        }
+        assertThat(updateNodesException.message?.contains("LiveData value was never set."))
+    }
+
+    @Test
     fun `test that live data is dispatched when updates triggered from api`() = runTest {
         triggerRepositoryUpdate(
             listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))
@@ -91,12 +116,6 @@ class ManagerViewModelTest {
         ) {
             val updateUserAlerts = underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
             assertEquals(updateUserAlerts.size, 1)
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnNodesUpdate(arrayListOf(mock())))
-        ) {
-            val updateNodes = underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
-            assertEquals(updateNodes.size, 1)
         }
         triggerRepositoryUpdate(
             listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))
@@ -129,17 +148,6 @@ class ManagerViewModelTest {
                 underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
             }
             assertThat(updateUserAlerts.message?.contains("LiveData value was never set."))
-        }
-        triggerRepositoryUpdate(
-            listOf(
-                GlobalUpdate.OnNodesUpdate(null),
-                GlobalUpdate.OnNodesUpdate(arrayListOf()),
-            )
-        ) {
-            val updateNodesException = assertThrows(TimeoutException::class.java) {
-                underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
-            }
-            assertThat(updateNodesException.message?.contains("LiveData value was never set."))
         }
         triggerRepositoryUpdate(
             listOf(
