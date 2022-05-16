@@ -120,6 +120,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private Preference megaSecondaryFolder;
 
     private boolean cameraUpload = false;
+    private boolean cameraUploadSettingsChanged = false;
     private boolean secondaryUpload = false;
     private boolean charging = false;
     private boolean includeGPS;
@@ -972,9 +973,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
     @Override
     public void onPause() {
-        if (cameraUpload && !Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+        if (cameraUploadSettingsChanged) {
             Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
-            prefs.setCamSyncEnabled(Boolean.toString(cameraUpload));
             fireCameraUploadJob(context, false);
         }
         super.onPause();
@@ -1017,6 +1017,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
         //set camera upload enabled
         dbH.setCamSyncEnabled(true);
+        prefs.setCamSyncEnabled(Boolean.toString(true));
+        cameraUploadSettingsChanged = true;
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
