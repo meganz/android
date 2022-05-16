@@ -909,12 +909,16 @@ class MediaPlayerServiceViewModel(
      * @param currentPosition the current position of audio
      */
     fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
-        playlistItems.filter {
-            it.nodeHandle == playingHandle
-        }.firstNotNullOfOrNull {
-            it.duration = duration
-            it.currentPosition = currentPosition
-        }
+        val list = mutableListOf<PlaylistItem>()
+        list.addAll(playlistItems.map { playListItem ->
+            if (playListItem.nodeHandle == playingHandle) {
+                playListItem.copy(duration = duration, currentPosition = currentPosition)
+            } else {
+                playListItem
+            }
+        })
+        playlistItems.clear()
+        playlistItems.addAll(list)
         postPlaylistItems(false)
     }
 
