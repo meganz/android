@@ -45,6 +45,8 @@ import javax.inject.Inject
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
  *                                      as well as each individual node action required by the menu
+ * @property moveNodeUseCase            Needed to move image node on demand
+ * @property removeNodeUseCase          Needed to remove image node on demand
  * @property exportNodeUseCase          Needed to export image node on demand
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
@@ -57,6 +59,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
+    private val removeNodeUseCase: RemoveNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
@@ -495,7 +498,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun removeNode(nodeHandle: Long) {
-        moveNodeUseCase.remove(nodeHandle)
+        removeNodeUseCase.remove(nodeHandle)
             .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }

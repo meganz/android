@@ -236,39 +236,4 @@ class MoveNodeUseCase @Inject constructor(
                 destination
             ).apply { resetAccountDetailsIfNeeded() })
         }
-
-    /**
-     * Remove a node
-     *
-     * @param nodeHandle    Node handle to be removed
-     * @return              Completable
-     */
-    fun remove(nodeHandle: Long): Completable =
-        getNodeUseCase.get(nodeHandle).flatMapCompletable { node -> remove(node) }
-
-    /**
-     * Remove a node
-     *
-     * @param node  Node to be removed
-     * @return      Completable
-     */
-    fun remove(node: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (node == null) {
-                emitter.onError(IllegalArgumentException("Null node"))
-                return@create
-            }
-
-            megaApi.remove(node, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    if (error.errorCode == API_OK) {
-                        emitter.onComplete()
-                    } else {
-                        emitter.onError(error.toMegaException())
-                    }
-                }
-            ))
-        }
 }
