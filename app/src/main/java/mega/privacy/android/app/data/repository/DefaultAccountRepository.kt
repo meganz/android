@@ -3,10 +3,9 @@ package mega.privacy.android.app.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.data.extensions.failWithError
@@ -15,16 +14,15 @@ import mega.privacy.android.app.data.extensions.isType
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.UserChangesMapper
+import mega.privacy.android.app.data.mapper.UserUpdateMapper
+import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.entity.user.UserId
-import mega.privacy.android.app.domain.entity.user.UserUpdate
 import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.NoLoggedInUserException
 import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import nz.mega.sdk.MegaError
@@ -52,10 +50,10 @@ class DefaultAccountRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val userChangesMapper: UserChangesMapper,
+    private val userUpdateMapper: UserUpdateMapper,
 ) : AccountRepository {
 
-    override suspend fun getUserAccount() = withContext(ioDispatcher){
+    override suspend fun getUserAccount() = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
         UserAccount(
             userId = user?.let { UserId(it.handle) },
@@ -95,7 +93,7 @@ class DefaultAccountRepository @Inject constructor(
     }
 
     private fun onMultiFactorAuthCheckRequestFinish(
-        continuation: Continuation<Boolean>
+        continuation: Continuation<Boolean>,
     ) = { request: MegaRequest, error: MegaError ->
         if (request.isType(MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK)) {
             if (error.errorCode == MegaError.API_OK) {
@@ -141,30 +139,9 @@ class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override fun monitorUserUpdates(): Flow<UserUpdate> {
-        return callbackFlow {
-            val listener = OptionalMegaGlobalListenerInterface(
-                onUsersUpdate = {
-                    it?.let {
-                        trySend(
-                            UserUpdate(
-                                it.groupBy { user -> UserId(user.handle) }
-                                    .mapValues { (_, users) ->
-                                        users.map { i -> userChangesMapper(i.changes) }.flatten()
-                                    }
-                            )
-                        )
-                    }
-                }
-            )
-
-            megaApiGateway.addGlobalListener(listener)
-
-            awaitClose { megaApiGateway.removeGlobalListener(listener) }
-        }.onEach {
-            Timber.d("User update received: $it")
-        }
-    }
-
+    override fun monitorUserUpdates() = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull { it.users }
+        .map { userUpdateMapper(it) }
 
 }
