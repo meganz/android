@@ -48,9 +48,20 @@ class FavouriteFolderFragmentTest {
     @Test
     fun test_that_the_recycler_view_is_displayed_when_children_of_current_folder_is_not_empty() {
         val node = mock<MegaNode>()
-        val favouriteInfo = FavouriteInfo(node, false, 0, 0)
+        whenever(node.handle).thenReturn(123)
+        whenever(node.parentHandle).thenReturn(1234)
+        whenever(node.base64Handle).thenReturn("base64Handle")
+        whenever(node.modificationTime).thenReturn(1234567890)
         whenever(node.name).thenReturn("test name")
-
+        val favouriteInfo = FavouriteInfo(
+            id = node.handle,
+            parentId = node.parentHandle,
+            base64Id = node.base64Handle,
+            modificationTime = node.modificationTime,
+            node = node,
+            hasVersion = false,
+            numChildFolders = 0,
+            numChildFiles = 0)
         val favourites = listOf(
             favouriteInfo
         )
@@ -99,7 +110,20 @@ class FavouriteFolderFragmentTest {
     @Test
     fun test_that_clicked_three_dot_and_the_snack_bar_shows_error_message_when_offline() {
         val node = mock<MegaNode>()
-        val favouriteInfo = FavouriteInfo(node, false, 0, 0)
+        whenever(node.handle).thenReturn(123)
+        whenever(node.parentHandle).thenReturn(1234)
+        whenever(node.base64Handle).thenReturn("base64Handle")
+        whenever(node.modificationTime).thenReturn(1234567890)
+        val favouriteInfo = FavouriteInfo(
+            id = node.handle,
+            parentId = node.parentHandle,
+            base64Id = node.base64Handle,
+            modificationTime = node.modificationTime,
+            node = node,
+            hasVersion = false,
+            numChildFolders = 0,
+            numChildFiles = 0
+        )
         whenever(node.name).thenReturn("test folder")
         whenever(FavouritesTestModule.megaUtilWrapper.isOnline(any())).thenReturn(false)
         val favourites = listOf(

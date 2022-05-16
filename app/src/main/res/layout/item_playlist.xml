@@ -32,6 +32,10 @@
             type="Integer" />
 
         <variable
+            name="isAudio"
+            type="Boolean" />
+
+        <variable
             name="holder"
             type="mega.privacy.android.app.mediaplayer.playlist.PlaylistViewHolder" />
 
@@ -155,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="72dp"
-                android:text="@string/general_next"
+                android:text="@{isAudio ? @string/media_player_audio_playlist_next : @string/media_player_video_playlist_next}"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor" />
         </FrameLayout>
     </LinearLayout>

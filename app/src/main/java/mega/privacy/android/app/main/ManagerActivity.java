@@ -296,7 +296,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
