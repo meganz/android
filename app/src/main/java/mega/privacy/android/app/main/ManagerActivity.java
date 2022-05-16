@@ -10090,7 +10090,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         onNodesInboxUpdate();
 
-        checkCameraUploadFolder(false,  updatedNodes);
+        checkCameraUploadFolder(false, updatedNodes);
 
         refreshCUNodes();
 
