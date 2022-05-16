@@ -81,7 +81,7 @@ private fun FavouriteInfo.createFile(
  * android.text.format.Formatter.formatShortFileSize(activityContext, bytes) for size
  * @param stringUtil StringUtilWrapper
  * @return file info
-*/
+ */
 private fun FavouriteInfo.getFileInfo(stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
@@ -96,4 +96,3 @@ private fun FavouriteInfo.getFileInfo(stringUtil: StringUtilWrapper) =
  */
 private fun FavouriteInfo.getFolderInfo(stringUtil: StringUtilWrapper) =
     stringUtil.getFolderInfo(numChildFolders, numChildFiles)
-

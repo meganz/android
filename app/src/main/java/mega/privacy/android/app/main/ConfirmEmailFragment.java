@@ -225,7 +225,7 @@ public class ConfirmEmailFragment extends Fragment implements MegaRequestListene
 
 		String email = newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		((LoginActivity) context).setEmailTemp(email);
-		megaApi.sendSignupLink(email, firstNameTemp, passwdTemp, this);
+		megaApi.resendSignupLink(email, firstNameTemp, this);
 	}
 
 	private boolean validateForm() {

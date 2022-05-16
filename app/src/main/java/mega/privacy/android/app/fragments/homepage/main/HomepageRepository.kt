@@ -82,7 +82,7 @@ class HomepageRepository @Inject constructor(
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
+            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg")?.absolutePath,
             listener
         )
     }

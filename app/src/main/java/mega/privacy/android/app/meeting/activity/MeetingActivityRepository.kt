@@ -57,7 +57,7 @@ class MeetingActivityRepository @Inject constructor(
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION).absolutePath,
+            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.absolutePath,
             listener
         )
     }
@@ -229,7 +229,7 @@ class MeetingActivityRepository @Inject constructor(
                 CacheFolderManager.buildAvatarFile(
                     context,
                     mail + JPG_EXTENSION
-                ).absolutePath, MeetingAvatarListener(context, peerId)
+                )?.absolutePath, MeetingAvatarListener(context, peerId)
             )
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,

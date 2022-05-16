@@ -13,6 +13,7 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.ALBUM_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.TIMELINE_INDEX
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
  * PhotosFragment is a parent fragment for both TimelineFragment and AlbumsFragment
@@ -88,14 +89,14 @@ class PhotosFragment : BaseFragment() {
             override fun onPageSelected(position: Int) {
                 currentTab =
                     childFragmentManager.findFragmentByTag("f$position") as? PhotosTabCallback
-                currentTab?.let { currentTab->
+                currentTab?.let { currentTab ->
                     checkScroll()
 
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
                         mManagerActivity.fromAlbumContent = false
-                        with (timelineFragment) {
+                        with(timelineFragment) {
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()
                             if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
@@ -224,11 +225,37 @@ class PhotosFragment : BaseFragment() {
     }
 
     /**
+     * Hides CU progress bar and checks the scroll
+     * in order to hide elevation if the list is not scrolled.
+     */
+    fun hideCUProgress() {
+        mManagerActivity.hideCUProgress()
+        checkScroll()
+    }
+
+    /**
      * update progress UI
      */
     fun updateProgress(visibility: Int, pending: Int) {
-        (currentTab as? TimelineFragment)?.updateProgress(visibility, pending)
+        if (binding.uploadProgress.visibility != visibility) {
+            binding.uploadProgress.visibility = visibility
+            checkScroll()
+        }
+        binding.uploadProgress.text = StringResourcesUtils
+            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
     }
+
+    /**
+     * Set UploadProgressText Visibility
+     */
+    fun setUploadProgressTextVisibility(visibility: Int) {
+        binding.uploadProgress.visibility = visibility
+    }
+
+    /**
+     * Get UploadProgressText Visibility
+     */
+    fun getUploadProgressText(): View = binding.uploadProgress
 
     /**
      * Load Photos

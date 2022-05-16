@@ -1602,7 +1602,7 @@ public class ChatUtil {
      * @param chatId  The ID of a chat room.
      */
     public static void shareNodeFromChat(Context context, MegaNode node, long chatId, long msgId){
-        if(!MegaNodeUtil.shouldContinueWithoutError(context, "sharing node", node)){
+        if(!MegaNodeUtil.shouldContinueWithoutError(context, node)){
             return;
         }
 
@@ -1639,7 +1639,7 @@ public class ChatUtil {
             listNodes.add(node);
         }
 
-        if (!MegaNodeUtil.shouldContinueWithoutError(context, "sharing nodes", listNodes)) {
+        if (!MegaNodeUtil.shouldContinueWithoutError(context, listNodes)) {
             return;
         }
 
