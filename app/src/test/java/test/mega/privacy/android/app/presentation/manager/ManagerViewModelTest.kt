@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -49,11 +49,8 @@ class ManagerViewModelTest {
      */
     @Suppress("DEPRECATION")
     private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
-        whenever(monitorGlobalUpdates()).thenReturn(
-            flow {
-                updates.forEach { emit(it) }
-            }
-        )
+        whenever(monitorGlobalUpdates()).thenReturn(updates.asFlow())
+        
         underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
         after()
     }
