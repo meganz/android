@@ -9,7 +9,6 @@ import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EOVERQUOTA
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
@@ -146,56 +145,6 @@ class MoveNodeUseCase @Inject constructor(
                 errorCount,
                 oldParentHandle
             ).apply { resetAccountDetailsIfNeeded() })
-        }
-
-    /**
-     * Copy node to a different location, either passing handles or node itself.
-     *
-     * @param nodeHandle        Node handle to be copied
-     * @param toParentHandle    Parent node handle to be copied to
-     * @param node              Node to be copied
-     * @param toParentNode      Parent node to be copied to
-     * @return                  Completable
-     */
-    fun copyNode(
-        nodeHandle: Long? = null,
-        toParentHandle: Long? = null,
-        node: MegaNode? = null,
-        toParentNode: MegaNode? = null
-    ): Completable =
-        Completable.fromCallable {
-            require((node != null || nodeHandle != null) && (toParentNode != null || toParentHandle != null))
-            copyNode(
-                node ?: getNodeUseCase.get(nodeHandle!!).blockingGet(),
-                toParentNode ?: getNodeUseCase.get(toParentHandle!!).blockingGet()
-            ).blockingAwait()
-        }
-
-    /**
-     * Copy node to a different location.
-     *
-     * @param currentNode   Node to be copied
-     * @param toParentNode  Parent node to be copied to
-     * @return              Completable
-     */
-    fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (currentNode == null || toParentNode == null) {
-                emitter.onError(IllegalArgumentException("Null nodes"))
-                return@create
-            }
-
-            megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onComplete()
-                    } else {
-                        emitter.onError(error.toMegaException())
-                    }
-                }
-            ))
         }
 
     /**

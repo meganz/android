@@ -45,6 +45,7 @@ import javax.inject.Inject
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
  *                                      as well as each individual node action required by the menu
+ * @property copyNodeUseCase            Needed to copy image node on demand
  * @property moveNodeUseCase            Needed to move image node on demand
  * @property removeNodeUseCase          Needed to remove image node on demand
  * @property exportNodeUseCase          Needed to export image node on demand
@@ -58,6 +59,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
@@ -474,7 +476,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        moveNodeUseCase.copyNode(
+        copyNodeUseCase.copy(
             node = getExistingNode(nodeHandle),
             nodeHandle = nodeHandle,
             toParentHandle = newParentHandle
