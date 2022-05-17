@@ -736,8 +736,8 @@
     <string name="settings_advanced_features_cache">Clear Cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Clear Offline Files</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Open file when downloaded</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_auto_play_label">Open unsupported file types in third-party apps</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Delete account</string>
     <!-- Size of files in offline or cache folders -->
@@ -4319,8 +4319,10 @@
     <string name="media_player_audio_playlist_next">Next</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">Previous</string>
-    <!-- Next videos to be played in the audio playlist -->
+    <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Next</string>
-    <!-- Previous videos have been already played in the audio playlist -->
+    <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Previous</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_auto_play_label_text">MEGA will open in-app unsupported file types in third-party apps instead of the MEGA app.</string>
 </resources>
