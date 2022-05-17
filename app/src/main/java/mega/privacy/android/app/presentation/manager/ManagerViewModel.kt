@@ -3,10 +3,13 @@ package mega.privacy.android.app.presentation.manager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
@@ -31,10 +34,17 @@ class ManagerViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
+     * Monitor all global updates
+     */
+    @Suppress("DEPRECATION")
+    private val updates = globalUpdatesRepository.monitorGlobalUpdates()
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    /**
      * Monitor user updates and dispatch to observers
      */
     val updateUsers: LiveData<List<MegaUser>> =
-        globalUpdatesRepository.monitorGlobalUpdates()
+        updates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .also { Timber.d("onUsersUpdate") }
             .map { it.users?.toList() }
@@ -46,7 +56,7 @@ class ManagerViewModel @Inject constructor(
      * Monitor user alerts updates and dispatch to observers
      */
     val updateUserAlerts: LiveData<List<MegaUserAlert>> =
-        globalUpdatesRepository.monitorGlobalUpdates()
+        updates
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .also { Timber.d("onUserAlertsUpdate") }
             .map { it.userAlerts?.toList() }
@@ -67,7 +77,7 @@ class ManagerViewModel @Inject constructor(
      * Monitor contact request updates and dispatch to observers
      */
     val updateContactsRequests: LiveData<List<MegaContactRequest>> =
-        globalUpdatesRepository.monitorGlobalUpdates()
+        updates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .also { Timber.d("onContactRequestsUpdate") }
             .map { it.requests?.toList() }
