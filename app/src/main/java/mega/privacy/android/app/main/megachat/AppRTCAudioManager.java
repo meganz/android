@@ -247,6 +247,7 @@ public class AppRTCAudioManager {
      */
     public void playSound(CallSoundType type) {
         stopAudioSignals();
+        selectAudioDevice(AudioDevice.SPEAKER_PHONE, false);
         soundsController.playSound(type);
     }
 
@@ -1004,7 +1005,7 @@ public class AppRTCAudioManager {
             newAudioDevice = userSelectedAudioDevice;
         }
         defaultAudioDevice = newAudioDevice;
-
+    logDebug("****************++ defaultAudioDevice "+defaultAudioDevice);
         // Switch to new device but only if there has been any changes.
         if (newAudioDevice != selectedAudioDevice || audioDeviceSetUpdated) {
             // Do the required device switch.
