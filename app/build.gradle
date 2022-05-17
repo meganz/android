@@ -67,7 +67,6 @@ def readReleaseNotes() {
  */
 String readTesters() {
     String testers = System.getenv("TESTERS_FOR_CD")
-    print("testers = " + testers)
     if (testers == null || testers.trim().isEmpty()) {
         testers = ""
     }

@@ -120,15 +120,20 @@ data class PlaylistItem(
 
         /**
          * Get name of item header
+         * @param isAudio check if the item is audio
          * @param type item type
          * @param paused media whether is paused
          * @return the name of header
          */
-        fun getHeaderName(type: Int, paused: Boolean = false): String {
+        fun getHeaderName(isAudio: Boolean, type: Int, paused: Boolean = false): String {
             return getString(
                 when (type) {
-                    TYPE_PREVIOUS -> R.string.general_previous
-                    TYPE_NEXT -> R.string.general_next
+                    TYPE_PREVIOUS -> if (isAudio) {
+                        R.string.media_player_audio_playlist_previous
+                    }
+                    else {
+                        R.string.media_player_video_playlist_previous
+                    }
                     else -> {
                         if (paused) {
                             R.string.audio_player_now_playing_paused
