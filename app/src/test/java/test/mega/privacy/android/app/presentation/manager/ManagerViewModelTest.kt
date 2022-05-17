@@ -20,6 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.getOrAwaitValue
 import java.util.concurrent.TimeoutException
+import kotlin.test.assertContains
 
 
 @ExperimentalCoroutinesApi
@@ -29,14 +30,12 @@ class ManagerViewModelTest {
     private val globalUpdateRepository = mock<GlobalUpdatesRepository>()
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
 
-    private val scheduler = TestCoroutineScheduler()
-
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
+        Dispatchers.setMain(StandardTestDispatcher())
     }
 
     /**
@@ -45,6 +44,7 @@ class ManagerViewModelTest {
      * @param updates the values to emit from the repository
      * @param after a lambda function to call after setting up the viewmodel
      */
+    @Suppress("DEPRECATION")
     private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
         whenever(globalUpdateRepository.monitorGlobalUpdates()).thenReturn(
             flow {
@@ -65,22 +65,22 @@ class ManagerViewModelTest {
         val updateUserException = assertThrows(TimeoutException::class.java) {
             underTest.updateUsers.getOrAwaitValue { advanceUntilIdle() }
         }
-        assertThat(updateUserException.message?.contains("LiveData value was never set."))
+        assertContains(updateUserException.message ?: "", "LiveData value was never set.", true)
 
         val updateUserAlertsException = assertThrows(TimeoutException::class.java) {
             underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
         }
-        assertThat(updateUserAlertsException.message?.contains("LiveData value was never set."))
+        assertContains(updateUserAlertsException.message ?: "", "LiveData value was never set.", true)
 
         val updateNodesException = assertThrows(TimeoutException::class.java) {
             underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
         }
-        assertThat(updateNodesException.message?.contains("LiveData value was never set."))
+        assertContains(updateNodesException.message ?: "", "LiveData value was never set.", true)
 
         val updateContactsRequestsException = assertThrows(TimeoutException::class.java) {
             underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
         }
-        assertThat(updateContactsRequestsException.message?.contains("LiveData value was never set."))
+        assertContains(updateContactsRequestsException.message ?: "", "LiveData value was never set.", true)
 
     }
 
@@ -136,7 +136,7 @@ class ManagerViewModelTest {
             val updateUserException = assertThrows(TimeoutException::class.java) {
                 underTest.updateUsers.getOrAwaitValue { advanceUntilIdle() }
             }
-            assertThat(updateUserException.message?.contains("LiveData value was never set."))
+            assertContains(updateUserException.message ?: "", "LiveData value was never set.", true)
         }
         triggerRepositoryUpdate(
             listOf(
@@ -147,7 +147,7 @@ class ManagerViewModelTest {
             val updateUserAlerts = assertThrows(TimeoutException::class.java) {
                 underTest.updateUserAlerts.getOrAwaitValue { advanceUntilIdle() }
             }
-            assertThat(updateUserAlerts.message?.contains("LiveData value was never set."))
+            assertContains(updateUserAlerts.message ?: "", "LiveData value was never set.", true)
         }
         triggerRepositoryUpdate(
             listOf(
@@ -158,15 +158,7 @@ class ManagerViewModelTest {
             val updateContactsRequestsException = assertThrows(TimeoutException::class.java) {
                 underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
             }
-            assertThat(updateContactsRequestsException.message?.contains("LiveData value was never set."))
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnEvent(null))
-        ) {
-            val eventException = assertThrows(TimeoutException::class.java) {
-                underTest.updateContactsRequests.getOrAwaitValue { advanceUntilIdle() }
-            }
-            assertThat(eventException.message?.contains("LiveData value was never set."))
+            assertContains(updateContactsRequestsException.message ?: "", "LiveData value was never set.", true)
         }
     }
 }
