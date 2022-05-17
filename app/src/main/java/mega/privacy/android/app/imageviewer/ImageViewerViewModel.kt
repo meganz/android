@@ -52,6 +52,9 @@ import javax.inject.Inject
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
  *                                      as well as each individual node action required by the menu
+ * @property copyNodeUseCase            Needed to copy image node on demand
+ * @property moveNodeUseCase            Needed to move image node on demand
+ * @property removeNodeUseCase          Needed to remove image node on demand
  * @property exportNodeUseCase          Needed to export image node on demand
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
@@ -240,11 +243,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOfflineNode(imageItem.handle)
+                getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri)
+                getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
 
         subscription
@@ -569,34 +572,40 @@ class ImageViewerViewModel @Inject constructor(
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         moveNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeAndComplete {
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
         removeNodeUseCase.remove(nodeHandle)
-            .subscribeAndComplete {
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
 
-    fun stopImageLoading(itemId: Long, aggressive: Boolean) {
+    fun stopImageLoading(itemId: Long) {
         images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
+            imageResult.transferTag?.let { tag ->
+                cancelTransferUseCase.cancel(tag)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onError = { error ->
+                            logError(error.stackTraceToString())
+                        }
+                    )
+            }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
             }
-            if (aggressive) {
-                imageResult.transferTag?.let { tag ->
-                    cancelTransferUseCase.cancel(tag)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                            onError = { error ->
-                                logError(error.stackTraceToString())
-                            }
-                        )
-                }
+        }
+    }
+
+    fun onLowMemory() {
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.lastPathSegment?.let { fileName ->
+            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll {
+                !it.uriString.contains(fileName)
             }
         }
     }
@@ -660,6 +669,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     private fun Completable.subscribeAndComplete(
+        addToComposite: Boolean = false,
         completeAction: (() -> Unit)? = null,
         errorAction: ((Throwable) -> Unit)? = null
     ) {
@@ -673,7 +683,8 @@ class ImageViewerViewModel @Inject constructor(
                     errorAction?.invoke(error)
                     logError(error.stackTraceToString())
                 }
-            )
-            .addTo(composite)
+            ).also {
+                if (addToComposite) it.addTo(composite)
+            }
     }
 }

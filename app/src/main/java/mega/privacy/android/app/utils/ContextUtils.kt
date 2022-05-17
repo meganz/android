@@ -23,10 +23,19 @@ object ContextUtils {
     /**
      * Return general information about the memory state of the system.
      */
-    fun Context.getAvailableMemory(): ActivityManager.MemoryInfo =
+    fun Context.getMemoryInfo(): ActivityManager.MemoryInfo =
         ActivityManager.MemoryInfo().also { memoryInfo ->
             (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memoryInfo)
         }
+
+    /**
+     * Get the available memory on the system
+     *
+     * @return  Available memory in Bytes
+     */
+    @JvmStatic
+    fun Context.getAvailableMemory(): Long =
+        getMemoryInfo().availMem
 
     /**
      * Return true if the system considers itself to currently be in a low
@@ -35,5 +44,5 @@ object ContextUtils {
      * @return  true if low memory, false otherwise
      */
     fun Context.isLowMemory(): Boolean =
-        getAvailableMemory().lowMemory
+        getMemoryInfo().lowMemory
 }

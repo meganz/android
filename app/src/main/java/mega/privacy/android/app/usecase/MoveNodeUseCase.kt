@@ -222,7 +222,7 @@ class MoveNodeUseCase @Inject constructor(
 
             var errorCount = 0
             val oldParentHandle = if (handles.size == 1) {
-                getNodeUseCase.get(handles[0]).blockingGetOrNull()?.parentHandle
+                getNodeUseCase.get(handles.first()).blockingGetOrNull()?.parentHandle
             } else {
                 INVALID_HANDLE
             }
@@ -265,7 +265,7 @@ class MoveNodeUseCase @Inject constructor(
             var errorCount = 0
             val rubbishNode = megaApi.rubbishNode
             val oldParentHandle = if (handles.size == 1) {
-                getNodeUseCase.get(handles[0]).blockingGetOrNull()?.parentHandle
+                getNodeUseCase.get(handles.first()).blockingGetOrNull()?.parentHandle
             } else {
                 INVALID_HANDLE
             }
@@ -303,7 +303,7 @@ class MoveNodeUseCase @Inject constructor(
         Single.create { emitter ->
             var errorCount = 0
             val destination: MegaNode? = if (nodes.size == 1) {
-                getNodeUseCase.get(nodes[0].restoreHandle).blockingGetOrNull()
+                getNodeUseCase.get(nodes.first().restoreHandle).blockingGetOrNull()
             } else {
                 null
             }

@@ -14,7 +14,6 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
@@ -221,7 +220,7 @@ class GetNodeUseCase @Inject constructor(
                             emitter.onError(IllegalArgumentException("Invalid key for public node"))
                         }
                     } else {
-                        emitter.onError(error.toThrowable())
+                        emitter.onError(error.toMegaException())
                     }
                 }
             ))

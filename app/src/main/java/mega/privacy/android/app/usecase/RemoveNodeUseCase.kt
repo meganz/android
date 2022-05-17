@@ -32,9 +32,7 @@ class RemoveNodeUseCase @Inject constructor(
      * @return  Completable.
      */
     fun remove(handle: Long): Completable =
-        Completable.fromCallable {
-            remove(getNodeUseCase.get(handle).blockingGetOrNull()).blockingAwait()
-        }
+        getNodeUseCase.get(handle).flatMapCompletable { node -> remove(node) }
 
     /**
      * Removes a node.

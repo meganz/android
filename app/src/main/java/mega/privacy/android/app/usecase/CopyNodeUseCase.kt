@@ -13,6 +13,8 @@ import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
