@@ -6,9 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
+import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import org.junit.Assert.assertEquals
@@ -27,7 +30,7 @@ import kotlin.test.assertContains
 class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
-    private val globalUpdateRepository = mock<GlobalUpdatesRepository>()
+    private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
 
     @get:Rule
@@ -42,16 +45,16 @@ class ManagerViewModelTest {
      * Simulate a repository emission and setup the [ManagerViewModel]
      *
      * @param updates the values to emit from the repository
-     * @param after a lambda function to call after setting up the viewmodel
+     * @param after a lambda function to call after setting up the viewModel
      */
     @Suppress("DEPRECATION")
     private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
-        whenever(globalUpdateRepository.monitorGlobalUpdates()).thenReturn(
+        whenever(monitorGlobalUpdates()).thenReturn(
             flow {
                 updates.forEach { emit(it) }
             }
         )
-        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
         after()
     }
 
@@ -59,7 +62,7 @@ class ManagerViewModelTest {
     fun `test that live data are not set when no updates are triggered from api`() = runTest {
         underTest = ManagerViewModel(
             monitorNodeUpdates,
-            globalUpdateRepository
+            monitorGlobalUpdates
         )
 
         val updateUserException = assertThrows(TimeoutException::class.java) {
@@ -87,7 +90,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that live data value is set when node updates is triggered from api`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
         val updateNodes = underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
         assertEquals(updateNodes.size, 1)
     }
@@ -96,7 +99,7 @@ class ManagerViewModelTest {
     fun `test that live data value is not set when node updates is triggered from api with an empty list`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
 
-        underTest = ManagerViewModel(monitorNodeUpdates, globalUpdateRepository)
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
         val updateNodesException = assertThrows(TimeoutException::class.java) {
             underTest.updateNodes.getOrAwaitValue { advanceUntilIdle() }
         }

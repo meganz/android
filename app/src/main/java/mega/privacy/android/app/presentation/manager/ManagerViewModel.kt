@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
+import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaNode
@@ -25,19 +25,19 @@ import javax.inject.Inject
  * ViewModel associated to {@link mega.privacy.android.app.main.ManagerActivity}
  *
  * @param monitorNodeUpdates Monitor global node updates
- * @param globalUpdatesRepository Monitor global updates
+ * @param monitorGlobalUpdates Monitor global updates
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
-    globalUpdatesRepository: GlobalUpdatesRepository,
+    monitorGlobalUpdates: MonitorGlobalUpdates,
 ) : ViewModel() {
 
     /**
      * Monitor all global updates
      */
     @Suppress("DEPRECATION")
-    private val updates = globalUpdatesRepository.monitorGlobalUpdates()
+    private val updates = monitorGlobalUpdates()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
