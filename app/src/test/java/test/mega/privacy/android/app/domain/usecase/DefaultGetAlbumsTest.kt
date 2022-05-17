@@ -8,6 +8,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.Album
@@ -23,6 +24,9 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.times
+import org.mockito.kotlin.clearInvocations
 import java.io.File
 
 @OptIn(FlowPreview::class)
@@ -97,6 +101,7 @@ class DefaultGetAlbumsTest {
 
         underTest()
                 .flatMapConcat { it.asFlow() }
+                .drop(1)
                 .test {
                     assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
                     cancelAndIgnoreRemainingEvents()
@@ -118,6 +123,7 @@ class DefaultGetAlbumsTest {
 
                 underTest()
                         .flatMapConcat { it.asFlow() }
+                        .drop(1)
                         .test {
                             assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
                             cancelAndIgnoreRemainingEvents()
@@ -139,6 +145,7 @@ class DefaultGetAlbumsTest {
 
                 underTest()
                         .flatMapConcat { it.asFlow() }
+                        .drop(1)
                         .test {
                             assertThat(awaitItem().thumbnail).isSameInstanceAs(thumbnail)
                             cancelAndIgnoreRemainingEvents()
@@ -190,6 +197,7 @@ class DefaultGetAlbumsTest {
 
         underTest()
                 .flatMapConcat { it.asFlow() }
+                .drop(1)
                 .test {
                     assertThat(awaitItem().thumbnail).isSameInstanceAs(expectedThumbnail)
                     cancelAndIgnoreRemainingEvents()
@@ -215,6 +223,7 @@ class DefaultGetAlbumsTest {
 
         underTest()
                 .flatMapConcat { it.asFlow() }
+                .drop(1) // drop the default empty favourite album
                 .test {
                     assertThat(awaitItem().itemCount).isEqualTo(favourites.size)
                     cancelAndIgnoreRemainingEvents()
@@ -222,8 +231,54 @@ class DefaultGetAlbumsTest {
     }
 
     @Test
-    fun `test that items are fetched again when nodes are updated`() = runTest {
+    fun `test that items are fetched again when new favourites are returned`() = runTest {
+        clearInvocations(getThumbnail)
+        val favourites = (1..6).map {
+            createFavouriteItem(id = it.toLong(), lastModified = it.toLong(), isImage = true)
+        }
 
+        whenever(getAllFavorites()).thenReturn(
+                flowOf(
+                        favourites,
+                        favourites
+                )
+        )
+
+        underTest().test {
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(getThumbnail, times(2)).invoke(any())
+    }
+
+    // black box test
+    @Test
+    fun `test that new album is return when new favourites are returned`() = runTest {
+        val id1 = 1L
+        val id2 = 2L
+        val thumbnail1 = File("Thumbnail1")
+        val thumbnail2 = File("Thumbnail2")
+
+        whenever(getAllFavorites()).thenReturn(
+                flowOf(
+                        listOf(
+                                createFavouriteItem(id = id1, isImage = true)
+                        ),
+                        listOf(
+                                createFavouriteItem(id = id2, isImage = true)
+                        ),
+                )
+        )
+
+        whenever(getThumbnail(id1)).thenReturn(thumbnail1)
+        whenever(getThumbnail(id2)).thenReturn(thumbnail2)
+
+        underTest().test{
+            assertThat(awaitItem()[0].thumbnail).isNull()
+            assertThat(awaitItem()[0].thumbnail).isEqualTo(thumbnail1)
+            assertThat(awaitItem()[0].thumbnail).isEqualTo(thumbnail2)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun createFavouriteItem(
