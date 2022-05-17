@@ -2,6 +2,7 @@ package mega.privacy.android.app.main;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +47,8 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -295,17 +299,36 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
 	 * So opens the system file picker in order to give the option to chose a CU or MU local folder.
 	 */
 	private void openPickCUFolderFromSystem() {
-		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
+		try {
+			startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+					.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
+		} catch (ActivityNotFoundException e) {
+			showOpenDocumentWarningAndFinish(e);
+		}
 	}
 
 	/**
 	 * Opens the file picker in order to allow the user choose a default download location.
 	 */
 	private void openPickDownloadFolderFromSystem() {
-		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-						.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
-				REQUEST_PICK_DOWNLOAD_FOLDER);
+		try {
+			startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+							.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+					REQUEST_PICK_DOWNLOAD_FOLDER);
+		} catch (ActivityNotFoundException e) {
+			showOpenDocumentWarningAndFinish(e);
+		}
+	}
+
+	/**
+	 * Shows a warning when there is no app to pick folders and finishes.
+	 *
+	 * @param e The caught exception.
+	 */
+	private void showOpenDocumentWarningAndFinish(ActivityNotFoundException e) {
+		Timber.e(e, "Error launching ACTION_OPEN_DOCUMENT_TREE.");
+		showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.general_warning_no_picker));
+		new Handler().postDelayed(this::finish, LONG_SNACKBAR_DURATION);
 	}
 
 	/**

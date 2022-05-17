@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
-        app:roundingBorderColor="@color/white"
+        app:roundingBorderColor="@color/white_dark_grey"
         app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
-        app:roundingBorderColor="@color/white"
+        app:roundingBorderColor="@color/white_dark_grey"
         app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 

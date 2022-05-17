@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
@@ -536,6 +537,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             dialogBinding.firstNameLayout,
                             dialogBinding.firstNameErrorIcon
                         )
+                    }
+
+                    post {
+                        requestFocus()
+                        setSelection(length())
+                        showSoftKeyboard()
                     }
                 }
 

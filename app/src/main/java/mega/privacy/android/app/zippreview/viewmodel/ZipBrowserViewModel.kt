@@ -5,27 +5,32 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.zippreview.domain.FileType
-import mega.privacy.android.app.zippreview.domain.IZipFileRepo
+import mega.privacy.android.app.zippreview.domain.ZipFileRepository
 import mega.privacy.android.app.zippreview.domain.ZipTreeNode
 import mega.privacy.android.app.zippreview.ui.ZipInfoUIO
+import timber.log.Timber
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
 /**
  * ViewModel regarding to zip preview
- * @param zipFileRepo ZipFileRepo
+ * @param zipFileRepository ZipFileRepo
  */
 @HiltViewModel
-class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileRepo) :
-    ViewModel() {
+class ZipBrowserViewModel @Inject constructor(
+    private val zipFileRepository: ZipFileRepository,
+    private val crashReporter: CrashReporter
+) : ViewModel() {
     companion object {
         private const val TITLE_ZIP = "ZIP "
         private const val SUFFIX_ZIP = ".zip"
@@ -38,7 +43,7 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
 
     private lateinit var rootFolderPath: String
 
-    private lateinit var currentZipInfo: ZipInfoUIO
+    private var currentZipInfo: ZipInfoUIO? = null
 
     private var _title = MutableLiveData<String>()
     val title: LiveData<String>
@@ -60,6 +65,15 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
     val openFile: LiveData<Pair<Int, ZipInfoUIO>>
         get() = _openFile
 
+    private var isException = false
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Timber.e(exception)
+        if (exception is IllegalArgumentException) {
+            isException = true
+        }
+    }
+
     /**
      * The type of clicked item
      */
@@ -73,11 +87,11 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
      */
     private fun updateZipInfoList(folderPath: String = "") {
         _zipInfoList.value =
-            zipFileRepo.updateZipInfoList(zipFile, folderPath).map {
+            zipFileRepository.updateZipInfoList(zipFile, folderPath).map {
                 zipTreeNodeToZipInfoUIO(it)
             }
 
-        getTitle(if (folderPath.isEmpty()) "" else folderPath)
+        getTitle(folderPath.ifEmpty { "" })
     }
 
     /**
@@ -134,10 +148,12 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
     fun viewModelInit(zipFullPath: String, unzipRootPath: String) {
         this.zipFullPath = zipFullPath
         this.unzipRootPath = "${unzipRootPath}${File.separator}"
+        // Log the zip file path
+        crashReporter.log("Path of ZipFile(viewModelInit) is $zipFullPath")
         zipFile = ZipFile(zipFullPath)
         rootFolderPath = unzipRootPath.split("/").last()
-        viewModelScope.launch {
-            zipFileRepo.initZipTreeNode(zipFile)
+        viewModelScope.launch(handler) {
+            zipFileRepository.initZipTreeNode(zipFile)
             updateZipInfoList()
         }
     }
@@ -147,8 +163,13 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
      * @return if true, use super.onBackPress(). If false, return parent directory
      */
     fun backOnPress(): Boolean {
+        if (isException) {
+            return true
+        }
         if (zipInfoList.value.isNullOrEmpty()) {
-            return backUpdateZipInfoList(currentZipInfo.path, true)
+            return currentZipInfo?.run {
+                backUpdateZipInfoList(this.path, true)
+            } ?: true
         } else {
             _zipInfoList.value?.get(0)?.path?.apply {
                 return backUpdateZipInfoList(this, false)
@@ -164,12 +185,13 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
      * @return validation that parent folder content whether is empty, if true close activity
      */
     private fun backUpdateZipInfoList(parentFolderPath: String, isEmptyFolder: Boolean): Boolean {
-        _zipInfoList.value = zipFileRepo.getParentZipInfoList(parentFolderPath, isEmptyFolder).map {
-            zipTreeNodeToZipInfoUIO(it)
-        }.also {
-            val firstNodeParent = it.firstOrNull()?.parent
-            getTitle(if (firstNodeParent.isNullOrEmpty()) "" else firstNodeParent)
-        }
+        _zipInfoList.value =
+            zipFileRepository.getParentZipInfoList(parentFolderPath, isEmptyFolder).map {
+                zipTreeNodeToZipInfoUIO(it)
+            }.also {
+                val firstNodeParent = it.firstOrNull()?.parent
+                getTitle(if (firstNodeParent.isNullOrEmpty()) "" else firstNodeParent)
+            }
         return zipInfoList.value.isNullOrEmpty()
     }
 
@@ -214,7 +236,7 @@ class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileR
      */
     private fun unpackedZipFile(zipInfoUIO: ZipInfoUIO, position: Int) {
         viewModelScope.launch {
-            zipFileRepo.unzipFile(zipFullPath, unzipRootPath)
+            zipFileRepository.unzipFile(zipFullPath, unzipRootPath)
             _showProgressDialog.value = false
             _openFile.value = Pair(position, zipInfoUIO)
         }

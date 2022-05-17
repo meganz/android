@@ -35,6 +35,7 @@ class ImagesFragment : BaseZoomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showBottomNav = false
         initViewCreated()
         subscribeObservers()
     }
@@ -69,6 +70,9 @@ class ImagesFragment : BaseZoomFragment() {
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
+        if (isInActionMode()) {
+            mManagerActivity.updateCUViewTypes(View.GONE)
+        }
     }
 
     override fun handleZoomChange(zoom: Int, needReload: Boolean) {
@@ -91,12 +95,11 @@ class ImagesFragment : BaseZoomFragment() {
                 gridAdapter.submitList(it)
             }
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
+            viewTypePanel.visibility = if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
-                viewTypePanel.visibility = View.GONE
             } else {
                 handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-                viewTypePanel.visibility = View.VISIBLE
             }
             removeSortByMenu()
         }
@@ -105,11 +108,6 @@ class ImagesFragment : BaseZoomFragment() {
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
-        ColorUtils.setImageViewAlphaIfDark(
-            context,
-            binding.emptyHint.emptyHintImage,
-            ColorUtils.DARK_IMAGE_ALPHA
-        )
         binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
                 context,

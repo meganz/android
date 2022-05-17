@@ -37,6 +37,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     private lateinit var binding: FragmentTimelineBinding
 
+    private lateinit var photosFragment: PhotosFragment
+
     /**
      * Current order.
      */
@@ -76,7 +78,13 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        photosFragment = parentFragment as PhotosFragment
         initAfterViewCreated()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mManagerActivity.refreshTimelineFragment()
     }
 
     override fun onBackPressed() = when {
@@ -232,7 +240,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             return
         }
 
-        mManagerActivity.updateCUViewTypes(View.VISIBLE)
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
@@ -302,13 +309,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             }
 
             actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
-            viewTypePanel.visibility = if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
 
-            if (galleryItems.isEmpty()) {
-                handleOptionsMenuUpdate(shouldShow = false)
-            } else {
-                handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
-            }
+            updateOptionsButtons()
 
             updateEnableCUButtons(
                 gridAdapterHasData = galleryItems.isNotEmpty(),
@@ -317,7 +319,17 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             binding.emptyHint.visibility = if (galleryItems.isEmpty()) View.VISIBLE else View.GONE
             listView.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
             binding.scroller.visibility = if (galleryItems.isEmpty()) View.GONE else View.VISIBLE
-            mManagerActivity.updateCUViewTypes(if (galleryItems.isEmpty() || (parentFragment as PhotosFragment).currentTab !is TimelineFragment || actionMode != null) View.GONE else View.VISIBLE)
+            mManagerActivity.updateCUViewTypes(
+                if (
+                    galleryItems.isEmpty() ||
+                    photosFragment.tabIndex != 0 ||
+                    actionMode != null
+                ) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
+            )
         }
 
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
@@ -343,7 +355,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (!cuEnabled) {
-            hideCUProgress()
+            photosFragment.hideCUProgress()
         }
     }
 
@@ -381,20 +393,31 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (selectedView != ALL_VIEW) {
-            hideCUProgress()
-            binding.uploadProgress.visibility = View.GONE
+            photosFragment.hideCUProgress()
+            photosFragment.setUploadProgressTextVisibility(View.GONE)
         }
     }
 
     public override fun setHideBottomViewScrollBehaviour() {
-        mManagerActivity.showBottomView()
-        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        if (!isInActionMode()) {
+            mManagerActivity.showBottomView()
+            mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
+        }
+    }
+
+    fun updateOptionsButtons() {
+        if (viewModel.items.value?.isEmpty() == true || mManagerActivity.fromAlbumContent) {
+            handleOptionsMenuUpdate(shouldShow = false)
+        } else {
+            handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
+        }
     }
 
     override fun whenStartActionMode() {
         if (!mManagerActivity.isInPhotosPage) return
-        animateBottomView()
-        with(parentFragment as PhotosFragment) {
+        super.whenStartActionMode()
+        mManagerActivity.animateCULayout(true)
+        with(photosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
         }
@@ -405,40 +428,20 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!mManagerActivity.isInPhotosPage) return
         // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
-        mManagerActivity.updateCUViewTypes(if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) View.VISIBLE else View.GONE)
-        with(parentFragment as PhotosFragment) {
+        super.whenEndActionMode()
+        mManagerActivity.animateCULayout(viewModel.isCUEnabled())
+        with(photosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
         }
 
     }
 
-    /**
-     * Hides CU progress bar and checks the scroll
-     * in order to hide elevation if the list is not scrolled.
-     */
-    private fun hideCUProgress() {
-        mManagerActivity.hideCUProgress()
-        checkScroll()
-    }
-
     override fun checkScroll() {
         if (!this::binding.isInitialized || !listViewInitialized()) return
 
         val isScrolled = listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-        mManagerActivity.changeAppBarElevation(binding.uploadProgress.isVisible || isScrolled)
-    }
-
-    /**
-     * update progress UI
-     */
-    fun updateProgress(visibility: Int, pending: Int) {
-        if (binding.uploadProgress.visibility != visibility) {
-            binding.uploadProgress.visibility = visibility
-            checkScroll()
-        }
-        binding.uploadProgress.text = StringResourcesUtils
-            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
+        mManagerActivity.changeAppBarElevation(photosFragment.getUploadProgressText().isVisible || isScrolled)
     }
 
     /**
@@ -480,18 +483,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(isShowMenu())
-    }
-
-    override fun animateBottomView() {
-        val hide = actionMode != null
-        with(mManagerActivity) {
-            animateCULayout(hide || viewModel.isCUEnabled())
-            animateBottomView(hide)
-            setDrawerLockMode(hide)
-            //action mode should hide BottomNavigationView
-            showHideBottomNavigationView(hide)
-        }
-        checkScroll()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

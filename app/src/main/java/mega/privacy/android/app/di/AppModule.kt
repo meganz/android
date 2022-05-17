@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
+import android.os.Process
 import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -13,8 +14,12 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -68,4 +73,18 @@ class AppModule {
     @Provides
     fun providePreferences(@ApplicationContext context: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
+
+    @Singleton
+    @Provides
+    fun provideThreadPoolExecutor(): ThreadPoolExecutor {
+        val noOfCores = Runtime.getRuntime().availableProcessors()
+        return ThreadPoolExecutor(
+            noOfCores * 4,
+            noOfCores * 8,
+            60L,
+            TimeUnit.SECONDS,
+            LinkedBlockingQueue<Runnable>(),
+            MegaThreadFactory(Process.THREAD_PRIORITY_BACKGROUND)
+        )
+    }
 }

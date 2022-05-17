@@ -112,9 +112,9 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages()
     }
 
-    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, currentNodeHandle: Long? = null) {
+    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, itemId: Long? = null) {
         getImageHandlesUseCase.get(imageFileUri = imageUri, showNearbyFiles = showNearbyFiles)
-            .subscribeAndUpdateImages(currentNodeHandle)
+            .subscribeAndUpdateImages(itemId)
     }
 
     fun retrieveImagesFromParent(
@@ -218,11 +218,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOffline(imageItem.handle)
+                getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri)
+                getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
 
         subscription
@@ -500,22 +500,28 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun stopImageLoading(itemId: Long, aggressive: Boolean) {
+    fun stopImageLoading(itemId: Long) {
         images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
+            imageResult.transferTag?.let { tag ->
+                cancelTransferUseCase.cancel(tag)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onError = { error ->
+                            logError(error.stackTraceToString())
+                        }
+                    )
+            }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
             }
-            if (aggressive) {
-                imageResult.transferTag?.let { tag ->
-                    cancelTransferUseCase.cancel(tag)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                            onError = { error ->
-                                logError(error.stackTraceToString())
-                            }
-                        )
-                }
+        }
+    }
+
+    fun onLowMemory() {
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.lastPathSegment?.let { fileName ->
+            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll {
+                !it.uriString.contains(fileName)
             }
         }
     }
@@ -563,7 +569,7 @@ class ImageViewerViewModel @Inject constructor(
                 onSuccess = { items ->
                     images.value = items.toList()
 
-                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() }
+                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id }
                     if (position != INVALID_POSITION) {
                         updateCurrentPosition(position, true)
                     } else {

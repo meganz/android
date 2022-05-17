@@ -2,7 +2,11 @@ package mega.privacy.android.app.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
@@ -10,56 +14,77 @@ import mega.privacy.android.app.data.extensions.isType
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.mapper.UserUpdateMapper
+import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.entity.user.UserId
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.NoLoggedInUserException
 import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Default implementation of [AccountRepository]
+ *
+ * @property myAccountInfoFacade
+ * @property megaApiGateway
+ * @property context
+ * @property monitorMultiFactorAuth
+ * @property ioDispatcher
+ */
 @ExperimentalContracts
 class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
-    private val apiFacade: MegaApiGateway,
+    private val megaApiGateway: MegaApiGateway,
     @ApplicationContext private val context: Context,
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val userUpdateMapper: UserUpdateMapper,
 ) : AccountRepository {
-    override fun getUserAccount(): UserAccount {
-        return UserAccount(
-            email = apiFacade.accountEmail ?: "",
-            isBusinessAccount = apiFacade.isBusinessAccount,
-            isMasterBusinessAccount = apiFacade.isMasterBusinessAccount,
+
+    override suspend fun getUserAccount() = withContext(ioDispatcher) {
+        val user = megaApiGateway.getLoggedInUser()
+        UserAccount(
+            userId = user?.let { UserId(it.handle) },
+            email = user?.email ?: "",
+            isBusinessAccount = megaApiGateway.isBusinessAccount,
+            isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount,
             accountTypeIdentifier = myAccountInfoFacade.accountTypeId
         )
     }
 
-    override fun isAccountDataStale(): Boolean {
-        LogUtil.logDebug("Check the last call to getAccountDetails")
-        return DBUtil.callToAccountDetails() || myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
+    override fun isAccountDataStale(): Boolean =
+        databaseEntryIsStale() || storageCapacityUsedIsBlank()
+
+    private fun databaseEntryIsStale() = DBUtil.callToAccountDetails().also {
+        Timber.d("Check the last call to getAccountDetails")
     }
 
-    override fun requestAccount() {
-        (context as MegaApplication).askForAccountDetails()
-    }
+    private fun storageCapacityUsedIsBlank() =
+        myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
-    override fun getRootNode(): MegaNode? = apiFacade.rootNode
+    override fun requestAccount() = (context as MegaApplication).askForAccountDetails()
 
-    override fun isMultiFactorAuthAvailable(): Boolean {
-        return apiFacade.multiFactorAuthAvailable()
-    }
+    override fun getRootNode(): MegaNode? = megaApiGateway.rootNode
 
-    override suspend fun isMultiFactorAuthEnabled(): Boolean {
-        return suspendCoroutine { continuation ->
-            apiFacade.multiFactorAuthEnabled(
-                apiFacade.accountEmail,
+    override fun isMultiFactorAuthAvailable() = megaApiGateway.multiFactorAuthAvailable()
+
+    @Throws(MegaException::class)
+    override suspend fun isMultiFactorAuthEnabled(): Boolean = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.multiFactorAuthEnabled(
+                megaApiGateway.accountEmail,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onMultiFactorAuthCheckRequestFinish(continuation)
                 )
@@ -68,7 +93,7 @@ class DefaultAccountRepository @Inject constructor(
     }
 
     private fun onMultiFactorAuthCheckRequestFinish(
-        continuation: Continuation<Boolean>
+        continuation: Continuation<Boolean>,
     ) = { request: MegaRequest, error: MegaError ->
         if (request.isType(MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK)) {
             if (error.errorCode == MegaError.API_OK) {
@@ -77,13 +102,12 @@ class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override fun monitorMultiFactorAuthChanges(): Flow<Boolean> {
-        return monitorMultiFactorAuth.getEvents()
-    }
+    override fun monitorMultiFactorAuthChanges() =
+        monitorMultiFactorAuth.getEvents()
 
-    override suspend fun requestDeleteAccountLink() {
-        return suspendCoroutine { continuation ->
-            apiFacade.cancelAccount(
+    override suspend fun requestDeleteAccountLink() = withContext<Unit>(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.cancelAccount(
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onDeleteAccountRequestFinished(continuation)
                 )
@@ -115,5 +139,9 @@ class DefaultAccountRepository @Inject constructor(
             }
         }
 
+    override fun monitorUserUpdates() = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull { it.users }
+        .map { userUpdateMapper(it) }
 
 }

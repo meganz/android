@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Access</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">Register now and get 20&#160;GB of free storage</string>
     <!--  -->
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <!--  -->
@@ -383,7 +383,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">View transfers</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4GB. Your download will probably fail</string>
+    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">There isn’t any available app to execute this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Folder link unavailable</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS or AUP violation.</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link unavailable</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS or AUP violation.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2167,7 +2167,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA\’s Terms of Service including, but not limited to, clause 15.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2177,21 +2177,21 @@
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2412,9 +2412,9 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Write message to %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Two-Factor Authentication</string>
+    <string name="settings_2fa">Two-factor authentication</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Two-Factor Authentication is a second layer of security for your account.</string>
+    <string name="setting_subtitle_2fa">Two-factor authentication is a second layer of security for your account.</string>
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Why do you need two-factor authentication?</string>
     <!--  -->
@@ -2436,11 +2436,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">An error occurred generating the seed or QR code, please try again.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Two-Factor Authentication Enabled</string>
+    <string name="title_2fa_enabled">Two-factor authentication enabled</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
+    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2458,23 +2458,23 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Lost your Authenticator device?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
+    <string name="error_disable_2fa">An error occurred trying to disable two-factor authentication. Please try again.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
+    <string name="error_enable_2fa">An error occurred trying to enable two-factor authentication. Please try again.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Enable Two-Factor Authentication</string>
+    <string name="title_enable_2fa">Enable two-factor authentication</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Two-Factor Authentication Disabled</string>
+    <string name="label_2fa_disabled">Two-factor authentication disabled</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Open in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">There isn’t any available app to enable Two-Factor Authentication on your device</string>
+    <string name="intent_not_available_2fa">There isn’t any available app to enable two-factor authentication on your device</string>
     <!-- Text button -->
     <string name="general_close">Close</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Export your Recovery Key to finish</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Two-factor authentication app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
     <!-- Label Play Store -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Dispute Takedown</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible due to ToS or AUP violation</string>
+    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
@@ -3153,11 +3153,11 @@
     <!-- Content of second tour screen -->
     <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
     <!-- Title of third tour screen -->
-    <string name="title_tour_three">Create your Network</string>
+    <string name="title_tour_three">Create your network</string>
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Your Photos in the Cloud</string>
+    <string name="title_tour_four">Your photos in the cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Start chatting securely with your contacts using end-to-end encryption</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20 GB of free cloud storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20&#160;GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">No chat link available.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3555,13 +3555,13 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">No documents found</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">No audio files found</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">No videos found</string>
+    <string name="homepage_empty_hint_photos">[B]No[/B] [A]images[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Search GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3814,7 +3814,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
+    <string name="photos_empty">[B]No[/B] [A]photos[/A] [B]found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3828,7 +3828,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s, %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload in progress, 1 file pending</item>
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file already downloaded. %d files pending.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d files already downloaded. 1 file pending.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d files already downloaded. %2$d files pending.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and %d items were not sent successfully</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items moved to the Rubbish Bin successfully and %2$d items were not sent successfully</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item restored successfully and 1 item was not restored successfully</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item restored successfully and %d items were not restored successfully</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d items restored successfully and 1 item was not restored successfully</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items restored successfully and %2$d items were not restored successfully</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">1 file already downloaded. %d files pending.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
@@ -4061,7 +4067,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA meeting</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">End-to-end encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4073,7 +4079,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Get 20 GB for free</string>
+    <string name="left_meeting_bonus_title">Get 20&#160;GB for free</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4297,4 +4303,24 @@
     <string name="action_remove_favourites">Remove favourites</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">You have entered your current password</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">File no longer available</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">File removed as it violated our Terms of Service.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Next</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Previous</string>
+    <!-- Next videos to be played in the audio playlist -->
+    <string name="media_player_video_playlist_next">Next</string>
+    <!-- Previous videos have been already played in the audio playlist -->
+    <string name="media_player_video_playlist_previous">Previous</string>
 </resources>

@@ -134,7 +134,7 @@ class MediaPlayerServiceViewModel(
     var paused = false
         set(value) {
             field = value
-            postPlaylistItems()
+            postPlaylistItems(false)
             _mediaPlaybackState.update {
                 value
             }
@@ -873,7 +873,14 @@ class MediaPlayerServiceViewModel(
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
-            items[index] = item.finalizeItem(index, type, item.isSelected)
+            items[index] =
+                item.finalizeItem(
+                    index = index,
+                    type = type,
+                    isSelected = item.isSelected,
+                    duration = item.duration,
+                    currentPosition = item.currentPosition
+                )
         }
 
         val hasPrevious = playingIndex > 0
@@ -896,11 +903,31 @@ class MediaPlayerServiceViewModel(
         _playlist.postValue(Pair(items, scrollPosition))
     }
 
-    private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
-        val filteredItems = ArrayList<PlaylistItem>()
+    /**
+     * Set the duration for playing item
+     * @param duration the duration of audio
+     * @param currentPosition the current position of audio
+     */
+    fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
+        val list = mutableListOf<PlaylistItem>()
+        list.addAll(playlistItems.map { playListItem ->
+            if (playListItem.nodeHandle == playingHandle) {
+                playListItem.copy(duration = duration, currentPosition = currentPosition)
+            } else {
+                playListItem
+            }
+        })
+        playlistItems.clear()
+        playlistItems.addAll(list)
+        postPlaylistItems(false)
+    }
 
-        for ((index, item) in items.withIndex()) {
-            if (item.nodeName.lowercase(Locale.ROOT).contains(filter)) {
+    private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
+        if (items.isEmpty()) return
+
+        val filteredItems = ArrayList<PlaylistItem>()
+        items.forEachIndexed { index, item ->
+            if (item.nodeName.contains(filter, true)) {
                 // Filter only affects displayed playlist, it doesn't affect what
                 // ExoPlayer is playing, so we still need use the index before filter.
                 filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))

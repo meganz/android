@@ -95,11 +95,11 @@ class ContactListViewModel @Inject constructor(
     fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
         contacts.map { items ->
             if (queryString.isNullOrBlank() && items.any { it.isNew }) {
-                val itemsWithHeaders = mutableListOf<ContactItem>()
-                itemsWithHeaders.add(ContactItem.Header(getString(R.string.section_recently_added)))
-                itemsWithHeaders.addAll(items.filter { it.isNew })
-                itemsWithHeaders.add(ContactItem.Header(getString(R.string.section_contacts)))
-                itemsWithHeaders
+                mutableListOf<ContactItem>().apply {
+                    add(ContactItem.Header(getString(R.string.section_recently_added)))
+                    addAll(items.filter { it.isNew })
+                    add(ContactItem.Header(getString(R.string.section_contacts)))
+                }
             } else {
                 emptyList()
             }

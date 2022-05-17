@@ -163,7 +163,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Czy na pewno chcesz anulować bieżący proces logowania?</string>
     <!-- Login button -->
-    <string name="login_text">Login</string>
+    <string name="login_text">Zaloguj się</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -213,7 +213,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Dostępność</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Zarejestruj się teraz i otrzymaj 20 GB darmowej pamięci masowej</string>
+    <string name="tour_space_text">Zarejestruj się teraz i otrzymaj 20&#160;GB darmowej pamięci masowej</string>
     <!--  -->
     <string name="tour_speed_text">Wgrywanie jest szybkie. Udostępniaj pliki z każdym</string>
     <!--  -->
@@ -399,7 +399,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Pokaż transfery</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Większość urządzeń nie jest wstanie pobierać plików większych niż 4GB. Twoj pobieranie prawdopodobnie nie powiedzie się</string>
+    <string name="error_file_size_greater_than_4gb">Większość urządzeń nie jest wstanie pobierać plików większych niż 4&#160;GB. Twoj pobieranie prawdopodobnie nie powiedzie się</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Nie znaleziono aplikacji do otworzenia tego pliku na Twoim urządzeniu</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -2255,7 +2255,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2265,7 +2265,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s MB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;MB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -3375,7 +3375,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Zacznij czatować bezpiecznie ze swoimi kontaktami za pomocą szyfrowania end-to-end</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Cześć. Prowadź ze mną bezpieczne rozmowy na MEGA i otrzymaj 20 GB darmowej pamięci w chmurze. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Cześć. Prowadź ze mną bezpieczne rozmowy na MEGA i otrzymaj 20&#160;GB darmowej pamięci w chmurze. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Brak dostępnego linku do czatu.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4239,7 +4239,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Kliknij , aby dołączyć do bieżącego spotkania.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">MEGA spotkanie</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4251,7 +4251,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Dołącz do największej na świecie platformy bezpiecznego przechowywania danych i współpracy w chmurze.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Uzyskaj 20 GB za darmo</string>
+    <string name="left_meeting_bonus_title">Uzyskaj 20&#160;GB za darmo</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Zarejestruj się teraz i korzystaj z zaawansowanych funkcji współpracy za darmo.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4458,7 +4458,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Masz aktywną subskrypcję MEGA z %1$s. Musisz ją anulować oddzielnie w %2$s, ponieważ MEGA nie może jej anulować za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Masz aktywną subskrypcję MEGA. Zostanie ona automatycznie anulowana po usunięciu konta. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Masz aktywną subskrypcję MEGA w Apple. Musisz ją anulować oddzielnie ze swojego konta iTunes, ponieważ MEGA nie jest w stanie anulować jej za Ciebie. Odwiedź nasze Centrum Pomocy, aby uzyskać więcej informacji.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4475,4 +4475,10 @@
     <string name="empty_hint_favourite_album">[B]Brak[/B] [A]ulubionych[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Usuń ulubione</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">Wybrany folder jest pusty. Brak plików do przesłania.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Wprowadziłeś swoje aktualne hasło</string>
 </resources>

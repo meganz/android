@@ -95,6 +95,9 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
+        if (isInActionMode()) {
+            mManagerActivity.updateCUViewTypes(View.GONE)
+        }
     }
 
     override fun handleZoomChange(zoom: Int, needReload: Boolean) {
@@ -119,12 +122,11 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            viewTypePanel.visibility = if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
-                viewTypePanel.visibility = View.GONE
             } else {
                 handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-                viewTypePanel.visibility = View.VISIBLE
             }
         }
     }

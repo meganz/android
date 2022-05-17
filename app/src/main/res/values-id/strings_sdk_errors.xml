@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Tidak selesai</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Kunci salah/Dekripsi salah</string>
+    <string name="api_ekey">Kunci salah atau dekripsi salah</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Sesi ID buruk</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -55,7 +55,7 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Kuota tidak cukup</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">Diperlukan Otentikasi Dua Faktor.</string>
+    <string name="api_emfarequired">Diperlukan otentikasi dua faktor.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Akses ditolak untuk pengguna non-admin</string>
     <!-- A dialog title shown to users when their business account is expired. -->

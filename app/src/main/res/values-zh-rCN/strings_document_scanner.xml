@@ -5,17 +5,17 @@
     <!-- Screen title for saving current scan (Document scanner) -->
     <string name="scan_title_save_scan">保存扫描</string>
     <!-- Label of the button to add a new page to the current document scan -->
-    <string name="scan_action_add">新增</string>
+    <string name="scan_action_add">添加</string>
     <!-- Action of a button to save something -->
     <string name="scan_action_save">保存</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">重新扫描</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">文件名</string>
+    <string name="scan_file_name">文件名称</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">文件类型</string>
     <!-- Input field description in the document save screen (Document scanner) -->
-    <string name="scan_quality">画质</string>
+    <string name="scan_quality">品质</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_destination">位置</string>
     <!-- Document scanner high quality option -->
@@ -37,15 +37,15 @@
     <!-- Body text shown on document scanner dialog to delete current scan -->
     <string name="scan_dialog_delete_body">删除当前扫描？</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
-    <string name="scan_requires_permission">“相机”需获取此权限才能扫描文件</string>
+    <string name="scan_requires_permission">扫描文档需要获取“相机“权限</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">文件名无效</string>
+    <string name="scan_incorrect_name">无效的名称</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">无效的字符</string>
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">请更改您的文件名后继续</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">正在准备%1$s。请稍等&#8230;</string>
+    <string name="scan_dialog_progress">正在准备%1$s。请稍后&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->
     <string name="scan_snackbar_invalid_characters">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
 </resources>

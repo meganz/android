@@ -19,14 +19,12 @@ import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.core.content.ContextCompat;
@@ -72,7 +70,7 @@ public class UploadUtil {
      */
     public static void uploadTakePicture(Context context, long parentHandle, MegaApiAndroid megaApi) {
         logDebug("uploadTakePicture");
-        File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
+        File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
             Util.showSnackbar(context, context.getString(R.string.general_error));
             return;
@@ -80,7 +78,7 @@ public class UploadUtil {
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
         logDebug("Taken picture Name: "+name);
-        File newFile = buildTempFile(context, name);
+        File newFile = CacheFolderManager.buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
         uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
@@ -159,7 +157,9 @@ public class UploadUtil {
         }
 
         int size = uploadResults.size();
-        Util.showSnackbar(activity, getQuantityString(R.plurals.upload_began, size, size));
+        Util.showSnackbar(activity, size > 0
+                ? getQuantityString(R.plurals.upload_began, size, size)
+                : getString(R.string.no_uploads_empty_folder));
     }
 
     /** The method is to return sdcard root of the file

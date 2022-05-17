@@ -9,6 +9,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
@@ -19,12 +20,14 @@ import mega.privacy.android.app.databinding.ItemPlaylistBinding
  * @param context Context
  * @param itemOperation PlaylistItemOperation
  * @param paused Whether is paused
+ * @param isAudio whether is audio
  * @param dragStartListener DragStartListener
  */
 class PlaylistAdapter(
     private val context: Context,
     private val itemOperation: PlaylistItemOperation,
     var paused: Boolean = false,
+    val isAudio: Boolean,
     private val dragStartListener: DragStartListener
 ) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
     companion object {
@@ -60,8 +63,15 @@ class PlaylistAdapter(
         val playlistItem = getItem(holder.absoluteAdapterPosition)
         val currentPosition = holder.absoluteAdapterPosition
 
-        if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
-            playingPosition = holder.absoluteAdapterPosition
+        with(holder.itemView.findViewById<TextView>(R.id.duration)) {
+            isVisible = playlistItem.duration != 0L
+
+            if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
+                playingPosition = holder.absoluteAdapterPosition
+                text = playlistItem.formatCurrentPositionAndDuration()
+            } else {
+                text = playlistItem.formatDuration()
+            }
         }
 
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
@@ -69,7 +79,7 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
             currentPosition != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
 
-        holder.bind(paused, playlistItem, itemOperation, holder, currentPosition)
+        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, currentPosition)
     }
 
     /**

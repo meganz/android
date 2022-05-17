@@ -32,6 +32,10 @@
             type="Integer" />
 
         <variable
+            name="isAudio"
+            type="Boolean" />
+
+        <variable
             name="holder"
             type="mega.privacy.android.app.mediaplayer.playlist.PlaylistViewHolder" />
 
@@ -98,17 +102,36 @@
                 android:src="@drawable/ic_select_folder"
                 android:visibility="@{item.isSelected ? View.VISIBLE : View.GONE}" />
 
-            <TextView
-                style="@style/textAppearanceSubtitle1"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="72dp"
-                android:layout_marginEnd="72dp"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                android:text="@{item.nodeName}"
-                tools:text="Music.mp3" />
+                android:orientation="vertical">
+                <TextView
+                    style="@style/textAppearanceSubtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="72dp"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:text="@{item.nodeName}"
+                    tools:text="Music.mp3" />
+
+                <TextView
+                    android:id="@+id/duration"
+                    style="@style/TextAppearance.Mega.Body2.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="72dp"
+                    android:ellipsize="middle"
+                    android:singleLine="true"/>
+
+            </LinearLayout>
+
 
             <ImageView
                 android:id="@+id/transfers_list_option_reorder"
@@ -136,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="72dp"
-                android:text="@string/general_next"
+                android:text="@{isAudio ? @string/media_player_audio_playlist_next : @string/media_player_video_playlist_next}"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor" />
         </FrameLayout>
     </LinearLayout>

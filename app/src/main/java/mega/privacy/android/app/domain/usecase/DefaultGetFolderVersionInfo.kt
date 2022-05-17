@@ -11,6 +11,6 @@ import javax.inject.Inject
  */
 class DefaultGetFolderVersionInfo @Inject constructor(private val filesRepository: FilesRepository) : GetFolderVersionInfo {
     override suspend fun invoke(): FolderVersionInfo? {
-        return filesRepository.getFolderVersionInfo().takeIf { it.numberOfVersions >= 0 }
+        return filesRepository.getRootFolderVersionInfo().takeIf { it.numberOfVersions >= 0 }
     }
 }

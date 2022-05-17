@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Incompleet</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Ongeldige sleutel/Decoderings-fout</string>
+    <string name="api_ekey">Ongeldige sleutel of decoderings-fout</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Slechte sessie ID</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -55,7 +55,7 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Onvoldoende tegoed</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">Twee-Factor Authenticatie vereist.</string>
+    <string name="api_emfarequired">Twee-staps authenticatie vereist.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Toegang geweigerd voor niet-admin-gebruikers</string>
     <!-- A dialog title shown to users when their business account is expired. -->

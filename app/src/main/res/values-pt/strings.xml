@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">Acesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Cadastre-se agora e obtenha 20 GB de espaço gratuito</string>
+    <string name="tour_space_text">Cadastre-se agora e obtenha 20&#160;GB de espaço gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Os envios são rápidos. Compartilhe rapidamente arquivos com todo mundo</string>
     <!--  -->
@@ -383,7 +383,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver as transferências</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4 GB. O seu download provavelmente falhará.</string>
+    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4&#160;GB. O seu download provavelmente falhará.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Não existe nenhum aplicativo disponível para abrir este arquivo no seu dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -2179,7 +2179,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2189,7 +2189,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -3157,7 +3157,7 @@
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Adicione contatos, crie uma rede, colabore e faça chamadas de voz e vídeo sem sair do MEGA</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">As suas fotos na Nuvem</string>
+    <string name="title_tour_four">As suas fotos na nuvem</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Sabemos que os Uploads da câmera são um recurso essencial para qualquer dispositivo móvel. Crie a sua conta agora.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Converse com segurança com os seus contatos usando criptografia de ponta a ponta</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Olá, converse com segurança comigo no MEGA e obtenha 20 GB de armazenamento em nuvem gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Olá, converse com segurança comigo no MEGA e obtenha 20&#160;GB de armazenamento em nuvem gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Não há link de chat disponível.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4061,7 +4061,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toque para entrar na reunião atual.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA Meeting</string>
+    <string name="title_tour_five">Reunião MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Videoconferência criptografada de ponta a ponta</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4073,7 +4073,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Faça parte da maior plataforma de colaboração e armazenamento em nuvem segura do mundo.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Obtenha 20 GB de forma gratuita</string>
+    <string name="left_meeting_bonus_title">Obtenha 20&#160;GB de forma gratuita</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Cadastre-se agora e aproveite de forma gratuita os recursos de colaboração avançados.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4278,7 +4278,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Você tem uma assinatura MEGA ativa com %1$s. Você deve cancelá-la separadamente em %2$s, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Você tem uma assinatura MEGA ativa. Ela será cancelada automaticamente após a exclusão da conta. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Você tem uma assinatura MEGA ativa com a Apple. Você deve cancelá-la separadamente em sua conta do iTunes, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4295,4 +4295,10 @@
     <string name="empty_hint_favourite_album">[B]Não há[/B] [A]Favoritos[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remover favoritos</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">O formato do arquivo não é suportado. Não é possível abrir o arquivo.</string>
+    <!-- Warnign shown after trying to upload an empty folder -->
+    <string name="no_uploads_empty_folder">A pasta selecionada está vazia. Nenhum arquivo para fazer upload.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Você digitou a sua senha atual</string>
 </resources>
