@@ -51,20 +51,35 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that live data are not set when no updates are triggered from api`() = runTest {
-        underTest = ManagerViewModel(
-            monitorNodeUpdates,
-            monitorGlobalUpdates
-        )
+    fun `test that user updates live data is not set when no updates triggered from use case`() = runTest {
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
 
         underTest.updateUsers.test().assertNoValue()
+    }
+
+    @Test
+    fun `test that user alert updates live data is not set when no updates triggered from use case`() = runTest {
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
+
         underTest.updateUserAlerts.test().assertNoValue()
+    }
+
+    @Test
+    fun `test that node updates live data is not set when no updates triggered from use case`() = runTest {
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
+
         underTest.updateNodes.test().assertNoValue()
+    }
+
+    @Test
+    fun `test that contact request updates live data is not set when no updates triggered from use case`() = runTest {
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
+
         underTest.updateContactsRequests.test().assertNoValue()
     }
 
     @Test
-    fun `test that live data value is set when node updates is triggered from api`() = runTest {
+    fun `test that node updates live data is set when node updates triggered from use case`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
 
         underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
@@ -77,7 +92,7 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that live data value is not set when node updates is triggered from api with an empty list`() = runTest {
+    fun `test that node updates live data is not set when node updates triggered from use case with an empty list`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
 
         underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates)
@@ -86,38 +101,18 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that live data is dispatched when updates triggered from api`() = runTest {
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))
-        ) {
+    fun `test that user updates live data is set when user updates triggered from use case`() = runTest {
+        triggerRepositoryUpdate(listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))) {
             runCatching {
                 underTest.updateUsers.test()
-                    .awaitValue(100, TimeUnit.MILLISECONDS)
-                    .assertValue { it.size == 1 }
-            }
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))
-        ) {
-            runCatching {
-                underTest.updateUserAlerts.test()
-                    .awaitValue(100, TimeUnit.MILLISECONDS)
-                    .assertValue { it.size == 1 }
-            }
-        }
-        triggerRepositoryUpdate(
-            listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))
-        ) {
-            runCatching {
-                underTest.updateContactsRequests.test()
-                    .awaitValue(100, TimeUnit.MILLISECONDS)
+                    .awaitValue(50, TimeUnit.MILLISECONDS)
                     .assertValue { it.size == 1 }
             }
         }
     }
 
     @Test
-    fun `test that an update is not dispatched when an update is triggered from api with null or empty list`() = runTest {
+    fun `test that user updates live data is not set when user updates triggered from use case with null or empty list`() = runTest {
         triggerRepositoryUpdate(
             listOf(
                 GlobalUpdate.OnUsersUpdate(null),
@@ -126,6 +121,21 @@ class ManagerViewModelTest {
         ) {
             underTest.updateUsers.test().assertNoValue()
         }
+    }
+
+    @Test
+    fun `test that user alert updates live data is set when user alert updates triggered from use case`() = runTest {
+        triggerRepositoryUpdate(listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))) {
+            runCatching {
+                underTest.updateUserAlerts.test()
+                    .awaitValue(50, TimeUnit.MILLISECONDS)
+                    .assertValue { it.size == 1 }
+            }
+        }
+    }
+
+    @Test
+    fun `test that user alert updates live data is not set when user alert updates triggered from use case with null or empty list`() = runTest {
         triggerRepositoryUpdate(
             listOf(
                 GlobalUpdate.OnUserAlertsUpdate(null),
@@ -134,6 +144,21 @@ class ManagerViewModelTest {
         ) {
             underTest.updateUserAlerts.test().assertNoValue()
         }
+    }
+
+    @Test
+    fun `test that contact request updates live data is set when contact request updates triggered from use case`() = runTest {
+        triggerRepositoryUpdate(listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
+            runCatching {
+                underTest.updateContactsRequests.test()
+                    .awaitValue(50, TimeUnit.MILLISECONDS)
+                    .assertValue { it.size == 1 }
+            }
+        }
+    }
+
+    @Test
+    fun `test that contact request updates live data is not set when contact request updates triggered from use case with null or empty list`() = runTest {
         triggerRepositoryUpdate(
             listOf(
                 GlobalUpdate.OnContactRequestsUpdate(null),
