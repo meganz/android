@@ -82,6 +82,31 @@ class GetCallUseCase @Inject constructor(
         }, BackpressureStrategy.LATEST)
 
     /**
+     * Method to get the destroyed call
+     *
+     * @return Chat ID of the call
+     */
+    fun getCallEnded(): Flowable<Long> =
+        Flowable.create({ emitter ->
+            val callStatusObserver = Observer<MegaChatCall> { call ->
+                when (call.status) {
+                    CALL_STATUS_TERMINATING_USER_PARTICIPATION,
+                    CALL_STATUS_DESTROYED -> {
+                        emitter.onNext(call.chatid)
+                    }
+                }
+            }
+
+            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                .observeForever(callStatusObserver)
+
+            emitter.setCancellable {
+                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                    .removeObserver(callStatusObserver)
+            }
+        }, BackpressureStrategy.LATEST)
+
+    /**
      * Method to get if there is currently a call in progress, joining or connecting
      *
      * @return              Flowable containing True, if there is a ongoing call. False, if not.
