@@ -107,7 +107,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
             val currentPosition = exoPlayer.currentPosition
             // Up the frequency of refresh, keeping in sync with Exoplayer.
             positionUpdateHandler.postDelayed(this, 500)
-            viewModel.setCurrentPositionAndDuration(exoPlayer.duration, currentPosition)
+            viewModel.setCurrentPosition(currentPosition)
         }
     }
 
@@ -186,7 +186,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                     }
 
                     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                        viewModel.paused = !playWhenReady
+                        viewModel.setPaused(!playWhenReady, exoPlayer.currentPosition)
 
                         if (playWhenReady && notificationDismissed) {
                             playerNotificationManager?.setPlayer(player)
@@ -205,10 +205,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                     override fun onPlaybackStateChanged(state: Int) {
                         when {
                             state == Player.STATE_ENDED && !viewModel.paused -> {
-                                viewModel.paused = true
+                                viewModel.setPaused(true, exoPlayer.currentPosition)
                             }
                             state == Player.STATE_READY && viewModel.paused && player.playWhenReady -> {
-                                viewModel.paused = false
+                                viewModel.setPaused(false, exoPlayer.currentPosition)
+                            }
+                            state == Player.STATE_READY && player.playWhenReady -> {
+                                viewModel.setDuration(exoPlayer.duration)
                             }
                         }
                     }
