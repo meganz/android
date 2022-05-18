@@ -118,7 +118,10 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_I
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbish;
@@ -315,21 +318,15 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -379,7 +376,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
-import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
@@ -387,7 +383,6 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
@@ -796,6 +791,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private AlertDialog alertDialogStorageStatus;
     private AlertDialog alertDialogSMSVerification;
     private AlertDialog newTextFileDialog;
+    private AlertDialog newFolderDialog;
 
     private MenuItem searchMenuItem;
     private MenuItem enableSelectMenuItem;
@@ -1499,6 +1495,8 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
             backupWarningDialog.dismiss();
         }
+
+        checkNewFolderDialogState(newFolderDialog, outState);
     }
 
     @Override
@@ -1622,6 +1620,10 @@ public class ManagerActivity extends TransfersManagementActivity
             backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
             backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
             backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
+
+            if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
+                showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
+            }
         } else {
             logDebug("Bundle is NULL");
             parentHandleBrowser = -1;
@@ -3605,6 +3607,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         dismissAlertDialogIfExists(processFileDialog);
         dismissAlertDialogIfExists(openLinkDialog);
+        dismissAlertDialogIfExists(newFolderDialog);
 
         nodeSaver.destroy();
 
@@ -6902,8 +6905,8 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     @Override
-    public void showNewFolderDialog() {
-        MegaNodeDialogUtil.showNewFolderDialog(this, this);
+    public void showNewFolderDialog(String typedText) {
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
     }
 
     @Override
