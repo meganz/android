@@ -1,9 +1,12 @@
 package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -20,7 +23,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway
  * @property ioDispatcher
  */
-class MegaFilesRepository @Inject constructor(
+class DefaultFilesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FilesRepository {
@@ -51,4 +54,9 @@ class MegaFilesRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    override fun monitorNodeUpdates() =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
+            .mapNotNull { it.nodeList?.toList() }
 }

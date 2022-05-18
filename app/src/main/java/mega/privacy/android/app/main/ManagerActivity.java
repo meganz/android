@@ -242,6 +242,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
@@ -314,6 +315,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
@@ -372,6 +374,8 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
+import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -431,9 +435,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
-import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -447,11 +449,11 @@ import nz.mega.sdk.MegaUserAlert;
 @AndroidEntryPoint
 @SuppressWarnings("deprecation")
 public class ManagerActivity extends TransfersManagementActivity
-        implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
-        MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-        BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-        ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+		implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
+        MegaTransferListenerInterface, OnClickListener,
+		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
     private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -498,6 +500,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean mShowAnyTabLayout;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+
+    private ManagerViewModel viewModel;
 
     @Inject
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
@@ -1522,6 +1526,12 @@ public class ManagerActivity extends TransfersManagementActivity
         super.onCreate(savedInstanceState);
         logDebug("onCreate after call super");
 
+        viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
+        viewModel.getUpdateUsers().observe(this, this::updateUsers);
+        viewModel.getUpdateUserAlerts().observe(this, this::updateUserAlerts);
+        viewModel.getUpdateNodes().observe(this, this::updateNodes);
+        viewModel.getUpdateContactsRequests().observe(this, this::updateContactRequests);
+
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
         // and then switch the app to foreground, causing the app to create a new instantiation.
@@ -2298,7 +2308,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
             initPayments();
 
-            megaApi.addGlobalListener(this);
             megaApi.isGeolocationEnabled(this);
 
             if (savedInstanceState == null) {
@@ -3565,7 +3574,6 @@ public class ManagerActivity extends TransfersManagementActivity
         dbH.removeSentPendingMessages();
 
         if (megaApi != null && megaApi.getRootNode() != null) {
-            megaApi.removeGlobalListener(this);
             megaApi.removeTransferListener(this);
             megaApi.removeRequestListener(this);
         }
@@ -5852,7 +5860,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
      * @param updatedNodes  Nodes which have changed.
      */
-    private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
+    private void checkCameraUploadFolder(boolean shouldDisable, List<MegaNode> updatedNodes) {
         // Get CU and MU folder hanlde from local setting.
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
@@ -9836,10 +9844,7 @@ public class ManagerActivity extends TransfersManagementActivity
         logWarning("onRequestTemporaryError: " + request.getRequestString() + "__" + e.getErrorCode() + "__" + e.getErrorString());
     }
 
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        logDebug("onUsersUpdate");
-
+    public void updateUsers(List<MegaUser> users) {
         if (users != null) {
             logDebug("users.size(): " + users.size());
             for (int i = 0; i < users.size(); i++) {
@@ -9978,10 +9983,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
-
+    public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         setNotificationsTitleSection();
         notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
         if (notificationsFragment != null && userAlerts != null) {
@@ -9989,11 +9991,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         updateNavigationToolbarIcon();
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
     }
 
     public void updateMyEmail(String email) {
@@ -10103,9 +10100,7 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-        logDebug("onNodesUpdate");
+    public void updateNodes(List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
         boolean updateContacts = false;
@@ -10166,18 +10161,7 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-        logDebug("onReloadNeeded");
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate");
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+    public void updateContactRequests(List<MegaContactRequest> requests) {
         logDebug("onContactRequestsUpdate");
 
         if (requests != null) {
