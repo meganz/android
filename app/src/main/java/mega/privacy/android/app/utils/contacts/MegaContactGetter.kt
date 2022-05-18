@@ -4,11 +4,10 @@ import android.content.Context
 import android.text.TextUtils
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.contacts.ContactsUtil.LocalContact
 import nz.mega.sdk.*
+import timber.log.Timber
 import java.util.*
 
 class MegaContactGetter(context: Context) {
@@ -59,10 +58,10 @@ class MegaContactGetter(context: Context) {
                             }
                         }
                     } else {
-                        logWarning("Contact's email is empty!")
+                        Timber.w("Contact's email is empty!")
                     }
                 } else {
-                    logWarning("Get contact's email faild with error code: " + error.errorCode)
+                    Timber.e("Get contact's email faild with error code: " + error.errorCode)
                 }
                 // Get next contact's email.
                 currentContactIndex++
@@ -205,12 +204,12 @@ class MegaContactGetter(context: Context) {
 
     fun getMegaContacts(api: MegaApiAndroid, period: Long, context: Context) {
         if (api.rootNode == null) {
-            logDebug("haven't logged in, return")
+            Timber.d("haven't logged in, return")
             return
         }
         if (System.currentTimeMillis() - lastSyncTimestamp > period && !requestInProgress) {
             requestInProgress = true
-            logDebug("getMegaContacts request from server")
+            Timber.d("getMegaContacts request from server")
             val requestParam = getRequestParameter(ContactsUtil.getLocalContactList(context))
             api.getRegisteredContacts(requestParam, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -238,13 +237,13 @@ class MegaContactGetter(context: Context) {
                                 if (megaContactsWithEmail.size > 0) {
                                     processFinished(api, megaContactsWithEmail)
                                 } else {
-                                    logWarning("No mega contacts.")
+                                    Timber.w("No mega contacts.")
                                     updater?.noContacts()
                                 }
                             }
                         }
                     } else {
-                        logWarning("Get registered contacts failed with error code: " + error.errorCode)
+                        Timber.e("Get registered contacts failed with error code: " + error.errorCode)
                         // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
                         // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
                         if (error.errorCode == MegaError.API_ETOOMANY || error.errorCode == MegaError.API_EPAYWALL) {
@@ -256,7 +255,7 @@ class MegaContactGetter(context: Context) {
             ))
         } else {
             if (!requestInProgress) {
-                logDebug("getMegaContacts load from database")
+                Timber.d("getMegaContacts load from database")
                 val list = dbH.megaContacts.apply { this.filterOut(api) }
                 updater?.onFinish(list)
             }
@@ -279,7 +278,7 @@ class MegaContactGetter(context: Context) {
                 stringMap[email] = name
             }
         }
-        logDebug("local contacts size is: " + stringMap.size())
+        Timber.d("local contacts size is: " + stringMap.size())
         return stringMap
     }
 
