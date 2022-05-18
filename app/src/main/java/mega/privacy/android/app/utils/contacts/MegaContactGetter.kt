@@ -170,32 +170,26 @@ class MegaContactGetter(context: Context) {
         dbH.batchInsertMegaContacts(list)
 
         // filter out
-        val filteredList = filterOut(api, list)
+        val filteredList = list.filterOut(api)
         //when request is successful, update the timestamp.
         updateLastSyncTimestamp()
         updater?.onFinish(filteredList)
     }
 
-    private fun filterOut(api: MegaApiJava, list: MutableList<MegaContact>): MutableList<MegaContact> {
-        val emails: MutableList<String?> = mutableListOf()
-        for (megaContact in list) {
-            emails.add(megaContact.email)
-        }
+    private fun MutableList<MegaContact>.filterOut(api: MegaApiJava): List<MegaContact> {
+        val emails = this.map { it.email }
         ContactsFilter.filterOutContacts(api, emails)
         ContactsFilter.filterOutPendingContacts(api, emails)
         ContactsFilter.filterOutMyself(api, emails)
-        val iterator = list.iterator()
+
+        val iterator = iterator()
         while (iterator.hasNext()) {
             if (!emails.contains(iterator.next().email)) {
                 iterator.remove()
             }
         }
-        Collections.sort(list) { o1: MegaContact, o2: MegaContact ->
-            o1.localName!!.compareTo(
-                o2.localName!!
-            )
-        }
-        return list
+
+        return sortedBy { it.localName ?: "" }
     }
 
     private fun getCurrentContactIndex(): MegaContact? {
@@ -263,7 +257,7 @@ class MegaContactGetter(context: Context) {
         } else {
             if (!requestInProgress) {
                 logDebug("getMegaContacts load from database")
-                val list = dbH.megaContacts.apply { filterOut(api, this) }
+                val list = dbH.megaContacts.apply { this.filterOut(api) }
                 updater?.onFinish(list)
             }
         }
