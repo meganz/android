@@ -42,6 +42,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
+import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -58,7 +59,8 @@ import javax.inject.Inject
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
-    private val getCallUseCase: GetCallUseCase
+    private val getCallUseCase: GetCallUseCase,
+    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -167,6 +169,18 @@ class InMeetingViewModel @Inject constructor(
     }
 
     init {
+        getParticipantsChangesUseCase.getChangesFromParticipants()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                        onNext = {
+                            logDebug("*********** RECIBIDO EN EL VIEW MODEL")
+                        },
+                        onError = { error ->
+                            LogUtil.logError(error.stackTraceToString())
+                        }
+                )
+                .addTo(composite)
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
