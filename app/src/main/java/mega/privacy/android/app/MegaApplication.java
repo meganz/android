@@ -164,14 +164,14 @@ import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
-import mega.privacy.android.app.meeting.CallSoundType;
+import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
+import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
@@ -238,7 +238,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
     @Inject
-    GetParticipantsChangesUseCase getParticipantsChangesUseCase;
+    GetCallSoundsUseCase getCallSoundsUseCase;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -306,6 +306,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     private MeetingListener meetingListener = new MeetingListener();
     private GlobalChatListener globalChatListener = new GlobalChatListener(this);
+
+    private CallSoundsController soundsController = new CallSoundsController();
 
     @Override
     public void networkAvailable() {
@@ -719,11 +721,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
     };
 
-    private final Observer<Pair> sessionStatusObserver = callIdAndSession -> {
-        MegaChatSession session = (MegaChatSession) callIdAndSession.second;
+    private final Observer<Pair> sessionStatusObserver = callAndSession -> {
+        MegaChatSession session = (MegaChatSession) callAndSession.second;
         int sessionStatus = session.getStatus();
-        long callId = (long) callIdAndSession.first;
-        MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
+        MegaChatCall call = (MegaChatCall) callAndSession.first;
         if (call == null)
             return;
 
@@ -732,13 +733,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
             if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS &&
                     (chat.isGroup() || chat.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary())) {
                 logDebug("Session is in progress");
-                getChatManagement().setRequestSentCall(callId, false);
+                getChatManagement().setRequestSentCall(call.getCallId(), false);
                 updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
-            }
-
-            if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED && !chat.isGroup() &&
-                    !chat.isMeeting() && session.getTermCode() == MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE) {
-                rtcAudioManager.playSound(CallSoundType.CALL_ENDED);
             }
         }
     };
@@ -1146,21 +1142,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
             megaChatApi.addChatListener(globalChatListener);
             megaChatApi.addChatCallListener(meetingListener);
             registeredChatListeners = true;
-            checkCallParticipantsChanges();
+            checkCallSounds();
         }
     }
 
     /**
-     * Check the changes of the meeting participants
+     * Check the changes of the meeting to play the right sound
      */
-    private void checkCallParticipantsChanges() {
-        getParticipantsChangesUseCase.getChangesFromParticipants()
+    private void checkCallSounds() {
+        getCallSoundsUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((next) -> {
-                    CallSoundType typeChange = next.getTypeChange();
-                    rtcAudioManager.playSound(typeChange);
-                });
+                .subscribe((next) -> soundsController.playSound(next));
     }
 
     /**

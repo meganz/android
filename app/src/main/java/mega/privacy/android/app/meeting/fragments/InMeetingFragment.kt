@@ -346,7 +346,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
     private val sessionStatusObserver =
-        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
+        Observer<Pair<MegaChatCall, MegaChatSession>> { callAndSession ->
             if (!inMeetingViewModel.isOneToOneCall()) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {

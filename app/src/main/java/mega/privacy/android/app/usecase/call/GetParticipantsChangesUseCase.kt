@@ -8,7 +8,6 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaChatApiAndroid
@@ -47,7 +46,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
      */
     data class ParticipantsChangesResult(
             val chatId: Long?,
-            val typeChange: CallSoundType,
+            val typeChange: Int,
             val peers: ArrayList<Long>?
     )
 
@@ -107,7 +106,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         listOfPeers.addAll(peerIdsJoined)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
-                                                typeChange = CallSoundType.PARTICIPANT_JOINED_CALL,
+                                                typeChange = TYPE_JOIN,
                                                 listOfPeers
                                         )
                                         this.onNext(result)
@@ -140,7 +139,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         listOfPeers.addAll(peerIdsLeft)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
-                                                typeChange = CallSoundType.PARTICIPANT_LEFT_CALL,
+                                                typeChange = TYPE_LEFT,
                                                 listOfPeers
                                         )
 

@@ -128,7 +128,7 @@ class MeetingListener : MegaChatCallListenerInterface {
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
             logDebug("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, callid)
+            sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, call)
         }
 
         // Remote audio/video flags has changed
@@ -180,6 +180,14 @@ class MeetingListener : MegaChatCallListenerInterface {
         LiveEventBus.get(
             type,
             Pair::class.java
+        ).post(sessionAndCall)
+    }
+
+    private fun sendSessionEvent(type: String, session: MegaChatSession, call: MegaChatCall?) {
+        val sessionAndCall = Pair.create(call, session)
+        LiveEventBus.get(
+                type,
+                Pair::class.java
         ).post(sessionAndCall)
     }
 

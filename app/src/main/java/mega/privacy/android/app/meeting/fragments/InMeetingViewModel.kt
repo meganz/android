@@ -34,7 +34,6 @@ import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
-import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
@@ -200,26 +199,29 @@ class InMeetingViewModel @Inject constructor(
             .observeForever(noOutgoingCallObserver)
     }
 
-    private fun getParticipantChangesText(list: ArrayList<Long>, type: CallSoundType) {
+    /**
+     * Method to get right text to display on the banner
+     *
+     * @param list List of participants with changes
+     * @param type Type of change
+     */
+    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
         val numParticipants = list.size
 
-        when (type) {
-            CallSoundType.PARTICIPANT_JOINED_CALL -> {
-                _getParticipantsChangesTitle.value = when (numParticipants) {
-                    1 -> getParticipantFullName(list[0]) + " joined"
-                    2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " joined"
-                    else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others joined"
-                }
+        if (type == TYPE_JOIN) {
+            _getParticipantsChangesTitle.value = when (numParticipants) {
+                1 -> getParticipantFullName(list[0]) + " joined"
+                2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " joined"
+                else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others joined"
             }
+        }
 
-            CallSoundType.PARTICIPANT_LEFT_CALL -> {
-                _getParticipantsChangesTitle.value = when (numParticipants) {
-                    1 -> getParticipantFullName(list[0]) + " left"
-                    2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " left"
-                    else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others left"
-                }
+        if (type == TYPE_LEFT) {
+            _getParticipantsChangesTitle.value = when (numParticipants) {
+                1 -> getParticipantFullName(list[0]) + " left"
+                2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " left"
+                else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others left"
             }
-            else -> {}
         }
     }
 
