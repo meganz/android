@@ -9,7 +9,6 @@ import io.reactivex.rxjava3.core.FlowableEmitter
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaChatApiAndroid
@@ -31,8 +30,6 @@ class GetParticipantsChangesUseCase @Inject constructor(
     var joinedCountDownTimer: CustomCountDownTimer? = null
     var leftCountDownTimer: CustomCountDownTimer? = null
 
-    val soundController = CallSoundsController()
-
     var numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
     var numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
 
@@ -49,9 +46,9 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @property peers        List of user IDs
      */
     data class ParticipantsChangesResult(
-            val chatId: Long,
-            val typeChange: Int,
-            val peers: ArrayList<Long>
+            val chatId: Long?,
+            val typeChange: CallSoundType,
+            val peers: ArrayList<Long>?
     )
 
     /**
@@ -77,15 +74,6 @@ class GetParticipantsChangesUseCase @Inject constructor(
                             .removeObserver(callCompositionObserver)
                 }
             }, BackpressureStrategy.LATEST)
-
-    val leftParticipantsObserver = Observer<Boolean> { counterState ->
-        counterState?.let { isFinished ->
-            if (isFinished) {
-                soundController.playSound(CallSoundType.PARTICIPANT_LEFT_CALL)
-                numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
-            }
-        }
-    }
 
     /**
      * Control when participants join or leave and the appropriate sound should be played.
@@ -119,7 +107,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         listOfPeers.addAll(peerIdsJoined)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
-                                                typeChange = TYPE_JOIN,
+                                                typeChange = CallSoundType.PARTICIPANT_JOINED_CALL,
                                                 listOfPeers
                                         )
                                         this.onNext(result)
@@ -152,7 +140,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         listOfPeers.addAll(peerIdsLeft)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
-                                                typeChange = TYPE_LEFT,
+                                                typeChange = CallSoundType.PARTICIPANT_LEFT_CALL,
                                                 listOfPeers
                                         )
 

@@ -34,6 +34,7 @@ import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
+import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
@@ -178,7 +179,9 @@ class InMeetingViewModel @Inject constructor(
                 .subscribeBy(
                         onNext = { result ->
                             if (currentChatId == result.chatId) {
-                                getParticipantChangesText(result.peers, result.typeChange)
+                                result.peers?.let { list->
+                                    getParticipantChangesText(list, result.typeChange)
+                                }
                             }
                         },
                         onError = { error ->
@@ -197,11 +200,11 @@ class InMeetingViewModel @Inject constructor(
             .observeForever(noOutgoingCallObserver)
     }
 
-    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
+    private fun getParticipantChangesText(list: ArrayList<Long>, type: CallSoundType) {
         val numParticipants = list.size
 
         when (type) {
-            TYPE_JOIN -> {
+            CallSoundType.PARTICIPANT_JOINED_CALL -> {
                 _getParticipantsChangesTitle.value = when (numParticipants) {
                     1 -> getParticipantFullName(list[0]) + " joined"
                     2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " joined"
@@ -209,13 +212,14 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
 
-            TYPE_LEFT -> {
+            CallSoundType.PARTICIPANT_LEFT_CALL -> {
                 _getParticipantsChangesTitle.value = when (numParticipants) {
                     1 -> getParticipantFullName(list[0]) + " left"
                     2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " left"
                     else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others left"
                 }
             }
+            else -> {}
         }
     }
 

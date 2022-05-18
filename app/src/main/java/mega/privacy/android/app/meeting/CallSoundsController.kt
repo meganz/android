@@ -29,7 +29,7 @@ class CallSoundsController {
             mMediaPlayer = MediaPlayer()
 
         mMediaPlayer?.let { mp ->
-            if(mp.isPlaying){
+            if (mp.isPlaying) {
                 mp.stop()
             }
 

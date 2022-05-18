@@ -82,6 +82,11 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         initAfterViewCreated()
     }
 
+    override fun onResume() {
+        super.onResume()
+        mManagerActivity.refreshTimelineFragment()
+    }
+
     override fun onBackPressed() = when {
         mManagerActivity.isFirstNavigationLevel -> {
             if (selectedView != ALL_VIEW) {
