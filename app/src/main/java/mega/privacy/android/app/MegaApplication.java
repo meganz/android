@@ -170,6 +170,7 @@ import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
@@ -235,6 +236,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     PerformanceReporter performanceReporter;
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
+    @Inject
+    GetParticipantsChangesUseCase getParticipantsChangesUseCase;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -1135,7 +1138,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
             megaChatApi.addChatListener(globalChatListener);
             megaChatApi.addChatCallListener(meetingListener);
             registeredChatListeners = true;
+            checkCallParticipantsChanges();
         }
+    }
+
+    private void checkCallParticipantsChanges(){
+        getParticipantsChangesUseCase.getChangesFromParticipants()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result) -> {
+                });
     }
 
     /**

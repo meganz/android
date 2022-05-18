@@ -81,7 +81,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             logDebug("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
             checkLastParticipant(api, call)
-            checkParticipantsChanges(api, call)
         }
 
         // Call is set onHold
@@ -186,70 +185,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             type,
             Pair::class.java
         ).post(sessionAndCall)
-    }
-
-    /**
-     * Control when participants join or leave and the appropriate sound should be played.
-     *
-     * @param call MegaChatCall
-     * @param api MegaChatApiJava
-     */
-    private fun checkParticipantsChanges(api: MegaChatApiJava, call: MegaChatCall) {
-        if (call.status != CALL_STATUS_IN_PROGRESS || call.peeridCallCompositionChange == api.myUserHandle || call.callCompositionChange == 0)
-            return
-
-        api.getChatRoom(call.chatid)?.let { chat ->
-            if (!chat.isMeeting && !chat.isGroup) {
-                return
-            }
-
-            when (call.callCompositionChange) {
-                TYPE_JOIN -> {
-                    if (numberOfShiftsToWaitToJoin > 0) {
-                        numberOfShiftsToWaitToJoin--
-                        if (customCountDownTimer != null) {
-                            cancelCountDown()
-                            customCountDownTimer = null
-                        }
-                        val joinedParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                        customCountDownTimer = CustomCountDownTimer(joinedParticipantLiveData)
-                        customCountDownTimer?.apply {
-                            start(1)
-                            mutableLiveData.observeForever { counterState ->
-                                counterState?.let { isFinished ->
-                                    if (isFinished) {
-                                        soundController.playSound(CallSoundType.PARTICIPANT_JOINED_CALL)
-                                        numberOfShiftsToWaitToJoin = 2
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                TYPE_LEFT -> {
-                    if (numberOfShiftsToWaitToLeft > 0) {
-                        numberOfShiftsToWaitToLeft--
-                        if (customCountDownTimer != null) {
-                            cancelCountDown()
-                            customCountDownTimer = null
-                        }
-                        val leftParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                        customCountDownTimer = CustomCountDownTimer(leftParticipantLiveData)
-                        customCountDownTimer?.apply {
-                            start(1)
-                            mutableLiveData.observeForever { counterState ->
-                                counterState?.let { isFinished ->
-                                    if (isFinished) {
-                                        soundController.playSound(CallSoundType.PARTICIPANT_LEFT_CALL)
-                                        numberOfShiftsToWaitToLeft = 2
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**

@@ -25,19 +25,21 @@ class GetParticipantsChangesUseCase @Inject constructor(
 
     companion object {
         const val MAX_NUM_OF_WAITING_SHIFTS = 2
-
-        var joinedCountDownTimer: CustomCountDownTimer? = null
-        var leftCountDownTimer: CustomCountDownTimer? = null
-
-        val soundController = CallSoundsController()
-
-        var numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
-        var numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
-
-        val joinedParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
-        val leftParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
-
+        const val NUM_OF_SECONDS_TO_WAIT: Long = 1
     }
+
+    var joinedCountDownTimer: CustomCountDownTimer? = null
+    var leftCountDownTimer: CustomCountDownTimer? = null
+
+    val soundController = CallSoundsController()
+
+    var numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
+    var numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
+
+    val joinedParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val leftParticipantLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val peerIdsJoined = ArrayList<Long>()
+    val peerIdsLeft = ArrayList<Long>()
 
     /**
      * Participants' changes result
@@ -101,6 +103,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
 
             when (call.callCompositionChange) {
                 TYPE_JOIN -> {
+                    peerIdsJoined.add(call.peeridCallCompositionChange)
                     if (numberOfShiftsToWaitToJoin > 0) {
                         numberOfShiftsToWaitToJoin--
 
@@ -111,15 +114,16 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                     if (isFinished) {
                                         joinedCountDownTimer?.stop()
                                         numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
-                                        val peers = ArrayList<Long>()
-                                        peers.add(call.peeridCallCompositionChange)
+
+                                        val listOfPeers = ArrayList<Long>()
+                                        listOfPeers.addAll(peerIdsJoined)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
                                                 typeChange = TYPE_JOIN,
-                                                peers
+                                                listOfPeers
                                         )
-
                                         this.onNext(result)
+                                        peerIdsJoined.clear()
                                     }
                                 }
                             }
@@ -128,12 +132,11 @@ class GetParticipantsChangesUseCase @Inject constructor(
                             joinedCountDownTimer?.stop()
                         }
 
-
-                        joinedCountDownTimer?.start(1)
+                        joinedCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                     }
                 }
                 TYPE_LEFT -> {
-
+                    peerIdsLeft.add(call.peeridCallCompositionChange)
                     if (numberOfShiftsToWaitToLeft > 0) {
                         numberOfShiftsToWaitToLeft--
 
@@ -144,15 +147,17 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                     if (isFinished) {
                                         leftCountDownTimer?.stop()
                                         numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
-                                        val peers = ArrayList<Long>()
-                                        peers.add(call.peeridCallCompositionChange)
+
+                                        val listOfPeers = ArrayList<Long>()
+                                        listOfPeers.addAll(peerIdsLeft)
                                         val result = ParticipantsChangesResult(
                                                 chatId = call.chatid,
                                                 typeChange = TYPE_LEFT,
-                                                peers
+                                                listOfPeers
                                         )
 
                                         this.onNext(result)
+                                        peerIdsLeft.clear()
                                     }
                                 }
                             }
@@ -160,7 +165,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
                             leftCountDownTimer?.stop()
                         }
 
-                        leftCountDownTimer?.start(1)
+                        leftCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                     }
                 }
             }

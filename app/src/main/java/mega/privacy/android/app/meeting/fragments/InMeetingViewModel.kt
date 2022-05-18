@@ -60,7 +60,7 @@ import javax.inject.Inject
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
     private val getCallUseCase: GetCallUseCase,
-    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase
+    getParticipantsChangesUseCase: GetParticipantsChangesUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -142,6 +142,9 @@ class InMeetingViewModel @Inject constructor(
     private val _anotherChatTitle = MutableStateFlow(" ")
     val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
+    private val _getParticipantsChangesTitle = MutableStateFlow(" ")
+    val getParticipantsChangesTitle: StateFlow<String> get() = _getParticipantsChangesTitle
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -173,14 +176,17 @@ class InMeetingViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                        onNext = {
-                            logDebug("*********** RECIBIDO EN EL VIEW MODEL")
+                        onNext = { result ->
+                            if (currentChatId == result.chatId) {
+                                getParticipantChangesText(result.peers, result.typeChange)
+                            }
                         },
                         onError = { error ->
                             LogUtil.logError(error.stackTraceToString())
                         }
                 )
                 .addTo(composite)
+
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
@@ -189,6 +195,28 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
+    }
+
+    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
+        val numParticipants = list.size
+
+        when (type) {
+            TYPE_JOIN -> {
+                _getParticipantsChangesTitle.value = when (numParticipants) {
+                    1 -> getParticipantFullName(list[0]) + " joined"
+                    2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " joined"
+                    else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others joined"
+                }
+            }
+
+            TYPE_LEFT -> {
+                _getParticipantsChangesTitle.value = when (numParticipants) {
+                    1 -> getParticipantFullName(list[0]) + " left"
+                    2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " left"
+                    else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others left"
+                }
+            }
+        }
     }
 
     /**
@@ -784,13 +812,11 @@ class InMeetingViewModel @Inject constructor(
      * Method to show the appropriate banner
      *
      * @param bannerText the text of the banner to be edited
-     * @param peerId user handle of a participant
      * @param type type of banner
      * @return True, if should be shown. False, otherwise.
      */
     fun updateFixedBanner(
         bannerText: TextView?,
-        peerId: Long,
         type: Int
     ) {
         when (type) {
@@ -803,32 +829,6 @@ class InMeetingViewModel @Inject constructor(
                     ),
                     StringResourcesUtils.getString(R.string.error_server_connection_problem)
                 )
-            TYPE_JOIN ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.teal_300
-                    ),
-                    StringResourcesUtils.getString(
-                        R.string.contact_joined_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                )
-
-            TYPE_LEFT ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.teal_300
-                    ),
-                    StringResourcesUtils.getString(
-                        R.string.contact_left_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                )
-
             TYPE_RECONNECTING ->
                 updateFixedBanner(
                     bannerText,

@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.app.Dialog
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
@@ -113,8 +112,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerMuteText: EmojiTextView? = null
     private var bannerMuteIcon: ImageView? = null
 
-    private var bannerParticipant: EmojiTextView? = null
-
+    private var meetingChangesBanner: EmojiTextView? = null
     private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
@@ -310,13 +308,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         checkChildFragments()
                     }
                 } else {
-                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !inMeetingViewModel.isRequestSent()) {
-                        showParticipantBanner(
-                            it.peeridCallCompositionChange,
-                            it.callCompositionChange
-                        )
-                    }
-
                     checkChildFragments()
                 }
             }
@@ -812,7 +803,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallLayout = meetingActivity.binding.bannerAnotherCall
         bannerAnotherCallTitle = meetingActivity.binding.bannerAnotherCallTitle
         bannerAnotherCallSubtitle = meetingActivity.binding.bannerAnotherCallSubtitle
-        bannerParticipant = meetingActivity.binding.bannerParticipant
+        meetingChangesBanner = meetingActivity.binding.meetingBanner
+
         bannerInfo = meetingActivity.binding.bannerInfo
         bannerMuteLayout = meetingActivity.binding.bannerMute
         bannerMuteIcon = meetingActivity.binding.bannerMuteIcon
@@ -1040,6 +1032,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.anotherChatTitle.collect { title ->
                 if (title.isNotEmpty()) {
                     bannerAnotherCallTitle?.text = title
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.getParticipantsChangesTitle.collect { title ->
+                if (title.trim().isNotEmpty()) {
+                    meetingChangesBanner?.apply {
+                        text = title
+                        isVisible = true
+                        alpha =
+                                if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
+                                else 1f
+
+                        animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
+                    }
                 }
             }
         }
@@ -1893,19 +1901,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     /**
      * Method that controls whether the fixed banner should be displayed.
-     * This banner is displayed when a participant joins/leaves the meeting
-     *
-     * @param peerId userHandle
-     * @param type Type of banner
-     */
-    private fun showParticipantBanner(peerId: Long, type: Int) {
-        bannerParticipant?.let {
-            showFixedBanner(it, peerId, type)
-        }
-    }
-
-    /**
-     * Method that controls whether the fixed banner should be displayed.
      * This banner is displayed when my network quality is low,
      * I am in a state of reconnection or I am alone on the call
      *
@@ -1917,7 +1912,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 type
             )
             if (shouldShow) {
-                showFixedBanner(it, MEGACHAT_INVALID_HANDLE, type)
+                showFixedBanner(it, type)
                 return
             }
 
@@ -1926,7 +1921,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     TYPE_RECONNECTING,
                 )
                 if (shouldShowReconnectingBanner) {
-                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+                    showFixedBanner(it, TYPE_RECONNECTING)
                     return
                 }
             }
@@ -1936,7 +1931,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     TYPE_NETWORK_QUALITY
                 )
                 if (shouldShowNetworkQualityBanner) {
-                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_NETWORK_QUALITY)
+                    showFixedBanner(it, TYPE_NETWORK_QUALITY)
                     return
                 }
             }
@@ -1947,7 +1942,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         TYPE_SINGLE_PARTICIPANT
                     )
                 if (shouldShowSingleParticipantBanner) {
-                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_SINGLE_PARTICIPANT)
+                    showFixedBanner(it, TYPE_SINGLE_PARTICIPANT)
                     return
                 }
             }
@@ -1960,12 +1955,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method of displaying the banner
      *
      * @param textView The text in the banner
-     * @param peerId User handle
      * @param type The type of banner
      */
-    private fun showFixedBanner(textView: TextView, peerId: Long, type: Int) {
+    private fun showFixedBanner(textView: TextView, type: Int) {
         logDebug("Show fixed banner: type = $type")
-        inMeetingViewModel.updateFixedBanner(textView, peerId, type)
+        inMeetingViewModel.updateFixedBanner(textView,type)
         textView.apply {
             isVisible = true
             alpha =
