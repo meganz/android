@@ -1717,7 +1717,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
             logDebug("sync mega contacts");
             MegaContactGetter getter = new MegaContactGetter(this);
-            getter.getMegaContacts(megaApi, TimeUtils.WEEK);
+            getter.getMegaContacts(megaApi, TimeUtils.WEEK, this);
         }
 
         Display display = getWindowManager().getDefaultDisplay();
