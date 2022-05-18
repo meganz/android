@@ -35,7 +35,7 @@ abstract class RepositoryModule {
     abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
 
     @Binds
-    abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
+    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
@@ -43,4 +43,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
+
+    @Binds
+    abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
+
+    @Binds
+    abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalUpdatesRepository): GlobalUpdatesRepository
 }

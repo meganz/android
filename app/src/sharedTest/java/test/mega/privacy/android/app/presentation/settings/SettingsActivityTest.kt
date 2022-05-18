@@ -9,14 +9,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
+import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -30,6 +33,7 @@ class SettingsActivityTest{
 
     @Before
     fun setUp() {
+        runBlocking { whenever(TestSettingsAdvancedUseCases.isUseHttpsEnabled()).thenReturn(true) }
         hiltRule.inject()
     }
 

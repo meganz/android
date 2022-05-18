@@ -31,6 +31,7 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
+import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -53,6 +54,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
+    getLocalAudioChangesUseCase:GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -191,11 +193,38 @@ class MeetingActivityViewModel @Inject constructor(
                         }
                     }
                 },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
+                    }
+            )
+                .addTo(composite)
+
+        getLocalAudioChangesUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { call ->
+                    currentChatId.value?.let {
+                        if (call.chatid == it) {
+                            val isEnable = call.hasLocalAudio()
+                            _micLiveData.value = isEnable
+                            logDebug("open Mic: $isEnable")
+                            tips.value = when (isEnable) {
+                                true -> getString(
+                                    R.string.general_mic_unmute
+                                )
+                                false -> getString(
+                                    R.string.general_mic_mute
+                                )
+                            }
+                        }
+                    }
+                },
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(composite)
+                .addTo(composite)
 
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)
@@ -542,18 +571,6 @@ class MeetingActivityViewModel @Inject constructor(
 
     override fun onDisableAudioVideo(chatId: Long, typeChange: Int, isEnable: Boolean) {
         when (typeChange) {
-            MegaChatRequest.AUDIO -> {
-                _micLiveData.value = isEnable
-                logDebug("open Mic: $isEnable")
-                tips.value = when (isEnable) {
-                    true -> getString(
-                        R.string.general_mic_unmute
-                    )
-                    false -> getString(
-                        R.string.general_mic_mute
-                    )
-                }
-            }
             MegaChatRequest.VIDEO -> {
                 updateCameraValueAndTips(isEnable)
             }

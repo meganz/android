@@ -1,16 +1,19 @@
-
 BUILD_STEP = ""
 SDK_BRANCH = "develop"
 MEGACHAT_BRANCH = "develop"
+
+GMS_APK_BUILD_LOG = "gms_build.log"
+HMS_APK_BUILD_LOG = "hms_build.log"
 
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
  * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
  * been removed from MR title, newly triggered builds will resume to normal.
- * @param mrTitle of the Merge Request
+ *
  * @return true if current stage should be skipped. Otherwise return false.
  */
-def shouldSkip(mrTitle) {
+def shouldSkipBuild() {
+    String mrTitle = env.GITLAB_OA_TITLE
     if (mrTitle != null && !mrTitle.isEmpty()) {
         return mrTitle.toLowerCase().startsWith("draft:") ||
                 mrTitle.toLowerCase().startsWith("wip:")
@@ -53,7 +56,7 @@ def getSDKBranch() {
  * can checkout wanted branch for MEGAChat SDK.
  * If no, set MEGACHAT_BRANCH to "develop".
  */
-def getMEGAchatBranch() {
+def getMEGAChatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     if (description != null) {
         String[] lines = description.split("\n");
@@ -61,11 +64,11 @@ def getMEGAchatBranch() {
         for (String line : lines) {
             line = line.trim();
             if (line.startsWith(KEY)) {
-                print("MEGACHAT_BRANCH line found!!! --> " + line);
+                print("MEGACHAT_BRANCH line found!!! --> " + line)
                 String value = line.substring(KEY.length());
                 if (!value.isEmpty()) {
                     MEGACHAT_BRANCH = value;
-                    print("Setting MEGACHAT_BRANCH value --> " + value);
+                    print("Setting MEGACHAT_BRANCH value --> " + value)
                     return;
                 }
             }
@@ -88,7 +91,7 @@ def getLastCommitMessage() {
 }
 
 pipeline {
-    agent { label 'mac-jenkins-slave'}
+    agent { label 'mac-jenkins-slave' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
@@ -165,7 +168,7 @@ pipeline {
                         }
                         slackSend color: "danger", message: comment
                         sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
-                        slackUploadFile filePath:"console.txt", initialComment:"Android Build Log"
+                        slackUploadFile filePath: "console.txt", initialComment: "Android Build Log"
                     }
                 }
             }
@@ -177,9 +180,9 @@ pipeline {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
 
                     // If CI build is skipped due to Draft status, send a comment to MR
-                    if (shouldSkip(env.GITLAB_OA_TITLE)) {
+                    if (shouldSkipBuild()) {
                         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                            env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
+                            env.MARKDOWN_LINK = ":raising_hand: Android CI Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
                             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                         }
@@ -187,7 +190,9 @@ pipeline {
                         // always report build success to MR comment
                         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                             env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
-                                    "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})"
+                                    "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})" +
+                                    "<br/>Build Warnings: ${readBuildWarnings()}"
+
                             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                         }
@@ -199,7 +204,7 @@ pipeline {
     stages {
         stage('Preparation') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -208,7 +213,7 @@ pipeline {
                     getSDKBranch()
                     sh("echo SDK_BRANCH = ${SDK_BRANCH}")
 
-                    getMEGAchatBranch()
+                    getMEGAChatBranch()
                     sh("echo MEGACHAT_BRANCH = ${MEGACHAT_BRANCH}")
                 }
                 gitlabCommitStatus(name: 'Preparation') {
@@ -220,7 +225,7 @@ pipeline {
 
         stage('Fetch SDK Submodules') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -242,7 +247,7 @@ pipeline {
 
         stage('Download Dependency Lib for SDK') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -287,7 +292,7 @@ pipeline {
         }
         stage('Build SDK') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -305,7 +310,7 @@ pipeline {
         }
         stage('Build APK (GMS+HMS)') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -313,7 +318,9 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
-                    sh "./gradlew clean app:assembleGmsRelease app:assembleHmsRelease"
+                    sh "./gradlew clean"
+                    sh "./gradlew app:assembleGmsRelease | tee ${GMS_APK_BUILD_LOG}"
+                    sh "./gradlew app:assembleHmsRelease | tee ${HMS_APK_BUILD_LOG}"
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
@@ -322,7 +329,7 @@ pipeline {
         }
         stage('Unit Test') {
             when {
-                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
@@ -339,7 +346,7 @@ pipeline {
         }
         // stage('Static analysis') {
         //   when {
-        //      expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+        //      expression { (!shouldSkip()) }
         //   }
         //   steps {
         //     // Run Lint and analyse the results
@@ -350,7 +357,7 @@ pipeline {
         stage('Deploy') {
             when {
                 allOf {
-                    expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+                    expression { (!shouldSkipBuild()) }
 
                     // Only execute this stage when building from the `beta` branch
                     branch 'beta'
@@ -412,4 +419,35 @@ pipeline {
     //     mail to: 'android-devs@example.com', subject: 'Oops!', body: "Build ${env.BUILD_NUMBER} failed; ${env.BUILD_URL}"
     //   }
     // }
+}
+
+String readBuildWarnings() {
+    String result = ""
+    if (fileExists(GMS_APK_BUILD_LOG)) {
+        String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
+        println("gmsBuildWarnings = $gmsBuildWarnings")
+        if (!gmsBuildWarnings.isEmpty()) {
+            result = "<br/><b>:warning: GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(gmsBuildWarnings)
+        }
+    }
+
+    if (fileExists(HMS_APK_BUILD_LOG)) {
+        String hmsBuildWarnings = sh(script: "cat ${HMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
+        println("hmsBuildWarnings = $hmsBuildWarnings")
+        if (!hmsBuildWarnings.isEmpty()) {
+            result += "<br/><b>:warning: HMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(hmsBuildWarnings)
+        }
+    }
+
+    if (result == "") result = "None"
+    println("readBuildWarnings() = ${result}")
+    return result
+}
+
+String wrapBuildWarnings(String rawWarning) {
+    if (rawWarning == null || rawWarning.isEmpty()) {
+        return ""
+    } else {
+        return rawWarning.split('\n').join("<br/>")
+    }
 }

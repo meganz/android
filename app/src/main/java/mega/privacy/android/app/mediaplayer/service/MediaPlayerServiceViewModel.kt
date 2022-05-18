@@ -46,8 +46,6 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * A class containing audio player service logic, because using ViewModel in Service
@@ -103,8 +101,8 @@ class MediaPlayerServiceViewModel(
     var currentIntent: Intent? = null
         private set
 
-    private val playlistItems = ArrayList<PlaylistItem>()
-    private val playlistItemsMap = HashMap<String, PlaylistItem>()
+    private val playlistItems = mutableListOf<PlaylistItem>()
+    private val playlistItemsMap = mutableMapOf<String, PlaylistItem>()
 
     private var _isActionMode = MutableLiveData<Boolean>()
     val isActionMode: LiveData<Boolean>
@@ -112,7 +110,7 @@ class MediaPlayerServiceViewModel(
 
     private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
 
-    private var _itemsSelectedCount = MutableLiveData<Int>()
+    private val _itemsSelectedCount = MutableLiveData<Int>()
     val itemsSelectedCount: LiveData<Int>
         get() = _itemsSelectedCount
 
@@ -132,13 +130,7 @@ class MediaPlayerServiceViewModel(
         }
 
     var paused = false
-        set(value) {
-            field = value
-            postPlaylistItems(false)
-            _mediaPlaybackState.update {
-                value
-            }
-        }
+        private set
 
     var audioPlayer = false
         private set
@@ -166,6 +158,19 @@ class MediaPlayerServiceViewModel(
         )
         _itemsSelectedCount.value = 0
         megaApi.addTransferListener(this)
+    }
+
+    /**
+     * Set paused
+     * @param paused the paused state
+     * @param currentPosition current position when the media is paused
+     */
+    fun setPaused(paused: Boolean, currentPosition: Long? = null) {
+        this.paused = paused
+        postPlaylistItems(currentPosition = currentPosition, isScroll = false)
+        _mediaPlaybackState.update {
+            paused
+        }
     }
 
     /**
@@ -334,7 +339,7 @@ class MediaPlayerServiceViewModel(
                                             .uppercase(Locale.getDefault())
                                     )
 
-                                    val nodes = ArrayList<MegaNode>()
+                                    val nodes = mutableListOf<MegaNode>()
                                     var lastHandle = INVALID_HANDLE
                                     for (share in megaApi.getOutShares(order)) {
                                         val node = megaApi.getNodeByHandle(share.nodeHandle)
@@ -812,9 +817,9 @@ class MediaPlayerServiceViewModel(
      * Get playlist from playlistItems
      * @param isScroll whether scroll to the specific position
      */
-    private fun postPlaylistItems(isScroll: Boolean = true) {
+    private fun postPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
         logDebug("postPlaylistItems")
-        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems(isScroll) }
+        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems(currentPosition, isScroll) }
             .subscribeOn(Schedulers.single())
             .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
     }
@@ -823,7 +828,7 @@ class MediaPlayerServiceViewModel(
      * Get playlist from playlistItems
      * @param isScroll whether scroll to the specific position
      */
-    private fun doPostPlaylistItems(isScroll: Boolean = true) {
+    private fun doPostPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
         logDebug("doPostPlaylistItems ${playlistItems.size} items")
         if (playlistItems.isEmpty()) {
             return
@@ -874,13 +879,17 @@ class MediaPlayerServiceViewModel(
                 else -> PlaylistItem.TYPE_NEXT
             }
             items[index] =
-                item.finalizeItem(
-                    index = index,
-                    type = type,
-                    isSelected = item.isSelected,
-                    duration = item.duration,
-                    currentPosition = item.currentPosition
-                )
+                    item.finalizeItem(
+                            index = index,
+                            type = type,
+                            isSelected = item.isSelected,
+                            duration = item.duration,
+                            currentPosition = if (playingIndex == index) {
+                                currentPosition ?: item.currentPosition
+                            } else {
+                                item.currentPosition
+                            }
+                    )
         }
 
         val hasPrevious = playingIndex > 0
@@ -905,21 +914,24 @@ class MediaPlayerServiceViewModel(
 
     /**
      * Set the duration for playing item
-     * @param duration the duration of audio
      * @param currentPosition the current position of audio
      */
-    fun setCurrentPositionAndDuration(duration: Long, currentPosition: Long) {
+    fun setCurrentPosition(currentPosition: Long) {
+        postPlaylistItems(currentPosition, false)
+    }
+
+    fun setDuration(duration: Long) {
         val list = mutableListOf<PlaylistItem>()
         list.addAll(playlistItems.map { playListItem ->
             if (playListItem.nodeHandle == playingHandle) {
-                playListItem.copy(duration = duration, currentPosition = currentPosition)
+                playListItem.copy(duration = duration)
             } else {
                 playListItem
             }
         })
         playlistItems.clear()
         playlistItems.addAll(list)
-        postPlaylistItems(false)
+        postPlaylistItems(isScroll = false)
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
@@ -996,7 +1008,7 @@ class MediaPlayerServiceViewModel(
                 }
                 _itemsSelectedCount.value = itemsSelectedMap.size
                 // Refresh the playlist
-                postPlaylistItems(false)
+                postPlaylistItems(isScroll = false)
             }
         }
     }
@@ -1020,7 +1032,7 @@ class MediaPlayerServiceViewModel(
     fun setActionMode(isActionMode: Boolean) {
         _isActionMode.value = isActionMode
         if (isActionMode) {
-            postPlaylistItems(false)
+            postPlaylistItems(isScroll = false)
         }
     }
 

@@ -67,7 +67,6 @@ def readReleaseNotes() {
  */
 String readTesters() {
     String testers = System.getenv("TESTERS_FOR_CD")
-    print("testers = " + testers)
     if (testers == null || testers.trim().isEmpty()) {
         testers = ""
     }
@@ -391,6 +390,9 @@ dependencies {
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
+
+    // Live Data testing
+    testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
