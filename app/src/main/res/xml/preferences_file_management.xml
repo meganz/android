@@ -75,8 +75,8 @@
     <androidx.preference.SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="auto_play_switch"
-        android:summary="@string/settings_auto_play_label_text"
-        android:title="@string/settings_auto_play_label"
+        android:summary="@string/settings_file_management_auto_open_downloaded_file_description"
+        android:title="@string/settings_file_management_auto_open_downloaded_file"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
