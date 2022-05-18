@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -2332,7 +2333,8 @@ class InMeetingViewModel @Inject constructor(
         }
         AccountController.logout(
             meetingActivity,
-            MegaApplication.getInstance().megaApi
+            MegaApplication.getInstance().megaApi,
+            viewModelScope
         )
     }
 

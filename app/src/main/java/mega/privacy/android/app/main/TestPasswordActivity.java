@@ -26,8 +26,11 @@ import android.widget.TextView;
 
 import java.io.File;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -42,7 +45,14 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class TestPasswordActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
+
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     private LinearLayout passwordReminderLayout;
     private ImageView passwordReminderCloseButton;
@@ -423,8 +433,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
                 if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
                     logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
                     if (dismissPasswordReminder && isLogout() && numRequests <= 0) {
-                        AccountController ac = new AccountController(this);
-                        ac.logout(this, megaApi);
+                        AccountController.logout(this, megaApi, sharingScope);
                     }
                 }
                 else {

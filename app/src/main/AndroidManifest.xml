@@ -411,6 +411,10 @@
             android:label="@string/section_chat"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.settings.chat.imagequality.SettingsChatImageQualityActivity"
+            android:exported="false"
+            android:label="@string/settings_chat_image_quality" />
+        <activity
             android:name=".activities.settingsActivities.DownloadPreferencesActivity"
             android:label="@string/download_location"
             android:launchMode="singleTop" />

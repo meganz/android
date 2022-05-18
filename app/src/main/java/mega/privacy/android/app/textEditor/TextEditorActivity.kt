@@ -243,11 +243,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_text_file_editor, menu)
         this.menu = menu
 
-        menu?.findItem(R.id.action_get_link)?.title =
+        menu.findItem(R.id.action_get_link)?.title =
             StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
 
         refreshMenuOptionsVisibility()

@@ -15,6 +15,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.main.LoginActivity;
@@ -24,10 +27,17 @@ import mega.privacy.android.app.main.controllers.AccountController;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class WeakAccountProtectionAlertActivity extends PasscodeActivity implements View.OnClickListener {
 
     private static final String IS_INFO_DIALOG_SHOWN = "IS_INFO_DIALOG_SHOWN";
     private static final String IS_ACCOUNT_BLOCKED = "IS_ACCOUNT_BLOCKED";
+
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     private ScrollView scrollContentLayout;
     private TextView verifyEmailText;
@@ -133,7 +143,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
                 break;
 
             case R.id.logout_button:
-                AccountController.logout(this, megaApi);
+                AccountController.logout(this, megaApi, sharingScope);
                 break;
         }
     }

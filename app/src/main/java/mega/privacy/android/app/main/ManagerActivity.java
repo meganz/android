@@ -281,6 +281,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -294,6 +295,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -526,6 +528,9 @@ public class ManagerActivity extends TransfersManagementActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     DownloadNodeUseCase downloadNodeUseCase;
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -3393,9 +3398,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)) {
                     AccountController ac = new AccountController(this);
                     if (getIntent().getBooleanExtra("logout", false)) {
-                        ac.copyMK(true);
+                        ac.copyMK(true, sharingScope);
                     } else {
-                        ac.copyMK(false);
+                        ac.copyMK(false, sharingScope);
                     }
                 } else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
                     logDebug("Open after LauncherFileExplorerActivity ");
@@ -6553,35 +6558,6 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
         }
-    }
-
-    public void askConfirmationDeleteAccount() {
-        logDebug("askConfirmationDeleteAccount");
-        megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        aC.deleteAccount();
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.delete_account));
-
-        builder.setMessage(getResources().getString(R.string.delete_account_text));
-
-        builder.setPositiveButton(R.string.delete_account, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
-        builder.show();
     }
 
     /**
