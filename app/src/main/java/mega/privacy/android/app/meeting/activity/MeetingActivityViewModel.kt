@@ -182,6 +182,23 @@ class MeetingActivityViewModel @Inject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
 
+        getCallUseCase.getCallEnded()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { chatIdOfCallEnded ->
+                    currentChatId.value.let { currentChatId ->
+                        if(chatIdOfCallEnded == currentChatId) {
+                            _finishMeetingActivity.value = true
+                        }
+                    }
+                },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
+                    }
+            )
+                .addTo(composite)
+
         getLocalAudioChangesUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -207,7 +224,7 @@ class MeetingActivityViewModel @Inject constructor(
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(composite)
+                .addTo(composite)
 
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)

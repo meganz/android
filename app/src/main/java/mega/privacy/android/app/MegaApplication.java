@@ -164,6 +164,7 @@ import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
+import mega.privacy.android.app.meeting.CallSoundType;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
@@ -718,16 +719,23 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private final Observer<Pair> sessionStatusObserver = callIdAndSession -> {
         MegaChatSession session = (MegaChatSession) callIdAndSession.second;
         int sessionStatus = session.getStatus();
-        if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-            logDebug("Session is in progress");
-            long callId = (long) callIdAndSession.first;
-            MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
-            if (call != null) {
-                MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-                if (chatRoom != null && (chatRoom.isGroup() || chatRoom.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary())) {
-                    getChatManagement().setRequestSentCall(callId, false);
-                    updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
-                }
+        long callId = (long) callIdAndSession.first;
+        MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
+        if (call == null)
+            return;
+
+        MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
+        if (chat != null) {
+            if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS &&
+                    (chat.isGroup() || chat.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary())) {
+                logDebug("Session is in progress");
+                getChatManagement().setRequestSentCall(callId, false);
+                updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
+            }
+
+            if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED && !chat.isGroup() &&
+                    !chat.isMeeting() && session.getTermCode() == MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE) {
+                rtcAudioManager.playSound(CallSoundType.CALL_ENDED);
             }
         }
     };
