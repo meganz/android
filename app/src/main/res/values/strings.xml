@@ -4319,8 +4319,10 @@
     <string name="media_player_audio_playlist_next">Next</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">Previous</string>
-    <!-- Next videos to be played in the audio playlist -->
+    <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Next</string>
-    <!-- Previous videos have been already played in the audio playlist -->
+    <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Previous</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Photos</string>
 </resources>
