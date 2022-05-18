@@ -1184,7 +1184,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">フォルダリンクが使用できません</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました</string>
+    <string name="folder_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">ファイルリンクが使用できません</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -2774,7 +2774,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">異議申立による削除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">ToS（ご利用規約）/AUP（ご利用規定）違反のためアクセスできません</string>
+    <string name="error_download_takendown_node">ご利用規約に違反するため、アクセスできません。</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="other">%d個のファイルは当社のご利用規約に違反するため、ダウンロードされませんでした。</item>
@@ -3483,12 +3483,12 @@
     <string name="fab_label_new_chat">新しいチャット</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B][/B][A]画像[/A][B]が見つかりません[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">ドキュメントが見つかりません</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">音声ファイルが見つかりません</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">動画が見つかりません</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B][/B][A]ドキュメント[/A][B]が見つかりません[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B][/B][A]音声ファイル[/A][B]が見つかりません[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B][/B][A]動画[/A][B]が見つかりません[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">GIPHYを検索</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3767,30 +3767,30 @@
     <string name="error_share_owner_storage_quota">共有所有者はストレージ容量を超えています。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ターゲットユーザーはストレージ容量を超えているため、ファイルを送信できません。</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1個のファイルはすでにダウンロードされています。1個のファイルが保留されています。</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1個のファイルはすでにダウンロードされています。%d個のファイルが保留中です。</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d個のファイルがすでにダウンロードされました。1個のファイルが保留されています。</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d個のファイルがすでにダウンロードされました。%2$d個のファイルが保留中です。</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1個の項目が正常にごみ箱に移動し、1個の項目が正常に送信されませんでした</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1個の項目が正常にごみ箱に移動し、%d個の項目が正常に送信されませんでした</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d個の項目が正常にごみ箱に移動し、1個の項目が正常に送信されませんでした</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d個の項目が正常にごみ箱に移動し、%2$d個の項目が正常に送信されませんでした</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1個の項目は正常に復元され、1個の項目は正常に復元されませんでした</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1個の項目は正常に復元され、%d個の項目は正常に復元されませんでした</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d個の項目は正常に復元され、1個の項目は正常に復元されませんでした</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d個の項目は正常に復元され、%2$d個の項目は正常に復元されませんでした</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="other">1個のファイルはすでにダウンロードされています。%d個のファイルが保留中です。</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="other">%d個のファイルがすでにダウンロードされました。1個のファイルが保留されています。</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="other">1個の項目がごみ箱に移動しましたが、%d個の項目は移動しませんでした。後でもう一度試してください。</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="other">%d個の項目がごみ箱に移動しましたが、1個の項目は移動しませんでした。後でもう一度試してください。</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1個の項目が復元されましたが、%d個の項目は復元されませんでした。後でもう一度試してください。</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d個の項目が復元されましたが、1個の項目は復元されませんでした。後でもう一度試してください。</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d個の項目がごみ箱に正常に移動しました</item>
@@ -4211,4 +4211,20 @@
     <string name="no_uploads_empty_folder">選択したフォルダは空です。アップロードするファイルがありません。</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">現在のパスワードを入力しました</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">ファイルは利用できなくなりました</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">ご利用規約に違反するため、ファイルは削除されました。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">ご利用規約違反です</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">この端末には、フォルダを選択するアプリがありません。</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">次</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">前</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">次</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">前</string>
 </resources>

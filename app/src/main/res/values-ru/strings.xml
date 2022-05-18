@@ -2927,10 +2927,10 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Оспорить блокировку</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Недоступно из-за нарушения условий предоставления услуг/политики допустимого использования</string>
+    <string name="error_download_takendown_node">Недоступно из-за нарушения наших условий обслуживания.</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d файл не был скачан из-за нарушения наших условий обслуживания.</item>
+        <item quantity="one">%d файл не было скачан из-за нарушения наших условий обслуживания.</item>
         <item quantity="few">%d файла не было скачано из-за нарушения наших условий обслуживания.</item>
         <item quantity="many">%d файлов не было скачано из-за нарушения наших условий обслуживания.</item>
         <item quantity="other">%d файла не было скачано из-за нарушения наших условий обслуживания.</item>
@@ -3702,12 +3702,12 @@
     <string name="fab_label_new_chat">Новый чат</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[A]Изображения[/A] [B]не[/B] [B]найдены[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Документы не найдены</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Аудиофайлы не найдены</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Видео не найдены</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B][/B][A]Документы[/A] [B]не найдены[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B][/B][A]Аудиофайлы[/A] [B]не найдены[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B][/B][A]Видео[/A] [B]не найдено[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Искать GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -4010,30 +4010,48 @@
     <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 файл уже скачан. 1 файл в ожидании.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 файл уже скачан. Файлы в ожидании: %d.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">Файлы уже скачаны: %d. 1 файл в ожидании.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">Файлы уже скачаны: %1$d. Файлы в ожидании: %2$d.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 элемент успешно перемещён в корзину и 1 не удалось переместить</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 элемент успешно перемещён в корзину и %d не удалось переместить</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">Элементы (%d) успешно перемещены в корзину и 1 не удалось переместить</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">Элементы (%1$d) успешно перемещены в корзину и %2$d не удалось переместить</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 элемент успешно восстановлен и 1 не удалось восстановить</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 элемент успешно восстановлен и %d не удалось восстановить</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">Элементы успешно восстановлены (%d) и 1 не удалось восстановить</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">Элементы успешно восстановлены (%1$d) и %2$d не удалось восстановить</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 файл уже скачан. 1 файл в ожидании.</item>
+        <item quantity="few">1 файл уже скачан. %d файла в ожидании.</item>
+        <item quantity="many">1 файл уже скачан. %d файлов в ожидании.</item>
+        <item quantity="other">1 файл уже скачан. %d файла в ожидании.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 файл уже скачан. 1 файл в ожидании.</item>
+        <item quantity="few">%d файла уже скачано. 1 файл в ожидании.</item>
+        <item quantity="many">%d файлов уже скачано. 1 файл в ожидании.</item>
+        <item quantity="other">%d файла уже скачано. 1 файл в ожидании.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 элемент перемещён в корзину, но ещё один не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="few">1 элемент перемещен в корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
+        <item quantity="many">1 элемент перемещен в корзину, но ещё %d элементов не перемещено. Попробуйте ещё раз позже.</item>
+        <item quantity="other">1 элемент перемещен в корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 элемент перемещён в корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="few">%d элемента перемещено в корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="many">%d элементов перемещено в корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="other">%d элемента перемещено в корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="few">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
+        <item quantity="many">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
+        <item quantity="other">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="few">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="many">%d элементов восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="other">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 элемент успешно перемещён в корзину</item>
@@ -4481,4 +4499,20 @@
     <string name="no_uploads_empty_folder">Выбранная папка пуста. Нет файлов для загрузки.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Вы ввели текущий пароль</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">Файл больше не доступен</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">Файл удалён, поскольку он нарушал наши условия обслуживания.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Нарушены условия обслуживания</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">На этом устройстве нет приложения для выбора папок.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Далее</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Назад</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Далее</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Назад</string>
 </resources>

@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Enlace de la carpeta no disponible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">El enlace de la carpeta ha sido eliminado por infringir nuestros Términos de servicio y/o condiciones de uso.</string>
+    <string name="folder_link_unavaible_ToS_violation">El enlace de carpeta ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Enlace del archivo no disponible</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">El enlace del archivo se ha eliminado por infringir nuestros Términos de servicio y/o condiciones de uso.</string>
+    <string name="file_link_unavaible_ToS_violation">El enlace de archivo ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Esta URL está corrupta o deformada. El enlace al que intentas acceder no existe.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Disputar la retirada</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">No accesible por infringir los Términos de servicio</string>
+    <string name="error_download_takendown_node">Eliminado por infringir nuestros Términos de servicio</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d archivo no se ha descargado debido a una violación de nuestros Términos de servicio y/o condiciones de uso.</item>
-        <item quantity="other">%d archivos no se han descargado debido a una violación de losTérminos de servicio y/o condiciones de uso.</item>
+        <item quantity="one">El archivo %d no se puede descargar porque infringe nuestros Términos de servicio.</item>
+        <item quantity="other">Los archivos %d no se pueden descargar porque infringen nuestros Términos de servicio.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B][C] ha sido restaurado.[/C]</string>
@@ -3223,7 +3223,7 @@
     <!-- Text of the dialog shown when you want to join a group call -->
     <string name="text_join_call">Para unirte a esta llamada tienes que finalizar tu llamada actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
-    <string name="text_join_another_call">Para unirte a esta llamada, tienes que colgar o dejar en espera la llamada actual.</string>
+    <string name="text_join_another_call">Para unirte a esta llamada, tienes que finalizar o dejar en espera la llamada en curso.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Las personas pueden unirse a tu grupo usando este enlace.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3556,18 +3556,18 @@
     <string name="fab_label_new_chat">Nuevo chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]No[/B] [B]hay[/B] [A]imágenes[/A]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">No se han encontrado documentos</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">No se han encontrado audios</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">No se han encontrado vídeos</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]No[/B] [B]hay[/B] [A]documentos[/A]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [B]hay[/B] [A]audios[/A]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]No[/B] [B]hay[/B] [A]vídeos[/A]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Buscar GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">No se han encontrado [A]GIFs[/A]</string>
+    <string name="empty_search_giphy">No hay [A]GIF[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">No hay GIFS disponibles, prueba más tarde</string>
+    <string name="server_down_giphy">No hay GIF disponibles, inténtalo más tarde</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Fin[/A] de los resultados</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">El propietario de la carpeta compartida ha superado la cuota de almacenamiento disponible.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">El archivo no se puede enviar porque el destinatario ha superado su límite de almacenamiento.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 archivo descargado anteriormente. 1 archivo pendiente.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 archivo descargado anteriormente. %d archivos pendientes.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d archivos descargados anteriormente. 1 archivo pendiente.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d archivos descargados anteriormente. %2$d archivos pendientes.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 elemento se ha movido a la Papelera y otro no se ha podido mover</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 elemento se ha movido a la Papelera y otros %d no se han podido mover</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d elementos se han movido a la Papelera y uno no se ha podido mover</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d elementos se han movido a la Papelera y %2$d no se han podido mover</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">Se ha restaurado 1 elemento y otro no se ha podido restaurar</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">Se ha restaurado 1 elemento y %d no se han podido restaurar</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">Se han restaurado %d elementos y otro no se ha podido restaurar</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">Se han restaurado %1$d elementos y otros %2$d no se han podido restaurar</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 archivo descargado anteriormente. 1 archivo pendiente.</item>
+        <item quantity="other">1 archivo descargado anteriormente. %d archivos pendientes.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 archivo descargado anteriormente. 1 archivo pendiente.</item>
+        <item quantity="other">%d archivos descargados anteriormente. 1 archivo pendiente.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">Se ha movido 1 elemento a la papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="other">Se ha movido 1 elemento a la papelera pero otros %d no se han podido mover. Inténtalo más tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">Se ha movido 1 elemento a la papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="other">Se han movido %d elementos a la papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">Se ha restaurado 1 elemento pero el otro no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="other">Se ha restaurado 1 elemento pero otros %d no se han podido restaurar. Inténtalo más tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">Se ha restaurado 1 elemento pero el otro no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="other">Se han restaurado %d elementos pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 elemento enviado a la Papelera correctamente</item>
@@ -4301,4 +4307,20 @@
     <string name="no_uploads_empty_folder">La carpeta seleccionada está vacía. No hay archivos para subir.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Has introducido tu contraseña actual</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">El archivo ya no está disponible.</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">El archivo ha sido eliminado por infringir nuestros Términos de servicio.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Infringe los Términos de servicio</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">Este dispositivo no tiene ninguna aplicación para seleccionar carpetas.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Siguiente</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Anterior</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Siguiente</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Anterior</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4319,8 +4319,8 @@
     <string name="media_player_audio_playlist_next">Next</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">Previous</string>
-    <!-- Next videos to be played in the audio playlist -->
+    <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Next</string>
-    <!-- Previous videos have been already played in the audio playlist -->
+    <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Previous</string>
 </resources>

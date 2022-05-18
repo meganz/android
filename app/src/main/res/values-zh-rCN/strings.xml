@@ -29,7 +29,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_move">移动</string>
     <!-- Menu option to delete one or multiple selected items. -->
-    <string name="general_remove">删除</string>
+    <string name="general_remove">移除</string>
     <!-- button -->
     <string name="general_share">共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -273,7 +273,7 @@
     <!-- title of the screen that shows all the shared items -->
     <string name="section_shared_items">共享文件夹</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">垃圾桶</string>
+    <string name="section_rubbish_bin">回收站</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">联系人</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
@@ -393,7 +393,7 @@
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">离开共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_clean_shares_menu">移除分享</string>
+    <string name="context_clean_shares_menu">移除共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">移除链接</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
@@ -427,9 +427,9 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">正在复制</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">移至垃圾桶</string>
+    <string name="context_move_to_trash">移至回收站</string>
     <!-- menu item -->
-    <string name="context_delete_from_mega">从MEGA中删除</string>
+    <string name="context_delete_from_mega">从MEGA中移除</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">文件夹名称</string>
     <!-- when adding a new contact. in the dialog -->
@@ -439,15 +439,15 @@
     <!-- Menu item -->
     <string name="context_download_to">保存到</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">清空垃圾桶</string>
+    <string name="context_clear_rubbish">清空回收站</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">您将永久删除垃圾桶中的所有项目。</string>
+    <string name="clear_rubbish_confirmation">您即将永久移除回收站中的所有项目。</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">发送</string>
     <!-- send the file to inbox -->
     <string name="context_send_file_inbox">发送至联系人</string>
     <!-- Menu option to delete one or multiple selected items. -->
-    <string name="context_remove">删除</string>
+    <string name="context_remove">移除</string>
     <!-- Menu option to delete selected items of the offline state -->
     <string name="context_delete_offline">从离线中移除</string>
     <!-- menu item -->
@@ -473,7 +473,7 @@
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">联系人已被移除</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">错误。联系人移除失败</string>
+    <string name="context_contact_not_removed">发生错误。联系人移除失败</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">权限已更改</string>
     <!-- error message -->
@@ -509,7 +509,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d个项目移动失败</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">已成功移至垃圾桶</string>
+    <string name="context_correctly_moved_to_rubbish">已成功移至回收站</string>
     <!-- error message -->
     <string name="context_no_moved">错误。未移动</string>
     <!-- success message when sharing a folder -->
@@ -523,7 +523,7 @@
     <!-- error message -->
     <string name="context_no_shared">错误。未共享</string>
     <!-- error message -->
-    <string name="context_no_removed_shared">错误。删除共享失败</string>
+    <string name="context_no_removed_shared">发生错误。移除共享失败</string>
     <!-- success message when removing a sharing -->
     <string name="context_remove_sharing">已移除文件夹共享</string>
     <!-- error message -->
@@ -573,9 +573,9 @@
     <!-- option available for just one file -->
     <string name="context_select_one_file">仅选择一个文件</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">已成功清空垃圾桶</string>
+    <string name="rubbish_bin_emptied">清空回收站成功</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">发生错误。垃圾桶清空失败</string>
+    <string name="rubbish_bin_no_emptied">发生错误。回收站未被清空</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">您将取消您的MEGA订阅。如需再次开启订阅，请与我们联系。</string>
     <!-- hint cancel subscriptions dialog -->
@@ -615,7 +615,7 @@
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">图片</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">语音</string>
+    <string name="upload_to_audio">音频</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">视频</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
@@ -745,7 +745,7 @@
     <!-- enter verification code page title -->
     <string name="verify_account_title">验证您的帐户</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
-    <string name="verify_account_helper_locked">由于可能存在滥用行为，您的帐户已被暂时锁定。请通过验证手机号以解锁您的帐户。</string>
+    <string name="verify_account_helper_locked">由于可能存在滥用行为，您的帐户已被暂时锁定。请验证手机号以解锁您的帐户。</string>
     <!-- Hint text of the country edittext for billing purposes -->
     <string name="general_country_label">国家</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
@@ -1158,9 +1158,9 @@
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">已成功删除%1$d个邀请，%2$d个邀请未被删除。</string>
     <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">您是否要删除%s的联系人邀请请求？</string>
+    <string name="confirmation_delete_contact_request">您是否要移除%s的联系人邀请请求？</string>
     <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">您是否要删除这%d个邀请请求？</string>
+    <string name="confirmation_remove_multiple_contact_request">您是否要移除这%d个邀请请求？</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">已发送%d个请求回复。</string>
     <!-- error message when replying to multiple received request -->
@@ -1184,11 +1184,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">文件夹链接不可用</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">该文件夹链接因违反我们的服务条款而被删除。</string>
+    <string name="folder_link_unavaible_ToS_violation">该文件夹链接因违反我们的服务条款而被移除。</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">文件链接不可用</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">该文件链接因违反我们的服务条款而被删除。</string>
+    <string name="file_link_unavaible_ToS_violation">该文件链接因违反我们的服务条款而被移除。</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">该网址不可用。您尝试访问的链接不存在。</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1340,9 +1340,9 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message_by">[B]%1$s[/B][A]已删除此消息[/A]</string>
     <!-- Confirmation before deleting messages -->
-    <string name="confirmation_delete_several_messages">要删除消息吗？</string>
+    <string name="confirmation_delete_several_messages">要移除消息吗？</string>
     <!-- Confirmation before deleting one message -->
-    <string name="confirmation_delete_one_message">要删除消息吗？</string>
+    <string name="confirmation_delete_one_message">要移除消息吗？</string>
     <!-- Label for the sliding panel of a group chat -->
     <string name="group_chat_label">群聊</string>
     <!-- Label for the option of the sliding panel to show the info of a chat group -->
@@ -1439,7 +1439,7 @@
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
-        <item quantity="other">删除联系人？</item>
+        <item quantity="other">移除联系人？</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
     <string name="message_option_retry">重试</string>
@@ -1674,7 +1674,7 @@
     <string name="download_show_info">显示详细信息</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
-        <item quantity="other">链接删除失败。请稍后再试。</item>
+        <item quantity="other">链接移除失败。请稍后再试。</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
@@ -1682,7 +1682,7 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="other">已成功删除链接。</item>
+        <item quantity="other">已成功移除链接。</item>
     </plurals>
     <!-- error message -->
     <string name="context_link_action_error">链接操作失败。请稍后再试。</string>
@@ -1789,7 +1789,7 @@
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_chat_clear">清除聊天记录</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
-    <string name="title_properties_remove_contact">删除联系人</string>
+    <string name="title_properties_remove_contact">移除联系人</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_chat_notifications_contact">聊天通知</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1801,13 +1801,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">正在从共享文件夹中移除联系人</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">要移至垃圾桶吗？</string>
+    <string name="confirmation_move_to_rubbish">要移至回收站吗？</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">您确定要将此文件夹移至垃圾桶吗？此操作将禁用相机上传。</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">您确定要将此文件夹移至回收站吗？这将禁用相机上传。</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">您确定要将此文件夹移至垃圾桶吗？此操作将禁用辅助媒体上传。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">您确定要将此文件夹移至回收站吗？这将禁用辅助媒体上传。</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">要移至垃圾桶吗？</string>
+    <string name="confirmation_move_to_rubbish_plural">要移至回收站吗？</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">确定从MEGA删除吗？</string>
     <!-- label to indicate the state of an upload in chat -->
@@ -2065,7 +2065,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]邀请好友加入[/B][A]聊天[/A][B]并享受我们私密和安全的加密服务[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[A]垃圾桶[/A][B]为空[/B]</string>
+    <string name="context_empty_rubbish_bin">[A]回收站[/A][B]为空[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[A]您的收件箱[/A][B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
@@ -2161,7 +2161,7 @@
         <item quantity="other">%1$d个版本</item>
     </plurals>
     <!-- Title of the section Versions for files -->
-    <string name="title_section_versions">版本</string>
+    <string name="title_section_versions">文件版本</string>
     <!-- Header of the item to show the current version of a file in a list -->
     <string name="header_current_section_item">当前版本</string>
     <!--  -->
@@ -2177,9 +2177,9 @@
         <item quantity="other">是否删除这些版本？</item>
     </plurals>
     <!-- Content of the dialog to confirm that a version is going to be deleted -->
-    <string name="content_dialog_delete_version">该版本将被永久删除。</string>
+    <string name="content_dialog_delete_version">该版本将被永久移除。</string>
     <!-- Content of the dialog to confirm that several versions are going to be deleted -->
-    <string name="content_dialog_delete_multiple_version">这%d个版本将被永久删除。</string>
+    <string name="content_dialog_delete_multiple_version">这%d个版本将被永久移除。</string>
     <!-- Title of the notification shown when a file is uploading to a chat -->
     <string name="chat_upload_title_notification">上传文件到聊天</string>
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
@@ -2306,7 +2306,7 @@
     <!-- message when a temporary error on logging in is due to servers busy -->
     <string name="login_servers_busy">服务器正忙。请稍候。</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
-    <string name="login_API_lock">加载时间较长，请稍后。</string>
+    <string name="login_API_lock">加载时间较长。请稍候。</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">请求过多。请稍候。</string>
     <!-- Message when previous login is being cancelled -->
@@ -2382,7 +2382,7 @@
     <!-- Text button -->
     <string name="general_verify">验证</string>
     <!-- Text button -->
-    <string name="general_next">下一步</string>
+    <string name="general_next">接下来</string>
     <!-- Text button -->
     <string name="general_previous">上一个</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -2394,7 +2394,7 @@
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">为避免您忘记密码或想要禁用双重验证时出现问题，请将您的<b>恢复密钥</b>保存到安全位置。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
-    <string name="pin_error_2fa">代码无效</string>
+    <string name="pin_error_2fa">验证码无效</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">丢失了您的身份验证设备？</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
@@ -2646,9 +2646,9 @@
     <!-- When app is retrieving push message -->
     <string name="retrieving_message_title">正在检索信息</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">垃圾桶定时清理</string>
+    <string name="settings_rb_scheduler_enable_title">回收站定时清理</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">垃圾桶会为您自动清理。</string>
+    <string name="settings_rb_scheduler_enable_subtitle">回收站会自动为您清理。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">最短期限为7天。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2656,7 +2656,7 @@
     <!-- Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB. -->
     <string name="settings_compression_queue_subtitle">最小为%1$s，最大为%2$s。</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
-    <string name="settings_rb_scheduler_select_days_title">删除垃圾桶中的文件，时间超过</string>
+    <string name="settings_rb_scheduler_select_days_title">移除回收站中的文件，时间超过</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="settings_rb_scheduler_select_days_subtitle">%d天</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
@@ -2664,7 +2664,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">当解压的视频大于</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">若要禁用垃圾桶定时清理或设置延长保留期限，请升级至Pro会员帐户。</string>
+    <string name="settings_rb_scheduler_alert_disabling">要禁用回收站定时清理或设置更长的保留期限，请订阅Pro会员方案。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">天</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2698,7 +2698,7 @@
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">加入</string>
     <!-- Label for observers of a group chat -->
-    <string name="observers_chat_label">观察者</string>
+    <string name="observers_chat_label">查看者</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link -->
     <string name="error_chat_link">加载聊天链接时发生错误。</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
@@ -2774,7 +2774,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">争议移除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">由于违反服务条款或使用限制政策而无法访问</string>
+    <string name="error_download_takendown_node">因违反我们的服务条款而无法访问</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="other">%d个文件因违反我们的服务条款而无法下载。</item>
@@ -2834,7 +2834,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">文件名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">显示上一次登录时间&#8230;</string>
+    <string name="option_enable_last_green_chat">显示上次登录时间&#8230;</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
     <string name="subtitle_option_enable_last_green_chat">允许您的联系人查看您在MEGA的上次登录时间。</string>
     <!-- title of notification when device is out of storage during camera upload -->
@@ -3114,7 +3114,7 @@
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]已加入群聊。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
-    <string name="context_remove_chat_link_warning_text">删除后，您将无法再次通过聊天链接访问此对话。</string>
+    <string name="context_remove_chat_link_warning_text">移除后，您将无法再次通过聊天链接访问此对话。</string>
     <!-- Description text of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_warning_text">启用加密密钥轮换后，您无法在未创建新群聊的情况下获取聊天链接。</string>
     <!-- Question of the dialog to generate a public chat link -->
@@ -3282,7 +3282,7 @@
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">传输</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">您无法删除联系人%1$s，因为他们是您企业帐户的用户。</string>
+    <string name="error_remove_business_contact">您无法移除联系人%1$s，因为他们是您企业帐户的用户。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您的上一笔付款未成功。请使用网络浏览器登录MEGA后获取详情。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
@@ -3448,9 +3448,9 @@
     <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
     <string name="remove_phone_number">要移除您的手机号码吗？</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">您的手机号已成功解除绑定。</string>
+    <string name="remove_phone_number_success">您的手机号码已成功移除。</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">无法删除您的手机号。</string>
+    <string name="remove_phone_number_fail">无法移除您的手机号码。</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">在MEGA中搜索</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3468,9 +3468,9 @@
     <!-- Option in bottom sheet dialog for removing the associated phone number of current account. -->
     <string name="title_remove_phone_number">移除手机号码</string>
     <!-- Message showing to explain what will happen when the operation of -->
-    <string name="modify_phone_number_message">此操作将解除与您当前手机号的绑定状态，并将您的新手机号与您的帐户关联。</string>
+    <string name="modify_phone_number_message">此操作将移除您当前的手机号码并将您的新手机号码与您的帐户关联。</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">这将从您的帐户中删除您所关联的手机号码。如需再次添加手机号码，则需要进行验证。</string>
+    <string name="remove_phone_number_message">这将从您的帐户中移除您所关联的手机号码。如需再次添加手机号码，则需要进行验证。</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">查看</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
@@ -3483,12 +3483,12 @@
     <string name="fab_label_new_chat">新建聊天</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]未[/B][B]找到[/B][A]图片[/A]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">未找到文档</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">无音频文件</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">未找到视频</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]未[/B][B]找到[/B][A]文档[/A]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]未[/B][B]找到[/B][A]音频文件[/A]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]未[/B][B]找到[/B][A]视频[/A]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">搜索GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3767,37 +3767,37 @@
     <string name="error_share_owner_storage_quota">共享所有者帐户已超出存储空间。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由于目标用户帐户已超出其存储空间，无法发送此文件。</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">已下载1个文件。1个文件待处理。</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">已下载1个文件。%d个文件待处理。</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">已下载%d个文件。1个文件待处理。</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">已下载%1$d个文件。%2$d个文件待处理。</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1个项目已成功移至垃圾桶，1个项目未发送成功</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1个项目已成功移至垃圾桶，%d个项目未发送成功</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d个项目已成功移至垃圾桶，1个项目未发送成功</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d个项目已成功移至垃圾桶，%2$d个项目未发送成功</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1个项目已还原成功，1个项目未还原成功</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1个项目已还原成功，%d个项目未还原成功</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d个项目已还原成功，1个项目未还原成功</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d个项目已还原成功，%2$d个项目未还原成功</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="other">1个文件已下载。%d个文件待处理。</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="other">%d个文件已下载。1个文件待处理。</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="other">1个项目已移至回收站，%d个项目未移动。请稍后再试。</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="other">%d个项目已移至回收站，1个项目未移动。请稍后再试。</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1个项目已恢复，%d个项目未恢复。请稍后再试。</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d个项目已恢复，1个项目未恢复。请稍后再试。</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="other">%d个项目已成功移至垃圾桶</item>
+        <item quantity="other">%d个项目已成功移至回收站</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="other">%d个项目未成功移至垃圾桶</item>
+        <item quantity="other">%d个项目未成功移至回收站</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -4084,17 +4084,17 @@
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_sub_folder">移动此文件夹会更改一个或多个已配置备份的目标位置，并可能导致异常情况。为了安全起见，备份将停止。您可以通过MEGA桌面应用程序重新开启备份。您确定要继续吗？</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">备份文件夹将会被删除。此操作将删除您设置的所有备份。您确定要继续吗？</string>
+    <string name="backup_remove_root_folder">备份文件夹将会被删除。此操作将移除您设置的所有备份。您确定要继续吗？</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_sub_folder">您确定要删除备份文件夹并停用已关联的备份吗？</string>
     <!-- The title of warning dialog for single folder moving -->
     <string name="backup_move_folder_title">移动“%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">移动“%1s”到垃圾桶</string>
+    <string name="backup_remove_folder_title">将“%1s”移至回收站</string>
     <!-- The title of warning dialog for multi-folder moving -->
     <string name="backup_move_multiple_folder_title">移动备份文件夹</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">移动备份文件夹到垃圾桶</string>
+    <string name="backup_remove_multiple_folder_title">将备份文件夹移至回收站</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">停用备份</string>
     <!-- The confirm information of warning dialog for moving "My backup" -->
@@ -4211,4 +4211,20 @@
     <string name="no_uploads_empty_folder">所选文件夹为空。无可上传的文件。</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">您输入的密码与当前密码相同</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">文件已不可用</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">该文件因违反我们的服务条款而被移除。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">已违反服务条款</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">此设备没有用于选择文件夹的应用程序。</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">下一个</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">上一个</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">下一个</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">上一个</string>
 </resources>
