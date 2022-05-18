@@ -78,6 +78,7 @@ class LineNumberEditText : AppCompatEditText {
             arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
         )
 
+        @Suppress("DEPRECATION")
         return InputConnectionCompat.createWrapper(
             inputConnection,
             editorInfo

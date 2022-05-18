@@ -262,7 +262,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_my_account, menu)
         this.menu = menu
 

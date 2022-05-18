@@ -3,6 +3,7 @@ package mega.privacy.android.app.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.domain.entity.ChatImageQuality
 
 /**
  * Settings repository - class for handling all calls relating to settings
@@ -114,5 +115,20 @@ interface SettingsRepository{
      * @param enabled
      */
     suspend fun setUseHttpsPreference(enabled: Boolean)
+
+    /**
+     * Gets chat image quality.
+     *
+     * @return Chat image quality.
+     */
+    fun getChatImageQuality(): Flow<ChatImageQuality>
+
+    /**
+     * Sets chat image quality.
+     *
+     * @param quality New chat image quality.
+     * @return Chat image quality.
+     */
+    suspend fun setChatImageQuality(quality: ChatImageQuality)
 
 }

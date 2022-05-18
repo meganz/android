@@ -80,6 +80,11 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion composeVersion
     }
 
     defaultConfig {
@@ -113,12 +118,21 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
+        debug{
+            res {
+                srcDirs 'src/main/res', 'src/sharedTest/res'
+            }
+        }
+
         testDebug {
             java.srcDir 'src/sharedTest/java'
         }
 
         androidTest {
             java.srcDir 'src/sharedTest/java'
+            resources {
+                srcDirs 'src/sharedTest/res'
+            }
         }
     }
 
@@ -261,6 +275,10 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation 'androidx.preference:preference:1.1.1'
+    implementation "androidx.compose.ui:ui:$composeVersion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    implementation 'androidx.activity:activity-compose:1.4.0'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
@@ -373,6 +391,7 @@ dependencies {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
+    testImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
@@ -386,10 +405,13 @@ dependencies {
         exclude module: "protobuf-lite"
     }
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
 
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'

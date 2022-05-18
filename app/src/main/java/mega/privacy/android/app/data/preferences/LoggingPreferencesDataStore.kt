@@ -30,6 +30,13 @@ private val Context.loggingDataStore: DataStore<Preferences> by preferencesDataS
         )
     })
 
+/**
+ * Logging preferences data store implementation of the [LoggingPreferencesGateway]
+ *
+ * @property context
+ * @property ioDispatcher
+ * @constructor Create empty Logging preferences data store
+ */
 class LoggingPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

@@ -8,8 +8,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.main.FileLinkActivity;
@@ -41,7 +44,14 @@ import static mega.privacy.android.app.utils.Util.decodeURL;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, LoadPreviewListener.OnPreviewLoadedCallback {
+
+	@ApplicationScope
+	@Inject
+	CoroutineScope sharingScope;
 
 	private DatabaseHandler dbH = null;
 
@@ -135,10 +145,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			logDebug("Confirmation url");
 			urlConfirmationLink = url;
 
-			AccountController aC = new AccountController(this);
 			app.setUrlConfirmationLink(urlConfirmationLink);
 
-			aC.logout(this, megaApi);
+			AccountController.logout(this, megaApi, sharingScope);
 
 			return;
 		}
@@ -476,7 +485,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					dbH.clearEphemeral();
 				}
 
-				AccountController.logoutConfirmed(this);
+				AccountController.logoutConfirmed(this, sharingScope);
 
 				Intent confirmIntent = new Intent(this, LoginActivity.class);
 				confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
@@ -492,10 +501,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
 
 			if(e.getErrorCode() == MegaError.API_OK){
-				AccountController aC = new AccountController(this);
-				app.setUrlConfirmationLink(request.getLink());
+				MegaApplication.setUrlConfirmationLink(request.getLink());
 
-				aC.logout(this, megaApi);
+				AccountController.logout(this, megaApi, sharingScope);
 			}
 			else{
 				setError(getString(R.string.invalid_link));

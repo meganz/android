@@ -10,8 +10,8 @@ import nz.mega.sdk.MegaUser
 
 class SelectFileToShareActivityContract : ActivityResultContract<List<MegaUser>, Intent?>() {
 
-    override fun createIntent(context: Context, users: List<MegaUser>): Intent {
-        val emails = users.map { it.email } as ArrayList<String>
+    override fun createIntent(context: Context, input: List<MegaUser>): Intent {
+        val emails = input.map { it.email } as ArrayList<String>
 
         return Intent(context, FileExplorerActivity::class.java).apply {
             action = FileExplorerActivity.ACTION_MULTISELECT_FILE
