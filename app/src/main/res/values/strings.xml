@@ -736,8 +736,6 @@
     <string name="settings_advanced_features_cache">Clear Cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Clear Offline Files</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Open file when downloaded</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Delete account</string>
     <!-- Size of files in offline or cache folders -->
@@ -3029,10 +3027,6 @@
     <string name="label_tomorrow">Tomorrow</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]No [/B][A]Shared Files[/A]</string>
-    <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s joined the call</string>
-    <!-- Text to indicate that a contact has left a group call -->
-    <string name="contact_left_the_call">%1$s left the call</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
     <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
@@ -4319,8 +4313,40 @@
     <string name="media_player_audio_playlist_next">Next</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">Previous</string>
-    <!-- Next videos to be played in the audio playlist -->
+    <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Next</string>
-    <!-- Previous videos have been already played in the audio playlist -->
+    <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Previous</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Photos</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">MEGA will open in-app unsupported file types in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Image quality</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automatic</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Always send original size images.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Optimised</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Always send optimised images.</string>
+    <!-- Message shown when one participant joined the call -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when more than two participants joined the call -->
+    <string name="meeting_call_screen_more_than_two_participants_joined_call">%1$s and %2$d others joined</string>
+    <!-- Message shown when one participant left the call -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants left the call -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants left the call -->
+    <string name="meeting_call_screen_more_than_two_participants_left_call">%1$s and %2$d others left</string>
 </resources>

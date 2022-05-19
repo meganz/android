@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
@@ -208,20 +209,22 @@ class InMeetingViewModel @Inject constructor(
     private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
         val numParticipants = list.size
 
-        if (type == TYPE_JOIN) {
-            _getParticipantsChangesTitle.value = when (numParticipants) {
-                1 -> getParticipantFullName(list[0]) + " joined"
-                2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " joined"
-                else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others joined"
-            }
-        }
-
-        if (type == TYPE_LEFT) {
-            _getParticipantsChangesTitle.value = when (numParticipants) {
-                1 -> getParticipantFullName(list[0]) + " left"
-                2 -> getParticipantFullName(list[0]) + " and " + getParticipantFullName(list[1]) + " left"
-                else -> getParticipantFullName(list[0]) + " and " + (list.size - 1) + " others left"
-            }
+        _getParticipantsChangesTitle.value = when (numParticipants) {
+            1 -> StringResourcesUtils.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_one_participant_joined_call
+                    else
+                        R.string.meeting_call_screen_one_participant_left_call, getParticipantFullName(list[0]))
+            2 -> StringResourcesUtils.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_two_participants_joined_call
+                    else
+                        R.string.meeting_call_screen_two_participants_left_call, getParticipantFullName(list[0]), getParticipantFullName(list[1]))
+            else -> StringResourcesUtils.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_more_than_two_participants_joined_call
+                    else
+                        R.string.meeting_call_screen_more_than_two_participants_left_call, getParticipantFullName(list[0]), (numParticipants - 1))
         }
     }
 
