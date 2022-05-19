@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly">
 
@@ -496,14 +497,6 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
         <service
-            android:name=".jobservices.CuSyncInactiveHeartbeatService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".jobservices.CameraUploadStarterService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
             android:name=".fcm.IncomingCallService"
             android:exported="true" />
         <service
@@ -563,6 +556,14 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
+        </provider>
+
+<!--    remove default WorkManager initializer-->
+        <provider
+            tools:replace="android:authorities"
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="mega.privacy.android.app.androidx-startup"
+            tools:node="remove">
         </provider>
 
         <activity

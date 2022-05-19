@@ -1,16 +1,5 @@
 package mega.privacy.android.app.listeners;
 
-import android.content.Context;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.utils.JobUtil;
-import mega.privacy.android.app.utils.MegaNodeUtil;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaStringMap;
-
 import static mega.privacy.android.app.utils.CameraUploadUtil.compareAndUpdateLocalFolderAttribute;
 import static mega.privacy.android.app.utils.CameraUploadUtil.forceUpdateCameraUploadFolderIcon;
 import static mega.privacy.android.app.utils.CameraUploadUtil.initCUFolderFromScratch;
@@ -22,9 +11,18 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 import static nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER;
 
-public class GetCuAttributeListener extends BaseListener {
+import android.content.Context;
 
-    public GetCuAttributeListener(Context context) {
+import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.utils.JobUtil;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaStringMap;
+
+public class GetCameraUploadAttributeListener extends BaseListener {
+
+    public GetCameraUploadAttributeListener(Context context) {
         super(context);
     }
 
@@ -52,7 +50,7 @@ public class GetCuAttributeListener extends BaseListener {
             }
         } else {
             logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-            JobUtil.stopRunningCameraUploadService(context);
+            JobUtil.fireStopCameraUploadJob(context);
         }
     }
 
@@ -91,22 +89,22 @@ public class GetCuAttributeListener extends BaseListener {
      * @param e           MegaError object.
      */
     private void handle(long handle, boolean isSecondary, MegaError e) {
-        boolean shouldCUStop = false;
+        boolean shouldStopCameraUpload = false;
 
         if (isNodeInRubbishOrDeleted(handle)) {
             logDebug("Folder in rubbish bin, is secondary: " + isSecondary);
             initCUFolderFromScratch(context, isSecondary);
         } else {
-            shouldCUStop = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
-            //stop CU if destination has changed
-            if (shouldCUStop && CameraUploadsService.isServiceRunning) {
-                JobUtil.stopRunningCameraUploadService(context);
+            shouldStopCameraUpload = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
+            // stop CameraUpload if destination has changed
+            if (shouldStopCameraUpload) {
+                JobUtil.fireStopCameraUploadJob(context);
             }
 
             forceUpdateCameraUploadFolderIcon(isSecondary, handle);
         }
 
-        if (!shouldCUStop && context instanceof CameraUploadsService) {
+        if (!shouldStopCameraUpload && context instanceof CameraUploadsService) {
             if (isSecondary) {
                 ((CameraUploadsService) context).onGetSecondaryFolderAttribute(handle, e.getErrorCode());
             } else {
