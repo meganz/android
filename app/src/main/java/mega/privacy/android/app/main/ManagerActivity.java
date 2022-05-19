@@ -10011,41 +10011,39 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    public void updateNodes(List<MegaNode> updatedNodes) {
+    public void updateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
         boolean updateContacts = false;
 
-        if (updatedNodes != null) {
-            //Verify is it is a new item to the inbox
-            for (int i = 0; i < updatedNodes.size(); i++) {
-                MegaNode updatedNode = updatedNodes.get(i);
+        //Verify is it is a new item to the inbox
+        for (int i = 0; i < updatedNodes.size(); i++) {
+            MegaNode updatedNode = updatedNodes.get(i);
 
-                if (!updateContacts) {
-                    if (updatedNode.isInShare()) {
-                        updateContacts = true;
+            if (!updateContacts) {
+                if (updatedNode.isInShare()) {
+                    updateContacts = true;
 
-                        if (drawerItem == DrawerItem.SHARED_ITEMS
-                                && getTabItemShares() == INCOMING_TAB && parentHandleIncoming == updatedNode.getHandle()) {
-                            getNodeUseCase.get(parentHandleIncoming)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((result, throwable) -> {
-                                        if (throwable != null) {
-                                            decreaseDeepBrowserTreeIncoming();
-                                            parentHandleIncoming = INVALID_HANDLE;
-                                            hideTabs(false, INCOMING_TAB);
-                                            refreshIncomingShares();
-                                        }
-                                    });
-                        }
+                    if (drawerItem == DrawerItem.SHARED_ITEMS
+                            && getTabItemShares() == INCOMING_TAB && parentHandleIncoming == updatedNode.getHandle()) {
+                        getNodeUseCase.get(parentHandleIncoming)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe((result, throwable) -> {
+                                    if (throwable != null) {
+                                        decreaseDeepBrowserTreeIncoming();
+                                        parentHandleIncoming = INVALID_HANDLE;
+                                        hideTabs(false, INCOMING_TAB);
+                                        refreshIncomingShares();
+                                    }
+                                });
                     }
                 }
+            }
 
-                if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
-                    logDebug("New element to Inbox!!");
-                    setInboxNavigationDrawer();
-                }
+            if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
+                logDebug("New element to Inbox!!");
+                setInboxNavigationDrawer();
             }
         }
 
