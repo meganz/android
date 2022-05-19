@@ -225,7 +225,7 @@ class InMeetingViewModel @Inject constructor(
                     if (type == TYPE_JOIN)
                         R.plurals.meeting_call_screen_more_than_two_participants_joined_call
                     else
-                        R.plurals.meeting_call_screen_more_than_two_participants_left_call, (numParticipants - 1), getParticipantFullName(list[0]), (numParticipants - 1))
+                        R.plurals.meeting_call_screen_more_than_two_participants_left_call, numParticipants, getParticipantFullName(list[0]), (numParticipants - 1))
         }
     }
 

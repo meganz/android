@@ -183,6 +183,13 @@ class MeetingListener : MegaChatCallListenerInterface {
         ).post(sessionAndCall)
     }
 
+    /**
+     * Method to post a LiveEventBus with MegaChatCall and MegaChatSession
+     *
+     * @param type Type of event for LiveEventBus
+     * @param session MegaChatSession
+     * @param call MegaChatCall
+     */
     private fun sendSessionEvent(type: String, session: MegaChatSession, call: MegaChatCall?) {
         val sessionAndCall = Pair.create(call, session)
         LiveEventBus.get(

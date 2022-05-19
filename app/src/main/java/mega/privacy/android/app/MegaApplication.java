@@ -318,7 +318,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private MeetingListener meetingListener = new MeetingListener();
     private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
-    private CallSoundsController soundsController = new CallSoundsController();
+    private final CallSoundsController soundsController = new CallSoundsController();
 
     @Override
     public void networkAvailable() {
