@@ -17,7 +17,6 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.*
 import androidx.core.content.ContextCompat
-import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -36,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.*
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.app.domain.entity.SyncRecordType
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.*
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
@@ -43,7 +43,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.removeEmojisSharedPreferences
 import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService
+import mega.privacy.android.app.utils.JobUtil.*
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.*
@@ -306,7 +306,8 @@ class AccountController(private val context: Context) {
             if (dbH.preferences != null) {
                 dbH.clearPreferences()
                 dbH.setFirstTime(false)
-                stopRunningCameraUploadService(context)
+                fireStopCameraUploadJob(context);
+                stopCameraUploadSyncHeartbeatWorkers(context);
             }
 
             dbH.clearOffline()
@@ -316,7 +317,7 @@ class AccountController(private val context: Context) {
             dbH.clearCompletedTransfers()
             dbH.clearPendingMessage()
             dbH.clearAttributes()
-            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY)
+            dbH.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
             dbH.clearChatSettings()
             dbH.clearBackups()
 

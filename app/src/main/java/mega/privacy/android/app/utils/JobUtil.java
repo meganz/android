@@ -1,176 +1,229 @@
 package mega.privacy.android.app.utils;
 
-import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 
-import androidx.core.content.ContextCompat;
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.jobservices.CuSyncInactiveHeartbeatService;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;
+import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
+import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
+import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker;
 import nz.mega.sdk.MegaApiJava;
-
-import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
-import static mega.privacy.android.app.utils.Constants.CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID;
-import static mega.privacy.android.app.utils.Constants.PHOTOS_UPLOAD_JOB_ID;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import timber.log.Timber;
 
 public class JobUtil {
 
-    private static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
+    // when app is inactive, send heartbeat every 30 minutes
+    private static final long INACTIVE_HEARTBEAT_INTERVAL = 30;
 
-    private static final int CU_RESCHEDULE_INTERVAL = 5000;   //milliseconds
+    private static final long HEARTBEAT_FLEX_INTERVAL = 20; // 20 minutes
 
-    private static final int START_JOB_FAILED = -1;
+    private static final long CU_SCHEDULER_INTERVAL = 1; // 1 hour
+
+    private static final long SCHEDULER_FLEX_INTERVAL = 50; // 50 minutes
+
+    private static final int CU_RESCHEDULE_INTERVAL = 5000; // 5000 milliseconds
+
+    private static final int START_JOB_SUCCEED = 0;
+
     private static final int START_JOB_FAILED_NOT_ENABLED = -2;
 
-    public static volatile boolean hasStartedCU;
+    public static final String SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES";
 
-    private static synchronized boolean isJobScheduled(Context context, int id) {
-        JobScheduler js = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (js != null) {
-            List<JobInfo> jobs = js.getAllPendingJobs();
-            for (JobInfo info : jobs) {
-                if (info.getId() == id) {
-                    logDebug("Job already scheduled");
-                    return true;
-                }
-            }
-        }
-        logDebug("No scheduled job found");
-        return false;
-    }
+    /**
+     * Worker tags
+     */
+    private static final String CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG";
 
+    private static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
+
+    private static final String HEART_BEAT_TAG = "HEART_BEAT_TAG";
+
+    private static final String SINGLE_HEART_BEAT_TAG = "SINGLE_HEART_BEAT_TAG";
+
+    private static final String STOP_CAMERA_UPLOAD_TAG = "STOP_CAMERA_UPLOAD_TAG";
+
+    private static final String CANCEL_UPLOADS_TAG = "CANCEL_UPLOADS_TAG";
+
+    /**
+     * Schedule job of camera upload
+     *
+     * @param context From which the action is done.
+     * @return The result of schedule job
+     */
     public static synchronized int scheduleCameraUploadJob(Context context) {
-        if (!isCameraUploadEnabled(context)) {
-            logDebug("Schedule failed as CU not enabled");
+        if (isCameraUploadDisabled(context)) {
+            Timber.d("Scheduling CameraUpload failed as CameraUpload not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
         }
 
-        scheduleCuSyncInactiveHeartbeat(context);
+        scheduleCameraUploadSyncActiveHeartbeat(context);
 
-        if (isJobScheduled(context, PHOTOS_UPLOAD_JOB_ID)) {
-            logDebug("Schedule failed as already scheduled");
-            return START_JOB_FAILED;
-        }
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,
-                    new ComponentName(context, CameraUploadStarterService.class));
-            jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
-            jobInfoBuilder.setPersisted(true);
+        Timber.d("JobUtil: scheduleCameraUploadJob()");
+        // periodic work that runs during the last 10 minutes of every one hour period
+        PeriodicWorkRequest cameraUploadWorkRequest =
+                new PeriodicWorkRequest.Builder(StartCameraUploadWorker.class, CU_SCHEDULER_INTERVAL, TimeUnit.HOURS, SCHEDULER_FLEX_INTERVAL, TimeUnit.MINUTES)
+                        .addTag(CAMERA_UPLOAD_TAG)
+                        .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, false).build())
+                        .build();
 
-            int result = jobScheduler.schedule(jobInfoBuilder.build());
-            logDebug("Job scheduled successfully");
-            return result;
-        }
-        logError("Schedule job failed");
-        return START_JOB_FAILED;
+        WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(CAMERA_UPLOAD_TAG, ExistingPeriodicWorkPolicy.KEEP, cameraUploadWorkRequest);
+        Timber.d("CameraUpload Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(CAMERA_UPLOAD_TAG));
+        return START_JOB_SUCCEED;
     }
 
-    private static void scheduleCuSyncInactiveHeartbeat(Context context) {
-        if (isJobScheduled(context, CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID)) {
+    /**
+     * Schedule job of camera upload active heartbeat
+     *
+     * @param context From which the action is done.
+     */
+    private static void scheduleCameraUploadSyncActiveHeartbeat(Context context) {
+        Timber.d("JobUtil: scheduleCameraUploadSyncActiveHeartbeat()");
+        // periodic work that runs during the last 10 minutes of every half an hour period
+        PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
+                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
+                        .addTag(HEART_BEAT_TAG)
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(HEART_BEAT_TAG, ExistingPeriodicWorkPolicy.KEEP, cuSyncActiveHeartbeatWorkRequest);
+        Timber.d("CameraUpload Sync Heartbeat Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(HEART_BEAT_TAG));
+    }
+
+    /**
+     * Fire a single camera upload heartbeat
+     *
+     * @param context From which the action is done.
+     */
+    public static synchronized void fireSingleHeartbeat(Context context) {
+        Timber.d("JobUtil: sendSingleHeartbeat()");
+        OneTimeWorkRequest heartbeatWorkRequest =
+                new OneTimeWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class).addTag(SINGLE_HEART_BEAT_TAG).build();
+
+        WorkManager.getInstance(context).
+                enqueueUniqueWork(SINGLE_HEART_BEAT_TAG, ExistingWorkPolicy.KEEP, heartbeatWorkRequest);
+        Timber.d("Single Sync Heartbeat Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_HEART_BEAT_TAG));
+    }
+
+    /**
+     * Fire a one time work request of camera upload to upload immediately;
+     * It will also schedule the camera upload job inside of {@link CameraUploadsService}
+     *
+     * @param context From which the action is done.
+     * @return The result of the job
+     */
+    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
+        if (isCameraUploadDisabled(context)) {
+            Timber.d("Firing CameraUpload request failed as CameraUpload not enabled");
+            return START_JOB_FAILED_NOT_ENABLED;
+        }
+
+        Timber.d("JobUtil: fireCameraUploadJob()");
+        OneTimeWorkRequest cameraUploadWorkRequest =
+                new OneTimeWorkRequest.Builder(StartCameraUploadWorker.class)
+                        .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                        .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes).build())
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniqueWork(SINGLE_CAMERA_UPLOAD_TAG, ExistingWorkPolicy.KEEP, cameraUploadWorkRequest);
+        Timber.d("Single CameraUpload Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG));
+        return START_JOB_SUCCEED;
+    }
+
+    /**
+     * Fire a request to stop camera upload service.
+     *
+     * @param context From which the action is done.
+     */
+    public static synchronized void fireStopCameraUploadJob(Context context) {
+        if (isCameraUploadDisabled(context)) {
+            Timber.d("Firing StopCameraUpload request failed as CameraUpload not enabled");
             return;
         }
 
-        JobScheduler scheduler
-                = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (scheduler != null) {
-            scheduler.schedule(
-                    new JobInfo.Builder(CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID,
-                            new ComponentName(context, CuSyncInactiveHeartbeatService.class))
-                            .setPeriodic(TimeUnit.SECONDS.toMillis(
-                                    CuSyncManager.INACTIVE_HEARTBEAT_INTERVAL_SECONDS))
-                            .setPersisted(true)
-                            .build()
-            );
-        }
+        Timber.d("JobUtil: fireStopCameraUploadJob()");
+        OneTimeWorkRequest stopUploadWorkRequest =
+                new OneTimeWorkRequest.Builder(StopCameraUploadWorker.class)
+                        .addTag(STOP_CAMERA_UPLOAD_TAG)
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniqueWork(STOP_CAMERA_UPLOAD_TAG, ExistingWorkPolicy.KEEP, stopUploadWorkRequest);
+        Timber.d("Stop CameraUpload Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG));
     }
 
-    public static synchronized void startCameraUploadService(Context context) {
-        start(context, false);
-    }
+    /**
+     * Cancel all camera upload related jobs immediately, e.g. when all transfers are cancelled.
+     *
+     * @param context From which the action is done.
+     */
+    public static synchronized void fireCancelCameraUploadJob(Context context) {
+        Timber.d("JobUtil: fireCancelCameraUploadJob()");
+        OneTimeWorkRequest cancelWorkRequest =
+                new OneTimeWorkRequest.Builder(CancelCameraUploadWorker.class).addTag(CANCEL_UPLOADS_TAG).build();
 
-    public static synchronized void startCameraUploadServiceIgnoreAttr(final Context context) {
-        new Handler().postDelayed(() -> start(context, true), CU_RESCHEDULE_INTERVAL);
-    }
-
-    private static void start(Context context, boolean shouldIgnoreAttr) {
-        boolean isOverQuota = isOverquota(context);
-        boolean hasReadPermission = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-        boolean isEnabled = isCameraUploadEnabled(context);
-        logDebug("isOverQuota:" + isOverQuota +
-                ", hasStoragePermission:" + hasReadPermission +
-                ", isCameraUploadEnabled:" + isEnabled +
-                ", isRunning:" + CameraUploadsService.isServiceRunning + ", should ignore attr: " + shouldIgnoreAttr);
-        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled && !hasStartedCU) {
-            hasStartedCU = true;
-            Intent newIntent = new Intent(context, CameraUploadsService.class);
-            newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, shouldIgnoreAttr);
-            ContextCompat.startForegroundService(context, newIntent);
-        }
-    }
-
-    private static boolean isOverquota(Context context) {
-        MegaApplication app = (MegaApplication) context.getApplicationContext();
-        return app.getStorageState() == MegaApiJava.STORAGE_STATE_RED;
-    }
-
-    public static synchronized void stopRunningCameraUploadService(Context context) {
-        if (!isCameraUploadEnabled(context) && !CameraUploadsService.isServiceRunning) return;
-        logDebug("Stop CU.");
-        Intent stopIntent = new Intent(context, CameraUploadsService.class);
-        stopIntent.setAction(CameraUploadsService.ACTION_STOP);
-        ContextCompat.startForegroundService(context, stopIntent);
-    }
-
-    public static synchronized void cancelAllUploads(Context context) {
-        logDebug("stopRunningCameraUploadService");
-        Intent stopIntent = new Intent(context, CameraUploadsService.class);
-        stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
-        ContextCompat.startForegroundService(context, stopIntent);
+        WorkManager.getInstance(context).
+                enqueueUniqueWork(CANCEL_UPLOADS_TAG, ExistingWorkPolicy.KEEP, cancelWorkRequest);
+        Timber.d("Cancel Uploads Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(CANCEL_UPLOADS_TAG));
     }
 
     public static void rescheduleCameraUpload(final Context context) {
-        stopRunningCameraUploadService(context);
+        fireStopCameraUploadJob(context);
         Handler handler = new Handler();
         handler.postDelayed(() -> {
-            logDebug("Rescheduling CU");
+            Timber.d("JobUtil: rescheduleCameraUpload()");
             scheduleCameraUploadJob(context);
         }, CU_RESCHEDULE_INTERVAL);
     }
 
-    private static boolean isCameraUploadEnabled(Context context) {
+    /**
+     * Stop the camera upload work by tag.
+     * Stop regular camera upload sync heartbeat work by tag.
+     *
+     * @param context From which the action is done.
+     */
+    public static void stopCameraUploadSyncHeartbeatWorkers(Context context) {
+        if (context != null) {
+            Timber.d("JobUtil: stopCameraUploadSyncHeartbeatWorkers()");
+            WorkManager manager = WorkManager.getInstance(context);
+            for (String tag : Arrays.asList(CAMERA_UPLOAD_TAG, SINGLE_CAMERA_UPLOAD_TAG, HEART_BEAT_TAG, SINGLE_HEART_BEAT_TAG)) {
+                manager.cancelAllWorkByTag(tag);
+            }
+        }
+    }
+
+    private static boolean isCameraUploadDisabled(Context context) {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         MegaPreferences prefs = dbH.getPreferences();
         if (prefs == null) {
-            logDebug("MegaPreferences not defined, so not enabled");
-            return false;
+            Timber.d("MegaPreferences not defined, so not enabled");
+            return true;
         }
-
-        String cuEnabled = prefs.getCamSyncEnabled();
-        if (TextUtils.isEmpty(cuEnabled)) {
-            logDebug("CU not enabled");
-            return false;
+        String cameraUploadEnabled = prefs.getCamSyncEnabled();
+        if (TextUtils.isEmpty(cameraUploadEnabled)) {
+            Timber.d("CameraUpload not enabled");
+            return true;
         }
-
-        return Boolean.parseBoolean(cuEnabled);
+        return !Boolean.parseBoolean(cameraUploadEnabled);
     }
 
+    public static boolean isOverQuota(Context context) {
+        return ((MegaApplication) context.getApplicationContext()).getStorageState() == MegaApiJava.STORAGE_STATE_RED;
+    }
 }

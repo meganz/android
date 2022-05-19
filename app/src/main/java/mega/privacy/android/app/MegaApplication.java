@@ -111,8 +111,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.hilt.work.HiltWorkerFactory;
 import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
+import androidx.work.Configuration;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -155,7 +157,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.GetCuAttributeListener;
+import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.logging.InitialiseLoggingUseCaseJavaWrapper;
@@ -203,9 +205,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -241,6 +244,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
     InitialiseLogging initialiseLoggingUseCase;
     @Inject
     GetCallSoundsUseCase getCallSoundsUseCase;
+    @Inject
+    HiltWorkerFactory workerFactory;
+
     @ApplicationScope
     @Inject
     CoroutineScope sharingScope;
@@ -447,8 +453,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     }
 
                     //Ask for MU and CU folder when App in init state
-                    logDebug("Get CU attribute on fetch nodes.");
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+                    Timber.d("Get CameraUpload attribute on fetch nodes.");
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(getApplicationContext()));
 
                     // Init CU sync data after login successfully
                     new CUBackupInitializeChecker(megaApi).initCuSync();
@@ -967,6 +973,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
         if (!legacyLoggingUtil.isLoggerKarereInitialized()) {
             legacyLoggingUtil.initLoggerKarere();
         }
+    }
+
+    @NonNull
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build();
     }
 
     /**
