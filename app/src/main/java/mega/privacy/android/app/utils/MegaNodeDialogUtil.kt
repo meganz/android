@@ -1148,14 +1148,16 @@ object MegaNodeDialogUtil {
      * @param outState          Bundle where the state of the dialog will be save.
      */
     @JvmStatic
-    fun AlertDialog.checkNewFolderDialogState(outState: Bundle) {
-        if (isShowing) {
-            outState.putBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, true)
-            val typeText = findViewById<EmojiEditText>(R.id.type_text)
+    fun AlertDialog?.checkNewFolderDialogState(outState: Bundle) {
+        if (this == null || !isShowing) {
+            return
+        }
 
-            if (typeText != null) {
-                outState.putString(NEW_FOLDER_DIALOG_TEXT, typeText.text.toString())
-            }
+        outState.putBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, true)
+        val typeText = findViewById<EmojiEditText>(R.id.type_text)
+
+        if (typeText != null) {
+            outState.putString(NEW_FOLDER_DIALOG_TEXT, typeText.text.toString())
         }
     }
 }
