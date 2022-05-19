@@ -14,9 +14,9 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
-import mega.privacy.android.app.utils.LogUtil
 
 import nz.mega.sdk.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -65,7 +65,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                     }
                                 },
                                 onError = { error ->
-                                    LogUtil.logError(error.stackTraceToString())
+                                    Timber.e(error.stackTraceToString())
                                 }
                         )
                         .addTo(disposable)

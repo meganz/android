@@ -144,8 +144,8 @@ class InMeetingViewModel @Inject constructor(
     private val _anotherChatTitle = MutableStateFlow(" ")
     val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
-    private val _getParticipantsChangesTitle = MutableStateFlow(" ")
-    val getParticipantsChangesTitle: StateFlow<String> get() = _getParticipantsChangesTitle
+    private val _getParticipantsChangesText = MutableStateFlow(" ")
+    val getParticipantsChangesText: StateFlow<String> get() = _getParticipantsChangesText
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -180,7 +180,7 @@ class InMeetingViewModel @Inject constructor(
                 .subscribeBy(
                         onNext = { result ->
                             if (currentChatId == result.chatId) {
-                                result.peers?.let { list->
+                                result.peers?.let { list ->
                                     getParticipantChangesText(list, result.typeChange)
                                 }
                             }
@@ -210,7 +210,7 @@ class InMeetingViewModel @Inject constructor(
     private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
         val numParticipants = list.size
 
-        _getParticipantsChangesTitle.value = when (numParticipants) {
+        _getParticipantsChangesText.value = when (numParticipants) {
             1 -> StringResourcesUtils.getString(
                     if (type == TYPE_JOIN)
                         R.string.meeting_call_screen_one_participant_joined_call

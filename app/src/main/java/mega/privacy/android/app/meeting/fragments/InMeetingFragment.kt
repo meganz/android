@@ -1037,7 +1037,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.getParticipantsChangesTitle.collect { title ->
+            inMeetingViewModel.getParticipantsChangesText.collect { title ->
                 if (title.trim().isNotEmpty()) {
                     meetingChangesBanner?.apply {
                         text = title

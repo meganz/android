@@ -159,6 +159,9 @@ class GetParticipantsChangesUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Cancel all count downs timer
+     */
     private fun removeCountDown() {
         joinedCountDownTimer?.let {
             cancelCountDown(it)
