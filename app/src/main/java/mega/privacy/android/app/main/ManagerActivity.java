@@ -731,7 +731,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     boolean firstLogin = false;
     private boolean askPermissions = false;
-    private boolean isClearRubbishBin = false;
 
     boolean megaContacts = true;
 
@@ -5965,17 +5964,7 @@ public class ManagerActivity extends TransfersManagementActivity
         rubbishBinFragment = (RubbishBinFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
         if (rubbishBinFragment != null) {
             rubbishBinFragment.hideMultipleSelect();
-
-            if (isClearRubbishBin) {
-                isClearRubbishBin = false;
-                parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(),
-                        sortOrderManagement.getOrderCloud());
-                rubbishBinFragment.setNodes(nodes);
-                rubbishBinFragment.getRecyclerView().invalidate();
-            } else {
-                refreshRubbishBin();
-            }
+            refreshRubbishBin();
         }
 
         onNodesInboxUpdate();
@@ -6389,10 +6378,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }, 50);
     }
 
-    public void setIsClearRubbishBin(boolean value) {
-        this.isClearRubbishBin = value;
-    }
-
     /**
      * Move folders or files that belong to "My backups"
      *
@@ -6410,7 +6395,6 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
         logDebug("askConfirmationMoveToRubbish");
-        isClearRubbishBin = false;
 
         if (handleList != null) {
 
@@ -9940,16 +9924,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rubbishBinFragment != null) {
             rubbishBinFragment.hideMultipleSelect();
 
-            if (isClearRubbishBin) {
-                isClearRubbishBin = false;
-                parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(),
-                        sortOrderManagement.getOrderCloud());
-                rubbishBinFragment.setNodes(nodes);
-                rubbishBinFragment.getRecyclerView().invalidate();
-            } else {
-                refreshRubbishBin();
-            }
+            refreshRubbishBin();
         }
         if (pagerOfflineFragment != null) {
             pagerOfflineFragment.refreshNodes();
