@@ -64,7 +64,7 @@ class PlaylistAdapter(
         val currentPosition = holder.absoluteAdapterPosition
 
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
-            isVisible = playlistItem.duration != 0L
+            isVisible = playlistItem.duration > 0L
 
             if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
                 playingPosition = holder.absoluteAdapterPosition

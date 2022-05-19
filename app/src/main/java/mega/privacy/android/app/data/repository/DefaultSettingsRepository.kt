@@ -17,9 +17,11 @@ import mega.privacy.android.app.data.extensions.isTypeWithParam
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
+import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.entity.ChatImageQuality
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
@@ -43,9 +45,10 @@ import kotlin.coroutines.suspendCoroutine
  * @property apiFacade
  * @property monitorStartScreenFacade
  * @property monitorHideRecentActivityFacade
- * @property loggingSettingsGateway
+ * @property loggingPreferencesGateway
  * @property appScope
  * @property ioDispatcher
+ * @property chatPreferencesGateway
  */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
@@ -54,9 +57,10 @@ class DefaultSettingsRepository @Inject constructor(
     private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
-    private val loggingSettingsGateway: LoggingPreferencesDataStore,
+    private val loggingPreferencesGateway: LoggingPreferencesGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val chatPreferencesGateway: ChatPreferencesGateway
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -168,18 +172,18 @@ class DefaultSettingsRepository @Inject constructor(
         monitorHideRecentActivityFacade.getEvents()
 
     override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
-        loggingSettingsGateway.isLoggingPreferenceEnabled()
+        loggingPreferencesGateway.isLoggingPreferenceEnabled()
             .shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
-        loggingSettingsGateway.setLoggingEnabledPreference(enabled)
+        loggingPreferencesGateway.setLoggingEnabledPreference(enabled)
     }
 
     override fun isChatLoggingEnabled(): Flow<Boolean> =
-        loggingSettingsGateway.isChatLoggingPreferenceEnabled()
+        loggingPreferencesGateway.isChatLoggingPreferenceEnabled()
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
-        loggingSettingsGateway.setChatLoggingEnabledPreference(enabled)
+        loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
     }
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
@@ -191,4 +195,10 @@ class DefaultSettingsRepository @Inject constructor(
     override suspend fun setUseHttpsPreference(enabled: Boolean) {
         databaseHandler.setUseHttpsOnly(enabled)
     }
+
+    override fun getChatImageQuality(): Flow<ChatImageQuality> =
+        chatPreferencesGateway.getChatImageQualityPreference()
+
+    override suspend fun setChatImageQuality(quality: ChatImageQuality) =
+        withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
 }

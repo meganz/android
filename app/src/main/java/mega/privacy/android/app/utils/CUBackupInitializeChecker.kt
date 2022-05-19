@@ -2,7 +2,7 @@ package mega.privacy.android.app.utils
 
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.sync.cusync.CuSyncManager
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -33,17 +33,17 @@ class CUBackupInitializeChecker(
         val dbH = MegaApplication.getInstance().dbH
 
         if (CameraUploadUtil.isPrimaryEnabled() && dbH.cuBackup == null) {
-            CuSyncManager.setPrimaryBackup()
+            CameraUploadSyncManager.setPrimaryBackup()
         } else if (dbH.cuBackup != null) {
             // Update to make sure backup name is applied on startup.
-            CuSyncManager.updatePrimaryBackupName()
+            CameraUploadSyncManager.updatePrimaryBackupName()
         }
 
         if (CameraUploadUtil.isSecondaryEnabled() && dbH.muBackup == null) {
-            CuSyncManager.setSecondaryBackup()
+            CameraUploadSyncManager.setSecondaryBackup()
         } else if (dbH.muBackup != null) {
             // Update to make sure backup name is applied on startup.
-            CuSyncManager.updateSecondaryBackupName()
+            CameraUploadSyncManager.updateSecondaryBackupName()
         }
     }
 

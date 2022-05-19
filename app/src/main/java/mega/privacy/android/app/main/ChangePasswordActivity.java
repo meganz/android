@@ -29,10 +29,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -49,9 +52,16 @@ import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+import javax.inject.Inject;
+
 
 @SuppressLint("NewApi")
+@AndroidEntryPoint
 public class ChangePasswordActivity extends PasscodeActivity implements OnClickListener, MegaRequestListenerInterface {
+
+	@ApplicationScope
+	@Inject
+	CoroutineScope sharingScope;
 
 	public static final String KEY_IS_LOGOUT = "logout";
 	private static final float DISABLED_BUTTON_ALPHA = 0.5F;
@@ -625,8 +635,7 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
-                    AccountController ac = new AccountController(this);
-                    ac.logout(this, megaApi);
+                    AccountController.logout(this, megaApi, sharingScope);
                 } else {
                     //Intent to MyAccount
                     Intent resetPassIntent = new Intent(this, ManagerActivity.class);

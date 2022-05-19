@@ -2035,12 +2035,8 @@ public class ChatActivity extends PasscodeActivity
         int chatConnection = megaChatApi.getChatConnectionState(idChat);
         logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
 
-        if (adapter == null) {
-            createAdapter();
-        } else {
-            adapter.updateChatRoom(chatRoom);
-            adapter.notifyDataSetChanged();
-        }
+        //Create always a new adapter to avoid showing messages of a previous conversation.
+        createAdapter();
 
         setPreviewersView();
         titleToolbar.setText(getTitleChat(chatRoom));
@@ -2231,16 +2227,7 @@ public class ChatActivity extends PasscodeActivity
         if(chatRoom==null){
             return;
         }
-        int width;
-        if(isScreenInPortrait(this)){
-            if(chatRoom.isGroup()) {
-                width = scaleWidthPx(TITLE_TOOLBAR_PORT, getOutMetrics());
-            }else {
-                width = scaleWidthPx(TITLE_TOOLBAR_IND_PORT, getOutMetrics());
-            }
-        }else{
-            width = scaleWidthPx(TITLE_TOOLBAR_LAND, getOutMetrics());
-        }
+
         setSubtitleVisibility();
 
         if (chatC.isInAnonymousMode() && megaChatApi.getChatConnectionState(idChat)==MegaChatApi.CHAT_CONNECTION_ONLINE) {
@@ -2617,7 +2604,8 @@ public class ChatActivity extends PasscodeActivity
      * Set status icon image resource depends on online state and toolbar's elevation.
      */
     private void setStatusIcon() {
-        if(listView == null || adapter == null || iconStateToolbar == null || individualSubtitleToobar == null) {
+        if(chatRoom == null || chatRoom.isGroup() || listView == null || adapter == null
+                || iconStateToolbar == null || individualSubtitleToobar == null) {
             return;
         }
 

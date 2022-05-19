@@ -1,5 +1,65 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
+import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS;
+import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS;
+import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS;
+import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_WIFI;
+import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_WIFI_OR_DATA_PLAN;
+import static mega.privacy.android.app.constants.SettingsConstants.COMPRESSION_QUEUE_SIZE_MAX;
+import static mega.privacy.android.app.constants.SettingsConstants.COMPRESSION_QUEUE_SIZE_MIN;
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_CAMERA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_CHARGING;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_HOW_TO;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_INCLUDE_GPS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_MEGA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_ON_OFF;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_VIDEO_QUALITY;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_WHAT_TO;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_KEEP_FILE_NAMES;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_LOCAL_SECONDARY_MEDIA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_MEGA_SECONDARY_MEDIA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_SECONDARY_MEDIA_FOLDER_ON;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_SET_QUEUE_DIALOG;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_SET_QUEUE_SIZE;
+import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_CAMERA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
+import static mega.privacy.android.app.utils.CameraUploadUtil.findDefaultFolder;
+import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
+import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
+import static mega.privacy.android.app.utils.CameraUploadUtil.resetMUTimestampsAndCache;
+import static mega.privacy.android.app.utils.CameraUploadUtil.restorePrimaryTimestampsAndSyncRecordProcess;
+import static mega.privacy.android.app.utils.CameraUploadUtil.restoreSecondaryTimestampsAndSyncRecordProcess;
+import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
+import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
+import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isOffline;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,29 +93,15 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.SDCardUtils;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
-import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
-import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import timber.log.Timber;
 
 public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
@@ -74,6 +120,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private Preference megaSecondaryFolder;
 
     private boolean cameraUpload = false;
+    private boolean cameraUploadSettingsChanged = false;
     private boolean secondaryUpload = false;
     private boolean charging = false;
     private boolean includeGPS;
@@ -440,10 +487,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     }
 
     /**
-     * This method is to do the setting process
-     * and UI related process
+     * This method is to do the setting process and UI related process.
+     * It also cancels all CameraUpload and Heartbeat workers.
      */
     public void disableCameraUpload() {
+        stopCameraUploadSyncHeartbeatWorkers(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }
@@ -850,11 +898,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 if (value == VIDEO_QUALITY_ORIGINAL) {
                     disableChargingSettings();
-                    dbH.updateVideoState(SyncRecord.STATUS_PENDING);
+                    dbH.updateVideoState(SyncStatus.STATUS_PENDING.getValue());
                 } else {
                     dbH.setConversionOnCharging(true);
                     enableChargingSettings();
-                    dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
+                    dbH.updateVideoState(SyncStatus.STATUS_TO_COMPRESS.getValue());
                 }
 
                 videoQuality.setSummary(videoQuality.getEntry());
@@ -923,6 +971,15 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        if (cameraUploadSettingsChanged) {
+            Timber.d("CameraUpload enabled through Settings - fireCameraUploadJob()");
+            fireCameraUploadJob(context, false);
+        }
+        super.onPause();
+    }
+
     private void setupVideoOptionsForCameraUpload() {
         if (prefs.getCamSyncFileUpload() == null) {
             disableVideoQualitySettings();
@@ -958,14 +1015,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //secondary upload
         setupSecondaryUpload();
 
-        //set cu enabled and start the service
+        //set camera upload enabled
         dbH.setCamSyncEnabled(true);
-
-        handler.postDelayed(() -> {
-            logDebug("Enable Camera Uploads, Now I start the service");
-            startCameraUploadService(context);
-        }, 1000);
-
+        prefs.setCamSyncEnabled(Boolean.toString(true));
+        cameraUploadSettingsChanged = true;
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
@@ -1129,7 +1182,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 resetCUTimestampsAndCache();
                 rescheduleCameraUpload(context);
                 // Update sync when primary local folder changed.
-                CuSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
                 break;
 
             case REQUEST_MEGA_CAMERA_FOLDER:
@@ -1167,7 +1220,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 dbH.setSecVideoSyncTimeStamp(0);
                 rescheduleCameraUpload(context);
                 // Update sync when secondary local folder changed.
-                CuSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
                 break;
 
             case REQUEST_MEGA_SECONDARY_MEDIA_FOLDER:

@@ -54,5 +54,10 @@ abstract class SettingsUseCases {
     @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
 
+    @Binds
+    abstract fun bindGetChatImageQuality(useCase: DefaultGetChatImageQuality): GetChatImageQuality
+
+    @Binds
+    abstract fun bindSetChatImageQuality(useCaseSetChatImageQuality: DefaultSetChatImageQuality): SetChatImageQuality
 
 }

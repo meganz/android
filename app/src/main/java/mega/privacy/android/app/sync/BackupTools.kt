@@ -2,7 +2,7 @@ package mega.privacy.android.app.sync
 
 import mega.privacy.android.app.DatabaseHandler.*
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.sync.cusync.CuSyncManager
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.CameraUploadUtil
 
 /**
@@ -43,10 +43,10 @@ fun deleteSQL(id: Long) =
  */
 fun removeBackupsBeforeLogout() {
     if (CameraUploadUtil.isPrimaryEnabled()) {
-        CuSyncManager.removePrimaryBackup()
+        CameraUploadSyncManager.removePrimaryBackup()
     }
 
     if (CameraUploadUtil.isSecondaryEnabled()) {
-        CuSyncManager.removeSecondaryBackup()
+        CameraUploadSyncManager.removeSecondaryBackup()
     }
 }

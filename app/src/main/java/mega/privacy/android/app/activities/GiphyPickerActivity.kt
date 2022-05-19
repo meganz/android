@@ -395,10 +395,10 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_giphy, menu)
 
-        searchMenuItem = menu?.findItem(R.id.action_search)
+        searchMenuItem = menu.findItem(R.id.action_search)
         val searchView = searchMenuItem?.actionView as SearchView
         searchView.maxWidth = Int.MAX_VALUE
 

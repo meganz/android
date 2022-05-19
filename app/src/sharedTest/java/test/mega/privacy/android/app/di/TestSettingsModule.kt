@@ -37,6 +37,8 @@ object TestSettingsModule {
     val getAccountDetails = mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
     val shouldHideRecentActivity =
         mock<IsHideRecentActivityEnabled> { on { invoke() }.thenReturn(emptyFlow()) }
+    val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
+    val setChatImageQuality = mock<SetChatImageQuality>()
 
     @Provides
     fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
@@ -111,4 +113,10 @@ object TestSettingsModule {
             flowOf(true)
         )
     }
+
+    @Provides
+    fun provideGetChatImageQuality(): GetChatImageQuality = getChatImageQuality
+
+    @Provides
+    fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
 }

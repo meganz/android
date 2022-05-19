@@ -54,6 +54,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -62,6 +64,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.main.controllers.AccountController;
@@ -108,8 +111,14 @@ import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingS
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class LoginFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
@@ -1909,7 +1918,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             logDebug("TYPE_LOGOUT");
             if (error.getErrorCode() == MegaError.API_OK){
-                AccountController.localLogoutApp(context.getApplicationContext());
+                AccountController.localLogoutApp(context.getApplicationContext(), sharingScope);
             }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){

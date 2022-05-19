@@ -1,5 +1,29 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.Constants.PIN_4;
+import static mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID;
+import static mega.privacy.android.app.utils.LogUtil.areKarereLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.areSDKLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logInfo;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.LogUtil.updateKarereLogs;
+import static mega.privacy.android.app.utils.LogUtil.updateSDKLogs;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.aes_decrypt;
+import static mega.privacy.android.app.utils.Util.aes_encrypt;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,7 +41,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.domain.entity.SyncRecord;
+import mega.privacy.android.app.domain.entity.SyncRecordType;
+import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatItemPreferences;
 import mega.privacy.android.app.main.megachat.ChatSettings;
@@ -26,20 +52,10 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.sync.Backup;
 import mega.privacy.android.app.sync.BackupToolsKt;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
-
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.aes_decrypt;
-import static mega.privacy.android.app.utils.Util.aes_encrypt;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -998,13 +1014,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (record.getTimestamp() != null) {
             values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
         }
-        if (record.isCopyOnly() != null) {
-            values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
-        }
-        if (record.isSecondary() != null) {
-            values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
-        }
-        if (record.getLongitude() != null) {
+		values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
+		values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
+		if (record.getLongitude() != null) {
             values.put(KEY_SYNC_LONGITUDE,encrypt(String.valueOf(record.getLongitude())));
         }
         if (record.getLatitude() != null) {
@@ -1017,7 +1029,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void updateVideoState(int state) {
         String sql = "UPDATE " + TABLE_SYNC_RECORDS + " SET " + KEY_SYNC_STATE + " = " + state + "  WHERE "
-                + KEY_SYNC_TYPE + " = " + SyncRecord.TYPE_VIDEO;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue();
         db.execSQL(sql);
     }
 
@@ -1025,7 +1037,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
-        if (fileType != SyncRecord.TYPE_ANY) {
+        if (fileType != SyncRecordType.TYPE_ANY.getValue()) {
             selectQuery += " AND " + KEY_SYNC_TYPE + " = " + fileType;
         }
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
@@ -1037,7 +1049,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
-        if (fileType != SyncRecord.TYPE_ANY) {
+        if (fileType != SyncRecordType.TYPE_ANY.getValue()) {
             selectQuery += " AND " + KEY_SYNC_TYPE + " = " + fileType;
         }
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
@@ -1062,7 +1074,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public List<SyncRecord> findAllPendingSyncRecords() {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
-                + KEY_SYNC_STATE + " = " + SyncRecord.STATUS_PENDING;
+                + KEY_SYNC_STATE + " = " + SyncStatus.STATUS_PENDING.getValue();
 		List<SyncRecord> records = new ArrayList<>();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
@@ -1080,7 +1092,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<SyncRecord> findVideoSyncRecordsByState(int state) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
-                + KEY_SYNC_TYPE + " = " + SyncRecord.TYPE_VIDEO ;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue() ;
 		List<SyncRecord> records = new ArrayList<>();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
@@ -1097,7 +1109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteAllSyncRecords(int type){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS;
-        if(type != SyncRecord.TYPE_ANY) {
+        if(type != SyncRecordType.TYPE_ANY.getValue()) {
             sql += " WHERE " + KEY_SYNC_TYPE + " = " + type;
         }
         db.execSQL(sql);
@@ -1105,7 +1117,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteAllSecondarySyncRecords(int type){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS +" WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("true") + "'";
-        if(type != SyncRecord.TYPE_ANY) {
+        if(type != SyncRecordType.TYPE_ANY.getValue()) {
             sql += " AND " + KEY_SYNC_TYPE + " = " + type;
         }
         db.execSQL(sql);
@@ -1113,7 +1125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void deleteAllPrimarySyncRecords(int type) {
 		String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("false") + "'";
-		if (type != SyncRecord.TYPE_ANY) {
+		if (type != SyncRecordType.TYPE_ANY.getValue()) {
 			sql += " AND " + KEY_SYNC_TYPE + " = " + type;
 		}
 		db.execSQL(sql);
@@ -1122,40 +1134,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void deleteVideoRecordsByState(int state){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
-                + KEY_SYNC_TYPE + " = " + SyncRecord.TYPE_VIDEO ;
+                + KEY_SYNC_TYPE + " = " + SyncRecordType.TYPE_VIDEO.getValue() ;
         db.execSQL(sql);
     }
 
-    private SyncRecord extractSyncRecord(Cursor cursor) {
-        SyncRecord record = new SyncRecord();
-        record.setId(cursor.getInt(0));
-        record.setLocalPath(decrypt(cursor.getString(1)));
-        record.setNewPath(decrypt(cursor.getString(2)));
-        record.setOriginFingerprint(decrypt(cursor.getString(3)));
-        record.setNewFingerprint(decrypt(cursor.getString(4)));
-        String timestamp = decrypt(cursor.getString(5));
-        if (!TextUtils.isEmpty(timestamp)) {
-            record.setTimestamp(Long.valueOf(timestamp));
-        }
-        record.setFileName(decrypt(cursor.getString(6)));
-        String longitude = decrypt(cursor.getString(7));
-        if(!TextUtils.isEmpty(longitude)) {
-            record.setLongitude(Float.valueOf(longitude));
-        }
-        String latitude = decrypt(cursor.getString(8));
-        if(!TextUtils.isEmpty(latitude)) {
-            record.setLatitude(Float.valueOf(latitude));
-        }
-        record.setStatus(cursor.getInt(9));
-        record.setType(cursor.getInt(10));
-        String nodeHandle = decrypt(cursor.getString(11));
-        if (!TextUtils.isEmpty(nodeHandle)) {
-            record.setNodeHandle(Long.valueOf(nodeHandle));
-        }
-        record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(12))));
-        record.setSecondary(Boolean.valueOf(decrypt(cursor.getString(13))));
-        return record;
-    }
+	private SyncRecord extractSyncRecord(Cursor cursor) {
+		String timestamp = decrypt(cursor.getString(5));
+		String longitude = decrypt(cursor.getString(7));
+		String latitude = decrypt(cursor.getString(8));
+		String nodeHandle = decrypt(cursor.getString(11));
+		return new SyncRecord(cursor.getInt(0),
+				decrypt(cursor.getString(1)),
+				decrypt(cursor.getString(2)),
+				decrypt(cursor.getString(3)),
+				decrypt(cursor.getString(4)),
+				!TextUtils.isEmpty(timestamp) ? Long.valueOf(timestamp) : null,
+				decrypt(cursor.getString(6)),
+				!TextUtils.isEmpty(longitude) ? Float.valueOf(longitude) : null,
+				!TextUtils.isEmpty(latitude) ? Float.valueOf(latitude) : null,
+				cursor.getInt(9),
+				cursor.getInt(10),
+				!TextUtils.isEmpty(nodeHandle) ? Long.valueOf(nodeHandle) : null,
+				Boolean.parseBoolean(decrypt(cursor.getString(12))),
+				Boolean.parseBoolean(decrypt(cursor.getString(13))));
+	}
 
     public SyncRecord findSyncRecordByLocalPath(String localPath,boolean isSecondary) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
@@ -2980,9 +2982,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 			if (enabled) {
-				CuSyncManager.INSTANCE.setPrimaryBackup();
+				CameraUploadSyncManager.INSTANCE.setPrimaryBackup();
 			} else {
-				CuSyncManager.INSTANCE.removePrimaryBackup();
+				CameraUploadSyncManager.INSTANCE.removePrimaryBackup();
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -3003,9 +3005,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			// Set or remove corresponding MU backup.
 			if (enabled) {
-				CuSyncManager.INSTANCE.setSecondaryBackup();
+				CameraUploadSyncManager.INSTANCE.setSecondaryBackup();
 			} else {
-				CuSyncManager.INSTANCE.removeSecondaryBackup();
+				CameraUploadSyncManager.INSTANCE.removeSecondaryBackup();
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -3026,7 +3028,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			logDebug("Set new primary handle: " + handle);
 			//Update CU backup when CU target folder changed.
-			CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
+			CameraUploadSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
@@ -3047,7 +3049,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			logDebug("Set new secondary handle: " + handle);
 			//Update MU backup when MU target folder changed.
-			CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
+			CameraUploadSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}

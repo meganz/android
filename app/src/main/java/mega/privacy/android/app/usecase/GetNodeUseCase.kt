@@ -9,12 +9,10 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
@@ -222,7 +220,7 @@ class GetNodeUseCase @Inject constructor(
                             emitter.onError(IllegalArgumentException("Invalid key for public node"))
                         }
                     } else {
-                        emitter.onError(error.toThrowable())
+                        emitter.onError(error.toMegaException())
                     }
                 }
             ))
@@ -256,13 +254,10 @@ class GetNodeUseCase @Inject constructor(
                 onRequestFinish = { _, error ->
                     if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
-                        else ->
-                            emitter.onError(error.toThrowable())
+                    if (error.errorCode == MegaError.API_OK) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(error.toMegaException())
                     }
                 }
             ))
@@ -371,152 +366,6 @@ class GetNodeUseCase @Inject constructor(
         Completable.fromCallable {
             val offlineNode = databaseHandler.findByHandle(nodeHandle)
             OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
-        }
-
-    /**
-     * Copy node to a different location, either passing handles or node itself.
-     *
-     * @param nodeHandle        Node handle to be copied
-     * @param toParentHandle    Parent node handle to be copied to
-     * @param node              Node to be copied
-     * @param toParentNode      Parent node to be copied to
-     * @return                  Completable
-     */
-    fun copyNode(
-        nodeHandle: Long? = null,
-        toParentHandle: Long? = null,
-        node: MegaNode? = null,
-        toParentNode: MegaNode? = null
-    ): Completable =
-        Completable.fromCallable {
-            require((node != null || nodeHandle != null) && (toParentNode != null || toParentHandle != null))
-            copyNode(
-                node ?: nodeHandle?.getMegaNode(),
-                toParentNode ?: toParentHandle?.getMegaNode()
-            ).blockingAwait()
-        }
-
-    /**
-     * Copy node to a different location.
-     *
-     * @param currentNode   Node to be copied
-     * @param toParentNode  Parent node to be copied to
-     * @return              Completable
-     */
-    fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (currentNode == null || toParentNode == null) {
-                emitter.onError(IllegalArgumentException("Null nodes"))
-                return@create
-            }
-
-            megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
-                        else ->
-                            emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
-
-    /**
-     * Move node to a different location
-     *
-     * @param nodeHandle        Node handle to be moved
-     * @param toParentHandle    Parent node handle to be moved to
-     * @return                  Completable
-     */
-    fun moveNode(nodeHandle: Long, toParentHandle: Long): Completable =
-        Completable.fromCallable {
-            moveNode(nodeHandle.getMegaNode(), toParentHandle.getMegaNode()).blockingAwait()
-        }
-
-    /**
-     * Move a node to a different location
-     *
-     * @param currentNode   Node to be moved
-     * @param toParentNode  Parent node to be moved to
-     * @return              Completable
-     */
-    fun moveNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (currentNode == null || toParentNode == null) {
-                emitter.onError(IllegalArgumentException("Null node"))
-                return@create
-            }
-
-            megaApi.moveNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
-                        else ->
-                            emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
-
-    /**
-     * Move a node to the Rubbish bin
-     *
-     * @param nodeHandle    Node handle to be moved
-     * @return              Completable
-     */
-    fun moveToRubbishBin(nodeHandle: Long): Completable =
-        Completable.fromCallable {
-            moveNode(nodeHandle, megaApi.rubbishNode.handle).blockingAwait()
-        }
-
-    /**
-     * Remove a node
-     *
-     * @param nodeHandle    Node handle to be removed
-     * @return              Completable
-     */
-    fun removeNode(nodeHandle: Long): Completable =
-        Completable.fromCallable {
-            removeNode(nodeHandle.getMegaNode()).blockingAwait()
-        }
-
-    /**
-     * Remove a node
-     *
-     * @param node  Node to be removed
-     * @return      Completable
-     */
-    fun removeNode(node: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (node == null) {
-                emitter.onError(IllegalArgumentException("Null node"))
-                return@create
-            }
-
-            megaApi.remove(node, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EMASTERONLY ->
-                            emitter.onError(IllegalStateException("Sub-user business account"))
-                        else ->
-                            emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
         }
 
     /**
