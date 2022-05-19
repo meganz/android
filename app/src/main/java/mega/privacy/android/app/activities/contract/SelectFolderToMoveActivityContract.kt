@@ -10,12 +10,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
-class SelectFolderToMoveActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>>() {
+class SelectFolderToMoveActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>?>() {
 
-    override fun createIntent(context: Context, nodeHandles: LongArray): Intent =
+    override fun createIntent(context: Context, input: LongArray): Intent =
         Intent(context, FileExplorerActivity::class.java).apply {
             action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-            putExtra(INTENT_EXTRA_KEY_MOVE_FROM, nodeHandles)
+            putExtra(INTENT_EXTRA_KEY_MOVE_FROM, input)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Pair<LongArray, Long>? =

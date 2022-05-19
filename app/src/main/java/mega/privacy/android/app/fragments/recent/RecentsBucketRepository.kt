@@ -13,7 +13,10 @@ class RecentsBucketRepository @Inject constructor() {
     private val _nodes = MutableLiveData<List<MegaNode>>()
     val nodes: LiveData<List<MegaNode>> = _nodes
 
-    suspend fun getNodes(bucket: MegaRecentActionBucket) {
+    suspend fun getNodes(bucket: MegaRecentActionBucket?) {
+        if (bucket == null) {
+            return
+        }
 
         withContext(Dispatchers.IO) {
             val size = bucket.nodes.size()

@@ -9,12 +9,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
-class SelectFolderToImportActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>>() {
+class SelectFolderToImportActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>?>() {
 
-    override fun createIntent(context: Context, nodeHandles: LongArray): Intent =
+    override fun createIntent(context: Context, input: LongArray): Intent =
         Intent(context, FileExplorerActivity::class.java).apply {
             action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
-            putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, nodeHandles)
+            putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, input)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Pair<LongArray, Long>? =

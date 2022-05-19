@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -48,6 +49,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 
+@AndroidEntryPoint
 public class LoginActivity extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;

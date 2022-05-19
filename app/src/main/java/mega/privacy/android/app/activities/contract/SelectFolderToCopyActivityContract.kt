@@ -10,12 +10,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_HANDLES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
-class SelectFolderToCopyActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>>() {
+class SelectFolderToCopyActivityContract : ActivityResultContract<LongArray, Pair<LongArray, Long>?>() {
 
-    override fun createIntent(context: Context, nodeHandles: LongArray): Intent =
+    override fun createIntent(context: Context, input: LongArray): Intent =
         Intent(context, FileExplorerActivity::class.java).apply {
             action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
-            putExtra(INTENT_EXTRA_KEY_COPY_FROM, nodeHandles)
+            putExtra(INTENT_EXTRA_KEY_COPY_FROM, input)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Pair<LongArray, Long>? =
