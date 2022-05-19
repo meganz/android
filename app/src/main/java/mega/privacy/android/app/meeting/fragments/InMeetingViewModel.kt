@@ -221,11 +221,11 @@ class InMeetingViewModel @Inject constructor(
                         R.string.meeting_call_screen_two_participants_joined_call
                     else
                         R.string.meeting_call_screen_two_participants_left_call, getParticipantFullName(list[0]), getParticipantFullName(list[1]))
-            else -> StringResourcesUtils.getString(
+            else -> StringResourcesUtils.getQuantityString(
                     if (type == TYPE_JOIN)
-                        R.string.meeting_call_screen_more_than_two_participants_joined_call
+                        R.plurals.meeting_call_screen_more_than_two_participants_joined_call
                     else
-                        R.string.meeting_call_screen_more_than_two_participants_left_call, getParticipantFullName(list[0]), (numParticipants - 1))
+                        R.plurals.meeting_call_screen_more_than_two_participants_left_call, (numParticipants - 1), getParticipantFullName(list[0]), (numParticipants - 1))
         }
     }
 
