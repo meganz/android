@@ -39,11 +39,7 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
-import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
@@ -66,6 +62,8 @@ object MegaNodeDialogUtil {
     private const val TYPE_NEW_FILE = 2
     private const val TYPE_NEW_URL_FILE = 3
     private const val TYPE_NEW_TXT_FILE = 4
+    const val IS_NEW_FOLDER_DIALOG_SHOWN = "IS_NEW_FOLDER_DIALOG_SHOWN"
+    const val NEW_FOLDER_DIALOG_TEXT = "NEW_FOLDER_DIALOG_TEXT"
     const val IS_NEW_TEXT_FILE_SHOWN = "IS_NEW_TEXT_FILE_SHOWN"
     const val NEW_TEXT_FILE_TEXT = "NEW_TEXT_FILE_TEXT"
     private const val ERROR_EMPTY_EXTENSION = "ERROR_EMPTY_EXTENSION"
@@ -132,12 +130,14 @@ object MegaNodeDialogUtil {
      *
      * @param context            Current context.
      * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
+     * @param typedText          Typed text if the dialog has to be shown after a screen rotation.
      * @return The create new folder dialog.
      */
     @JvmStatic
     fun showNewFolderDialog(
         context: Context,
-        actionNodeCallback: ActionNodeCallback?
+        actionNodeCallback: ActionNodeCallback?,
+        typedText: String? = null
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -146,10 +146,15 @@ object MegaNodeDialogUtil {
             .setPositiveButton(R.string.general_create, null)
             .setNegativeButton(R.string.general_cancel, null)
 
-        return setFinalValuesAndShowDialog(
-            context, null, actionNodeCallback, null,
-            null, null, false, newFolderDialogBuilder, TYPE_NEW_FOLDER
-        )
+        val dialog = setFinalValuesAndShowDialog(
+            context, null, actionNodeCallback, null, null, null,
+            false, newFolderDialogBuilder, TYPE_NEW_FOLDER)
+
+        if (!typedText.isNullOrEmpty()) {
+            dialog.findViewById<EmojiEditText>(R.id.type_text)?.setText(typedText)
+        }
+
+        return dialog
     }
 
     /**
@@ -787,18 +792,20 @@ object MegaNodeDialogUtil {
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                 when (which) {
                     BUTTON_POSITIVE -> {
-                        if(actionType == ACTION_BACKUP_SHARE_FOLDER
+                        if (actionType == ACTION_BACKUP_SHARE_FOLDER
                             || actionType == ACTION_MENU_BACKUP_SHARE_FOLDER
                             || actionType == ACTION_BACKUP_SHARE
                             || (actionType == ACTION_COPY_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
                             || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
-                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)) {
+                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)
+                        ) {
                             logDebug("MyBackup + showTipDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
                                 nodeType,
-                                actionType)
+                                actionType
+                            )
                         } else {
                             logDebug("MyBackup + showTipDialogWithBackup / actionConfirmed")
                             actionBackupNodeCallback.actionConfirmed(
@@ -823,7 +830,7 @@ object MegaNodeDialogUtil {
 
         when (actionType) {
             ACTION_BACKUP_FAB -> {
-                if(nodeType == BACKUP_DEVICE) {
+                if (nodeType == BACKUP_DEVICE) {
                     tvTitle.text = getString(R.string.backup_add_item_title)
                     tvContent.setText(R.string.backup_add_item_to_root_text)
                 } else {
@@ -888,7 +895,7 @@ object MegaNodeDialogUtil {
                 tvContent.setText(R.string.backup_share_permission_text)
                 handleList?.let {
                     val nodeSize = it.size
-                    if(nodeSize > 1) {
+                    if (nodeSize > 1) {
                         when (nodeType) {
                             BACKUP_ROOT -> {
                                 tvContent.setText(R.string.backup_share_with_root_permission_text)
@@ -903,9 +910,9 @@ object MegaNodeDialogUtil {
             .setView(view)
         when (actionType) {
             ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
-                if (handleList!=null) {
+                if (handleList != null) {
                     val nodeSize = handleList.size
-                    if(nodeSize > 1 && nodeType == BACKUP_ROOT) {
+                    if (nodeSize > 1 && nodeType == BACKUP_ROOT) {
                         builder.setPositiveButton(
                             getString(R.string.general_positive_button),
                             dialogClickListener
@@ -1133,5 +1140,22 @@ object MegaNodeDialogUtil {
         editTextLayout.error =
             getString(R.string.error_backup_confirm_dont_match)
         editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+    }
+
+    /**
+     * Checks if the newFolderDialog is shown. If so, saves it's state on outState.
+     *
+     * @param outState          Bundle where the state of the dialog will be save.
+     */
+    @JvmStatic
+    fun AlertDialog.checkNewFolderDialogState(outState: Bundle) {
+        if (isShowing) {
+            outState.putBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, true)
+            val typeText = findViewById<EmojiEditText>(R.id.type_text)
+
+            if (typeText != null) {
+                outState.putString(NEW_FOLDER_DIALOG_TEXT, typeText.text.toString())
+            }
+        }
     }
 }
