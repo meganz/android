@@ -8,8 +8,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.facebook.common.util.UriUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TimeUtils
@@ -22,27 +21,24 @@ class GetGalleryFilesUseCase @Inject constructor(
         @ApplicationContext private val context: Context
 ) {
 
-    fun get(): Flowable<List<FileGalleryItem>> =
-            Flowable.create({ emitter ->
+    fun get(): Single<List<FileGalleryItem>> =
+            Single.fromCallable {
                 val files = mutableListOf<FileGalleryItem>().apply {
                     addAll(fetchImages())
                     addAll(fetchVideos())
                 }
 
-                val requestFiles = files
-                        .sortedByDescending { it.dateAdded }
+                files.sortedByDescending { it.dateAdded }
                         .toMutableList()
 
-                emitter.onNext(requestFiles)
-
-            }, BackpressureStrategy.LATEST)
+            }
 
     /**
      * Method to get the images from the gallery
      *
      * @return ArrayList<FileGalleryItem> List of images
      */
-    fun fetchImages(): ArrayList<FileGalleryItem> {
+    private fun fetchImages(): ArrayList<FileGalleryItem> {
         val imageList: ArrayList<FileGalleryItem> = ArrayList()
 
         val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -103,7 +99,7 @@ class GetGalleryFilesUseCase @Inject constructor(
      *
      * @return ArrayList<FileGalleryItem> List of videos
      */
-    fun fetchVideos(): ArrayList<FileGalleryItem> {
+    private fun fetchVideos(): ArrayList<FileGalleryItem> {
         val videoList: ArrayList<FileGalleryItem> = ArrayList()
 
         val queryUri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI

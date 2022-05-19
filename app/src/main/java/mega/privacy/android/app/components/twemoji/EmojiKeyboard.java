@@ -24,6 +24,7 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickLis
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiSelectedListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.ViewUtils;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -142,7 +143,7 @@ public class EmojiKeyboard extends LinearLayout {
         View view = (View) editInterface;
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        Util.showKeyboardDelayed(view);
+        ViewUtils.showSoftKeyboardDelayed(view);
     }
 
     /**
@@ -182,7 +183,7 @@ public class EmojiKeyboard extends LinearLayout {
 
         View view = (View) editInterface;
         view.clearFocus();
-        Util.hideKeyboardView(view.getContext(), view, 0);
+        ViewUtils.hideKeyboard(view);
     }
 
     public void hideKeyboardFromFileStorage(){

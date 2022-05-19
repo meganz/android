@@ -2,7 +2,6 @@ package mega.privacy.android.app.main.megachat.chatAdapters
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 import mega.privacy.android.app.fragments.homepage.getRoundingParamsWithoutBorder
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
@@ -25,13 +24,13 @@ class FileStorageChatHolder(
             if (item.isImage) {
                 imageThumbnail.setImageRequestFromUri(item.fileUri)
                 imageThumbnail.isVisible = true
-                imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(MegaApplication.getInstance().applicationContext)
+                imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
                 videoDuration.isVisible = false
                 videoThumbnail.isVisible = false
             } else {
                 videoThumbnail.setImageRequestFromUri(item.fileUri)
                 videoThumbnail.isVisible = true
-                videoThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(MegaApplication.getInstance().applicationContext)
+                videoThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
                 videoDuration.isVisible = true
                 videoDuration.text = item.duration
                 imageThumbnail.isVisible = false

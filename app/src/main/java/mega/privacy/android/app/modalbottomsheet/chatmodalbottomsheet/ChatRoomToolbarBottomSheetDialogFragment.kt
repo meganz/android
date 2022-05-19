@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +33,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 @AndroidEntryPoint
 class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    val viewModel: ChatRoomToolbarViewModel by activityViewModels()
+    val viewModel: ChatRoomToolbarViewModel by viewModels()
 
     private lateinit var binding: BottomSheetChatRoomToolbarBinding
 

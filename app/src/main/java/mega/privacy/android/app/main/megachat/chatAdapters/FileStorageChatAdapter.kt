@@ -48,8 +48,6 @@ class FileStorageChatAdapter(
         }
     }
 
-    private var files: List<String>? = null
-
     override fun onBindViewHolder(holder: FileStorageChatHolder, position: Int) {
         holder.bind(getItem(position), position)
     }
