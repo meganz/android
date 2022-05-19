@@ -114,4 +114,4 @@ public class SettingsConstants {
     public static final String KEY_COOKIE_ESSENTIAL = "settings_cookie_essential";
     public static final String KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics";
     public static final String KEY_COOKIE_POLICIES = "setting_cookie_policies";
-}
+    }

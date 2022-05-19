@@ -10,9 +10,9 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 
 class PassCodeActivityContract : ActivityResultContract<Boolean, Boolean>() {
 
-    override fun createIntent(context: Context, resetPin: Boolean): Intent =
+    override fun createIntent(context: Context, input: Boolean): Intent =
         Intent(context, PasscodeLockActivity::class.java).apply {
-            action = if (resetPin) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK
+            action = if (input) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Boolean =

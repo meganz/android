@@ -1,7 +1,11 @@
+/**
+ * This script is to build and upload Android APK to Firebase AppDistribution
+ */
+
+
 BUILD_STEP = ''
 
-// Below values will be read from MR description and are used
-// decide SDK versions
+// Below values will be read from MR description and are used to decide SDK versions
 SDK_BRANCH = 'develop'
 MEGACHAT_BRANCH = 'develop'
 SDK_COMMIT = ""
@@ -9,10 +13,11 @@ MEGACHAT_COMMIT = ""
 SDK_TAG = ""
 MEGACHAT_TAG = ""
 
-// flag to decide whether we do clean before build SDK.
-// Possible values: yes|no
+/**
+ * Flag to decide whether we do clean before build SDK.
+ * Possible values: yes|no
+ */
 REBUILD_SDK = "no"
-
 
 pipeline {
     agent { label 'mac-jenkins-slave' }
@@ -42,11 +47,6 @@ pipeline {
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
         APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
-        RELEASE_NOTES_FOR_CD = "Triggered by: $gitlabUserName" +
-                "\nTrigger Reason: ${getTriggerReason()}" +
-                "\nBranch: $gitlabSourceBranch " +
-                "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
-        TESTERS_FOR_CD = getTesterList()
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
@@ -227,8 +227,11 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
                 }
+
                 gitlabCommitStatus(name: 'Build APK (GMS)') {
-                    sh './gradlew clean app:assembleGmsRelease'
+                    script {
+                        sh './gradlew clean app:assembleGmsRelease'
+                    }
                 }
             }
         }
@@ -271,7 +274,13 @@ pipeline {
                         file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
                 ]) {
                     script {
-                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG"]) {
+                        withEnv([
+                                "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                        ]) {
+                            println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
+                            println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
                             sh './gradlew appDistributionUploadGmsRelease'
                         }
                     }
@@ -290,7 +299,9 @@ pipeline {
                     BUILD_STEP = 'Build APK(HMS)'
                 }
                 gitlabCommitStatus(name: 'Build APK(HMS)') {
-                    sh './gradlew clean app:assembleHmsRelease'
+                    script {
+                        sh './gradlew clean app:assembleHmsRelease'
+                    }
                 }
             }
         }
@@ -333,7 +344,11 @@ pipeline {
                         file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
                 ]) {
                     script {
-                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG"]) {
+                        withEnv([
+                                "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                        ]) {
                             sh './gradlew appDistributionUploadHmsRelease'
                         }
                     }
@@ -388,8 +403,8 @@ pipeline {
                     echo "workspace size before clean: "
                     du -sh
 
-                    cd ${WORKSPACE}/app/src/main/jni
-                    bash build.sh clean
+                    #cd ${WORKSPACE}/app/src/main/jni
+                    #bash build.sh clean
                     cd ${WORKSPACE}
                     ./gradlew clean
                     
@@ -423,7 +438,7 @@ private String failureMessage(String lineBreak) {
 }
 
 /**
- * get the value from GitLab MR description by key
+ * Get the value from GitLab MR description by key
  * @param key the key to check and read
  * @return actual value of key if key is specified. null otherwise.
  */
@@ -589,19 +604,80 @@ private String getTriggerReason() {
     }
 }
 
+
+
 /**
- * Read tester list from MR comment, so testers can be notified if APK is uploaded successfully.
+ *
+ * @return a map of the parameters and values. Below parameters should be included.
+ *     key "tester" - list of tester emails, separated by comma
+ *     key "notes - developer specified release notes.
+ *     If deliver_qa command is issued without parameters, then values of above keys are empty.
  */
-private String getTesterList() {
-    if (env.gitlabActionType == "NOTE") {
-        String triggerPhrase = env.gitlabTriggerPhrase
-        if (triggerPhrase.startsWith("deliver_qa")) {
-            String testerList = triggerPhrase.substring("deliver_qa".length()).trim()
-            sh "echo testerList = $testerList"
-            return testerList
+def parseDeliverQaParams() {
+    String command = env.gitlabTriggerPhrase
+
+    // parameter name in deliver_qa command
+    final PARAM_TESTER = "--tester"
+    final PARAM_NOTES = "--notes"
+
+    // key in the result dictionary
+    final KEY_TESTER = "tester"
+    final KEY_NOTES = "notes"
+
+    def result = [:]
+    result[KEY_TESTER] = ""
+    result[KEY_NOTES] = ""
+
+    if (command == null || !command.startsWith("deliver_qa")) {
+        return result
+    }
+
+    String params = command.substring("deliver_qa".length()).trim()
+    int testerPos = params.indexOf(PARAM_TESTER)
+    int notesPos = params.indexOf(PARAM_NOTES)
+
+    // If no tester or notes parameter is explicitly specified, take the contents
+    // after deliver_qa as tester.
+    // This is for backward compatibility for previous command format
+    if (testerPos < 0 && notesPos < 0) {
+        result[KEY_TESTER] = params
+        return result
+    }
+
+    // get release notes from parameter.
+    String notes = ""
+    if (notesPos >= 0) {
+        notes = params.substring(notesPos + PARAM_NOTES.length()).trim()
+    }
+    result[KEY_NOTES] = notes
+
+    // get tester list from parameter
+    String tester = ""
+    if (testerPos >= 0) {
+        if (notesPos > 0) {
+            tester = params.substring(testerPos + PARAM_TESTER.length(), notesPos).trim()
+        } else {
+            tester = params.substring(testerPos + PARAM_TESTER.length()).trim()
         }
     }
-    return ""
+    result[KEY_TESTER] = tester
+
+    println("[DEBUG] deliverQa params = $result")
+    return result
+}
+
+String readReleaseNotes() {
+    String baseRelNotes = "Triggered by: $gitlabUserName" +
+            "\nTrigger Reason: ${getTriggerReason()}" +
+            "\nBranch: $gitlabSourceBranch " +
+            "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
+
+    String customRelNotes = parseDeliverQaParams()["notes"]
+    if (!customRelNotes.isEmpty()) {
+        return customRelNotes + "\n" + baseRelNotes
+    } else {
+        return baseRelNotes
+    }
 }
 
 /**

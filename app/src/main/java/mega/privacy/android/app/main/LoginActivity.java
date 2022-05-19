@@ -55,6 +55,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -69,6 +70,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class LoginActivity extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;

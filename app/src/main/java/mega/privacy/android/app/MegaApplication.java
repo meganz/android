@@ -136,6 +136,7 @@ import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlinx.coroutines.CoroutineScope;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
@@ -143,6 +144,7 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.domain.usecase.InitialiseLogging;
@@ -239,8 +241,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
     PerformanceReporter performanceReporter;
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
+
     @Inject
     HiltWorkerFactory workerFactory;
+
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -422,7 +429,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
                     esid = true;
 
-                    AccountController.localLogoutApp(getApplicationContext());
+                    AccountController.localLogoutApp(getApplicationContext(), sharingScope);
                 } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
                     api.localLogout();
                     megaChatApi.logout();
@@ -1429,7 +1436,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 int loggedState = megaApi.isLoggedIn();
                 logDebug("Login status on " + loggedState);
                 if (loggedState == 0) {
-                    AccountController.logoutConfirmed(this);
+                    AccountController.logoutConfirmed(this, sharingScope);
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).post(true);
 
@@ -1463,7 +1470,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             } else {
 
                 AccountController aC = new AccountController(this);
-                aC.logoutConfirmed(this);
+                aC.logoutConfirmed(this, sharingScope);
 
 				if(isActivityVisible()){
 					logDebug("Launch intent to login screen");
