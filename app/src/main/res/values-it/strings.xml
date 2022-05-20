@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4308,9 +4308,9 @@
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Hai inserito la tua password corrente</string>
     <!-- Title of pop-up error message for taken down file -->
-    <string name="error_file_not_available">File no longer available</string>
+    <string name="error_file_not_available">File nomn più disponibile</string>
     <!-- Body of pop-up error message for taken down file. -->
-    <string name="error_takendown_file">File removed as it violated our Terms of Service.</string>
+    <string name="error_takendown_file">File rimosso perché viola i nostri Termini di Servizio.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Violated Terms of Service</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->

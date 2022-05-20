@@ -49,7 +49,7 @@
     <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
     <string name="api_eread">읽기 오류</string>
     <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-    <string name="api_eappkey">잘못된 어플리케이션 키</string>
+    <string name="api_eappkey">잘못된 애플리케이션 키</string>
     <!-- Error shown when SSL check has failed -->
     <string name="api_essl">SSL 인증 실패</string>
     <!-- Label shown when current account does not have enough quota to complete the operation -->

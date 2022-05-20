@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4181,15 +4181,15 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Vas a eliminar tu carpeta de copias de seguridad. Se borrarán todas las copias de seguridad que hayas configurado. ¿Seguro que quieres hacer esto?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">¿Estás seguro de que quieres eliminar tu carpeta de respaldo y desactivar la copia de seguridad asociada?</string>
+    <string name="backup_remove_sub_folder">¿Estás seguro de que quieres eliminar tu carpeta de backup y desactivar la copia de seguridad asociada?</string>
     <!-- The title of warning dialog for single folder moving -->
     <string name="backup_move_folder_title">Mover “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
     <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Mover las carpetas de respaldo</string>
+    <string name="backup_move_multiple_folder_title">Mover las carpetas de backup</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Mover las carpetas de respaldo a la Papelera</string>
+    <string name="backup_remove_multiple_folder_title">Mover las carpetas de backup a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Desactivar copia de seguridad</string>
     <!-- The confirm information of warning dialog for moving "My backup" -->

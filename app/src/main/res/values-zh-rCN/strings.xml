@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -1741,7 +1741,7 @@
     <!--  -->
     <string name="file_properties_shared_folder_public_link_name">链接</string>
     <!-- Refers to access rights for a file folder. -->
-    <string name="file_properties_shared_folder_full_access">完全访问权限</string>
+    <string name="file_properties_shared_folder_full_access">完全访问</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">只读</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
@@ -2768,11 +2768,11 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]您公开的共享文件夹[/A][B]%s[/B][C]已被删除。[/C]</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">此文件已被移除。</string>
+    <string name="message_file_takedown_pop_out_notification">此文件已被删除。</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">此文件夹已被移除。</string>
+    <string name="message_folder_takedown_pop_out_notification">此文件夹已被删除。</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">争议移除</string>
+    <string name="dispute_takendown_file">争议删除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">因违反我们的服务条款而无法访问</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -4220,9 +4220,9 @@
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">此设备没有用于选择文件夹的应用程序。</string>
     <!-- Next audios to be played in the audio playlist -->
-    <string name="media_player_audio_playlist_next">下一个</string>
+    <string name="media_player_audio_playlist_next">下一首</string>
     <!-- Previous audios have been already played in the audio playlist -->
-    <string name="media_player_audio_playlist_previous">上一个</string>
+    <string name="media_player_audio_playlist_previous">上一首</string>
     <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">下一个</string>
     <!-- Previous videos have been already played in the video playlist -->

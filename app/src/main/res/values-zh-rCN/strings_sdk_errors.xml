@@ -9,7 +9,7 @@
     <!-- Label to show that a request error occurs during a SDK operation. -->
     <string name="api_eagain">请求失败，正在重试</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-    <string name="api_eratelimit">超出速度限制</string>
+    <string name="api_eratelimit">超出速率限制</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">永久失败</string>
     <!-- Error shown when terms of service are breached during download. -->
