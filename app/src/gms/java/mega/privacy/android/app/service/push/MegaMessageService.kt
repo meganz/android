@@ -1,36 +1,61 @@
-package mega.privacy.android.app.service.push;
+package mega.privacy.android.app.service.push
 
-import androidx.annotation.NonNull;
+import android.content.Context
+import com.google.android.gms.tasks.Task
+import dagger.hilt.android.AndroidEntryPoint
+import com.google.firebase.messaging.FirebaseMessagingService
+import javax.inject.Inject
+import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.app.di.MegaApiFolder
+import nz.mega.sdk.MegaChatApiAndroid
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler
+import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.messaging.FirebaseMessaging
+import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.utils.Constants
+import timber.log.Timber
+import java.util.concurrent.Executors
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
+@AndroidEntryPoint
+class MegaMessageService : FirebaseMessagingService() {
 
-import java.util.concurrent.Executors;
+    @MegaApi
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+    @MegaApiFolder
+    @Inject
+    lateinit var megaApiFolder: MegaApiAndroid
 
-import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
-import android.content.Context;
+    @Inject
+    lateinit var dbH: DatabaseHandler
 
-public class MegaMessageService extends FirebaseMessagingService {
+    private var messageHandler: PushMessageHandler? = null
 
-    private PushMessageHanlder messageHanlder;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        logDebug("onCreateFCM");
-        messageHanlder = new PushMessageHanlder();
+    override fun onCreate() {
+        super.onCreate()
+        Timber.d("onCreateFCM")
+        messageHandler = PushMessageHandler(this, megaApi, megaApiFolder, megaChatApi, dbH)
     }
 
-    @Override
-    public void onDestroy() {
-        logDebug("onDestroyFCM");
-        super.onDestroy();
+    override fun onDestroy() {
+        Timber.d("onDestroyFCM")
+        super.onDestroy()
+    }
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        val message = convert(remoteMessage)
+        Timber.d("Receive remote msg: $message")
+        messageHandler?.handleMessage(message)
+    }
+
+    override fun onNewToken(s: String) {
+        Timber.d("New token is: $s")
+        messageHandler?.sendRegistrationToServer(s, Constants.DEVICE_ANDROID)
     }
 
     /**
@@ -39,46 +64,45 @@ public class MegaMessageService extends FirebaseMessagingService {
      * @param remoteMessage Google RemoteMessage.
      * @return Generic Message object.
      */
-    private PushMessageHanlder.Message convert(RemoteMessage remoteMessage) {
-        return new PushMessageHanlder.Message(
-                remoteMessage.getFrom(),
-                remoteMessage.getOriginalPriority(),
-                remoteMessage.getPriority(),
-                remoteMessage.getData());
-    }
+    private fun convert(remoteMessage: RemoteMessage): PushMessageHandler.Message =
+        PushMessageHandler.Message(
+            remoteMessage.from!!,
+            remoteMessage.originalPriority,
+            remoteMessage.priority,
+            remoteMessage.data
+        )
 
-    @Override
-    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        PushMessageHanlder.Message message = convert(remoteMessage);
-        logDebug("Receive remote msg: " + message);
-        messageHanlder.handleMessage(message);
-    }
+    companion object {
+        /**
+         * Request push service token, then register it in API as an identifier of the device.
+         *
+         * @param context       Context.
+         * @param megaApi       MegaApi instance.
+         * @param megaApiFolder MegaApi instance for folder links.
+         * @param megaChatApi   MegaChatApi instance.
+         * @param dbH           DatabaseHandler.
+         */
+        @JvmStatic
+        fun getToken(
+            context: Context, megaApi: MegaApiAndroid, megaApiFolder: MegaApiAndroid,
+            megaChatApi: MegaChatApiAndroid, dbH: DatabaseHandler
+        ) {
+            //project number from google-service.json
+            Executors.newFixedThreadPool(1).submit {
+                FirebaseMessaging.getInstance().token.addOnCompleteListener { task: Task<String> ->
+                    if (!task.isSuccessful) {
+                        Timber.w("Get token failed.")
+                        return@addOnCompleteListener
+                    }
 
-    @Override
-    public void onNewToken(@NonNull String s) {
-        logDebug("New token is: " + s);
-        messageHanlder.sendRegistrationToServer(s, DEVICE_ANDROID);
-    }
+                    // Get new Instance ID token
+                    val token = task.result
+                    Timber.d("Get token: $token")
 
-    /**
-     * Request push service token, then register it in API as an identifier of the device.
-     *
-     * @param context Context.
-     */
-    public static void getToken(Context context) {
-        //project number from google-service.json
-        Executors.newFixedThreadPool(1).submit(() -> {
-            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
-                if (!task.isSuccessful()) {
-                    logWarning("Get token failed.");
-                    return;
+                    PushMessageHandler(context, megaApi, megaApiFolder, megaChatApi, dbH)
+                        .sendRegistrationToServer(token, Constants.DEVICE_ANDROID)
                 }
-
-                // Get new Instance ID token
-                String token = task.getResult();
-                logDebug("Get token: " + token);
-                new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_ANDROID);
-            });
-        });
+            }
+        }
     }
 }

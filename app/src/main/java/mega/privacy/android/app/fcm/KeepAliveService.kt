@@ -1,89 +1,91 @@
-package mega.privacy.android.app.fcm;
+package mega.privacy.android.app.fcm
 
+import android.app.NotificationManager
+import android.content.Intent
+import mega.privacy.android.app.main.ManagerActivity
+import android.app.PendingIntent
+import android.app.NotificationChannel
+import android.app.Service
+import android.os.Build
+import mega.privacy.android.app.R
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import mega.privacy.android.app.utils.Constants
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.os.IBinder;
-import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
+open class KeepAliveService : Service() {
 
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.utils.Constants;
-
-import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE;
-import static mega.privacy.android.app.utils.Constants.EXTRA_MOVE_TO_CHAT_SECTION;
-
-public class KeepAliveService extends Service {
-
-    public static final String RETRIEVING_MSG_CHANNEL_ID = "Retrieving message";
-
-    public static final int NEW_MESSAGE_NOTIFICATION_ID = 1086;
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stop();
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        createNotification(
+            R.drawable.ic_stat_notify,
+            getString(R.string.notification_chat_undefined_content)
+        )
+        return START_NOT_STICKY
     }
 
-    protected void stop() {
-        stopForeground(true);
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if(manager != null) {
-            manager.cancel(NEW_MESSAGE_NOTIFICATION_ID);
-        }
-        stopSelf();
+    override fun onBind(intent: Intent): IBinder? = null
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stop()
     }
 
-    public void createNotification(int smallIcon,String title) {
-        Intent intent = new Intent(this, ManagerActivity.class);
-        intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE)
-                .putExtra(EXTRA_MOVE_TO_CHAT_SECTION, true)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    private fun stop() {
+        stopForeground(true)
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+            .cancel(NEW_MESSAGE_NOTIFICATION_ID)
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        stopSelf()
+    }
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, RETRIEVING_MSG_CHANNEL_ID);
-        mBuilder.setSmallIcon(smallIcon)
+    private fun createNotification(smallIcon: Int, title: String?) {
+        val intent = Intent(this, ManagerActivity::class.java)
+            .setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)
+            .putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
+            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val mBuilder = NotificationCompat.Builder(this, RETRIEVING_MSG_CHANNEL_ID).apply {
+            setSmallIcon(smallIcon)
                 .setContentIntent(pendingIntent)
                 .setContentText(title)
-                .setAutoCancel(false);
-        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel notificationChannel = new NotificationChannel(RETRIEVING_MSG_CHANNEL_ID, Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE, importance);
-            //no sound and vibration for this channel.
-            notificationChannel.enableVibration(false);
-            notificationChannel.setSound(null, null);
+                .setAutoCancel(false)
+        }
 
-            if (mNotificationManager != null) {
-                NotificationChannel channel = mNotificationManager.getNotificationChannel(RETRIEVING_MSG_CHANNEL_ID);
-                if (channel == null) {
-                    mNotificationManager.createNotificationChannel(notificationChannel);
-                }
+        val mNotificationManager =
+            this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val notificationChannel = NotificationChannel(
+                RETRIEVING_MSG_CHANNEL_ID,
+                Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,
+                importance
+            ).apply {
+                //no sound and vibration for this channel.
+                enableVibration(false)
+                setSound(null, null)
+            }
+
+            val channel = mNotificationManager.getNotificationChannel(RETRIEVING_MSG_CHANNEL_ID)
+
+            if (channel == null) {
+                mNotificationManager.createNotificationChannel(notificationChannel)
             }
         }
 
-        if (mNotificationManager != null) {
-            Notification notification = mBuilder.build();
-            startForeground(NEW_MESSAGE_NOTIFICATION_ID, notification);
-        }
+        val notification = mBuilder.build()
+        startForeground(NEW_MESSAGE_NOTIFICATION_ID, notification)
     }
 
-    @Override
-    public int onStartCommand(Intent intent,int flags,int startId) {
-        createNotification(R.drawable.ic_stat_notify,getString(R.string.notification_chat_undefined_content));
-        return START_NOT_STICKY;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    companion object {
+        const val RETRIEVING_MSG_CHANNEL_ID = "Retrieving message"
+        const val NEW_MESSAGE_NOTIFICATION_ID = 1086
     }
 }

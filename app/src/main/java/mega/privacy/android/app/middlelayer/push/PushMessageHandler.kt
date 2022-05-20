@@ -1,183 +1,174 @@
-package mega.privacy.android.app.middlelayer.push;
+package mega.privacy.android.app.middlelayer.push
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.PowerManager;
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.PowerManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.fcm.IncomingCallService
+import mega.privacy.android.app.fcm.KeepAliveService
+import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isGMS
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaRequest.*
+import timber.log.Timber
 
-import androidx.annotation.Nullable;
+class PushMessageHandler(
+    @ApplicationContext private val context: Context,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
+    private val megaChatApi: MegaChatApiAndroid,
+    private val dbH: DatabaseHandler
+) : MegaRequestListenerInterface {
 
-import java.util.Map;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.fcm.KeepAliveService;
-import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.TextUtil;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-
-public class PushMessageHanlder implements MegaRequestListenerInterface {
-
-    private static final int AWAKE_CPU_FOR = 60 * 1000;
-    private static final String TYPE_SHARE_FOLDER = "1";
-    private static final String TYPE_CONTACT_REQUEST = "3";
-    private static final String TYPE_ACCEPTANCE = "5";
-    private static final String TYPE_CALL = "4";
-    private static final String TYPE_CHAT = "2";
-    public static final String PUSH_TOKEN = "PUSH_TOKEN";
-
-    private MegaApplication app;
-
-    private MegaApiAndroid megaApi;
-    private MegaApiAndroid megaApiFolder;
-
-    private MegaChatApiAndroid megaChatApi;
-
-    private DatabaseHandler dbH;
-
-    private boolean showMessageNotificationAfterPush;
-
-    private boolean beep;
-
-    private static String token;
-
-    /**
-     * Flag for controlling if allows the app to do login in background upon receiving a push message.
-     */
-    public static volatile boolean allowBackgroundLogin = true;
-
-    public PushMessageHanlder() {
-        app = MegaApplication.getInstance();
-        megaApi = app.getMegaApi();
-        megaApiFolder = app.getMegaApiFolder();
-        megaChatApi = app.getMegaChatApi();
-        dbH = DatabaseHandler.getDbHandler(app);
-    }
+    private var showMessageNotificationAfterPush = false
+    private var beep = false
 
     /**
      * Awake CPU to make sure the following operations can finish.
      *
      * @param launchService Whether launch a foreground service to keep the app alive.
      */
-    private void awakeCpu(boolean launchService) {
-        PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
-        if (pm != null) {
-            logDebug("wake lock acquire");
-            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake:push_message");
-            wl.setReferenceCounted(false);
-            wl.acquire(AWAKE_CPU_FOR);
-        }
-        if (launchService) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                app.startForegroundService(new Intent(app, KeepAliveService.class));
-            } else {
-                app.startService(new Intent(app, KeepAliveService.class));
+    private fun awakeCpu(launchService: Boolean) {
+        Timber.d("wake lock acquire")
+        (context.getSystemService(Context.POWER_SERVICE) as PowerManager).apply {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake:push_message").apply {
+                setReferenceCounted(false)
+                acquire(AWAKE_CPU_FOR.toLong())
+            }
+
+            if (launchService) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                        && (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).isBackgroundRestricted
+                    ) {
+                        // This means the user has enforced background restrictions for the app.
+                        // Returning here avoids ForegroundServiceStartNotAllowedException.
+                        return
+                    }
+
+                    context.startForegroundService(Intent(context, KeepAliveService::class.java))
+                } else {
+                    context.startService(Intent(context, KeepAliveService::class.java))
+                }
             }
         }
     }
 
-    public void handleMessage(Message message) {
-        String messageType = message.getType();
-        logDebug("Handle message from: " + message.getFrom() + " , which type is: " + messageType);
-        logDebug("original priority is " + message.getOriginalPriority() + " ,priority is " + message.getPriority());
+    fun handleMessage(message: Message) {
+        val messageType = message.type
+        Timber.d(
+            "Handle message from: ${message.from} , which type is: $messageType. " +
+                    "Original priority is ${message.originalPriority}, priority is ${message.priority}"
+        )
+
+        if (!message.hasData()) {
+            return
+        }
 
         // Check if message contains a data payload.
-        if (message.hasData()) {
-            logDebug("Message data payload: " + message.getData());
-            UserCredentials credentials = dbH.getCredentials();
-            if (credentials == null) {
-                logError("No user credentials, process terminates!");
-            } else {
-                if (TYPE_SHARE_FOLDER.equals(messageType) || TYPE_CONTACT_REQUEST.equals(messageType) || TYPE_ACCEPTANCE.equals(messageType)) {
+        Timber.d("Message data payload: ${message.data}")
+
+        val credentials = dbH.credentials
+
+        if (credentials == null) {
+            Timber.e("No user credentials, process terminates!")
+            return
+        }
+
+        when (messageType) {
+            TYPE_SHARE_FOLDER, TYPE_CONTACT_REQUEST, TYPE_ACCEPTANCE -> {
+                //Leave the flag showMessageNotificationAfterPush as it is
+                //If true - wait until connection finish
+                //If false, no need to change it
+                Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush")
+
+                val gSession = credentials.session
+
+                if (megaApi.rootNode == null) {
+                    Timber.w("RootNode = null")
+                    performLoginProcess(gSession)
+                } else {
+                    Timber.d("Awaiting info on listener")
+                    retryPendingConnections()
+                }
+            }
+            TYPE_CALL -> {
+                //Leave the flag showMessageNotificationAfterPush as it is
+                //If true - wait until connection finish
+                //If false, no need to change it
+                Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush")
+
+                val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                val isIdle = pm.isDeviceIdleMode
+
+                if (!MegaApplication.getInstance().isActivityVisible && megaApi.rootNode == null || isIdle) {
+                    Timber.d("Launch foreground service!")
+                    awakeCpu(false)
+
+                    if (isGMS()) {
+                        context.startService(Intent(context, IncomingCallService::class.java))
+                        return
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        // For HMS build flavor, have to startForegroundService.
+                        // Android doesn't allow the app to launch background service if the app is not launched by FCM high priority push message.
+                        context.startForegroundService(
+                            Intent(
+                                context,
+                                IncomingCallService::class.java
+                            )
+                        )
+                        return
+                    }
+                }
+
+                val gSession = credentials.session
+
+                if (megaApi.rootNode == null) {
+                    Timber.w("RootNode = null")
+                    performLoginProcess(gSession)
+                } else {
+                    Timber.d("RootNode is NOT null - wait CALLDATA:onChatCallUpdate")
+                    val ret = megaChatApi.initState
+                    Timber.d("result of init ---> $ret")
+                    val status = megaChatApi.onlineStatus
+                    Timber.d("online status ---> $status")
+                    val connectionState = megaChatApi.connectionState
+                    Timber.d("connection state ---> $connectionState")
+                    retryPendingConnections()
+                }
+            }
+            TYPE_CHAT -> {
+                Timber.d("CHAT notification")
+
+                if (MegaApplication.getInstance().isActivityVisible) {
+                    Timber.d("App on foreground --> return")
+                    retryPendingConnections()
+                    return
+                }
+
+                beep = Message.NO_BEEP != message.silent
+                awakeCpu(beep)
+                Timber.d("Notification should beep: $beep")
+                showMessageNotificationAfterPush = true
+                val gSession = credentials.session
+
+                if (megaApi.rootNode == null) {
+                    Timber.w("RootNode = null")
+                    performLoginProcess(gSession)
+                } else {
                     //Leave the flag showMessageNotificationAfterPush as it is
                     //If true - wait until connection finish
                     //If false, no need to change it
-                    logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                    String gSession = credentials.getSession();
-                    if (megaApi.getRootNode() == null) {
-                        logWarning("RootNode = null");
-                        performLoginProccess(gSession);
-                    } else {
-                        logDebug("Awaiting info on listener");
-                        retryPendingConnections();
-                    }
-                } else if (TYPE_CALL.equals(messageType)) {
-                    //Leave the flag showMessageNotificationAfterPush as it is
-                    //If true - wait until connection finish
-                    //If false, no need to change it
-                    logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-
-                    PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
-                    boolean isIdle = pm.isDeviceIdleMode();
-                    if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
-                        logDebug("Launch foreground service!");
-                        awakeCpu(false);
-
-                        if (BuildFlavorHelper.INSTANCE.isGMS()) {
-                            app.startService(new Intent(app, IncomingCallService.class));
-                            return;
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            // For HMS build flavor, have to startForegroundService.
-                            // Android doesn't allow the app to launch background service if the app is not launched by FCM high priority push message.
-                            app.startForegroundService(new Intent(app, IncomingCallService.class));
-                            return;
-                        }
-                    }
-
-                    String gSession = credentials.getSession();
-                    if (megaApi.getRootNode() == null) {
-                        logWarning("RootNode = null");
-                        performLoginProccess(gSession);
-                    } else {
-                        logDebug("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-                        int ret = megaChatApi.getInitState();
-                        logDebug("result of init ---> " + ret);
-                        int status = megaChatApi.getOnlineStatus();
-                        logDebug("online status ---> " + status);
-                        int connectionState = megaChatApi.getConnectionState();
-                        logDebug("connection state ---> " + connectionState);
-                        retryPendingConnections();
-                    }
-                } else if (TYPE_CHAT.equals(messageType)) {
-                    logDebug("CHAT notification");
-                    if(app.isActivityVisible()){
-                        logDebug("App on foreground --> return");
-                        retryPendingConnections();
-                        return;
-                    }
-
-                    beep = !Message.NO_BEEP.equals(message.getSilent());
-                    awakeCpu(beep);
-
-                    logDebug("Notification should beep: " + beep);
-                    showMessageNotificationAfterPush = true;
-
-                    String gSession = credentials.getSession();
-                    if (megaApi.getRootNode() == null) {
-                        logWarning("RootNode = null");
-                        performLoginProccess(gSession);
-                    } else {
-                        //Leave the flag showMessageNotificationAfterPush as it is
-                        //If true - wait until connection finish
-                        //If false, no need to change it
-                        logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                        logDebug("Call to pushReceived");
-                        megaChatApi.pushReceived(beep);
-                        beep = false;
-                    }
+                    Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush. Call to pushReceived")
+                    megaChatApi.pushReceived(beep)
+                    beep = false
                 }
             }
         }
@@ -190,240 +181,220 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
      * @param newToken Push token gotten from the platform.
      * @param deviceType DEVICE_ANDROID or DEVICE_HUAWEI
      */
-    public void sendRegistrationToServer(String newToken, int deviceType) {
-        if(TextUtil.isTextEmpty(newToken)) return;
+    fun sendRegistrationToServer(newToken: String, deviceType: Int) {
+        if (TextUtil.isTextEmpty(newToken)) return
+        val sp = context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
+        val token = sp.getString("token", "")
 
-        SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
-        String token = sp.getString("token", "");
-        if (!token.equals(newToken)) {
-            if (megaApi == null) {
-                megaApi = app.getMegaApi();
-            }
-            logDebug("Push service's new token: " + newToken);
-            PushMessageHanlder.token = token;
-            megaApi.registerPushNotifications(deviceType, newToken, this);
+        if (token != newToken) {
+            Timber.d("Push service's new token: $newToken")
+            Companion.token = token
+            megaApi.registerPushNotifications(deviceType, newToken, this)
         } else {
-            logDebug("No need to register new token.");
+            Timber.d("No need to register new token.")
         }
-    }
-
-    public static String getToken() {
-        return token;
     }
 
     /**
-     * If the account hasn't logined in, login first.
+     * If the account hasn't logged in, login first.
      *
      * @param gSession Cached session, used to do a fast login.
      */
-    private void performLoginProccess(String gSession) {
+    private fun performLoginProcess(gSession: String) {
         if (!MegaApplication.isLoggingIn()) {
-            /*
-                Two locks and synchronized block prevent background login executes after login process is launched in `LoginFragment`.
-                Otherwise the login process in foreground will failed with `-11` and cause logout.
-             */
+            /* Two locks and synchronized block prevent background login executes after login process is launched in `LoginFragment`.
+                Otherwise the login process in foreground will failed with `-11` and cause logout.*/
             if (allowBackgroundLogin) {
-                synchronized (MegaApplication.getInstance()) {
+                synchronized(MegaApplication.getInstance()) {
                     if (allowBackgroundLogin) {
-                        megaApi.fastLogin(gSession, this);
+                        megaApi.fastLogin(gSession, this)
                     }
                 }
             }
-
-            ChatUtil.initMegaChatApi(gSession);
+            ChatUtil.initMegaChatApi(gSession)
         }
     }
 
-    private void retryPendingConnections() {
-        logDebug("retryPendingConnections");
+    private fun retryPendingConnections() {
+        Timber.d("retryPendingConnections")
+
         try {
-            if (megaApi != null) {
-                megaApi.retryPendingConnections();
-            }
-            if (megaChatApi != null) {
-                megaChatApi.retryPendingConnections(false, null);
-            }
-        } catch (Exception e) {
-            logError("Exception", e);
+            megaApi.retryPendingConnections()
+            megaChatApi.retryPendingConnections(false, null)
+        } catch (e: Exception) {
+            Timber.e("Exception", e)
         }
     }
 
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart: " + request.getRequestString());
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("onRequestStart: ${request.requestString}")
         // Avoid duplicate login.
-        allowBackgroundLogin = false;
+        allowBackgroundLogin = false
     }
 
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestUpdate: " + request.getRequestString());
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("onRequestUpdate: ${request.requestString}")
     }
 
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish: " + request.getRequestString());
-        if (request.getType() == MegaRequest.TYPE_LOGIN) {
-            allowBackgroundLogin = true;
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        Timber.d("onRequestFinish: ${request.requestString}")
 
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Fast login OK");
-                logDebug("Logged in. Setting account auth token for folder links.");
-                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
-                logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
-                megaApi.fetchNodes(this);
+        when (request.type) {
+            TYPE_LOGIN -> {
+                allowBackgroundLogin = true
 
-                // Get cookies settings after login.
-                MegaApplication.getInstance().checkEnabledCookies();
-            } else {
-                logError("ERROR: " + e.getErrorString());
-            }
-        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            if(e.getErrorCode() == MegaError.API_OK) {
-                if (showMessageNotificationAfterPush) {
-                    showMessageNotificationAfterPush = false;
-                    logDebug("Call to pushReceived");
-                    megaChatApi.pushReceived(beep);
-                    beep = false;
+                if (e.errorCode == MegaError.API_OK) {
+                    Timber.d("Fast login OK. Logged in. Setting account auth token for folder links.")
+                    megaApiFolder.accountAuth = megaApi.accountAuth
+                    Timber.d("Calling fetchNodes from MegaFireBaseMessagingService")
+                    megaApi.fetchNodes(this)
+
+                    // Get cookies settings after login.
+                    MegaApplication.getInstance().checkEnabledCookies()
                 } else {
-                    logDebug("Login do not started by CHAT message");
+                    Timber.e("ERROR: ${e.errorString}")
                 }
-            } else {
-                logDebug(request.getRequestString() + " failed. Error code: " + e.getErrorCode() + ", error string: " + e.getErrorString());
             }
-        } else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                String token = request.getText();
-                logDebug("Register push token successfully. Token is: " + token);
-                // record the token locally when register successful.
-                SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
-                sp.edit().putString("token", token).apply();
-            } else {
-                logError("Register push token failed, retry. error code is: " + e.getErrorCode());
-                // may need retry when error code isn't -15
+            TYPE_FETCH_NODES -> {
+                if (e.errorCode == MegaError.API_OK) {
+                    if (showMessageNotificationAfterPush) {
+                        showMessageNotificationAfterPush = false
+                        Timber.d("Call to pushReceived")
+                        megaChatApi.pushReceived(beep)
+                        beep = false
+                    } else {
+                        Timber.d("Login do not started by CHAT message")
+                    }
+                } else {
+                    Timber.d("${request.requestString} failed. Error code: ${e.errorCode}, error string: ${e.errorString}")
+                }
+            }
+            TYPE_REGISTER_PUSH_NOTIFICATION -> {
+                if (e.errorCode == MegaError.API_OK) {
+                    val token = request.text
+                    Timber.d("Register push token successfully. Token is: $token")
+                    // record the token locally when register successful.
+                    val sp = context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
+                    sp.edit().putString("token", token).apply()
+                } else {
+                    Timber.e("Register push token failed, retry. error code is: ${e.errorCode}")
+                    // may need retry when error code isn't -15
+                }
             }
         }
     }
 
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporary: " + request.getRequestString());
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        Timber.w("onRequestTemporary: ${request.requestString}")
     }
 
     /**
      * Generic push message object, used to unify corresponding platform dependent purchase object.
      */
-    public static class Message {
-
-        private static final String KEY_SILENT = "silent";
-        private static final String KEY_TYPE = "type";
-        private static final String KEY_EMAIL = "email";
-
-        private static final String NO_BEEP = "1";
-
+    class Message(
         /**
          * Where is the message from. May be null. Just for log purpose.
          */
-        private String from;
-
+        val from: String,
+        /**
+         * Just for log and debug purpose.
+         */
+        val originalPriority: Int,
+        /**
+         * Just for log and debug purpose.
+         */
+        val priority: Int,
         /**
          * Store couples of info sent from server,
          * but the client only use: silent, type, email.
          */
-        private Map<String, String> data;
-
-        /**
-         * Just for log and debug purpose.
-         */
-        private int originalPriority;
-
-        /**
-         * Just for log and debug purpose.
-         */
-        private int priority;
-
-        public Message(String from, int originalPriority, int priority, Map<String, String> data) {
-            this.from = from;
-            this.originalPriority = originalPriority;
-            this.priority = priority;
-            this.data = data;
-        }
+        val data: Map<String, String>?
+    ) {
 
         /**
          * Check if the data map has info.
          *
          * @return true, has; false, doesn't have.
          */
-        public boolean hasData() {
-            return data != null && data.size() > 0;
-        }
+        fun hasData(): Boolean = data != null && data.isNotEmpty()
 
         /**
          * Get the message type.
          *
          * @return Message type, or null if data map is empty.
          */
-        @Nullable
-        public String getType() {
-            if (hasData()) {
-                return data.get(KEY_TYPE);
+        val type: String?
+            get() {
+                if (hasData()) {
+                    return data!![KEY_TYPE]
+                }
+                Timber.w("Message type is null!")
+                return null
             }
-            logWarning("Message type is null!");
-            return null;
-        }
 
         /**
          * Get the email.
          *
          * @return Email, or null if data map is empty.
          */
-        @Nullable
-        public String getEmail() {
-            if (hasData()) {
-                return data.get(KEY_EMAIL);
+        val email: String?
+            get() {
+                if (hasData()) {
+                    return data!![KEY_EMAIL]
+                }
+                Timber.w("Message email is null!")
+                return null
             }
-            logWarning("Message email is null!");
-            return null;
-        }
 
         /**
          * Get if the push message should be silent.
          *
          * @return Message type, or null if data map is empty.
          */
-        @Nullable
-        public String getSilent() {
-            if (hasData()) {
-                return data.get(KEY_SILENT);
+        val silent: String?
+            get() {
+                if (hasData()) {
+                    return data!![KEY_SILENT]
+                }
+                Timber.w("Message silent is null!")
+                return null
             }
-            logWarning("Message silent is null!");
-            return null;
-        }
 
-        public String getFrom() {
-            return from;
-        }
-
-        public int getOriginalPriority() {
-            return originalPriority;
-        }
-
-        public int getPriority() {
-            return priority;
-        }
-
-        public Map<String, String> getData() {
-            return data;
-        }
-
-        @Override
-        public String toString() {
+        override fun toString(): String {
             return "Message{" +
                     "from='" + from + '\'' +
                     ", data=" + data +
                     ", originalPriority=" + originalPriority +
                     ", priority=" + priority +
-                    '}';
+                    '}'
         }
+
+        companion object {
+            private const val KEY_SILENT = "silent"
+            private const val KEY_TYPE = "type"
+            private const val KEY_EMAIL = "email"
+            const val NO_BEEP = "1"
+        }
+    }
+
+    companion object {
+        private const val AWAKE_CPU_FOR = 60 * 1000
+        private const val TYPE_SHARE_FOLDER = "1"
+        private const val TYPE_CONTACT_REQUEST = "3"
+        private const val TYPE_ACCEPTANCE = "5"
+        private const val TYPE_CALL = "4"
+        private const val TYPE_CHAT = "2"
+        const val PUSH_TOKEN = "PUSH_TOKEN"
+
+        @JvmStatic
+        var token: String? = null
+            private set
+
+        /**
+         * Flag for controlling if allows the app to do login in background upon receiving a push message.
+         */
+        @JvmField
+        @Volatile
+        var allowBackgroundLogin = true
     }
 }
