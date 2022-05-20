@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/file_explorer_item_layout"
     android:layout_width="match_parent"
     android:layout_height="72dp"
@@ -12,35 +13,58 @@
         android:layout_centerVertical="true"
         android:scaleType="fitCenter" />
 
-    <HorizontalScrollView
-        android:id="@+id/scroll_view_filename"
+    <RelativeLayout
+        android:id="@+id/first_line_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_toEndOf="@id/file_explorer_thumbnail"
-        android:layout_toStartOf="@id/file_explorer_permissions"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_marginTop="15dp"
+        android:layout_toStartOf="@+id/file_explorer_permissions"
+        android:layout_toEndOf="@id/file_explorer_thumbnail">
 
-        <TextView
-            android:id="@+id/file_explorer_filename"
+        <HorizontalScrollView
+            android:id="@+id/scroll_view_filename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:ellipsize="middle"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
-    </HorizontalScrollView>
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <TextView
+                android:id="@+id/file_explorer_filename"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceSubtitle1"/>
+
+        </HorizontalScrollView>
+
+        <ImageView
+            android:id="@+id/file_list_taken_down"
+            style="@style/taken_down_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignTop="@id/scroll_view_filename"
+            android:layout_alignBottom="@id/scroll_view_filename"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="6dp"
+            android:layout_toEndOf="@+id/scroll_view_filename"
+            android:src="@drawable/ic_input_warning"
+            app:tint="?attr/colorError"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/file_explorer_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/scroll_view_filename"
+        android:layout_below="@+id/first_line_container"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
-        android:layout_alignStart="@id/scroll_view_filename"
+        android:layout_alignStart="@id/first_line_container"
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"

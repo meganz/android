@@ -109,6 +109,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 		public ImageView permissionsIcon;
         public TextView textViewFileName;
 		public TextView textViewFileSize;
+		public ImageView takenDownImage;
 
 
 		public ViewHolderListExplorer(View itemView) {
@@ -130,7 +131,8 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         public RelativeLayout videoLayout;
         public TextView videoDuration;
         public ImageView videoIcon;
-
+        public ImageView takenDownImage;
+        public ImageView takenDownImageForFile;
 
 		public ViewHolderGridExplorer(View itemView) {
 			super(itemView);
@@ -224,8 +226,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 			holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
             holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
-            holder.textViewFileName.setOnClickListener(this);
-            holder.textViewFileName.setTag(holder);
+            holder.takenDownImage = v.findViewById(R.id.file_list_taken_down);
 			v.setTag(holder);
 			return holder;
 		} else if (viewType == ITEM_VIEW_TYPE_GRID){
@@ -247,6 +248,8 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             holder.videoLayout = v.findViewById(R.id.file_explorer_grid_file_videoinfo_layout);
             holder.videoDuration= v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
             holder.videoIcon = v.findViewById(R.id.file_explorer_grid_file_video_icon);
+            holder.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
+            holder.takenDownImageForFile = v.findViewById(R.id.file_grid_taken_down_for_file);
 
 			v.setTag(holder);
 			return holder;
@@ -289,6 +292,9 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             return;
         }
 
+        holder.itemView.setOnClickListener(null);
+        holder.itemView.setOnLongClickListener(null);
+
         holder.currentPosition = position;
 
         holder.document = node.getHandle();
@@ -296,12 +302,17 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         holder.textViewFileName.setText(node.getName());
 
         holder.imageView.setAlpha(1.0f);
-        holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+
+        if (node.isTakenDown()) {
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.takenDownImage.setVisibility(View.VISIBLE);
+        } else {
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+            holder.takenDownImage.setVisibility(View.GONE);
+        }
 
         if (node.isFolder()){
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
-
-            holder.itemView.setOnLongClickListener(null);
             holder.itemView.setOnClickListener(this);
             holder.permissionsIcon.setVisibility(View.GONE);
             if(node.getHandle() == myBackupHandle){
@@ -363,8 +374,10 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 
             if(selectFile){
-                holder.itemView.setOnClickListener(this);
-                holder.itemView.setOnLongClickListener(this);
+                if (!node.isTakenDown()) {
+                    holder.itemView.setOnClickListener(this);
+                    holder.itemView.setOnLongClickListener(this);
+                }
 
                 if (isMultipleSelect() && isItemChecked(position)) {
                     holder.imageView.setImageResource(R.drawable.ic_select_folder);
@@ -377,8 +390,6 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             } else{
                 holder.imageView.setAlpha(.4f);
                 holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                holder.itemView.setOnClickListener(null);
-                holder.itemView.setOnLongClickListener(null);
             }
 
 
@@ -407,9 +418,6 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 
     private void onBindViewHolderGrid(ViewHolderGridExplorer holder, int position) {
 	    logDebug("onBindViewHolderGrid");
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
 
         holder.currentPosition = position;
 
@@ -422,19 +430,26 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             return;
         }
 
+        holder.itemView.setOnClickListener(null);
+        holder.itemView.setOnLongClickListener(null);
+
         holder.document = node.getHandle();
         holder.itemLayout.setVisibility(View.VISIBLE);
 
-        if (node.isFolder()){
+        if (node.isFolder()) {
             holder.folderLayout.setVisibility(View.VISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
             holder.folderName.setText(node.getName());
-
-            holder.itemView.setOnLongClickListener(null);
-
             holder.folderIcon.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
             holder.itemView.setOnClickListener(this);
-            holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+
+            if (node.isTakenDown()) {
+                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+                holder.takenDownImage.setVisibility(View.VISIBLE);
+            } else {
+                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+                holder.takenDownImage.setVisibility(View.GONE);
+            }
         }
         else{
             holder.folderLayout.setVisibility(View.GONE);
@@ -442,6 +457,14 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             holder.fileName.setText(node.getName());
             holder.fileThumbnail.setVisibility(View.GONE);
             holder.fileIcon.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
+
+            if (node.isTakenDown()) {
+                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+                holder.takenDownImageForFile.setVisibility(View.VISIBLE);
+            } else {
+                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+                holder.takenDownImageForFile.setVisibility(View.GONE);
+            }
 
             if (isVideoFile(node.getName())) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
@@ -484,9 +507,11 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 
             if(selectFile){
                 holder.fileThumbnail.setAlpha(1.0f);
-                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
-                holder.itemView.setOnClickListener(this);
-                holder.itemView.setOnLongClickListener(this);
+
+                if (!node.isTakenDown()) {
+                    holder.itemView.setOnClickListener(this);
+                    holder.itemView.setOnLongClickListener(this);
+                }
 
                 if (isMultipleSelect() && isItemChecked(position)) {
                     holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
@@ -498,9 +523,6 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 }
             } else{
                 holder.fileThumbnail.setAlpha(.4f);
-                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
-                holder.itemView.setOnClickListener(null);
-                holder.itemView.setOnLongClickListener(null);
             }
         }
     }
@@ -773,10 +795,10 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 		}
 
 		if (fragment instanceof CloudDriveExplorerFragment)  {
-			((CloudDriveExplorerFragment) fragment).itemClick(v, holder.getAdapterPosition());
+			((CloudDriveExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
 		}
 		else if (fragment instanceof IncomingSharesExplorerFragment) {
-			((IncomingSharesExplorerFragment) fragment).itemClick(v, holder.getAdapterPosition());
+			((IncomingSharesExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
 		}
 	}
 
