@@ -8,7 +8,7 @@ import mega.privacy.android.app.main.megachat.ChatExplorerActivity
 
 class ChatExplorerActivityContract : ActivityResultContract<Unit?, Intent?>() {
 
-    override fun createIntent(context: Context, unit: Unit?): Intent =
+    override fun createIntent(context: Context, input: Unit?): Intent =
         Intent(context, ChatExplorerActivity::class.java)
 
     override fun parseResult(resultCode: Int, intent: Intent?): Intent? =

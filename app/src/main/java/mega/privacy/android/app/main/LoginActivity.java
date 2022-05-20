@@ -1,5 +1,34 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_CAM_SYNC;
+import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.ACTION_PARK_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.CONFIRM_EMAIL_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.setAppFontSize;
+import static mega.privacy.android.app.utils.Util.setDrawUnderStatusBar;
+
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,13 +38,6 @@ import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -25,8 +47,15 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -39,15 +68,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.JobUtil.*;
-
+@AndroidEntryPoint
 public class LoginActivity extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;
@@ -220,6 +243,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
+                            loginFragment.returnToLogin();
                             onBackPressed();
                         }
                         break;
@@ -374,14 +398,10 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             startActivity(intent);
             finish();
         } else {
-            logDebug("Start the Camera Uploads service");
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    logDebug("Now I start the service");
-                    scheduleCameraUploadJob(LoginActivity.this);
-                }
+            Timber.d("Start the Camera Uploads service");
+            handler.postDelayed(() -> {
+                Timber.d("Now I start the service");
+                scheduleCameraUploadJob(LoginActivity.this);
             }, time);
         }
     }
@@ -399,14 +419,11 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                         logDebug("Pressed button positive to cancel transfer");
                         if (megaApi != null) {
                             megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-                            if (megaApiFolder != null) {
-                                megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-                            }
                         } else {
                             logWarning("megaAPI is null");
-                            if (megaApiFolder != null) {
-                                megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-                            }
+                        }
+                        if (megaApiFolder != null) {
+                            megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
                         }
 
                         break;
@@ -475,7 +492,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    stopRunningCameraUploadService(LoginActivity.this);
+                                    fireStopCameraUploadJob(LoginActivity.this);
                                     dbH.setCamSyncEnabled(false);
                                 }
                             });

@@ -16,8 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
+import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -25,6 +26,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
+@AndroidEntryPoint
 public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsChatFragment sttChat;

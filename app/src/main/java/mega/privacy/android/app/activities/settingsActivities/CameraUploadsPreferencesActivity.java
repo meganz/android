@@ -121,7 +121,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CameraUploadsService.setInCameraUploadsSetting(true);
 
         setTitle(R.string.section_photo_sync);
         sttCameraUploads = new SettingsCameraUploadsFragment();
@@ -204,7 +203,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CameraUploadsService.setInCameraUploadsSetting(false);
         unregisterReceiver(networkReceiver);
         unregisterReceiver(cameraUploadDestinationReceiver);
         unregisterReceiver(enableDisableCameraUploadReceiver);

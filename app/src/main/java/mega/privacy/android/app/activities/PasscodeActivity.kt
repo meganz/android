@@ -90,12 +90,6 @@ open class PasscodeActivity : BaseActivity() {
         } else if (passcodeManagement.showPasscodeScreen) {
             passcodeUtil.resume()
         }
-
-        if (System.currentTimeMillis() - lastStart > 1000
-            && megaApi.rootNode != null && !MegaApplication.isLoggingIn()
-        ) {
-            JobUtil.startCameraUploadServiceIgnoreAttr(this@PasscodeActivity)
-        }
     }
 
     protected fun disablePasscode() {

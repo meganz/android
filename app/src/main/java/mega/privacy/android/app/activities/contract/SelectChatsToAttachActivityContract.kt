@@ -10,9 +10,9 @@ import nz.mega.sdk.MegaUser
 
 class SelectChatsToAttachActivityContract : ActivityResultContract<MegaUser, Intent?>() {
 
-    override fun createIntent(context: Context, user: MegaUser): Intent =
+    override fun createIntent(context: Context, input: MegaUser): Intent =
         Intent(context, ChatExplorerActivity::class.java).apply {
-            putExtra(Constants.USER_HANDLES, longArrayOf(user.handle))
+            putExtra(Constants.USER_HANDLES, longArrayOf(input.handle))
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Intent? =

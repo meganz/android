@@ -37,8 +37,6 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         if(intent == null || intent.getExtras() == null)
             return;
 
-        final Context c = context;
-
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = manager.getActiveNetworkInfo();
 
@@ -79,7 +77,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             }
 
             connected = true;
-            scheduleCameraUploadJob(c);
+            scheduleCameraUploadJob(context);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
             logDebug("Network state: DISCONNECTED");
             mApplication.setLocalIpAddress(null);

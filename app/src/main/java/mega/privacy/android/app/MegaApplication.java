@@ -111,8 +111,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.hilt.work.HiltWorkerFactory;
 import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
+import androidx.work.Configuration;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -134,6 +136,7 @@ import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlinx.coroutines.CoroutineScope;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
@@ -141,6 +144,7 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.domain.usecase.InitialiseLogging;
@@ -153,7 +157,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.GetCuAttributeListener;
+import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.logging.InitialiseLoggingUseCaseJavaWrapper;
@@ -200,9 +204,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -236,6 +241,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
     PerformanceReporter performanceReporter;
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
+
+    @Inject
+    HiltWorkerFactory workerFactory;
+
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -417,7 +429,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
                     esid = true;
 
-                    AccountController.localLogoutApp(getApplicationContext());
+                    AccountController.localLogoutApp(getApplicationContext(), sharingScope);
                 } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
                     api.localLogout();
                     megaChatApi.logout();
@@ -437,8 +449,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     }
 
                     //Ask for MU and CU folder when App in init state
-                    logDebug("Get CU attribute on fetch nodes.");
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+                    Timber.d("Get CameraUpload attribute on fetch nodes.");
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(getApplicationContext()));
 
                     // Init CU sync data after login successfully
                     new CUBackupInitializeChecker(megaApi).initCuSync();
@@ -965,6 +977,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
     }
 
+    @NonNull
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build();
+    }
+
     /**
      * Initialize Fresco library
      */
@@ -1416,7 +1436,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 int loggedState = megaApi.isLoggedIn();
                 logDebug("Login status on " + loggedState);
                 if (loggedState == 0) {
-                    AccountController.logoutConfirmed(this);
+                    AccountController.logoutConfirmed(this, sharingScope);
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).post(true);
 
@@ -1450,7 +1470,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             } else {
 
                 AccountController aC = new AccountController(this);
-                aC.logoutConfirmed(this);
+                aC.logoutConfirmed(this, sharingScope);
 
 				if(isActivityVisible()){
 					logDebug("Launch intent to login screen");

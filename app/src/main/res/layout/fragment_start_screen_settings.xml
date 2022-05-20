@@ -51,7 +51,7 @@
             android:id="@+id/cu_text"
             style="@style/StartScreenText"
             android:layout_toStartOf="@+id/cu_check"
-            android:text="@string/section_photo_sync" />
+            android:text="@string/settings_start_screen_photos_option" />
 
         <ImageView
             android:id="@+id/cu_check"

@@ -112,11 +112,9 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         super.onDestroy()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val finalMenu = menu ?: return super.onCreateOptionsMenu(menu)
-
-        menuInflater.inflate(R.menu.activity_upload_folder, finalMenu)
-        searchMenuItem = finalMenu.findItem(R.id.action_search).apply {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.activity_upload_folder, menu)
+        searchMenuItem = menu.findItem(R.id.action_search).apply {
             val isProcessingUpload = viewModel.isProcessingUpload()
             isVisible = !isProcessingUpload
 
@@ -135,7 +133,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             }
         }
 
-        return super.onCreateOptionsMenu(finalMenu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
