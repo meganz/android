@@ -1,5 +1,39 @@
 package mega.privacy.android.app.main.managerSections;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_FILE_BROWSER;
+import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
+import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTimer;
+import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -10,20 +44,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
@@ -41,6 +61,21 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,12 +99,13 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.filebrowser.FileBrowserViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -81,32 +117,13 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
-import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 @AndroidEntryPoint
 public class FileBrowserFragment extends RotatableFragment{
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+
+	private FileBrowserViewModel viewModel;
 
 	Context context;
 	ActionBar aB;
@@ -135,7 +152,7 @@ public class FileBrowserFragment extends RotatableFragment{
 
 	DatabaseHandler dbH;
 
-	ArrayList<MegaNode> nodes;
+	List<MegaNode> nodes;
 	public ActionMode actionMode;
 
 	LinearLayoutManager mLayoutManager;
@@ -507,6 +524,13 @@ public class FileBrowserFragment extends RotatableFragment{
 
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
 				new EventObserver<>(this::showSortByPanel));
+
+		viewModel = new ViewModelProvider(this).get(FileBrowserViewModel.class);
+		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(), nodes -> {
+			hideMultipleSelect();
+			setNodes(nodes);
+			getRecyclerView().invalidate();
+		});
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit.class).observe(this, this::showMediaDiscovery);
 
@@ -1196,7 +1220,7 @@ public class FileBrowserFragment extends RotatableFragment{
         return recyclerView;
     }
 
-    public void setNodes(ArrayList<MegaNode> nodes) {
+    public void setNodes(List<MegaNode> nodes) {
 		logDebug("Nodes size: " + nodes.size());
 
         visibilityFastScroller();
@@ -1395,7 +1419,7 @@ public class FileBrowserFragment extends RotatableFragment{
 	 *
 	 * @return the list of selected nodes
 	 */
-	public ArrayList<MegaNode> getNodeList() {
+	public List<MegaNode> getNodeList() {
 		return nodes;
 	}
 

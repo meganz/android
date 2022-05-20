@@ -128,9 +128,9 @@ class FileBackupManager(
      * @param currentParentHandle The parent node
      * @return The type of node
      */
-    fun checkSubBackupNode(megaNodes: ArrayList<MegaNode?>?, currentParentHandle: MegaNode?): Int {
+    fun checkSubBackupNode(megaNodes: List<MegaNode?>?, currentParentHandle: MegaNode?): Int {
         megaNodes?.let {
-            if (megaNodes.size > 0) {
+            if (megaNodes.isNotEmpty()) {
                 val handleList = ArrayList<Long>()
                 for (i in megaNodes.indices) {
                     val node: MegaNode? = megaNodes[i]
@@ -163,11 +163,11 @@ class FileBackupManager(
      * @return The parent node or null
      */
     fun getSubBackupParentNode(
-        megaNodes: ArrayList<MegaNode?>?,
+        megaNodes: List<MegaNode?>?,
         currentParentHandle: MegaNode?
     ): MegaNode? {
         megaNodes?.let {
-            if (megaNodes.size > 0) {
+            if (megaNodes.isNotEmpty()) {
                 for (p in megaNodes) {
                     if (p != null) {
                         return megaApi.getParentNode(p)
@@ -610,7 +610,7 @@ class FileBackupManager(
      * @return true if the node belongs to the backup folder, else return false.
      */
     fun fabForBackup(
-        nodeList: ArrayList<MegaNode?>,
+        nodeList: List<MegaNode?>,
         currentParentHandle: MegaNode?,
         actionType: Int
     ): Boolean {

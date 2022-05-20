@@ -5,15 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.*
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -22,16 +16,34 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel associated to {@link mega.privacy.android.app.main.ManagerActivity}
+ * ViewModel associated to [mega.privacy.android.app.main.ManagerActivity]
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
+ * @param setRubbishParentHandle Set rubbish parent handle in memory
+ * @param getManagerParentHandle Get rubbish parent handle previously set in memory
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
+    private val setManagerParentHandle: SetManagerParentHandle,
+    private val getManagerParentHandle: GetManagerParentHandle
 ) : ViewModel() {
+
+    /**
+     * Accessors to the current rubbish bin parent handle set in memory
+     */
+    var rubbishBinParentHandle: Long
+        get() = getManagerParentHandle(GetManagerParentHandleType.RubbishBin)
+        set(value) = setManagerParentHandle(SetManagerParentHandleType.RubbishBin, value)
+
+    /**
+     * Accessors to the current browser parent handle set in memory
+     */
+    var browserParentHandle: Long
+        get() = getManagerParentHandle(GetManagerParentHandleType.Browser)
+        set(value) = setManagerParentHandle(SetManagerParentHandleType.Browser, value)
 
     /**
      * Monitor all global updates

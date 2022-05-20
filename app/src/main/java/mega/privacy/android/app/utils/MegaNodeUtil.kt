@@ -134,7 +134,7 @@ object MegaNodeUtil {
      * @return how many nodes are folders in array list
      */
     @JvmStatic
-    fun getNumberOfFolders(nodes: ArrayList<MegaNode?>?): Int {
+    fun getNumberOfFolders(nodes: List<MegaNode?>?): Int {
         if (nodes == null) {
             return 0
         }
