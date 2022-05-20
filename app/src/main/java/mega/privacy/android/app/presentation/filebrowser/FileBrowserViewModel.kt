@@ -17,7 +17,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel associated to [mega.privacy.android.app.main.managerSections.RubbishBinFragment]
+ * ViewModel associated to [mega.privacy.android.app.main.managerSections.FileBrowserFragment]
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param megaApi
