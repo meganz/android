@@ -24,11 +24,30 @@ class ChatRoomToolbarViewModel @Inject constructor(
     private val _showSendImagesButton = MutableStateFlow(false)
     val showSendImagesButton: StateFlow<Boolean> get() = _showSendImagesButton
 
+    private val _hasPermissionsGranted = MutableStateFlow(false)
+    val hasPermissionsGranted: StateFlow<Boolean> get() = _hasPermissionsGranted
+
+    /**
+     * Method that receives changes related to read storage permissions
+     *
+     * @param hasPermissions If permission is granted. False, if not.
+     */
+    fun updateReadStoragePermissions(hasPermissions: Boolean) {
+        if (_hasPermissionsGranted.value == hasPermissions) {
+            return
+        }
+
+        _hasPermissionsGranted.value = hasPermissions
+        loadGallery()
+    }
+
     /**
      * How to get images and videos from the gallery
      */
-    fun loadGallery() {
-        _filesGallery.value = getGalleryFilesUseCase.get().blockingGet()
+    private fun loadGallery() {
+        if (_hasPermissionsGranted.value && filesGallery.value.isEmpty()) {
+            _filesGallery.value = getGalleryFilesUseCase.get().blockingGet()
+        }
     }
 
     fun getDefaultLocation(): String =

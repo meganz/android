@@ -69,7 +69,6 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        checkPermissionsDialog()
         setupButtons()
 
         lifecycleScope.launchWhenStarted {
@@ -84,6 +83,14 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
             viewModel.showSendImagesButton.collect { visibility ->
                 isMultiselectMode = visibility
                 binding.sendFilesButton.isVisible = visibility
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.hasPermissionsGranted.collect { isGranted ->
+                if (!isGranted) {
+                    checkPermissionsDialog()
+                }
             }
         }
 
@@ -177,15 +184,8 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     Constants.REQUEST_READ_STORAGE
             )
         } else {
-            loadGallery()
+            viewModel.updateReadStoragePermissions(true)
         }
-    }
-
-    /**
-     * Load files from gallery
-     */
-    fun loadGallery() {
-        viewModel.loadGallery()
     }
 
     private fun onTakePictureClick() {

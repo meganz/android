@@ -21,6 +21,10 @@ class GetGalleryFilesUseCase @Inject constructor(
         @ApplicationContext private val context: Context
 ) {
 
+    companion object {
+        const val DATA = "_data"
+    }
+
     fun get(): Single<List<FileGalleryItem>> =
             Single.fromCallable {
                 val files = mutableListOf<FileGalleryItem>().apply {
@@ -46,7 +50,8 @@ class GetGalleryFilesUseCase @Inject constructor(
         val projection = arrayOf(
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DATE_ADDED,
-                MediaStore.Images.Media.TITLE
+                MediaStore.Images.Media.TITLE,
+                DATA
         )
 
         context.contentResolver.query(
@@ -59,6 +64,7 @@ class GetGalleryFilesUseCase @Inject constructor(
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)
+            val dataColumn = cursor.getColumnIndexOrThrow(DATA)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -68,10 +74,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                         queryUri,
                         id
                 )
-                val path = UriUtil.getRealPathFromUri(
-                        context.contentResolver,
-                        contentUri
-                )
+                val path = cursor.getString(dataColumn)
 
                 val file = FileGalleryItem(
                         id = id,
@@ -108,7 +111,8 @@ class GetGalleryFilesUseCase @Inject constructor(
         val projection = arrayOf(
                 MediaStore.Video.Media._ID,
                 MediaStore.Video.Media.DATE_ADDED,
-                MediaStore.Video.Media.TITLE
+                MediaStore.Video.Media.TITLE,
+                DATA
         )
 
         context.contentResolver.query(
@@ -121,6 +125,7 @@ class GetGalleryFilesUseCase @Inject constructor(
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE)
+            val dataColumn = cursor.getColumnIndexOrThrow(DATA)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -132,10 +137,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                         id
                 )
 
-                val path = UriUtil.getRealPathFromUri(
-                        context.contentResolver,
-                        contentUri
-                )
+                val path = cursor.getString(dataColumn)
 
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(context, contentUri)

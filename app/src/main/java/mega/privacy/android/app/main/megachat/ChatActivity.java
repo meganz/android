@@ -3465,7 +3465,7 @@ public class ChatActivity extends PasscodeActivity
             case REQUEST_READ_STORAGE:
                 logDebug("Permission Read storage granted");
                 if (isBottomSheetDialogShown(bottomSheetDialogFragment) && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).loadGallery();
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updateReadStoragePermissions(true);
                 }
                 break;
 
