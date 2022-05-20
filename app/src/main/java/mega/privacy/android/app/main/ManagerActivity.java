@@ -10013,7 +10013,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        onNodesCloudDriveUpdate();
+        //onNodesCloudDriveUpdate();
 
         onNodesSearchUpdate();
 
