@@ -55,6 +55,15 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
+    <!--  Chat image quality   -->
+    <androidx.preference.Preference
+        android:key="settings_chat_image_quality"
+        android:title="@string/settings_chat_image_quality"
+        android:summary="@string/automatic_image_quality"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
     <!--  Chat video quality   -->
     <androidx.preference.ListPreference
         android:key="settings_chat_send_originals"

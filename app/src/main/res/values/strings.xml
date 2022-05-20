@@ -736,8 +736,6 @@
     <string name="settings_advanced_features_cache">Clear Cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Clear Offline Files</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Open file when downloaded</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Delete account</string>
     <!-- Size of files in offline or cache folders -->
@@ -4319,8 +4317,28 @@
     <string name="media_player_audio_playlist_next">Next</string>
     <!-- Previous audios have been already played in the audio playlist -->
     <string name="media_player_audio_playlist_previous">Previous</string>
-    <!-- Next videos to be played in the audio playlist -->
+    <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Next</string>
-    <!-- Previous videos have been already played in the audio playlist -->
+    <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Previous</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Photos</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">MEGA will open in-app unsupported file types in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Image quality</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automatic</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Always send original size images.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Optimised</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Always send optimised images.</string>
 </resources>

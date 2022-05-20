@@ -8,6 +8,7 @@ import android.content.Intent
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -495,7 +496,7 @@ class MyAccountViewModel @Inject constructor(
                             Intent(context, TestPasswordActivity::class.java)
                                 .putExtra("logout", true)
                         )
-                    } else AccountController.logout(context, megaApi)
+                    } else AccountController.logout(context, megaApi, viewModelScope)
                 },
                 onError = { error ->
                     logError("Error when killing sessions: ${error.message}")

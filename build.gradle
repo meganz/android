@@ -106,4 +106,7 @@ ext {
     preferenceVersion ='1.1.1'
     coroutineTestVersion = '1.6.0'
     turbineVersion = '0.7.0'
+    workVersion = '2.7.1'
+    roomVersion = '2.4.2'
+    composeVersion = '1.1.1'
 }

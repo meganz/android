@@ -99,10 +99,10 @@ import static mega.privacy.android.app.utils.FileUtil.buildExternalStorageFile;
 import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllUploads;
-import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
-import static mega.privacy.android.app.utils.JobUtil.startCameraUploadServiceIgnoreAttr;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logInfo;
@@ -118,7 +118,10 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_I
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbish;
@@ -244,6 +247,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
@@ -280,6 +284,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -292,8 +297,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -317,18 +322,13 @@ import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -378,15 +378,14 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
-import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.DownloadNodeUseCase;
@@ -426,17 +425,13 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
-import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -451,7 +446,7 @@ import nz.mega.sdk.MegaUserAlert;
 @SuppressWarnings("deprecation")
 public class ManagerActivity extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
-		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+        MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
 		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
@@ -502,6 +497,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
+    private ManagerViewModel viewModel;
+
     @Inject
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
     @Inject
@@ -526,6 +523,9 @@ public class ManagerActivity extends TransfersManagementActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     DownloadNodeUseCase downloadNodeUseCase;
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -796,6 +796,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private AlertDialog alertDialogStorageStatus;
     private AlertDialog alertDialogSMSVerification;
     private AlertDialog newTextFileDialog;
+    private AlertDialog newFolderDialog;
 
     private MenuItem searchMenuItem;
     private MenuItem enableSelectMenuItem;
@@ -1064,7 +1065,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if (actionType == GO_OFFLINE) {
                     //stop cu process
-                    stopRunningCameraUploadService(ManagerActivity.this);
+                    fireStopCameraUploadJob(ManagerActivity.this);
                     showOfflineMode();
                     LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
                 } else if (actionType == GO_ONLINE) {
@@ -1073,18 +1074,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (actionType == START_RECONNECTION) {
                     refreshSession();
                 }
-            }
-        }
-    };
-
-    private BroadcastReceiver cameraUploadLauncherReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                logDebug("cameraUploadLauncherReceiver: Start service here");
-                startCameraUploadServiceIgnoreAttr(ManagerActivity.this);
-            } catch (Exception e) {
-                logError("cameraUploadLauncherReceiver: Exception", e);
             }
         }
     };
@@ -1282,6 +1271,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     checkIfShouldShowBusinessCUAlert();
                 } else {
+                    stopCameraUploadSyncHeartbeatWorkers(this);
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
 
@@ -1499,6 +1489,8 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
             backupWarningDialog.dismiss();
         }
+
+        checkNewFolderDialogState(newFolderDialog, outState);
     }
 
     @Override
@@ -1519,6 +1511,12 @@ public class ManagerActivity extends TransfersManagementActivity
 //		Thus if you call super.onCreate() first, all of the rest of your onCreate() method will execute after your Fragments have been restored.
         super.onCreate(savedInstanceState);
         logDebug("onCreate after call super");
+
+        viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
+        viewModel.getUpdateUsers().observe(this, this::updateUsers);
+        viewModel.getUpdateUserAlerts().observe(this, this::updateUserAlerts);
+        viewModel.getUpdateNodes().observe(this, this::updateNodes);
+        viewModel.getUpdateContactsRequests().observe(this, this::updateContactRequests);
 
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
@@ -1616,6 +1614,10 @@ public class ManagerActivity extends TransfersManagementActivity
             backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
             backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
             backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
+
+            if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
+                showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
+            }
         } else {
             logDebug("Bundle is NULL");
             parentHandleBrowser = -1;
@@ -1669,7 +1671,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
-        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
         registerTransfersReceiver();
 
@@ -1734,7 +1735,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (newIntent.getAction().equals(ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)) {
                         openLink = true;
                     } else if (newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        stopRunningCameraUploadService(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext());
                         finish();
                         return;
                     }
@@ -1967,7 +1968,7 @@ public class ManagerActivity extends TransfersManagementActivity
         enableCUButton = findViewById(R.id.enable_cu_button);
         enableCUButton.setOnClickListener(v -> {
             if (getPhotosFragment() != null) {
-                photosFragment.enableCUClick();
+                photosFragment.enableCameraUploadClick();
             }
         });
 
@@ -2159,7 +2160,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        stopRunningCameraUploadService(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext());
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)) {
@@ -2298,7 +2299,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
             initPayments();
 
-            megaApi.addGlobalListener(this);
             megaApi.isGeolocationEnabled(this);
 
             if (savedInstanceState == null) {
@@ -2623,6 +2623,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             checkCurrentStorageStatus(true);
+            fireCameraUploadJob(ManagerActivity.this, false);
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
@@ -2795,9 +2796,9 @@ public class ManagerActivity extends TransfersManagementActivity
     private void enableCUClicked() {
         if (getPhotosFragment() != null) {
             if (photosFragment.isEnablePhotosFragmentShown()) {
-                photosFragment.enableCu();
+                photosFragment.enableCameraUpload();
             } else {
-                photosFragment.enableCUClick();
+                photosFragment.enableCameraUploadClick();
             }
         }
     }
@@ -2817,7 +2818,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 })
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> {
                     if (getPhotosFragment() != null) {
-                        photosFragment.enableCUClick();
+                        photosFragment.enableCameraUploadClick();
                     }
                 })
                 .setCancelable(false)
@@ -3313,7 +3314,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     builder.setPositiveButton(getString(R.string.general_yes),
                             (dialog, whichButton) -> {
-                                stopRunningCameraUploadService(ManagerActivity.this);
+                                fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 
@@ -3388,9 +3389,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)) {
                     AccountController ac = new AccountController(this);
                     if (getIntent().getBooleanExtra("logout", false)) {
-                        ac.copyMK(true);
+                        ac.copyMK(true, sharingScope);
                     } else {
-                        ac.copyMK(false);
+                        ac.copyMK(false, sharingScope);
                     }
                 } else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
                     logDebug("Open after LauncherFileExplorerActivity ");
@@ -3555,7 +3556,6 @@ public class ManagerActivity extends TransfersManagementActivity
         dbH.removeSentPendingMessages();
 
         if (megaApi != null && megaApi.getRootNode() != null) {
-            megaApi.removeGlobalListener(this);
             megaApi.removeTransferListener(this);
             megaApi.removeRequestListener(this);
         }
@@ -3578,7 +3578,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(receiverCUAttrChanged);
         unregisterReceiver(transferOverQuotaUpdateReceiver);
         unregisterReceiver(transferFinishReceiver);
-        unregisterReceiver(cameraUploadLauncherReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         unregisterReceiver(cuUpdateReceiver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
@@ -3601,6 +3600,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         dismissAlertDialogIfExists(processFileDialog);
         dismissAlertDialogIfExists(openLinkDialog);
+        dismissAlertDialogIfExists(newFolderDialog);
 
         nodeSaver.destroy();
 
@@ -5851,7 +5851,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
      * @param updatedNodes  Nodes which have changed.
      */
-    private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
+    private void checkCameraUploadFolder(boolean shouldDisable, List<MegaNode> updatedNodes) {
         // Get CU and MU folder hanlde from local setting.
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
@@ -5887,7 +5887,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 disableMediaUploadProcess();
             } else {
                 // Just stop the upload process.
-                stopRunningCameraUploadService(app);
+                fireStopCameraUploadJob(app);
             }
         } else if (isPrimaryFolderInRubbish) {
             // If CU folder is in rubbish bin.
@@ -5899,7 +5899,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
             } else {
                 // Just stop the upload process.
-                stopRunningCameraUploadService(app);
+                fireStopCameraUploadJob(app);
             }
         }
     }
@@ -6551,35 +6551,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void askConfirmationDeleteAccount() {
-        logDebug("askConfirmationDeleteAccount");
-        megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        aC.deleteAccount();
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.delete_account));
-
-        builder.setMessage(getResources().getString(R.string.delete_account_text));
-
-        builder.setPositiveButton(R.string.delete_account, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
-        builder.show();
-    }
-
     /**
      * Shows an error in the Open link dialog.
      *
@@ -6898,8 +6869,8 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     @Override
-    public void showNewFolderDialog() {
-        MegaNodeDialogUtil.showNewFolderDialog(this, this);
+    public void showNewFolderDialog(String typedText) {
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
     }
 
     @Override
@@ -8881,7 +8852,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 }
                 storageState = newStorageState;
-                startCameraUploadService(ManagerActivity.this);
+                fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
             case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -8905,8 +8876,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 storageState = newStorageState;
                 logDebug("Try to start CU, false.");
-                startCameraUploadService(ManagerActivity.this);
-                break;
+                fireCameraUploadJob(ManagerActivity.this, false);
+				break;
 
             case MegaApiJava.STORAGE_STATE_RED:
                 logWarning("STORAGE STATE RED");
@@ -9570,11 +9541,11 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 // Update CU backup state.
                 int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP
-                        : CuSyncManager.State.CU_SYNC_STATE_ACTIVE;
+                        ? CameraUploadSyncManager.State.CU_SYNC_STATE_PAUSE_UP
+                        : CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE;
 
-                CuSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
-                CuSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
@@ -9784,10 +9755,7 @@ public class ManagerActivity extends TransfersManagementActivity
         logWarning("onRequestTemporaryError: " + request.getRequestString() + "__" + e.getErrorCode() + "__" + e.getErrorString());
     }
 
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        logDebug("onUsersUpdate");
-
+    public void updateUsers(List<MegaUser> users) {
         if (users != null) {
             logDebug("users.size(): " + users.size());
             for (int i = 0; i < users.size(); i++) {
@@ -9926,10 +9894,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
-
+    public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         setNotificationsTitleSection();
         notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
         if (notificationsFragment != null && userAlerts != null) {
@@ -9937,11 +9902,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         updateNavigationToolbarIcon();
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
     }
 
     public void updateMyEmail(String email) {
@@ -10051,9 +10011,7 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-        logDebug("onNodesUpdate");
+    public void updateNodes(List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
         boolean updateContacts = false;
@@ -10114,18 +10072,7 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-        logDebug("onReloadNeeded");
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate");
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+    public void updateContactRequests(List<MegaContactRequest> requests) {
         logDebug("onContactRequestsUpdate");
 
         if (requests != null) {
@@ -10219,7 +10166,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    cancelAllUploads(ManagerActivity.this);
+                    fireCancelCameraUploadJob(ManagerActivity.this);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })
