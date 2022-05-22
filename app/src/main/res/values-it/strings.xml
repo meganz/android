@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -290,7 +290,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Camera Uploads</string>
+    <string name="section_photo_sync">Caricamenti da fotocamera</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">In entrata</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -715,7 +715,7 @@
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">I Caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- notification camera uploads complete -->
-    <string name="settings_camera_notif_complete">Caricamenti dalla fotocamera completi</string>
+    <string name="settings_camera_notif_complete">Caricamenti da fotocamera completi</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apparenza</string>
     <!-- settings of the Features section -->
@@ -811,11 +811,11 @@
         <item>Importa dal dispositivo</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Attiva i caricamenti dalla fotocamera</string>
+    <string name="settings_camera_upload_on">Attiva i Caricamenti da fotocamera</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">Attiva i caricamenti dalla fotocamera</string>
+    <string name="settings_camera_upload_turn_on">Attiva i Caricamenti da fotocamera</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_off">Disattiva i caricamenti dalla fotocamera</string>
+    <string name="settings_camera_upload_off">Disattiva i Caricamenti da fotocamera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Come caricare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -848,7 +848,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Cartella locale Camera</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Cartella MEGA caricamenti dalla fotocamera</string>
+    <string name="settings_mega_camera_upload_folder">Cartella MEGA Caricamenti da fotocamera</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Cartella Secondaria Locale</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -948,7 +948,7 @@
     <!--  -->
     <string name="free_account">Gratis</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Cartella Camera Uploads creata</string>
+    <string name="camera_uploads_created">Cartella Caricamenti da fotocamera creata</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nome</string>
     <!-- sort files alphabetically ascending -->
@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Collegamento Cartella non disponibile</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Il collegamento della cartella è stato rimossa a causa di una violazione dei ToS/PUA.</string>
+    <string name="folder_link_unavaible_ToS_violation">Il link della cartella è stato rimosso perché viola i nostri Termini di Servizio.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link non disponibile</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Il file collegato a questo link è stato rimosso a causa di una violazione dei Termini di Servizio.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Questo URL è corrotto o deformato. Il link a cui stai cercando di accedere non esiste.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contesta chiusura</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Non accessibile a causa di una violazione dei TdS o della PUA</string>
+    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file non è stato scaricato a causa di una violazione dei Termini di Servizio.</item>
-        <item quantity="other">%d file non sono stati scaricati a causa di una violazione dei Termini di Servizio.</item>
+        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] [C]è stato reintegrato.[/C]</string>
@@ -2898,7 +2898,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">La grandezza totale dei video da comprimere supera %s, per favore metti a caricare la tua batteria per continuare.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">Questa impostazione farà effetto la prossima volta che i Caricamenti dalla fotocamera saranno attivi</string>
+    <string name="message_keep_device_name">Questa impostazione farà effetto la prossima volta che i Caricamenti da fotocamera saranno attivi</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s è stato compresso</string>
     <!-- notification title when compressing video -->
@@ -3159,7 +3159,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Le tue foto nel cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">I caricamenti dalla fotocamera sono una feature essenziale per qualsiasi dispositivo mobile e possiamo farlo per te. Crea il tuo account adesso.</string>
+    <string name="content_tour_four">I Caricamenti da fotocamera sono una feature essenziale per qualsiasi dispositivo mobile e possiamo farlo per te. Crea il tuo account adesso.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Inserisci la tua password</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -3556,12 +3556,12 @@
     <string name="fab_label_new_chat">Nuova chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]Nessuna[/B] [A]immagine[/A] [B]trovata[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Nessun documento trovato</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Nessun file audio trovato</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Nessun video trovato</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Cerca su GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">Il proprietario della condivisione ha superato il limite dello spazio di archiviazione.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Il file non può essere inviato in quanto l\’utente destinatario ha superato il limite dello spazio di archiviazione.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file già scaricato. 1 file in attesa.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file già scaricato. %d file in attesa.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d file già scaricati. 1 file in attesa.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d file già scaricati. %2$d file in attesa.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 oggetto spostato nel Cestino con successo e 1 oggetto non eliminato correttamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 oggetto spostato nel Cestino con successo e %d oggetti non eliminati correttamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d oggetti spostati nel Cestino con successo e 1 oggetto non eliminato correttamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d oggetti spostati nel Cestino con successo e %2$d oggetti non eliminati correttamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 oggetto ripristinato con successo e 1 oggetto non ripristinato correttamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 oggetto ripristinato con successo e %d oggetti non ripristinati correttamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d oggetti ripristinati con successo e 1 oggetto non ripristinato correttamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d oggetti ripristinati con successo e %2$d oggetti non ripristinati correttamente</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">1 file already downloaded. %d files pending.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 oggetto spostato nel Cestino con successo</item>
@@ -4301,4 +4307,20 @@
     <string name="no_uploads_empty_folder">La cartella selezionata è vuota. Nessun file da caricare.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Hai inserito la tua password corrente</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">File nomn più disponibile</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">File rimosso perché viola i nostri Termini di Servizio.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Avanti</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Precedente</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Avanti</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Precedente</string>
 </resources>
