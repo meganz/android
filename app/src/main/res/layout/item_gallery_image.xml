@@ -52,5 +52,17 @@
             app:layout_constraintStart_toStartOf="@id/thumbnail"
             app:layout_constraintTop_toTopOf="@id/thumbnail"
             app:visibleGone="@{item.selected}" />
+
+        <ImageView
+            android:id="@+id/favourite_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_favourite_white"
+            android:visibility="gone"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
