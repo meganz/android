@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_VIDEO_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_NONE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.util.*
@@ -36,7 +37,10 @@ class PhotosFetcher(
         // Getting Images files
         val allImages: List<MegaNode> = megaApi.searchByType(
             cancelToken!!,
-            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC) order else 0,
+            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC)
+                order
+            else
+                ORDER_NONE,
             MegaApiJava.FILE_TYPE_PHOTO,
             MegaApiJava.SEARCH_TARGET_ROOTNODE
         ).filter { MimeTypeList.typeForName(it.name).isImage }
@@ -91,7 +95,7 @@ class PhotosFetcher(
 
         return megaApi.getChildren(
             nodeList,
-            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC) order else 0
+            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC) order else ORDER_NONE
         )
     }
 }
