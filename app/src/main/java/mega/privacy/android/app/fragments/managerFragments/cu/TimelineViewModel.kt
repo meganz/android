@@ -4,12 +4,15 @@ import android.content.Context
 import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
@@ -149,18 +152,15 @@ class TimelineViewModel @Inject constructor(
      * @return camSyncEnabled livedata
      */
     fun camSyncEnabled(): LiveData<Boolean> {
-        add(Single.fromCallable {
-            java.lang.Boolean.parseBoolean(
-                mDbHandler.preferences?.camSyncEnabled
-            )
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                camSyncEnabled.setValue(it)
-            }, RxUtil.logErr("camSyncEnabled")))
         return camSyncEnabled
     }
+
+    fun checkAndUpdateCamSyncEnabledStatus() {
+        viewModelScope.launch(IO) {
+            camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
+        }
+    }
+
 }
 
 
