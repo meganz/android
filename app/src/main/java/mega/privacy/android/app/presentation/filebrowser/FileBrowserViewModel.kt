@@ -7,8 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.usecase.GetManagerParentHandle
-import mega.privacy.android.app.domain.usecase.GetManagerParentHandleType
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import nz.mega.sdk.MegaApiAndroid
@@ -22,21 +20,18 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor global node updates
  * @param megaApi
  * @param sortOrderManagement
- * @param getManagerParentHandle Get current parent handle set in manager section
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     @MegaApi megaApi: MegaApiAndroid,
     sortOrderManagement: SortOrderManagement,
-    private val getManagerParentHandle: GetManagerParentHandle,
 ) : ViewModel() {
 
     /**
-     * Accessors to the current rubbish parent handle set in memory
+     * Current file browser parent handle
      */
-    val parentHandle: Long
-        get() = getManagerParentHandle(GetManagerParentHandleType.Browser)
+    var parentHandle: Long = -1L
 
     /**
      * Monitor global node updates and dispatch to observers

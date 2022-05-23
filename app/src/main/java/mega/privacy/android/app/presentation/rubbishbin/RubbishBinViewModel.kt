@@ -1,10 +1,13 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -17,21 +20,18 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor global node updates
  * @param megaApi
  * @param sortOrderManagement
- * @param getManagerParentHandle Get current parent handle set in manager section
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     @MegaApi megaApi: MegaApiAndroid,
     sortOrderManagement: SortOrderManagement,
-    private val getManagerParentHandle: GetManagerParentHandle,
 ) : ViewModel() {
 
     /**
-     * Accessors to the current rubbish parent handle set in memory
+     * Current rubbish parent handle
      */
-    val parentHandle: Long
-        get() = getManagerParentHandle(GetManagerParentHandleType.RubbishBin)
+    var parentHandle: Long = -1L
 
     /**
      * Monitor global node updates and dispatch to observers

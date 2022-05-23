@@ -20,30 +20,12 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
- * @param setRubbishParentHandle Set rubbish parent handle in memory
- * @param getManagerParentHandle Get rubbish parent handle previously set in memory
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
-    private val setManagerParentHandle: SetManagerParentHandle,
-    private val getManagerParentHandle: GetManagerParentHandle
 ) : ViewModel() {
-
-    /**
-     * Accessors to the current rubbish bin parent handle set in memory
-     */
-    var rubbishBinParentHandle: Long
-        get() = getManagerParentHandle(GetManagerParentHandleType.RubbishBin)
-        set(value) = setManagerParentHandle(SetManagerParentHandleType.RubbishBin, value)
-
-    /**
-     * Accessors to the current browser parent handle set in memory
-     */
-    var browserParentHandle: Long
-        get() = getManagerParentHandle(GetManagerParentHandleType.Browser)
-        set(value) = setManagerParentHandle(SetManagerParentHandleType.Browser, value)
 
     /**
      * Monitor all global updates

@@ -87,6 +87,7 @@ import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.presentation.manager.ManagerDataViewModel;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -99,6 +100,7 @@ public class RubbishBinFragment extends Fragment{
 	SortOrderManagement sortOrderManagement;
 
 	private RubbishBinViewModel viewModel;
+	private ManagerDataViewModel dataViewModel;
 
 	Context context;
 	RecyclerView recyclerView;
@@ -293,6 +295,11 @@ public class RubbishBinFragment extends Fragment{
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
 				new EventObserver<>(this::showSortByPanel));
 
+		dataViewModel = new ViewModelProvider(requireActivity()).get(ManagerDataViewModel.class);
+		dataViewModel.getOnRubbishBinParentHandleChanged()
+				.observe(getViewLifecycleOwner(), parentHandle -> {
+					viewModel.setParentHandle(parentHandle);
+				});
 		viewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
 		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(), nodes -> {
 			hideMultipleSelect();
