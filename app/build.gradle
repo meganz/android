@@ -74,6 +74,15 @@ String readTesters() {
 }
 
 android {
+
+    signingConfigs {
+        qa {
+            storeFile file('/Users/dhananjay/qakeystore')
+            storePassword 'android'
+            keyAlias 'android'
+            keyPassword 'android'
+        }
+    }
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
 
@@ -124,6 +133,12 @@ android {
             }
         }
 
+        qa {
+            res {
+                srcDirs 'src/qa/java', 'src/qa/res'
+            }
+        }
+
         testDebug {
             java.srcDir 'src/sharedTest/java'
         }
@@ -146,6 +161,11 @@ android {
         release {
             //  minifyEnabled false
             //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        qa {
+            debuggable true
+            signingConfig signingConfigs.qa
         }
     }
 
