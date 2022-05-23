@@ -4359,4 +4359,8 @@
         <item quantity="one">%1$s and 1 other left</item>
         <item quantity="other">%1$s and %2$d others left</item>
     </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
 </resources>
