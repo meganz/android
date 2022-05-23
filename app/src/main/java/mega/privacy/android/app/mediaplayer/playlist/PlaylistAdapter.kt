@@ -20,12 +20,14 @@ import mega.privacy.android.app.databinding.ItemPlaylistBinding
  * @param context Context
  * @param itemOperation PlaylistItemOperation
  * @param paused Whether is paused
+ * @param isAudio whether is audio
  * @param dragStartListener DragStartListener
  */
 class PlaylistAdapter(
     private val context: Context,
     private val itemOperation: PlaylistItemOperation,
     var paused: Boolean = false,
+    val isAudio: Boolean,
     private val dragStartListener: DragStartListener
 ) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
     companion object {
@@ -62,7 +64,7 @@ class PlaylistAdapter(
         val currentPosition = holder.absoluteAdapterPosition
 
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
-            isVisible = playlistItem.duration != 0L
+            isVisible = playlistItem.duration > 0L
 
             if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
                 playingPosition = holder.absoluteAdapterPosition
@@ -77,7 +79,7 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
             currentPosition != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
 
-        holder.bind(paused, playlistItem, itemOperation, holder, currentPosition)
+        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, currentPosition)
     }
 
     /**

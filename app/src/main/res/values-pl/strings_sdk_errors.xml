@@ -7,7 +7,7 @@
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="api_eargs">Nieprawidłowy argument</string>
     <!-- Label to show that a request error occurs during a SDK operation. -->
-    <string name="api_eagain">Żądanie nie powiodło się, ponowić próbę?</string>
+    <string name="api_eagain">Żądanie nie powiodło się, ponawiam próbę</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
     <string name="api_eratelimit">Limit został przekroczony</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Zły numer sesji</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Niedostępny z powodu naruszenia ToS / AUP</string>
+    <string name="api_eblocked_ec_import_ec_download">Brak dostępu, ponieważ narusza to nasze warunki korzystania z usługi</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Zablokowane</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

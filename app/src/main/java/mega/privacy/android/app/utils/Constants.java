@@ -182,6 +182,7 @@ public class Constants {
     public static final int BUSINESS = 100;
 
     public static final long DISABLED_RETENTION_TIME = 0;
+    public static final long SECONDS_IN_MINUTE = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
     public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
@@ -934,4 +935,6 @@ public class Constants {
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
     public static final int FIRST_NAVIGATION_LEVEL = 0;
+
+    public static final int LONG_SNACKBAR_DURATION = 2750;
 }

@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Ordnerlink nicht verfügbar</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Der Ordner-Link wurde aufgrund eines AGB/AUP-Verstoßes entfernt.</string>
+    <string name="folder_link_unavaible_ToS_violation">Der Ordnerlink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Datei-Link nicht verfügbar</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Dieser Dateilink wurde wegen Verletzung unserer Benutzungsbedingungen entfernt.</string>
+    <string name="file_link_unavaible_ToS_violation">Der Dateilink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Ungültiges URL-Format. Der eingegebene Link existiert nicht.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Löschbeanstandung</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Wegen Verletzung unser Nutzungsbedingungen nicht verfügbar</string>
+    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d Datei wurde wegen AGB-Verletzung nicht heruntergeladen.</item>
-        <item quantity="other">%d Dateien wurden wegen AGB-Verletzungen nicht heruntergeladen.</item>
+        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Ihr Dateilink [/A][B]%s[/B][C] wurde wiederhergestellt.[/C]</string>
@@ -3556,12 +3556,12 @@
     <string name="fab_label_new_chat">Neuer Chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]Keine[/B] [A]Bilder[/A] [B]vorhanden[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Keine Dokumente vorhanden</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Keine Audiodateien vorhanden</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Keine Videos vorhanden</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Keine[/B] [A]Dokumente[/A] [B]vorhanden[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Keine[/B] [A]Audiodateien[/A] [B]vorhanden[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Keine[/B] [A]Videos[/A] [B]vorhanden[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Search GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">Der Eigentümer der Ordnerfreigabe hat sein Speicherplatzlimit überschritten.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Die Datei kann nicht versandt werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">Eine Datei wurde bereits heruntergeladen. Eine Datei steht noch aus.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">Eine Datei wurde bereits heruntergeladen. %d Dateien stehen noch aus.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d Dateien wurden bereits heruntergeladen. Eine Datei steht noch aus.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d Dateien wurden bereits heruntergeladen. %2$d Dateien stehen noch aus.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">Ein Element wurde erfolgreich in den Papierkorb verschoben und ein Element konnte nicht verschoben werden</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">Ein Element wurde erfolgreich in den Papierkorb verschoben und %d Elemente konnten nicht verschoben werden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d Elemente wurden erfolgreich in den Papierkorb verschoben und ein Element konnte nicht verschoben werden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d Elemente wurden erfolgreich in den Papierkorb verschoben und %2$d Elemente konnten nicht verschoben werden</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">Ein Element wurde erfolgreich wiederhergestellt und ein Element konnte nicht wiederhergestellt werden</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">Ein Element wurde erfolgreich wiederhergestellt und %d Elemente konnten nicht wiederhergestellt werden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d Elemente wurden erfolgreich wiederhergestellt und ein Element konnte nicht wiederhergestellt werden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d Elemente wurden erfolgreich wiederhergestellt und %2$d Elemente konnten nicht wiederhergestellt werden</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 Datei bereits heruntergeladen. 1 Datei in der Warteschlange.</item>
+        <item quantity="other">1 Datei bereits heruntergeladen. %d Dateien in der Warteschlange.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 Datei bereits heruntergeladen. 1 Datei in der Warteschlange.</item>
+        <item quantity="other">%d Dateien bereits heruntergeladen. 1 Datei in der Warteschlange.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">Ein Element wurde in den Papierkorb verschoben, ein anderes jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+        <item quantity="other">Ein Element wurde in den Papierkorb verschoben, %d Elemente jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">Ein Element wurde in den Papierkorb verschoben, ein anderes jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+        <item quantity="other">%d Elemente wurden in den Papierkorb verschoben, ein Element jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">Ein Element wurde wiederhergestellt, ein anderes jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+        <item quantity="other">Ein Element wurde wiederhergestellt, %d Elemente jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">Ein Element wurde wiederhergestellt, ein anderes jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+        <item quantity="other">%d Elemente wurden wiederhergestellt, ein Element jedoch nicht. Bitte versuchen Sie es später noch einmal.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">Ein Element wurde in den Papierkorb verschoben</item>
@@ -4301,4 +4307,20 @@
     <string name="no_uploads_empty_folder">Der ausgewählte Ordner ist leer. Es sind keine Dateien zum Hochladen vorhanden.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Sie haben Ihr aktuelles Passwort eingegeben</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">Datei nicht mehr verfügbar</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">Die Datei wurde entfernt, da sie gegen unsere Nutzungsbedingungen verstieß.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Weiter</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Zurück</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Weiter</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Zurück</string>
 </resources>

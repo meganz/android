@@ -106,6 +106,9 @@
         <item name="snackbarStyle">@style/Widget.Mega.SnackBar</item>
         <item name="snackbarButtonStyle">@style/Widget.Mega.SnackbarButton</item>
 
+        <!-- FAB -->
+        <item name="floatingActionButtonStyle">@style/Widget.Mega.FAB</item>
+
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
         <!-- In material design, typically for the title of the action bar -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>

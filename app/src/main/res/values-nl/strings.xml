@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link naar map is niet beschikbaar</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">De link naar de map is verwijderd vanwege een overtreding van onze Algemene Voorwaarden.</string>
+    <string name="folder_link_unavaible_ToS_violation">De maplink is verwijderd omdat het onze Algemene Voorwaarden schendt.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Bestandslink onbeschikbaar</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">De bestandslink is verwijderd vanwege een overtreding van onze Algemene Voorwaarden.</string>
+    <string name="file_link_unavaible_ToS_violation">De bestandslink was verwijderd omdat het one Algemene Voorwaarden schendt.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Deze URL is corrupt of misvormd. De link die u wilt bereiken bestaat niet.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1398,7 +1398,7 @@
     <!-- chat message when the permissions for a user has been changed -->
     <string name="message_permissions_changed">[A]%1$s[/A][B]werd gewijzigd naar [/B][C]%2$s[/C][D]door[/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="message_add_participant">[A]%1$s[/A][B]heeft zich aangesloten bij de groepsgesprek door uitnodiging van[/B][C]%2$s[/C]</string>
+    <string name="message_add_participant">[A]%1$s[/A][B]heeft zich aangesloten bij de groepsoproep door uitnodiging van[/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] werd verwijderd van de groepsgesprek door [/B][C]%2$s[/C]</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -2159,7 +2159,7 @@
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
     <string name="action_notification_call_in_progress">Tik om terug te gaan naar de oproep</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
-    <string name="button_notification_call_in_progress">Teruggaan naar het gesprek</string>
+    <string name="button_notification_call_in_progress">Teruggaan naar de oproep</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
     <string name="contacts_mega">Bij MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Verwijdering van geschil</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Niet toegangelijk door overtreding van de Algemene Voorwaarden</string>
+    <string name="error_download_takendown_node">Niet toegankelijk omdat het onze Algemene Voorwaarden schendt</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d-bestand is niet gedownload vanwege ToS/AUP-schending.</item>
-        <item quantity="other">%d bestanden zijn niet gedownload vanwege ToS/AUP-schending.</item>
+        <item quantity="one">%d bestand was niet gedownload omdat het onze Algemene Voorwaarden schendt/</item>
+        <item quantity="other">%d bestanden waren niet gedownload omdat ze de Algemene Voorwaarden schenden.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Uw publieke gedeelde bestand [/A][B]%s[/B][C]is hersteld.[/C]</string>
@@ -2993,7 +2993,7 @@
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Bijlage al verzonden</string>
     <!-- Message shown when a group call ends. -->
-    <string name="group_call_ended_message">[A]Groepsgesprek beëindigd [/A][C]. Duur: [/C]</string>
+    <string name="group_call_ended_message">[A]Groepsoproep beëindigd [/A][C]. Duur: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
     <string name="call_ended_message">[A]Oproep beëindigd[/A][C]. Duur: [/C]</string>
     <!-- Message that shows the hours of a call when it ends, more hours -->
@@ -3014,7 +3014,7 @@
     <!-- Message to indicate a call has ended without indicate the call duration. -->
     <string name="call_ended_no_duration_message">[A]Oproep beëindigd[/A]</string>
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
-    <string name="group_call_ended_no_duration_message">[A]Groepsgesprek beëindigd [/A]</string>
+    <string name="group_call_ended_no_duration_message">[A]Groepsoproep beëindigd [/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
     <string name="last_seen_today">[A]Laatst gezien [/A]vandaag %1$s</string>
     <!-- String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user -->
@@ -3036,17 +3036,17 @@
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
     <string name="call_error_too_many_participants_start">Oproep kan niet starten omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Er kan niet worden deelgenomen aan het gesprek omdat het maximum aantal deelnemers is overschreden.</string>
+    <string name="call_error_too_many_participants">Er kan niet worden deelgenomen aan de oproep omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
     <string name="call_error_too_many_participants_join">Niet in staat om aan te sluiten aan de groep oproep omdat het maximum aantal deelnemers is bereikt</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Er kan niet worden deelgenomen aan een videogesprek omdat het maximum aantal deelnemers is overschreden.</string>
+    <string name="call_error_too_many_video">Er kan niet worden deelgenomen aan een videooproep omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">Oproep kan niet in de wacht worden gezet.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">Er is een fout opgetreden en het bestand kan niet worden geopend met deze applicatie.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">Binnenkomende oproepl&#8230;</string>
+    <string name="incoming_call_starting">Binnenkomende oproep&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Bellen&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -3173,15 +3173,15 @@
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Het is niet mogelijk om media bestanden af te spelen terwijl een oproep wordt uitgevoerd.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
-    <string name="ongoing_call_messages">Lopend Gesprek</string>
+    <string name="ongoing_call_messages">Lopende oproep</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Tik om aan te sluiten tot de huidige groep oproep.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Tik om terug te bellen</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
-    <string name="not_allowed_to_start_call">U bent momenteel in gesprek</string>
+    <string name="not_allowed_to_start_call">U heeft momenteel een oproep</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
-    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] is lid geworden van het groepsgesprek.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] is lid geworden van de groepsoproep.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Dit gesprek blijft niet langer toegankelijk via de gesprekslink zodra het is verwijderd.</string>
     <!-- Description text of the dialog to generate a public chat link -->
@@ -3191,7 +3191,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">Het roteren van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">U heeft zich succesvol aangesloten tot het gesprek.</string>
+    <string name="message_joined_successfully">U heeft zich succesvol aangesloten tot de oproep.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d van %2$d</string>
     <!-- Hint of the Search view -->
@@ -3205,7 +3205,7 @@
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Gedempt</string>
     <!-- Subtitle of the call screen when the call is on hold -->
-    <string name="call_on_hold">Gesprek in de wacht</string>
+    <string name="call_on_hold">Oproep in de wacht</string>
     <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
     <string name="session_on_hold">%s staat in de wacht</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
@@ -3223,7 +3223,7 @@
     <!-- Text of the dialog shown when you want to join a group call -->
     <string name="text_join_call">Om aan te sluiten bij deze oproep moet u uw huidige oproep beëindigen.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
-    <string name="text_join_another_call">Om toe te treden tot dit gesprek moet u het huidige gesprek stoppen of in de wacht zetten.</string>
+    <string name="text_join_another_call">Om toe te treden tot deze oproep moet u de huidige oproep stoppen of in de wacht zetten.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Personen kunnen aansluiten tot uw groep door deze link te gebruiken.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3311,7 +3311,7 @@
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Voeg uw telefoonnummer toe tot MEGA. Dit maakt het makkelijker voor uw contacten u te vinden op MEGA.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die gaande is.</string>
+    <string name="not_allowed_recording_voice_clip">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die in behandeling is.</string>
     <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
     <string name="error_upload_voice_clip">Er is een fout opgetreden bij het uploaden van het spraakbericht.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
@@ -3556,12 +3556,12 @@
     <string name="fab_label_new_chat">Nieuw gesprek</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]Geen[/B] [A]Afbeeldingen[/A] [B]Gevonden[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Geen documenten gevonden</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Geen audio bestanden gevonden</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Geen video’s gevonden</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Geen[/B] [A]documenten[/A] [B]gevonden[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Geen[/B] [A]audio bestanden[/A] [B]gevonden[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Geen[/B] [A]video\’s[/A] [B]gevonden[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Zoek GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">Gedeelde gebruiker is over opslag tegoed.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Het bestand kan niet worden verstuurd omdat de doelgebruiker zijn opslagtegoed heeft overschreden.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 bestand al gedownload. 1 bestand wachtend.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 bestand gedownload. %d bestanden wachtend.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d bestanden al gedownload. 1 bestand wachtend.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d bestanden al gedownload. %2$d bestanden wachtend.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item succesvol naar de Prullenbak verplaatst en 1 item was niet succesvol verzonden</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item succesvol verplaatst naar de Prullenbak en %d items waren niet succesvol verzonden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d items succesvol naar de Prullenbak verplaatst en 1 item was niet succesvol verzonden</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items succesvol verplaatst naar de Prullenbak en %2$d items waren niet succesvol verzonden</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item succesvol hersteld en 1 item was niet succesvol hersteld</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item succesvol hersteld en %d item waren niet succesvol hersteld</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d items succesvol hersteld en 1 item was niet succesvol hersteld</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items succesvol hersteld en %2$d items waren niet succesvol hersteld</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 bestand al gedownload. 1 bestand in afwachting.</item>
+        <item quantity="other">1 bestand al gedownload. %d bestanden in afwachting.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 bestand al gedownload. 1 bestand in afwachting.</item>
+        <item quantity="other">%d bestanden al gedownload. 1 bestand in afwachting.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">1 item verplaasts naar de prullenbak maar %d items waren niet verplaatst. Probeer later nogmaals.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">%d items verplaatst naar de prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item hersteld maar de andere was niet hersteld. Probeer later nogmaals.</item>
+        <item quantity="other">1 item hersteld maar %d items waren niet hersteld. Probeer later nogmaals.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item hersteld maar de andere was niet hersteld. Probeer later nogmaals.</item>
+        <item quantity="other">%d items hersteld maar 1 item was niet hersteld. Probeer later nogmaals.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 item succesvol verplaatst naar de Prullenbak</item>
@@ -4301,4 +4307,20 @@
     <string name="no_uploads_empty_folder">De geselecteerde map is leeg. Geen bestanden om te uploaden.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">U heeft uw huidige wachtwoord ingevoerd</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">Bestand niet langer beschikbaar</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">Bestand verwijderd omdat het onze Algemene Voorwaarden schendt.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Algemene Voorwaarden geschonden</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">Dit apparaat heeft geen applicatie om mappen te selecteren.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Volgende</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Vorige</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Volgende</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Vorige</string>
 </resources>

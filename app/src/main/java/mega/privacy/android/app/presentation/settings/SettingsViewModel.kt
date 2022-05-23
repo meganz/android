@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.app.utils.LogUtil
@@ -21,7 +22,7 @@ class SettingsViewModel @Inject constructor(
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
-    private val fetchAutoAcceptQRLinks: FetchAutoAcceptQRLinks,
+    private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
     private val startScreen: GetStartScreen,
     private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
@@ -32,13 +33,14 @@ class SettingsViewModel @Inject constructor(
     private val setSdkLogsEnabled: SetSdkLogsEnabled,
     private val setChatLoggingEnabled: SetChatLogsEnabled,
 ) : ViewModel() {
-    private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
-    private val online = monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
-
-    private val sdkLogsEnabled = areSdkLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
-    private val chatLogsEnabled = areChatLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val online =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
+    private val sdkLogsEnabled =
+        areSdkLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val chatLogsEnabled =
+        areChatLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
@@ -53,33 +55,33 @@ class SettingsViewModel @Inject constructor(
             chatEnabled = true,
             startScreen = 0,
             hideRecentActivityChecked = false,
+            email = "",
+            accountType = 0
         )
     }
 
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
-    val email: String
-        get() = userAccount.value.email
     val isCamSyncEnabled: Boolean
         get() = isCameraSyncEnabled()
-    val accountType: Int
-        get() = userAccount.value.accountTypeIdentifier
 
 
     init {
         viewModelScope.launch {
             merge(
-                userAccount.map {
-                    { state: SettingsState -> state.copy(deleteAccountVisible = canDeleteAccount(it)) }
+                flowOf(getAccountDetails(false)).map {
+                    updateAccountState(it)
                 },
                 flowOf(isMultiFactorAuthAvailable())
                     .map { available ->
                         { state: SettingsState -> state.copy(multiFactorVisible = available) }
                     },
-                flowOf(kotlin.runCatching{ fetchAutoAcceptQRLinks() }.getOrDefault(false))
-                    .map { enabled ->
-                        { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
-                    },
+                monitorAutoAcceptQRLinks().catch { e ->
+                    Timber.e(e, "Error when monitoring Auto accept QR settings")
+                    emit(false)
+                }.map { enabled ->
+                    { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
+                },
                 fetchMultiFactorAuthSetting()
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
@@ -97,17 +99,17 @@ class SettingsViewModel @Inject constructor(
                         }
                     },
                 startScreen()
-                    .map{ screen ->
-                        { state: SettingsState -> state.copy(startScreen = screen)}
+                    .map { screen ->
+                        { state: SettingsState -> state.copy(startScreen = screen) }
                     },
                 isHideRecentActivityEnabled()
-                    .map{ hide ->
-                        { state: SettingsState -> state.copy(hideRecentActivityChecked = hide)}
+                    .map { hide ->
+                        { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
                     },
                 isChatLoggedIn()
-                    .combine(online){ loggedIn, online -> loggedIn && online}
+                    .combine(online) { loggedIn, online -> loggedIn && online }
                     .map { enabled ->
-                        { state: SettingsState -> state.copy(chatEnabled = enabled)}
+                        { state: SettingsState -> state.copy(chatEnabled = enabled) }
                     },
             ).collect {
                 state.update(it)
@@ -117,9 +119,18 @@ class SettingsViewModel @Inject constructor(
 
     }
 
+    private fun updateAccountState(userAccount: UserAccount) =
+        { state: SettingsState ->
+            state.copy(
+                deleteAccountVisible = canDeleteAccount(userAccount),
+                email = userAccount.email,
+                accountType = userAccount.accountTypeIdentifier
+            )
+        }
+
     fun refreshAccount() {
         viewModelScope.launch {
-            userAccount.value = getAccountDetails(true)
+            state.update(updateAccountState(getAccountDetails(true)))
         }
     }
 
@@ -127,8 +138,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             kotlin.runCatching {
                 toggleAutoAcceptQRLinks()
-            }.onSuccess { autoAccept ->
-                state.update { it.copy(autoAcceptChecked = autoAccept) }
             }
         }
     }
@@ -138,36 +147,36 @@ class SettingsViewModel @Inject constructor(
             .fold(
                 { true },
                 { e ->
-                    LogUtil.logError( "Error when asking for the cancellation link: ${e.message}")
+                    LogUtil.logError("Error when asking for the cancellation link: ${e.message}")
                     false
                 }
             )
     }
 
     fun disableLogger(): Boolean {
-        return if (sdkLogsEnabled.value){
-            viewModelScope.launch{ setSdkLogsEnabled(false) }
+        return if (sdkLogsEnabled.value) {
+            viewModelScope.launch { setSdkLogsEnabled(false) }
             true
-        } else{
+        } else {
             false
         }
     }
 
     fun disableChatLogger(): Boolean {
-        return if (chatLogsEnabled.value){
-            viewModelScope.launch{ setChatLoggingEnabled(false) }
+        return if (chatLogsEnabled.value) {
+            viewModelScope.launch { setChatLoggingEnabled(false) }
             true
-        } else{
+        } else {
             false
         }
     }
 
     fun enableLogger() {
-        viewModelScope.launch{ setSdkLogsEnabled(true) }
+        viewModelScope.launch { setSdkLogsEnabled(true) }
     }
 
     fun enableChatLogger() {
-        viewModelScope.launch{ setChatLoggingEnabled(true) }
+        viewModelScope.launch { setChatLoggingEnabled(true) }
     }
 
 }
