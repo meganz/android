@@ -23,12 +23,12 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
-import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
-import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatSession
 
@@ -127,9 +127,8 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
-            cancelCountDown()
             logDebug("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, callid)
+            sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, call)
         }
 
         // Remote audio/video flags has changed
@@ -185,6 +184,21 @@ class MeetingListener : MegaChatCallListenerInterface {
     }
 
     /**
+     * Method to post a LiveEventBus with MegaChatCall and MegaChatSession
+     *
+     * @param type Type of event for LiveEventBus
+     * @param session MegaChatSession
+     * @param call MegaChatCall
+     */
+    private fun sendSessionEvent(type: String, session: MegaChatSession, call: MegaChatCall?) {
+        val sessionAndCall = Pair.create(call, session)
+        LiveEventBus.get(
+                type,
+                Pair::class.java
+        ).post(sessionAndCall)
+    }
+
+    /**
      * Control when I am the last participant in the call and the microphone should be muted
      *
      * @param call MegaChatCall
@@ -210,8 +224,8 @@ class MeetingListener : MegaChatCallListenerInterface {
      * @param api MegaChatApiJava
      */
     private fun checkFirstParticipant(api: MegaChatApiJava, call: MegaChatCall) {
-        if (call.hasLocalAudio() && call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS &&
-            MegaApplication.getChatManagement().isRequestSent(call.callId)
+        if (call.hasLocalAudio() && call.status == CALL_STATUS_IN_PROGRESS &&
+                MegaApplication.getChatManagement().isRequestSent(call.callId)
         ) {
             api.getChatRoom(call.chatid)?.let { chat ->
                 if (chat.isMeeting || chat.isGroup) {
@@ -229,9 +243,10 @@ class MeetingListener : MegaChatCallListenerInterface {
     }
 
     /**
-    * Cancel count down timer
-    */
+     * Cancel count down timer
+     */
     private fun cancelCountDown(){
         customCountDownTimer.stop()
     }
+
 }
