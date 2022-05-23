@@ -2287,7 +2287,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             dbH.setInvalidateSdkCache(false);
-            MegaMessageService.getToken(this);
+            MegaMessageService.getToken(this, megaApi, megaApiFolder, megaChatApi, dbH);
             nVEmail.setVisibility(View.VISIBLE);
             nVEmail.setText(megaApi.getMyEmail());
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);

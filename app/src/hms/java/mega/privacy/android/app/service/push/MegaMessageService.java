@@ -10,7 +10,7 @@ import com.huawei.hms.push.RemoteMessage;
 
 import java.util.concurrent.Executors;
 
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 
 import static mega.privacy.android.app.utils.Constants.DEVICE_HUAWEI;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;

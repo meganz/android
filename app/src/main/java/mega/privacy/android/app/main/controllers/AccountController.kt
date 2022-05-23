@@ -18,7 +18,7 @@ import android.app.NotificationManager
 import android.content.*
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.constants.SettingsConstants
@@ -335,7 +335,7 @@ class AccountController(private val context: Context) {
                 .apply()
 
             //clear push token
-            context.getSharedPreferences(PushMessageHanlder.PUSH_TOKEN, Context.MODE_PRIVATE).edit()
+            context.getSharedPreferences(PushMessageHandler.PUSH_TOKEN, Context.MODE_PRIVATE).edit()
                 .clear().apply()
 
             //clear user interface preferences
