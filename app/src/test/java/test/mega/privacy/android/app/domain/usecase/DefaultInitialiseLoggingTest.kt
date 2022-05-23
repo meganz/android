@@ -3,9 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
@@ -13,7 +11,6 @@ import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
 import mega.privacy.android.app.logging.loggers.FileLogMessage
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*

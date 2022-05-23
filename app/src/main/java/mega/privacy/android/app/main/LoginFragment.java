@@ -69,7 +69,7 @@ import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatSettings;
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -1109,7 +1109,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             disableLoginButton();
 
             // Primitive type directly set value, atomic operation. Don't allow background login.
-            PushMessageHanlder.allowBackgroundLogin = false;
+            PushMessageHandler.allowBackgroundLogin = false;
             IncomingCallService.allowBackgroundLogin = false;
 
             megaApi.fastLogin(gSession, this);
@@ -1799,7 +1799,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
-            PushMessageHanlder.allowBackgroundLogin = true;
+            PushMessageHandler.allowBackgroundLogin = true;
             IncomingCallService.allowBackgroundLogin = true;
 
             //cancel login process by press back.

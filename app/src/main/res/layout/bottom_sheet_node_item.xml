@@ -441,7 +441,7 @@
             <TextView
                 android:id="@+id/remove_option"
                 style="@style/BottomSheetOption.Red"
-                android:text="@string/context_remove"
+                android:text="@string/rubbish_bin_bottom_menu_option_delete"
                 app:drawableStartCompat="@drawable/ic_remove"/>
 
         </LinearLayout>
