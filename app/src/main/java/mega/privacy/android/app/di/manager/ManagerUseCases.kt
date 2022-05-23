@@ -16,7 +16,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-abstract class ManagerViewModelModule {
+abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindMonitorGlobalUpdates(useCase: DefaultMonitorGlobalUpdates): MonitorGlobalUpdates
