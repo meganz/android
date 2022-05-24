@@ -53,16 +53,22 @@
             app:layout_constraintTop_toTopOf="@id/thumbnail"
             app:visibleGone="@{item.selected}" />
 
-        <ImageView
-            android:id="@+id/favourite_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/ic_favourite_white"
-            android:visibility="gone"/>
+        <FrameLayout
+            android:id="@+id/favorite_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_overlay"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/favourite_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_favourite_white" />
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
