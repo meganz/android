@@ -329,7 +329,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         }
 
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
-            updateEnableCUButtons(cuEnabled = isEnabled)
+            if (!viewModel.isEnableCUShown()) {
+                updateEnableCUButtons(cuEnabled = isEnabled)
+            }
         }
     }
 
