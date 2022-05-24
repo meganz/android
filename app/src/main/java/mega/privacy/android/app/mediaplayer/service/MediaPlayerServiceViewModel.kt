@@ -39,6 +39,7 @@ import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import org.jetbrains.anko.defaultSharedPreferences
@@ -56,6 +57,7 @@ class MediaPlayerServiceViewModel(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
+    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
 ) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -460,7 +462,7 @@ class MediaPlayerServiceViewModel(
             val node = megaApi.getNodeByHandle(firstPlayHandle)
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
-                    getThumbnailFile(context, firstPlayHandle.toString())
+                    offlineThumbnailFileWrapper.getThumbnailFile(context, firstPlayHandle.toString())
                 }
                 node == null -> {
                     null
@@ -604,7 +606,7 @@ class MediaPlayerServiceViewModel(
                 it.name
             },
             {
-                getThumbnailFile(context, it)
+                offlineThumbnailFileWrapper.getThumbnailFile(context, it)
             },
             {
                 it.getSize(context)

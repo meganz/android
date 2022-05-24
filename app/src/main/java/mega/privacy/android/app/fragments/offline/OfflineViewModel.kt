@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
 import java.io.File
@@ -34,6 +35,7 @@ import javax.inject.Inject
 class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
+    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
 ) : BaseRxViewModel() {
 
     private var order = ORDER_DEFAULT_ASC
@@ -424,7 +426,7 @@ class OfflineViewModel @Inject constructor(
                     if (node.isFolder) {
                         folderCount++
                     }
-                    val thumbnail = getThumbnailFile(context, node)
+                    val thumbnail = offlineThumbnailFileWrapper.getThumbnailFile(context, node)
                     nodes.add(
                         OfflineNode(
                             node, if (isFileAvailable(thumbnail)) thumbnail else null,
@@ -488,7 +490,7 @@ class OfflineViewModel @Inject constructor(
     private fun createThumbnails(nodes: List<MegaOffline>) {
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
-            .map { Pair(getOfflineFile(context, it), getThumbnailFile(context, it)) }
+            .map { Pair(getOfflineFile(context, it), offlineThumbnailFileWrapper.getThumbnailFile(context, it)) }
             .filter { it.first.exists() }
             .map { createThumbnail(it.first, it.second) }
             .throttleLatest(1, SECONDS, true)
