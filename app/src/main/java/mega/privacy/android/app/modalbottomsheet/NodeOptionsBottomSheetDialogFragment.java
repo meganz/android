@@ -477,8 +477,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 int tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
                 if (tabSelected == 0 || nC.nodeComesFromIncoming(node)) {
                     logDebug("showOptionsPanelIncoming");
-                    long incomingParentHandle = ((ManagerActivity) requireActivity()).getParentHandleIncoming();
-                    boolean isParentNode = node.getHandle() == incomingParentHandle;
 
                     optionRemove.setVisibility(View.GONE);
                     if (ViewUtils.isVisible(optionShareFolder)) {
@@ -494,7 +492,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     int dBT = nC.getIncomingLevel(node);
                     logDebug("DeepTree value:" + dBT);
 
-                    if (dBT > FIRST_NAVIGATION_LEVEL && !isParentNode) {
+                    if (dBT > FIRST_NAVIGATION_LEVEL) {
                         optionLeaveShares.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
@@ -533,7 +531,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL:
                             logDebug("access FULL");
-                            if (dBT <= FIRST_NAVIGATION_LEVEL || isParentNode) {
+                            if (dBT <= FIRST_NAVIGATION_LEVEL) {
                                 optionRubbishBin.setVisibility(View.GONE);
                                 counterModify--;
                                 optionMove.setVisibility(View.GONE);
