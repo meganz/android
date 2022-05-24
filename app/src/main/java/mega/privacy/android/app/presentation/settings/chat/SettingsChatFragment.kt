@@ -71,7 +71,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         setOnlineOptions(Util.isOnline(context) && megaApi.rootNode != null)
         return v
@@ -190,11 +190,11 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                     if (statusConfig!!.isAutoawayEnabled) {
                         Timber.d("Change AUTOAWAY chat to false")
                         megaChatApi.setPresenceAutoaway(false, 0)
-                        preferenceScreen.removePreference(chatAutoAwayPreference)
+                        chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
                     } else {
                         Timber.d("Change AUTOAWAY chat to true")
                         megaChatApi.setPresenceAutoaway(true, 300)
-                        preferenceScreen.addPreference(chatAutoAwayPreference)
+                        chatAutoAwayPreference?.let { preferenceScreen.addPreference(it) }
                         chatAutoAwayPreference?.summary =
                             getString(R.string.settings_autoaway_value, 5)
                     }
@@ -314,9 +314,9 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
      */
     private fun waitPresenceConfig() {
         preferenceScreen.apply {
-            removePreference(autoAwaySwitch)
-            removePreference(chatAutoAwayPreference)
-            removePreference(chatPersistenceCheck)
+            autoAwaySwitch?.let { removePreference(it) }
+            chatAutoAwayPreference?.let { removePreference(it) }
+            chatPersistenceCheck?.let { removePreference(it) }
         }
 
         statusChatListPreference?.apply {
@@ -336,31 +336,31 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         if (statusConfig?.onlineStatus == MegaChatApi.STATUS_ONLINE ||
             statusConfig?.onlineStatus != MegaChatApi.STATUS_OFFLINE
         ) {
-            preferenceScreen.addPreference(chatPersistenceCheck)
+            chatPersistenceCheck?.let { preferenceScreen.addPreference(it) }
             chatPersistenceCheck?.isChecked = statusConfig!!.isPersist
         }
 
         if (statusConfig?.onlineStatus != MegaChatApi.STATUS_ONLINE) {
-            preferenceScreen.removePreference(autoAwaySwitch)
-            preferenceScreen.removePreference(chatAutoAwayPreference)
+            autoAwaySwitch?.let { preferenceScreen.removePreference(it) }
+            chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
             if (statusConfig?.onlineStatus == MegaChatApi.STATUS_OFFLINE) {
-                preferenceScreen.removePreference(chatPersistenceCheck)
+                chatPersistenceCheck?.let { preferenceScreen.removePreference(it) }
             }
         } else if (statusConfig!!.isPersist) {
-            preferenceScreen.removePreference(autoAwaySwitch)
-            preferenceScreen.removePreference(chatAutoAwayPreference)
+            autoAwaySwitch?.let { preferenceScreen.removePreference(it) }
+            chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
         } else {
-            preferenceScreen.addPreference(autoAwaySwitch)
+            autoAwaySwitch?.let { preferenceScreen.addPreference(it) }
 
             if (statusConfig!!.isAutoawayEnabled) {
                 val timeout = statusConfig!!.autoawayTimeout.toInt() / 60
                 autoAwaySwitch?.isChecked = true
-                preferenceScreen.addPreference(chatAutoAwayPreference)
+                chatAutoAwayPreference?.let { preferenceScreen.addPreference(it) }
                 chatAutoAwayPreference?.summary =
                     getString(R.string.settings_autoaway_value, timeout)
             } else {
                 autoAwaySwitch?.isChecked = false
-                preferenceScreen.removePreference(chatAutoAwayPreference)
+                chatAutoAwayPreference?.let { preferenceScreen.removePreference(it) }
             }
         }
 
