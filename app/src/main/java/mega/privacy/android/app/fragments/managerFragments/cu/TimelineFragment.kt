@@ -93,6 +93,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         super.onResume()
         viewModel.checkAndUpdateCamSyncEnabledStatus()
     }
+
     override fun onBackPressed() = when {
         mManagerActivity.isFirstNavigationLevel -> {
             if (selectedView != ALL_VIEW) {

@@ -1017,7 +1017,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
         //set camera upload enabled
         dbH.setCamSyncEnabled(true);
-        prefs.setCamSyncEnabled(Boolean.toString(true));
         cameraUploadSettingsChanged = true;
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
