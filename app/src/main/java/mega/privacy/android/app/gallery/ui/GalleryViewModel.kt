@@ -21,6 +21,7 @@ import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
+import mega.privacy.android.app.utils.PreviewUtils
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -120,7 +121,7 @@ abstract class GalleryViewModel constructor(
         liveData(context = ioDispatcher) {
             val cardsProvider = DateCardsProvider()
             cardsProvider.extractCardsFromNodeList(
-                context = galleryItemRepository.context,
+                previewFolder = PreviewUtils.getPreviewFolder(galleryItemRepository.context),
                 nodes = galleryItems.mapNotNull { item -> item.node }
                     .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
                         .thenByDescending { node -> node.name })

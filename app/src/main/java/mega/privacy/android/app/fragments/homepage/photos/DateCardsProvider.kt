@@ -60,7 +60,7 @@ class DateCardsProvider {
      * @param context Context object for get preview files' local path.
      * @param nodes MegaNode list, from which date cards will be extracted.
      */
-    fun extractCardsFromNodeList(context: Context, nodes: List<MegaNode>) {
+    fun extractCardsFromNodeList(previewFolder: File, nodes: List<MegaNode>) {
         var lastDayDate: LocalDate? = null
         var lastMonthDate: LocalDate? = null
         var lastYearDate: LocalDate? = null
@@ -68,7 +68,7 @@ class DateCardsProvider {
         nodes.forEach foreach@{ node ->
             var shouldGetPreview = false
             val preview = File(
-                PreviewUtils.getPreviewFolder(context),
+                previewFolder,
                 node.base64Handle + FileUtil.JPG_EXTENSION
             )
 
