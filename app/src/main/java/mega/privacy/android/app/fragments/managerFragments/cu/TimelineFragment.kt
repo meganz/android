@@ -91,9 +91,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onResume() {
         super.onResume()
-        if (mManagerActivity.isInPhotosPage) {
-            refreshViewLayout()
-        }
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
     }
 
     override fun onBackPressed() = when {

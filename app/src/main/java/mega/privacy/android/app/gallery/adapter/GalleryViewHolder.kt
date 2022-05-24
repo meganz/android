@@ -128,7 +128,8 @@ class GalleryViewHolder(
                     handleFavouriteUI(
                         zoom = mItemSizeConfig.zoom,
                         isFavorite = item.node?.isFavourite,
-                        favouriteIcon = favouriteIcon)
+                        favouriteView = favoriteOverlay
+                    )
 
                 }
                 is ItemGalleryVideoBinding -> {
@@ -161,7 +162,7 @@ class GalleryViewHolder(
                     handleFavouriteUI(
                         zoom = mItemSizeConfig.zoom,
                         isFavorite = item.node?.isFavourite,
-                        favouriteIcon = favouriteIcon)
+                        favouriteView = favouriteIcon)
 
                     videoInfo.setBackgroundResource(
                             if (item.selected) R.drawable.grid_cam_uploads_rounded else R.color.grey_alpha_032
@@ -182,17 +183,17 @@ class GalleryViewHolder(
         item.uiDirty = false
     }
 
-    private fun handleFavouriteUI(zoom: Int, isFavorite: Boolean?, favouriteIcon: View) {
+    private fun handleFavouriteUI(zoom: Int, isFavorite: Boolean?, favouriteView: View) {
         when (zoom) {
             ZOOM_IN_1X, ZOOM_DEFAULT, ZOOM_OUT_1X -> {
                 if (isFavorite == true) {
-                    favouriteIcon.visibility = View.VISIBLE
+                    favouriteView.visibility = View.VISIBLE
                 } else {
-                    favouriteIcon.visibility = View.GONE
+                    favouriteView.visibility = View.GONE
                 }
             }
             else -> {
-                favouriteIcon.visibility = View.GONE
+                favouriteView.visibility = View.GONE
             }
         }
     }
