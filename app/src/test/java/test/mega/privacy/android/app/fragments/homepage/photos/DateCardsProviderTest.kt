@@ -6,6 +6,7 @@ import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 import java.io.File
+import java.time.*
 import java.util.*
 
 class DateCardsProviderTest {
@@ -43,7 +44,7 @@ class DateCardsProviderTest {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 20
         val numberOfMonthsPerYear = 1
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val nodes = getNodes(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
 
         underTest.extractCardsFromNodeList(previewFolder, nodes)
         assertThat(underTest.getMonths()).hasSize(numberOfYears*numberOfMonthsPerYear)
@@ -77,13 +78,13 @@ class DateCardsProviderTest {
     }
 
     private fun getNodes(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int): List<MegaNode> {
-        val cal = Calendar.getInstance()
+        val offset = OffsetDateTime.now().offset
+
         val nodes =
                 (1..numberOfYears).map { year ->
                     (1..numberOfMonthsPerYear).map { month ->
                         (1..numberOfDaysPerMonth).map { day ->
-                            cal.set(year, month, day)
-                            cal.timeInMillis / 1000
+                            LocalDateTime.of(year, month, day, 1, 1).toEpochSecond(offset)
                         }
                     }.flatten()
                 }.flatten()
