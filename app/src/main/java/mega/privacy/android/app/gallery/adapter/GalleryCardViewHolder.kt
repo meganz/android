@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryCardBinding
 import mega.privacy.android.app.gallery.data.GalleryCard
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.StringUtils.formatDateTitle
+import mega.privacy.android.app.gallery.extension.formatDateTitle
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 
 /**
  * Holder representing a card view.
@@ -23,7 +23,7 @@ class GalleryCardViewHolder(
     private val viewType: Int,
     private val binding: ItemGalleryCardBinding,
     cardWidth: Int,
-    cardMargin: Int
+    cardMargin: Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
@@ -42,26 +42,27 @@ class GalleryCardViewHolder(
 
     @SuppressLint("SetTextI18n")
     fun bind(position: Int, card: GalleryCard, listener: GalleryCardAdapter.Listener) {
+        val context = binding.root.context
         itemView.setOnClickListener { listener.onCardClicked(position, card) }
 
         val date = when (viewType) {
             YEARS_VIEW -> Pair(card.year, "")
-            MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("", getString(
+            MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("", context.getFormattedStringOrDefault(
                 R.string.cu_month_year_date,
                 card.month,
                 card.year
             ))
-            DAYS_VIEW -> if (card.year == null)  Pair(card.date, "") else
-            Pair("", getString(
-                R.string.cu_day_month_year_date,
-                card.day,
-                card.month,
-                card.year
-            ))
+            DAYS_VIEW -> if (card.year == null) Pair(card.date, "") else
+                Pair("", context.getFormattedStringOrDefault(
+                    R.string.cu_day_month_year_date,
+                    card.day,
+                    card.month,
+                    card.year
+                ))
             else -> Pair("", "")
         }
 
-        binding.dateText.text = date.formatDateTitle()
+        binding.dateText.text = date.formatDateTitle(context)
 
         val numItems = card.numItems
 

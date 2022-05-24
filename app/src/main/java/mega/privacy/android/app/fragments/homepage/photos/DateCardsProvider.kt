@@ -1,9 +1,7 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.content.Context
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -13,8 +11,7 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-import java.util.Date
+import java.util.*
 
 /**
  * Tool class used to organize MegaNode list by years, months and days.

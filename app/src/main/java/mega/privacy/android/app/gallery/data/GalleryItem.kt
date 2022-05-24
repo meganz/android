@@ -1,10 +1,11 @@
 package mega.privacy.android.app.gallery.data
 
+import android.content.Context
 import android.text.Spanned
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.gallery.extension.formatDateTitle
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.MegaNode
 import java.io.File
 
@@ -25,16 +26,16 @@ import java.io.File
  * @param uiDirty        Force refresh the newly created Node list item
  */
 data class GalleryItem(
-    override var node: MegaNode?,
-    var indexForViewer: Int,
-    override var index: Int,
-    override var thumbnail: File?,
-    var type: Int,
-    var modifyDate: String,
-    var formattedDate: Spanned?,
-    var headerDate: Pair<String, String>?,
-    override var selected: Boolean,
-    override var uiDirty: Boolean
+        override var node: MegaNode?,
+        var indexForViewer: Int,
+        override var index: Int,
+        override var thumbnail: File?,
+        var type: Int,
+        var modifyDate: String,
+        var formattedDate: Spanned?,
+        var headerDate: Pair<String, String>?,
+        override var selected: Boolean,
+        override var uiDirty: Boolean,
 ) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
@@ -46,19 +47,20 @@ data class GalleryItem(
      *                   - Second: Year if not current year, empty otherwise.
      */
     constructor(
-        modifyDate: String,
-        headerDate: Pair<String, String>
+            modifyDate: String,
+            headerDate: Pair<String, String>,
+            context: Context,
     ) : this(
-        null, INVALID_POSITION, INVALID_POSITION, null,
-        TYPE_HEADER, modifyDate, headerDate.formatDateTitle(), headerDate, false, false
+            null, INVALID_POSITION, INVALID_POSITION, null,
+            TYPE_HEADER, modifyDate, headerDate.formatDateTitle(context), headerDate, false, false
     )
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
         override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem) =
-            oldItem.node?.handle == newItem.node?.handle
+                oldItem.node?.handle == newItem.node?.handle
 
         override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem) =
-            !newItem.uiDirty
+                !newItem.uiDirty
     }
 
     companion object {

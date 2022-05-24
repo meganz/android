@@ -1,13 +1,22 @@
 package test.mega.privacy.android.app.fragments.homepage.photos
 
+import android.text.Spanned
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
+import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.fragment.GroupingLevel
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
+import timber.log.Timber
 import java.io.File
-import java.time.*
-import java.util.*
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class DateCardsProviderTest {
     private val previewFolder = File("path")
@@ -34,7 +43,7 @@ class DateCardsProviderTest {
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
         underTest.extractCardsFromNodeList(previewFolder, nodes)
-        assertThat(underTest.getDays()).hasSize(numberOfYears*numberOfMonthsPerYear*numberOfDaysPerMonth)
+        assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
     }
 
     @Test
@@ -47,7 +56,7 @@ class DateCardsProviderTest {
         val nodes = getNodes(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
 
         underTest.extractCardsFromNodeList(previewFolder, nodes)
-        assertThat(underTest.getMonths()).hasSize(numberOfYears*numberOfMonthsPerYear)
+        assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
     @Test
@@ -60,7 +69,7 @@ class DateCardsProviderTest {
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
         underTest.extractCardsFromNodeList(previewFolder, nodes)
-        assertThat(underTest.getMonths()).hasSize(numberOfYears*numberOfMonthsPerYear)
+        assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
     @Test
@@ -93,4 +102,41 @@ class DateCardsProviderTest {
                         }
         return nodes
     }
+
+    private fun GalleryCard.dateString(level: GroupingLevel): String {
+
+        val date = when (level) {
+            GroupingLevel.Years -> "[B]$year[/B]" //Pair(year!!, "") // year -> [B]year[/B]
+            GroupingLevel.Months -> if (year == null) "[B]$month[/B]" //Pair(month!!, "") //month -> [B]month[/B]
+            else StringResourcesUtils.getString(
+                    R.string.cu_month_year_date,
+                    month,
+                    year
+            ) // [B]month[/B] year -> [B][/B] [B]month[/B] year
+            GroupingLevel.Days -> if (year == null) "[B]$date[/B]" // Pair(date, "") // date -> [B]date[/B]
+            else StringResourcesUtils.getString(
+                    R.string.cu_day_month_year_date,
+                    day,
+                    month,
+                    year
+            ) // [B]day month[/B] year -> [B][/B] [B] day month [/B] year
+            else -> ""// Pair("", "")// [B][/B]
+        }
+
+        return date
+    }
+
+    private fun spanString(stringToSpan: String): Spanned {
+        return stringToSpan.runCatching {
+            replace("[B]", "<font face=\"sans-serif-medium\">")
+                    .replace("[/B]", "</font>")
+        }.fold(
+                onSuccess = { it.toSpannedHtmlText() },
+                onFailure = {
+                    Timber.e(it, "Exception formatting text.")
+                    stringToSpan.toSpannedHtmlText()
+                }
+        )
+    }
+
 }
