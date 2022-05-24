@@ -87,10 +87,10 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      * @param newValue   The new value of the preference
      * @return {@code true} to update the state of the preference with the new value
      */
-    override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
+    override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
 
-        when (preference?.key) {
+        when (preference.key) {
             acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
             analyticsCookiesPreference.key -> viewModel.changeCookie(ANALYTICS, enable)
         }
