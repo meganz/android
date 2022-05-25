@@ -319,8 +319,19 @@ pipeline {
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
                     sh "./gradlew clean"
-                    sh "./gradlew app:assembleGmsRelease | tee ${GMS_APK_BUILD_LOG}"
-                    sh "./gradlew app:assembleHmsRelease | tee ${HMS_APK_BUILD_LOG}"
+                    sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
+                    sh "./gradlew app:assembleHmsRelease 2>&1  | tee ${HMS_APK_BUILD_LOG}"
+
+                    sh """
+                        if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
+                            echo GMS APK build failed. Exitting....
+                            exit 1
+                        fi
+                        if grep -q -m 1 \"^FAILURE: \" ${HMS_APK_BUILD_LOG}; then
+                            echo HMS APK build failed. Exitting....
+                            exit 1
+                        fi
+                    """
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
