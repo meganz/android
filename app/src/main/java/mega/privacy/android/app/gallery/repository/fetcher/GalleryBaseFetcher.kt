@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -183,7 +182,7 @@ abstract class GalleryBaseFetcher(
     }
 
     suspend fun getPreviewsFromServer(
-        map: MutableMap<MegaNode, String>,
+        map: Map<MegaNode, String>,
         refreshCallback: () -> Unit
     ) {
         for (item in map) {

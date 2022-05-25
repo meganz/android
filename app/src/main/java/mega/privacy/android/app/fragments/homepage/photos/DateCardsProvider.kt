@@ -34,17 +34,17 @@ class DateCardsProvider {
     /**
      * Days list.
      */
-    private val days = arrayListOf<GalleryCard>()
+    private val days = mutableListOf<GalleryCard>()
 
     /**
      * Months list.
      */
-    private val months = arrayListOf<GalleryCard>()
+    private val months = mutableListOf<GalleryCard>()
 
     /**
      * Years list.
      */
-    private val years = arrayListOf<GalleryCard>()
+    private val years = mutableListOf<GalleryCard>()
 
     /**
      * MegaNodes which doesn't have local preview.
@@ -134,8 +134,8 @@ class DateCardsProvider {
     }
 
     // Public getter functions
-    fun getDays() = days
-    fun getMonths() = months
-    fun getYears() = years
-    fun getNodesWithoutPreview() = nodesWithoutPreview
+    fun getDays() = days.toList()
+    fun getMonths() = months.toList()
+    fun getYears() = years.toList()
+    fun getNodesWithoutPreview() = nodesWithoutPreview.toMap()
 }

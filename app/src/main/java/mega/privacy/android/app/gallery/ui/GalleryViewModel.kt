@@ -125,7 +125,7 @@ abstract class GalleryViewModel constructor(
                     .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
                         .thenByDescending { node -> node.name })
             )
-            
+
             emit(listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears()))
 
             galleryItemRepository.getPreviews(cardsProvider.getNodesWithoutPreview()) {

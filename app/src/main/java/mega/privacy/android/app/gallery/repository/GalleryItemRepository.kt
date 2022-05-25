@@ -65,7 +65,7 @@ abstract class GalleryItemRepository constructor(
         }
     }
 
-    suspend fun getPreviews(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
+    suspend fun getPreviews(map: Map<MegaNode, String>, refreshCallback: () -> Unit) {
         nodesFetcher.getPreviewsFromServer(map, refreshCallback)
     }
 
