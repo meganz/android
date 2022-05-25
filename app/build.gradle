@@ -228,7 +228,6 @@ android {
     lint {
         checkReleaseBuilds false
     }
-    namespace 'mega.privacy.android.app'
 }
 
 dependencies {
