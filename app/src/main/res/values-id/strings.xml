@@ -1184,11 +1184,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Tautan folder tidak tersedia</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Tautan folder telah dihapus karena pelanggaran ToS/AUP.</string>
+    <string name="folder_link_unavaible_ToS_violation">Tautan folder telah dihapus karena melanggar Persyaratan Layanan kami.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Tautan file tidak tersedia</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Tautan file telah dihapus karena pelanggaran ToS/AUP.</string>
+    <string name="file_link_unavaible_ToS_violation">Tautan file telah dihapus karena melanggar Persyaratan Layanan kami.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL ini rusak atau cacat. Tautan yang anda coba akses tidak ada.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2774,11 +2774,10 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Penghapusan Perselisihan</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Tidak dapat diakses karena pelanggaran ToS / AUP</string>
+    <string name="error_download_takendown_node">Tidak dapat diakses karena melanggar Persyaratan Layanan kami</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as they violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="other">%d file tidak diunduh karena melanggar Persyaratan Layanan kami.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]File yang anda share ke public [/A][B]%s[/B][C]  telah dipulihkan.[/C]</string>
@@ -3483,17 +3482,17 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Obrolan baru</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]Gambar[/A] [B]Ditemukan[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Tidak ada dokumen yang ditemukan</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Tidak ada file audio yang ditemukan</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Video tidak ditemukan</string>
+    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]gambar[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Tidak ada[/B] [A]dokumen[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Tidak ada[/B] [A]berkas audio[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Tidak ada[/B] [A]video[/A] [B]ditemukan[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Telusuri GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">[A]GIF[/A] Tidak ditemukan</string>
+    <string name="empty_search_giphy">[A]GIF[/A] tidak ditemukan</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">GIF tidak tersedia. Silakan coba lagi nanti</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
@@ -3735,7 +3734,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Bermain di latar belakang</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A] [B]Ditemukan[/B]</string>
+    <string name="photos_empty">[B]Tidak ada[/B] [A]foto[/A] [B]ditemukan[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Cadangkan foto dan video anda ke Penyimpanan Cloud anda secara otomatis.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3768,30 +3767,30 @@
     <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file sudah diunduh. 1 file tertunda.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file sudah diunduh. %d file tertunda.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d file sudah diunduh. 1 file tertunda.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d file sudah diunduh. %2$d file tertunda.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan %d barang tidak berhasil dikirim</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d barang berhasil dipindahkan ke Tempat Sampah dan %2$d barang tidak berhasil dikirim</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan %d barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d barang berhasil dipulihkan dan %2$d barang tidak berhasil dipulihkan</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="other">1 file sudah diunduh. %d file tertunda.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="other">%d file yang sudah diunduh. 1 berkas tertunda.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="other">1 item dipindahkan ke tempat sampah tapi %d barang tidak dipindahkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="other">%dbarang dipindahkan ke tempat sampah tapi 1 barang tidak dipindahkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1 item dipulihkan tetapi %d item tidak dipulihkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d item dipulihkan tetapi 1 item tidak dipulihkan. Coba lagi nanti.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d barang berhasil dipindahkan ke Tempat Sampah</item>
@@ -4212,4 +4211,20 @@
     <string name="no_uploads_empty_folder">Folder yang dipilih kosong. Tidak ada file untuk diunggah.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Anda telah memasukkan kata sandi anda saat ini</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">File tidak lagi tersedia</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">File dihapus karena melanggar Persyaratan Layanan kami.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Persyaratan Layanan yang dilanggar</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">Perangkat ini tidak memiliki aplikasi untuk memilih folder.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Berikutnya</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Sebelumnya</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Berikutnya</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Sebelumnya</string>
 </resources>

@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID de sessão inválido</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Não acessível por infringir os termos de serviço</string>
+    <string name="api_eblocked_ec_import_ec_download">Não acessível pois infringiu os nossos Termos de Serviço</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bloqueado</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
