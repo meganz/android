@@ -4,13 +4,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.DefaultMonitorNodeUpdates
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.domain.usecase.*
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(ViewModelComponent::class, SingletonComponent::class)
 abstract class ManagerUseCases {
 
     @Binds
@@ -18,5 +16,8 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindMonitorNodeUpdates(useCase: DefaultMonitorNodeUpdates): MonitorNodeUpdates
+
+    @Binds
+    abstract fun bindMonitorContactRequestUpdates(useCase: DefaultMonitorContactRequestUpdates): MonitorContactRequestUpdates
 
 }

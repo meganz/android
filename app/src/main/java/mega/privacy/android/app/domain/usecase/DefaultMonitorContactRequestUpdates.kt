@@ -6,12 +6,12 @@ import nz.mega.sdk.MegaContactRequest
 import javax.inject.Inject
 
 /**
- * Default [MonitorContactUpdates] implementation
+ * Default [MonitorContactRequestUpdates] implementation
  *
  * @property contactsRepository
  */
-class DefaultMonitorContactUpdates @Inject constructor(
+class DefaultMonitorContactRequestUpdates @Inject constructor(
     private val contactsRepository: ContactsRepository
-) : MonitorContactUpdates {
+) : MonitorContactRequestUpdates {
     override fun invoke(): Flow<List<MegaContactRequest>> = contactsRepository.monitorContactRequestUpdates()
 }

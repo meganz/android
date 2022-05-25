@@ -1,6 +1,9 @@
 package mega.privacy.android.app.service.push
 
 import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import com.huawei.agconnect.AGConnectOptionsBuilder
 import com.huawei.hms.push.HmsMessageService
 import mega.privacy.android.app.middlelayer.push.PushMessageHandler
@@ -11,6 +14,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.fcm.MegaRemoteMessage
+import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -43,25 +48,42 @@ class MegaMessageService : HmsMessageService() {
         messageHandler = PushMessageHandler(this, megaApi, megaApiFolder, megaChatApi, dbH)
     }
 
-    /**
-     * Convert Huawei RemoteMessage object into generic Message object.
-     *
-     * @param remoteMessage Huawei RemoteMessage.
-     * @return Generic Message object.
-     */
-    private fun convert(remoteMessage: RemoteMessage): PushMessageHandler.Message {
-        return PushMessageHandler.Message(
-            remoteMessage.from,
-            remoteMessage.originalUrgency,
-            remoteMessage.urgency,
-            remoteMessage.dataOfMap
-        )
-    }
+//    /**
+//     * Convert Huawei RemoteMessage object into generic Message object.
+//     *
+//     * @param remoteMessage Huawei RemoteMessage.
+//     * @return Generic Message object.
+//     */
+//    private fun convert(remoteMessage: RemoteMessage): PushMessageHandler.Message {
+//        return PushMessageHandler.Message(
+//            remoteMessage.from,
+//            remoteMessage.originalUrgency,
+//            remoteMessage.urgency,
+//            remoteMessage.dataOfMap
+//        )
+//    }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val message = convert(remoteMessage)
-        Timber.d("Receive remote msg: $message")
-        messageHandler?.handleMessage(message)
+//        val message = convert(remoteMessage)
+//        Timber.d("Receive remote msg: $message")
+//        messageHandler?.handleMessage(message)
+
+        val megaRemoteMessage = MegaRemoteMessage(
+            from = remoteMessage.from,
+            originalPriority = remoteMessage.originalUrgency,
+            priority = remoteMessage.urgency,
+            data = remoteMessage.dataOfMap
+        )
+
+        Timber.d("$megaRemoteMessage")
+
+        WorkManager.getInstance(this)
+            .enqueue(
+                OneTimeWorkRequestBuilder<PushMessageWorker>()
+                    .setInputData(megaRemoteMessage.pushMessage.toData())
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .build()
+            )
     }
 
     override fun onNewToken(s: String) {

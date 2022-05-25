@@ -1,6 +1,9 @@
 package mega.privacy.android.app.service.push
 
 import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -13,6 +16,8 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHandler
 import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.FirebaseMessaging
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fcm.MegaRemoteMessage
+import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 import java.util.concurrent.Executors
@@ -48,9 +53,26 @@ class MegaMessageService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val message = convert(remoteMessage)
-        Timber.d("Receive remote msg: $message")
-        messageHandler?.handleMessage(message)
+//        val message = convert(remoteMessage)
+//        Timber.d("Receive remote msg: $message")
+//        messageHandler?.handleMessage(message)
+
+        val megaRemoteMessage = MegaRemoteMessage(
+            from = remoteMessage.from,
+            originalPriority = remoteMessage.originalPriority,
+            priority = remoteMessage.priority,
+            data = remoteMessage.data
+        )
+
+        Timber.d("$megaRemoteMessage")
+
+        WorkManager.getInstance(this)
+            .enqueue(
+                OneTimeWorkRequestBuilder<PushMessageWorker>()
+                    .setInputData(megaRemoteMessage.pushMessage.toData())
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .build()
+            )
     }
 
     override fun onNewToken(s: String) {
@@ -58,19 +80,19 @@ class MegaMessageService : FirebaseMessagingService() {
         messageHandler?.sendRegistrationToServer(s, Constants.DEVICE_ANDROID)
     }
 
-    /**
-     * Convert Google RemoteMessage object into generic Message object.
-     *
-     * @param remoteMessage Google RemoteMessage.
-     * @return Generic Message object.
-     */
-    private fun convert(remoteMessage: RemoteMessage): PushMessageHandler.Message =
-        PushMessageHandler.Message(
-            remoteMessage.from!!,
-            remoteMessage.originalPriority,
-            remoteMessage.priority,
-            remoteMessage.data
-        )
+//    /**
+//     * Convert Google RemoteMessage object into generic Message object.
+//     *
+//     * @param remoteMessage Google RemoteMessage.
+//     * @return Generic Message object.
+//     */
+//    private fun convert(remoteMessage: RemoteMessage): PushMessageHandler.Message =
+//        PushMessageHandler.Message(
+//            remoteMessage.from ?: "",
+//            remoteMessage.originalPriority,
+//            remoteMessage.priority,
+//            remoteMessage.data
+//        )
 
     companion object {
         /**

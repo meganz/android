@@ -289,7 +289,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static int disableFileVersions = -1;
 
     private static boolean recentChatVisible = false;
-    private static boolean chatNotificationReceived = false;
 
     private static String urlConfirmationLink = null;
 
@@ -1274,14 +1273,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         MegaApplication.recentChatVisible = recentChatVisible;
     }
 
-    public static boolean isChatNotificationReceived() {
-        return chatNotificationReceived;
-    }
-
-    public static void setChatNotificationReceived(boolean chatNotificationReceived) {
-        MegaApplication.chatNotificationReceived = chatNotificationReceived;
-    }
-
     public static long getOpenChatId() {
         return openChatId;
     }
@@ -1494,7 +1485,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			stopService(new Intent(this, KeepAliveService.class));
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("OK:TYPE_PUSH_RECEIVED");
-				chatNotificationReceived = true;
 				if (!getMegaApi().isEphemeralPlusPlus()) {
 					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 					notificationBuilder.generateChatNotification(request);

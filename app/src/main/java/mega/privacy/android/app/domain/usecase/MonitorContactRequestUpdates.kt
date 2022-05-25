@@ -6,7 +6,7 @@ import nz.mega.sdk.MegaContactRequest
 /**
  * Monitor global contact request updates for the current logged in user
  */
-interface MonitorContactUpdates {
+interface MonitorContactRequestUpdates {
     /**
      * Invoke
      *
