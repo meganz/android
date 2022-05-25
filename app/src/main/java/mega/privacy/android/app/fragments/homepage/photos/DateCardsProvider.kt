@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage.photos
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.text.SimpleDateFormat
@@ -18,7 +19,7 @@ import java.util.*
  * MegaNode will be converted GalleryCard object.
  * Also will filter out the node which doesn't have local preview.
  */
-class DateCardsProvider {
+class DateCardsProvider(private val fileUtil:FileUtilWrapper = object : FileUtilWrapper{}) {
 
     companion object {
         private const val DATE_FORMAT_DAY = "dd"
@@ -28,10 +29,12 @@ class DateCardsProvider {
         private const val DATE_FORMAT_YEAR_OF_ERA = "yyyy"
     }
 
+    private var dayNodes = listOf<Pair<MegaNode, Long>>()
+
     /**
      * Days list.
      */
-    private val days = mutableListOf<GalleryCard>()
+    private var days = listOf<GalleryCard>()
 
     /**
      * Months list.
@@ -48,7 +51,7 @@ class DateCardsProvider {
      * Key: MegaNode
      * Value: Local path of the preview file that will be downloaded.
      */
-    private val nodesWithoutPreview = mutableMapOf<MegaNode, String>()
+    private var nodesWithoutPreview = mapOf<MegaNode, String>()
 
     /**
      * Organize MegaNode list by years, months and days.
@@ -58,81 +61,115 @@ class DateCardsProvider {
      * @param nodes MegaNode list, from which date cards will be extracted.
      */
     fun extractCardsFromNodeList(previewFolder: File, nodes: List<MegaNode>) {
-        var lastDayDate: LocalDate? = null
-        var lastMonthDate: LocalDate? = null
-        var lastYearDate: LocalDate? = null
+        var lastEpochDay: Long = 0
+        var lastYearMonth: YearMonth = YearMonth.of(0,1)
+        var lastYear: Year = Year.of(0)
+
+        dayNodes = nodes.groupBy { Util.fromEpoch(it.modificationTime).toEpochDay() }
+                .map { (_, list) ->
+                    Pair(list.minByOrNull { it.modificationTime }!!, list.size - 1L)
+                }
+
+        nodesWithoutPreview = dayNodes.filter {
+            getPreview(previewFolder, it.first) == null
+        }.associate {
+            Pair(it.first, File(previewFolder,
+                    it.first.base64Handle + FileUtil.JPG_EXTENSION).absolutePath)
+        }
 
         nodes.forEach foreach@{ node ->
-            var shouldGetPreview = false
-            val preview = File(
-                previewFolder,
-                node.base64Handle + FileUtil.JPG_EXTENSION
-            )
+            val preview = getPreview(previewFolder, node)
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val day = DateTimeFormatter.ofPattern(DATE_FORMAT_DAY).format(modifyDate)
             val month = SimpleDateFormat(DATE_FORMAT_MONTH_STANDALONE, Locale.getDefault()).format(
-                Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                    Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             )
             val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifyDate)
-            val monthForDayCard = DateTimeFormatter.ofPattern(DATE_FORMAT_MONTH).format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
-            if (lastDayDate == null || lastDayDate!!.dayOfYear != modifyDate.dayOfYear) {
-                shouldGetPreview = true
-                lastDayDate = modifyDate
-                val date = DateTimeFormatter.ofPattern(
-                    if (sameYear) {
-                        "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH"
-                    } else {
-                        "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH $DATE_FORMAT_YEAR"
-                    }
-                ).format(lastDayDate)
-                days.add(
-                    GalleryCard(
-                        node, if (preview.exists()) preview else null, day, monthForDayCard,
-                        if (sameYear) null else year, date, modifyDate, 0
-                    )
-                )
-            } else if (days.isNotEmpty()) {
-                days[days.size - 1].incrementNumItems()
-            }
-
-            if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(modifyDate)
-            ) {
-                shouldGetPreview = true
-                lastMonthDate = modifyDate
-                val date = if (sameYear) month else SimpleDateFormat("$DATE_FORMAT_MONTH_STANDALONE $DATE_FORMAT_YEAR_OF_ERA", Locale.getDefault()).format(
+            val monthCardDate = if (sameYear) month else SimpleDateFormat("$DATE_FORMAT_MONTH_STANDALONE $DATE_FORMAT_YEAR_OF_ERA", Locale.getDefault()).format(
                     Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-                )
+            )
+
+            val yearCardDate = year
+            days = dayNodes.map {
+                createDayCard(it.first, previewFolder, it.second)
+            }
+
+
+            if (lastYearMonth != YearMonth.from(modifyDate)
+            ) {
+                lastYearMonth = YearMonth.from(modifyDate)
+
                 months.add(
-                    GalleryCard(
-                        node, if (preview.exists()) preview else null, null, month,
-                        if (sameYear) null else year, date, modifyDate, 0
-                    )
+                        GalleryCard(
+                                node = node,
+                                preview = preview,
+                                day = null,
+                                month = month,
+                                year = if (sameYear) null else year,
+                                date = monthCardDate,
+                                localDate = modifyDate,
+                                numItems = 0
+                        )
                 )
             }
 
-            if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
-                shouldGetPreview = true
-                lastYearDate = modifyDate
+            if (Year.from(lastYear) != Year.from(modifyDate)) {
+                lastYear = Year.from(modifyDate)
+
                 years.add(
-                    GalleryCard(
-                        node, if (preview.exists()) preview else null, null, null,
-                        year, year, modifyDate, 0
-                    )
+                        GalleryCard(
+                                node = node,
+                                preview = preview,
+                                day = null,
+                                month = null,
+                                year = year,
+                                date = yearCardDate,
+                                localDate = modifyDate,
+                                numItems = 0
+                        )
                 )
             }
 
-            if (shouldGetPreview && !preview.exists()) {
-                nodesWithoutPreview[node] = preview.absolutePath
-            }
         }
     }
 
+    private fun createDayCard(node: MegaNode, previewFolder: File, itemCount: Long): GalleryCard {
+        val modifiedDate = Util.fromEpoch(node.modificationTime)
+        val preview = getPreview(previewFolder, node)
+        val day = DateTimeFormatter.ofPattern(DATE_FORMAT_DAY).format(modifiedDate)
+        val monthForDayCard = DateTimeFormatter.ofPattern(DATE_FORMAT_MONTH).format(modifiedDate)
+        val sameYear = Year.from(LocalDate.now()) == Year.from(modifiedDate)
+        val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
+        val dayCardDate = DateTimeFormatter.ofPattern(
+                if (sameYear) {
+                    "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH"
+                } else {
+                    "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH $DATE_FORMAT_YEAR"
+                }
+        ).format(modifiedDate)
+        return GalleryCard(
+                node = node,
+                preview = preview,
+                day = day,
+                month = monthForDayCard,
+                year = if (sameYear) null else year,
+                date = dayCardDate,
+                localDate = modifiedDate,
+                numItems = itemCount
+        )
+    }
+
+    private fun getPreview(previewFolder: File, node: MegaNode) =
+            fileUtil.getFileIfExists(
+                    previewFolder,
+                    node.base64Handle + FileUtil.JPG_EXTENSION
+            )
+
     // Public getter functions
-    fun getDays() = days.toList()
-    fun getMonths() = months.toList()
-    fun getYears() = years.toList()
-    fun getNodesWithoutPreview() = nodesWithoutPreview.toMap()
+    fun getDays() = days
+    fun getMonths() = months
+    fun getYears() = years
+    fun getNodesWithoutPreview() = nodesWithoutPreview
 }

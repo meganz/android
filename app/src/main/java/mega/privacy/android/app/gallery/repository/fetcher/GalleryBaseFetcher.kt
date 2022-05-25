@@ -187,8 +187,8 @@ abstract class GalleryBaseFetcher(
     }
 
     suspend fun getPreviewsFromServer(
-        map: Map<MegaNode, String>,
-        refreshCallback: () -> Unit
+            map: Map<MegaNode, String>,
+            refreshCallback: () -> Unit
     ) {
         for (item in map) {
             megaApi.getPreview(
