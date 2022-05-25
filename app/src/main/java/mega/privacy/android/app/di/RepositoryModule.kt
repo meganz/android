@@ -49,4 +49,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalUpdatesRepository): GlobalUpdatesRepository
+
+    @Binds
+    abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 }
