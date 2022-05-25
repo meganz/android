@@ -9,10 +9,8 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_VIDEO_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_NONE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.util.*
@@ -31,28 +29,31 @@ class PhotosFetcher(
         zoom = zoom
 ) {
     override fun getNodes(cancelToken: MegaCancelToken?): List<MegaNode> {
-        // Getting CU/MU files
-        val cuItems = getFilteredChildren(getCuChildren())
+        // Getting CU/MU videos
+        val cuItems = getVideosFromCUMU()
 
-        // Getting Images files
+        // Getting Images files, this will include CU/MU
         val allImages: List<MegaNode> = megaApi.searchByType(
             cancelToken!!,
-            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC)
-                order
-            else
-                ORDER_NONE,
+            ORDER_MODIFICATION_DESC,
             MegaApiJava.FILE_TYPE_PHOTO,
             MegaApiJava.SEARCH_TARGET_ROOTNODE
         ).filter { MimeTypeList.typeForName(it.name).isImage }
 
+        val allItems = if (order == ORDER_PHOTO_DESC) {
+            allImages + cuItems
+        } else {
+            cuItems + allImages
+        }
+
         return when (order) {
-            ORDER_MODIFICATION_ASC -> (cuItems + allImages).sortedBy {
+            ORDER_MODIFICATION_ASC -> allItems.sortedBy {
                 it.modificationTime
             }
-            ORDER_MODIFICATION_DESC -> (cuItems + allImages).sortedByDescending {
+            ORDER_MODIFICATION_DESC -> allItems.sortedByDescending {
                 it.modificationTime
             }
-            else -> (cuItems + allImages)
+            else -> allItems
         }
     }
 
@@ -95,7 +96,14 @@ class PhotosFetcher(
 
         return megaApi.getChildren(
             nodeList,
-            if (order == ORDER_PHOTO_DESC || order == ORDER_VIDEO_DESC) order else ORDER_NONE
+            ORDER_MODIFICATION_DESC
         )
+    }
+
+    /**
+     * Get Videos that are only from CU/MU
+     */
+    private fun getVideosFromCUMU(): List<MegaNode> {
+        return getCuChildren().filter { MimeTypeList.typeForName(it.name).isVideoReproducible }
     }
 }
