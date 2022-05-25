@@ -12,9 +12,8 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.Mockito
+import org.mockito.kotlin.*
 import timber.log.Timber
 import java.io.File
 import java.time.LocalDateTime
@@ -29,12 +28,12 @@ class DateCardsProviderTest() {
 
     @Before
     fun setUp() {
-        underTest = DateCardsProvider(fileUtil = fileUtilWrapper)
+        underTest = DateCardsProvider(previewFolder = previewFolder, fileUtil = fileUtilWrapper)
     }
 
     @Test
     fun `test that all lists are empty if input is empty`() {
-        underTest.extractCardsFromNodeList(previewFolder, emptyList())
+        underTest.processNodes(emptyList())
 
         assertThat(underTest.getDays()).isEmpty()
         assertThat(underTest.getMonths()).isEmpty()
@@ -50,7 +49,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 1
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
     }
 
@@ -64,7 +63,7 @@ class DateCardsProviderTest() {
             getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
         }.flatten()
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         val days = underTest.getDays()
         assertThat(days).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
         assertThat(days.last().numItems).isEqualTo(numberOfDuplicateDays - 1)
@@ -77,7 +76,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 1
         val nodes = getNodes(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
@@ -88,7 +87,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 6
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
@@ -99,7 +98,18 @@ class DateCardsProviderTest() {
         val numberOfDaysPerMonth = 1
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
+        assertThat(underTest.getYears()).hasSize(numberOfYears)
+    }
+
+    @Test
+    fun `test that a year card is returned for every year`() {
+        val numberOfYears = 4
+        val numberOfMonthsPerYear = 6
+        val numberOfDaysPerMonth = 4
+        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+
+        underTest.processNodes(nodes)
         assertThat(underTest.getYears()).hasSize(numberOfYears)
     }
 
@@ -110,7 +120,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 1
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
         val nodesWithoutPreview = underTest.getNodesWithoutPreview()
@@ -127,7 +137,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 1
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
         val nodesWithoutPreview = underTest.getNodesWithoutPreview()
@@ -136,17 +146,20 @@ class DateCardsProviderTest() {
 
     @Test
     fun `test missing preview on duplicate day is not in missing preview list`() {
-        whenever(fileUtilWrapper.getFileIfExists(any(), any())).thenReturn(File("Exists"), null)
+        whenever(fileUtilWrapper.getFileIfExists(any(), argForWhich { contains("(1)") })).thenReturn(File("Exists"))
+        whenever(fileUtilWrapper.getFileIfExists(any(), argForWhich { !contains("(1)") })).thenReturn(null)
 
         val numberOfYears = 1
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 1
         val numberOfDuplicateDays = 2
         val nodes = (1..numberOfDuplicateDays).map {
-            getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+            getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth, it)
         }.flatten()
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        nodes.forEach { println(it.base64Handle) }
+
+        underTest.processNodes(nodes)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
         val nodesWithoutPreview = underTest.getNodesWithoutPreview()
@@ -160,7 +173,7 @@ class DateCardsProviderTest() {
         val numberOfMonthsPerYear = 4
         val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.extractCardsFromNodeList(previewFolder, nodes)
+        underTest.processNodes(nodes)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
         val nodesWithoutPreview = underTest.getNodesWithoutPreview()
@@ -169,7 +182,7 @@ class DateCardsProviderTest() {
         assertThat(nodesWithoutPreview.keys.last().base64Handle).isEqualTo(getHandleString(3,4,2))
     }
 
-    private fun getNodes(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int): List<MegaNode> {
+    private fun getNodes(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int, identifier: Int? = null): List<MegaNode> {
         val offset = OffsetDateTime.now().offset
 
         val nodes =
@@ -185,51 +198,16 @@ class DateCardsProviderTest() {
                             val month = localDateTime.monthValue
                             val year = localDateTime.year
                             mock<MegaNode> {
-                                on { base64Handle }.thenReturn(getHandleString(day, month, year))
+                                on { base64Handle }.thenReturn(getHandleString(day, month, year) + appendIdentifier(identifier))
                                 on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
                             }
                         }
         return nodes
     }
 
+    private fun appendIdentifier(identifier: Int?) = identifier?.let { " ($it)" } ?: ""
+
     private fun getHandleString(day: Int, month: Int, year: Int) =
             "Day: $day Month:$month Year:$year"
-
-
-    private fun GalleryCard.dateString(level: GroupingLevel): String {
-
-        val date = when (level) {
-            GroupingLevel.Years -> "[B]$year[/B]" //Pair(year!!, "") // year -> [B]year[/B]
-            GroupingLevel.Months -> if (year == null) "[B]$month[/B]" //Pair(month!!, "") //month -> [B]month[/B]
-            else StringResourcesUtils.getString(
-                    R.string.cu_month_year_date,
-                    month,
-                    year
-            ) // [B]month[/B] year -> [B][/B] [B]month[/B] year
-            GroupingLevel.Days -> if (year == null) "[B]$date[/B]" // Pair(date, "") // date -> [B]date[/B]
-            else StringResourcesUtils.getString(
-                    R.string.cu_day_month_year_date,
-                    day,
-                    month,
-                    year
-            ) // [B]day month[/B] year -> [B][/B] [B] day month [/B] year
-            else -> ""// Pair("", "")// [B][/B]
-        }
-
-        return date
-    }
-
-    private fun spanString(stringToSpan: String): Spanned {
-        return stringToSpan.runCatching {
-            replace("[B]", "<font face=\"sans-serif-medium\">")
-                    .replace("[/B]", "</font>")
-        }.fold(
-                onSuccess = { it.toSpannedHtmlText() },
-                onFailure = {
-                    Timber.e(it, "Exception formatting text.")
-                    stringToSpan.toSpannedHtmlText()
-                }
-        )
-    }
 
 }

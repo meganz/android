@@ -65,7 +65,7 @@ abstract class GalleryViewModel constructor(
      * Custom condition in sub class for filter the real photos count
      */
     open fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-        item.type != GalleryItem.TYPE_HEADER
+            item.type != GalleryItem.TYPE_HEADER
 
     /**
      * Indicate refreshing cards has finished.
@@ -119,12 +119,13 @@ abstract class GalleryViewModel constructor(
 
     var dateCards: LiveData<List<List<GalleryCard>>> = items.switchMap { galleryItems ->
         liveData(context = ioDispatcher) {
-            val cardsProvider = DateCardsProvider()
-            cardsProvider.extractCardsFromNodeList(
-                previewFolder = PreviewUtils.getPreviewFolder(galleryItemRepository.context),
-                nodes = galleryItems.mapNotNull { item -> item.node }
-                    .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
-                        .thenByDescending { node -> node.name })
+            val cardsProvider = DateCardsProvider(
+                    previewFolder = PreviewUtils.getPreviewFolder(galleryItemRepository.context),
+            )
+            cardsProvider.processNodes(
+                    nodes = galleryItems.mapNotNull { item -> item.node }
+                            .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
+                                    .thenByDescending { node -> node.name })
             )
 
             emit(listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears()))
@@ -144,10 +145,10 @@ abstract class GalleryViewModel constructor(
      * the closest month to the current.
      */
     fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-        position,
-        card,
-        dateCards.value?.get(MONTHS_INDEX),
-        dateCards.value?.get(YEARS_INDEX)
+            position,
+            card,
+            dateCards.value?.get(MONTHS_INDEX),
+            dateCards.value?.get(YEARS_INDEX)
     )
 
     /**
@@ -159,10 +160,10 @@ abstract class GalleryViewModel constructor(
      * the closest day to the current.
      */
     fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-        position,
-        card,
-        dateCards.value?.get(DAYS_INDEX),
-        dateCards.value?.get(MONTHS_INDEX)
+            position,
+            card,
+            dateCards.value?.get(DAYS_INDEX),
+            dateCards.value?.get(MONTHS_INDEX)
     )
 
     private val nodesChangeObserver = Observer<Boolean> {
@@ -189,7 +190,7 @@ abstract class GalleryViewModel constructor(
         // in the PhotosFragment, for fear that an nodes update event would be missed if
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodesChangeObserver)
+                .observeForever(nodesChangeObserver)
         loadPhotos(true)
     }
 
@@ -221,7 +222,7 @@ abstract class GalleryViewModel constructor(
      * @return  Node handles as LongArray
      */
     fun getItemsHandle(): LongArray =
-        items.value?.map { it.node?.handle ?: INVALID_HANDLE }?.toLongArray() ?: LongArray(0)
+            items.value?.map { it.node?.handle ?: INVALID_HANDLE }?.toLongArray() ?: LongArray(0)
 
     /**
      * Make the list adapter to rebind all item views with data since
@@ -236,15 +237,15 @@ abstract class GalleryViewModel constructor(
 
     override fun onCleared() {
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .removeObserver(nodesChangeObserver)
+                .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
 
     fun getRealPhotoCount(): Int {
         items.value?.filter { getFilterRealPhotoCountCondition(it) }
-            ?.let {
-                return it.size
-            }
+                ?.let {
+                    return it.size
+                }
         return 0
     }
 
