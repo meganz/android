@@ -11,10 +11,10 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.android.app.presentation.security.PasscodeCheck
 import org.jetbrains.anko.configuration
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ private const val TITLE_TAG = "settingsActivityTitle"
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity(),
-    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -33,11 +33,11 @@ class SettingsActivity : AppCompatActivity(),
         setSupportActionBar(findViewById(R.id.settings_toolbar))
         if (savedInstanceState == null) {
             supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.settings, SettingsFragment().apply {
-                    arguments = intent.extras
-                })
-                .commit()
+                    .beginTransaction()
+                    .replace(R.id.settings, SettingsFragment().apply {
+                        arguments = intent.extras
+                    })
+                    .commit()
         } else {
             title = savedInstanceState.getCharSequence(TITLE_TAG)
         }
@@ -48,9 +48,9 @@ class SettingsActivity : AppCompatActivity(),
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = when(configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK){
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> false
-            else ->  true
+            else -> true
         }
     }
 
@@ -68,34 +68,36 @@ class SettingsActivity : AppCompatActivity(),
     }
 
     override fun onPreferenceStartFragment(
-        caller: PreferenceFragmentCompat,
-        pref: Preference
+            caller: PreferenceFragmentCompat,
+            pref: Preference
     ): Boolean {
         // Instantiate the new Fragment
-        val args = pref.extras
-        val fragment = supportFragmentManager.fragmentFactory.instantiate(
-            classLoader,
-            pref.fragment
-        ).apply {
-            arguments = args
-        }
-        // Replace the existing Fragment with the new Fragment
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.settings, fragment)
-            .addToBackStack(null)
-            .commit()
+        return pref.fragment?.let {
+            val args = pref.extras
+            val fragment = supportFragmentManager.fragmentFactory.instantiate(
+                    classLoader,
+                    it
+            ).apply {
+                arguments = args
+            }
+            // Replace the existing Fragment with the new Fragment
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.settings, fragment)
+                    .addToBackStack(null)
+                    .commit()
 
-        if(caller is FragmentResultListener){
-            supportFragmentManager.setFragmentResultListener(pref.key, this, caller)
+            if (caller is FragmentResultListener) {
+                supportFragmentManager.setFragmentResultListener(pref.key, this, caller)
 //            In the calling fragment, implement FragmentResultListener to handle results for a specific preference key
 //            In the Called Fragment, setFragmentResult using the preference key to pass back any results
-        }
+            }
 
-        title = pref.title
-        return true
+            title = pref.title
+            true
+        } ?: false
     }
 
-    companion object{
+    companion object {
         fun getIntent(context: Context, targetPreference: TargetPreference? = null): Intent {
             return Intent(context, SettingsActivity::class.java).apply {
                 putExtra(INITIAL_PREFERENCE, targetPreference?.preferenceId)

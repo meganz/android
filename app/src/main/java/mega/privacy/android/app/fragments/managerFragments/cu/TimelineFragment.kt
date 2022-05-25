@@ -91,9 +91,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onResume() {
         super.onResume()
-        if (mManagerActivity.isInPhotosPage) {
-            refreshViewLayout()
-        }
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
     }
 
     override fun onBackPressed() = when {
@@ -331,7 +329,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         }
 
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
-            updateEnableCUButtons(cuEnabled = isEnabled)
+            if (!viewModel.isEnableCUShown()) {
+                updateEnableCUButtons(cuEnabled = isEnabled)
+            }
         }
     }
 
