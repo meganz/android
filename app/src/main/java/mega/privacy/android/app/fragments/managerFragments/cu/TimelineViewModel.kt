@@ -298,9 +298,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Check is enable CU shown UI
      */
-    fun isEnableCUShown(): Boolean {
-        return enableCUShown
-    }
+    fun isEnableCUShown(): Boolean = enableCUShown
 
     /**
      * set enable CU shown UI
@@ -312,9 +310,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Check is CU enabled
      */
-    fun isCUEnabled(): Boolean {
-        return if (camSyncEnabled.value != null) camSyncEnabled.value!! else false
-    }
+    fun isCUEnabled(): Boolean = camSyncEnabled.value ?: false
 
     /**
      * User enabled Camera Upload, so a periodic job should be scheduled if not already running
@@ -327,43 +323,33 @@ class TimelineViewModel @Inject constructor(
     /**
      * Set Initial Preferences
      */
-    fun setInitialPreferences() {
-        add(Completable.fromCallable {
-            Timber.d("setInitialPreferences")
-            mDbHandler.setFirstTime(false)
-            mDbHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation =
-                repository.buildDefaultDownloadDir()
-            defaultDownloadLocation.mkdirs()
-            mDbHandler.setStorageDownloadLocation(
-                defaultDownloadLocation.absolutePath
-            )
-            mDbHandler.isPasscodeLockEnabled = false
-            mDbHandler.passcodeLockCode = ""
-            val nodeLinks: ArrayList<MegaNode> = repository.getPublicLinks()
-            if (nodeLinks.size == 0) {
-                Timber.d("No public links: showCopyright set true")
-                mDbHandler.setShowCopyright(true)
-            } else {
-                Timber.d("Already public links: showCopyright set false")
-                mDbHandler.setShowCopyright(false)
-            }
-            true
+    fun setInitialPreferences() = viewModelScope.launch(ioDispatcher) {
+        Timber.d("setInitialPreferences")
+        mDbHandler.setFirstTime(false)
+        mDbHandler.setStorageAskAlways(true)
+        val defaultDownloadLocation =
+            repository.buildDefaultDownloadDir()
+        defaultDownloadLocation.mkdirs()
+        mDbHandler.setStorageDownloadLocation(
+            defaultDownloadLocation.absolutePath
+        )
+        mDbHandler.isPasscodeLockEnabled = false
+        mDbHandler.passcodeLockCode = ""
+        val nodeLinks: ArrayList<MegaNode> = repository.getPublicLinks()
+        if (nodeLinks.size == 0) {
+            Timber.d("No public links: showCopyright set true")
+            mDbHandler.setShowCopyright(true)
+        } else {
+            Timber.d("Already public links: showCopyright set false")
+            mDbHandler.setShowCopyright(false)
         }
-            .subscribeOn(Schedulers.io())
-            .subscribe(RxUtil.IGNORE, RxUtil.logErr("setInitialPreferences")))
     }
 
     /**
      * Set CamSync Enabled to db
      */
-    fun setCamSyncEnabled(enabled: Boolean) {
-        add(Completable.fromCallable {
-            mDbHandler.setCamSyncEnabled(enabled)
-            enabled
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe(RxUtil.IGNORE, RxUtil.logErr("setCamSyncEnabled")))
+    fun setCamSyncEnabled(enabled: Boolean) = viewModelScope.launch(ioDispatcher) {
+        mDbHandler.setCamSyncEnabled(enabled)
     }
 
     fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
@@ -408,10 +394,8 @@ class TimelineViewModel @Inject constructor(
         return camSyncEnabled
     }
 
-    fun checkAndUpdateCamSyncEnabledStatus() {
-        viewModelScope.launch(ioDispatcher) {
-            camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
-        }
+    fun checkAndUpdateCamSyncEnabledStatus() = viewModelScope.launch(ioDispatcher) {
+        camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
     }
 
     private fun add(disposable: Disposable) {

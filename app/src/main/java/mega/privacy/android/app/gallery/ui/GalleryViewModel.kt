@@ -10,7 +10,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineDispatcher
-import mega.privacy.android.app.arch.BaseRxViewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
@@ -30,7 +30,7 @@ abstract class GalleryViewModel constructor(
     private val sortOrderManagement: SortOrderManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
-) : BaseRxViewModel(), SearchCallback.Data {
+) : ViewModel(), SearchCallback.Data {
 
     companion object {
         const val DAYS_INDEX = 0
