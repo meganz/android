@@ -74,15 +74,6 @@ String readTesters() {
 }
 
 android {
-
-    signingConfigs {
-        qa {
-            storeFile file('/Users/dhananjay/qakeystore')
-            storePassword 'android'
-            keyAlias 'android'
-            keyPassword 'android'
-        }
-    }
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
 
@@ -164,8 +155,8 @@ android {
         }
 
         qa {
+            initWith debug
             debuggable true
-            signingConfig signingConfigs.qa
         }
     }
 
