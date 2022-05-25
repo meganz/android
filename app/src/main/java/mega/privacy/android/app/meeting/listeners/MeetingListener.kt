@@ -21,6 +21,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_SPEAK_REQUESTED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
+import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
 import mega.privacy.android.app.utils.Constants.*
@@ -34,8 +35,7 @@ import nz.mega.sdk.MegaChatSession
 
 class MeetingListener : MegaChatCallListenerInterface {
 
-    val timerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-    val customCountDownTimer = CustomCountDownTimer(timerLiveData)
+    var customCountDownTimer: CustomCountDownTimer? = null
 
     override fun onChatCallUpdate(api: MegaChatApiJava?, call: MegaChatCall?) {
         if (api == null || call == null) {
@@ -56,7 +56,7 @@ class MeetingListener : MegaChatCallListenerInterface {
             sendCallEvent(EVENT_CALL_STATUS_CHANGE, call)
             checkFirstParticipant(api, call)
             if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
-                cancelCountDown()
+                stopCountDown()
             }
         }
 
@@ -229,14 +229,21 @@ class MeetingListener : MegaChatCallListenerInterface {
         ) {
             api.getChatRoom(call.chatid)?.let { chat ->
                 if (chat.isMeeting || chat.isGroup) {
-                    customCountDownTimer.start(SECONDS_IN_MINUTE)
-                    customCountDownTimer.mutableLiveData.observeForever{ counterState ->
-                        counterState?.let { isFinished ->
-                            if (isFinished) {
-                                api.disableAudio(call.chatid, null)
+                    if(customCountDownTimer == null) {
+                        val timerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+                        customCountDownTimer = CustomCountDownTimer(timerLiveData)
+
+                        timerLiveData.observeOnce { counterState ->
+                            counterState?.let { isFinished ->
+                                if (isFinished) {
+                                    stopCountDown()
+                                    api.disableAudio(call.chatid, null)
+                                }
                             }
                         }
+
                     }
+                    customCountDownTimer?.start(SECONDS_IN_MINUTE)
                 }
             }
         }
@@ -245,8 +252,10 @@ class MeetingListener : MegaChatCallListenerInterface {
     /**
      * Cancel count down timer
      */
-    private fun cancelCountDown(){
-        customCountDownTimer.stop()
+    private fun stopCountDown() {
+        if (customCountDownTimer != null) {
+            customCountDownTimer?.stop()
+            customCountDownTimer = null
+        }
     }
-
 }
