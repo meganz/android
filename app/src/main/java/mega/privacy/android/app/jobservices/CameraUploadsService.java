@@ -990,8 +990,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             nodeExists.getFingerprint(),
                             media.timestamp,
                             sourceFile.getName(),
-                            null,
-                            null,
+                            (float) nodeExists.getLongitude(),
+                            (float) nodeExists.getLatitude(),
                             SyncStatus.STATUS_PENDING.getValue(),
                             type,
                             nodeExists.getHandle(),
@@ -2164,7 +2164,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 retriever.release();
             } else {
                 ExifInterface exif = new ExifInterface(filePath);
-                exif.getLatLong();
+                double[] latLong = exif.getLatLong();
+                if (latLong != null) {
+                    output[0] = (float) latLong[0];
+                    output[1] = (float) latLong[1];
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
