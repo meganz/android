@@ -25,10 +25,10 @@ import kotlin.coroutines.suspendCoroutine
  * @property cacheFolderFacade CacheFolderGateway
  */
 class DefaultAlbumsRepository @Inject constructor(
-        private val apiFacade: MegaApiGateway,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-        private val megaLocalStorageFacade: MegaLocalStorageGateway,
-        private val cacheFolderFacade: CacheFolderGateway,
+    private val apiFacade: MegaApiGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaLocalStorageFacade: MegaLocalStorageGateway,
+    private val cacheFolderFacade: CacheFolderGateway,
 ) : AlbumsRepository {
 
     override suspend fun getCameraUploadFolderId(): Long? = withContext(ioDispatcher) {
@@ -40,10 +40,7 @@ class DefaultAlbumsRepository @Inject constructor(
     }
 
     override suspend fun getThumbnailFromLocal(nodeId: Long): File? = withContext(ioDispatcher) {
-        cacheFolderFacade.getCacheFile(
-            folderName = CacheFolderManager.THUMBNAIL_FOLDER,
-            fileName = "${apiFacade.handleToBase64(nodeId)}${FileUtil.JPG_EXTENSION}"
-        ).takeIf {
+        getThumbnailFile(nodeId).takeIf {
             it?.exists() ?: false
         }
     }
@@ -51,7 +48,7 @@ class DefaultAlbumsRepository @Inject constructor(
     // Mark as suspend function, and later will CacheFolderGateway functions to suspend as well
     @Suppress("RedundantSuspendModifier")
     private suspend fun getThumbnailFile(nodeId: Long): File? =
-            cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${apiFacade.handleToBase64(nodeId)}${FileUtil.JPG_EXTENSION}")
+        cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${apiFacade.handleToBase64(nodeId)}${FileUtil.JPG_EXTENSION}")
 
     override suspend fun getThumbnailFromServer(nodeId: Long): File = withContext(ioDispatcher) {
         val node = apiFacade.getMegaNodeByHandle(nodeId)
@@ -59,15 +56,15 @@ class DefaultAlbumsRepository @Inject constructor(
         suspendCoroutine { continuation ->
             thumbnail?.let {
                 apiFacade.getThumbnail(node, it.absolutePath,
-                        OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        continuation.failWithError(error)
-                                    }
-                                }
-                        )
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(thumbnail))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    )
                 )
             }
         }
