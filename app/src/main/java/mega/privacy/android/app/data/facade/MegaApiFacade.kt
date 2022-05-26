@@ -155,4 +155,10 @@ class MegaApiFacade @Inject constructor(
         thumbnailFilePath: String,
         listener: MegaRequestListenerInterface
     ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
+
+    override fun registerPushNotifications(
+        deviceType: Int,
+        newToken: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.registerPushNotifications(deviceType, newToken, listener)
 }

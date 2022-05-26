@@ -52,4 +52,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
+
+    @Binds
+    abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
 }

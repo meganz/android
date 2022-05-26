@@ -14,7 +14,6 @@ import mega.privacy.android.app.fcm.IncomingCallService
 import mega.privacy.android.app.fcm.KeepAliveService
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isGMS
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaRequest.*
 import timber.log.Timber
@@ -171,27 +170,6 @@ class PushMessageHandler(
                     beep = false
                 }
             }
-        }
-    }
-
-    /**
-     * Send the push token to API to register the device.
-     * Token will be cached, only when the new token is different,it will be sent.
-     *
-     * @param newToken Push token gotten from the platform.
-     * @param deviceType DEVICE_ANDROID or DEVICE_HUAWEI
-     */
-    fun sendRegistrationToServer(newToken: String, deviceType: Int) {
-        if (TextUtil.isTextEmpty(newToken)) return
-        val sp = context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-        val token = sp.getString("token", "")
-
-        if (token != newToken) {
-            Timber.d("Push service's new token: $newToken")
-            Companion.token = token
-            megaApi.registerPushNotifications(deviceType, newToken, this)
-        } else {
-            Timber.d("No need to register new token.")
         }
     }
 

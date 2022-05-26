@@ -180,4 +180,13 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Registers push notifications.
+     *
+     * @param deviceType    Type of device.
+     * @param newToken      New push token.
+     * @param listener      Listener.
+     */
+    fun registerPushNotifications(deviceType: Int, newToken: String, listener: MegaRequestListenerInterface)
 }
