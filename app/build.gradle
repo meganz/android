@@ -125,8 +125,13 @@ android {
         }
 
         qa {
+            main {
+                java {
+                    srcDirs 'src/qa/java'
+                }
+            }
             res {
-                srcDirs 'src/qa/java', 'src/qa/res'
+                'src/qa/res'
             }
         }
 
