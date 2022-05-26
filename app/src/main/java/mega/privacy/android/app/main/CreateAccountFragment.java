@@ -134,6 +134,15 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         userLastNameError.setVisibility(View.GONE);
         userEmailLayout = v.findViewById(R.id.create_account_email_text_layout);
         userEmail = v.findViewById(R.id.create_account_email_text);
+
+        if (requireActivity().getIntent() != null) {
+            String email = requireActivity().getIntent().getStringExtra(EMAIL);
+
+            if (email != null) {
+                userEmail.setText(email);
+            }
+        }
+
         userEmailError = v.findViewById(R.id.create_account_email_text_error_icon);
         userEmailError.setVisibility(View.GONE);
         userPasswordLayout = v.findViewById(R.id.create_account_password_text_layout);

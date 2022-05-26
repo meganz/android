@@ -164,8 +164,8 @@ import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
@@ -1213,7 +1213,7 @@ public class ChatActivity extends PasscodeActivity
         if(position<messages.size()) {
             AndroidMegaChatMessage androidM = messages.get(position);
             StringBuilder messageToShow = new StringBuilder("");
-            String token = PushMessageHanlder.getToken();
+            String token = PushMessageHandler.getToken();
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }

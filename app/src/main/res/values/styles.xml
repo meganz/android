@@ -640,6 +640,19 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="MeetingBanner">
+        <item name="android:minHeight">36dp</item>
+        <item name="android:background">@drawable/background_meeting_banner</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
         <item name="bar_height">2dp</item>
         <item name="buffered_color">@color/grey_300_grey_600</item>

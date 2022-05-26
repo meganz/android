@@ -101,14 +101,11 @@ public class AppRTCAudioManager {
     // Callback method for changes in audio focus.
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
-    private final CallSoundsController soundsController;
-
     private AppRTCAudioManager(Context context, boolean statusSpeaker, int type) {
         ThreadUtils.checkIsOnMainThread();
         apprtcContext = context;
         startBluetooth();
         audioManager = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE));
-        soundsController = new CallSoundsController(audioManager);
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
         this.typeAudioManager = type;
@@ -238,17 +235,6 @@ public class AppRTCAudioManager {
             incomingCallSound();
             checkVibration();
         }
-    }
-
-    /**
-     * Method of reproducing a sound depending on the type
-     *
-     * @param type Type of sound
-     */
-    public void playSound(CallSoundType type) {
-        stopAudioSignals();
-        selectAudioDevice(AudioDevice.SPEAKER_PHONE, false);
-        soundsController.playSound(type);
     }
 
     private void outgoingCallSound() {

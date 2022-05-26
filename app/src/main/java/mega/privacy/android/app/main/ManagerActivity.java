@@ -1712,7 +1712,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
             logDebug("sync mega contacts");
             MegaContactGetter getter = new MegaContactGetter(this);
-            getter.getMegaContacts(megaApi, TimeUtils.WEEK);
+            getter.getMegaContacts(megaApi, TimeUtils.WEEK, this);
         }
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -2287,7 +2287,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             dbH.setInvalidateSdkCache(false);
-            MegaMessageService.getToken(this);
+            MegaMessageService.getToken(this, megaApi, megaApiFolder, megaChatApi, dbH);
             nVEmail.setVisibility(View.VISIBLE);
             nVEmail.setText(megaApi.getMyEmail());
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
@@ -6450,7 +6450,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                     builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
-                    builder.setPositiveButton(R.string.context_remove, (dialog, which) ->
+                    builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete, (dialog, which) ->
                             removeNodeUseCase.remove(handleList)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())

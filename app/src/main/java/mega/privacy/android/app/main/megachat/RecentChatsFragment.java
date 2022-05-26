@@ -1829,7 +1829,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     private void loadMegaContacts() {
-        contactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
+        contactGetter.getMegaContacts(megaApi, TimeUtils.DAY, context);
     }
 
     public void setCustomisedActionBar() {
