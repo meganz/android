@@ -247,18 +247,6 @@ class PushMessageHandler(
                     Timber.d("${request.requestString} failed. Error code: ${e.errorCode}, error string: ${e.errorString}")
                 }
             }
-            TYPE_REGISTER_PUSH_NOTIFICATION -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    val token = request.text
-                    Timber.d("Register push token successfully. Token is: $token")
-                    // record the token locally when register successful.
-                    val sp = context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-                    sp.edit().putString("token", token).apply()
-                } else {
-                    Timber.e("Register push token failed, retry. error code is: ${e.errorCode}")
-                    // may need retry when error code isn't -15
-                }
-            }
         }
     }
 
@@ -363,10 +351,6 @@ class PushMessageHandler(
         private const val TYPE_CALL = "4"
         private const val TYPE_CHAT = "2"
         const val PUSH_TOKEN = "PUSH_TOKEN"
-
-        @JvmStatic
-        var token: String? = null
-            private set
 
         /**
          * Flag for controlling if allows the app to do login in background upon receiving a push message.

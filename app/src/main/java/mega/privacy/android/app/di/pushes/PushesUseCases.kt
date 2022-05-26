@@ -21,4 +21,7 @@ internal abstract class PushesUseCases {
 
     @Binds
     abstract fun bindSetPushToken(useCase: DefaultSetPushToken): SetPushToken
+
+    @Binds
+    abstract fun bindPushReceived(useCase: DefaultPushReceived): PushReceived
 }

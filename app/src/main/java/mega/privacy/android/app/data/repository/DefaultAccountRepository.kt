@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isType
@@ -51,6 +53,7 @@ class DefaultAccountRepository @Inject constructor(
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
+    private val dbH: DatabaseHandler
 ) : AccountRepository {
 
     override suspend fun getUserAccount() = withContext(ioDispatcher) {
@@ -144,4 +147,5 @@ class DefaultAccountRepository @Inject constructor(
         .mapNotNull { it.users }
         .map { userUpdateMapper(it) }
 
+    override suspend fun getCredentials(): UserCredentials? = dbH.credentials
 }

@@ -51,6 +51,12 @@ interface MegaApiGateway {
      */
     val isMasterBusinessAccount: Boolean
 
+
+    /**
+     * Is ephemeral plus plus account.
+     */
+    val isEphemeralPlusPlus: Boolean
+
     /**
      * Root node of the account
      *

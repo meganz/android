@@ -1,6 +1,7 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.entity.user.UserUpdate
@@ -75,4 +76,7 @@ interface AccountRepository {
      * @return a flow of all global user updates
      */
     fun monitorUserUpdates(): Flow<UserUpdate>
+
+
+    suspend fun getCredentials(): UserCredentials?
 }

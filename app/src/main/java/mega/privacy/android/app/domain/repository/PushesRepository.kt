@@ -24,4 +24,11 @@ interface PushesRepository {
      * @param newToken  The push token.
      */
     fun setPushToken(newToken: String)
+
+    /**
+     * Notifies a push has been received.
+     *
+     * @param beep True if should beep, false otherwise.
+     */
+    suspend fun pushReceived(beep: Boolean)
 }
