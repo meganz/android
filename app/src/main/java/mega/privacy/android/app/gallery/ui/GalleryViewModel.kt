@@ -24,7 +24,6 @@ import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.PreviewUtils
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaNode
 
 abstract class GalleryViewModel constructor(
     private val galleryItemRepository: GalleryItemRepository,
@@ -122,15 +121,15 @@ abstract class GalleryViewModel constructor(
             val cardsProvider = DateCardsProvider(
                     previewFolder = PreviewUtils.getPreviewFolder(galleryItemRepository.context),
             )
-            cardsProvider.processNodes(
-                    nodes = galleryItems.mapNotNull { item -> item.node }
-                            .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }
-                                    .thenByDescending { node -> node.name })
+            cardsProvider.processGalleryItems(
+                    nodes = galleryItems
+                            .sortedWith(compareByDescending<GalleryItem> { item -> item.node?.modificationTime }
+                                    .thenByDescending { item -> item.node?.name })
             )
 
             emit(listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears()))
 
-            galleryItemRepository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
+            galleryItemRepository.getPreviews(cardsProvider.getGalleryItemsWithoutThumbnails()) {
                 _refreshCards.value = true
             }
         }

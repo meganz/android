@@ -19,10 +19,10 @@ import mega.privacy.android.app.gallery.data.GalleryCard
  * @param listener     Callback used to manage card events.
  */
 class GalleryCardAdapter(
-    private val cardViewType: Int,
-    private val cardWidth: Int,
-    private val cardMargin: Int,
-    private val listener: Listener
+        private val cardViewType: Int,
+        private val cardWidth: Int,
+        private val cardMargin: Int,
+        private val listener: Listener
 ) : ListAdapter<GalleryCard, GalleryCardViewHolder>(GalleryCard.DiffCallback()), SectionTitleProvider {
 
     init {
@@ -30,26 +30,26 @@ class GalleryCardAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryCardViewHolder =
-        GalleryCardViewHolder(
-            cardViewType,
-            ItemGalleryCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            cardWidth,
-            cardMargin
-        )
+            GalleryCardViewHolder(
+                    cardViewType,
+                    ItemGalleryCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    cardWidth,
+                    cardMargin
+            )
 
     override fun onBindViewHolder(holder: GalleryCardViewHolder, position: Int) {
         holder.bind(position, getItem(position), listener)
     }
 
     override fun getSectionTitle(position: Int): String =
-        if (position in 0 until itemCount) {
-            getItem(position).date
-        } else {
-            ""
-        }
+            if (position in 0 until itemCount) {
+                getItem(position).date
+            } else {
+                ""
+            }
 
     override fun getItemId(position: Int): Long =
-        getItem(position).node.handle
+            getItem(position).id
 
     interface Listener {
         fun onCardClicked(position: Int, card: GalleryCard)

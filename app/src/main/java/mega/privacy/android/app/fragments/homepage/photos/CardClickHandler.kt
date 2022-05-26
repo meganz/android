@@ -25,10 +25,10 @@ object CardClickHandler {
         }
 
         var card: GalleryCard? = cards[position]
-        if (handle != card!!.node.handle) {
+        if (handle != card!!.id) {
             card = null
             for (c in cards) {
-                if (c.node.handle == handle) {
+                if (c.id == handle) {
                     card = c
                     break
                 }
@@ -49,12 +49,12 @@ object CardClickHandler {
      * the closest month index to the current.
      */
     fun yearClicked(
-        position: Int,
-        card: GalleryCard,
-        months: List<GalleryCard>?,
-        years: List<GalleryCard>?
+            position: Int,
+            card: GalleryCard,
+            months: List<GalleryCard>?,
+            years: List<GalleryCard>?
     ): Int {
-        val yearCard = getClickedCard(position, card.node.handle, years) ?: return 0
+        val yearCard = getClickedCard(position, card.id, years) ?: return 0
         val monthCards = months ?: return 0
 
         val cardYear = yearCard.localDate.year
@@ -84,12 +84,12 @@ object CardClickHandler {
      * the closest day index to the current.
      */
     fun monthClicked(
-        position: Int,
-        card: GalleryCard,
-        days: List<GalleryCard>?,
-        months: List<GalleryCard>?
+            position: Int,
+            card: GalleryCard,
+            days: List<GalleryCard>?,
+            months: List<GalleryCard>?
     ): Int {
-        val monthCard = getClickedCard(position, card.node.handle, months) ?: return 0
+        val monthCard = getClickedCard(position, card.id, months) ?: return 0
         val dayCards = days ?: return 0
 
         val cardLocalDate = monthCard.localDate

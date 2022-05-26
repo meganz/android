@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
 import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.extension.thumbnailPath
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
@@ -28,9 +29,11 @@ class DateCardsProvider(
 
     private var dayNodes = mapOf<MegaNode, Long>()
 
+//    interface
 
-    fun processNodes(nodes: List<MegaNode>) {
-        dayNodes = nodes.groupBy { Util.fromEpoch(it.modificationTime).toEpochDay() }
+
+    fun processGalleryItems(nodes: List<GalleryItem>) {
+        dayNodes = nodes.mapNotNull{it.node}.groupBy { Util.fromEpoch(it.modificationTime).toEpochDay() }
                 .map { (_, list) ->
                     list.minByOrNull { it.modificationTime }!! to list.size - 1L
                 }.toMap()
@@ -143,5 +146,5 @@ class DateCardsProvider(
             .distinctBy { Util.fromEpoch(it.modificationTime).year }
             .map { createYearCard(it, previewFolder) }
 
-    fun getNodesWithoutPreview() = identifyMissingPreviews(dayNodes.keys.toList())
+    fun getGalleryItemsWithoutThumbnails() = identifyMissingPreviews(dayNodes.keys.toList())
 }

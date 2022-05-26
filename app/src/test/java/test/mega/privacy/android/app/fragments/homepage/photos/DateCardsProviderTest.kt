@@ -1,20 +1,16 @@
 package test.mega.privacy.android.app.fragments.homepage.photos
 
-import android.text.Spanned
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
-import mega.privacy.android.app.gallery.data.GalleryCard
-import mega.privacy.android.app.gallery.fragment.GroupingLevel
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.*
-import timber.log.Timber
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argForWhich
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.File
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -33,12 +29,12 @@ class DateCardsProviderTest() {
 
     @Test
     fun `test that all lists are empty if input is empty`() {
-        underTest.processNodes(emptyList())
+        underTest.processGalleryItems(emptyList())
 
         assertThat(underTest.getDays()).isEmpty()
         assertThat(underTest.getMonths()).isEmpty()
         assertThat(underTest.getYears()).isEmpty()
-        assertThat(underTest.getNodesWithoutPreview()).isEmpty()
+        assertThat(underTest.getGalleryItemsWithoutThumbnails()).isEmpty()
     }
 
     @Test
@@ -47,9 +43,9 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 20
         val numberOfMonthsPerYear = 1
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
     }
 
@@ -59,11 +55,11 @@ class DateCardsProviderTest() {
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 1
         val numberOfDuplicateDays = 20
-        val nodes = (1..numberOfDuplicateDays).map {
-            getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = (1..numberOfDuplicateDays).map {
+            getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
         }.flatten()
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         val days = underTest.getDays()
         assertThat(days).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
         assertThat(days.last().numItems).isEqualTo(numberOfDuplicateDays - 1)
@@ -74,9 +70,9 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 20
         val numberOfMonthsPerYear = 1
-        val nodes = getNodes(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
@@ -85,9 +81,9 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 6
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
@@ -96,9 +92,9 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfMonthsPerYear = 6
         val numberOfDaysPerMonth = 1
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getYears()).hasSize(numberOfYears)
     }
 
@@ -107,9 +103,9 @@ class DateCardsProviderTest() {
         val numberOfYears = 4
         val numberOfMonthsPerYear = 6
         val numberOfDaysPerMonth = 4
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getYears()).hasSize(numberOfYears)
     }
 
@@ -118,14 +114,14 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 1
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
-        val nodesWithoutPreview = underTest.getNodesWithoutPreview()
-        assertThat(nodesWithoutPreview.size).isEqualTo(1)
-        assertThat(nodesWithoutPreview.keys.first().base64Handle).isEqualTo(getHandleString(1,1,1))
+        val itemsWithoutThumbnails = underTest.getGalleryItemsWithoutThumbnails()
+        assertThat(itemsWithoutThumbnails.size).isEqualTo(1)
+        assertThat(itemsWithoutThumbnails.keys.first().base64Handle).isEqualTo(getHandleString(1, 1, 1))
     }
 
     @Test
@@ -135,13 +131,13 @@ class DateCardsProviderTest() {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 2
         val numberOfMonthsPerYear = 1
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
-        val nodesWithoutPreview = underTest.getNodesWithoutPreview()
-        assertThat(nodesWithoutPreview.size).isEqualTo(0)
+        val itemsWithoutThumbnails = underTest.getGalleryItemsWithoutThumbnails()
+        assertThat(itemsWithoutThumbnails.size).isEqualTo(0)
     }
 
     @Test
@@ -153,17 +149,17 @@ class DateCardsProviderTest() {
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 1
         val numberOfDuplicateDays = 2
-        val nodes = (1..numberOfDuplicateDays).map {
-            getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth, it)
+        val items = (1..numberOfDuplicateDays).map {
+            getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth, it)
         }.flatten()
 
-        nodes.forEach { println(it.base64Handle) }
+        items.forEach { println(it.node?.base64Handle) }
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
-        val nodesWithoutPreview = underTest.getNodesWithoutPreview()
-        assertThat(nodesWithoutPreview.size).isEqualTo(0)
+        val itemsWithoutThumbnails = underTest.getGalleryItemsWithoutThumbnails()
+        assertThat(itemsWithoutThumbnails.size).isEqualTo(0)
     }
 
     @Test
@@ -171,21 +167,21 @@ class DateCardsProviderTest() {
         val numberOfYears = 2
         val numberOfDaysPerMonth = 3
         val numberOfMonthsPerYear = 4
-        val nodes = getNodes(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
 
-        underTest.processNodes(nodes)
+        underTest.processGalleryItems(items)
         assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
 
-        val nodesWithoutPreview = underTest.getNodesWithoutPreview()
-        assertThat(nodesWithoutPreview.size).isEqualTo(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
-        assertThat(nodesWithoutPreview.keys.first().base64Handle).isEqualTo(getHandleString(1,1,1))
-        assertThat(nodesWithoutPreview.keys.last().base64Handle).isEqualTo(getHandleString(3,4,2))
+        val itemsWithoutThumbnails = underTest.getGalleryItemsWithoutThumbnails()
+        assertThat(itemsWithoutThumbnails.size).isEqualTo(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
+        assertThat(itemsWithoutThumbnails.keys.first().base64Handle).isEqualTo(getHandleString(1, 1, 1))
+        assertThat(itemsWithoutThumbnails.keys.last().base64Handle).isEqualTo(getHandleString(3, 4, 2))
     }
 
-    private fun getNodes(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int, identifier: Int? = null): List<MegaNode> {
+    private fun getGalleryItems(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int, identifier: Int? = null): List<GalleryItem> {
         val offset = OffsetDateTime.now().offset
 
-        val nodes =
+        val items =
                 (1..numberOfYears).map { year ->
                     (1..numberOfMonthsPerYear).map { month ->
                         (1..numberOfDaysPerMonth).map { day ->
@@ -197,17 +193,18 @@ class DateCardsProviderTest() {
                             val day = localDateTime.dayOfMonth
                             val month = localDateTime.monthValue
                             val year = localDateTime.year
-                            mock<MegaNode> {
+                            val node = mock<MegaNode> {
                                 on { base64Handle }.thenReturn(getHandleString(day, month, year) + appendIdentifier(identifier))
                                 on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
                             }
+                            GalleryItem(node, 1, 1, null, 1, "", null, null, false, false)
                         }
-        return nodes
+        return items
     }
-
-    private fun appendIdentifier(identifier: Int?) = identifier?.let { " ($it)" } ?: ""
 
     private fun getHandleString(day: Int, month: Int, year: Int) =
             "Day: $day Month:$month Year:$year"
+
+    private fun appendIdentifier(identifier: Int?) = identifier?.let { " ($it)" } ?: ""
 
 }
