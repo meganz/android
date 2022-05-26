@@ -632,7 +632,8 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
     public void selectAll() {
         for (int i = 0; i < nodes.size(); i++) {
             MegaNode node = nodes.get(i);
-            if (node != null && !node.isFolder() && !isItemChecked(i)) {
+            if (node != null && !node.isFolder()
+                    && !node.isTakenDown() && !isItemChecked(i)) {
                 toggleSelection(i);
             }
         }
