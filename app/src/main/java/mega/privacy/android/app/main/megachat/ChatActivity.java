@@ -1908,9 +1908,7 @@ public class ChatActivity extends PasscodeActivity
                 } else {
                     hideEditMsgLayout();
                     textChat.setText(written);
-                    textChat.post(() -> {
-                        controlExpandableInputText(textChat.getLineCount());
-                    });
+                    textChat.post(() -> controlExpandableInputText(textChat.getLineCount()));
                     showSendIcon();
                 }
 
@@ -3462,10 +3460,18 @@ public class ChatActivity extends PasscodeActivity
                 }
                 break;
             }
+
+            case REQUEST_CAMERA_SHOW_PREVIEW:
+                logDebug("Permission Camera granted");
+                if (isBottomSheetDialogShown(bottomSheetDialogFragment) && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updatePermissionsGranted(Manifest.permission.CAMERA);
+                }
+                break;
+
             case REQUEST_READ_STORAGE:
                 logDebug("Permission Read storage granted");
                 if (isBottomSheetDialogShown(bottomSheetDialogFragment) && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updateReadStoragePermissions(true);
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).getViewModel().updatePermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE);
                 }
                 break;
 

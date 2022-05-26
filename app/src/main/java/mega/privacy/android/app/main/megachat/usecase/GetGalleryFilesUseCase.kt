@@ -6,7 +6,6 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
 import android.net.Uri
 import android.provider.MediaStore
-import com.facebook.common.util.UriUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
@@ -25,7 +24,7 @@ class GetGalleryFilesUseCase @Inject constructor(
         const val DATA = "_data"
     }
 
-    fun get(): Single<List<FileGalleryItem>> =
+    fun get(): Single<MutableList<FileGalleryItem>> =
             Single.fromCallable {
                 val files = mutableListOf<FileGalleryItem>().apply {
                     addAll(fetchImages())
@@ -79,6 +78,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val file = FileGalleryItem(
                         id = id,
                         isImage = true,
+                        isTakePicture = false,
                         title = title,
                         fileUri = contentUri,
                         dateAdded = date,
@@ -148,6 +148,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val file = FileGalleryItem(
                         id = id,
                         isImage = false,
+                        isTakePicture = false,
                         title = title,
                         fileUri = contentUri,
                         dateAdded = date,

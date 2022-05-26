@@ -32,7 +32,7 @@
             android:src="@drawable/ic_send_white"
             app:borderWidth="0dp"
             app:tint="@color/teal_300_grey_087"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

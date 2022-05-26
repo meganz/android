@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.DiffUtil
 data class FileGalleryItem constructor(
         val id: Long,
         var isImage: Boolean,
+        var isTakePicture: Boolean,
+        val hasCameraPermissions: Boolean? = false,
         val title: String? = null,
         var fileUri: Uri? = null,
         var dateAdded: String? = null,

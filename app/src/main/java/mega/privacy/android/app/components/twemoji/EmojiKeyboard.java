@@ -213,7 +213,7 @@ public class EmojiKeyboard extends LinearLayout {
             if (isDifferentIcon(drawable)) {
                 emojiIcon.setImageDrawable(drawable);
             }
-            ImageViewCompat.setImageTintList(emojiIcon, ColorStateList.valueOf(ContextCompat.getColor(getContext(), editInterface.isTextEmpty() ? R.color.grey_alpha_020 : R.color.grey_alpha_060)));
+            ImageViewCompat.setImageTintList(emojiIcon, ColorStateList.valueOf(ContextCompat.getColor(getContext(), editInterface.isTextEmpty() ? R.color.grey_020_white_020 : R.color.grey_060_white_060)));
         } else {
             drawable = ContextCompat.getDrawable(getContext(), editInterface.isTextEmpty() ?
                     R.drawable.ic_emoji_unchecked :

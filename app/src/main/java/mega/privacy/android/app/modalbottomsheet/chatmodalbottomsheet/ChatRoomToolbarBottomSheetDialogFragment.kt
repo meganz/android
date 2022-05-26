@@ -46,7 +46,9 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(), R.style.BottomSheetFragmentWithTransparentBackground)
+        return BottomSheetDialog(requireContext(), R.style.BottomSheetFragmentWithTransparentBackground).apply {
+            setCanceledOnTouchOutside(true)
+        }
     }
 
     override fun onCreateView(
@@ -73,8 +75,8 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launchWhenStarted {
             viewModel.filesGallery.collect { filesList ->
-                binding.emptyGallery.isVisible = filesList.isNullOrEmpty()
-                binding.list.isVisible = !filesList.isNullOrEmpty()
+                binding.emptyGallery.isVisible = filesList.isEmpty()
+                binding.list.isVisible = filesList.isNotEmpty()
                 filesAdapter.submitList(filesList)
             }
         }
@@ -87,9 +89,17 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
 
         lifecycleScope.launchWhenStarted {
-            viewModel.hasPermissionsGranted.collect { isGranted ->
+            viewModel.hasReadStoragePermissionsGranted.collect { isGranted ->
                 if (!isGranted) {
-                    checkPermissionsDialog()
+                    checkPermissionsDialog(Manifest.permission.READ_EXTERNAL_STORAGE, Constants.REQUEST_READ_STORAGE)
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.hasCameraPermissionsGranted.collect { isGranted ->
+                if (!isGranted) {
+                    checkPermissionsDialog(Manifest.permission.CAMERA, Constants.REQUEST_CAMERA_SHOW_PREVIEW)
                 }
             }
         }
@@ -170,21 +180,21 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * Show node permission dialog to ask for Node permissions.
      */
-    private fun checkPermissionsDialog() {
+    private fun checkPermissionsDialog(typePermission: String, typeResult: Int) {
         val chatActivity = requireActivity() as ChatActivity
 
         val hasStoragePermission = ContextCompat.checkSelfPermission(
                 chatActivity,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                typePermission
         ) == PackageManager.PERMISSION_GRANTED
         if (!hasStoragePermission) {
             ActivityCompat.requestPermissions(
                     chatActivity,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    Constants.REQUEST_READ_STORAGE
+                    arrayOf(typePermission),
+                    typeResult
             )
         } else {
-            viewModel.updateReadStoragePermissions(true)
+            viewModel.updatePermissionsGranted(typePermission)
         }
     }
 

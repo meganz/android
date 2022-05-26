@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
+import android.Manifest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,30 +25,72 @@ class ChatRoomToolbarViewModel @Inject constructor(
     private val _showSendImagesButton = MutableStateFlow(false)
     val showSendImagesButton: StateFlow<Boolean> get() = _showSendImagesButton
 
-    private val _hasPermissionsGranted = MutableStateFlow(false)
-    val hasPermissionsGranted: StateFlow<Boolean> get() = _hasPermissionsGranted
+    private val _hasReadStoragePermissionsGranted = MutableStateFlow(false)
+    val hasReadStoragePermissionsGranted: StateFlow<Boolean> get() = _hasReadStoragePermissionsGranted
+
+    private val _hasCameraPermissionsGranted = MutableStateFlow(false)
+    val hasCameraPermissionsGranted: StateFlow<Boolean> get() = _hasCameraPermissionsGranted
 
     /**
      * Method that receives changes related to read storage permissions
      *
      * @param hasPermissions If permission is granted. False, if not.
      */
-    fun updateReadStoragePermissions(hasPermissions: Boolean) {
-        if (_hasPermissionsGranted.value == hasPermissions) {
+    private fun updateReadStoragePermissions(hasPermissions: Boolean) {
+        if (_hasReadStoragePermissionsGranted.value == hasPermissions) {
             return
         }
 
-        _hasPermissionsGranted.value = hasPermissions
+        _hasReadStoragePermissionsGranted.value = hasPermissions
         loadGallery()
+    }
+
+    private fun updateCameraPermissions(hasPermissions: Boolean) {
+        if (_hasCameraPermissionsGranted.value == hasPermissions) {
+            return
+        }
+
+        _hasCameraPermissionsGranted.value = hasPermissions
+
+        _filesGallery.value = _filesGallery.value.map { file ->
+            return@map when (file.isTakePicture) {
+                true -> {
+                    file.copy(hasCameraPermissions = true)
+                }
+                else -> file
+            }
+        }.toMutableList()
+    }
+
+    fun updatePermissionsGranted(typePermission: String) {
+        when (typePermission) {
+            Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                updateReadStoragePermissions(true)
+            }
+            Manifest.permission.CAMERA -> {
+                updateCameraPermissions(true)
+            }
+        }
     }
 
     /**
      * How to get images and videos from the gallery
      */
     private fun loadGallery() {
-        if (_hasPermissionsGranted.value && filesGallery.value.isEmpty()) {
-            _filesGallery.value = getGalleryFilesUseCase.get().blockingGet()
+        if (_hasReadStoragePermissionsGranted.value && filesGallery.value.isEmpty()) {
+            val files: MutableList<FileGalleryItem> = getGalleryFilesUseCase.get().blockingGet()
+            files.add(0, createTakeAPictureOption())
+            _filesGallery.value = files
         }
+    }
+
+    private fun createTakeAPictureOption(): FileGalleryItem {
+        return FileGalleryItem(
+                id = TAKE_PHOTO_OPTION_ID,
+                isImage = false,
+                isTakePicture = true,
+                isSelected = false
+        )
     }
 
     fun getDefaultLocation(): String =
@@ -86,5 +129,9 @@ class ChatRoomToolbarViewModel @Inject constructor(
         val list = getSelectedFiles()
 
         _showSendImagesButton.value = list.isNotEmpty()
+    }
+
+    companion object {
+        const val TAKE_PHOTO_OPTION_ID: Long = -1
     }
 }

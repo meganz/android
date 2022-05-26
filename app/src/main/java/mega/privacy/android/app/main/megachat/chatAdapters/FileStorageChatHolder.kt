@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat.chatAdapters
 
+
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
@@ -18,23 +19,30 @@ class FileStorageChatHolder(
 
     fun bind(item: FileGalleryItem, position: Int) {
         binding.apply {
-            takePictureButton.isVisible = position == 0
-            icSelected.isVisible = item.isSelected
+            takePictureLayout.isVisible = item.isTakePicture
+            fileLayout.isVisible = !item.isTakePicture
 
-            if (item.isImage) {
-                imageThumbnail.setImageRequestFromUri(item.fileUri)
-                imageThumbnail.isVisible = true
-                imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
-                videoDuration.isVisible = false
-                videoThumbnail.isVisible = false
+            if(item.isTakePicture) {
+                if(item.hasCameraPermissions == true){
+                }
             } else {
-                videoThumbnail.setImageRequestFromUri(item.fileUri)
-                videoThumbnail.isVisible = true
-                videoThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
-                videoDuration.isVisible = true
-                videoDuration.text = item.duration
-                imageThumbnail.isVisible = false
+                icSelected.isVisible = item.isSelected
+                if (item.isImage) {
+                    imageThumbnail.setImageRequestFromUri(item.fileUri)
+                    imageThumbnail.isVisible = true
+                    imageThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
+                    videoDuration.isVisible = false
+                    videoThumbnail.isVisible = false
+                } else {
+                    videoThumbnail.setImageRequestFromUri(item.fileUri)
+                    videoThumbnail.isVisible = true
+                    videoThumbnail.hierarchy.roundingParams = getRoundingParamsWithoutBorder(root.context)
+                    videoDuration.isVisible = true
+                    videoDuration.text = item.duration
+                    imageThumbnail.isVisible = false
+                }
             }
+            takePictureButton.isVisible = position == 0
         }
     }
 }
