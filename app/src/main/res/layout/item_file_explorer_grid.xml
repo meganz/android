@@ -1,4 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/file_explorer_grid_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -36,9 +38,21 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"
                 android:layout_toEndOf="@+id/file_explorer_grid_folder_icon"
+                android:layout_toStartOf="@+id/file_grid_taken_down"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:textSize="14sp"/>
+
+            <ImageView
+                android:id="@+id/file_grid_taken_down"
+                style="@style/taken_down_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_input_warning"
+                app:tint="?attr/colorError"
+                tools:ignore="ContentDescription" />
+
         </RelativeLayout>
 
     </RelativeLayout>
@@ -128,7 +142,8 @@
                 android:id="@+id/file_grid_filename_for_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/file_grid_taken_down_for_file"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
@@ -136,6 +151,17 @@
                 android:singleLine="true"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp"/>
+
+            <ImageView
+                android:id="@+id/file_grid_taken_down_for_file"
+                style="@style/taken_down_icon"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="6dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_input_warning"
+                app:tint="?attr/colorError"
+                tools:ignore="ContentDescription" />
 
         </RelativeLayout>
 
