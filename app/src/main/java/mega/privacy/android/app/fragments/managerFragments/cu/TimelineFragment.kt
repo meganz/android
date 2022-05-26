@@ -62,6 +62,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTimelineBinding.inflate(inflater, container, false)
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
 
         if (mManagerActivity.firstLogin || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true)
