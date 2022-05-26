@@ -12,18 +12,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImagesViewModel @Inject constructor(
-    repository: ImagesItemRepository,
-    sortOrderManagement: SortOrderManagement,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        repository: ImagesItemRepository,
+        sortOrderManagement: SortOrderManagement,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : GalleryViewModel(
-    galleryItemRepository = repository,
-    sortOrderManagement = sortOrderManagement,
-    ioDispatcher = ioDispatcher,
+        galleryItemRepository = repository,
+        sortOrderManagement = sortOrderManagement,
+        ioDispatcher = ioDispatcher,
 ) {
 
     override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
 
-    override fun getFilterRealPhotoCountCondition(item: GalleryItem)= item.type == GalleryItem.TYPE_IMAGE
+    override fun getFilterRealPhotoCountCondition(item: GalleryItem) = item.type == GalleryItem.TYPE_IMAGE
 
     override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex

@@ -2,11 +2,9 @@ package mega.privacy.android.app.fragments.homepage.photos
 
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.extension.thumbnailPath
-import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.gallery.extension.previewPath
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import nz.mega.sdk.MegaNode
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -27,31 +25,37 @@ class DateCardsProvider(
 
     private val DATE_FORMAT_YEAR = "uuuu"
 
-    private var dayNodes = mapOf<MegaNode, Long>()
+    private var dayNodes = mapOf<MediaItem, Long>()
 
-//    interface
+    private interface MediaItem {
+        val id: Long
+        val modifiedDate: LocalDate
+        val preview: File?
+        val name: String
+    }
 
 
     fun processGalleryItems(nodes: List<GalleryItem>) {
-        dayNodes = nodes.mapNotNull{it.node}.groupBy { Util.fromEpoch(it.modificationTime).toEpochDay() }
+        dayNodes = nodes.mapNotNull {
+            val node = it.node ?: return
+            object : MediaItem {
+                override val id: Long = node.handle
+                override val modifiedDate: LocalDate = Util.fromEpoch(node.modificationTime)
+                override val preview: File? = fileUtil.getFileIfExists(previewFolder, node.previewPath)
+                override val name: String = node.name
+            }
+
+        }.groupBy { it.modifiedDate.toEpochDay() }
                 .map { (_, list) ->
-                    list.minByOrNull { it.modificationTime }!! to list.size - 1L
+                    list.minByOrNull { it.modifiedDate }!! to list.size - 1L
                 }.toMap()
     }
 
-    private fun identifyMissingPreviews(list: List<MegaNode>) = list.filter {
-        getPreview(previewFolder, it) == null
-    }.associateWith { node ->
-        File(previewFolder,
-                node.base64Handle + FileUtil.JPG_EXTENSION
-        ).absolutePath
-    }
-
-    private fun createMonthCard(node: MegaNode, previewFolder: File): GalleryCard {
+    private fun createMonthCard(item: MediaItem): GalleryCard {
         val DATE_FORMAT_MONTH_STANDALONE = "LLLL"
         val DATE_FORMAT_YEAR_OF_ERA = "yyyy"
-        val modifiedDate = Util.fromEpoch(node.modificationTime)
-        val preview = getPreview(previewFolder, node)
+        val modifiedDate = item.modifiedDate
+        val preview = item.preview
         val sameYear = Year.from(LocalDate.now()) == Year.from(modifiedDate)
         val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
         val month = SimpleDateFormat(DATE_FORMAT_MONTH_STANDALONE, Locale.getDefault()).format(
@@ -70,7 +74,8 @@ class DateCardsProvider(
             )
         }
         return GalleryCard(
-                node = node,
+                id = item.id,
+                name = item.name,
                 preview = preview,
                 day = null,
                 month = month,
@@ -81,11 +86,11 @@ class DateCardsProvider(
         )
     }
 
-    private fun createDayCard(node: MegaNode, previewFolder: File, itemCount: Long): GalleryCard {
+    private fun createDayCard(item: MediaItem, itemCount: Long): GalleryCard {
         val DATE_FORMAT_DAY = "dd"
         val DATE_FORMAT_MONTH = "MMMM"
-        val modifiedDate = Util.fromEpoch(node.modificationTime)
-        val preview = getPreview(previewFolder, node)
+        val modifiedDate = item.modifiedDate
+        val preview = item.preview
         val day = DateTimeFormatter.ofPattern(DATE_FORMAT_DAY).format(modifiedDate)
         val monthForDayCard = DateTimeFormatter.ofPattern(DATE_FORMAT_MONTH).format(modifiedDate)
         val sameYear = Year.from(LocalDate.now()) == Year.from(modifiedDate)
@@ -98,7 +103,8 @@ class DateCardsProvider(
                 }
         ).format(modifiedDate)
         return GalleryCard(
-                node = node,
+                id = item.id,
+                name = item.name,
                 preview = preview,
                 day = day,
                 month = monthForDayCard,
@@ -109,12 +115,13 @@ class DateCardsProvider(
         )
     }
 
-    private fun createYearCard(node: MegaNode, previewFolder: File): GalleryCard {
-        val modifiedDate = Util.fromEpoch(node.modificationTime)
-        val preview = getPreview(previewFolder, node)
+    private fun createYearCard(item: MediaItem): GalleryCard {
+        val modifiedDate = item.modifiedDate
+        val preview = item.preview
         val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
         return GalleryCard(
-                node = node,
+                id = item.id,
+                name = item.name,
                 preview = preview,
                 day = null,
                 month = null,
@@ -125,26 +132,19 @@ class DateCardsProvider(
         )
     }
 
-    private fun getPreview(previewFolder: File, node: MegaNode) =
-            fileUtil.getFileIfExists(
-                    previewFolder,
-                    node.thumbnailPath
-            )
-
     fun getDays() = dayNodes.map { (key, value) ->
-        createDayCard(key, previewFolder, value)
+        createDayCard(key, value)
     }
 
     fun getMonths() = dayNodes.keys
-            .sortedBy { it.modificationTime }
+            .sortedBy { it.modifiedDate }
             .distinctBy {
-                YearMonth.from(Util.fromEpoch(it.modificationTime))
-            }.map { createMonthCard(it, previewFolder) }
+                YearMonth.from(it.modifiedDate)
+            }.map { createMonthCard(it) }
 
     fun getYears() = dayNodes.keys
-            .sortedBy { it.modificationTime }
-            .distinctBy { Util.fromEpoch(it.modificationTime).year }
-            .map { createYearCard(it, previewFolder) }
+            .sortedBy { it.modifiedDate }
+            .distinctBy { it.modifiedDate.year }
+            .map { createYearCard(it) }
 
-    fun getGalleryItemsWithoutThumbnails() = identifyMissingPreviews(dayNodes.keys.toList())
 }

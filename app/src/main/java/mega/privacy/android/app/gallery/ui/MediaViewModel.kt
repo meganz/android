@@ -33,9 +33,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MediaViewModel @Inject constructor(
-    val repository: MediaItemRepository,
+    private val repository: MediaItemRepository,
     private val sortOrderManagement: SortOrderManagement,
-    savedStateHandle: SavedStateHandle? = null,
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 

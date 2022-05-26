@@ -33,13 +33,14 @@ class GalleryCardViewHolderTest {
     private val date = "date"
 
     private fun getCard(dayString: String = day, monthString: String = month, yearString: String? = year) = GalleryCard(
-            mock(),
-            null,
-            dayString,
-            monthString,
-            yearString,
-            date,
-            LocalDate.now()
+            id = 1L,
+            name = "$day$month$year",
+            preview = null,
+            day = dayString,
+            month = monthString,
+            year = yearString,
+            date = date,
+            localDate = LocalDate.now()
     )
 
     @Before

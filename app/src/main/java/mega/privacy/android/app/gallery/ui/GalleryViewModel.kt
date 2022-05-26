@@ -8,9 +8,10 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
@@ -18,19 +19,15 @@ import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
-import mega.privacy.android.app.utils.PreviewUtils
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaCancelToken
+import mega.privacy.android.app.globalmanagement.NodeSortOrder
 
 abstract class GalleryViewModel constructor(
     private val galleryItemRepository: GalleryItemRepository,
-    private val sortOrderManagement: SortOrderManagement,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val sortOrderManagement: NodeSortOrder,
+    @IoDispatcher val ioDispatcher: CoroutineDispatcher,
+    private val onNodesChange: Flow<Boolean> = MonitorNodeChangeFacade().getEvents(),
     savedStateHandle: SavedStateHandle? = null,
-) : ViewModel(), SearchCallback.Data {
+) : ViewModel() {
 
     companion object {
         const val DAYS_INDEX = 0
@@ -56,7 +53,7 @@ abstract class GalleryViewModel constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    private var cancelToken: MegaCancelToken? = null
+    private var cancelToken: GalleryItemRepository.CancelCallback? = null
 
     abstract var mZoom: Int
 
@@ -64,7 +61,7 @@ abstract class GalleryViewModel constructor(
      * Custom condition in sub class for filter the real photos count
      */
     open fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-            item.type != GalleryItem.TYPE_HEADER
+        item.type != GalleryItem.TYPE_HEADER
 
     /**
      * Indicate refreshing cards has finished.
@@ -118,20 +115,37 @@ abstract class GalleryViewModel constructor(
 
     var dateCards: LiveData<List<List<GalleryCard>>> = items.switchMap { galleryItems ->
         liveData(context = ioDispatcher) {
+            val previewFolder = galleryItemRepository.previewFolder
+                ?: return@liveData
             val cardsProvider = DateCardsProvider(
-                    previewFolder = PreviewUtils.getPreviewFolder(galleryItemRepository.context),
+                previewFolder = previewFolder,
             )
             cardsProvider.processGalleryItems(
-                    nodes = galleryItems
-                            .sortedWith(compareByDescending<GalleryItem> { item -> item.node?.modificationTime }
-                                    .thenByDescending { item -> item.node?.name })
+                nodes = galleryItems
             )
 
-            emit(listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears()))
+            val days = cardsProvider.getDays()
 
-            galleryItemRepository.getPreviews(cardsProvider.getGalleryItemsWithoutThumbnails()) {
-                _refreshCards.value = true
-            }
+
+            emit(
+                listOf(
+                    days.sortDescending(),
+                    cardsProvider.getMonths().sortDescending(),
+                    cardsProvider.getYears().sortDescending())
+            )
+
+            fetchMissingPreviews(days)
+        }
+    }
+
+    fun List<GalleryCard>.sortDescending() = sortedWith(
+        compareByDescending<GalleryCard> { it.localDate }
+            .thenByDescending { it.name }
+    )
+
+    private suspend fun fetchMissingPreviews(days: List<GalleryCard>) {
+        galleryItemRepository.getPreviews(days) {
+            _refreshCards.value = true
         }
     }
 
@@ -144,10 +158,10 @@ abstract class GalleryViewModel constructor(
      * the closest month to the current.
      */
     fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-            position,
-            card,
-            dateCards.value?.get(MONTHS_INDEX),
-            dateCards.value?.get(YEARS_INDEX)
+        position,
+        card,
+        dateCards.value?.get(MONTHS_INDEX),
+        dateCards.value?.get(YEARS_INDEX)
     )
 
     /**
@@ -159,19 +173,11 @@ abstract class GalleryViewModel constructor(
      * the closest day to the current.
      */
     fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-            position,
-            card,
-            dateCards.value?.get(DAYS_INDEX),
-            dateCards.value?.get(MONTHS_INDEX)
+        position,
+        card,
+        dateCards.value?.get(DAYS_INDEX),
+        dateCards.value?.get(MONTHS_INDEX)
     )
-
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            loadPhotos(true)
-        } else {
-            refreshUi()
-        }
-    }
 
     private val loadFinishedObserver = Observer<List<GalleryItem>> {
         loadInProgress = false
@@ -188,9 +194,20 @@ abstract class GalleryViewModel constructor(
         // Calling ObserveForever() here instead of calling observe()
         // in the PhotosFragment, for fear that an nodes update event would be missed if
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-                .observeForever(nodesChangeObserver)
+        monitorNodeUpdates()
         loadPhotos(true)
+    }
+
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch(ioDispatcher) {
+            onNodesChange.collect {
+                if (it) {
+                    loadPhotos(true)
+                } else {
+                    refreshUi()
+                }
+            }
+        }
     }
 
     /**
@@ -215,13 +232,15 @@ abstract class GalleryViewModel constructor(
         liveDataRoot.value = liveDataRoot.value
     }
 
+    private val invalidHandle = 0L.inv()
+
     /**
      * Get items node handles
      *
      * @return  Node handles as LongArray
      */
     fun getItemsHandle(): LongArray =
-            items.value?.map { it.node?.handle ?: INVALID_HANDLE }?.toLongArray() ?: LongArray(0)
+        items.value?.map { it.node?.handle ?: invalidHandle }?.toLongArray() ?: LongArray(0)
 
     /**
      * Make the list adapter to rebind all item views with data since
@@ -235,25 +254,23 @@ abstract class GalleryViewModel constructor(
     }
 
     override fun onCleared() {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-                .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
 
     fun getRealPhotoCount(): Int {
         items.value?.filter { getFilterRealPhotoCountCondition(it) }
-                ?.let {
-                    return it.size
-                }
+            ?.let {
+                return it.size
+            }
         return 0
     }
 
-    override fun initNewSearch(): MegaCancelToken {
+    fun initNewSearch(): GalleryItemRepository.CancelCallback {
         cancelSearch()
-        return MegaCancelToken.createInstance()
+        return galleryItemRepository.createCancelCallback()
     }
 
-    override fun cancelSearch() {
+    fun cancelSearch() {
         cancelToken?.cancel()
     }
 }

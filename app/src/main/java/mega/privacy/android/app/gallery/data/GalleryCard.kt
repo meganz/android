@@ -21,7 +21,8 @@ import java.time.LocalDate
  * @param numItems  Number of items contained in a card. Should be used only on day cards as per design.
  */
 data class GalleryCard(
-        private val node: MegaNode,
+        val id :Long,
+        val name: String,
         var preview: File?,
         var day: String? = null,
         var month: String? = null,
@@ -30,7 +31,7 @@ data class GalleryCard(
         val localDate: LocalDate,
         var numItems: Long = 0
 ) {
-    val id = node.handle
+
 
     fun incrementNumItems() {
         numItems++
@@ -38,7 +39,7 @@ data class GalleryCard(
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryCard>() {
         override fun areItemsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
-                oldItem.node.handle == newItem.node.handle
+                oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
                 oldItem == newItem

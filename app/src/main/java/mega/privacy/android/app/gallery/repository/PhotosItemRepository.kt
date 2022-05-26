@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
@@ -24,6 +25,7 @@ class PhotosItemRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
+    cacheFolderGateway: CacheFolderGateway,
 ) {
 
     fun getPublicLinks(): ArrayList<MegaNode> {

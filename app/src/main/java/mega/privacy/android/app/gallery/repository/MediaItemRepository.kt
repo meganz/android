@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.fetcher.MediaFetcher
@@ -19,6 +21,8 @@ import javax.inject.Singleton
 class MediaItemRepository @Inject constructor(
     @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
+    dbHandler: DatabaseHandler,
+    cacheFolderGateway: CacheFolderGateway,
 ) {
 
     /** Live Data to notify the query result*/

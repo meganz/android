@@ -14,13 +14,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AlbumContentViewModel @Inject constructor(
-    val repository: FavouriteAlbumRepository,
-    val sortOrderManagement: SortOrderManagement,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        val repository: FavouriteAlbumRepository,
+        val sortOrderManagement: SortOrderManagement,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : GalleryViewModel(
-    galleryItemRepository = repository,
-    sortOrderManagement = sortOrderManagement,
-    ioDispatcher = ioDispatcher,
+        galleryItemRepository = repository,
+        sortOrderManagement = sortOrderManagement,
+        ioDispatcher = ioDispatcher,
 ) {
 
     override var mZoom = ZoomUtil.ALBUM_ZOOM_LEVEL

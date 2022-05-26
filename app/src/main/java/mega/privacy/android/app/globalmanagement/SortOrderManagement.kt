@@ -8,7 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class SortOrderManagement @Inject constructor(
     private val dbH: DatabaseHandler
-) {
+) : NodeSortOrder {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
@@ -36,16 +36,16 @@ class SortOrderManagement @Inject constructor(
     /**
      * Sets all the available orders to the value by default
      */
-    fun resetDefaults() {
+    override fun resetDefaults() {
         orderCloud = ORDER_DEFAULT_ASC
         orderOthers = ORDER_DEFAULT_ASC
         orderCamera = ORDER_MODIFICATION_DESC
         orderOffline = ORDER_DEFAULT_ASC
     }
 
-    fun getOrderCloud(): Int = orderCloud
+    override fun getOrderCloud(): Int = orderCloud
 
-    fun setOrderCloud(newOrderCloud: Int) {
+    override fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud
         dbH.setPreferredSortCloud(orderCloud.toString())
 
@@ -54,23 +54,23 @@ class SortOrderManagement @Inject constructor(
         }
     }
 
-    fun getOrderOthers(): Int = orderOthers
+    override fun getOrderOthers(): Int = orderOthers
 
-    fun setOrderOthers(newOrderOthers: Int) {
+    override fun setOrderOthers(newOrderOthers: Int) {
         orderOthers = newOrderOthers
         dbH.setPreferredSortOthers(orderOthers.toString())
     }
 
-    fun getOrderCamera(): Int = orderCamera
+    override fun getOrderCamera(): Int = orderCamera
 
-    fun setOrderCamera(newOrderCamera: Int) {
+    override fun setOrderCamera(newOrderCamera: Int) {
         orderCamera = newOrderCamera
         dbH.setPreferredSortCameraUpload(orderCamera.toString())
     }
 
-    fun getOrderOffline(): Int = orderOffline
+    override fun getOrderOffline(): Int = orderOffline
 
-    fun setOrderOffline(newOrderOffline: Int) {
+    override fun setOrderOffline(newOrderOffline: Int) {
         orderOffline = newOrderOffline
         orderCloud = newOrderOffline
         dbH.setPreferredSortCloud(orderCloud.toString())
