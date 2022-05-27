@@ -55,4 +55,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
+
+    @Binds
+    abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
 }

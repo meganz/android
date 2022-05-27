@@ -1481,18 +1481,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
-			logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
-			stopService(new Intent(this, KeepAliveService.class));
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("OK:TYPE_PUSH_RECEIVED");
-				if (!getMegaApi().isEphemeralPlusPlus()) {
-					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-					notificationBuilder.generateChatNotification(request);
-				}
-			}
-			else{
-				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
-			}
+//			logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
+//			stopService(new Intent(this, KeepAliveService.class));
+//			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+//				logDebug("OK:TYPE_PUSH_RECEIVED");
+//				if (!getMegaApi().isEphemeralPlusPlus()) {
+//					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
+//					notificationBuilder.generateChatNotification(request);
+//				}
+//			}
+//			else{
+//				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
+//			}
 		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
 			chatManagement.removeJoiningChatId(request.getChatHandle());
 			chatManagement.removeJoiningChatId(request.getUserHandle());
@@ -1517,7 +1517,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
         getChatManagement().addNotificationShown(incomingCall.getChatid());
         stopService(new Intent(this, IncomingCallService.class));
-        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
         notificationBuilder.showOneCallNotification(incomingCall);
     }
 
@@ -1782,7 +1782,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
                     try {
                         logDebug("Show missed call notification");
-                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
                         notificationBuilder.showMissedCallNotification(chatId, callId);
                     } catch (Exception e) {
                         logError("EXCEPTION when showing missed call notification", e);
@@ -2003,7 +2003,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     public void checkQueuedCalls(long incomingCallChatId) {
         try {
             stopService(new Intent(this, IncomingCallService.class));
-            ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+            ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
             notificationBuilder.checkQueuedCalls(incomingCallChatId);
         } catch (Exception e) {
             logError("EXCEPTION", e);

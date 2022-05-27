@@ -51,7 +51,6 @@ interface MegaApiGateway {
      */
     val isMasterBusinessAccount: Boolean
 
-
     /**
      * Is ephemeral plus plus account.
      */
@@ -195,4 +194,19 @@ interface MegaApiGateway {
      * @param listener      Listener.
      */
     fun registerPushNotifications(deviceType: Int, newToken: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Performs a fast login.
+     *
+     * @param session   Required for fast login.
+     * @param listener  Listener.
+     */
+    fun fastLogin(session: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Performs fetch nodes.
+     *
+     * @param listener  Listener.
+     */
+    fun fetchNodes(listener: MegaRequestListenerInterface)
 }

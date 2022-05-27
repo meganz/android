@@ -53,6 +53,8 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isBusinessAccount
     override val isMasterBusinessAccount: Boolean
         get() = megaApi.isMasterBusinessAccount
+    override val isEphemeralPlusPlus: Boolean
+        get() = megaApi.isEphemeralPlusPlus
     override val rootNode: MegaNode?
         get() = megaApi.rootNode
 
@@ -161,4 +163,10 @@ class MegaApiFacade @Inject constructor(
         newToken: String,
         listener: MegaRequestListenerInterface
     ) = megaApi.registerPushNotifications(deviceType, newToken, listener)
+
+    override fun fastLogin(session: String, listener: MegaRequestListenerInterface) =
+        megaApi.fastLogin(session, listener)
+
+    override fun fetchNodes(listener: MegaRequestListenerInterface) =
+        megaApi.fetchNodes(listener)
 }

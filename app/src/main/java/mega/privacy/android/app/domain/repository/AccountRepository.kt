@@ -78,5 +78,10 @@ interface AccountRepository {
     fun monitorUserUpdates(): Flow<UserUpdate>
 
 
+    /**
+     * Gets user account credentials.
+     *
+     * @return User credentials if exists, null otherwise.
+     */
     suspend fun getCredentials(): UserCredentials?
 }

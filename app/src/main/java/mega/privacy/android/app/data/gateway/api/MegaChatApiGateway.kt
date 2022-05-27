@@ -11,6 +11,24 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 interface MegaChatApiGateway {
 
     /**
+     * Init state
+     */
+    val initState: Int
+
+    /**
+     * Initializes API.
+     *
+     * @param session   Account session.
+     * @return Init state.
+     */
+    fun init(session: String): Int
+
+    /**
+     * Logouts API.
+     */
+    fun logout()
+
+    /**
      * Set logger
      *
      * @param logger

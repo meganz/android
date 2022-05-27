@@ -8544,7 +8544,7 @@ public class ChatActivity extends PasscodeActivity
 
             try {
                 ChatAdvancedNotificationBuilder notificationBuilder;
-                notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
                 notificationBuilder.removeAllChatNotifications();
             } catch (Exception e) {
                 logError("Exception NotificationManager - remove all notifications", e);

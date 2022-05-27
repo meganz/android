@@ -6,6 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetPushToken
 import mega.privacy.android.app.domain.usecase.RegisterPushNotifications
 import mega.privacy.android.app.domain.usecase.SetPushToken
@@ -28,23 +30,23 @@ class NewTokenWorker @AssistedInject constructor(
     private val setPushToken: SetPushToken
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result {
-        val newToken = inputData.getString(NEW_TOKEN)
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) {
+            val newToken = inputData.getString(NEW_TOKEN)
 
-        if (newToken.isNullOrEmpty() || getPushToken() == newToken) {
-            Timber.d("No need to register new token.")
-            return Result.success()
+            if (newToken.isNullOrEmpty() || getPushToken() == newToken) {
+                Timber.d("No need to register new token.")
+            } else {
+                Timber.d("Push service's new token: $newToken")
+
+                setPushToken(
+                    registerPushNotifications
+                        .invoke(inputData.getInt(DEVICE_TYPE, INVALID_VALUE), newToken)
+                )
+            }
+
+            Result.success()
         }
-
-        Timber.d("Push service's new token: $newToken")
-
-        setPushToken(
-            registerPushNotifications
-                .invoke(inputData.getInt(DEVICE_TYPE, INVALID_VALUE), newToken)
-        )
-
-        return Result.success()
-    }
 
     companion object {
         const val NEW_TOKEN = "NEW_TOKEN"
