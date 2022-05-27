@@ -30,13 +30,13 @@ data class GalleryItem(
         var indexForViewer: Int,
         override var index: Int,
         override var thumbnail: File?,
-        var type: Int,
+        var type: MediaType,
         var modifyDate: String,
         var formattedDate: Spanned?,
         var headerDate: Pair<String, String>?,
         override var selected: Boolean,
         override var uiDirty: Boolean,
-) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
+) : NodeItem(node, index, type == MediaType.Video, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
      * Creates a TYPE_HEADER which represent date.
@@ -52,7 +52,7 @@ data class GalleryItem(
             context: Context,
     ) : this(
             null, INVALID_POSITION, INVALID_POSITION, null,
-            TYPE_HEADER, modifyDate, headerDate.formatDateTitle(context), headerDate, false, false
+            MediaType.Header, modifyDate, headerDate.formatDateTitle(context), headerDate, false, false
     )
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
@@ -63,13 +63,4 @@ data class GalleryItem(
                 !newItem.uiDirty
     }
 
-    companion object {
-
-        /**
-         * Three different types of nodes.
-         */
-        const val TYPE_HEADER = 1
-        const val TYPE_IMAGE = 2
-        const val TYPE_VIDEO = 3
-    }
 }

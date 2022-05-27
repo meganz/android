@@ -65,6 +65,7 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
+import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -430,7 +431,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaType.Header })
 
             updateOptionsButtons()
 

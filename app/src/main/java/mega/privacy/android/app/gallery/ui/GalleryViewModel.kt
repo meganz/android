@@ -18,6 +18,7 @@ import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.NodeSortOrder
 
@@ -61,7 +62,7 @@ abstract class GalleryViewModel constructor(
      * Custom condition in sub class for filter the real photos count
      */
     open fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-        item.type != GalleryItem.TYPE_HEADER
+        item.type != MediaType.Header
 
     /**
      * Indicate refreshing cards has finished.
@@ -78,7 +79,7 @@ abstract class GalleryViewModel constructor(
     open fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
 
-        if (item.type != GalleryItem.TYPE_HEADER) {
+        if (item.type != MediaType.Header) {
             item.indexForViewer = tempIndex++
         }
 

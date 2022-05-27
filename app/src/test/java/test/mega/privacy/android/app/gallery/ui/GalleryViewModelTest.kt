@@ -12,12 +12,20 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.globalmanagement.NodeSortOrder
 import nz.mega.sdk.MegaNode
-import org.junit.*
-import org.mockito.kotlin.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argWhere
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -48,7 +56,6 @@ class GalleryViewModelTest {
         Dispatchers.resetMain()
     }
 
-    @Ignore("Fix linking errors by removing m ega dependencies")
     @Test
     fun `test missing preview on one day`() {
         val numberOfYears = 1
@@ -137,7 +144,7 @@ class GalleryViewModelTest {
                                 on { base64Handle }.thenReturn(getHandleString(day, month, year) + appendIdentifier(identifier))
                                 on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
                             }
-                            GalleryItem(node, 1, 1, null, 1, "", null, null, false, false)
+                            GalleryItem(node, 1, 1, null, MediaType.Header, "", null, null, false, false)
                         }
         return items
     }

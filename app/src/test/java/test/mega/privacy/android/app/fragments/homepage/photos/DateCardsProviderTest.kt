@@ -3,14 +3,12 @@ package test.mega.privacy.android.app.fragments.homepage.photos
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argForWhich
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import java.io.File
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -129,7 +127,7 @@ class DateCardsProviderTest() {
                                 on { base64Handle }.thenReturn(getHandleString(day, month, year) + appendIdentifier(identifier))
                                 on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
                             }
-                            GalleryItem(node, 1, 1, null, 1, "", null, null, false, false)
+                            GalleryItem(node, 1, 1, null, MediaType.Header, "", null, null, false, false)
                         }
         return items
     }

@@ -7,9 +7,7 @@ import kotlinx.coroutines.delay
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.fragments.homepage.TypedNodesFetcher
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_VIDEO
+import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.gallery.extension.formatDateTitle
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -151,7 +149,7 @@ abstract class GalleryBaseFetcher(
                     INVALID_POSITION,
                     INVALID_POSITION,
                     thumbnail,
-                    if (node.duration == -1) TYPE_IMAGE else TYPE_VIDEO,
+                    if (node.duration == -1) MediaType.Image else MediaType.Video,
                     dateString,
                     null,
                     null,
@@ -177,7 +175,7 @@ abstract class GalleryBaseFetcher(
                 INVALID_POSITION,
                 INVALID_POSITION,
                 null,
-                TYPE_HEADER,
+                MediaType.Header,
                 dateString,
                 date.formatDateTitle(context),
                 null,
