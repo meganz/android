@@ -27,11 +27,11 @@
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_title">Anulować skan?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
-    <string name="scan_dialog_discard_body">Bieżące skanowanie zostanie utracone.</string>
+    <string name="scan_dialog_discard_body">Bieżące skanowanie zostanie utracone</string>
     <!-- Title text shown on document scanner dialog to discard scan all scans -->
     <string name="scan_dialog_discard_all_title">Odrzucić wszystkie skany?</string>
     <!-- Body text shown on document scanner dialog to discard all scans -->
-    <string name="scan_dialog_discard_all_body">Bieżący dokument zostanie utracony.</string>
+    <string name="scan_dialog_discard_all_body">Bieżący dokument zostanie utracony</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_action">Odrzuć</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->

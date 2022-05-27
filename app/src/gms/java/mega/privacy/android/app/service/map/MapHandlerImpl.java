@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -65,10 +66,22 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     public MapHandlerImpl(MapsActivity activity, Bitmap fullscreenIconMarker) {
         super(activity, fullscreenIconMarker);
-        SupportMapFragment mapFragment = (SupportMapFragment) activity.getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+
+        MapsInitializer.initialize(activity.getApplicationContext(), MapsInitializer.Renderer.LATEST, renderer -> {
+            switch (renderer) {
+                case LATEST:
+                    logDebug("The latest version of the renderer is used.");
+                    break;
+                case LEGACY:
+                    logDebug("The legacy version of the renderer is used.");
+                    break;
+            }
+
+            SupportMapFragment mapFragment = (SupportMapFragment) activity.getSupportFragmentManager().findFragmentById(R.id.map);
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(this);
+            }
+        });
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
         locationRequest = LocationRequest.create();

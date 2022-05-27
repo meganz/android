@@ -256,7 +256,7 @@ class MeetingActivity : BaseActivity() {
         }
 
         navGraph?.apply {
-            startDestination = when (meetingAction) {
+            val startDestination = when (meetingAction) {
                 MEETING_ACTION_CREATE -> R.id.createMeetingFragment
                 MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
                 MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
@@ -265,6 +265,7 @@ class MeetingActivity : BaseActivity() {
                 MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
                 else -> R.id.createMeetingFragment
             }
+            setStartDestination(startDestination)
 
             navController.setGraph(this, bundle)
         }

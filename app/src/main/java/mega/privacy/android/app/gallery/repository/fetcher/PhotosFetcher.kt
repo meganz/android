@@ -11,12 +11,12 @@ import nz.mega.sdk.MegaNodeList
 import java.util.*
 
 class PhotosFetcher(
-        context: Context,
-        megaApi: MegaApiAndroid,
-        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-        private val order: Int,
-        zoom: Int,
-        private val dbHandler: DatabaseHandler
+    context: Context,
+    megaApi: MegaApiAndroid,
+    selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+    private val order: Int,
+    zoom: Int,
+    private val dbHandler: DatabaseHandler
 ) : GalleryBaseFetcher(
         context = context,
         megaApi = megaApi,

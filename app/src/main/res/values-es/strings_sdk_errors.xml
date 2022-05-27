@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Identificador de sesión erróneo</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">No accesible por infringir los Términos de servicio</string>
+    <string name="api_eblocked_ec_import_ec_download">Eliminado por infringir nuestros Términos de servicio</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bloqueado</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

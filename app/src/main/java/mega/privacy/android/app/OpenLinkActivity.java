@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
@@ -23,6 +25,7 @@ import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.usecase.QuerySignupLinkUseCase;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
@@ -33,6 +36,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -52,6 +56,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	@ApplicationScope
 	@Inject
 	CoroutineScope sharingScope;
+	@Inject
+	QuerySignupLinkUseCase querySignupLinkUseCase;
 
 	private DatabaseHandler dbH = null;
 
@@ -217,14 +223,23 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 			if (dbH != null) {
 				if (isLoggedIn) {
-					logDebug("Logged IN");
+					Timber.d("Logged IN");
 					setError(getString(R.string.log_out_warning));
 				} else {
-					logDebug("Not logged");
-					Intent createAccountIntent = new Intent(this, LoginActivity.class);
-					createAccountIntent.putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT);
-					startActivity(createAccountIntent);
-					finish();
+					querySignupLinkUseCase.query(url)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe((result, throwable) -> {
+								if (throwable == null) {
+									Timber.d("Not logged");
+									startActivity(new Intent(this, LoginActivity.class)
+											.putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT)
+											.putExtra(EMAIL, result));
+									finish();
+								} else {
+									Timber.e(throwable);
+								}
+							});
 				}
 			}
 			return;
