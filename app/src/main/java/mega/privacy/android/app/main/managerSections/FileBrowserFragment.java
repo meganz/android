@@ -105,8 +105,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.presentation.filebrowser.FileBrowserViewModel;
-import mega.privacy.android.app.presentation.manager.ManagerDataViewModel;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -124,8 +123,7 @@ public class FileBrowserFragment extends RotatableFragment{
 	@Inject
 	SortOrderManagement sortOrderManagement;
 
-	private FileBrowserViewModel viewModel;
-	private ManagerDataViewModel dataViewModel;
+	private ManagerViewModel managerViewModel;
 
 	Context context;
 	ActionBar aB;
@@ -527,13 +525,8 @@ public class FileBrowserFragment extends RotatableFragment{
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
 				new EventObserver<>(this::showSortByPanel));
 
-		dataViewModel = new ViewModelProvider(requireActivity()).get(ManagerDataViewModel.class);
-		dataViewModel.getOnRubbishBinParentHandleChanged()
-				.observe(getViewLifecycleOwner(), parentHandle -> {
-					viewModel.setParentHandle(parentHandle);
-				});
-		viewModel = new ViewModelProvider(this).get(FileBrowserViewModel.class);
-		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(), nodes -> {
+		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+		managerViewModel.getUpdateBrowserNodes().observe(getViewLifecycleOwner(), nodes -> {
 			hideMultipleSelect();
 			setNodes(nodes);
 			getRecyclerView().invalidate();

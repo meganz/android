@@ -103,7 +103,7 @@ import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.presentation.manager.ManagerDataViewModel;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -122,7 +122,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
-	private ManagerDataViewModel dataViewModel;
+	private ManagerViewModel managerViewModel;
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -539,7 +539,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
 				new EventObserver<>(this::showSortByPanel));
 
-		dataViewModel = new ViewModelProvider(requireActivity()).get(ManagerDataViewModel.class);
+		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -699,7 +699,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				}
 
 			case RUBBISH_BIN:
-				return dataViewModel.getRubbishBinParentHandle();
+				return managerViewModel.getRubbishBinParentHandle();
 
 			case INBOX:
 				return ((ManagerActivity) context).getParentHandleInbox();

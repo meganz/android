@@ -1,17 +1,13 @@
 package mega.privacy.android.app.presentation.manager
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.usecase.*
-import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,6 +21,8 @@ import javax.inject.Inject
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
+    @MegaApi megaApi: MegaApiAndroid,
+    sortOrderManagement: SortOrderManagement,
 ) : ViewModel() {
 
     /**
@@ -79,4 +77,57 @@ class ManagerViewModel @Inject constructor(
             .filterNot { it.isEmpty() }
             .asLiveData()
 
+    /**
+     * Current rubbish bin parent handle
+     */
+    var rubbishBinParentHandle: Long = -1L
+
+    /**
+     * Current browser parent handle
+     */
+    var browserParentHandle: Long = -1L
+
+    /**
+     * Update Rubbish Nodes when a node update callback happens
+     */
+    val updateRubbishBinNodes: LiveData<List<MegaNode>> =
+        updateNodes.asFlow()
+            .map {
+                if (rubbishBinParentHandle == -1L) {
+                    megaApi.getChildren(megaApi.rubbishNode, sortOrderManagement.getOrderCloud())
+                }
+                else {
+                    megaApi.getChildren(
+                        megaApi.getNodeByHandle(rubbishBinParentHandle),
+                        sortOrderManagement.getOrderCloud()
+                    )
+                }
+            }
+            .also { Timber.d("onRubbishNodesUpdate") }
+            .asLiveData()
+
+
+    /**
+     * Update Browser Nodes when a node update callback happens
+     */
+    val updateBrowserNodes: LiveData<List<MegaNode>> =
+        updateNodes.asFlow()
+            .map {
+                if (browserParentHandle == -1L) {
+                    megaApi.rootNode?.let {
+                        megaApi.getChildren(it, sortOrderManagement.getOrderCloud())
+                    } ?: run {
+                        emptyList()
+                    }
+                }
+                else {
+                    megaApi.getNodeByHandle(browserParentHandle)?.let {
+                        megaApi.getChildren(it, sortOrderManagement.getOrderCloud())
+                    } ?: run {
+                        emptyList()
+                    }
+                }
+            }
+            .also { Timber.d("onBrowserNodesUpdate") }
+            .asLiveData()
 }
