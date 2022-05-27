@@ -12,6 +12,7 @@ import mega.privacy.android.app.domain.entity.FolderVersionInfo
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -59,4 +60,14 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull { it.nodeList?.toList() }
+
+    override fun getRootNode(): MegaNode? = megaApiGateway.rootNode
+
+    override fun getRubbishBinNode(): MegaNode? = megaApiGateway.rubbishBinNode
+
+    override fun getChildrenNode(parentHandle: MegaNode, order: Int?): List<MegaNode> =
+        megaApiGateway.getChildrenByNode(parentHandle, order)
+
+    override fun getNodeByHandle(handle: Long): MegaNode =
+        megaApiGateway.getMegaNodeByHandle(handle)
 }

@@ -55,6 +55,8 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isMasterBusinessAccount
     override val rootNode: MegaNode?
         get() = megaApi.rootNode
+    override val rubbishBinNode: MegaNode?
+        get() = megaApi.rubbishNode
 
     override val globalUpdates: Flow<GlobalUpdate>
         get() = callbackFlow {
@@ -121,8 +123,11 @@ class MegaApiFacade @Inject constructor(
 
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
-    override fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode> =
-        megaApi.getChildren(parentNode)
+    override fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
+        if (order == null)
+            megaApi.getChildren(parentNode)
+        else
+            megaApi.getChildren(parentNode, order)
 
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 

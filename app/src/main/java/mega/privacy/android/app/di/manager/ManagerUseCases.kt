@@ -4,10 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.DefaultMonitorNodeUpdates
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.*
 
 /**
  * Manager module
@@ -23,5 +20,23 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindMonitorNodeUpdates(useCase: DefaultMonitorNodeUpdates): MonitorNodeUpdates
+
+    @Binds
+    abstract fun bindRubbishNodeByHandle(useCase: DefaultGetRubbishBinNodeByHandle): GetRubbishBinNodeByHandle
+
+    @Binds
+    abstract fun bindBrowserNodeByHandle(useCase: DefaultGetBrowserNodeByHandle): GetBrowserNodeByHandle
+
+    @Binds
+    abstract fun bindGetRootNode(useCase: DefaultGetRootNode): GetRootNode
+
+    @Binds
+    abstract fun bindGetRubbishBinNode(useCase: DefaultGetRubbishBinNode): GetRubbishBinNode
+
+    @Binds
+    abstract fun bindGetChildrenNode(useCase: DefaultGetChildrenNode): GetChildrenNode
+
+    @Binds
+    abstract fun bindGetNodeByHandle(useCase: DefaultGetNodeByHandle): GetNodeByHandle
 
 }
