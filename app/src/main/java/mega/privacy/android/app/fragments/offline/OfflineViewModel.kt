@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -12,10 +13,16 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
@@ -24,7 +31,9 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
@@ -34,6 +43,7 @@ import javax.inject.Inject
 class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : BaseRxViewModel() {
 
     private var order = ORDER_DEFAULT_ASC
@@ -89,6 +99,15 @@ class OfflineViewModel @Inject constructor(
         private set
     var skipNextAutoScroll = false
 
+    /**
+     * Monitor global node updates
+     */
+    var updateNodes: StateFlow<List<MegaNode>> =
+        monitorNodeUpdates()
+            .also { Timber.d("onNodesUpdate") }
+            .filterNot { it.isEmpty() }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
     init {
         add(
             openNodeAction.throttleFirst(1, SECONDS)
@@ -114,6 +133,14 @@ class OfflineViewModel @Inject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
+
+        viewModelScope.launch {
+            updateNodes =
+                monitorNodeUpdates()
+                    .also { Timber.d("onNodesUpdate") }
+                    .filterNot { it.isEmpty() }
+                    .stateIn(viewModelScope)
+        }
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
