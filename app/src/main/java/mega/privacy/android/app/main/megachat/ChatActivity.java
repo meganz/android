@@ -102,13 +102,13 @@ import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
+import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
@@ -181,10 +181,8 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatGeolocation;
 import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -242,12 +240,8 @@ public class ChatActivity extends PasscodeActivity
         MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
         SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
-        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
-        SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
-        LoadPreviewListener.OnChatPreviewLoadedCallback {
-
-    @Inject
-    GetChatChangesUseCase getChatChangesUseCase;
+        HangChatCallListener.OnCallHungUpCallback, SetCallOnHoldListener.OnCallOnHoldCallback,
+        LoadPreviewListener.OnPreviewLoadedCallback, LoadPreviewListener.OnChatPreviewLoadedCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -337,6 +331,10 @@ public class ChatActivity extends PasscodeActivity
     GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
     @Inject
     GetPublicNodeUseCase getPublicNodeUseCase;
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    AnswerCallUseCase answerCallUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -680,21 +678,6 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onCallAnswered(long chatId, boolean flag) {
-        logDebug("The call has been answered success");
-        callInProgressLayout.setEnabled(true);
-        openMeetingInProgress(this, chatId, true, passcodeManagement);
-    }
-
-
-    @Override
-    public void onErrorAnsweredCall(int errorCode) {
-        callInProgressLayout.setEnabled(true);
-
-        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
-    }
-
-    @Override
     public void onCallOnHold(long chatId, boolean isOnHold) {
         if(!isOnHold)
             return;
@@ -831,8 +814,34 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    /**
+     * Method for answering a call
+     *
+     * @param chatId  Chat ID
+     * @param video   True, video ON. False, video OFF.
+     * @param audio   True, audio ON. False, audio OFF.
+     * @param speaker True, speaker ON. False, speaker OFF.
+     */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
-        MegaApplication.getChatManagement().answerChatCall(chatId, video, audio, speaker, new AnswerChatCallListener(this, this));
+        if (audio) {
+            audio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        }
+
+        if (video) {
+            video = hasPermissions(this, Manifest.permission.CAMERA) && hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        }
+
+        answerCallUseCase.answerCall(chatId, video, audio, speaker)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        callInProgressLayout.setEnabled(true);
+                        openMeetingInProgress(this, chatId, true, passcodeManagement);
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+                    }
+                });
     }
 
     @Override
@@ -3978,9 +3987,7 @@ public class ChatActivity extends PasscodeActivity
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
-                    if (checkPermissionsCall()) {
-                        startCall();
-                    }
+                    startCall();
                 } else {
                     returnCall(this, chatIdBanner, passcodeManagement);
                 }

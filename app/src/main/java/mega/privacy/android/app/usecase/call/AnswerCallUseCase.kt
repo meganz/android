@@ -6,12 +6,16 @@ import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.app.usecase.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Use case to start call
+ * Use case to answer call
  *
  * @property megaChatApi    MegaChatApi required to call the SDK
  */
@@ -38,6 +42,19 @@ class AnswerCallUseCase @Inject constructor(
         enableSpeaker: Boolean
     ): Single<AnswerCallResult> =
         Single.create { emitter ->
+            if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
+                Timber.d("Already participating in this call")
+                return@create
+            }
+
+            if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
+                Timber.d("The call has been answered")
+                return@create
+            }
+
+            CallUtil.addChecksForACall(chatId, enableSpeaker)
+            MegaApplication.getChatManagement().addJoiningCallChatId(chatId)
+
             megaChatApi.answerChatCall(
                 chatId,
                 enableVideo,
@@ -57,7 +74,6 @@ class AnswerCallUseCase @Inject constructor(
 
                             val enabledAudio: Boolean = request.paramType == START_CALL_AUDIO_ENABLE
                             val enabledVideo = request.flag
-
                             emitter.onSuccess(
                                 AnswerCallResult(
                                     requestChatId,

@@ -116,8 +116,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
     private fun answerCall(enableVideo: Boolean) {
-        sharedModel.answerCall(enableVideo, true, enableVideo).observe(viewLifecycleOwner) {
-            result ->
+        sharedModel.answerCall(enableVideo, true, enableVideo).observe(viewLifecycleOwner) { result ->
             val actionString = if (result.enableVideo) {
                 logDebug("Call answered with video ON and audio ON")
                 MEETING_ACTION_RINGING_VIDEO_ON

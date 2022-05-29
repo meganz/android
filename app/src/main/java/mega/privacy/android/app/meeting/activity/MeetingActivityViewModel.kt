@@ -654,16 +654,6 @@ class MeetingActivityViewModel @Inject constructor(
     ): LiveData<AnswerCallUseCase.AnswerCallResult> {
         val result = MutableLiveData<AnswerCallUseCase.AnswerCallResult>()
         _currentChatId.value?.let {
-            if (CallUtil.amIParticipatingInThisMeeting(it)) {
-                Timber.d("Already participating in this call")
-                return result
-            }
-
-            if (MegaApplication.getChatManagement().isAlreadyJoiningCall(it)) {
-                Timber.d("AnswerChatCall already done")
-                return result
-            }
-
             var video = cameraGranted.value
             if (cameraGranted.value) {
                 video = enableVideo
