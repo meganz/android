@@ -74,10 +74,10 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
         requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
@@ -95,7 +95,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { state ->
                     findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
-                        state.cameraUploadEnabled
+                            state.cameraUploadEnabled
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
 
                     findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
@@ -116,11 +116,11 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
                     //        TODO: Move Summaries to initialise and update summaries methods
                     val startScreenSummary =
-                        resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
+                            resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
                     findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
 
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivityChecked }
-                        ?.let { it.isChecked = state.hideRecentActivityChecked }
+                            ?.let { it.isChecked = state.hideRecentActivityChecked }
 
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
 
@@ -131,9 +131,9 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     private fun navigateToInitialPreference() {
         val initial =
-            arguments?.getString(INITIAL_PREFERENCE)?.let {
-                findPreference<Preference>(it)
-            }
+                arguments?.getString(INITIAL_PREFERENCE)?.let {
+                    findPreference<Preference>(it)
+                }
 
         initial?.let {
             scrollToPreference(it)
@@ -145,7 +145,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     override fun onResume() {
         registerAccountChangeReceiver()
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
         refreshSummaries()
         resetCounters(null)
         super.onResume()
@@ -165,7 +165,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     private fun updateCameraUploadSummary() {
         val isCameraUploadOn = viewModel.isCamSyncEnabled
         findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
-            getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+                getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
     private fun updatePasscodeLockSummary() {
@@ -173,7 +173,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     override fun onPause() {
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
         requireContext().unregisterReceiver(updateMyAccountReceiver)
         super.onPause()
     }
@@ -182,56 +182,56 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
         when (key) {
             KEY_APPEARNCE_COLOR_THEME -> findPreference<ListPreference>(key)?.value?.let {
                 applyTheme(
-                    it
+                        it
                 )
             }
         }
     }
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        val key = preference?.key
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        val key = preference.key
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> startActivity(
-                Intent(
-                    context,
-                    CameraUploadsPreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            CameraUploadsPreferencesActivity::class.java
+                    )
             )
             KEY_FEATURES_CHAT -> startActivity(
-                Intent(
-                    context,
-                    ChatPreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            ChatPreferencesActivity::class.java
+                    )
             )
             KEY_STORAGE_DOWNLOAD -> startActivity(
-                Intent(
-                    context,
-                    DownloadPreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            DownloadPreferencesActivity::class.java
+                    )
             )
             KEY_STORAGE_FILE_MANAGEMENT -> requireActivity().startActivity(
-                Intent(
-                    context,
-                    FileManagementPreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            FileManagementPreferencesActivity::class.java
+                    )
             )
             KEY_RECOVERY_KEY -> startActivity(
-                Intent(
-                    context,
-                    ExportRecoveryKeyActivity::class.java
-                )
+                    Intent(
+                            context,
+                            ExportRecoveryKeyActivity::class.java
+                    )
             )
             KEY_PASSCODE_LOCK -> startActivity(
-                Intent(
-                    context,
-                    PasscodePreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            PasscodePreferencesActivity::class.java
+                    )
             )
             KEY_CHANGE_PASSWORD -> startActivity(
-                Intent(
-                    context,
-                    ChangePasswordActivity::class.java
-                )
+                    Intent(
+                            context,
+                            ChangePasswordActivity::class.java
+                    )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
                 val intent = Intent(context, VerifyTwoFactorActivity::class.java)
@@ -264,18 +264,18 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                         MegaApplication.setShowInfoChatMessages(true)
                         view?.let {
                             Snackbar.make(
-                                it,
-                                R.string.show_info_chat_msg_enabled,
-                                Snackbar.LENGTH_SHORT
+                                    it,
+                                    R.string.show_info_chat_msg_enabled,
+                                    Snackbar.LENGTH_SHORT
                             ).show()
                         }
                     } else {
                         MegaApplication.setShowInfoChatMessages(false)
                         view?.let {
                             Snackbar.make(
-                                it,
-                                R.string.show_info_chat_msg_disabled,
-                                Snackbar.LENGTH_SHORT
+                                    it,
+                                    R.string.show_info_chat_msg_disabled,
+                                    Snackbar.LENGTH_SHORT
                             ).show()
                         }
                     }
@@ -300,29 +300,29 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                 startActivity(intent)
             }
             KEY_COOKIE_SETTINGS -> startActivity(
-                Intent(
-                    context,
-                    CookiePreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            CookiePreferencesActivity::class.java
+                    )
             )
             KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> if (playerService != null) {
                 playerService?.viewModel?.toggleBackgroundPlay()
             }
             KEY_START_SCREEN -> startActivity(
-                Intent(
-                    context,
-                    StartScreenPreferencesActivity::class.java
-                )
+                    Intent(
+                            context,
+                            StartScreenPreferencesActivity::class.java
+                    )
             )
             KEY_HIDE_RECENT_ACTIVITY -> {
                 val checked =
-                    findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked
+                        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked
                 requireContext().getSharedPreferences(
-                    USER_INTERFACE_PREFERENCES,
-                    Context.MODE_PRIVATE
+                        USER_INTERFACE_PREFERENCES,
+                        Context.MODE_PRIVATE
                 ).edit().putBoolean(HIDE_RECENT_ACTIVITY, checked == true).apply()
                 LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-                    .post(checked)
+                        .post(checked)
             }
         }
         resetCounters(key)
@@ -340,11 +340,11 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     private fun enableSdkLogger() {
-                viewModel.enableLogger()
-                view?.let {
-                    Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
-                }
-            }
+        viewModel.enableLogger()
+        view?.let {
+            Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
+        }
+    }
 
     private fun toggleChatLogger() {
         if (viewModel.disableChatLogger()) {
@@ -357,37 +357,37 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     private fun enableChatLogger() {
-                viewModel.enableChatLogger()
-                view?.let {
-                    Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
-                }
-            }
+        viewModel.enableChatLogger()
+        view?.let {
+            Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
+        }
+    }
 
     private fun showConfirmationEnableLogs(enableFunction: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage(R.string.enable_log_text_dialog)
-            .setPositiveButton(R.string.general_enable) { _, _ ->
-                enableFunction()
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-            .setCanceledOnTouchOutside(false)
+                .setMessage(R.string.enable_log_text_dialog)
+                .setPositiveButton(R.string.general_enable) { _, _ ->
+                    enableFunction()
+                }
+                .setNegativeButton(R.string.general_cancel, null)
+                .show()
+                .setCanceledOnTouchOutside(false)
     }
 
     private fun showEvaluatedAppDialog() {
         FeedBackDialog.newInstance(
-            viewModel.email,
-            viewModel.accountType
+                viewModel.uiState.value.email,
+                viewModel.uiState.value.accountType
         ).show(childFragmentManager, FeedBackDialog.TAG)
     }
 
     private fun deleteAccountClicked() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.delete_account))
-            .setMessage(resources.getString(R.string.delete_account_text))
-            .setPositiveButton(R.string.delete_account) { _, _ -> deleteAccountConfirmed() }
-            .setNegativeButton(R.string.general_dismiss) { _, _ -> }
-            .show()
+                .setTitle(getString(R.string.delete_account))
+                .setMessage(resources.getString(R.string.delete_account_text))
+                .setPositiveButton(R.string.delete_account) { _, _ -> deleteAccountConfirmed() }
+                .setNegativeButton(R.string.general_dismiss) { _, _ -> }
+                .show()
 
     }
 
@@ -409,13 +409,13 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
         viewLifecycleOwner.lifecycleScope.launch {
             if (viewModel.deleteAccount()) {
                 showInfoDialog(
-                    R.string.email_verification_title,
-                    R.string.email_verification_text
+                        R.string.email_verification_title,
+                        R.string.email_verification_text
                 )
             } else {
                 showInfoDialog(
-                    R.string.general_error_word,
-                    R.string.general_text_error
+                        R.string.general_error_word,
+                        R.string.general_text_error
                 )
             }
         }
@@ -424,10 +424,10 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
         requireActivity().hideKeyboard()
         MaterialAlertDialogBuilder(requireContext())
-            .setPositiveButton(R.string.general_ok) { _, _ -> }
-            .setTitle(title)
-            .setMessage(message)
-            .show()
+                .setPositiveButton(R.string.general_ok) { _, _ -> }
+                .setTitle(title)
+                .setMessage(message)
+                .show()
     }
 
     private fun launchWebPage(url: String) {

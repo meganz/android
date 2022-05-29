@@ -207,7 +207,7 @@
     <!--  -->
     <string name="tour_access_title">การเข้าถึง MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">ลงทะเบียนตอนนี้และรับพื้นที่เก็บข้อมูลฟรี 20 GB</string>
+    <string name="tour_space_text">ลงทะเบียนตอนนี้และรับพื้นที่เก็บข้อมูลฟรี 20&#160;GB</string>
     <!--  -->
     <string name="tour_speed_text">อัปโหลดได้รวดเร็ว พร้อมกับแชร์ไปยังทุกคนได้รวดเร็วเช่นเดียวกัน</string>
     <!--  -->
@@ -375,7 +375,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">ดูการถ่ายโอน</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">อุปกรณ์ส่วนใหญ่ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดใหญ่กว่า 4GB การดาวน์โหลดของคุณอาจล้มเหลวได้</string>
+    <string name="error_file_size_greater_than_4gb">อุปกรณ์ส่วนใหญ่ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดใหญ่กว่า 4&#160;GB การดาวน์โหลดของคุณอาจล้มเหลวได้</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ไม่มีแอปใดที่สามารถเรียกใช้ไฟล์นี้บนอุปกรณ์ของคุณได้</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1092,7 +1092,7 @@
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">อัปเกรด</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
-    <string name="my_account_upgrade_pro_panel">อัพเกรดเดี๋ยวนี้</string>
+    <string name="my_account_upgrade_pro_panel">อัปเกรดตอนนี้</string>
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">ขยับขยายคลาวด์ของคุณ[A]รับพื้นที่เก็บข้อมูลที่เพิ่มขึ้นและโควต้าการถ่ายโอนด้วยบัญชี Pro</string>
     <!-- success message when the MasterKey file has been downloaded -->
@@ -1184,11 +1184,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">ลิงก์โฟลเดอร์ยังไม่พร้อมใช้งาน</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">ลิงก์โฟลเดอร์ถูกลบออกแล้ว เนื่องจากละเมิด ToS/AUP</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">ลิงก์ไฟล์ไม่พร้อมใช้งาน</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">ลิงก์ไฟล์ถูกลบ เนื่องจากมีการละเมิด ToS/AUP</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL นี้เสียหายหรือผิดรูปแบบ ไม่มีลิงก์ที่คุณพยายามเข้าถึง</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2141,7 +2141,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2151,7 +2151,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -2774,10 +2774,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">ระงับข้อพิพาท</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">ไม่สามารถเข้าถึงได้เนื่องจากการละเมิด ToS/AUP</string>
+    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">ไฟล์ %d รายการไม่ถูกดาวน์โหลด เนื่องจากการละเมิด ToS/AUP</item>
+        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
+        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ไฟล์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B][C] ถูกคืนสถานะแล้ว[/C]</string>
@@ -3168,7 +3169,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">เริ่มแชทอย่างปลอดภัยกับผู้ติดต่อของคุณโดยใช้การเข้ารหัสแบบต้นทางถึงปลายทาง</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">หวัดดี มาร่วมสนทนากับฉันบน MEGA อย่างปลอดภัยสิ แล้วรับพื้นที่เก็บข้อมูลบนคลาวด์ฟรี 20 GB ไปเลย%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">หวัดดี มาร่วมสนทนากับฉันบน MEGA อย่างปลอดภัยสิ แล้วรับพื้นที่เก็บข้อมูลบนคลาวด์ฟรี 20&#160;GB ไปเลย%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">ไม่มีลิงก์แชท</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3483,12 +3484,12 @@
     <string name="fab_label_new_chat">แชทใหม่</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]ไม่[/B][B]พบ[/B][A]รูปภาพ[/A]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">ไม่พบเอกสาร</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">ไม่พบไฟล์เสียง</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">ไม่พบวิดีโอ</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">ค้นหาใน GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3767,30 +3768,36 @@
     <string name="error_share_owner_storage_quota">เจ้าของการแชร์ได้ใช้พื้นที่เก็บข้อมูลเกินโควต้า</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">ดาวน์โหลดแล้ว 1 ไฟล์ อยู่ระหว่างดำเนินการ 1 ไฟล์</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">ดาวน์โหลดแล้ว 1 ไฟล์ อยู่ระหว่างดำเนินการ %d ไฟล์</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">ดาวน์โหลดแล้ว %d ไฟล์ อยู่ระหว่างดำเนินการ 1 ไฟล์</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">ดาวน์โหลดแล้ว %1$d ไฟล์ อยู่ระหว่างดำเนินการ %2$d ไฟล์</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">ย้าย 1 รายการไปที่ถังขยะสำเร็จแล้ว และ 1 รายการยังย้ายไม่สำเร็จ</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">ย้าย 1 รายการไปที่ถังขยะสำเร็จแล้ว และ %d รายการยังย้ายไม่สำเร็จ</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">ย้าย %d รายการไปที่ถังขยะสำเร็จแล้ว และ 1 รายการยังย้ายไม่สำเร็จ</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">ย้าย %1$d รายการไปที่ถังขยะสำเร็จแล้ว และ %2$d รายการยังย้ายไม่สำเร็จ</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">กู้คืน 1 รายการสำเร็จแล้ว และ 1 รายการไม่สามารถกู้คืนได้</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">กู้คืน 1 รายการสำเร็จแล้ว และ %d รายการไม่สามารถกู้คืนได้</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">กู้คืน %d รายการสำเร็จแล้ว และ 1 รายการไม่สามารถกู้คืนได้</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">กู้คืน %1$d รายการสำเร็จแล้ว และ %2$d รายการไม่สามารถกู้คืนได้</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">1 file already downloaded. %d files pending.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
+        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d รายการถูกย้ายไปถังขยะเรียบร้อยแล้ว</item>
@@ -3984,7 +3991,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">เข้าร่วมพื้นที่เก็บข้อมูลบนคลาวด์ที่ปลอดภัยและแพลตฟอร์มการทำงานร่วมกันที่ใหญ่ที่สุดในโลก</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">รับฟรี 20 GB</string>
+    <string name="left_meeting_bonus_title">รับฟรี 20&#160;GB</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">ลงทะเบียนตอนนี้และเพลิดเพลินไปกับฟีเจอร์การทำงานร่วมกันขั้นสูงได้ฟรี</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4206,7 +4213,25 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">ลบออกจากรายการโปรด</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">ไม่สนับสนุนรูปแบบไฟล์นี้ ไม่สามารถเปิดไฟล์ได้</string>
     <!-- Warnign shown after trying to upload an empty folder -->
-    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <string name="no_uploads_empty_folder">โฟลเดอร์ที่เลือกว่างเปล่า ไม่มีไฟล์ที่จะอัปโหลด</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">คุณกรอกรหัสผ่านเดิมของคุณ</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">ไฟล์ไม่สามารถใช้ได้อีกต่อไป</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">ไฟล์ถูกลบเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">ต่อไป</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">ก่อนหน้า</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">ต่อไป</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">ก่อนหน้า</string>
 </resources>

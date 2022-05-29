@@ -16,7 +16,6 @@ import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -36,7 +35,7 @@ public class PreviewUtils {
 	 */	
 	public static File getPreviewFolder(Context context) {
 	    if(!isFileAvailable(previewDir)) {
-            previewDir = getCacheFolder(context, PREVIEW_FOLDER);
+            previewDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER);
         }
         return previewDir;
 	}

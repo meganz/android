@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Le lien de dossier est inaccessible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Le lien de dossier a été supprimé en raison du non-respect des CGU/PUA.</string>
+    <string name="folder_link_unavaible_ToS_violation">Le lien de dossier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Le lien de fichier est inaccessible</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Le lien de fichier a été retiré en raison du non-respect des CGU/PUA.</string>
+    <string name="file_link_unavaible_ToS_violation">Le lien de fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Cette URL est corrompue ou mal formée. Le lien auquel vous essayez d’accéder n’existe pas.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1864,13 +1864,13 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Primes d’invitation</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Installer une Appli&#160;MEGA mobile</string>
+    <string name="title_install_app">Installer une appli&#160;MEGA mobile</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">Ajouter un numéro de téléphone</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Prime d’inscription</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Obtenir une Appli&#160;MEGA pour ordinateur</string>
+    <string name="title_install_desktop">Obtenir l’appli&#160;MEGA pour ordinateur</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Aucun fichier dans Téléversements de l’appareil photo</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1884,9 +1884,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA Gratuit et à installer une Appli&#160;MEGA mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli réussie.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA Gratuit et à installer une appli&#160;MEGA mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli réussie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’Appli&#160;MEGA mobile ou l’Appli&#160;MEGA pour ordinateur est installée.</string>
+    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’appli&#160;MEGA mobile ou l’appli&#160;MEGA pour ordinateur est installée.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Choisissez des contacts de la liste de contacts de votre téléphone ou saisissez plusieurs adresses courriel.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -1898,15 +1898,15 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">L’adresse courriel est mal formée</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">En installant l’Appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’Appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">En installant l’appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">En installant l’Appli&#160;MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli&#160;MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre Appli&#160;MEGA pour ordinateur.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli&#160;MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’Appli&#160;MEGA mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’appli&#160;MEGA mobile.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Vous avez reçu %1$s d’espace de stockage pour avoir confirmé votre numéro de téléphone.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2009,7 +2009,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Une erreur est survenue et l’appel ne peut pas être connecté.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Aimez-vous l’Appli&#160;MEGA mobile ?</string>
+    <string name="title_evaluate_the_app_panel">Aimez-vous l’appli&#160;MEGA mobile ?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Oui, évaluer l’appli</string>
     <!-- Label to show send feedback -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contester le retrait</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">N’est pas accessible en raison du non-respect des CGU/PUA</string>
+    <string name="error_download_takendown_node">Non accessible pour non-respect des Conditions générales d’utilisation</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d fichier n’a pas été téléchargé en raison du non-respect des CGU/PUA.</item>
-        <item quantity="other">%d fichiers n’ont pas été téléchargés en raison du non-respect des CGU/PUA.</item>
+        <item quantity="one">%d fichier n’a pas été téléchargé pour non-respect des Conditions générales d’utilisation.</item>
+        <item quantity="other">%d fichiers n’ont pas été téléchargés pour non-respect des Conditions générales d’utilisation.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A][C] a été rétabli.[/C]</string>
@@ -3556,12 +3556,12 @@
     <string name="fab_label_new_chat">Nouvelle conversation</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]Aucune[/B] [A]image[/A] [B]n’a été trouvée[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Aucun document n’a été trouvé</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Aucun fichier son n’a été trouvé</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Aucune vidéo n’a été trouvée</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Aucun[/B] [A]document[/A] [B]n’a été trouvé[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Aucun[/B] [A]fichier son[/A] [B]n’a été trouvé[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Aucune[/B] [A]vidéo[/A] [B]n’a été trouvée[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Chercher dans GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3579,7 +3579,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Reprendre les transferts pour poursuivre votre téléversement.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% sur %2$s</string>
+    <string name="progress_size_indicator">%1$d&#160;%% sur %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Les renseignements de débogage des conversations sont activés</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3818,7 +3818,7 @@
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre Disque nuagique.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
-    <string name="all_view_button">Tout</string>
+    <string name="all_view_button">Toutes</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Jours</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
@@ -3848,30 +3848,36 @@
     <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota d’espace de stockage.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota d’espace de stockage.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 fichier est déjà téléchargé, 1 fichier est en attente.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 fichier est déjà téléchargé, %d fichiers sont en attente.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d fichiers sont déjà téléchargés, 1 fichier est en attente.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d fichiers sont déjà téléchargés, %2$d fichiers sont en attente.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la Corbeille avec succès et 1 ne l’a pas été</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la Corbeille avec succès et %d ne l’ont pas été</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d éléments ont été déplacé vers la Corbeille avec succès et 1 ne l’a pas été</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d éléments ont été déplacé vers la Corbeille avec succès et %2$d ne l’ont pas été</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 élément a été restauré de la corbeille avec succès et 1 ne l’a pas été</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 élément a été restauré de la corbeille avec succès et %d ne l’ont pas été</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d éléments ont été restaurés de la corbeille avec succès et 1 ne l’a pas été</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d éléments ont été restaurés de la corbeille avec succès et %2$d ne l’ont pas été</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">1 fichier est déjà téléchargé. 1 fichier est en attente.</item>
+        <item quantity="other">1 fichier est déjà téléchargé. %d fichiers sont en attente.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">1 fichier est déjà téléchargé, 1 fichier est en attente.</item>
+        <item quantity="other">%d fichiers sont déjà téléchargés, 1 fichier est en attente.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 élément a été déplacé dans la corbeille, mais pas l’autre. Réessayez plus tard.</item>
+        <item quantity="other">1 élément a été déplacé dans la corbeille, mais %d ne l’ont pas été. Réessayez plus tard.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 élément a été déplacé dans la corbeille, mais pas l’autre. Réessayez plus tard.</item>
+        <item quantity="other">%d éléments ont été déplacés dans la corbeille, mais 1 ne l’a pas été. Réessayez plus tard.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 élément a été restauré, mais pas l’autre. Réessayez plus tard.</item>
+        <item quantity="other">1 élément a été restauré, mais %d ne l’ont pas été. Réessayez plus tard.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 élément a été restauré, mais pas l’autre. Réessayez plus tard.</item>
+        <item quantity="other">%d éléments ont été restaurés, mais 1 ne l’a pas été. Réessayez plus tard.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 élément a été déplacé vers la Corbeille avec succès</item>
@@ -4135,7 +4141,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Cet emplacement n’existe plus.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">Vous avez déjà invité %1$s.</string>
+    <string name="contact_already_invited">Vous avez déjà invité %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">L\’invitation a été envoyée avec succès. Consultez les demandes envoyées.</string>
     <!-- Message when file available offline. -->
@@ -4197,13 +4203,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Configurer la sauvegarde</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’Appli&#160;MEGA pour ordinateur.</string>
+    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’appli&#160;MEGA pour ordinateur.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">En lecture seule</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4278,7 +4284,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Vous avez un abonnement MEGA actif auprès de %1$s. Vous devez l’annuler séparément dans %2$s, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Vous avez un abonnement MEGA actif. Il sera annulé automatiquement  après suppression du compte. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte iTunes, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4299,4 +4305,22 @@
     <string name="message_zip_format_error">Le format de fichier n’est pas pris en charge. Impossible d’ouvrir le fichier.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">Le dossier sélectionné est vide. Il n’y a aucun fichier à téléverser.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Vous avez saisi votre mot de passe actuel</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">Le fichier n’est plus proposé</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">Le fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Non-respect des Conditions générales d’utilisation</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">Aucune appli n’est installée sur cet appareil pour sélectionner les dossiers.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Suivant</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Précédent</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Suivante</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Précédente</string>
 </resources>

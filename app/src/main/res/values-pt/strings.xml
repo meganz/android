@@ -209,7 +209,7 @@
     <!--  -->
     <string name="tour_access_title">Acesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Cadastre-se agora e obtenha 20 GB de espaço gratuito</string>
+    <string name="tour_space_text">Cadastre-se agora e obtenha 20&#160;GB de espaço gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Os envios são rápidos. Compartilhe rapidamente arquivos com todo mundo</string>
     <!--  -->
@@ -383,7 +383,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver as transferências</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4 GB. O seu download provavelmente falhará.</string>
+    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4&#160;GB. O seu download provavelmente falhará.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Não existe nenhum aplicativo disponível para abrir este arquivo no seu dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">O link da pasta não está disponível</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">O link desta pasta foi eliminado por infringir os nossos Termos de serviço.</string>
+    <string name="folder_link_unavaible_ToS_violation">O link da pasta foi removido por infringir os nossos Termos de Serviço.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Link de arquivo indisponível</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Este link foi removido por infringir os nossos Termos de serviço.</string>
+    <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de Serviço.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Esta URL está corrupta ou mal formada. O link que você está tentando acessar não existe.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2179,7 +2179,7 @@
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2189,7 +2189,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s TB/s</string>
     <!-- Size in megabytes. -->
@@ -2825,11 +2825,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Disputar remoção</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Não acessível por infringir os termos de serviço</string>
+    <string name="error_download_takendown_node">Não acessível pois infringiu os nossos Termos de Serviço</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">Não foi feito o download de %d arquivo por infringir os nossos Termos de serviço.</item>
-        <item quantity="other">Não foi feito o download de %d arquivos por infringirem os nossos Termos de serviço.</item>
+        <item quantity="one">%d arquivo não foi baixado porque ele infringiu os nossos Termos de Serviço.</item>
+        <item quantity="other">%d arquivos não foram baixados porque eles infringiram os nossos Termos de Serviço.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B][C] foi restaurado.[/C]</string>
@@ -3237,7 +3237,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Converse com segurança com os seus contatos usando criptografia de ponta a ponta</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Olá, converse com segurança comigo no MEGA e obtenha 20 GB de armazenamento em nuvem gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Olá, converse com segurança comigo no MEGA e obtenha 20&#160;GB de armazenamento em nuvem gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Não há link de chat disponível.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3555,13 +3555,13 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Novo chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]Não[/B] [A]Há[/A] [B]Imagens[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Não há documentos</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Não há arquivos de áudio</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Não há arquivos de vídeo</string>
+    <string name="homepage_empty_hint_photos">[B]Não[/B] [A]há[/A] [B]imagens[/B]</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Não[/B] [A]há[/A] [B]documentos[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Não[/B] [A]há[/A] [B]arquivos de áudio[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Não[/B] [A]há[/A] [B]vídeos[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Pesquisar em GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3814,7 +3814,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproduzindo em segundo plano</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Não[/B] [B]Há[/B] [A]Fotos[/A]</string>
+    <string name="photos_empty">[B]Não[/B] [B]há[/B] [A]fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Faça o backup automático de fotos e vídeos na sua Nuvem.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3848,39 +3848,45 @@
     <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Não foi possível enviar o arquivo porque destinatário ultrapassou o seu limite de armazenamento.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">Já foi feito o download de 1 arquivo. %d arquivos pendentes.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">Já foi feito o download de %d arquivos. 1 arquivo pendente.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">Já foi feito o download de %1$d arquivos. %2$d arquivos pendentes.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item foi enviado à Lixeira corretamente e 1 item não foi enviado corretamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item foi enviado à Lixeira corretamente e %d itens não foram enviados corretamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d itens foram enviados à Lixeira corretamente e 1 item não foi enviado corretamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d itens foram enviados à Lixeira corretamente e %2$d itens não foram enviados corretamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item foi restaurado corretamente e 1 item não foi restaurado corretamente</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item foi restaurado corretamente e %d itens não foram restaurados corretamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d itens foram restaurados corretamente e 1 item não foi restaurado corretamente</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d itens foram restaurados corretamente e %2$d itens não foram restaurados corretamente</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="one">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</item>
+        <item quantity="other">Já foi feito o download de 1 arquivo. %d arquivos pendentes.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="one">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</item>
+        <item quantity="other">Já foi feito o download de %d arquivos. 1 arquivo pendente.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="other">1 item movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="other">%d itens movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item foi restaurado, mas o outro item não foi restaurado. Tente novamente mais tarde.</item>
+        <item quantity="other">1 item foi restaurado, mas %d itens não foram restaurados. Tente novamente mais tarde.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item foi restaurado, mas o outro item não foi restaurado. Tente novamente mais tarde.</item>
+        <item quantity="other">%d itens foram restaurados, mas 1 item não foi restaurado. Tente novamente mais tarde.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item foi enviado para a Lixeira corretamente</item>
-        <item quantity="other">%d itens foram enviados para a Lixeira corretamente</item>
+        <item quantity="one">1 item foi movido para a Lixeira corretamente</item>
+        <item quantity="other">%d itens foram movidos para a Lixeira corretamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item não foi enviado para a Lixeira corretamente</item>
-        <item quantity="other">%d itens não foram enviados para a Lixeira corretamente</item>
+        <item quantity="one">1 item não foi movido para a Lixeira corretamente</item>
+        <item quantity="other">%d itens não foram movidos para a Lixeira corretamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -4073,7 +4079,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Faça parte da maior plataforma de colaboração e armazenamento em nuvem segura do mundo.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Obtenha 20 GB de forma gratuita</string>
+    <string name="left_meeting_bonus_title">Obtenha 20&#160;GB de forma gratuita</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Cadastre-se agora e aproveite de forma gratuita os recursos de colaboração avançados.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4278,7 +4284,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Você tem uma assinatura MEGA ativa com %1$s. Você deve cancelá-la separadamente em %2$s, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Você tem uma assinatura MEGA ativa. Ela será cancelada automaticamente após a exclusão da conta. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Você tem uma assinatura MEGA ativa com a Apple. Você deve cancelá-la separadamente em sua conta do iTunes, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4296,7 +4302,25 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remover favoritos</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">O formato do arquivo não é suportado. Não é possível abrir o arquivo.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
-    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <string name="no_uploads_empty_folder">A pasta selecionada está vazia. Nenhum arquivo para fazer upload.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Você digitou a sua senha atual</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">O arquivo não está mais disponível</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">Arquivo removido porque infringiu os nossos Termos de serviço.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Termos de Serviço infringidos</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Seguinte</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Anterior</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Seguinte</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Anterior</string>
 </resources>

@@ -90,7 +90,6 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onPause() {
         if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
-            viewModel.stopImageLoading(itemId!!, aggressive = false)
             showPreviewImage()
         }
         super.onPause()
@@ -98,7 +97,7 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onDestroy() {
         if (activity?.isFinishing == true) {
-            viewModel.stopImageLoading(itemId!!, aggressive = true)
+            viewModel.stopImageLoading(itemId!!)
         }
         super.onDestroy()
     }
@@ -155,8 +154,8 @@ class ImageViewerPageFragment : Fragment() {
     private fun showPreviewImage(
         imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
     ) {
-        val previewImageRequest = imageResult?.previewUri?.toImageRequest()
-        val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest()
+        val previewImageRequest = imageResult?.previewUri?.toImageRequest(false)
+        val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest(false)
         if (previewImageRequest == null && thumbnailImageRequest == null) return
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
@@ -188,11 +187,11 @@ class ImageViewerPageFragment : Fragment() {
     private fun showFullImage(
         imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
     ) {
-        val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest() ?: run {
+        val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest(true) ?: run {
             showPreviewImage(imageResult)
             return
         }
-        val previewImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest()
+        val previewImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest(false)
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
             .setImageRequest(fullImageRequest)
@@ -234,7 +233,7 @@ class ImageViewerPageFragment : Fragment() {
             val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
             binding.image.hierarchy.setFailureImage(R.drawable.ic_error, ScaleType.FIT_CENTER)
             binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(imageResult.previewUri?.toImageRequest())
+                .setImageRequest(imageResult.previewUri?.toImageRequest(false))
                 .build()
 
             if (imageResult.isFullyLoaded) {
@@ -269,15 +268,23 @@ class ImageViewerPageFragment : Fragment() {
         (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
     }
 
-    private fun Uri.toImageRequest(): ImageRequest? =
-        ImageRequestBuilder.newBuilderWithSource(this)
+    private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? {
+        val imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(this)
             .setRotationOptions(RotationOptions.autoRotate())
-            .setResizeOptions(ResizeOptions.forDimensions(screenSize.width, screenSize.height))
             .setRequestPriority(
-                if (lifecycle.currentState == Lifecycle.State.RESUMED)
+                if (lifecycle.currentState == Lifecycle.State.RESUMED) {
                     Priority.HIGH
-                else
+                } else {
                     Priority.LOW
+                }
             )
-            .build()
+
+        if (isFullImage) {
+            imageRequestBuilder.resizeOptions = ResizeOptions.forDimensions(screenSize.width, screenSize.height)
+        } else {
+            imageRequestBuilder.cacheChoice = ImageRequest.CacheChoice.SMALL
+        }
+
+        return imageRequestBuilder.build()
+    }
 }

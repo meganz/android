@@ -2,7 +2,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumsFragment
+import mega.privacy.android.app.presentation.photos.albums.AlbumsFragment
 
 /**
  * PhotosPagerAdapter includes TimelineFragment and AlbumsFragment as tabs, using in PhotosFragment

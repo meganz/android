@@ -38,6 +38,8 @@ import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.meeting.CallSoundType;
+import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 
 import static android.media.AudioManager.RINGER_MODE_NORMAL;

@@ -28,8 +28,8 @@ import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 class GalleryViewHolder(
-    val binding: ViewDataBinding,
-    private val mItemSizeConfig: GalleryItemSizeConfig
+        val binding: ViewDataBinding,
+        private val mItemSizeConfig: GalleryItemSizeConfig
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @MegaApi
@@ -40,9 +40,9 @@ class GalleryViewHolder(
 
         @JvmStatic
         fun updateThumbnailDisplay(
-            thumbnail: SimpleDraweeView,
-            item: GalleryItem,
-            itemSizeConfig: GalleryItemSizeConfig
+                thumbnail: SimpleDraweeView,
+                item: GalleryItem,
+                itemSizeConfig: GalleryItemSizeConfig
         ) {
             // force set the thumbnail visible, in case FullscreenImageViewer/AudioVideoPlayer
             // doesn't call setVisibility when dismissed
@@ -50,22 +50,22 @@ class GalleryViewHolder(
             if (item.thumbnail != null) {
                 val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(item.thumbnail)).build()
                 val controller = Fresco.newDraweeControllerBuilder()
-                    .setImageRequest(request)
-                    .setOldController(thumbnail.controller)
-                    .build()
+                        .setImageRequest(request)
+                        .setOldController(thumbnail.controller)
+                        .build()
                 thumbnail.controller = controller
             } else {
                 thumbnail.setActualImageResource(R.drawable.ic_image_thumbnail)
             }
             thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
-                (if (item.selected) itemSizeConfig.roundCornerRadius else 0).toFloat()
+                    (if (item.selected) itemSizeConfig.roundCornerRadius else 0).toFloat()
             )
             val imagePadding = if (item.selected) itemSizeConfig.imageSelectedPadding else 0
             thumbnail.setPadding(imagePadding, imagePadding, imagePadding, imagePadding)
             if (item.selected) {
                 thumbnail.background = ContextCompat.getDrawable(
-                    thumbnail.context,
-                    R.drawable.background_item_grid_selected
+                        thumbnail.context,
+                        R.drawable.background_item_grid_selected
                 )
             } else {
                 thumbnail.background = null
@@ -102,9 +102,9 @@ class GalleryViewHolder(
     }
 
     fun bind(
-        actionModeViewModel: ActionModeViewModel,
-        itemOperationViewModel: ItemOperationViewModel?,
-        item: GalleryItem
+            actionModeViewModel: ActionModeViewModel,
+            itemOperationViewModel: ItemOperationViewModel?,
+            item: GalleryItem
     ) {
         binding.apply {
             when (this) {
@@ -114,16 +114,23 @@ class GalleryViewHolder(
                     this.item = item
 
                     setViewSize(
-                        root,
-                        iconSelected,
-                        mItemSizeConfig
+                            root,
+                            iconSelected,
+                            mItemSizeConfig
                     )
 
                     updateThumbnailDisplay(
-                        thumbnail,
-                        item,
-                        mItemSizeConfig
+                            thumbnail,
+                            item,
+                            mItemSizeConfig
                     )
+
+                    handleFavouriteUI(
+                        zoom = mItemSizeConfig.zoom,
+                        isFavorite = item.node?.isFavourite,
+                        favouriteView = favoriteOverlay
+                    )
+
                 }
                 is ItemGalleryVideoBinding -> {
                     this.actionModeViewModel = actionModeViewModel
@@ -131,41 +138,40 @@ class GalleryViewHolder(
                     this.item = item
 
                     setViewSize(
-                        root,
-                        iconSelected,
-                        mItemSizeConfig
+                            root,
+                            iconSelected,
+                            mItemSizeConfig
                     )
 
                     when (mItemSizeConfig.zoom) {
-                        ZOOM_IN_1X, ZOOM_DEFAULT -> {
-                            playIcon.visibility = View.GONE
+                        ZOOM_IN_1X, ZOOM_DEFAULT, ZOOM_OUT_1X -> {
                             if (item.node != null) {
                                 videoDuration.visibility = View.VISIBLE
                                 videoDuration.text = TimeUtils.getVideoDuration(
-                                    item.node!!.duration
+                                        item.node!!.duration
                                 )
                             } else {
                                 videoDuration.visibility = View.GONE
                             }
                         }
-                        ZOOM_OUT_1X -> {
-                            videoDuration.visibility = View.GONE
-                            playIcon.visibility = View.VISIBLE
-                        }
                         else -> {
                             videoDuration.visibility = View.GONE
-                            playIcon.visibility = View.GONE
                         }
                     }
 
+                    handleFavouriteUI(
+                        zoom = mItemSizeConfig.zoom,
+                        isFavorite = item.node?.isFavourite,
+                        favouriteView = favouriteIcon)
+
                     videoInfo.setBackgroundResource(
-                        if (item.selected) R.drawable.grid_cam_uploads_rounded else R.color.grey_alpha_032
+                            if (item.selected) R.drawable.grid_cam_uploads_rounded else R.color.grey_alpha_032
                     )
 
                     updateThumbnailDisplay(
-                        thumbnail,
-                        item,
-                        mItemSizeConfig
+                            thumbnail,
+                            item,
+                            mItemSizeConfig
                     )
                 }
                 is ItemGalleryTitleBinding -> {
@@ -175,5 +181,20 @@ class GalleryViewHolder(
         }
 
         item.uiDirty = false
+    }
+
+    private fun handleFavouriteUI(zoom: Int, isFavorite: Boolean?, favouriteView: View) {
+        when (zoom) {
+            ZOOM_IN_1X, ZOOM_DEFAULT, ZOOM_OUT_1X -> {
+                if (isFavorite == true) {
+                    favouriteView.visibility = View.VISIBLE
+                } else {
+                    favouriteView.visibility = View.GONE
+                }
+            }
+            else -> {
+                favouriteView.visibility = View.GONE
+            }
+        }
     }
 }

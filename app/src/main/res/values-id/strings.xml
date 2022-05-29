@@ -207,7 +207,7 @@
     <!--  -->
     <string name="tour_access_title">Akses MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Daftar sekarang dan dapatkan 20 GB penyimpanan gratis</string>
+    <string name="tour_space_text">Daftar sekarang dan dapatkan 20&#160;GB penyimpanan gratis</string>
     <!--  -->
     <string name="tour_speed_text">Upload cepat. Bagikan file dengan siapapun</string>
     <!--  -->
@@ -375,7 +375,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Lihat pemindahan</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Sebagian besar perangkat tidak bisa mengunduh file lebih besar  dari 4GB. Unduhan Anda mungkin akan gagal</string>
+    <string name="error_file_size_greater_than_4gb">Sebagian besar perangkat tidak bisa mengunduh file lebih besar dari 4&#160;GB. Unduhan Anda mungkin akan gagal</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Tidak ada app tersedia untuk mengeksekusi file ini pada perangkat anda</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1006,9 +1006,9 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Mengekspor Kunci Pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya  dengan kunci anda. Reset password membutuhkan kunci dan akses ke email anda.</string>
+    <string name="backup_third_paragraph">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya  dengan kunci anda. Ubah sandi membutuhkan kunci dan akses ke email anda.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Salin Kunci Pemulihan ke clipboard atau simpan sebagai file teks</string>
+    <string name="backup_action">Salin Kunci Pemulihan ke clipboard atau simpan sebagai file teks.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Simpan</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1060,9 +1060,9 @@
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_title">Alamat email anda salah</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Harap cek alamat email dan coba kembali</string>
+    <string name="invalid_email_text">Harap cek alamat email dan coba kembali.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="title_dialog_insert_MK">Reset password</string>
+    <string name="title_dialog_insert_MK">Ubah sandi</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Masukkan Kunci Pemulihan anda di bawah ini</string>
     <!-- Text of the alert when the pass has been correctly changed -->
@@ -1086,7 +1086,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Recovery link ini telah kadaluarsa, harap coba kembali.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Kunci Pemulihan anda akan digunakan untuk mereset kata sandi anda. Tolong masukkan kata sandi baru anda</string>
+    <string name="text_reset_pass_logged_in">Kunci Pemulihan anda akan digunakan untuk mengubah kata sandi anda. Tolong masukkan kata sandi baru anda</string>
     <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
     <string name="email_verification_text_change_pass">Anda akan menerima link pemulihan yang memungkinkan anda menyetel ulang kata sandi anda.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -1162,7 +1162,7 @@
     <!-- confirmation message before removing mutiple contact request -->
     <string name="confirmation_remove_multiple_contact_request">Apakah anda ingin menghapus %d permintaan undangan ini?</string>
     <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d balasan permintaan dikirim</string>
+    <string name="number_correctly_invitation_reply_sent">%d balasan permintaan dikirim.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d balasan permintaan berhasil terkirim namun %2$d gagal terkirim.</string>
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
@@ -1184,11 +1184,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Tautan folder tidak tersedia</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Tautan folder telah dihapus karena pelanggaran ToS/AUP.</string>
+    <string name="folder_link_unavaible_ToS_violation">Tautan folder telah dihapus karena melanggar Persyaratan Layanan kami.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Tautan file tidak tersedia</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Tautan file telah dihapus karena pelanggaran ToS/AUP.</string>
+    <string name="file_link_unavaible_ToS_violation">Tautan file telah dihapus karena melanggar Persyaratan Layanan kami.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL ini rusak atau cacat. Tautan yang anda coba akses tidak ada.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1240,7 +1240,7 @@
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d permintaan sudah terkirim.</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d permintaan undangan berhasil dikirim</string>
+    <string name="number_correctly_invite_contact_request">%d permintaan undangan berhasil dikirim.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d permintaan undangan berhasil dikirim namun %2$d permintaan tidak terkirim.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1422,7 +1422,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Disalin ke clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chat Error!</string>
+    <string name="chat_error_open_title">Chat Error</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Obrolan tidak dapat dibuka dengan sukses</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -2137,23 +2137,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2774,10 +2774,10 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Penghapusan Perselisihan</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Tidak dapat diakses karena pelanggaran ToS / AUP</string>
+    <string name="error_download_takendown_node">Tidak dapat diakses karena melanggar Persyaratan Layanan kami</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">%d file tidak diunduh karena pelanggaran ToS / AUP.</item>
+        <item quantity="other">%d file tidak diunduh karena melanggar Persyaratan Layanan kami.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]File yang anda share ke public [/A][B]%s[/B][C]  telah dipulihkan.[/C]</string>
@@ -2806,7 +2806,7 @@
     <!-- Subtitle of the Upgrade account section -->
     <string name="type_of_my_account">Akun anda sekarang adalah [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
-    <string name="footnote_achievements">Subyek pada partisipasi anda dalam program pencapaian kami</string>
+    <string name="footnote_achievements">Subyek pada partisipasi anda dalam program pencapaian kami.</string>
     <!-- Title label for the current payment method during account upgrading -->
     <string name="payment_method">Cara pembayaran</string>
     <!-- title of billing period -->
@@ -2896,7 +2896,7 @@
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Dari[/A] %s / [A]bulan[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan</string>
+    <string name="upgrade_comment">* Langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Panggilan Dimulai</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -3168,7 +3168,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mulai mengobrol dengan aman dengan kontak anda menggunakan enkripsi menyeluruh</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Halo. Lakukan percakapan aman di MEGA dengan saya dan dapatkan 20 GB penyimpanan cloud gratis. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Halo. Lakukan percakapan aman di MEGA dengan saya dan dapatkan 20&#160;GB penyimpanan cloud gratis. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3454,7 +3454,7 @@
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Cari di MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
-    <string name="error_reset_account_blocked">Akun yang anda coba untuk reset telah diblokir</string>
+    <string name="error_reset_account_blocked">Akun yang anda coba untuk reset telah diblokir.</string>
     <!-- Error message when trying to login and the account is blocked -->
     <string name="error_account_blocked">Akun anda telah diblok. Harap kontak support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
@@ -3482,17 +3482,17 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Obrolan baru</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]Gambar[/A] [B]Ditemukan[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">Tidak ada dokumen yang ditemukan</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">Tidak ada file audio yang ditemukan</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Video tidak ditemukan</string>
+    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]gambar[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]Tidak ada[/B] [A]dokumen[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]Tidak ada[/B] [A]berkas audio[/A] [B]ditemukan[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]Tidak ada[/B] [A]video[/A] [B]ditemukan[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Telusuri GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">[A]GIF[/A] Tidak ditemukan</string>
+    <string name="empty_search_giphy">[A]GIF[/A] tidak ditemukan</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">GIF tidak tersedia. Silakan coba lagi nanti</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
@@ -3662,7 +3662,7 @@
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Kami menggunakan Cookie dan teknologi serupa (“Cookies”) untuk menyediakan dan meningkatkan pengalaman anda dengan layanan kami. Terima penggunaan Cookie kami sejak awal kunjungan anda atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Pengaturan Cookie belum disimpan</string>
+    <string name="dialog_cookie_alert_unsaved">Pengaturan Cookie belum disimpan.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Perubahan Pengaturan Cookie telah disimpan.</string>
     <!-- Preference screen item title -->
@@ -3734,7 +3734,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Bermain di latar belakang</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A] [B]Ditemukan[/B]</string>
+    <string name="photos_empty">[B]Tidak ada[/B] [A]foto[/A] [B]ditemukan[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Cadangkan foto dan video anda ke Penyimpanan Cloud anda secara otomatis.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3767,30 +3767,30 @@
     <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file sudah diunduh. 1 file tertunda.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file sudah diunduh. %d file tertunda.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d file sudah diunduh. 1 file tertunda.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d file sudah diunduh. %2$d file tertunda.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan %d barang tidak berhasil dikirim</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d barang berhasil dipindahkan ke Tempat Sampah dan %2$d barang tidak berhasil dikirim</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan %d barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d barang berhasil dipulihkan dan %2$d barang tidak berhasil dipulihkan</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="other">1 file sudah diunduh. %d file tertunda.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="other">%d file yang sudah diunduh. 1 berkas tertunda.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="other">1 item dipindahkan ke tempat sampah tapi %d barang tidak dipindahkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="other">%dbarang dipindahkan ke tempat sampah tapi 1 barang tidak dipindahkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1 item dipulihkan tetapi %d item tidak dipulihkan. Coba lagi nanti.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d item dipulihkan tetapi 1 item tidak dipulihkan. Coba lagi nanti.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d barang berhasil dipindahkan ke Tempat Sampah</item>
@@ -3814,9 +3814,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Tambahkan nomor telepon anda</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3868,7 +3868,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Pertemuan</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Mulai/Gabung pertemuan</string>
+    <string name="start_join_meeting">Mulai atau gabung pertemuan</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">Buat pertemuan</string>
     <!-- Label that join a meeting -->
@@ -3984,7 +3984,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Bergabunglah dengan platform kolaborasi dan penyimpanan cloud aman terbesar di dunia.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">Dapatkan 20 GB gratis</string>
+    <string name="left_meeting_bonus_title">Dapatkan 20&#160;GB gratis</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Daftar sekarang dan nikmati fitur kolaborasi lanjutan secara gratis.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -4209,4 +4209,22 @@
     <string name="message_zip_format_error">Format file tidak didukung. Tidak dapat membuka file.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">Folder yang dipilih kosong. Tidak ada file untuk diunggah.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">Anda telah memasukkan kata sandi anda saat ini</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">File tidak lagi tersedia</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">File dihapus karena melanggar Persyaratan Layanan kami.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">Persyaratan Layanan yang dilanggar</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">Perangkat ini tidak memiliki aplikasi untuk memilih folder.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">Berikutnya</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">Sebelumnya</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">Berikutnya</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">Sebelumnya</string>
 </resources>

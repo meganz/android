@@ -31,11 +31,11 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Incompleet</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Ongeldige sleutel/Decoderings-fout</string>
+    <string name="api_ekey">Ongeldige sleutel of decoderings-fout</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Slechte sessie ID</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Niet toegangelijk door Algemene Voorwaarden schending</string>
+    <string name="api_eblocked_ec_import_ec_download">Niet toegankelijk omdat het onze Algemene Voorwaarden schendt</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Geblokkeerd</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

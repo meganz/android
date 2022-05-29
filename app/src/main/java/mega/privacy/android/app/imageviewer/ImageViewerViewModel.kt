@@ -45,6 +45,9 @@ import javax.inject.Inject
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
  *                                      as well as each individual node action required by the menu
+ * @property copyNodeUseCase            Needed to copy image node on demand
+ * @property moveNodeUseCase            Needed to move image node on demand
+ * @property removeNodeUseCase          Needed to remove image node on demand
  * @property exportNodeUseCase          Needed to export image node on demand
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
@@ -56,6 +59,9 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
+    private val removeNodeUseCase: RemoveNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
@@ -218,11 +224,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.ChatNode ->
                 getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOfflineNode(imageItem.handle)
+                getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri)
+                getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
 
         subscription
@@ -470,52 +476,58 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.copyNode(
+        copyNodeUseCase.copy(
             node = getExistingNode(nodeHandle),
             nodeHandle = nodeHandle,
             toParentHandle = newParentHandle
-        ).subscribeAndComplete {
+        ).subscribeAndComplete(false) {
             snackbarMessage.value = getString(R.string.context_correctly_copied)
         }
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.moveNode(nodeHandle, newParentHandle)
-            .subscribeAndComplete {
+        moveNodeUseCase.move(nodeHandle, newParentHandle)
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_moved)
             }
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
-        getNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeAndComplete {
+        moveNodeUseCase.moveToRubbishBin(nodeHandle)
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
-        getNodeUseCase.removeNode(nodeHandle)
-            .subscribeAndComplete {
+        removeNodeUseCase.remove(nodeHandle)
+            .subscribeAndComplete(false) {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
 
-    fun stopImageLoading(itemId: Long, aggressive: Boolean) {
+    fun stopImageLoading(itemId: Long) {
         images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
+            imageResult.transferTag?.let { tag ->
+                cancelTransferUseCase.cancel(tag)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onError = { error ->
+                            logError(error.stackTraceToString())
+                        }
+                    )
+            }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
             }
-            if (aggressive) {
-                imageResult.transferTag?.let { tag ->
-                    cancelTransferUseCase.cancel(tag)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                            onError = { error ->
-                                logError(error.stackTraceToString())
-                            }
-                        )
-                }
+        }
+    }
+
+    fun onLowMemory() {
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.lastPathSegment?.let { fileName ->
+            Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll {
+                !it.uriString.contains(fileName)
             }
         }
     }
@@ -578,7 +590,7 @@ class ImageViewerViewModel @Inject constructor(
             .addTo(composite)
     }
 
-    private fun Completable.subscribeAndComplete(completeAction: (() -> Unit)? = null) {
+    private fun Completable.subscribeAndComplete(addToComposite: Boolean = false, completeAction: (() -> Unit)? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -588,7 +600,8 @@ class ImageViewerViewModel @Inject constructor(
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
-            )
-            .addTo(composite)
+            ).also {
+                if (addToComposite) it.addTo(composite)
+            }
     }
 }

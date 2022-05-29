@@ -15,7 +15,7 @@
     <!-- Error shown when terms of service are breached during download. -->
     <string name="api_etoomany_ec_download">ご利用規約違反</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-    <string name="api_etoomay">同時接続または転送が多すぎます。</string>
+    <string name="api_etoomay">同時接続または転送が多すぎます</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
     <string name="api_erange">範囲外</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">セッションIDが正しくありません</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">ToS（ご利用規約）/AUP（ご利用規定）違反のためアクセスできません</string>
+    <string name="api_eblocked_ec_import_ec_download">ご利用規約に違反するため、アクセスできません。</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">ブロックされています</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

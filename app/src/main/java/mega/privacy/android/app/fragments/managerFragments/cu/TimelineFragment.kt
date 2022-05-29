@@ -3,9 +3,12 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 import android.Manifest
 import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -16,11 +19,15 @@ import mega.privacy.android.app.databinding.FragmentTimelineBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
+import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaChatApiJava
@@ -36,6 +43,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     override val viewModel by viewModels<TimelineViewModel>()
 
     private lateinit var binding: FragmentTimelineBinding
+
+    private lateinit var photosFragment: PhotosFragment
 
     /**
      * Current order.
@@ -53,6 +62,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTimelineBinding.inflate(inflater, container, false)
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
 
         if (mManagerActivity.firstLogin || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true)
@@ -76,7 +86,13 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        photosFragment = parentFragment as PhotosFragment
         initAfterViewCreated()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
     }
 
     override fun onBackPressed() = when {
@@ -130,30 +146,19 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     /**
-     * Enable CU
+     * Enable Camera Upload
      */
-    fun enableCu() {
+    fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
-        startCU()
-    }
-
-    /**
-     * Start CU Job
-     */
-    private fun startCU() {
         callManager {
             it.refreshTimelineFragment()
         }
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            LogUtil.logDebug("Starting CU")
-            JobUtil.startCameraUploadService(context)
-        }, 1000)
+        viewModel.startCameraUploadJob()
     }
 
     /**
@@ -258,7 +263,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
      * Set up other views
      */
     private fun setupOtherViews() {
-        binding.emptyEnableCuButton.setOnClickListener { enableCUClick() }
+        binding.emptyEnableCuButton.setOnClickListener { enableCameraUploadClick() }
         setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
         binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
@@ -270,9 +275,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     /**
-     * handle enable CU click UI and logic
+     * handle enable Camera Upload click UI and logic
      */
-    fun enableCUClick() {
+    fun enableCameraUploadClick() {
         ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
         val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (hasPermissions(context, *permissions)) {
@@ -314,19 +319,20 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             mManagerActivity.updateCUViewTypes(
                 if (
                     galleryItems.isEmpty() ||
-                    (parentFragment as PhotosFragment).tabIndex != 0 ||
+                    photosFragment.tabIndex != 0 ||
                     actionMode != null
                 ) {
                     View.GONE
-                }
-                else {
+                } else {
                     View.VISIBLE
                 }
             )
         }
 
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
-            updateEnableCUButtons(cuEnabled = isEnabled)
+            if (!viewModel.isEnableCUShown()) {
+                updateEnableCUButtons(cuEnabled = isEnabled)
+            }
         }
     }
 
@@ -348,7 +354,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (!cuEnabled) {
-            hideCUProgress()
+            photosFragment.hideCUProgress()
         }
     }
 
@@ -386,8 +392,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             ) View.VISIBLE else View.GONE
         )
         if (selectedView != ALL_VIEW) {
-            hideCUProgress()
-            binding.uploadProgress.visibility = View.GONE
+            photosFragment.hideCUProgress()
+            photosFragment.setUploadProgressTextVisibility(View.GONE)
         }
     }
 
@@ -410,7 +416,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!mManagerActivity.isInPhotosPage) return
         super.whenStartActionMode()
         mManagerActivity.animateCULayout(true)
-        with(parentFragment as PhotosFragment) {
+        with(photosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
         }
@@ -423,39 +429,18 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
         super.whenEndActionMode()
         mManagerActivity.animateCULayout(viewModel.isCUEnabled())
-        with(parentFragment as PhotosFragment) {
+        with(photosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
         }
 
     }
 
-    /**
-     * Hides CU progress bar and checks the scroll
-     * in order to hide elevation if the list is not scrolled.
-     */
-    private fun hideCUProgress() {
-        mManagerActivity.hideCUProgress()
-        checkScroll()
-    }
-
     override fun checkScroll() {
         if (!this::binding.isInitialized || !listViewInitialized()) return
 
         val isScrolled = listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-        mManagerActivity.changeAppBarElevation(binding.uploadProgress.isVisible || isScrolled)
-    }
-
-    /**
-     * update progress UI
-     */
-    fun updateProgress(visibility: Int, pending: Int) {
-        if (binding.uploadProgress.visibility != visibility) {
-            binding.uploadProgress.visibility = visibility
-            checkScroll()
-        }
-        binding.uploadProgress.text = StringResourcesUtils
-            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
+        mManagerActivity.changeAppBarElevation(photosFragment.getUploadProgressText().isVisible || isScrolled)
     }
 
     /**

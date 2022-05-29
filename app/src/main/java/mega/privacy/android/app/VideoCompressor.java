@@ -6,7 +6,7 @@ import android.os.StatFs;
 import java.io.File;
 import java.util.List;
 
-import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static mega.privacy.android.app.utils.LogUtil.*;

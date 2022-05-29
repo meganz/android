@@ -12,7 +12,6 @@ public class Constants {
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
     public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
     public static final int BOOT_JOB_ID = 10097;
-    public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
@@ -165,6 +164,7 @@ public class Constants {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_BT_CONNECT = 16;
+    public static final int REQUEST_ACCESS_MEDIA_LOCATION = 17;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
@@ -182,6 +182,7 @@ public class Constants {
     public static final int BUSINESS = 100;
 
     public static final long DISABLED_RETENTION_TIME = 0;
+    public static final long SECONDS_IN_MINUTE = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
     public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
@@ -934,4 +935,6 @@ public class Constants {
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
     public static final int FIRST_NAVIGATION_LEVEL = 0;
+
+    public static final int LONG_SNACKBAR_DURATION = 2750;
 }

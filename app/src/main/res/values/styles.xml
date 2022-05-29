@@ -212,7 +212,16 @@
     </style>
 
     <!-- For FAB above images or scrim -->
-    <style name="Widget.Mega.FAB.Variant" parent="Widget.MaterialComponents.FloatingActionButton">
+    <style name="Widget.Mega.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.FAB</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.FAB" parent="">
+        <item name="colorSecondary">@color/teal_300_teal_200</item>
+        <item name="colorOnSecondary">@color/white_dark_grey</item>
+    </style>
+
+    <style name="Widget.Mega.FAB.Variant">
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.FAB.Variant</item>
     </style>
 
@@ -616,6 +625,19 @@
         <item name="android:gravity">center</item>
         <item name="android:maxLines">1</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="MeetingBanner">
+        <item name="android:minHeight">36dp</item>
+        <item name="android:background">@drawable/background_meeting_banner</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
     </style>

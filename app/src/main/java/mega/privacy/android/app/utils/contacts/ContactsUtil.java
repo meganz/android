@@ -88,7 +88,7 @@ public class ContactsUtil {
         }
     }
 
-    static List<LocalContact> getLocalContactList(Context context) {
+    public static List<LocalContact> getLocalContactList(Context context) {
         List<LocalContact> localContacts = new ArrayList<>();
         ContentResolver resolver = context.getContentResolver();
 

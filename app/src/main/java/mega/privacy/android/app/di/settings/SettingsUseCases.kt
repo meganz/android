@@ -51,4 +51,13 @@ abstract class SettingsUseCases {
     @Binds
     abstract fun bindFetchMultiFactorAuthSetting(useCase: DefaultFetchMultiFactorAuthSetting): FetchMultiFactorAuthSetting
 
+    @Binds
+    abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
+
+    @Binds
+    abstract fun bindGetChatImageQuality(useCase: DefaultGetChatImageQuality): GetChatImageQuality
+
+    @Binds
+    abstract fun bindSetChatImageQuality(useCaseSetChatImageQuality: DefaultSetChatImageQuality): SetChatImageQuality
+
 }

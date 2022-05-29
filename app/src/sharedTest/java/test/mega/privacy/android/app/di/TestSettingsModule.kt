@@ -10,9 +10,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.LoggingModule
 import mega.privacy.android.app.di.settings.SettingsModule
 import mega.privacy.android.app.di.settings.SettingsUseCases
-import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
-import mega.privacy.android.app.utils.SDCardOperator.TEST
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
@@ -33,12 +31,14 @@ object TestSettingsModule {
     val isMultiFactorAuthAvailable =
         mock<IsMultiFactorAuthAvailable> { on { invoke() }.thenReturn(true) }
     val fetchAutoAcceptQRLinks =
-        mock<FetchAutoAcceptQRLinks> { on { runBlocking { invoke() } }.thenReturn(false) }
+        mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
     val fetchMultiFactorAuthSetting =
         mock<FetchMultiFactorAuthSetting> { on { invoke() }.thenReturn(emptyFlow()) }
-    val getAccountDetails = mock<GetAccountDetails> { on { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
+    val getAccountDetails = mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
     val shouldHideRecentActivity =
         mock<IsHideRecentActivityEnabled> { on { invoke() }.thenReturn(emptyFlow()) }
+    val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
+    val setChatImageQuality = mock<SetChatImageQuality>()
 
     @Provides
     fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
@@ -106,4 +106,17 @@ object TestSettingsModule {
 
     @Provides
     fun provideResetSdkLogger(): ResetSdkLogger = mock()
+
+    @Provides
+    fun provide(): MonitorAutoAcceptQRLinks = mock {
+        on { invoke() }.thenReturn(
+            flowOf(true)
+        )
+    }
+
+    @Provides
+    fun provideGetChatImageQuality(): GetChatImageQuality = getChatImageQuality
+
+    @Provides
+    fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
 }

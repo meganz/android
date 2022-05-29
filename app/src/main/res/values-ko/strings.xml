@@ -179,7 +179,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">네트워크 연결 없음</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃 하였습니다.</string>
+    <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃 하였습니다</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">암호화 키 생성 중</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -207,7 +207,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA 접근</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">지금 가입하고 20GB의 무료 공간을 받으세요</string>
+    <string name="tour_space_text">지금 가입하고 20&#160;GB의 무료 공간을 받으세요</string>
     <!--  -->
     <string name="tour_speed_text">업로드는 매우 빠릅니다. 모두와 빠르게 파일을 공유하세요</string>
     <!--  -->
@@ -229,7 +229,7 @@
     <!-- Does the user already have a MEGA account -->
     <string name="already_account">이미 계정이 있으신가요?</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">이용 약관에 동의하여야 합니다.</string>
+    <string name="create_account_no_terms">이용 약관에 동의하여야 합니다</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">암호를 잊는 것에 대한 위험성을 이해하였다는 데에 동의해야 합니다</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -241,7 +241,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">암호가 일치하지 않습니다</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">이 이메일 주소는 이미 MEGA에 가입되어 있습니다.</string>
+    <string name="error_email_registered">이 이메일 주소는 이미 MEGA에 가입되어 있습니다</string>
     <!--  -->
     <string name="create_account_creating_account">서버에 연결 중: 계정 생성 중</string>
     <!--  -->
@@ -375,7 +375,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
+    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4&#160;GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">장치에 이 파일을 실행할 앱이 없습니다</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -976,9 +976,9 @@
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">영숫자</string>
     <!-- Confirmation message when enabling logs in the app -->
-    <string name="settings_enable_logs">로그가 활성화 되었습니다.</string>
+    <string name="settings_enable_logs">로그가 활성화 되었습니다</string>
     <!-- Confirmation message when disabling logs in the app -->
-    <string name="settings_disable_logs">로그가 비활성화 되었습니다.</string>
+    <string name="settings_disable_logs">로그가 비활성화 되었습니다</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">MEGA 카메라 업로드 폴더를 설정할 수 없습니다</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
@@ -1008,7 +1008,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">외부 공격자가 당신의 키만으로 계정에 접근할 수는 없습니다. 암호 재설정은 당신의 이메일에 대한 접근과 키 모두를 요구합니다.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요</string>
+    <string name="backup_action">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">저장</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1152,9 +1152,9 @@
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">입력하신 현재 암호가 맞지 않습니다.</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d개의 재초대 요청이 발송됨</string>
+    <string name="number_correctly_reinvite_contact_request">%d개의 재초대 요청이 발송됨.</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d개의 요청이 삭제됨</string>
+    <string name="number_correctly_delete_contact_request">%d개의 요청이 삭제됨.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d개의 요청은 성공적으로 삭제되었지만 %2$d개의 요청은 삭제되지 않았습니다.</string>
     <!-- confirmation message before removing a contact request. -->
@@ -1184,7 +1184,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">폴더 링크가 사용불가입니다</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">이 파일은 이용 약관/용인 가능한 이용 정책 위반으로 삭제되었습니다.</string>
+    <string name="folder_link_unavaible_ToS_violation">폴더 링크가 이용 약관 위반으로 삭제되었습니다.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">파일 링크가 사용불가능합니다</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -1214,7 +1214,7 @@
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">보관함</string>
     <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">친구를 대화에 초대하고 우리의 안전한 암호화된 플랫폼을 즐기세요</string>
+    <string name="recent_chat_empty_invite">친구를 대화에 초대하고 우리의 안전한 암호화된 플랫폼을 즐기세요.</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">시간</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1228,7 +1228,7 @@
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <string name="remove_multiple_contacts_shared_folder">%d개의 연락처가 공유된 폴더에서 제거됩니다.</string>
     <!-- success message when removing a contact from a shared folder -->
-    <string name="number_correctly_removed_from_shared">%d개의 연락처가 공유된 폴더에서 올바르게 제거되었습니다.</string>
+    <string name="number_correctly_removed_from_shared">%d개의 연락처가 공유된 폴더에서 올바르게 제거되었습니다</string>
     <!-- success message when removing a contact from a shared folder -->
     <string name="number_incorrectly_removed_from_shared">%d개의 연락처가 제거되지 않았습니다</string>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
@@ -1372,7 +1372,7 @@
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">단체 대화를 떠날까요?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error_already_exists">참가자가 이미 이 그룹 대화에 존재합니다.</string>
+    <string name="add_participant_error_already_exists">참가자가 이미 이 그룹 대화에 존재합니다</string>
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">%d명의 참여자가 올바르게 초대되었습니다</string>
     <!-- error message when inviting multiple contacts to a group chat -->
@@ -1384,7 +1384,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A]님이 [C]%2$s[/C]님에 의해[B] 그룹 대화에서 제거되었습니다[/B]</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="change_title_messages">[A]%1$s님이[/A][B] 그룹 대화 이름을 [/B][C]“%2$s”[/C](으)로 변경하였습니다.</string>
+    <string name="change_title_messages">[A]%1$s님이[/A][B] 그룹 대화 이름을 [/B][C]“%2$s”[/C](으)로 변경하였습니다</string>
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s님이[/A][B] 단체 대화를 떠났습니다[/B]</string>
     <!-- chat message alert when the message have to been manually -->
@@ -1404,7 +1404,7 @@
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">현재 계정에서 로그아웃 하시겠습니까?</string>
     <!-- Text shown when a message has been deleted in the chat -->
-    <string name="non_format_text_deleted_message_by">이 메시지는 %1$s님에 의해 삭제되었습니다.</string>
+    <string name="non_format_text_deleted_message_by">이 메시지는 %1$s님에 의해 삭제되었습니다</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
     <string name="history_cleared_message">대화 기록이 삭제되었습니다</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1416,7 +1416,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%1$s님이 %2$s님에 의해 단체 대화에 제거되었습니다</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="non_format_change_title_messages">%1$s님이 단체 대화 이름을 ”%2$s”로 변경하였습니다</string>
+    <string name="non_format_change_title_messages">%1$s님이 단체 대화 이름을 “%2$s”로 변경하였습니다</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s님이 단체 대화를 떠났습니다</string>
     <!-- success alert when the user copy some messages to the clipboard -->
@@ -1747,7 +1747,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">읽기와 쓰기</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">전송 일시정지됨!</string>
+    <string name="attachment_uploading_state_paused">전송 일시정지됨</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">업로드 중&#8230;</string>
     <!--  -->
@@ -1781,7 +1781,7 @@
     <!-- messages string in chat notification -->
     <string name="messages_chat_notification">메시지</string>
     <!-- part of the string in incoming shared folder notification -->
-    <string name="incoming_folder_notification">폴더가 공유됨, 공유자:</string>
+    <string name="incoming_folder_notification">폴더가 공유됨, 공유자</string>
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">새 공유 폴더</string>
     <!-- title of the notification for a new incoming contact request -->
@@ -1925,9 +1925,9 @@
     <!-- when add or share a file with a new contact, it can type by name or mail -->
     <string name="type_contact">연락처의 이름 또는 이메일</string>
     <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">더 이상의 연락처가 추가될 수 없습니다.</string>
+    <string name="max_add_contact">더 이상의 연락처가 추가될 수 없습니다</string>
     <!-- when changing the password , the old password and new password are equals -->
-    <string name="old_and_new_passwords_equals">새 암호는 기존 암호와 동일할 수 없습니다.</string>
+    <string name="old_and_new_passwords_equals">새 암호는 기존 암호와 동일할 수 없습니다</string>
     <!-- Menu item -->
     <string name="action_search_by_date">날짜로 찾기</string>
     <!-- title of a button to apply search by date -->
@@ -1939,7 +1939,7 @@
     <!-- title of a Search by date tag -->
     <string name="label_set_day">날짜 설정</string>
     <!-- the user can’t choose this date -->
-    <string name="snackbar_search_by_date">요구된 날짜가 유효하지 않습니다.</string>
+    <string name="snackbar_search_by_date">요구된 날짜가 유효하지 않습니다</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">잘못된 이름</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
@@ -1965,7 +1965,7 @@
     <!-- before sharing a file, has to be downloaded -->
     <string name="not_download">파일이 아직 다운로드되지 않았습니다</string>
     <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">MEGA 연락처만 추가할 수 있습니다.</string>
+    <string name="not_permited_add_email_to_invite">MEGA 연락처만 추가할 수 있습니다</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">대화에 다시 연결중</string>
     <!-- Message show when a call cannot be established -->
@@ -2031,7 +2031,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">QR 파일을 다운로드하던 중 오류가 발생하였습니다. 파일이 존재하지 않을 수도 있습니다. 다시 시도하세요.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">QR 코드가 성공적으로 %s에 다운로드되었습니다.</string>
+    <string name="success_download_qr">QR 코드가 성공적으로 %s에 다운로드되었습니다</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">초대가 발송되지 않았습니다</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -2137,23 +2137,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s GB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%sMB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s GB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2468,7 +2468,7 @@
     <!-- Indicates that can type a contact email -->
     <string name="contact_email">연락처 이메일</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">당신은 이미 이 연락처를 추가했습니다</string>
+    <string name="contact_not_added">당신은 이미 이 연락처를 추가했습니다.</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">잘못된 메시지 형식</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2500,7 +2500,7 @@
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">삭제</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s 대화가 저장되었습니다</string>
+    <string name="success_archive_chat">%s 대화가 저장되었습니다.</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
     <string name="error_archive_chat">오류. %s 대화가 저장되지 않았습니다.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
@@ -2533,7 +2533,7 @@
     <string name="settings_file_management_file_versions_title">파일 버전</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="other">%1$d개의 파일 버전이 있으며, 총 %2$s를 사용 중입니다.</item>
+        <item quantity="other">%1$d개의 파일 버전이 있으며, 총 %2$s를 사용 중입니다</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">파일 관리</string>
@@ -2578,15 +2578,15 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">잘못된 코드</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 MEGA 고객 지원에 연락하여 맞춤 요금제를 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -2700,9 +2700,9 @@
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">참관인</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">대화 링크를 불러오던 중 오류 발생</string>
+    <string name="error_chat_link">대화 링크를 불러오던 중 오류 발생.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">대화 링크를 불러오던 중 대화 초기화 오류 발생</string>
+    <string name="error_chat_link_init_error">대화 링크를 불러오던 중 대화 초기화 오류 발생.</string>
     <!-- Message on the alert to preview a chat link if the user is already a participant -->
     <string name="alert_already_participant_chat_link">이미 이 대화에 참여하고 있습니다.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
@@ -2774,7 +2774,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">게시중단 이의제기</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">이용 약관 위반으로 인하여 접근 불가</string>
+    <string name="error_download_takendown_node">이용 약관 위반으로 인하여 접근할 수 없습니다</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="other">%d개의 파일이 이용 약관 위반으로 인해 다운로드되지 않았습니다.</item>
@@ -2910,7 +2910,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 암호화된 메시지를 교환하고 안전한 통화를 하려면 다른 접근 권한이 필요할 수 있습니다.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
+    <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용.</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -3050,7 +3050,7 @@
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">파일 준비중</string>
     <!-- Label indicating some content has been sent as message -->
-    <string name="sent_as_message">메시지로 전송</string>
+    <string name="sent_as_message">메시지로 전송.</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
     <string name="error_sent_as_message">오류. 파일이 선택한 대화에 전송되지 않았습니다.</string>
     <!-- Action delete all file versions -->
@@ -3082,7 +3082,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">암호화된 대화</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">완전히 암호화된 대화와 음성과 영상 통화, 그룹 대화 그리고 클라우드 드라이브와 통합된 파일 공유</string>
+    <string name="content_tour_two">완전히 암호화된 대화와 음성과 영상 통화, 그룹 대화 그리고 클라우드 드라이브와 통합된 파일 공유.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">네트워크 생성</string>
     <!-- Content of third tour screen -->
@@ -3152,7 +3152,7 @@
     <!-- Title of the dialog shown when you want to join a group call -->
     <string name="title_join_call">통화 참여</string>
     <!-- Text of the dialog shown when you want to join a group call -->
-    <string name="text_join_call">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
+    <string name="text_join_call">이 통화에 참여하려면 현재 통화를 마쳐야합니다.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">이 통화에 참여하려면 현재 통화를 종료하거나 보류해야합니다.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
@@ -3168,9 +3168,9 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">종단간 암호화를 통하여 당신의 연락처와 안전하게 대화를 시작하세요</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요! 저와 MEGA에서 안전하게 대화하고 20GB의 무료 저장소를 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20&#160;GB의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
-    <string name="no_chat_link_available">사용 가능한 대화 링크 없음</string>
+    <string name="no_chat_link_available">사용 가능한 대화 링크 없음.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">대화 링크를 성공적으로 삭제하였습니다.</string>
     <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
@@ -3483,12 +3483,12 @@
     <string name="fab_label_new_chat">새 대화</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]발견된[/B] [A]이미지[/A] [B]없음[/B]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">문서가 없습니다</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">음성 파일이 없습니다</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">영상이 없습니다</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[A]문서[/A][B]가[/B] [B]없습니다[/B]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[A]음성 파일[/A][B]이[/B] [B]없습니다[/B]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[A]동영상[/A][B]이[/B] [B]없습니다[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">GIPHY 검색</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3578,11 +3578,11 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ”%1$s”의 우선순위를 바꿀 수 없습니다</string>
+    <string name="change_of_transfer_priority_failed">전송 “%1$s”의 우선순위를 바꿀 수 없습니다</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">링크와 복호화 키를 따로 내보내기</string>
+    <string name="explanation_send_decryption_key_separately">링크와 복호화 키를 따로 내보내기.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">더 알아보기</string>
     <!-- Label key referring to a link decryption key -->
@@ -3767,30 +3767,30 @@
     <string name="error_share_owner_storage_quota">공유 소유자의 저장소 할당량 초과.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">파일 1개 이미 다운로드 됨. 파일 1개 대기 중.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">파일 1개 이미 다운로드 됨. 파일 %d개 대기 중.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">파일 %d개 이미 다운로드 됨. 파일 1개 대기 중.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">파일 %1$d개 이미 다운로드 됨. 파일 %2$d개 대기 중.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">항목 1개가 휴지통으로 이동 되었으며 항목 1개가 이동 되지 않았습니다</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">항목 1개가 휴지통으로 이동 되었으며 항목 %d개가 이동 되지 않았습니다</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">항목 %d개가 휴지통으로 이동 되었으며 항목 1개가 이동 되지 않았습니다</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">항목 %1$d개가 휴지통으로 이동 되었으며 항목 %2$d개가 이동 되지 않았습니다</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">항목 1개가 복원 되었으며 항목 1개가 복원 되지 않았습니다</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">항목 1개가 복원 되었으며 항목 %d개가 복원 되지 않았습니다</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">항목 %d개가 복원 되었으며 항목 1개가 복원 되지 않았습니다</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">항목 %1$d개가 복원 되었으며 항목 %2$d개가 복원 되지 않았습니다</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="other">1개의 파일이 이미 다운로드 되었습니다. %d개의 파일이 대기 중입니다.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="other">%d개의 파일이 이미 다운로드 되었습니다. 1개의 파일이 대기 중입니다.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="other">1개의 항목이 휴지통으로 이동되었으나 %d개 항목이 이동되지 않았습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="other">%d개의 항목이 휴지통으로 이동되었으나 1개 항목이 이동되지 않았습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1개의 항목이 복원 되었으나 %d개 항목이 복원되지 않았습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d개의 항목이 복원되었으나 1개 항목이 복원되지 않았습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d개의 항목이 휴지통으로 이동 되었습니다</item>
@@ -3814,9 +3814,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$sPB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$sEB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">전화 번호 추가</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3864,7 +3864,7 @@
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">현재 혼자 뿐입니다.</string>
+    <string name="banner_alone_on_the_call">현재 혼자 뿐입니다</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">회의</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3890,9 +3890,9 @@
     <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">카메라</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">카메라 켜짐</string>
+    <string name="general_camera_enable">카메라 켜짐.</string>
     <!-- General label for camera disable -->
-    <string name="general_camera_disable">카메라 꺼짐</string>
+    <string name="general_camera_disable">카메라 꺼짐.</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">보류</string>
     <!-- General label for speaker -->
@@ -3942,7 +3942,7 @@
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">회의에 초대 되었습니다.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">받은 회의 링크를 탭하거나 여기에 붙여넣으세요.</string>
+    <string name="paste_meeting_link_guest_instruction">받은 회의 링크를 탭하거나 여기에 붙여넣으세요</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">안 좋은 연결 품질</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -3968,7 +3968,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">당신은 새 중재자입니다.</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">회의 링크 복사됨</string>
+    <string name="copied_meeting_link">회의 링크 복사됨.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">현재 회의에 참여하려면 탭 하세요.</string>
     <!-- Title of fifth tour screen -->
@@ -3984,7 +3984,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
+    <string name="left_meeting_bonus_title">20&#160;GB를 무료로 받으세요</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3992,7 +3992,7 @@
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">새 회의 이름</string>
     <!-- The content of dialog when failed for creating meeting-->
-    <string name="meeting_is_failed_content">회의 생성 실패</string>
+    <string name="meeting_is_failed_content">회의 생성 실패.</string>
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s [A](나)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
@@ -4006,7 +4006,7 @@
     <!-- Setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting">최근 활동 숨기기</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting_context">홈 섹션에서 최근 활동 숨기기</string>
+    <string name="hide_recent_setting_context">홈 섹션에서 최근 활동 숨기기.</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">시작 화면을 선택하세요</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
@@ -4036,7 +4036,7 @@
     <!-- Message informing the fingerprint was enabled successfully -->
     <string name="confirmation_fingerprint_enabled">지문이 확인되었습니다</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
-    <string name="image_insertion_not_allowed">MEGA가 여기서의 이미지 삽입을 지원하지 않습니다.</string>
+    <string name="image_insertion_not_allowed">MEGA가 여기서의 이미지 삽입을 지원하지 않습니다</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">이미지</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -4100,7 +4100,7 @@
     <!-- The confirm information of warning dialog for moving "My backup" -->
     <string name="backup_move_confirm">백업 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요.</string>
+    <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요</string>
     <!-- when checking the input -->
     <string name="error_backup_confirm_dont_match">입력한 문자가 일치하지 않습니다</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->
@@ -4209,4 +4209,22 @@
     <string name="message_zip_format_error">지원 되지 않는 파일 형식입니다. 파일을 열 수 없습니다.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">선택한 폴더는 비어있습니다. 업로드할 파일이 없습니다.</string>
+    <!-- Error shown when user is trying to change the password typing the same as the current one. -->
+    <string name="error_same_password">현재 비밀번호를 입력하였습니다</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">파일을 더 이상 이용할 수 없습니다</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">파일이 이용 약관 위반으로 삭제되었습니다.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">이용 약관 위반</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">이 기기에 폴더를 선택할 앱이 없습니다.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">다음</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">이전</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">다음</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">이전</string>
 </resources>
