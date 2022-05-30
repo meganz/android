@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -113,6 +114,111 @@ class ManagerViewModelTest {
         setUnderTest()
 
         underTest.updateNodes.test().assertNoValue()
+    }
+
+    @Test
+    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertValue { it.size == 2 }
+        }
+    }
+
+    @Test
+    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns an empty list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getRubbishBinNodeByHandle(any())).thenReturn(emptyList())
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertNoValue()
+        }
+    }
+
+    @Test
+    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertNoValue()
+        }
+    }
+
+    @Test
+    fun `test that rubbish bin node updates live data is not set when node updates triggered from use case with an empty list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
+        whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+        setUnderTest()
+
+        underTest.updateRubbishBinNodes.test().assertNoValue()
+    }
+
+
+    @Test
+    fun `test that browser node updates live data is set when node updates triggered from use case`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertValue { it.size == 2 }
+        }
+    }
+
+    @Test
+    fun `test that browser node updates live data is not set when get browser node returns an empty list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getBrowserNodeByHandle(any())).thenReturn(emptyList())
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertNoValue()
+        }
+    }
+
+    @Test
+    fun `test that browser node updates live data is not set when get browser node returns a null list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        whenever(getBrowserNodeByHandle(any())).thenReturn(null)
+
+        setUnderTest()
+
+        runCatching {
+            underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+        }.onSuccess { result ->
+            result.assertNoValue()
+        }
+    }
+
+    @Test
+    fun `test that browser node updates live data is not set when node updates triggered from use case with an empty list`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
+        whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+        setUnderTest()
+
+        underTest.updateBrowserNodes.test().assertNoValue()
     }
 
     @Test
