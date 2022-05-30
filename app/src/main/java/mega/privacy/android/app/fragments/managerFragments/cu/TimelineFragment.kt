@@ -62,6 +62,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTimelineBinding.inflate(inflater, container, false)
+        viewModel.checkAndUpdateCamSyncEnabledStatus()
 
         if (mManagerActivity.firstLogin || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true)
@@ -331,6 +332,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
             if (!viewModel.isEnableCUShown()) {
                 updateEnableCUButtons(cuEnabled = isEnabled)
+            } else {
+                photosFragment.hideCUProgress()
             }
         }
     }

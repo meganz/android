@@ -6,11 +6,11 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.LoggingModule
 import mega.privacy.android.app.di.settings.SettingsModule
 import mega.privacy.android.app.di.settings.SettingsUseCases
 import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
@@ -39,6 +39,7 @@ object TestSettingsModule {
         mock<IsHideRecentActivityEnabled> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
+    val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
 
     @Provides
     fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
@@ -119,4 +120,7 @@ object TestSettingsModule {
 
     @Provides
     fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
+
+    @Provides
+    fun provideGetOfflineThumbnailFileWrapper():GetOfflineThumbnailFileWrapper = getOfflineThumbnailFileWrapper
 }

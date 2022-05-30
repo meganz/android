@@ -62,7 +62,7 @@ class DefaultAlbumsRepositoryTest {
                 }
 
                 val actual = underTest.getThumbnailFromServer(1L)
-                assertThat(actual.path).isEqualTo("${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName")
+                assertThat(actual?.path).isEqualTo("${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName")
             }
 
     @Test(expected = MegaException::class)

@@ -12,7 +12,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -26,10 +25,10 @@ import kotlin.coroutines.suspendCoroutine
  * @property cacheFolderFacade CacheFolderGateway
  */
 class DefaultAlbumsRepository @Inject constructor(
-        private val apiFacade: MegaApiGateway,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-        private val megaLocalStorageFacade: MegaLocalStorageGateway,
-        private val cacheFolderFacade: CacheFolderGateway,
+    private val apiFacade: MegaApiGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaLocalStorageFacade: MegaLocalStorageGateway,
+    private val cacheFolderFacade: CacheFolderGateway,
 ) : AlbumsRepository {
 
     override suspend fun getCameraUploadFolderId(): Long? = withContext(ioDispatcher) {
@@ -41,31 +40,31 @@ class DefaultAlbumsRepository @Inject constructor(
     }
 
     override suspend fun getThumbnailFromLocal(nodeId: Long): File? = withContext(ioDispatcher) {
-        getThumbnailFile(apiFacade.getMegaNodeByHandle(nodeId)).takeIf {
+        getThumbnailFile(nodeId).takeIf {
             it?.exists() ?: false
         }
     }
 
     // Mark as suspend function, and later will CacheFolderGateway functions to suspend as well
     @Suppress("RedundantSuspendModifier")
-    private suspend fun getThumbnailFile(node: MegaNode): File? =
-            cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${node.base64Handle}${FileUtil.JPG_EXTENSION}")
+    private suspend fun getThumbnailFile(nodeId: Long): File? =
+        cacheFolderFacade.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER, "${apiFacade.handleToBase64(nodeId)}${FileUtil.JPG_EXTENSION}")
 
     override suspend fun getThumbnailFromServer(nodeId: Long): File = withContext(ioDispatcher) {
         val node = apiFacade.getMegaNodeByHandle(nodeId)
-        val thumbnail = getThumbnailFile(node)
+        val thumbnail = getThumbnailFile(nodeId)
         suspendCoroutine { continuation ->
             thumbnail?.let {
                 apiFacade.getThumbnail(node, it.absolutePath,
-                        OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _, error ->
-                                    if (error.errorCode == MegaError.API_OK) {
-                                        continuation.resumeWith(Result.success(thumbnail))
-                                    } else {
-                                        continuation.failWithError(error)
-                                    }
-                                }
-                        )
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(thumbnail))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    )
                 )
             }
         }

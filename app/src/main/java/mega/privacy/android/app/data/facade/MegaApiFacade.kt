@@ -158,6 +158,8 @@ class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface
     ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 
+    override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
+
     override fun registerPushNotifications(
         deviceType: Int,
         newToken: String,
