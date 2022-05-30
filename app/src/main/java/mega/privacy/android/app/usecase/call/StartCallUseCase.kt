@@ -1,19 +1,18 @@
 package mega.privacy.android.app.usecase.call
 
 import android.Manifest
+import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -76,6 +75,12 @@ class StartCallUseCase @Inject constructor(
                                     val chatID = request.chatHandle
 
                                     if (error.errorCode == MegaError.API_OK) {
+                                        MegaApplication.getChatManagement().setSpeakerStatus(request.chatHandle, request.flag)
+                                        val call: MegaChatCall = megaChatApi.getChatCall(request.chatHandle)
+                                        if(call.isOutgoing){
+                                            MegaApplication.getChatManagement().setRequestSentCall(call.callId, true)
+                                        }
+
                                         val enabledAudio: Boolean = request.paramType == START_CALL_AUDIO_ENABLE
                                         val enabledVideo = request.flag
                                         emitter.onSuccess(
@@ -86,6 +91,10 @@ class StartCallUseCase @Inject constructor(
                                                 )
                                         )
                                     } else {
+                                        LiveEventBus.get(
+                                            EventConstants.EVENT_ERROR_STARTING_CALL,
+                                            Long::class.java
+                                        ).post(request.chatHandle)
                                         emitter.onError(error.toMegaException())
                                     }
                                 })

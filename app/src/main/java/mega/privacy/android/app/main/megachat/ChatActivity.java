@@ -3283,7 +3283,7 @@ public class ChatActivity extends PasscodeActivity
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) return;
+        if (grantResults.length == 0) return;
 
         if (nodeSaver.handleRequestPermissionsResult(requestCode)) {
             return;
@@ -3292,36 +3292,31 @@ public class ChatActivity extends PasscodeActivity
         switch (requestCode) {
             case REQUEST_CAMERA:
             case REQUEST_RECORD_AUDIO:{
-                logDebug("REQUEST_CAMERA || RECORD_AUDIO");
-                if (checkPermissionsCall()) {
-                    startCall();
-                }
+                startCall();
                 break;
             }
             case REQUEST_CAMERA_TAKE_PICTURE:
             case REQUEST_WRITE_STORAGE_TAKE_PICTURE:{
-                logDebug("REQUEST_CAMERA_TAKE_PICTURE || REQUEST_WRITE_STORAGE_TAKE_PICTURE");
-                if (checkPermissionsTakePicture()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
                     takePicture();
                 }
                 break;
             }
             case RECORD_VOICE_CLIP:
             case REQUEST_STORAGE_VOICE_CLIP:{
-                logDebug("RECORD_VOICE_CLIP || REQUEST_STORAGE_VOICE_CLIP");
-                if (checkPermissionsVoiceClip()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsVoiceClip()) {
                    cancelRecording();
                 }
                 break;
             }
             case REQUEST_READ_STORAGE:{
-                if (checkPermissionsReadStorage()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsReadStorage()) {
                     this.attachFromFileStorage();
                 }
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {

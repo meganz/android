@@ -74,7 +74,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -88,7 +87,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
-    StartChatCallListener.StartChatCallCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
     @Inject
@@ -399,11 +397,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val chatConnectionStatusObserver =
         Observer<Pair<Long, Int>> { chatAndState ->
             if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall()) {
-                inMeetingViewModel.startMeeting(
-                    camIsEnable,
-                    micIsEnable,
-                    StartChatCallListener(meetingActivity, this, this)
-                )
+                startCall()
             }
         }
 
@@ -1692,11 +1686,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             logDebug("Starting meeting ...")
-            inMeetingViewModel.startMeeting(
-                camIsEnable,
-                micIsEnable,
-                StartChatCallListener(requireContext(), this, this)
-            )
+            startCall()
         }
     }
 
@@ -2566,11 +2556,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         showMuteBanner()
     }
 
-    override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
-        logDebug("Call started")
-        checkCallStarted(chatId)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 
@@ -2660,11 +2645,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun answerCall() {
         sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable).observe(viewLifecycleOwner) {
                 result ->
-
                 MegaApplication.getChatManagement().setSpeakerStatus(result.chatHandle,
                     result.enableVideo
                 )
                 checkCallStarted(result.chatHandle)
+        }
+    }
+
+    /**
+     * Method to start the call
+     */
+    private fun startCall() {
+        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable).observe(viewLifecycleOwner) {
+                result ->
+           result?.let {
+               checkCallStarted(result.chatHandle)
+           }
         }
     }
 
@@ -2708,9 +2704,5 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dialog?.let {
             if (it.isShowing) it.dismiss()
         }
-    }
-
-    override fun onCallFailed(chatId: Long) {
-        logError("Call with chat ID $chatId failed")
     }
 }

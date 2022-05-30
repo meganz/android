@@ -57,7 +57,7 @@ import javax.inject.Inject
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
     private val answerCallUseCase: AnswerCallUseCase,
-    getLocalAudioChangesUseCase:GetLocalAudioChangesUseCase,
+    getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {

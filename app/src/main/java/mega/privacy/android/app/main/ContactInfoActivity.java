@@ -1010,7 +1010,9 @@ public class ContactInfoActivity extends PasscodeActivity
 		switch (requestCode) {
 			case REQUEST_CAMERA:
 			case REQUEST_RECORD_AUDIO:
-				startCall();
+				if (grantResults.length > 0) {
+					startCall();
+				}
 				break;
 		}
 

@@ -1053,9 +1053,10 @@ public class GroupChatInfoActivity extends PasscodeActivity
    private void onChatConnectionStateUpdate(long chatid, int newState) {
         logDebug("Chat ID: " + chatid + ", New state: " + newState);
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatid);
-        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-            startCallWithChatOnline(this, megaChatApi.getChatRoom(chatid));
-        }
+
+       if (isChatConnectedInOrderToInitiateACall(newState, chatRoom) && canCallBeStartedFromContactOption(this, passcodeManagement)) {
+           checkStartCall();
+       }
     }
 
     public void showConfirmationPrivateChatDialog() {
@@ -1177,8 +1178,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
             case REQUEST_CAMERA:
                 if (grantResults.length > 0) {
                     checkStartCall();
-                } else {
-
                 }
                 break;
         }
