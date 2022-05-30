@@ -26,9 +26,6 @@ class PushMessageHandler(
     private val dbH: DatabaseHandler
 ) : MegaRequestListenerInterface {
 
-    private var showMessageNotificationAfterPush = false
-    private var beep = false
-
     /**
      * Awake CPU to make sure the following operations can finish.
      *
@@ -83,11 +80,6 @@ class PushMessageHandler(
 
         when (messageType) {
             TYPE_SHARE_FOLDER, TYPE_CONTACT_REQUEST, TYPE_ACCEPTANCE -> {
-                //Leave the flag showMessageNotificationAfterPush as it is
-                //If true - wait until connection finish
-                //If false, no need to change it
-                Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush")
-
                 val gSession = credentials.session
 
                 if (megaApi.rootNode == null) {
@@ -99,11 +91,6 @@ class PushMessageHandler(
                 }
             }
             TYPE_CALL -> {
-                //Leave the flag showMessageNotificationAfterPush as it is
-                //If true - wait until connection finish
-                //If false, no need to change it
-                Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush")
-
                 val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
                 val isIdle = pm.isDeviceIdleMode
 
@@ -141,33 +128,6 @@ class PushMessageHandler(
                     val connectionState = megaChatApi.connectionState
                     Timber.d("connection state ---> $connectionState")
                     retryPendingConnections()
-                }
-            }
-            TYPE_CHAT -> {
-                Timber.d("CHAT notification")
-
-                if (MegaApplication.getInstance().isActivityVisible) {
-                    Timber.d("App on foreground --> return")
-                    retryPendingConnections()
-                    return
-                }
-
-                beep = Message.NO_BEEP != message.silent
-                awakeCpu(beep)
-                Timber.d("Notification should beep: $beep")
-                showMessageNotificationAfterPush = true
-                val gSession = credentials.session
-
-                if (megaApi.rootNode == null) {
-                    Timber.w("RootNode = null")
-                    performLoginProcess(gSession)
-                } else {
-                    //Leave the flag showMessageNotificationAfterPush as it is
-                    //If true - wait until connection finish
-                    //If false, no need to change it
-                    Timber.d("Flag showMessageNotificationAfterPush: $showMessageNotificationAfterPush. Call to pushReceived")
-                    megaChatApi.pushReceived(beep)
-                    beep = false
                 }
             }
         }
@@ -235,14 +195,7 @@ class PushMessageHandler(
             }
             TYPE_FETCH_NODES -> {
                 if (e.errorCode == MegaError.API_OK) {
-                    if (showMessageNotificationAfterPush) {
-                        showMessageNotificationAfterPush = false
-                        Timber.d("Call to pushReceived")
-                        megaChatApi.pushReceived(beep)
-                        beep = false
-                    } else {
-                        Timber.d("Login do not started by CHAT message")
-                    }
+                    Timber.d("Login do not started by CHAT message")
                 } else {
                     Timber.d("${request.requestString} failed. Error code: ${e.errorCode}, error string: ${e.errorString}")
                 }

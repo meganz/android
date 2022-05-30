@@ -3,9 +3,11 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.exception.ChatNotInitializedException
 import mega.privacy.android.app.domain.repository.LoginRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaChatApi
@@ -20,13 +22,15 @@ import kotlin.coroutines.suspendCoroutine
  * Default [LoginRepository] implementation.
  *
  * @property megaApiGateway
+ * @property megaApiFolderGateway
  * @property megaChatApiGateway
  * @property ioDispatcher
  */
 class DefaultLoginRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LoginRepository {
 
     override suspend fun fastLogin(session: String) =
@@ -44,6 +48,7 @@ class DefaultLoginRepository @Inject constructor(
     private fun onFastLoginFinish(continuation: Continuation<Unit>) =
         { _: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
+                megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
                 continuation.resumeWith(Result.success(Unit))
             } else {
                 continuation.failWithError(error)
@@ -72,17 +77,23 @@ class DefaultLoginRepository @Inject constructor(
 
     override suspend fun initMegaChat(session: String) =
         withContext<Unit>(ioDispatcher) {
-            suspendCoroutine {
+            suspendCoroutine { continuation ->
                 var state = megaChatApiGateway.initState
 
                 if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
                     state = megaChatApiGateway.init(session)
 
-                    when (state){
+                    when (state) {
                         MegaChatApi.INIT_NO_CACHE -> Timber.d("INIT_NO_CACHE")
                         MegaChatApi.INIT_ERROR -> megaChatApiGateway.logout()
                         else -> Timber.d("Chat correctly initialized")
                     }
+                }
+
+                if (state == MegaChatApi.INIT_ERROR) {
+                    continuation.resumeWith(Result.failure(ChatNotInitializedException()))
+                } else {
+                    continuation.resumeWith(Result.success(Unit))
                 }
             }
         }

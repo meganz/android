@@ -57,6 +57,11 @@ interface MegaApiGateway {
     val isEphemeralPlusPlus: Boolean
 
     /**
+     * Authentication token that can be used to identify the user account.
+     */
+    val accountAuth: String
+
+    /**
      * Root node of the account
      *
      * All accounts have a root node, therefore if it is null the account has not been logged in or

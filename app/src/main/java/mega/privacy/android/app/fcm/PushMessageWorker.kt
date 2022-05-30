@@ -7,15 +7,11 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.fcm.PushMessage.Companion.toPushMessage
-import mega.privacy.android.app.utils.ChatUtil
 import timber.log.Timber
 
 /**
@@ -41,7 +37,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val initMegaChat: InitMegaChat,
     private val pushReceived: PushReceived,
     private val monitorNodeUpdates: MonitorNodeUpdates,
-    private val monitorContactRequestUpdates: MonitorContactRequestUpdates
+    private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
@@ -58,29 +54,37 @@ class PushMessageWorker @AssistedInject constructor(
             val pushMessage = inputData.toPushMessage()
 
             if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
-                var success = runFastLogin(session)
+                Timber.d("Needs fast login")
+
+                var success = runInitChat(session)
 
                 if (!success) {
-                    Result.failure()
-                    this.cancel()
+                    return@withContext Result.failure()
+                }
+
+                success = runFastLogin(session)
+
+                if (!success) {
+                    return@withContext Result.failure()
                 }
 
                 success = runFetchNodes()
 
                 if (!success) {
-                    Result.failure()
+                    return@withContext Result.failure()
                 }
 
-                initMegaChat(session)
+                Timber.d("PushMessage.type: ${pushMessage.type}")
 
                 if (pushMessage.type == TYPE_CHAT) {
                     success = runPushReceived(pushMessage.shouldBeep())
 
                     if (!success) {
-                        Result.failure()
+                        return@withContext Result.failure()
                     }
                 }
             } else {
+                Timber.d("No fast login")
                 when (pushMessage.type) {
                     TYPE_SHARE_FOLDER, TYPE_CONTACT_REQUEST, TYPE_ACCEPTANCE -> {
 
@@ -92,7 +96,7 @@ class PushMessageWorker @AssistedInject constructor(
                         val success = runPushReceived(pushMessage.shouldBeep())
 
                         if (!success) {
-                            Result.failure()
+                            return@withContext Result.failure()
                         }
                     }
                 }
@@ -132,6 +136,21 @@ class PushMessageWorker @AssistedInject constructor(
             )
 
     /**
+     * Initializes chat API.
+     *
+     * @return True if the request finishes with success, false otherwise.
+     */
+    private suspend fun runInitChat(session: String): Boolean =
+        kotlin.runCatching { initMegaChat(session) }
+            .fold(
+                { true },
+                { error ->
+                    Timber.e("Init chat error. ", error)
+                    false
+                }
+            )
+
+    /**
      * Notifies a push received.
      *
      * @return True if the request finishes with success, false otherwise.
@@ -139,8 +158,15 @@ class PushMessageWorker @AssistedInject constructor(
     private suspend fun runPushReceived(beep: Boolean): Boolean =
         kotlin.runCatching { pushReceived(beep) }
             .fold(
-                { true },
-                { false }
+                { request ->
+                    ChatAdvancedNotificationBuilder.newInstance(applicationContext)
+                        .generateChatNotification(request)
+                    true
+                },
+                { error ->
+                    Timber.e("Push received error. ", error)
+                    false
+                }
             )
 
     override suspend fun getForegroundInfo(): ForegroundInfo {

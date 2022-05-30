@@ -57,6 +57,8 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isEphemeralPlusPlus
     override val rootNode: MegaNode?
         get() = megaApi.rootNode
+    override val accountAuth: String
+        get() = megaApi.accountAuth
 
     override val globalUpdates: Flow<GlobalUpdate>
         get() = callbackFlow {

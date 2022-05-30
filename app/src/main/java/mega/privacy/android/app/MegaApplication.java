@@ -150,7 +150,6 @@ import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.domain.usecase.InitialiseLogging;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.featuretoggle.PurgeLogsToggle;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
@@ -1479,20 +1478,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					this.startActivity(tourIntent);
 				}
 			}
-		}
-		else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
-//			logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
-//			stopService(new Intent(this, KeepAliveService.class));
-//			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-//				logDebug("OK:TYPE_PUSH_RECEIVED");
-//				if (!getMegaApi().isEphemeralPlusPlus()) {
-//					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-//					notificationBuilder.generateChatNotification(request);
-//				}
-//			}
-//			else{
-//				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
-//			}
 		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
 			chatManagement.removeJoiningChatId(request.getChatHandle());
 			chatManagement.removeJoiningChatId(request.getUserHandle());

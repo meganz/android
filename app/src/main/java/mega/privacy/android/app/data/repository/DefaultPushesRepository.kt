@@ -9,7 +9,6 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.PushesRepository
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -34,7 +33,7 @@ class DefaultPushesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApi: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaChatApi: MegaChatApiGateway
+    private val megaChatApi: MegaChatApiGateway,
 ) : PushesRepository {
 
     private val token = "token"
@@ -54,24 +53,6 @@ class DefaultPushesRepository @Inject constructor(
             }
         }
 
-    override fun setPushToken(newToken: String) {
-        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-            .edit()
-            .putString(NEW_TOKEN, newToken)
-            .apply()
-    }
-
-    override suspend fun pushReceived(beep: Boolean): Unit =
-        withContext(ioDispatcher) {
-            suspendCoroutine {
-                megaChatApi.pushReceived(
-                    beep, OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestPushReceivedCompleted()
-                    )
-                )
-            }
-        }
-
     private fun onRequestRegisterPushNotificationsCompleted(continuation: Continuation<String>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
@@ -81,15 +62,35 @@ class DefaultPushesRepository @Inject constructor(
             }
         }
 
-    private fun onRequestPushReceivedCompleted() =
+    override fun setPushToken(newToken: String) {
+        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
+            .edit()
+            .putString(NEW_TOKEN, newToken)
+            .apply()
+    }
+
+    override suspend fun pushReceived(beep: Boolean): MegaChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApi.pushReceived(
+                    beep, OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestPushReceivedCompleted(continuation)
+                    )
+                )
+            }
+        }
+
+    private fun onRequestPushReceivedCompleted(continuation: Continuation<MegaChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
+                Timber.d("PushMessageWorker onRequestPushReceivedCompleted")
                 if (!megaApi.isEphemeralPlusPlus) {
-                    ChatAdvancedNotificationBuilder.newInstance(context)
-                        .generateChatNotification(request)
+                    continuation.resumeWith(Result.success(request))
+                } else {
+                    continuation.failWithError(error)
                 }
             } else {
-                Timber.e("Error TYPE_PUSH_RECEIVED: ${error.errorString}")
+                continuation.failWithError(error)
             }
         }
 }

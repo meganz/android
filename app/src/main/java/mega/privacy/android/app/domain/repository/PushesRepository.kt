@@ -1,5 +1,7 @@
 package mega.privacy.android.app.domain.repository
 
+import nz.mega.sdk.MegaChatRequest
+
 interface PushesRepository {
 
     /**
@@ -29,6 +31,7 @@ interface PushesRepository {
      * Notifies a push has been received.
      *
      * @param beep True if should beep, false otherwise.
+     * @return Result of the request. Required for creating the notification.
      */
-    suspend fun pushReceived(beep: Boolean)
+    suspend fun pushReceived(beep: Boolean): MegaChatRequest
 }
