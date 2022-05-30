@@ -65,8 +65,8 @@ class DefaultFilesRepository @Inject constructor(
 
     override fun getRubbishBinNode(): MegaNode? = megaApiGateway.rubbishBinNode
 
-    override fun getChildrenNode(parentHandle: MegaNode, order: Int?): List<MegaNode> =
-        megaApiGateway.getChildrenByNode(parentHandle, order)
+    override fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
+        megaApiGateway.getChildrenByNode(parentNode, order)
 
     override fun getNodeByHandle(handle: Long): MegaNode =
         megaApiGateway.getMegaNodeByHandle(handle)
