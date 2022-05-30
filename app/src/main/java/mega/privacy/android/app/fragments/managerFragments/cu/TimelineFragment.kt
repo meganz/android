@@ -158,7 +158,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         callManager {
             it.refreshTimelineFragment()
         }
-        viewModel.startCameraUploadJob()
     }
 
     /**
