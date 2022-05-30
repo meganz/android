@@ -936,61 +936,84 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 deleteMenuItem.setVisible(true);
             } else {
-                if (!node.isTakenDown() && !node.isFolder()) {
-                    sendToChatMenuItem.setVisible(true);
-                    sendToChatMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                }
-
-                if (from == FROM_INCOMING_SHARES) {
-                    if (!node.isTakenDown()) {
-                        downloadMenuItem.setVisible(true);
-                        downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                        leaveMenuItem.setVisible(firstIncomingLevel);
-                        leaveMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                        copyMenuItem.setVisible(true);
-                    }
-
-                    switch (megaApi.getAccess(node)) {
-                        case MegaShare.ACCESS_OWNER:
-                        case MegaShare.ACCESS_FULL:
-                            rubbishMenuItem.setVisible(!firstIncomingLevel);
-                            renameMenuItem.setVisible(true);
-                            break;
-
-                        case MegaShare.ACCESS_READ:
-                            copyMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                            break;
-                    }
-                } else {
-                    if (!node.isTakenDown()) {
-                        downloadMenuItem.setVisible(true);
-                        downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-                        if (node.isFolder()) {
-                            shareMenuItem.setVisible(true);
-                            shareMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                        }
-
-                        if (node.isExported()) {
-                            editLinkMenuItem.setVisible(true);
-                            removeLinkMenuItem.setVisible(true);
-                            removeLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                        } else {
-                            getLinkMenuItem.setVisible(true);
-                            getLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                        }
-
-                        copyMenuItem.setVisible(true);
-                    }
-
-                    rubbishMenuItem.setVisible(true);
-                    renameMenuItem.setVisible(true);
-                    moveMenuItem.setVisible(true);
-                }
+                setDefaultOptionsToolbar();
             }
+            // Check if read-only properties should be applied
+            checkIfShouldApplyReadOnlyState(parent);
         }
 
         return super.onCreateOptionsMenu(menu);
+	}
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * if the MegaNode is a Backup node.
+     *
+     * @param node The Mega Node
+     */
+    private void checkIfShouldApplyReadOnlyState(MegaNode node) {
+        if (node != null && megaApi.isInInbox(node)) {
+            renameMenuItem.setVisible(false);
+            moveMenuItem.setVisible(false);
+            rubbishMenuItem.setVisible(false);
+        }
+    }
+
+    /**
+     * Sets up the default items to be displayed on the Toolbar Menu
+     */
+    private void setDefaultOptionsToolbar() {
+        if (!node.isTakenDown() && !node.isFolder()) {
+            sendToChatMenuItem.setVisible(true);
+            sendToChatMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+
+        if (from == FROM_INCOMING_SHARES) {
+            if (!node.isTakenDown()) {
+                downloadMenuItem.setVisible(true);
+                downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                leaveMenuItem.setVisible(firstIncomingLevel);
+                leaveMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                copyMenuItem.setVisible(true);
+            }
+
+            switch (megaApi.getAccess(node)) {
+                case MegaShare.ACCESS_OWNER:
+                case MegaShare.ACCESS_FULL:
+                    rubbishMenuItem.setVisible(!firstIncomingLevel);
+                    renameMenuItem.setVisible(true);
+                    break;
+
+                case MegaShare.ACCESS_READ:
+                    copyMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    break;
+            }
+        } else {
+            if (!node.isTakenDown()) {
+                downloadMenuItem.setVisible(true);
+                downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+                if (node.isFolder()) {
+                    shareMenuItem.setVisible(true);
+                    shareMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                }
+
+                if (node.isExported()) {
+                    editLinkMenuItem.setVisible(true);
+                    removeLinkMenuItem.setVisible(true);
+                    removeLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                } else {
+                    getLinkMenuItem.setVisible(true);
+                    getLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                }
+
+                copyMenuItem.setVisible(true);
+            }
+
+            rubbishMenuItem.setVisible(true);
+            renameMenuItem.setVisible(true);
+            moveMenuItem.setVisible(true);
+        }
     }
 
     /**

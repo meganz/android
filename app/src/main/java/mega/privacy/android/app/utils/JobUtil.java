@@ -28,8 +28,8 @@ import timber.log.Timber;
 
 public class JobUtil {
 
-    // when app is inactive, send heartbeat every 30 minutes
-    private static final long INACTIVE_HEARTBEAT_INTERVAL = 30;
+    // when CU has nothing to upload, send up to date heartbeat every 30 minutes
+    private static final long UP_TO_DATE_HEARTBEAT_INTERVAL = 30;
 
     private static final long HEARTBEAT_FLEX_INTERVAL = 20; // 20 minutes
 
@@ -97,7 +97,7 @@ public class JobUtil {
         Timber.d("JobUtil: scheduleCameraUploadSyncActiveHeartbeat()");
         // periodic work that runs during the last 10 minutes of every half an hour period
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, UP_TO_DATE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(HEART_BEAT_TAG)
                         .build();
 

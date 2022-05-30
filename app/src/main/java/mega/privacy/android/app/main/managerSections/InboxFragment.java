@@ -2,10 +2,17 @@ package mega.privacy.android.app.main.managerSections;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_VAULT_ACTION;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
@@ -14,7 +21,6 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INBOX;
 import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
@@ -439,7 +445,7 @@ public class InboxFragment extends RotatableFragment {
 
         if (((ManagerActivity) context).isList) {
 			Timber.d("InboxFragment is on a ListView");
-            View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
+            View v = inflater.inflate(R.layout.fragment_inbox_list, container, false);
 
             recyclerView = v.findViewById(R.id.inbox_list_recycler_view);
             mLayoutManager = new LinearLayoutManager(context);
@@ -560,33 +566,33 @@ public class InboxFragment extends RotatableFragment {
 
             String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 
-            Intent mediaIntent;
-            boolean internalIntent;
-            boolean opusFile = false;
-            if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()) {
-                mediaIntent = new Intent(Intent.ACTION_VIEW);
-                internalIntent = false;
-                String[] s = file.getName().split("\\.");
-                if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
-                    opusFile = true;
-                }
-            } else {
-                internalIntent = true;
-                mediaIntent = getMediaIntent(context, node.getName());
-            }
-            mediaIntent.putExtra("position", position);
-            if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_INCOMING) {
-                mediaIntent.putExtra("parentNodeHandle", -1L);
-            } else {
-                mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
-            }
+			Intent mediaIntent;
+			boolean internalIntent;
+			boolean opusFile = false;
+			if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()) {
+				mediaIntent = new Intent(Intent.ACTION_VIEW);
+				internalIntent = false;
+				String[] s = file.getName().split("\\.");
+				if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+					opusFile = true;
+				}
+			} else {
+				internalIntent = true;
+				mediaIntent = getMediaIntent(context, node.getName());
+			}
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position);
+			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_INCOMING) {
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L);
+			} else {
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, megaApi.getParentNode(node).getHandle());
+			}
 
-            mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
-            putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
-            mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
-            mediaIntent.putExtra("HANDLE", file.getHandle());
-            mediaIntent.putExtra("FILENAME", file.getName());
-            mediaIntent.putExtra("adapterType", INBOX_ADAPTER);
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCloud());
+			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, adapter.getPlaceholderCount());
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.getHandle());
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.getName());
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INBOX_ADAPTER);
 
             String localPath = getLocalFile(file);
 
@@ -645,8 +651,8 @@ public class InboxFragment extends RotatableFragment {
 
             Intent pdfIntent = new Intent(context, PdfViewerActivity.class);
 
-            pdfIntent.putExtra("inside", true);
-            pdfIntent.putExtra("adapterType", INBOX_ADAPTER);
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INBOX_ADAPTER);
 
             String localPath = getLocalFile(file);
 
@@ -676,15 +682,15 @@ public class InboxFragment extends RotatableFragment {
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
-                String url = megaApi.httpServerGetLocalLink(file);
-                pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-            }
-            pdfIntent.putExtra("HANDLE", file.getHandle());
-            putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
-            if (isIntentAvailable(context, pdfIntent)) {
-                startActivity(pdfIntent);
-            } else {
-                Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				String url = megaApi.httpServerGetLocalLink(file);
+				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+			}
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.getHandle());
+			putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
+			if (isIntentAvailable(context, pdfIntent)) {
+				startActivity(pdfIntent);
+			} else {
+				Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
                 ((ManagerActivity) context).saveNodesToDevice(
                         Collections.singletonList(node),

@@ -669,6 +669,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         menu.findItem(R.id.copy).isVisible = adapterType != FOLDER_LINK_ADAPTER
                     }
                 }
+
+                // After establishing the Options menu, check if read-only properties should be applied
+                checkIfShouldApplyReadOnlyState(menu)
             } ?: run {
                 Timber.d("refreshMenuOptionsVisibility null adapterType")
 
@@ -679,6 +682,24 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             Timber.d("refreshMenuOptionsVisibility null service")
 
             menu.toggleAllMenuItemsVisibility(false)
+        }
+    }
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * on the Options toolbar if the [MegaNode] is a Backup node.
+     *
+     * @param menu The Options Menu
+     */
+    private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
+        megaApi.getNodeByHandle(playerServiceViewModelGateway?.getCurrentPlayingHandle())?.let {
+            if (megaApi.isInInbox(it)) {
+                with(menu) {
+                    findItem(R.id.move_to_trash).isVisible = false
+                    findItem(R.id.move).isVisible = false
+                    findItem(R.id.rename).isVisible = false
+                }
+            }
         }
     }
 

@@ -102,7 +102,6 @@ import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbe
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MOVE_TO_BACKUP;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
@@ -6401,26 +6400,22 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Delete folders or files that included "My backup"
+     * Displays a confirmation dialog before moving the selected nodes to the Rubbish Bin
      *
-     * @param handleList handleList handles list of the nodes that selected
+     * @param handleList List of Nodes selected for removal
      */
     public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
         Timber.d("askConfirmationMoveToRubbish");
 
         if (handleList != null) {
 
-            if (handleList.size() > 0) {
+            if (!handleList.isEmpty()) {
                 Long handle = handleList.get(0);
                 MegaNode p = megaApi.getNodeByHandle(handle);
                 while (megaApi.getParentNode(p) != null) {
                     p = megaApi.getParentNode(p);
                 }
                 if (p.getHandle() != megaApi.getRubbishNode().getHandle()) {
-                    if (fileBackupManager.removeBackup(moveNodeUseCase, handleList)) {
-                        return;
-                    }
-
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                     if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
                         builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
@@ -6468,7 +6463,6 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.w("handleList NULL");
             return;
         }
-
     }
 
     public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType) {
@@ -8194,10 +8188,6 @@ public class ManagerActivity extends TransfersManagementActivity
             final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
             final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
-            if (fileBackupManager.moveToBackup(moveNodeUseCase, moveHandles, toHandle)) {
-                return;
-            }
-
             checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -8233,10 +8223,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
-
-            if (fileBackupManager.copyNodesToBackups(nC, copyHandles, toHandle)) {
-                return;
-            }
 
             checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
                     .subscribeOn(Schedulers.io())
@@ -10350,20 +10336,36 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB:
                         if (!isOutgoingAdded()) break;
 
+                        MegaNode parentNodeInOutgoing = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingHandle());
+                        // If the user is in the main page of Outgoing Shares, hide the Fab Button
                         if (outgoingSharesState(this).getOutgoingTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
-                            updateFabAndShow();
+                            // Otherwise, check if the current parent node of the Outgoing Shares section is a Backup folder or not.
+                            // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
+                            if (parentNodeInOutgoing != null && megaApi.isInInbox(parentNodeInOutgoing)) {
+                                hideFabButton();
+                            } else {
+                                updateFabAndShow();
+                            }
                         }
                         break;
 
                     case LINKS_TAB:
                         if (!isLinksAdded()) break;
 
+                        MegaNode parentNodeInLinks = megaApi.getNodeByHandle(linksState(this).getLinksHandle());
+                        // If the user is in the main page of Links, hide the Fab Button
                         if (linksState(this).getLinksTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
-                            updateFabAndShow();
+                            // Otherwise, check if the current parent node of the Links section is a Backup folder or not.
+                            // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
+                            if (parentNodeInLinks != null && megaApi.isInInbox(parentNodeInLinks)) {
+                                hideFabButton();
+                            } else {
+                                updateFabAndShow();
+                            }
                         }
                         break;
 
@@ -11048,6 +11050,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 refreshSharesPageAdapter();
             }
             selectDrawerItem(DrawerItem.SHARED_ITEMS);
+        } else if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) {
+            refreshFragment(FragmentTag.INBOX.getTag());
+            selectDrawerItem(DrawerItem.INBOX);
         }
     }
 
@@ -11359,11 +11364,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void initFileBackupManager() {
         fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
-            if (actionType == ACTION_MOVE_TO_BACKUP) {
-                if (operationType == OPERATION_EXECUTE) {
-                    showMovementResult(result, handle);
-                }
-            } else if (actionType == ACTION_BACKUP_FAB) {
+            if (actionType == ACTION_BACKUP_FAB) {
                 if (operationType == OPERATION_EXECUTE) {
                     if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
                     bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
