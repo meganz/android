@@ -126,11 +126,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val finalMenu = menu ?: return super.onCreateOptionsMenu(menu)
-
-        menuInflater.inflate(R.menu.activity_upload_folder, finalMenu)
-        searchMenuItem = finalMenu.findItem(R.id.action_search).apply {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.activity_upload_folder, menu)
+        searchMenuItem = menu.findItem(R.id.action_search).apply {
             isVisible = binding.progressBar.isVisible
 
             setupSearchView { query ->
@@ -146,7 +144,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             }
         }
 
-        return super.onCreateOptionsMenu(finalMenu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

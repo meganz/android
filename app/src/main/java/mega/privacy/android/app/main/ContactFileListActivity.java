@@ -81,6 +81,10 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -195,6 +199,7 @@ public class ContactFileListActivity extends PasscodeActivity
 		outState.putLong(PARENT_HANDLE, parentHandle);
 		checkNewTextFileDialogState(newTextFileDialog, outState);
 		nodeSaver.saveState(outState);
+		checkNewFolderDialogState(newFolderDialog, outState);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -245,8 +250,8 @@ public class ContactFileListActivity extends PasscodeActivity
     }
 
 	@Override
-	public void showNewFolderDialog() {
-		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
+	public void showNewFolderDialog(String typedText) {
+		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
 	}
 
 	@Override
@@ -427,6 +432,10 @@ public class ContactFileListActivity extends PasscodeActivity
 			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
 				showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
 			}
+
+			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
+				showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
+			}
 		}
 	}
 
@@ -504,6 +513,8 @@ public class ContactFileListActivity extends PasscodeActivity
 
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
+
+		dismissAlertDialogIfExists(newFolderDialog);
 
 		nodeSaver.destroy();
 	}

@@ -1254,11 +1254,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">رابط المجلد غير متوفر</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">تمت إزالة رابط المجلد بسبب انتهاكات سياسة الاستخدام المقبول و سياسة الاستخدام المقبول ToS/AUP.</string>
+    <string name="folder_link_unavaible_ToS_violation">تمت إزالة رابط المجلد لأنه ينتهك شروط الخدمة الخاصة بنا.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">رابط الملف غير متوفر</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">تمت إزالة رابط الملف بسبب انتهاكات سياسة الاستخدام المقبول و سياسة الاستخدام المقبول ToS/AUP.</string>
+    <string name="file_link_unavaible_ToS_violation">تمت إزالة رابط الملف لأنه ينتهك شروط الخدمة الخاصة بنا.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">عنوان الرابط الالكتروني URL هذا تالف أو مشوه. الرابط الذي تحاول الوصول إليه غير موجود.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -3029,15 +3029,15 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">الاعتراض على الإزالة</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">لا يمكن الوصول إليها بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP</string>
+    <string name="error_download_takendown_node">لا يمكن الوصول إليه لأنه ينتهك شروط الخدمة الخاصة بنا</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="zero">لم يتم تنزيل %d ملف بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
-        <item quantity="one">لم يتم تنزيل %d ملف بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
-        <item quantity="two">لم يتم تنزيل %d ملفين بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
-        <item quantity="few">لم يتم تنزيل %d ملفات بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
-        <item quantity="many">لم يتم تنزيل %d ملف بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
-        <item quantity="other">لم يتم تنزيل %d ملف بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
+        <item quantity="zero">%d  ملف لم يتم تنزيله لانتهاك شروط الخدمة الخاصة بنا.</item>
+        <item quantity="one">%d  ملف لم يتم تنزيله لانتهاك شروط الخدمة الخاصة بنا.</item>
+        <item quantity="two">%d  ملفين لم يتم تنزيلهما لانتهاك شروط الخدمة الخاصة بنا.</item>
+        <item quantity="few">%d  ملفات لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
+        <item quantity="many">%d  ملفاً لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
+        <item quantity="other">%d ملف لم يتم تنزيلها لانتهاك شروط الخدمة الخاصة بنا.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ملفك المشارك للعموم [/A][B]%s[/B][C] قد تم إعادته.[/C]</string>
@@ -3848,12 +3848,12 @@
     <string name="fab_label_new_chat">محادثة جديدة</string>
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]لم يتم [/B] [B]العثور على أي [/B] [A]صورة[/A]</string>
-    <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">لم يتم العثور على أي مستندات</string>
-    <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">لم يتم العثور على أي ملفات صوتية</string>
-    <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">لم يتم العثور على أي ملفات فيديو</string>
+    <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_documents">[B]لم يتم [/B] [B]العثور على أية [/B] [A]مستندات[/A]</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]لم يتم [/B] [B]العثور على [/B] [A]ملفات صوتية[/A]</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_video">[B]لم يتم [/B] [B]العثور على أي [/B] [A]فيديو[/A]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">بحث GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -4172,30 +4172,60 @@
     <string name="error_share_owner_storage_quota">صاحب المشاركة تجاوز مساحة التخزين المتاحة له.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">لا يمكن إرسال الملف لأن المستخدم المستهدف قد تجاوز حصة التخزين المتاحة له.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">تم تنزيل 1 ملف بالفعل. 1 ملف قيد الانتظار.</string>
-    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">قد تم تنزيل 1 ملف. %d ملف قيد الانتظار.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">قد تم تنزيل %d ملف. 1 ملف قيد الانتظار.</string>
-    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">تم تنزيل %1$d ملف بالفعل. %2$d ملف قيد الانتظار.</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">تم نقل 1 عنصر إلى سلة المحذوفات بنجاح ولم يتم إرسال 1 عنصر بنجاح</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">تم نقل 1 عنصر إلى سلة المحذوفات بنجاح ولم يتم إرسال %d عنصر بنجاح</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">تم نقل %d عنصر إلى سلة المحذوفات بنجاح ولم يتم إرسال 1 عنصر بنجاح</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">تم نقل %1$d عنصر إلى سلة المحذوفات بنجاح ولم يتم إرسال %2$d عنصر بنجاح</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">تمت استعادة 1 عنصر بنجاح ولم تتم استعادة 1 عنصر بنجاح</string>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">تمت استعادة 1 عنصر بنجاح ولم تتم استعادة %d عنصر بنجاح</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">تمت استعادة %d عنصر بنجاح ولم تتم استعادة 1 عنصر بنجاح</string>
-    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">تمت استعادة %1$d عنصر بنجاح ولم تتم استعادة %2$d عنصر بنجاح</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
+    <plurals name="file_already_downloaded_and_files_pending_download">
+        <item quantity="zero">قد تم تنزيل 1 ملف. %d ملف قيد الانتظار.</item>
+        <item quantity="one">تم تنزيل 1 ملف بالفعل. 1 ملف قيد الانتظار.</item>
+        <item quantity="two">قد تم تنزيل 1 ملف. %d ملفان قيد الانتظار.</item>
+        <item quantity="few">قد تم تنزيل 1 ملف. %d ملفات قيد الانتظار.</item>
+        <item quantity="many">قد تم تنزيل 1 ملف. %d ملفاً قيد الانتظار.</item>
+        <item quantity="other">قد تم تنزيل 1 ملف. %d ملف قيد الانتظار.</item>
+    </plurals>
+    <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <plurals name="files_already_downloaded_and_file_pending_download">
+        <item quantity="zero">قد تم تنزيل %d ملف. 1 ملف قيد الانتظار.</item>
+        <item quantity="one">تم تنزيل 1 ملف. 1 ملف قيد الانتظار.</item>
+        <item quantity="two">قد تم تنزيل %d ملفين. 1 ملف قيد الانتظار.</item>
+        <item quantity="few">قد تم تنزيل %d ملفات. 1 ملف قيد الانتظار.</item>
+        <item quantity="many">قد تم تنزيل %d ملفاً. 1 ملف قيد الانتظار.</item>
+        <item quantity="other">قد تم تنزيل %d ملف. 1 ملف قيد الانتظار.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="zero">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل %d عنصر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="one">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن  لم يتم نقل العنصر الآخر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="two">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل %d عنصرين. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="few">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل %d عناصر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="many">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل %d عنصراً. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="other">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل %d عنصر. حاول مرة أخرى لاحقاً.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
+        <item quantity="one">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل العنصر الآخر. حاول مرة أخرى في وقت لاحق.</item>
+        <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
+        <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
+        <item quantity="many">تم نقل %d عنصراً إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
+        <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً.</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="zero">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="one">تمت استعادة 1 عنصر واحد ولكن لم يتم استعادة العنصر الآخر. حاول مرة أخرى في وقت لاحق.</item>
+        <item quantity="two">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصرين. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="few">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عناصر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="many">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصراً. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="other">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصر. حاول مرة أخرى لاحقاً.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="zero">%d عنصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
+        <item quantity="one">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة العنصر الآخر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="two">%d عنصرين تمت استعادتهما ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
+        <item quantity="few">%d عناصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
+        <item quantity="many">%d عنصراً تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
+        <item quantity="other">%d عنصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات بنجاح</item>
@@ -4658,7 +4688,23 @@
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">نوع الملف غير مدعوم. لا يمكن فتح الملف.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
-    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <string name="no_uploads_empty_folder">المجلد المحدد فارغ. لا توجد ملفات للترفيع.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">لقد أدخلت كلمة مرورك الحالية</string>
+    <!-- Title of pop-up error message for taken down file -->
+    <string name="error_file_not_available">الملف لم يعد متوفراً</string>
+    <!-- Body of pop-up error message for taken down file. -->
+    <string name="error_takendown_file">تمت إزالة الملف لأنه ينتهك شروط الخدمة الخاصة بنا.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
+    <string name="error_download_takendown_file">انتهك شروط الخدمة</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_warning_no_picker">لا يحتوي هذا الجهاز على تطبيق لتحديد المجلدات.</string>
+    <!-- Next audios to be played in the audio playlist -->
+    <string name="media_player_audio_playlist_next">التالي</string>
+    <!-- Previous audios have been already played in the audio playlist -->
+    <string name="media_player_audio_playlist_previous">السابق</string>
+    <!-- Next videos to be played in the video playlist -->
+    <string name="media_player_video_playlist_next">التالي</string>
+    <!-- Previous videos have been already played in the video playlist -->
+    <string name="media_player_video_playlist_previous">السابق</string>
 </resources>

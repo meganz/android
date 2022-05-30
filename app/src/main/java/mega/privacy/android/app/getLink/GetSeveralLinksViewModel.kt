@@ -15,7 +15,6 @@ import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -23,6 +22,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -114,12 +114,11 @@ class GetSeveralLinksViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { exportedNodes -> notifyExportedNodes(exportedNodes) },
-                    onError = { error ->
-                        LogUtil.logWarning(error.message)
-                    }
+                    onError = { error -> Timber.e(error) }
                 )
-                .addTo(composite)
-        } else exportingNodes.value = false
+        } else {
+            exportingNodes.value = false
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -481,7 +482,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                         false
                     )
                 ) {
-                    AccountController.logout(this, megaApi)
+                    AccountController.logout(this, megaApi, lifecycleScope)
                 } else {
                     //Intent to MyAccount
                     val resetPassIntent = Intent(this, ManagerActivity::class.java)

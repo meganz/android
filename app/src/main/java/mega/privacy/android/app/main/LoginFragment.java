@@ -54,6 +54,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -62,11 +64,12 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatSettings;
-import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -108,8 +111,14 @@ import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingS
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class LoginFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    @ApplicationScope
+    @Inject
+    CoroutineScope sharingScope;
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
@@ -1100,7 +1109,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             disableLoginButton();
 
             // Primitive type directly set value, atomic operation. Don't allow background login.
-            PushMessageHanlder.allowBackgroundLogin = false;
+            PushMessageHandler.allowBackgroundLogin = false;
             IncomingCallService.allowBackgroundLogin = false;
 
             megaApi.fastLogin(gSession, this);
@@ -1790,7 +1799,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
-            PushMessageHanlder.allowBackgroundLogin = true;
+            PushMessageHandler.allowBackgroundLogin = true;
             IncomingCallService.allowBackgroundLogin = true;
 
             //cancel login process by press back.
@@ -1909,7 +1918,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             logDebug("TYPE_LOGOUT");
             if (error.getErrorCode() == MegaError.API_OK){
-                AccountController.localLogoutApp(context.getApplicationContext());
+                AccountController.localLogoutApp(context.getApplicationContext(), sharingScope);
             }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){

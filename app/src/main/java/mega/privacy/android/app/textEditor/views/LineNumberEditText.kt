@@ -7,17 +7,15 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.view.inputmethod.EditorInfoCompat
+import androidx.core.view.inputmethod.InputConnectionCompat
+import androidx.core.view.inputmethod.InputContentInfoCompat
+import mega.privacy.android.app.R
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.initTextPaint
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.updatePaddingsAndView
-import android.widget.Toast
-
-import androidx.core.view.inputmethod.InputConnectionCompat
-
-import androidx.core.view.inputmethod.EditorInfoCompat
-import androidx.core.view.inputmethod.InputContentInfoCompat
-import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 
@@ -69,23 +67,24 @@ class LineNumberEditText : AppCompatEditText {
      * Rename this in this way to avoid enter any type of image in the text editor and redirect
      * the user to the import screen.
      */
-    override fun onCreateInputConnection(editorInfo: EditorInfo?): InputConnection? {
+    override fun onCreateInputConnection(editorInfo: EditorInfo): InputConnection? {
         val inputConnection = super.onCreateInputConnection(editorInfo)
-        if (inputConnection == null || editorInfo == null) return inputConnection
+        if (inputConnection == null) return inputConnection
 
         EditorInfoCompat.setContentMimeTypes(
-            editorInfo,
-            arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
+                editorInfo,
+                arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
         )
 
+        @Suppress("DEPRECATION")
         return InputConnectionCompat.createWrapper(
-            inputConnection,
-            editorInfo
+                inputConnection,
+                editorInfo
         ) { _: InputContentInfoCompat?, _: Int, _: Bundle? ->
             Toast.makeText(
-                context,
-                getString(R.string.image_insertion_not_allowed),
-                Toast.LENGTH_SHORT
+                    context,
+                    getString(R.string.image_insertion_not_allowed),
+                    Toast.LENGTH_SHORT
             ).show()
             true
         }

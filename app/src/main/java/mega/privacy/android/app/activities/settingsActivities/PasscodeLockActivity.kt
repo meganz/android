@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -212,7 +213,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun logout() {
         resetAttempts()
-        AccountController.logout(this, megaApi)
+        AccountController.logout(this, megaApi, lifecycleScope)
     }
 
     /**

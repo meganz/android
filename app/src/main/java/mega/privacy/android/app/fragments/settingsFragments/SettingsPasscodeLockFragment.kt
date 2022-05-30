@@ -140,11 +140,11 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         when (val canAuthenticate = from(requireContext()).canAuthenticate(BIOMETRIC_STRONG)) {
             BIOMETRIC_SUCCESS -> {
                 logDebug("Show fingerprint setting, hardware available and fingerprint enabled.")
-                preferenceScreen.addPreference(fingerprintSwitch)
+                fingerprintSwitch?.let { preferenceScreen.addPreference(it) }
                 fingerprintSwitch?.isChecked = dbH.isFingerprintLockEnabled
             }
             else -> {
-                preferenceScreen.removePreference(fingerprintSwitch)
+                fingerprintSwitch?.let { preferenceScreen.removePreference(it) }
                 logDebug("Error. Cannot show fingerprint setting: $canAuthenticate")
             }
         }
@@ -215,8 +215,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeLock = true
         passcodeSwitch?.isChecked = true
         preferenceScreen.apply {
-            addPreference(resetPasscode)
-            addPreference(requirePasscode)
+            resetPasscode?.let { addPreference(it) }
+            requirePasscode?.let { addPreference(it) }
         }
 
         setupFingerprintSetting()
@@ -227,9 +227,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeLock = false
         passcodeSwitch?.isChecked = false
         preferenceScreen.apply {
-            removePreference(resetPasscode)
-            removePreference(fingerprintSwitch)
-            removePreference(requirePasscode)
+            resetPasscode?.let { removePreference(it) }
+            fingerprintSwitch?.let { removePreference(it) }
+            requirePasscode?.let { removePreference(it) }
         }
 
         passcodeUtil.disablePasscode()

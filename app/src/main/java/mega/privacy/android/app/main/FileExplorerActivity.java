@@ -116,6 +116,9 @@ import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewURLFileDialog;
@@ -249,6 +252,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	private ImportFilesFragment importFileFragment;
 
 	private AlertDialog statusDialog;
+	private AlertDialog newFolderDialog;
 
 	private List<ShareInfo> filePreparedInfos;
 
@@ -445,6 +449,11 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
+			}
+
+			if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
+				newFolderDialog = showNewFolderDialog(this, this,
+						savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
 			}
 		}
 		else{
@@ -1428,6 +1437,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
 		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 		bundle.putString(CURRENT_ACTION, currentAction);
+
+		checkNewFolderDialogState(newFolderDialog, bundle);
 	}
 
 	@Override
@@ -2263,6 +2274,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 			}
 		}
 		mViewModel.shutdownExecutorService();
+
+		dismissAlertDialogIfExists(newFolderDialog);
 		super.onDestroy();
 	}
 
@@ -2315,7 +2328,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				break;
 			}
 			case R.id.cab_menu_create_folder:{
-	        	showNewFolderDialog(this, this);
+	        	newFolderDialog = showNewFolderDialog(this, this, null);
         		break;
 			}
 			case R.id.cab_menu_new_chat:{

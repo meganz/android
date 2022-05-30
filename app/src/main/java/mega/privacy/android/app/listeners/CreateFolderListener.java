@@ -21,7 +21,7 @@ public class CreateFolderListener extends BaseListener {
     public enum ExtraAction {
         NONE,
         MY_CHAT_FILES,
-        INIT_CU
+        INIT_CAMERA_UPLOAD
     }
 
     private ExtraAction extraAction;
@@ -44,7 +44,7 @@ public class CreateFolderListener extends BaseListener {
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();
 
-        if (extraAction == ExtraAction.INIT_CU) {
+        if (extraAction == ExtraAction.INIT_CAMERA_UPLOAD) {
             if (name.equals(context.getString(R.string.section_photo_sync))) {
                 CameraUploadsService.isCreatingPrimary = false;
                 //set primary only
@@ -53,7 +53,7 @@ public class CreateFolderListener extends BaseListener {
                     api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
                 } else {
                     logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-                    JobUtil.stopRunningCameraUploadService(context);
+                    JobUtil.fireStopCameraUploadJob(context);
                 }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
                 CameraUploadsService.isCreatingSecondary = false;
@@ -63,7 +63,7 @@ public class CreateFolderListener extends BaseListener {
                     api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
                 } else {
                     logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-                    JobUtil.stopRunningCameraUploadService(context);
+                    JobUtil.fireStopCameraUploadJob(context);
                 }
             }
         }

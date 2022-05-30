@@ -1,23 +1,29 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
+import android.content.Context
 import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
+import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -25,9 +31,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
-    val sortOrderManagement: SortOrderManagement
+    val sortOrderManagement: SortOrderManagement,
+    private val jobUtilWrapper: JobUtilWrapper
 ) : GalleryViewModel(repository, sortOrderManagement) {
 
     override var mZoom = PHOTO_ZOOM_LEVEL
@@ -62,11 +70,19 @@ class TimelineViewModel @Inject constructor(
     }
 
     /**
+     * User enabled Camera Upload, so a periodic job should be scheduled if not already running
+     */
+    fun startCameraUploadJob() {
+        Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
+        jobUtilWrapper.fireCameraUploadJob(context, false)
+    }
+
+    /**
      * Set Initial Preferences
      */
     fun setInitialPreferences() {
         add(Completable.fromCallable {
-            LogUtil.logDebug("setInitialPreferences")
+            Timber.d("setInitialPreferences")
             mDbHandler.setFirstTime(false)
             mDbHandler.setStorageAskAlways(true)
             val defaultDownloadLocation =
@@ -79,10 +95,10 @@ class TimelineViewModel @Inject constructor(
             mDbHandler.passcodeLockCode = ""
             val nodeLinks: ArrayList<MegaNode> = repository.getPublicLinks()
             if (nodeLinks.size == 0) {
-                LogUtil.logDebug("No public links: showCopyright set true")
+                Timber.d("No public links: showCopyright set true")
                 mDbHandler.setShowCopyright(true)
             } else {
-                LogUtil.logDebug("Already public links: showCopyright set false")
+                Timber.d("Already public links: showCopyright set false")
                 mDbHandler.setShowCopyright(false)
             }
             true
@@ -136,18 +152,15 @@ class TimelineViewModel @Inject constructor(
      * @return camSyncEnabled livedata
      */
     fun camSyncEnabled(): LiveData<Boolean> {
-        add(Single.fromCallable {
-            java.lang.Boolean.parseBoolean(
-                mDbHandler.preferences?.camSyncEnabled
-            )
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                camSyncEnabled.setValue(it)
-            }, RxUtil.logErr("camSyncEnabled")))
         return camSyncEnabled
     }
+
+    fun checkAndUpdateCamSyncEnabledStatus() {
+        viewModelScope.launch(IO) {
+            camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
+        }
+    }
+
 }
 
 

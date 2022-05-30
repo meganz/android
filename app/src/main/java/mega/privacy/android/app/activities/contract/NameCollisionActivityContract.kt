@@ -15,11 +15,11 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 class NameCollisionActivityContract : ActivityResultContract<ArrayList<NameCollision>, String?>() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun createIntent(context: Context, list: ArrayList<NameCollision>): Intent =
-        if (list.size == 1) {
-            getIntentForSingleItem(context, list[0])
+    override fun createIntent(context: Context, input: ArrayList<NameCollision>): Intent =
+        if (input.size == 1) {
+            getIntentForSingleItem(context, input[0])
         } else {
-            getIntentForList(context, list)
+            getIntentForList(context, input)
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): String? =
