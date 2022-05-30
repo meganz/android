@@ -332,6 +332,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         viewModel.camSyncEnabled().observe(viewLifecycleOwner) { isEnabled ->
             if (!viewModel.isEnableCUShown()) {
                 updateEnableCUButtons(cuEnabled = isEnabled)
+            } else {
+                photosFragment.hideCUProgress()
             }
         }
     }

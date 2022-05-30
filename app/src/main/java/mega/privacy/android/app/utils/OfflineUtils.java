@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -279,13 +280,13 @@ public class OfflineUtils {
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
-    public static File getThumbnailFile(Context context, MegaOffline node) {
-        return getThumbnailFile(context, node.getHandle());
+    public static File getThumbnailFile(Context context, MegaOffline node, MegaApiGateway megaApiGateway) {
+        return getThumbnailFile(context, node.getHandle(), megaApiGateway);
     }
 
-    public static File getThumbnailFile(Context context, String handle) {
+    public static File getThumbnailFile(Context context, String handle, MegaApiGateway megaApiGateway) {
         File thumbDir = ThumbnailUtils.getThumbFolder(context);
-        String thumbName = Base64.encodeToString(handle.getBytes(), Base64.DEFAULT);
+        String thumbName = megaApiGateway.handleToBase64(Long.parseLong(handle));
         return new File(thumbDir, thumbName + JPG_EXTENSION);
     }
 

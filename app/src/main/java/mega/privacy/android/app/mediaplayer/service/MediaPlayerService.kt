@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -53,6 +54,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @Inject
     lateinit var dbHandler: DatabaseHandler
+
+    @Inject
+    lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
 
     private val binder by lazy { MediaPlayerServiceBinder(this) }
     private var initialized = false
@@ -114,7 +118,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = MediaPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
+        viewModel = MediaPlayerServiceViewModel(
+            this,
+            megaApi,
+            megaApiFolder,
+            dbHandler,
+            offlineThumbnailFileWrapper
+        )
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
