@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -939,10 +939,6 @@
     <string name="zip_browser_activity">ZIP Browser</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Account Type</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Renews on&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on&#160;</string>
     <!--  -->
     <string name="free_account">Free</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4326,7 +4322,7 @@
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
     <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">MEGA will open in-app unsupported file types in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Image quality</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
@@ -4363,4 +4359,8 @@
     <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Renews on[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Expires on[/A] [B]%s[/B]</string>
 </resources>
