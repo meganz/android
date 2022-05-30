@@ -22,10 +22,10 @@ abstract class ManagerUseCases {
     abstract fun bindMonitorNodeUpdates(useCase: DefaultMonitorNodeUpdates): MonitorNodeUpdates
 
     @Binds
-    abstract fun bindRubbishNodeByHandle(useCase: DefaultGetRubbishBinNodeByHandle): GetRubbishBinNodeByHandle
+    abstract fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode): GetRubbishBinChildrenNode
 
     @Binds
-    abstract fun bindBrowserNodeByHandle(useCase: DefaultGetBrowserNodeByHandle): GetBrowserNodeByHandle
+    abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
     @Binds
     abstract fun bindGetRootNode(useCase: DefaultGetRootNode): GetRootNode

@@ -10,8 +10,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.usecase.GetBrowserNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
@@ -30,8 +30,8 @@ class ManagerViewModelTest {
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
-    private val getRubbishBinNodeByHandle = mock<GetRubbishBinNodeByHandle>()
-    private val getBrowserNodeByHandle = mock<GetBrowserNodeByHandle>()
+    private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
+    private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()

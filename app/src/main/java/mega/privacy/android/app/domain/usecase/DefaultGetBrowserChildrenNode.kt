@@ -13,12 +13,12 @@ import javax.inject.Inject
  *  @property getRootNode
  *  @property sortOrderManagement
  */
-class DefaultGetBrowserNodeByHandle @Inject constructor(
+class DefaultGetBrowserChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
     private val getRootNode: GetRootNode,
     private val sortOrderManagement: SortOrderManagement,
-) : GetBrowserNodeByHandle {
+) : GetBrowserChildrenNode {
 
     override fun invoke(parentHandle: Long): List<MegaNode>? {
         val node = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRootNode())

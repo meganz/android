@@ -19,8 +19,8 @@ import javax.inject.Inject
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
-    getRubbishBinNodeByHandle: GetRubbishBinNodeByHandle,
-    getBrowserNodeByHandle: GetBrowserNodeByHandle,
+    getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
+    getBrowserChildrenNode: GetBrowserChildrenNode,
 ) : ViewModel() {
 
     /**
@@ -91,7 +91,7 @@ class ManagerViewModel @Inject constructor(
     val updateRubbishBinNodes: LiveData<List<MegaNode>> =
         updateNodes.asFlow()
             .also { Timber.d("onRubbishNodesUpdate") }
-            .map { getRubbishBinNodeByHandle(rubbishBinParentHandle) }
+            .map { getRubbishBinChildrenNode(rubbishBinParentHandle) }
             .filterNotNull()
             .filterNot { it.isEmpty() }
             .asLiveData()
@@ -103,7 +103,7 @@ class ManagerViewModel @Inject constructor(
     val updateBrowserNodes: LiveData<List<MegaNode>> =
         updateNodes.asFlow()
             .also { Timber.d("onBrowserNodesUpdate") }
-            .map { getBrowserNodeByHandle(browserParentHandle) }
+            .map { getBrowserChildrenNode(browserParentHandle) }
             .filterNotNull()
             .filterNot { it.isEmpty() }
             .asLiveData()

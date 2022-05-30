@@ -12,12 +12,12 @@ import javax.inject.Inject
  *  @property getRubbishBinNode
  *  @property sortOrderManagement
  */
-class DefaultGetRubbishBinNodeByHandle @Inject constructor(
+class DefaultGetRubbishBinChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
     private val getRubbishBinNode: GetRubbishBinNode,
     private val sortOrderManagement: SortOrderManagement,
-) : GetRubbishBinNodeByHandle {
+) : GetRubbishBinChildrenNode {
 
     override fun invoke(parentHandle: Long): List<MegaNode>? {
         val rubbishNode = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinNode())
