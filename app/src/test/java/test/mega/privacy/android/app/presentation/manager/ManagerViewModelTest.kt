@@ -41,6 +41,18 @@ class ManagerViewModelTest {
     }
 
     /**
+     * Initialize the view model under test
+     */
+    private fun setUnderTest() {
+        underTest = ManagerViewModel(
+            monitorNodeUpdates,
+            monitorGlobalUpdates,
+            getRubbishBinNodeByHandle,
+            getBrowserNodeByHandle
+        )
+    }
+
+    /**
      * Simulate a repository emission and setup the [ManagerViewModel]
      *
      * @param updates the values to emit from the repository
@@ -49,28 +61,27 @@ class ManagerViewModelTest {
     @Suppress("DEPRECATION")
     private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
         whenever(monitorGlobalUpdates()).thenReturn(updates.asFlow())
-        
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
         after()
     }
 
     @Test
     fun `test that user updates live data is not set when no updates triggered from use case`() = runTest {
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
 
         underTest.updateUsers.test().assertNoValue()
     }
 
     @Test
     fun `test that user alert updates live data is not set when no updates triggered from use case`() = runTest {
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
 
         underTest.updateUserAlerts.test().assertNoValue()
     }
 
     @Test
     fun `test that node updates live data is not set when no updates triggered from use case`() = runTest {
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
 
         underTest.updateNodes.test().assertNoValue()
     }
@@ -86,7 +97,7 @@ class ManagerViewModelTest {
     fun `test that node updates live data is set when node updates triggered from use case`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
 
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
 
         runCatching {
             underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
@@ -99,7 +110,7 @@ class ManagerViewModelTest {
     fun `test that node updates live data is not set when node updates triggered from use case with an empty list`() = runTest {
         whenever(monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
 
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        setUnderTest()
 
         underTest.updateNodes.test().assertNoValue()
     }
