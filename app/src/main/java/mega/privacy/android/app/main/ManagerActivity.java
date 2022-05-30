@@ -7484,6 +7484,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void hideCUProgress() {
         cuProgressBar.setVisibility(View.GONE);
+        photosFragment.updateProgress(View.GONE, 0);
     }
 
     /**
