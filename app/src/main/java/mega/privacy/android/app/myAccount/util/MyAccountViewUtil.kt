@@ -6,12 +6,21 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.StringUtils.formatColorTag
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
 object MyAccountViewUtil {
+
+    /**
+     * Enum class defining the active fragment.
+     */
+    enum class ActiveFragment {
+        MY_ACCOUNT, MY_ACCOUNT_USAGE
+    }
 
     private val gettingInfo by lazy { getString(R.string.recovering_info) }
 
@@ -106,13 +115,14 @@ object MyAccountViewUtil {
      * Updates the views related to payments for all type of accounts except business ones.
      *
      * @param viewModel MyAccountViewModel to check the data.
+     * @param fragment Value from `ActiveFragment` enum indicating what is the active fragment.
      */
-    fun MyAccountPaymentInfoContainerBinding.update(viewModel: MyAccountViewModel): Boolean {
+    fun MyAccountPaymentInfoContainerBinding.update(viewModel: MyAccountViewModel, fragment: ActiveFragment): Boolean {
         businessStatusText.isVisible = false
         val renewable = viewModel.hasRenewableSubscription()
 
         return if (renewable || viewModel.hasExpirableSubscription()) {
-            setRenewOrExpiryDate(viewModel, renewable)
+            setRenewOrExpiryDate(viewModel, renewable, fragment)
             true
         } else false
     }
@@ -123,11 +133,13 @@ object MyAccountViewUtil {
      * @param megaApi       MegaApiAndroid to check business status.
      * @param viewModel     MyAccountViewModel to check the data.
      * @param expandedView  True if the binding is in the expanded view, false otherwise.
+     * @param fragment      Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.businessUpdate(
         megaApi: MegaApiAndroid,
         viewModel: MyAccountViewModel,
-        expandedView: Boolean
+        expandedView: Boolean,
+        fragment: ActiveFragment
     ) {
         if (!megaApi.isMasterBusinessAccount) {
             return
@@ -145,7 +157,7 @@ object MyAccountViewUtil {
                 setBusinessAlert(false, expandedView)
             }
             renewable || expirable -> {
-                setRenewOrExpiryDate(viewModel, renewable)
+                setRenewOrExpiryDate(viewModel, renewable, fragment)
             }
         }
     }
@@ -155,24 +167,42 @@ object MyAccountViewUtil {
      *
      * @param viewModel MyAccountViewModel to check the data.
      * @param renewable True if the subscriptions is renewable, false otherwise.
+     * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     private fun MyAccountPaymentInfoContainerBinding.setRenewOrExpiryDate(
         viewModel: MyAccountViewModel,
-        renewable: Boolean
+        renewable: Boolean,
+        fragment: ActiveFragment
     ) {
         businessStatusText.isVisible = false
 
         renewExpiryText.apply {
             isVisible = true
-            text = getString(if (renewable) R.string.renews_on else R.string.expires_on)
-        }
-
-        renewExpiryDateText.apply {
-            isVisible = true
-            text = TimeUtils.formatDate(
-                if (renewable) viewModel.getRenewTime() else viewModel.getExpirationTime(),
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+            text = getString(
+                if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
+                TimeUtils.formatDate(
+                    if (renewable) viewModel.getRenewTime() else viewModel.getExpirationTime(),
+                    TimeUtils.DATE_MM_DD_YYYY_FORMAT
+                )
             )
+
+            text = when (fragment) {
+                ActiveFragment.MY_ACCOUNT -> {
+                    text.toString()
+                        .replace("[A]", "<font face='sans-serif'>")
+                        .replace("[/A]", "</font>")
+                        .replace("[B]", "<big><font face='sans-serif-medium'>")
+                        .replace("[/B]", "</font></big>")
+                        .toSpannedHtmlText()
+                }
+                ActiveFragment.MY_ACCOUNT_USAGE -> {
+                    text.toString()
+                        .replace("[A]", "")
+                        .replace("[/A]", "")
+                        .formatColorTag(context, 'B', R.color.grey_087_white)
+                        .toSpannedHtmlText()
+                }
+            }
         }
     }
 
@@ -187,7 +217,6 @@ object MyAccountViewUtil {
         expandedView: Boolean
     ) {
         renewExpiryText.isVisible = false
-        renewExpiryDateText.isVisible = false
 
         businessStatusText.apply {
             isVisible = true
