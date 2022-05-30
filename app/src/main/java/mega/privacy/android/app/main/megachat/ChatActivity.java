@@ -816,6 +816,7 @@ public class ChatActivity extends PasscodeActivity
      * @param speaker True, speaker ON. False, speaker OFF.
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
+        callInProgressLayout.setEnabled(false);
         answerCallUseCase.answerCall(chatId, video, audio, speaker)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -3203,7 +3204,6 @@ public class ChatActivity extends PasscodeActivity
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
-                callInProgressLayout.setEnabled(false);
                 answerCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo);
             }
             return;
@@ -3212,7 +3212,7 @@ public class ChatActivity extends PasscodeActivity
         if (!participatingInACall()) {
             Timber.d("There is not a call in this chat and I am NOT in another call");
             enableCallMenuItems(false);
-            startCallUseCase.startCall(chatRoom.getChatId(), startVideo, true)
+            startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -9146,6 +9146,7 @@ public class ChatActivity extends PasscodeActivity
             return;
 
         showCallInProgressLayout(text, true, call);
+
         callInProgressLayout.setOnClickListener(this);
         if (chatRoom != null && chatRoom.isGroup() && megaChatApi.getChatCall(chatRoom.getChatId()) != null) {
             subtitleCall.setVisibility(View.VISIBLE);

@@ -240,7 +240,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.contact_list_option_call_layout:
                 MegaApplication.setUserWaitingForCall(participantHandle);
                 if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                    ((GroupChatInfoActivity) requireActivity()).checkStartCall();
+                    ((GroupChatInfoActivity) requireActivity()).startCall();
                 }
                 break;
 

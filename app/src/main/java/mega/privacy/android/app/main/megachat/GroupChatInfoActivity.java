@@ -53,7 +53,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
@@ -115,8 +114,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     StartCallUseCase startCallUseCase;
-    @Inject
-    GetChatRoomUseCase getChatRoomUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
@@ -1055,7 +1052,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatid);
 
        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom) && canCallBeStartedFromContactOption(this, passcodeManagement)) {
-           checkStartCall();
+           startCall();
        }
     }
 
@@ -1177,32 +1174,25 @@ public class GroupChatInfoActivity extends PasscodeActivity
             case REQUEST_RECORD_AUDIO:
             case REQUEST_CAMERA:
                 if (grantResults.length > 0) {
-                    checkStartCall();
+                    startCall();
                 }
                 break;
         }
     }
 
     /**
-     * Method for checking the necessary actions to start a call.
+     * Start a call
      */
-    public void checkStartCall() {
-        getChatRoomUseCase.get(MegaApplication.getUserWaitingForCall())
+    public void startCall() {
+        startCallUseCase.startCallFromUserHandle(MegaApplication.getUserWaitingForCall(), false, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((idReceived, throwable) -> {
-                    if (throwable == null) {
-                        startCallUseCase.startCall(idReceived, false, true)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe((result, error) -> {
-                                    if (error == null) {
-                                        long id = result.component1();
-                                        boolean videoEnable = result.component2();
-                                        boolean audioEnable = result.component3();
-                                        openMeetingWithAudioOrVideo(this, id, audioEnable, videoEnable, passcodeManagement);
-                                    }
-                                });
+                .subscribe((result, error) -> {
+                    if (error == null) {
+                        long id = result.component1();
+                        boolean videoEnable = result.component2();
+                        boolean audioEnable = result.component3();
+                        openMeetingWithAudioOrVideo(this, id, audioEnable, videoEnable, passcodeManagement);
                     }
                 });
     }

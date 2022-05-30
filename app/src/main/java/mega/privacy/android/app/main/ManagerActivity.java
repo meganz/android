@@ -72,13 +72,13 @@ import static mega.privacy.android.app.utils.CallUtil.isChatConnectedInOrderToIn
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
 import static mega.privacy.android.app.utils.CallUtil.openMeetingToCreate;
+import static mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
 import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
-import static mega.privacy.android.app.utils.CallUtil.startCallWithChatOnline;
 import static mega.privacy.android.app.utils.CameraUploadUtil.backupTimestampsAndFolderHandle;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableMediaUploadProcess;
@@ -297,6 +297,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -392,6 +393,7 @@ import mega.privacy.android.app.usecase.DownloadNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -521,6 +523,10 @@ public class ManagerActivity extends TransfersManagementActivity
     GetNodeUseCase getNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    StartCallUseCase startCallUseCase;
+    @Inject
+    GetChatRoomUseCase getChatRoomUseCase;
     @Inject
     DownloadNodeUseCase downloadNodeUseCase;
     @ApplicationScope
@@ -1217,7 +1223,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     }
                 } else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
-                        grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        grantResults.length > 0) {
                     controlCallPermissions();
                 }
                 break;
@@ -1304,7 +1310,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             case REQUEST_RECORD_AUDIO:
                 if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
-                        grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        grantResults.length > 0) {
                     controlCallPermissions();
                 }
                 break;
@@ -1336,14 +1342,28 @@ public class ManagerActivity extends TransfersManagementActivity
                     break;
 
                 case START_CALL_PERMISSIONS:
-                    MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
-                    if (chat != null) {
-                        startCallWithChatOnline(this, chat);
-                    }
+                    checkStartCall();
                     break;
             }
             typesCameraPermission = INVALID_TYPE_PERMISSIONS;
         }
+    }
+
+    /**
+     * Method for checking the necessary actions to start a call.
+     */
+    public void checkStartCall() {
+        startCallUseCase.startCallFromUserHandle(MegaApplication.getUserWaitingForCall(), false, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        long chatId = result.component1();
+                        boolean videoEnable = result.component2();
+                        boolean audioEnable = result.component3();
+                        openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+                    }
+                });
     }
 
     public void setTypesCameraPermission(int typesCameraPermission) {
@@ -10637,7 +10657,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaChatApiJava api = MegaApplication.getInstance().getMegaChatApi();
         MegaChatRoom chatRoom = api.getChatRoom(chatid);
         if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-            startCallWithChatOnline(this, api.getChatRoom(chatid));
+            checkStartCall();
         }
     }
 

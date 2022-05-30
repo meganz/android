@@ -2,14 +2,20 @@ package mega.privacy.android.app.usecase.call
 
 import android.Manifest
 import com.jeremyliao.liveeventbus.LiveEventBus
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -23,7 +29,8 @@ import javax.inject.Inject
  */
 class StartCallUseCase @Inject constructor(
         private val megaChatApi: MegaChatApiAndroid,
-        private val passcodeManagement: PasscodeManagement
+        private val passcodeManagement: PasscodeManagement,
+        private val getChatRoomUseCase: GetChatRoomUseCase
 ) {
 
     /**
@@ -39,20 +46,49 @@ class StartCallUseCase @Inject constructor(
             val enableAudio: Boolean = false,
     )
 
-    fun startCall(
+    fun startCallFromUserHandle(userHandle: Long, enableVideo: Boolean, enableAudio: Boolean): Single<StartCallResult> =
+            Single.create { emitter ->
+                logDebug("****************+ startCallFromUserHandle:: Creating chat...")
+                getChatRoomUseCase.get(userHandle)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                                onSuccess = { chatId ->
+                                    Timber.d("Chat recovered")
+                                    logDebug("****************+ startCallFromUserHandle:: Created chat OK && Starting call...")
+
+                                    startCallFromChatId(chatId, enableVideo = enableVideo, enableAudio = enableAudio)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeBy(
+                                                    onSuccess = { resultStartCall ->
+                                                        logDebug("****************+ startCallFromUserHandle:: Started call OK")
+
+                                                        emitter.onSuccess(resultStartCall)
+                                                    },
+                                                    onError = { error ->
+                                                        Timber.e(error.stackTraceToString())
+                                                    }
+                                            )
+                                },
+                                onError = { error ->
+                                    LogUtil.logError(error.stackTraceToString())
+                                }
+                        )
+            }
+
+    fun startCallFromChatId(
             chatId: Long,
             enableVideo: Boolean,
             enableAudio: Boolean
     ): Single<StartCallResult> =
             Single.create { emitter ->
-
                 if (megaChatApi.getChatCall(chatId) != null) {
                     Timber.d("There is a call, open it")
                     CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext, chatId, true, passcodeManagement)
                     return@create
                 }
 
-                CallUtil.addChecksForACall(chatId, enableVideo)
                 MegaApplication.setIsWaitingForCall(false)
 
                 var audio = enableAudio
@@ -62,8 +98,10 @@ class StartCallUseCase @Inject constructor(
 
                 var video = enableVideo
                 if (video) {
-                    video = hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.RECORD_AUDIO) && hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.CAMERA)
+                    video = hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.RECORD_AUDIO) &&
+                            hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.CAMERA)
                 }
+                logDebug("****************+ startCallFromChatId:: Starting call...")
 
                 megaChatApi.startChatCall(
                         chatId,
@@ -75,10 +113,14 @@ class StartCallUseCase @Inject constructor(
                                     val chatID = request.chatHandle
 
                                     if (error.errorCode == MegaError.API_OK) {
-                                        MegaApplication.getChatManagement().setSpeakerStatus(request.chatHandle, request.flag)
-                                        val call: MegaChatCall = megaChatApi.getChatCall(request.chatHandle)
-                                        if(call.isOutgoing){
-                                            MegaApplication.getChatManagement().setRequestSentCall(call.callId, true)
+                                        logDebug("****************+ startCallFromChatId:: Started call OK")
+
+                                        Timber.d("Call started")
+                                        CallUtil.addChecksForACall(request.chatHandle, request.flag)
+                                        megaChatApi.getChatCall(request.chatHandle)?.let { call ->
+                                            if (call.isOutgoing) {
+                                                MegaApplication.getChatManagement().setRequestSentCall(call.callId, true)
+                                            }
                                         }
 
                                         val enabledAudio: Boolean = request.paramType == START_CALL_AUDIO_ENABLE
@@ -92,8 +134,8 @@ class StartCallUseCase @Inject constructor(
                                         )
                                     } else {
                                         LiveEventBus.get(
-                                            EventConstants.EVENT_ERROR_STARTING_CALL,
-                                            Long::class.java
+                                                EventConstants.EVENT_ERROR_STARTING_CALL,
+                                                Long::class.java
                                         ).post(request.chatHandle)
                                         emitter.onError(error.toMegaException())
                                     }

@@ -65,7 +65,6 @@ class AnswerCallUseCase @Inject constructor(
                             hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.CAMERA)
                 }
 
-                CallUtil.addChecksForACall(chatId, enableSpeaker)
                 MegaApplication.getChatManagement().addJoiningCallChatId(chatId)
 
                 megaChatApi.answerChatCall(
@@ -77,9 +76,11 @@ class AnswerCallUseCase @Inject constructor(
                                     if (emitter.isDisposed) return@OptionalMegaChatRequestListenerInterface
 
                                     val requestChatId = request.chatHandle
+                                    MegaApplication.getChatManagement().removeJoiningCallChatId(chatId)
                                     if (error.errorCode == MegaError.API_OK) {
-                                        CallUtil.addChecksForACall(requestChatId, enableSpeaker)
-                                        MegaApplication.getChatManagement().addJoiningCallChatId(requestChatId)
+                                        Timber.d("Call answered")
+                                        CallUtil.addChecksForACall(chatId, enableSpeaker)
+
                                         megaChatApi.getChatCall(requestChatId)?.let { call ->
                                             MegaApplication.getChatManagement()
                                                     .setRequestSentCall(call.callId, false)

@@ -18,12 +18,14 @@ import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFra
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import javax.inject.Inject
 
 /**
  * Fragment that represents the UI showing the list of contacts for the current user.
@@ -43,6 +45,9 @@ class ContactListFragment : Fragment() {
     private val contactsAdapter by lazy {
         ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
     }
+
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +74,13 @@ class ContactListFragment : Fragment() {
     override fun onDestroyView() {
         binding.list.clearOnScrollListeners()
         super.onDestroyView()
+    }
+
+    /**
+     * Start call
+     */
+    fun startCall() {
+        viewModel.startCall()
     }
 
     private fun setupView() {

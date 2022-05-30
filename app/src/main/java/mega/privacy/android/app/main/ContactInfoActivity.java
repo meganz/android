@@ -137,7 +137,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -971,37 +970,23 @@ public class ContactInfoActivity extends PasscodeActivity
 		}
 	}
 
+	/**
+	 * Start call
+	 */
 	public void startCall() {
-		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-		if (chatRoomTo != null) {
-			logDebug("Chat exists");
-			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
-				logDebug("There is a call, open it");
-				openMeetingInProgress(this, chatRoomTo.getChatId(), true, passcodeManagement);
-			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
-				logDebug("There is no call, start it");
-				startCallWithChatOnline(chatRoomTo);
-			}
-		} else {
-			logDebug("Chat doesn't exist");
-			//Create first the chat
-			ArrayList<MegaChatRoom> chats = new ArrayList<>();
-			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
-			usersNoChat.add(user);
-			CreateChatListener listener;
-
-			if (startVideo) {
-				listener = new CreateChatListener(CreateChatListener.START_VIDEO_CALL, chats,
-						usersNoChat, this, this);
-			} else {
-				listener = new CreateChatListener(CreateChatListener.START_AUDIO_CALL, chats,
-						usersNoChat, this, this);
-			}
-
-			MegaChatPeerList peers = MegaChatPeerList.createInstance();
-			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-			megaChatApi.createChat(false, peers, listener);
-		}
+		enableCallLayouts(false);
+		startCallUseCase.startCallFromUserHandle(user.getHandle(), startVideo, true)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					enableCallLayouts(true);
+					if (throwable == null) {
+						long chatId = result.component1();
+						boolean videoEnable = result.component2();
+						boolean audioEnable = result.component3();
+						openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+					}
+				});
 	}
 
 	@Override
@@ -1960,19 +1945,16 @@ public class ContactInfoActivity extends PasscodeActivity
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		enableCallLayouts(false);
 
-		startCallUseCase.startCall(chatRoom.getChatId(), startVideo, true)
+		startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((result, throwable) -> {
 					enableCallLayouts(true);
 					if (throwable == null) {
 						long chatId = result.component1();
-						MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-						if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
-							boolean videoEnable = result.component2();
-							boolean audioEnable = result.component3();
-							openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-						}
+						boolean videoEnable = result.component2();
+						boolean audioEnable = result.component3();
+						openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
 					}
 				});
 	}

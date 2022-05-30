@@ -42,7 +42,6 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.usecase.call.StartCallUseCase
@@ -993,7 +992,7 @@ class InMeetingViewModel @Inject constructor(
                 )
             ) {
                 Timber.d("Chat status is connected")
-                startCallUseCase.startCall(currentChatId, enableVideo, enableAudio)
+                startCallUseCase.startCallFromChatId(currentChatId, enableVideo, enableAudio)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
@@ -1001,7 +1000,6 @@ class InMeetingViewModel @Inject constructor(
                             result.value = resultStartCall
                         },
                         onError = { error ->
-                            // _finishMeetingActivity.value = true
                             Timber.e(error.stackTraceToString())
                         }
                     )

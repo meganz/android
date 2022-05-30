@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -12,10 +13,13 @@ import androidx.navigation.ui.navigateUp
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.contacts.list.ContactListFragment
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
@@ -130,6 +134,25 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.root, content, chatId)
+    }
+
+    /**
+     * Get current fragment from navHostFragment
+     */
+    fun getCurrentFragment(): Fragment? {
+        return supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment)?.childFragmentManager?.fragments?.get(0)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            Constants.REQUEST_RECORD_AUDIO, Constants.REQUEST_CAMERA -> if (grantResults.isNotEmpty()) {
+                val currentFragment = getCurrentFragment()
+                if (currentFragment is ContactListFragment) {
+                    currentFragment.startCall()
+                }
+            }
+        }
     }
 
     /**
