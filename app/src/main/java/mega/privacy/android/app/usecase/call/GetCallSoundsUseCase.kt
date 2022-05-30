@@ -32,7 +32,7 @@ class GetCallSoundsUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 30
+        const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
     }
 
     var countDownTimer: CustomCountDownTimer? = null
