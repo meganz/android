@@ -19,8 +19,8 @@ import javax.inject.Inject
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
-    getRubbishBinNodeByHandle: DefaultGetRubbishBinNodeByHandle,
-    getBrowserNodeByHandle: DefaultGetBrowserNodeByHandle,
+    getRubbishBinNodeByHandle: GetRubbishBinNodeByHandle,
+    getBrowserNodeByHandle: GetBrowserNodeByHandle,
 ) : ViewModel() {
 
     /**
