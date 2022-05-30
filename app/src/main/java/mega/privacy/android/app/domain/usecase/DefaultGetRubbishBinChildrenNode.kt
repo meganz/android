@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.globalmanagement.SortOrderManagementInterface
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class DefaultGetRubbishBinChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
     private val getRubbishBinNode: GetRubbishBinNode,
-    private val sortOrderManagement: SortOrderManagement,
+    private val sortOrderManagement: SortOrderManagementInterface,
 ) : GetRubbishBinChildrenNode {
 
     override fun invoke(parentHandle: Long): List<MegaNode>? {

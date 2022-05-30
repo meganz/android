@@ -3,12 +3,10 @@ package mega.privacy.android.app.globalmanagement
 import mega.privacy.android.app.DatabaseHandler
 import nz.mega.sdk.MegaApiJava.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class SortOrderManagement @Inject constructor(
     private val dbH: DatabaseHandler
-) {
+): SortOrderManagementInterface {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
@@ -43,7 +41,7 @@ class SortOrderManagement @Inject constructor(
         orderOffline = ORDER_DEFAULT_ASC
     }
 
-    fun getOrderCloud(): Int = orderCloud
+    override fun getOrderCloud(): Int = orderCloud
 
     fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud

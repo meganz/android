@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.homepage.favourites.FavouritesUseCases
 import mega.privacy.android.app.di.homepage.favourites.OpenFileModule
 import mega.privacy.android.app.domain.usecase.GetAllFavorites
 import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
+import mega.privacy.android.app.globalmanagement.SortOrderManagementInterface
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -39,4 +40,7 @@ object FavouritesTestModule {
 
     @Provides
     fun provideOpenFileWrapper() : OpenFileWrapper = mock()
+
+    @Provides
+    fun provideSortManagementInterface() : SortOrderManagementInterface = mock()
 }
