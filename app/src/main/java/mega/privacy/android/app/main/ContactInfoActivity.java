@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -82,7 +81,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.megachat.ChatActivity;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
@@ -91,6 +89,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
@@ -138,6 +137,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -151,13 +151,14 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivity extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, OnItemClickListener,
-		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.StartChatCallCallback {
+		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower {
 
 	@Inject
 	PasscodeManagement passcodeManagement;
-
 	@Inject
 	GetChatChangesUseCase getChatChangesUseCase;
+	@Inject
+	StartCallUseCase startCallUseCase;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -908,9 +909,7 @@ public class ContactInfoActivity extends PasscodeActivity
 				break;
 			}
 			case R.id.action_return_call:
-				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					returnActiveCall(this, passcodeManagement);
-				}
+				returnActiveCall(this, passcodeManagement);
 				return true;
 		}
 		return true;
@@ -1011,10 +1010,7 @@ public class ContactInfoActivity extends PasscodeActivity
 		switch (requestCode) {
 			case REQUEST_CAMERA:
 			case REQUEST_RECORD_AUDIO:
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-						checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					startCall();
-				}
+				startCall();
 				break;
 		}
 
@@ -1193,9 +1189,7 @@ public class ContactInfoActivity extends PasscodeActivity
 				break;
 
 			case R.id.call_in_progress_layout:
-				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
-					returnActiveCall(this, passcodeManagement);
-				}
+				returnActiveCall(this, passcodeManagement);
 				break;
 		}
 	}
@@ -1962,10 +1956,23 @@ public class ContactInfoActivity extends PasscodeActivity
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-		addChecksForACall(chatRoom.getChatId(), startVideo);
 		enableCallLayouts(false);
-		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
-		MegaApplication.setIsWaitingForCall(false);
+
+		startCallUseCase.startCall(chatRoom.getChatId(), startVideo, true)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					enableCallLayouts(true);
+					if (throwable == null) {
+						long chatId = result.component1();
+						MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
+						if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
+							boolean videoEnable = result.component2();
+							boolean audioEnable = result.component3();
+							openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+						}
+					}
+				});
 	}
 
 	private void enableCallLayouts(Boolean enable) {
@@ -2048,21 +2055,6 @@ public class ContactInfoActivity extends PasscodeActivity
 	@Override
 	public void createFolder(@NotNull String folderName) {
 		//No action needed
-	}
-
-	@Override
-	public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
-		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-		if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
-			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
-		}
-
-		enableCallLayouts(true);
-	}
-
-	@Override
-	public void onCallFailed(long chatId) {
-		enableCallLayouts(true);
 	}
 
 	/**

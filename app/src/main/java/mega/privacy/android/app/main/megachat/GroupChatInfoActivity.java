@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
@@ -65,6 +66,7 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -111,6 +113,10 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    StartCallUseCase startCallUseCase;
+    @Inject
+    GetChatRoomUseCase getChatRoomUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
@@ -1169,23 +1175,37 @@ public class GroupChatInfoActivity extends PasscodeActivity
         switch (requestCode) {
             case REQUEST_RECORD_AUDIO:
             case REQUEST_CAMERA:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    controlCallPermissions();
+                if (grantResults.length > 0) {
+                    checkStartCall();
+                } else {
+
                 }
                 break;
         }
     }
 
     /**
-     * Method for checking the necessary actions when you have permission to start a call.
+     * Method for checking the necessary actions to start a call.
      */
-    private void controlCallPermissions() {
-        if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-            MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
-            if (chat != null) {
-                startCallWithChatOnline(this, chat);
-            }
-        }
+    public void checkStartCall() {
+        getChatRoomUseCase.get(MegaApplication.getUserWaitingForCall())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((idReceived, throwable) -> {
+                    if (throwable == null) {
+                        startCallUseCase.startCall(idReceived, false, true)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe((result, error) -> {
+                                    if (error == null) {
+                                        long id = result.component1();
+                                        boolean videoEnable = result.component2();
+                                        boolean audioEnable = result.component3();
+                                        openMeetingWithAudioOrVideo(this, id, audioEnable, videoEnable, passcodeManagement);
+                                    }
+                                });
+                    }
+                });
     }
 
     private void onChatPresenceLastGreen(long userhandle, int lastGreen) {

@@ -688,17 +688,7 @@ class MeetingActivityViewModel @Inject constructor(
     ): LiveData<AnswerCallUseCase.AnswerCallResult> {
         val result = MutableLiveData<AnswerCallUseCase.AnswerCallResult>()
         _currentChatId.value?.let {
-            var video = cameraGranted.value
-            if (cameraGranted.value) {
-                video = enableVideo
-            }
-
-            var audio = recordAudioGranted.value
-            if (recordAudioGranted.value) {
-                audio = enableAudio
-            }
-
-            answerCallUseCase.answerCall(it, video, audio, speakerAudio)
+            answerCallUseCase.answerCall(it, enableVideo, enableAudio, speakerAudio)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

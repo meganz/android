@@ -179,10 +179,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
      * @param chatId Chat ID
      */
     private void answerCall(long chatId) {
-        Context context = MegaApplication.getInstance().getApplicationContext();
-        boolean audio = isTraditionalCall && hasPermissions(context, Manifest.permission.RECORD_AUDIO);
-
-        answerCallUseCase.answerCall(chatId, false, audio, false)
+        answerCallUseCase.answerCall(chatId, false, isTraditionalCall, false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {

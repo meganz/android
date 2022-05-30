@@ -103,6 +103,7 @@ import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -111,7 +112,6 @@ import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -197,6 +197,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
@@ -239,9 +240,9 @@ public class ChatActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
-        HangChatCallListener.OnCallHungUpCallback, SetCallOnHoldListener.OnCallOnHoldCallback,
-        LoadPreviewListener.OnPreviewLoadedCallback, LoadPreviewListener.OnChatPreviewLoadedCallback {
+        SnackbarShower, AttachNodeToChatListener, HangChatCallListener.OnCallHungUpCallback,
+        SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
+        LoadPreviewListener.OnChatPreviewLoadedCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -335,6 +336,8 @@ public class ChatActivity extends PasscodeActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     AnswerCallUseCase answerCallUseCase;
+    @Inject
+    StartCallUseCase startCallUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -692,16 +695,6 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
-        if (idChat == chatId) {
-            // In this case, the callMenuItem will be reset to enabled after resuming this activity (it calls invalidateOptionMenu())
-            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
-        } else {
-            enableCallMenuItems(true);
-        }
-    }
-
-    @Override
     public void onPreviewLoaded(MegaChatRequest request, boolean alreadyExist) {
         long chatId = request.getChatHandle();
         boolean isFromOpenChatPreview = request.getFlag();
@@ -823,14 +816,6 @@ public class ChatActivity extends PasscodeActivity
      * @param speaker True, speaker ON. False, speaker OFF.
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
-        if (audio) {
-            audio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
-        }
-
-        if (video) {
-            video = hasPermissions(this, Manifest.permission.CAMERA) && hasPermissions(this, Manifest.permission.RECORD_AUDIO);
-        }
-
         answerCallUseCase.answerCall(chatId, video, audio, speaker)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -842,11 +827,6 @@ public class ChatActivity extends PasscodeActivity
                         showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
                     }
                 });
-    }
-
-    @Override
-    public void onCallFailed(long chatId) {
-        enableCallMenuItems(true);
     }
 
     private class UserTyping {
@@ -3230,14 +3210,25 @@ public class ChatActivity extends PasscodeActivity
         }
 
         if (!participatingInACall()) {
-            logDebug("There is not a call in this chat and I am NOT in another call");
-            addChecksForACall(chatRoom.getChatId(), startVideo);
+            Timber.d("There is not a call in this chat and I am NOT in another call");
             enableCallMenuItems(false);
-            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
+            startCallUseCase.startCall(chatRoom.getChatId(), startVideo, true)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        enableCallMenuItems(true);
+                        if (throwable == null) {
+                            long chatId = result.component1();
+                            if (chatId == chatRoom.getChatId()) {
+                                boolean videoEnable = result.component2();
+                                boolean audioEnable = result.component3();
+                                openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+                            }
+                        }
+                    });
         }else{
             logDebug("There is not a call in this chat and I am in another call");
         }
-
     }
 
     private void enableCallMenuItems(Boolean enable) {
