@@ -8,7 +8,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -16,16 +15,17 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import javax.inject.Inject
 
 @HiltViewModel
 class OfflineFileInfoViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val repo: MegaNodeRepo
+    private val repo: MegaNodeRepo,
+    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
 ) : BaseRxViewModel() {
 
     private val _node = MutableLiveData<OfflineNode?>()
@@ -44,7 +44,7 @@ class OfflineFileInfoViewModel @Inject constructor(
                 val thumbnail = if (MimeTypeList.typeForName(it.name).isImage) {
                     getOfflineFile(context, it)
                 } else {
-                    getThumbnailFile(context, it)
+                    offlineThumbnailFileWrapper.getThumbnailFile(context, it)
                 }
                 OfflineNode(it, if (isFileAvailable(thumbnail)) thumbnail else null, "", false)
             }

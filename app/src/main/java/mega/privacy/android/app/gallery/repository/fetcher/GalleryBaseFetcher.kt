@@ -210,6 +210,9 @@ abstract class GalleryBaseFetcher(
         }
     }
 
+    /**
+     * Function to filter out node items that are either in rubbish, or is a folder.
+     */
     protected fun getFilteredChildren(nodes: List<MegaNode>): List<MegaNode> {
         val filteredNodes = ArrayList<MegaNode>()
 

@@ -4,27 +4,33 @@ import android.content.Context
 import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.di.DefaultDispatcher
+import mega.privacy.android.app.di.MainDispatcher
+import mega.privacy.android.app.domain.usecase.GetThumbnail
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.*
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
 import mega.privacy.android.app.utils.RxUtil.logErr
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
@@ -34,6 +40,9 @@ import javax.inject.Inject
 class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
+    private val getThumbnail: GetThumbnail,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private var order = ORDER_DEFAULT_ASC
@@ -88,6 +97,11 @@ class OfflineViewModel @Inject constructor(
     var placeholderCount = 0
         private set
     var skipNextAutoScroll = false
+
+    /**
+     * Job for processing OfflineNodes loading
+     */
+    var loadOfflineNodesJob: Job? = null
 
     init {
         add(
@@ -415,64 +429,56 @@ class OfflineViewModel @Inject constructor(
             return
         }
 
-        add(Single.fromCallable { repo.loadOfflineNodes(path, order, searchQuery) }
-            .map {
-                val nodes = ArrayList<OfflineNode>()
-                val nodesWithoutThumbnail = ArrayList<MegaOffline>()
-                var folderCount = 0
-                for (node in it) {
-                    if (node.isFolder) {
-                        folderCount++
-                    }
-                    val thumbnail = getThumbnailFile(context, node)
-                    nodes.add(
-                        OfflineNode(
-                            node, if (isFileAvailable(thumbnail)) thumbnail else null,
-                            getNodeInfo(node), selectedNodes.containsKey(node.id), refreshUi
-                        )
+        loadOfflineNodesJob?.cancel()
+        loadOfflineNodesJob = viewModelScope.launch(defaultDispatcher) {
+            val nodes = ArrayList<OfflineNode>()
+            val nodesWithoutThumbnail = ArrayList<MegaOffline>()
+            var folderCount = 0
+            repo.loadOfflineNodes(path, order, searchQuery).map { node ->
+                if (node.isFolder) {
+                    folderCount++
+                }
+                val thumbnail = kotlin.runCatching {
+                    getThumbnail(node.handle.toLong())
+                }.fold(
+                    onSuccess = { it },
+                    onFailure = { null }
+                )
+                nodes.add(
+                    OfflineNode(
+                        node, if (isFileAvailable(thumbnail)) thumbnail else null,
+                        getNodeInfo(node), selectedNodes.containsKey(node.id), refreshUi
                     )
+                )
 
-                    val mime = typeForName(node.name)
-                    if ((mime.isVideo || mime.isImage || mime.isPdf || mime.isAudio) &&
-                        !isFileAvailable(thumbnail) && !creatingThumbnailNodes.contains(node.handle)
-                    ) {
-                        creatingThumbnailNodes.add(node.handle)
-                        nodesWithoutThumbnail.add(node)
-                    }
+                val mime = typeForName(node.name)
+                if ((mime.isVideo || mime.isImage || mime.isPdf || mime.isAudio) &&
+                    !isFileAvailable(thumbnail) && !creatingThumbnailNodes.contains(node.handle)
+                ) {
+                    creatingThumbnailNodes.add(node.handle)
+                    nodesWithoutThumbnail.add(node)
                 }
-
-                var placeholders = 0
-                if (!isList && gridSpanCount != 0) {
-                    placeholders = if (folderCount % gridSpanCount == 0) {
-                        0
-                    } else {
-                        gridSpanCount - (folderCount % gridSpanCount)
-                    }
-                    if (placeholders != 0) {
-                        for (i in 0 until placeholders) {
-                            nodes.add(folderCount + i, OfflineNode.PLACE_HOLDER)
-                        }
-                    }
-                }
-
-                if (nodes.isNotEmpty() && !rootFolderOnly && !searchMode()) {
-                    placeholders++
-                    nodes.add(0, OfflineNode.HEADER)
-                }
-                placeholderCount = placeholders
-
-                createThumbnails(nodesWithoutThumbnail)
-                nodes
             }
-            // loadOfflineNodes would be called multiple times when load fragment because of
-            // observing different LiveData, use single thread scheduler to avoid concurrency issue
-            .subscribeOn(Schedulers.single())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { _nodes.value = Pair(it, autoScrollPos) },
-                logErr("loadOfflineNodes")
-            )
-        )
+
+            var placeholders = 0
+            if (!isList && gridSpanCount != 0) {
+                placeholders = if (folderCount % gridSpanCount == 0) {
+                    0
+                } else {
+                    gridSpanCount - (folderCount % gridSpanCount)
+                }
+                if (placeholders != 0) {
+                    for (i in 0 until placeholders) {
+                        nodes.add(folderCount + i, OfflineNode.PLACE_HOLDER)
+                    }
+                }
+            }
+            placeholderCount = placeholders
+            withContext(mainDispatcher) {
+                _nodes.value = Pair(nodes, autoScrollPos)
+            }
+        }
+        loadOfflineNodesJob?.start()
     }
 
     private fun getNodeInfo(node: MegaOffline): String {
@@ -483,16 +489,5 @@ class OfflineViewModel @Inject constructor(
         } else {
             getFileInfo(file)
         }
-    }
-
-    private fun createThumbnails(nodes: List<MegaOffline>) {
-        add(Observable.fromIterable(nodes)
-            .subscribeOn(Schedulers.io())
-            .map { Pair(getOfflineFile(context, it), getThumbnailFile(context, it)) }
-            .filter { it.first.exists() }
-            .map { createThumbnail(it.first, it.second) }
-            .throttleLatest(1, SECONDS, true)
-            .subscribe({ loadOfflineNodes() }, logErr("createThumbnail"))
-        )
     }
 }

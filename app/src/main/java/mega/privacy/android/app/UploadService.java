@@ -406,7 +406,7 @@ public class UploadService extends Service {
         } else {
             showUploadCompleteNotification();
 
-            if (showSnackbar) {
+            if (showSnackbar && uploadCount > 0) {
                 sendUploadFinishBroadcast();
             }
         }

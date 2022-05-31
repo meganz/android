@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 import java.util.concurrent.Callable
@@ -44,6 +45,7 @@ class TrackInfoViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
+    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
 ) : BaseRxViewModel() {
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
@@ -144,7 +146,7 @@ class TrackInfoViewModel @Inject constructor(
                 return
             }
 
-            val thumbnail = getThumbnailFile(context, node)
+            val thumbnail = offlineThumbnailFileWrapper.getThumbnailFile(context, node)
             createThumbnailIfNotExists(thumbnail, args.handle)
 
             _nodeInfo.postValue(

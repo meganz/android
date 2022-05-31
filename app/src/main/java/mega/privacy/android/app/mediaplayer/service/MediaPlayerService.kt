@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -53,6 +54,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @Inject
     lateinit var dbHandler: DatabaseHandler
+
+    @Inject
+    lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
 
     private val binder by lazy { MediaPlayerServiceBinder(this) }
     private var initialized = false
@@ -114,7 +118,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = MediaPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
+        viewModel = MediaPlayerServiceViewModel(
+            this,
+            megaApi,
+            megaApiFolder,
+            dbHandler,
+            offlineThumbnailFileWrapper
+        )
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
@@ -210,9 +220,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                             state == Player.STATE_READY && viewModel.paused && player.playWhenReady -> {
                                 viewModel.setPaused(false, exoPlayer.currentPosition)
                             }
-                            state == Player.STATE_READY && player.playWhenReady -> {
-                                viewModel.setDuration(exoPlayer.duration)
-                            }
                         }
                     }
 
@@ -247,73 +254,76 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
         ).setChannelNameResourceId(R.string.audio_player_notification_channel_name)
             .setChannelDescriptionResourceId(0)
             .setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
-            override fun getCurrentContentTitle(player: Player): String {
-                val meta = _metadata.value ?: return ""
-                return meta.title ?: meta.nodeName
-            }
-
-            @SuppressLint("UnspecifiedImmutableFlag")
-            @Nullable
-            override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
-                intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
-                return PendingIntent.getActivity(
-                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-
-            @Nullable
-            override fun getCurrentContentText(player: Player): String {
-                val meta = _metadata.value ?: return ""
-                return meta.artist ?: ""
-            }
-
-            @Nullable
-            override fun getCurrentLargeIcon(
-                player: Player,
-                callback: PlayerNotificationManager.BitmapCallback
-            ): Bitmap? {
-                val thumbnail = viewModel.playingThumbnail.value
-                if (thumbnail == null || !thumbnail.exists()) {
-                    return ContextCompat.getDrawable(
-                        this@MediaPlayerService,
-                        R.drawable.ic_default_audio_cover
-                    )?.toBitmap()
+                override fun getCurrentContentTitle(player: Player): String {
+                    val meta = _metadata.value ?: return ""
+                    return meta.title ?: meta.nodeName
                 }
-                return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
-            }
-        }).setNotificationListener(object : PlayerNotificationManager.NotificationListener {
-            override fun onNotificationPosted(
-                notificationId: Int,
-                notification: Notification,
-                ongoing: Boolean
-            ) {
-                if (ongoing) {
-                    // Make sure the service will not get destroyed while playing media.
-                    startForeground(notificationId, notification)
-                } else {
-                    // Make notification cancellable.
-                    stopForeground(false)
-                }
-            }
 
-            override fun onNotificationCancelled(
-                notificationId: Int,
-                dismissedByUser: Boolean
-            ) {
-                if (dismissedByUser) {
-                    playerNotificationManager?.setPlayer(null)
-                    notificationDismissed = true
+                @SuppressLint("UnspecifiedImmutableFlag")
+                @Nullable
+                override fun createCurrentContentIntent(player: Player): PendingIntent? {
+                    val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
+                    intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
+                    return PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                 }
-            }
-        }).build().apply {
-            setSmallIcon(R.drawable.ic_stat_notify)
-            setUseChronometer(false)
-            setUseNextActionInCompactView(true)
-            setUsePreviousActionInCompactView(true)
 
-            setPlayer(player)
-        }
+                @Nullable
+                override fun getCurrentContentText(player: Player): String {
+                    val meta = _metadata.value ?: return ""
+                    return meta.artist ?: ""
+                }
+
+                @Nullable
+                override fun getCurrentLargeIcon(
+                    player: Player,
+                    callback: PlayerNotificationManager.BitmapCallback,
+                ): Bitmap? {
+                    val thumbnail = viewModel.playingThumbnail.value
+                    if (thumbnail == null || !thumbnail.exists()) {
+                        return ContextCompat.getDrawable(
+                            this@MediaPlayerService,
+                            R.drawable.ic_default_audio_cover
+                        )?.toBitmap()
+                    }
+                    return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
+                }
+            }).setNotificationListener(object : PlayerNotificationManager.NotificationListener {
+                override fun onNotificationPosted(
+                    notificationId: Int,
+                    notification: Notification,
+                    ongoing: Boolean,
+                ) {
+                    if (ongoing) {
+                        // Make sure the service will not get destroyed while playing media.
+                        startForeground(notificationId, notification)
+                    } else {
+                        // Make notification cancellable.
+                        stopForeground(false)
+                    }
+                }
+
+                override fun onNotificationCancelled(
+                    notificationId: Int,
+                    dismissedByUser: Boolean,
+                ) {
+                    if (dismissedByUser) {
+                        playerNotificationManager?.setPlayer(null)
+                        notificationDismissed = true
+                    }
+                }
+            }).build().apply {
+                setSmallIcon(R.drawable.ic_stat_notify)
+                setUseChronometer(false)
+                setUseNextActionInCompactView(true)
+                setUsePreviousActionInCompactView(true)
+
+                setPlayer(player)
+            }
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -586,7 +596,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when(event){
+        when (event) {
             Lifecycle.Event.ON_START -> onMoveToForeground()
             Lifecycle.Event.ON_STOP -> onMoveToBackground()
             else -> return

@@ -783,9 +783,9 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 
 		if (error != null) {
 			setError(newPassword1, error);
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 }

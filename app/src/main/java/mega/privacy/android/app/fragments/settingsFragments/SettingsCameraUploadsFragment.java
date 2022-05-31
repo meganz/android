@@ -38,10 +38,12 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.resetMUTimestampsA
 import static mega.privacy.android.app.utils.CameraUploadUtil.restorePrimaryTimestampsAndSyncRecordProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.restoreSecondaryTimestampsAndSyncRecordProcess;
 import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_ACCESS_MEDIA_LOCATION;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -60,6 +62,8 @@ import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS;
 import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -97,6 +101,7 @@ import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
@@ -491,6 +496,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * It also cancels all CameraUpload and Heartbeat workers.
      */
     public void disableCameraUpload() {
+        fireCancelCameraUploadJob(getContext());
         stopCameraUploadSyncHeartbeatWorkers(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
@@ -506,8 +512,30 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         switch (preference.getKey()) {
             case KEY_CAMERA_UPLOAD_INCLUDE_GPS:
                 includeGPS = cameraUploadIncludeGPS.isChecked();
-                dbH.setRemoveGPS(!includeGPS);
-                rescheduleCameraUpload(context);
+                if (!includeGPS) {
+                    dbH.setRemoveGPS(true);
+                    rescheduleCameraUpload(context);
+                    break;
+                }
+
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+                    dbH.setRemoveGPS(false);
+                    rescheduleCameraUpload(context);
+                    break;
+                }
+
+                @SuppressLint("InlinedApi") String[] PERMISSIONS = {Manifest.permission.ACCESS_MEDIA_LOCATION};
+                if (hasPermissions(context, PERMISSIONS)) {
+                    dbH.setRemoveGPS(false);
+                    rescheduleCameraUpload(context);
+                    break;
+                }
+
+                // user enabled location data, is on >= Android 10, but has not enabled required permissions
+                includeGPS = false;
+                dbH.setRemoveGPS(true);
+                cameraUploadIncludeGPS.setChecked(includeGPS);
+                requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_ACCESS_MEDIA_LOCATION, PERMISSIONS);
                 break;
 
             case KEY_CAMERA_UPLOAD_CHARGING:
@@ -989,6 +1017,13 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 enableVideoQualitySettings();
             }
         }
+    }
+
+    public void enableCameraUploadsWithLocation() {
+        includeGPS = true;
+        dbH.setRemoveGPS(false);
+        cameraUploadIncludeGPS.setChecked(includeGPS);
+        rescheduleCameraUpload(context);
     }
 
     public void enableCameraUpload() {
