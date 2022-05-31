@@ -1,6 +1,11 @@
 package mega.privacy.android.app.fcm
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -9,6 +14,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetPushToken
 import mega.privacy.android.app.domain.usecase.RegisterPushNotifications
 import mega.privacy.android.app.domain.usecase.SetPushToken
@@ -28,7 +34,7 @@ class NewTokenWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val getPushToken: GetPushToken,
     private val registerPushNotifications: RegisterPushNotifications,
-    private val setPushToken: SetPushToken
+    private val setPushToken: SetPushToken,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
@@ -50,12 +56,37 @@ class NewTokenWorker @AssistedInject constructor(
         }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return super.getForegroundInfo()
+        return ForegroundInfo(NOTIFICATION_CHANNEL_ID, getNotification())
+    }
+
+    private fun getNotification(): Notification {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                RETRIEVING_NEW_TOKEN_ID,
+                RETRIEVING_NEW_TOKEN,
+                NotificationManager.IMPORTANCE_NONE).apply {
+                enableVibration(false)
+                setSound(null, null)
+            }
+            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .createNotificationChannel(notificationChannel)
+        }
+
+        val builder = NotificationCompat.Builder(applicationContext,
+            RETRIEVING_NEW_TOKEN_ID).apply {
+            setSmallIcon(R.drawable.ic_stat_notify)
+        }
+
+        return builder.build()
     }
 
     companion object {
         const val NEW_TOKEN = "NEW_TOKEN"
         const val DEVICE_TYPE = "DEVICE_TYPE"
         const val WORK_NAME = "NewTokenWorker"
+
+        const val NOTIFICATION_CHANNEL_ID = 1087
+        const val RETRIEVING_NEW_TOKEN_ID = "RETRIEVING_NEW_TOKEN_ID"
+        const val RETRIEVING_NEW_TOKEN = "RETRIEVING_NEW_TOKEN"
     }
 }

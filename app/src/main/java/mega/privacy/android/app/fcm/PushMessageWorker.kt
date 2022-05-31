@@ -1,6 +1,11 @@
 package mega.privacy.android.app.fcm
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -10,6 +15,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.usecase.FastLogin
 import mega.privacy.android.app.domain.usecase.FetchNodes
@@ -19,6 +25,7 @@ import mega.privacy.android.app.domain.usecase.PushReceived
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fcm.PushMessage.Companion.toPushMessage
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import timber.log.Timber
 
 /**
@@ -116,7 +123,39 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return super.getForegroundInfo()
+        val notification = when (inputData.toPushMessage().type) {
+            TYPE_CALL -> getNotification(R.drawable.ic_call_started)
+            TYPE_CHAT -> getNotification(R.drawable.ic_stat_notify,
+                R.string.notification_chat_undefined_content)
+            else -> getNotification(R.drawable.ic_stat_notify)
+        }
+
+        return ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
+    }
+
+    private fun getNotification(iconId: Int, titleId: Int? = null): Notification {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                RETRIEVING_NOTIFICATIONS_ID,
+                RETRIEVING_NOTIFICATIONS,
+                NotificationManager.IMPORTANCE_NONE).apply {
+                enableVibration(false)
+                setSound(null, null)
+            }
+            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .createNotificationChannel(notificationChannel)
+        }
+
+        val builder = NotificationCompat.Builder(applicationContext, RETRIEVING_NOTIFICATIONS_ID)
+            .apply {
+                setSmallIcon(iconId)
+
+                if (titleId != null) {
+                    setContentText(getString(titleId))
+                }
+            }
+
+        return builder.build()
     }
 
     companion object {
@@ -125,5 +164,9 @@ class PushMessageWorker @AssistedInject constructor(
         private const val TYPE_CONTACT_REQUEST = "3"
         private const val TYPE_CALL = "4"
         private const val TYPE_ACCEPTANCE = "5"
+
+        const val NOTIFICATION_CHANNEL_ID = 1086
+        const val RETRIEVING_NOTIFICATIONS_ID = "RETRIEVING_NOTIFICATIONS_ID"
+        const val RETRIEVING_NOTIFICATIONS = "RETRIEVING_NOTIFICATIONS"
     }
 }
