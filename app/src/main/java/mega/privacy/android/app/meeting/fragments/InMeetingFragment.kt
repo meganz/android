@@ -640,12 +640,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 logDebug("Action ringing with video on")
-                sharedModel.micInitiallyOn()
-                sharedModel.camInitiallyOn()
+                inMeetingViewModel.getCall()?.let {
+                    if (it.hasLocalAudio()) {
+                        sharedModel.micInitiallyOn()
+                    }
+                    if (it.hasLocalVideo()) {
+                        sharedModel.camInitiallyOn()
+                    }
+                }
             }
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
                 logDebug("Action ringing with video off")
-                sharedModel.micInitiallyOn()
+                inMeetingViewModel.getCall()?.let {
+                    if (it.hasLocalAudio()) {
+                        sharedModel.micInitiallyOn()
+                    }
+                }
             }
             MEETING_ACTION_START -> {
                 logDebug("Action need answer call")

@@ -1099,6 +1099,8 @@ public class ChatActivity extends PasscodeActivity
             return;
         }
 
+        shouldRefreshSessionDueToSDK();
+
         handler = new Handler();
 
         chatActivity = this;

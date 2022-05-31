@@ -37,6 +37,14 @@ class AnswerCallUseCase @Inject constructor(
             val enableAudio: Boolean = false,
     )
 
+    /**
+     * Method to answer a call
+     *
+     * @param chatId Chat ID
+     * @param enableVideo True, video ON. False, video OFF
+     * @param enableAudio True, audio ON. False, audio OFF
+     * @param enableSpeaker True, speaker ON. False, speaker OFF
+     */
     fun answerCall(
             chatId: Long,
             enableVideo: Boolean,
