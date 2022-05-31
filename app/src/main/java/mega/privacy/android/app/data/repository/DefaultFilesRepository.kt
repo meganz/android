@@ -9,6 +9,7 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaError
@@ -27,6 +28,8 @@ class DefaultFilesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FilesRepository {
+
+    @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
