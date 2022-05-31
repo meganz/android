@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import timber.log.Timber
 import java.util.*
 
 @AndroidEntryPoint
@@ -118,10 +119,10 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     private fun answerCall(enableVideo: Boolean) {
         sharedModel.answerCall(enableVideo, true, enableVideo).observe(viewLifecycleOwner) { result ->
             val actionString = if (result.enableVideo) {
-                logDebug("Call answered with video ON and audio ON")
+                Timber.d("Call answered with video ON and audio ON")
                 MEETING_ACTION_RINGING_VIDEO_ON
             } else {
-                logDebug("Call answered with video OFF and audio ON")
+                Timber.d("Call answered with video OFF and audio ON")
                 MEETING_ACTION_RINGING_VIDEO_OFF
             }
 
@@ -198,6 +199,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Method to control the required permission
+     *
+     * @param permission Type of permission required
+     */
     private fun requirePermission(permission: String) {
         permissionsBuilder(
             arrayOf(permission)
