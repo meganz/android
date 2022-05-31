@@ -18,7 +18,6 @@ import android.app.NotificationManager
 import android.content.*
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.constants.SettingsConstants
@@ -35,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.*
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.domain.entity.SyncRecordType
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.*
@@ -335,7 +335,7 @@ class AccountController(private val context: Context) {
                 .apply()
 
             //clear push token
-            context.getSharedPreferences(PushMessageHandler.PUSH_TOKEN, Context.MODE_PRIVATE).edit()
+            context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
                 .clear().apply()
 
             //clear user interface preferences

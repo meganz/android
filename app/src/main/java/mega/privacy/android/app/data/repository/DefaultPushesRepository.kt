@@ -12,7 +12,6 @@ import mega.privacy.android.app.domain.repository.PushesRepository
 import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler.Companion.PUSH_TOKEN
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
@@ -93,4 +92,8 @@ class DefaultPushesRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    companion object {
+        const val PUSH_TOKEN = "PUSH_TOKEN"
+    }
 }

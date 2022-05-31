@@ -497,9 +497,6 @@
             android:name=".jobservices.CameraUploadsService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
-        <service
-            android:name=".fcm.IncomingCallService"
-            android:exported="true" />
         <receiver
             android:name=".receivers.CustomInstallReferrerReceiver"
             android:exported="true">

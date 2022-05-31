@@ -8,6 +8,7 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.exception.ChatNotInitializedException
+import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.repository.LoginRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaChatApi
@@ -15,6 +16,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -33,20 +35,29 @@ class DefaultLoginRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LoginRepository {
 
+    @Singleton
+    override var allowBackgroundLogin: Boolean = true
+
     override suspend fun fastLogin(session: String) =
         withContext<Unit>(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.fastLogin(
-                    session,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onFastLoginFinish(continuation)
+                if (allowBackgroundLogin) {
+                    allowBackgroundLogin = false
+                    megaApiGateway.fastLogin(
+                        session,
+                        OptionalMegaRequestListenerInterface(
+                            onRequestFinish = onFastLoginFinish(continuation)
+                        )
                     )
-                )
+                } else {
+                    continuation.resumeWith(Result.failure(LoginAlreadyRunningException()))
+                }
             }
         }
 
     private fun onFastLoginFinish(continuation: Continuation<Unit>) =
         { _: MegaRequest, error: MegaError ->
+            allowBackgroundLogin = true
             if (error.errorCode == MegaError.API_OK) {
                 megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
                 continuation.resumeWith(Result.success(Unit))

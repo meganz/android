@@ -65,11 +65,10 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.di.ApplicationScope;
-import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.domain.repository.LoginRepository;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatSettings;
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -119,6 +118,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @ApplicationScope
     @Inject
     CoroutineScope sharingScope;
+    @Inject
+    LoginRepository loginRepository;
+
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
@@ -1109,8 +1111,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             disableLoginButton();
 
             // Primitive type directly set value, atomic operation. Don't allow background login.
-            PushMessageHandler.allowBackgroundLogin = false;
-            IncomingCallService.allowBackgroundLogin = false;
+            loginRepository.setAllowBackgroundLogin(false);
 
             megaApi.fastLogin(gSession, this);
 
@@ -1799,8 +1800,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
-            PushMessageHandler.allowBackgroundLogin = true;
-            IncomingCallService.allowBackgroundLogin = true;
+            loginRepository.setAllowBackgroundLogin(true);
 
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {

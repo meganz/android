@@ -5,6 +5,8 @@ package mega.privacy.android.app.domain.repository
  */
 interface LoginRepository {
 
+    var allowBackgroundLogin: Boolean
+
     /**
      * Performs a fast login given a session.
      *

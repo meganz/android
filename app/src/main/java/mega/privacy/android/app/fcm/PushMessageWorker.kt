@@ -10,6 +10,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.usecase.FastLogin
 import mega.privacy.android.app.domain.usecase.FetchNodes
 import mega.privacy.android.app.domain.usecase.GetCredentials
@@ -57,113 +58,62 @@ class PushMessageWorker @AssistedInject constructor(
 
             val pushMessage = inputData.toPushMessage()
 
-            var success: Boolean
-
             if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
                 Timber.d("Needs fast login")
 
-                success = runInitChat(session)
+                kotlin.runCatching { initMegaChat(session) }
+                    .fold(
+                        { Timber.d("Init chat success.") },
+                        { error ->
+                            Timber.e("Init chat error.", error)
+                            return@withContext Result.failure()
+                        }
+                    )
 
-                if (!success) {
-                    return@withContext Result.failure()
-                }
+                kotlin.runCatching { fastLogin(session) }
+                    .fold(
+                        { Timber.d("Fast login success.") },
+                        { error ->
+                            if (error is LoginAlreadyRunningException) {
+                                Timber.d(error, "No more actions required.")
+                                return@withContext Result.success()
+                            } else {
+                                Timber.e("Fast login error.", error)
+                                return@withContext Result.failure()
+                            }
+                        }
+                    )
 
-                success = runFastLogin(session)
-
-                if (!success) {
-                    return@withContext Result.failure()
-                }
-
-                success = runFetchNodes()
-
-                if (!success) {
-                    return@withContext Result.failure()
-                }
+                kotlin.runCatching { fetchNodes() }
+                    .fold(
+                        { Timber.d("Fetch nodes success.") },
+                        { error ->
+                            Timber.e("Fetch nodes error.", error)
+                            return@withContext Result.failure()
+                        }
+                    )
             } else {
                 retryPendingConnections(disconnect = false)
             }
 
             Timber.d("PushMessage.type: ${pushMessage.type}")
 
-            when (pushMessage.type) {
-                TYPE_CALL -> {
-
-                }
-                TYPE_CHAT -> {
-                    success = runPushReceived(pushMessage.shouldBeep())
-
-                    if (!success) {
-                        return@withContext Result.failure()
-                    }
-                }
+            if (pushMessage.type == TYPE_CHAT) {
+                kotlin.runCatching { pushReceived(pushMessage.shouldBeep()) }
+                    .fold(
+                        { request ->
+                            ChatAdvancedNotificationBuilder.newInstance(applicationContext)
+                                .generateChatNotification(request)
+                        },
+                        { error ->
+                            Timber.e("Push received error. ", error)
+                            return@withContext Result.failure()
+                        }
+                    )
             }
 
             Result.success()
         }
-
-    /**
-     * Performs a fast login.
-     *
-     * @return True if the request finishes with success, false otherwise.
-     */
-    private suspend fun runFastLogin(session: String): Boolean =
-        kotlin.runCatching { fastLogin(session) }
-            .fold(
-                { true },
-                { error ->
-                    Timber.e("Fast login error. ", error)
-                    false
-                }
-            )
-
-    /**
-     * Performs a fetch nodes.
-     *
-     * @return True if the request finishes with success, false otherwise.
-     */
-    private suspend fun runFetchNodes(): Boolean =
-        kotlin.runCatching { fetchNodes() }
-            .fold(
-                { true },
-                { error ->
-                    Timber.e("Fetch nodes error. ", error)
-                    false
-                }
-            )
-
-    /**
-     * Initializes chat API.
-     *
-     * @return True if the request finishes with success, false otherwise.
-     */
-    private suspend fun runInitChat(session: String): Boolean =
-        kotlin.runCatching { initMegaChat(session) }
-            .fold(
-                { true },
-                { error ->
-                    Timber.e("Init chat error. ", error)
-                    false
-                }
-            )
-
-    /**
-     * Notifies a push received.
-     *
-     * @return True if the request finishes with success, false otherwise.
-     */
-    private suspend fun runPushReceived(beep: Boolean): Boolean =
-        kotlin.runCatching { pushReceived(beep) }
-            .fold(
-                { request ->
-                    ChatAdvancedNotificationBuilder.newInstance(applicationContext)
-                        .generateChatNotification(request)
-                    true
-                },
-                { error ->
-                    Timber.e("Push received error. ", error)
-                    false
-                }
-            )
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return super.getForegroundInfo()
