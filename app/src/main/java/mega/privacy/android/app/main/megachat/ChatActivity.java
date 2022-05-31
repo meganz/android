@@ -128,7 +128,6 @@ import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
@@ -8516,7 +8515,6 @@ public class ChatActivity extends PasscodeActivity
    @Override
     public void onResume(){
         super.onResume();
-       stopService(new Intent(this, KeepAliveService.class));
 
         if(idChat!=-1 && chatRoom!=null) {
 

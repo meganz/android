@@ -1,6 +1,5 @@
 package mega.privacy.android.app.middlelayer.push
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -11,7 +10,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fcm.IncomingCallService
-import mega.privacy.android.app.fcm.KeepAliveService
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isGMS
 import mega.privacy.android.app.utils.ChatUtil
 import nz.mega.sdk.*
@@ -31,28 +29,12 @@ class PushMessageHandler(
      *
      * @param launchService Whether launch a foreground service to keep the app alive.
      */
-    private fun awakeCpu(launchService: Boolean) {
+    private fun awakeCpu() {
         Timber.d("wake lock acquire")
         (context.getSystemService(Context.POWER_SERVICE) as PowerManager).apply {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake:push_message").apply {
                 setReferenceCounted(false)
                 acquire(AWAKE_CPU_FOR.toLong())
-            }
-
-            if (launchService) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
-                        && (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).isBackgroundRestricted
-                    ) {
-                        // This means the user has enforced background restrictions for the app.
-                        // Returning here avoids ForegroundServiceStartNotAllowedException.
-                        return
-                    }
-
-                    context.startForegroundService(Intent(context, KeepAliveService::class.java))
-                } else {
-                    context.startService(Intent(context, KeepAliveService::class.java))
-                }
             }
         }
     }
@@ -79,24 +61,13 @@ class PushMessageHandler(
         }
 
         when (messageType) {
-            TYPE_SHARE_FOLDER, TYPE_CONTACT_REQUEST, TYPE_ACCEPTANCE -> {
-                val gSession = credentials.session
-
-                if (megaApi.rootNode == null) {
-                    Timber.w("RootNode = null")
-                    performLoginProcess(gSession)
-                } else {
-                    Timber.d("Awaiting info on listener")
-                    retryPendingConnections()
-                }
-            }
             TYPE_CALL -> {
                 val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
                 val isIdle = pm.isDeviceIdleMode
 
                 if (!MegaApplication.getInstance().isActivityVisible && megaApi.rootNode == null || isIdle) {
                     Timber.d("Launch foreground service!")
-                    awakeCpu(false)
+                    awakeCpu()
 
                     if (isGMS()) {
                         context.startService(Intent(context, IncomingCallService::class.java))

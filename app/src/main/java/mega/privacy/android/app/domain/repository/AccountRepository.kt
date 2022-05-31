@@ -84,4 +84,11 @@ interface AccountRepository {
      * @return User credentials if exists, null otherwise.
      */
     suspend fun getCredentials(): UserCredentials?
+
+    /**
+     * Refreshes DNS servers and retries pending connections.
+     *
+     * @param disconnect True if should disconnect megaChatApi, false otherwise.
+     */
+    fun retryPendingConnections(disconnect: Boolean)
 }

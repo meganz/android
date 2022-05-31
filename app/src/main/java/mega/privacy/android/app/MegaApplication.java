@@ -109,6 +109,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
+import androidx.core.text.HtmlCompat;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.hilt.work.HiltWorkerFactory;
@@ -1301,18 +1302,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
             }
 
             String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + toCDATA(name);
-            Spanned notificationContent;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                notificationContent = Html.fromHtml(source);
-            }
+            Spanned notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
             int notificationId = NOTIFICATION_PUSH_CLOUD_DRIVE;
             String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
-            String notificationChannelName = NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 
-			Intent intent = new Intent(this, ManagerActivity.class);
+            Intent intent = new Intent(this, ManagerActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -1326,7 +1321,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 notificationTitle = getString(R.string.title_incoming_folder_notification);
             }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel channel = new NotificationChannel(notificationChannelId, NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME, NotificationManager.IMPORTANCE_HIGH);
                 channel.setShowBadge(true);
                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.createNotificationChannel(channel);

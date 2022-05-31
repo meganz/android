@@ -173,4 +173,6 @@ class MegaApiFacade @Inject constructor(
 
     override fun fetchNodes(listener: MegaRequestListenerInterface) =
         megaApi.fetchNodes(listener)
+
+    override fun retryPendingConnections() = megaApi.retryPendingConnections()
 }

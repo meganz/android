@@ -36,4 +36,7 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface) =
         chatApi.pushReceived(beep, listener)
+
+    override fun retryPendingConnections(disconnect: Boolean) =
+        chatApi.retryPendingConnections(disconnect, null)
 }

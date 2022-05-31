@@ -500,10 +500,6 @@
         <service
             android:name=".fcm.IncomingCallService"
             android:exported="true" />
-        <service
-            android:name=".fcm.KeepAliveService"
-            android:exported="true" />
-
         <receiver
             android:name=".receivers.CustomInstallReferrerReceiver"
             android:exported="true">

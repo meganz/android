@@ -669,7 +669,6 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.cancel(id);
         }
         notificationIds.clear();
-        notificationManager.cancel(KeepAliveService.NEW_MESSAGE_NOTIFICATION_ID);
     }
 
     /**

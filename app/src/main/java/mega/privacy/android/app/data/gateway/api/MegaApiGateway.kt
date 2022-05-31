@@ -222,4 +222,9 @@ interface MegaApiGateway {
      * @param listener  Listener.
      */
     fun fetchNodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Retries all pending requests.
+     */
+    fun retryPendingConnections()
 }

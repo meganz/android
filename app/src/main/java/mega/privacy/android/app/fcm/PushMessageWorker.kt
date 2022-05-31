@@ -10,7 +10,13 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.FastLogin
+import mega.privacy.android.app.domain.usecase.FetchNodes
+import mega.privacy.android.app.domain.usecase.GetCredentials
+import mega.privacy.android.app.domain.usecase.InitMegaChat
+import mega.privacy.android.app.domain.usecase.PushReceived
+import mega.privacy.android.app.domain.usecase.RetryPendingConnections
+import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fcm.PushMessage.Companion.toPushMessage
 import timber.log.Timber
 
@@ -23,8 +29,7 @@ import timber.log.Timber
  * @property fetchNodes                     Required for fetching nodes.
  * @property initMegaChat                   Required for initializing megaChat.
  * @property pushReceived                   Required for notifying received pushes.
- * @property monitorNodeUpdates             Required for checking share updates.
- * @property monitorContactRequestUpdates   Required for checking contact request updates.
+ * @property retryPendingConnections        Required for retrying pending connections.
  */
 @HiltWorker
 class PushMessageWorker @AssistedInject constructor(
@@ -36,8 +41,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val fetchNodes: FetchNodes,
     private val initMegaChat: InitMegaChat,
     private val pushReceived: PushReceived,
-    private val monitorNodeUpdates: MonitorNodeUpdates,
-    private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    private val retryPendingConnections: RetryPendingConnections,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
@@ -53,10 +57,12 @@ class PushMessageWorker @AssistedInject constructor(
 
             val pushMessage = inputData.toPushMessage()
 
+            var success: Boolean
+
             if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
                 Timber.d("Needs fast login")
 
-                var success = runInitChat(session)
+                success = runInitChat(session)
 
                 if (!success) {
                     return@withContext Result.failure()
@@ -73,31 +79,21 @@ class PushMessageWorker @AssistedInject constructor(
                 if (!success) {
                     return@withContext Result.failure()
                 }
+            } else {
+                retryPendingConnections(disconnect = false)
+            }
 
-                Timber.d("PushMessage.type: ${pushMessage.type}")
+            Timber.d("PushMessage.type: ${pushMessage.type}")
 
-                if (pushMessage.type == TYPE_CHAT) {
+            when (pushMessage.type) {
+                TYPE_CALL -> {
+
+                }
+                TYPE_CHAT -> {
                     success = runPushReceived(pushMessage.shouldBeep())
 
                     if (!success) {
                         return@withContext Result.failure()
-                    }
-                }
-            } else {
-                Timber.d("No fast login")
-                when (pushMessage.type) {
-                    TYPE_SHARE_FOLDER, TYPE_CONTACT_REQUEST, TYPE_ACCEPTANCE -> {
-
-                    }
-                    TYPE_CALL -> {
-
-                    }
-                    TYPE_CHAT -> {
-                        val success = runPushReceived(pushMessage.shouldBeep())
-
-                        if (!success) {
-                            return@withContext Result.failure()
-                        }
                     }
                 }
             }

@@ -16,6 +16,7 @@ import mega.privacy.android.app.data.extensions.isType
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
@@ -41,19 +42,23 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property myAccountInfoFacade
  * @property megaApiGateway
+ * @property megaChatApiGateway
  * @property context
  * @property monitorMultiFactorAuth
  * @property ioDispatcher
+ * @property userUpdateMapper
+ * @property dbH
  */
 @ExperimentalContracts
 class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @ApplicationContext private val context: Context,
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
 ) : AccountRepository {
 
     override suspend fun getUserAccount() = withContext(ioDispatcher) {
@@ -148,4 +153,9 @@ class DefaultAccountRepository @Inject constructor(
         .map { userUpdateMapper(it) }
 
     override suspend fun getCredentials(): UserCredentials? = dbH.credentials
+
+    override fun retryPendingConnections(disconnect: Boolean) {
+        megaApiGateway.retryPendingConnections()
+        megaChatApiGateway.retryPendingConnections(disconnect)
+    }
 }

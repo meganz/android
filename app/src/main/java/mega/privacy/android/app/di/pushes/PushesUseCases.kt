@@ -24,4 +24,7 @@ internal abstract class PushesUseCases {
 
     @Binds
     abstract fun bindPushReceived(useCase: DefaultPushReceived): PushReceived
+
+    @Binds
+    abstract fun bindMonitorContactRequestUpdates(useCase: DefaultMonitorContactRequestUpdates): MonitorContactRequestUpdates
 }

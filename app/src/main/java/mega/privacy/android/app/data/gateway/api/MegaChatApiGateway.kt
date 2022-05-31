@@ -63,4 +63,11 @@ interface MegaChatApiGateway {
      * @param listener  Listener.
      */
     fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Refreshes DNS servers and retries pending connections.
+     *
+     * @param disconnect True if should disconnect, false otherwise.
+     */
+    fun retryPendingConnections(disconnect: Boolean)
 }
