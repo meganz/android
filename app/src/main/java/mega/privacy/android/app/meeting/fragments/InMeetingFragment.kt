@@ -608,7 +608,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     MegaRequest.TYPE_CREATE_ACCOUNT,
                                     onSuccess = { _, _, _ ->
                                         logDebug("Action guest. Create ephemeral Account, done")
-                                        MegaApplication.setLoggingIn(true)
                                         inMeetingViewModel.openChatPreview(
                                             meetingLink,
                                             SimpleChatRequestListener(
