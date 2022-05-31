@@ -65,6 +65,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     binding.playerView.isVisible = false
                 }
                 tryObservePlaylist()
+                playerService?.viewModel?.scrollToPlayingPosition()
                 // Initial item touch helper after the service is connected.
                 setupItemTouchHelper()
             }

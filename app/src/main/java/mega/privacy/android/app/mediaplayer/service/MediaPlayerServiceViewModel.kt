@@ -1182,6 +1182,13 @@ class MediaPlayerServiceViewModel(
         return playingPosition
     }
 
+    /**
+     * Scroll the list to current playing position
+     */
+    fun scrollToPlayingPosition() {
+        postPlaylistItems(isScroll = true)
+    }
+
     private fun initPlayerSourceChanged() {
         if (playSourceChanged.isEmpty()) {
             // Get the play source
