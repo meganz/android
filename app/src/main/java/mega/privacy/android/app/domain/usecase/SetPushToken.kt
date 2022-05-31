@@ -1,5 +1,8 @@
 package mega.privacy.android.app.domain.usecase
 
+/**
+ * Set push token use case.
+ */
 interface SetPushToken {
 
     /**

@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Default implementation of [GetPushToken]
  *
- * @property pushesRepository
+ * @property pushesRepository [PushesRepository]
  */
 class DefaultGetPushToken @Inject constructor(
     private val pushesRepository: PushesRepository

@@ -3,6 +3,11 @@ package mega.privacy.android.app.domain.usecase
 import mega.privacy.android.app.domain.repository.PushesRepository
 import javax.inject.Inject
 
+/**
+ * Default [RegisterPushNotifications] implementation.
+ *
+ * @property pushesRepository [PushesRepository]
+ */
 class DefaultRegisterPushNotifications @Inject constructor(
     private val pushesRepository: PushesRepository
 ) : RegisterPushNotifications {

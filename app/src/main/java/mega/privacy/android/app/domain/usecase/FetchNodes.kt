@@ -5,5 +5,8 @@ package mega.privacy.android.app.domain.usecase
  */
 interface FetchNodes {
 
+    /**
+     * Invoke.
+     */
     suspend operator fun invoke()
 }

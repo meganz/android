@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Default [RetryPendingConnections] implementation.
  *
- * @property accountRepository Required for retrying pending connections.
+ * @property accountRepository [AccountRepository]
  */
 class DefaultRetryPendingConnections @Inject constructor(
     private val accountRepository: AccountRepository,

@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Default [InitMegaChat] implementation.
  *
- * @property loginRepository Login repository.
+ * @property loginRepository [LoginRepository]
  */
 class DefaultInitMegaChat @Inject constructor(
     private val loginRepository: LoginRepository

@@ -2,6 +2,9 @@ package mega.privacy.android.app.domain.usecase
 
 import nz.mega.sdk.MegaChatRequest
 
+/**
+ * Push received use case.
+ */
 interface PushReceived {
 
     /**

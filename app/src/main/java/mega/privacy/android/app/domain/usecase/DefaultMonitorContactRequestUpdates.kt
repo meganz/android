@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Default [MonitorContactRequestUpdates] implementation
  *
- * @property contactsRepository
+ * @property contactsRepository [ContactsRepository]
  */
 class DefaultMonitorContactRequestUpdates @Inject constructor(
     private val contactsRepository: ContactsRepository

@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Default [FastLogin] implementation.
  *
- * @property loginRepository    Login reporsitory.
+ * @property loginRepository [LoginRepository].
  */
 class DefaultFastLogin @Inject constructor(
     private val loginRepository: LoginRepository

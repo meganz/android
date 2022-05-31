@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Default [FetchNodes] implementation.
  *
- * @property loginRepository Login repository
+ * @property loginRepository [LoginRepository]
  */
 class DefaultFetchNodes @Inject constructor(
     private val loginRepository: LoginRepository

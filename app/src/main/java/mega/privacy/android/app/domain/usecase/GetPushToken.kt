@@ -1,7 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
 /**
- * Gets push token.
+ * Gets push token use case.
  */
 interface GetPushToken {
 

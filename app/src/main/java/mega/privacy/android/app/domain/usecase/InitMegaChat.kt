@@ -8,7 +8,7 @@ interface InitMegaChat {
     /**
      * Invoke.
      *
-     * @param session   Account session.
+     * @param session Required account session.
      */
     suspend operator fun invoke(session: String)
 }

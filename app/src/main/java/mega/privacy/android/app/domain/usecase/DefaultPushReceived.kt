@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Default [PushReceived] implementation.
  *
- * @property pushesRepository   [PushesRepository]
+ * @property pushesRepository [PushesRepository]
  */
 class DefaultPushReceived @Inject constructor(
     private val pushesRepository: PushesRepository,
