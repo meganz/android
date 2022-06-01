@@ -1072,13 +1072,11 @@ public class CallUtil {
     }
 
     /**
-     * Method for obtaining the necessary permissions in one call.
+     * Check Camera Permission
      *
-     * @param activity       The activity.
-     * @param typePermission The type of permission
-     * @return True, if you have both permits. False, otherwise.
+     * @return True, if granted. False, if not granted
      */
-    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
+    public static boolean checkCameraPermission(Activity activity, int typePermission) {
         boolean hasCameraPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
             if (activity == null)
@@ -1091,6 +1089,15 @@ public class CallUtil {
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Check Audio Permission
+     *
+     * @return True, if granted. False, if not granted
+     */
+    public static boolean checkAudioPermission(Activity activity, int typePermission) {
         boolean hasRecordAudioPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
             if (activity == null)
@@ -1104,6 +1111,21 @@ public class CallUtil {
         }
 
         return true;
+    }
+
+    /**
+     * Method for obtaining the necessary permissions in one call.
+     *
+     * @param activity       The activity.
+     * @param typePermission The type of permission
+     * @return True, if you have both permits. False, otherwise.
+     */
+    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
+        if(!checkAudioPermission(activity, typePermission)) {
+            return false;
+        }
+
+        return checkCameraPermission(activity, typePermission);
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {

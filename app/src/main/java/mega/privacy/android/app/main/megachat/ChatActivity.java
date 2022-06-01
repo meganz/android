@@ -2720,13 +2720,10 @@ public class ChatActivity extends PasscodeActivity
                 }
 
                 startVideo = false;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+                checkCallInThisChat();
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
@@ -2735,9 +2732,7 @@ public class ChatActivity extends PasscodeActivity
                 }
 
                 startVideo = true;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+                checkCallInThisChat();
                 break;
             }
             case R.id.cab_menu_select_messages:
@@ -3162,7 +3157,12 @@ public class ChatActivity extends PasscodeActivity
         if (emojiKeyboard != null) emojiKeyboard.setListenerActivated(true);
     }
 
-    private void startCall(){
+    /**
+     * Method to make the correct action in the call of this chat.
+     * If a call already exists, I will return to it or join it.
+     * If it does not exist, I will initiate a call.
+     */
+    private void checkCallInThisChat(){
         stopReproductions();
         hideKeyboard();
 
@@ -3171,17 +3171,17 @@ public class ChatActivity extends PasscodeActivity
 
         MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
         if(callInThisChat != null){
-            logDebug("There is a call in this chat");
+            Timber.d("There is a call in this chat");
             if (participatingInACall()) {
                 MegaChatCall currentCallInProgress = getCallInProgress();
                 if (callInThisChat.isOnHold() ||
                         (currentCallInProgress != null && currentCallInProgress.getChatid() == chatRoom.getChatId())) {
-                    logDebug("I'm participating in the call of this chat");
+                    Timber.d("I'm participating in the call of this chat");
                     returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     return;
                 }
 
-                logDebug("I'm participating in another call from another chat");
+                Timber.d("I'm participating in another call from another chat");
                 ArrayList<Long> numCallsParticipating = getCallsParticipating();
                 if (numCallsParticipating == null || numCallsParticipating.isEmpty())
                     return;
@@ -3205,32 +3205,37 @@ public class ChatActivity extends PasscodeActivity
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                logDebug("The call in this chat is In progress, but I do not participate");
+                Timber.d("The call in this chat is In progress, but I do not participate");
                 answerCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo);
             }
             return;
         }
 
-        if (!participatingInACall()) {
+        if (!participatingInACall() && canCallBeStartedFromContactOption(this, passcodeManagement)) {
             Timber.d("There is not a call in this chat and I am NOT in another call");
-            enableCallMenuItems(false);
-            startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe((result, throwable) -> {
-                        enableCallMenuItems(true);
-                        if (throwable == null) {
-                            long chatId = result.component1();
-                            if (chatId == chatRoom.getChatId()) {
-                                boolean videoEnable = result.component2();
-                                boolean audioEnable = result.component3();
-                                openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                            }
-                        }
-                    });
-        }else{
-            logDebug("There is not a call in this chat and I am in another call");
+            startCall();
         }
+    }
+
+    /**
+     * Start a call
+     */
+    private void startCall() {
+        enableCallMenuItems(false);
+        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    enableCallMenuItems(true);
+                    if (throwable == null) {
+                        long chatId = result.component1();
+                        if (chatId == chatRoom.getChatId()) {
+                            boolean videoEnable = result.component2();
+                            boolean audioEnable = result.component3();
+                            openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+                        }
+                    }
+                });
     }
 
     private void enableCallMenuItems(Boolean enable) {
@@ -3292,11 +3297,18 @@ public class ChatActivity extends PasscodeActivity
         }
 
         switch (requestCode) {
-            case REQUEST_CAMERA:
-            case REQUEST_RECORD_AUDIO:{
-                startCall();
+            case REQUEST_RECORD_AUDIO:
+                if (grantResults.length > 0 && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+                    startCall();
+                }
                 break;
-            }
+
+            case REQUEST_CAMERA:
+                if (grantResults.length > 0) {
+                    startCall();
+                }
+                break;
+
             case REQUEST_CAMERA_TAKE_PICTURE:
             case REQUEST_WRITE_STORAGE_TAKE_PICTURE:{
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
@@ -3963,7 +3975,7 @@ public class ChatActivity extends PasscodeActivity
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
-                    startCall();
+                    checkCallInThisChat();
                 } else {
                     returnCall(this, chatIdBanner, passcodeManagement);
                 }

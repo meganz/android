@@ -993,8 +993,13 @@ public class ContactInfoActivity extends PasscodeActivity
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
-			case REQUEST_CAMERA:
 			case REQUEST_RECORD_AUDIO:
+				if (grantResults.length > 0 && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+					startCall();
+				}
+				break;
+
+			case REQUEST_CAMERA:
 				if (grantResults.length > 0) {
 					startCall();
 				}

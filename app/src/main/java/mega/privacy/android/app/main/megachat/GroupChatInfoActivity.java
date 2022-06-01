@@ -1168,10 +1168,15 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_RECORD_AUDIO:
+                if (grantResults.length > 0 && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+                    startCall();
+                }
+                break;
+
             case REQUEST_CAMERA:
                 if (grantResults.length > 0) {
                     startCall();
