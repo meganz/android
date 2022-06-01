@@ -13,6 +13,6 @@ class DefaultGetChildrenNode @Inject constructor(
     private val filesRepository: FilesRepository
 ) : GetChildrenNode {
 
-    override fun invoke(parent: MegaNode, order: Int?): List<MegaNode> =
+    override suspend fun invoke(parent: MegaNode, order: Int?): List<MegaNode> =
         filesRepository.getChildrenNode(parent, order)
 }

@@ -63,15 +63,22 @@ class DefaultFilesRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull { it.nodeList?.toList() }
 
-    override fun getRootNode(): MegaNode? = megaApiGateway.rootNode
+    override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.rootNode
+    }
 
-    override fun getRubbishBinNode(): MegaNode? = megaApiGateway.rubbishBinNode
+    override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.rubbishBinNode
+    }
 
-    override fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
-        megaApiGateway.getChildrenByNode(parentNode, order)
+    override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getChildrenByNode(parentNode, order)
+        }
 
-    override fun getNodeByHandle(handle: Long): MegaNode =
+    override suspend fun getNodeByHandle(handle: Long): MegaNode = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)
+    }
 
     override suspend fun getCloudSortOrder(): Int = megaLocalStorageGateway.getCloudSortOrder()
 }

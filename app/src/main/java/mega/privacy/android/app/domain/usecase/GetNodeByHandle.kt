@@ -12,5 +12,5 @@ interface GetNodeByHandle {
      * @param handle
      * @return A node corresponding to the given handle, null if cannot be retrieved
      */
-    operator fun invoke(handle: Long): MegaNode?
+    suspend operator fun invoke(handle: Long): MegaNode?
 }

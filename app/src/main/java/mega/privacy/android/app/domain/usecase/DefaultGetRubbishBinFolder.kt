@@ -13,5 +13,5 @@ class DefaultGetRubbishBinFolder @Inject constructor(
     private val filesRepository: FilesRepository
 ) : GetRubbishBinFolder {
 
-    override fun invoke(): MegaNode? = filesRepository.getRubbishBinNode()
+    override suspend fun invoke(): MegaNode? = filesRepository.getRubbishBinNode()
 }

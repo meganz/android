@@ -20,7 +20,7 @@ class DefaultGetBrowserChildrenNode @Inject constructor(
     private val sortOrderManagement: SortOrderManagementInterface,
 ) : GetBrowserChildrenNode {
 
-    override fun invoke(parentHandle: Long): List<MegaNode>? {
+    override suspend fun invoke(parentHandle: Long): List<MegaNode>? {
         val node = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRootFolder())
             ?: return null
         return getChildrenNode(parent = node, order = sortOrderManagement.getOrderCloud())

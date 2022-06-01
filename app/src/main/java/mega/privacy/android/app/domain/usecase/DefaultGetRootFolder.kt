@@ -13,5 +13,5 @@ class DefaultGetRootFolder @Inject constructor(
     private val filesRepository: FilesRepository
 ) : GetRootFolder {
 
-    override fun invoke(): MegaNode? = filesRepository.getRootNode()
+    override suspend fun invoke(): MegaNode? = filesRepository.getRootNode()
 }

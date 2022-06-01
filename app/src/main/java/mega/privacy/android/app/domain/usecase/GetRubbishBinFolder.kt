@@ -11,5 +11,5 @@ interface GetRubbishBinFolder {
      *
      * @return A node corresponding to the rubbish bin node, null if cannot be retrieved
      */
-    operator fun invoke(): MegaNode?
+    suspend operator fun invoke(): MegaNode?
 }

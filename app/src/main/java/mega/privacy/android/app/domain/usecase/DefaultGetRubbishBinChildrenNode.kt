@@ -19,9 +19,10 @@ class DefaultGetRubbishBinChildrenNode @Inject constructor(
     private val sortOrderManagement: SortOrderManagementInterface,
 ) : GetRubbishBinChildrenNode {
 
-    override fun invoke(parentHandle: Long): List<MegaNode>? {
-        val rubbishNode = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinFolder())
-            ?: return null
+    override suspend fun invoke(parentHandle: Long): List<MegaNode>? {
+        val rubbishNode =
+            (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinFolder())
+                ?: return null
         return getChildrenNode(parent = rubbishNode, order = sortOrderManagement.getOrderCloud())
     }
 }

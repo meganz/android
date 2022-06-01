@@ -12,5 +12,5 @@ interface GetBrowserChildrenNode {
      * @param parentHandle
      * @return Children nodes of the parent handle, null if cannot be retrieved
      */
-    operator fun invoke(parentHandle: Long): List<MegaNode>?
+    suspend operator fun invoke(parentHandle: Long): List<MegaNode>?
 }

@@ -11,5 +11,5 @@ interface GetRootFolder {
      *
      * @return A node corresponding to the root node, null if cannot be retrieved
      */
-    operator fun invoke(): MegaNode?
+    suspend operator fun invoke(): MegaNode?
 }

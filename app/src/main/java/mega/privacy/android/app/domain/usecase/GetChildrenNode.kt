@@ -13,5 +13,5 @@ interface GetChildrenNode {
      * @param order Order for the returned list
      * @return Children nodes of the parent node
      */
-    operator fun invoke(parent: MegaNode, order: Int? = null): List<MegaNode>
+    suspend operator fun invoke(parent: MegaNode, order: Int? = null): List<MegaNode>
 }
