@@ -22,4 +22,10 @@ interface FilesRepository {
      * @return a flow of all global node updates
      */
     fun monitorNodeUpdates(): Flow<List<MegaNode>>
+
+    /**
+     * Get cloud sort order
+     * @return cloud sort order
+     */
+    suspend fun getCloudSortOrder(): Int
 }

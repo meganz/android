@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
@@ -26,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
 class DefaultFilesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaLocalStorageGateway: MegaLocalStorageGateway
 ) : FilesRepository {
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {
@@ -59,4 +61,6 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull { it.nodeList?.toList() }
+
+    override suspend fun getCloudSortOrder(): Int = megaLocalStorageGateway.getCloudSortOrder()
 }
