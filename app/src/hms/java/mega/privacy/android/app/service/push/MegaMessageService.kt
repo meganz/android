@@ -7,12 +7,9 @@ import com.huawei.hms.push.HmsMessageService
 import com.huawei.hms.push.RemoteMessage
 import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
+import mega.privacy.android.app.data.extensions.enqueuePushMessage
+import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
 import mega.privacy.android.app.fcm.MegaRemoteMessage
-import mega.privacy.android.app.fcm.NewTokenWorker
-import mega.privacy.android.app.fcm.NewTokenWorker.Companion.DEVICE_TYPE
-import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
-import mega.privacy.android.app.fcm.NewTokenWorker.Companion.WORK_NAME
-import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.utils.Constants.DEVICE_HUAWEI
 import timber.log.Timber
 import java.util.concurrent.Executors
@@ -30,30 +27,14 @@ class MegaMessageService : HmsMessageService() {
         Timber.d("$megaRemoteMessage")
 
         WorkManager.getInstance(this)
-            .enqueue(
-                OneTimeWorkRequestBuilder<PushMessageWorker>()
-                    .setInputData(megaRemoteMessage.pushMessage.toData())
-                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                    .build()
-            )
+            .enqueuePushMessage(megaRemoteMessage.pushMessage.toData())
     }
 
     override fun onNewToken(s: String) {
         Timber.d("New token is: $s")
 
         WorkManager.getInstance(this)
-            .enqueueUniqueWork(
-                WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequestBuilder<NewTokenWorker>()
-                    .setInputData(
-                        Data.Builder()
-                            .putString(NEW_TOKEN, s)
-                            .putInt(DEVICE_TYPE, DEVICE_HUAWEI)
-                            .build()
-                    )
-                    .build()
-            )
+            .enqueueUniqueWorkNewToken(s, DEVICE_HUAWEI)
     }
 
     companion object {
@@ -72,18 +53,7 @@ class MegaMessageService : HmsMessageService() {
                     Timber.d("Get token: $token")
 
                     WorkManager.getInstance(context)
-                        .enqueueUniqueWork(
-                            WORK_NAME,
-                            ExistingWorkPolicy.REPLACE,
-                            OneTimeWorkRequestBuilder<NewTokenWorker>()
-                                .setInputData(
-                                    Data.Builder()
-                                        .putString(NEW_TOKEN, token)
-                                        .putInt(DEVICE_TYPE, DEVICE_HUAWEI)
-                                        .build()
-                                )
-                                .build()
-                        )
+                        .enqueueUniqueWorkNewToken(token, DEVICE_HUAWEI)
                 } catch (e: ApiException) {
                     Timber.e(e.message, e)
                     e.printStackTrace()
