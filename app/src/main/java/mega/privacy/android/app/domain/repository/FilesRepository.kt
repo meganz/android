@@ -53,4 +53,9 @@ interface FilesRepository {
      */
     fun getNodeByHandle(handle: Long): MegaNode
 
+    /**
+     * Get cloud sort order
+     * @return cloud sort order
+     */
+    suspend fun getCloudSortOrder(): Int
 }

@@ -309,7 +309,8 @@ public class ChatManagement {
      * @param chatId   Chat ID
      */
     public void controlCallFinished(long callId, long chatId) {
-        if (CallUtil.getCallsParticipating() == null || CallUtil.getCallsParticipating().size() == 0) {
+        ArrayList<Long> listCalls = CallUtil.getCallsParticipating();
+        if (listCalls == null || listCalls.isEmpty()) {
             MegaApplication.getInstance().unregisterProximitySensor();
         }
 
