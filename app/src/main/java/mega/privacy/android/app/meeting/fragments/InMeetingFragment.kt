@@ -1130,18 +1130,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun requirePermission(permission: String) {
-        permissionsBuilder(
-            arrayOf(permission)
-        )
-
-            .setOnRequiresPermission { l -> onRequiresPermission(l) }
-            .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-            .build()
-            .launch(false)
-    }
-
     /**
      * Control the initial state of the buttons when a call is established
      */
