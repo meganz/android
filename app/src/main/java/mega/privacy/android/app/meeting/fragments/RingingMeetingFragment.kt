@@ -188,13 +188,39 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
-                requirePermission(Manifest.permission.CAMERA)
+                permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.CAMERA)
+                )
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickCamera(true)
+                            }
+                        }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                        .build()
+                permissionsRequester.launch(false)
             }
         }
 
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
-                requirePermission(Manifest.permission.RECORD_AUDIO)
+                permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.RECORD_AUDIO)
+                )
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickMic(true)
+                            }
+                        }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                        .build()
+                permissionsRequester.launch(false)
             }
         }
     }
