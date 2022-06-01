@@ -3514,7 +3514,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setDefaultAvatar() {
         logDebug("setDefaultAvatar");
-        nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), myAccountInfo.getFullName(), AVATAR_SIZE, true));
+        nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), megaChatApi.getMyFullname(), AVATAR_SIZE, true));
     }
 
     public void setOfflineAvatar(String email, long myHandle, String name) {
