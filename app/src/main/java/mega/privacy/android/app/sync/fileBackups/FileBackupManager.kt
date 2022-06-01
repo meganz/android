@@ -129,31 +129,24 @@ class FileBackupManager(
      * @return The type of node
      */
     fun checkSubBackupNode(megaNodes: List<MegaNode?>?, currentParentHandle: MegaNode?): Int {
-        megaNodes?.let {
-            if (megaNodes.isNotEmpty()) {
-                val handleList = ArrayList<Long>()
-                for (i in megaNodes.indices) {
-                    val node: MegaNode? = megaNodes[i]
-                    node?.let {
-                        handleList.add(it.handle)
-                    }
+        if (megaNodes == null) return BACKUP_NONE
+
+        if (megaNodes.isNotEmpty()) {
+            val handleList = megaNodes.mapNotNull { it?.handle }
+            return checkBackupNodeTypeInList(megaApi, handleList)
+        } else {
+            // for empty folder
+            return if (currentParentHandle != null) {
+                val nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle)
+                logDebug("nodeType = $nodeType")
+                return when (nodeType) {
+                    BACKUP_ROOT -> BACKUP_DEVICE
+                    BACKUP_DEVICE -> BACKUP_FOLDER
+                    BACKUP_FOLDER, BACKUP_FOLDER_CHILD -> BACKUP_FOLDER_CHILD
+                    else -> BACKUP_NONE
                 }
-                return checkBackupNodeTypeInList(megaApi, handleList)
-            } else {
-                // for empty folder
-                if (currentParentHandle != null) {
-                    val nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle)
-                    logDebug("nodeType = $nodeType")
-                    return when (nodeType) {
-                        BACKUP_ROOT -> BACKUP_DEVICE
-                        BACKUP_DEVICE -> BACKUP_FOLDER
-                        BACKUP_FOLDER, BACKUP_FOLDER_CHILD -> BACKUP_FOLDER_CHILD
-                        else -> BACKUP_NONE
-                    }
-                }
-            }
+            } else BACKUP_NONE
         }
-        return BACKUP_NONE
     }
 
     /**
@@ -165,20 +158,9 @@ class FileBackupManager(
     fun getSubBackupParentNode(
         megaNodes: List<MegaNode?>?,
         currentParentHandle: MegaNode?
-    ): MegaNode? {
-        megaNodes?.let {
-            if (megaNodes.isNotEmpty()) {
-                for (p in megaNodes) {
-                    if (p != null) {
-                        return megaApi.getParentNode(p)
-                    }
-                }
-            } else {
-                return currentParentHandle
-            }
-        }
-        return null
-    }
+    ): MegaNode? = megaNodes?.firstNotNullOfOrNull { it?.let { megaApi.getParentNode(it) } }
+        ?: currentParentHandle
+
 
     /**
      * Show the warning dialog when acting with "My backups" folder
