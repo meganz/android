@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">캐시 지우기</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">오프라인 파일 삭제</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">다운로드 완료 후 파일 열기</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">계정 삭제</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">ZIP 브라우저</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">계정 유형</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">갱신일&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">만료일&#160;</string>
     <!--  -->
     <string name="free_account">무료</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4227,4 +4221,48 @@
     <string name="media_player_video_playlist_next">다음</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">이전</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">사진</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">지원되지 않은 파일 유형을 제3자 앱에서 열기</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">지원되지 않는 파일 유형을 MEGA 앱 대신 제3자 앱에서 엽니다.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">이미지 품질</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">자동</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">모바일 데이터를 사용할 때는 최적화된 이미지를 보내지만 Wi-Fi에 연결되있을 때에는 원본 크기 이미지를 보냅니다.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">원본</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">항상 원본 크기 이미지 전송</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">최적화</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">항상 최적화된 이미지 전송</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s님 참여함</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s님과 %2$s님 참여함</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s님 떠남</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s님과 %2$s님 떠남</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="other">%1$s님 외 %2$d명 참여함</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="other">%1$s님 외 %2$d명 떠남</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">영구적으로 삭제</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">삭제</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[B]%s[/B][A]에 갱신[/A]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[B]%s[/B][A]에 만료[/A]</string>
 </resources>

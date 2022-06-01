@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -81,13 +81,13 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CHAVEDERECUPERACAO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova.</string>
+    <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova</string>
     <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">Não foi detectado nenhum dispositivo de armazenamento externo.</string>
+    <string name="no_external_SD_card_detected">Não foi detectado nenhum dispositivo de armazenamento externo</string>
     <!-- On clicking menu item upload in a incoming shared folder read only -->
     <string name="no_permissions_upload">Esta pasta é somente leitura. Você não tem permissão para fazer uploads.</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">Você está removendo a chave de recuperação exportada anteriormente.</string>
+    <string name="remove_key_confirmation">Você está removendo a chave de recuperação exportada anteriormente</string>
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Você quer enviar um convite para %s?</string>
     <!-- Button where the user can sign off or logout -->
@@ -143,15 +143,17 @@
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="one">Arquivo</item>
+        <item quantity="many">Arquivos</item>
         <item quantity="other">Arquivos</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
         <item quantity="one">Compartilhado com %1$s</item>
+        <item quantity="many">Compartilhado com %1$d contatos</item>
         <item quantity="other">Compartilhado com %1$d contatos</item>
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file">Será feito o download de %s</string>
+    <string name="alert_larger_file">Será feito o download de %s.</string>
     <!-- Alert text before download -->
     <string name="alert_no_app">Não há nenhum aplicativo para abrir o arquivo %s. Você quer continuar com o download?</string>
     <!-- Dialog option that permits user do not show it again -->
@@ -213,9 +215,9 @@
     <!--  -->
     <string name="tour_speed_text">Os envios são rápidos. Compartilhe rapidamente arquivos com todo mundo</string>
     <!--  -->
-    <string name="tour_privacy_text">Mantenha todos os seus arquivos seguros com a criptografia MEGA de ponta a ponta.</string>
+    <string name="tour_privacy_text">Mantenha todos os seus arquivos seguros com a criptografia MEGA de ponta a ponta</string>
     <!--  -->
-    <string name="tour_access_text">Tenha acesso completamente criptografado em qualquer lugar, a qualquer momento.</string>
+    <string name="tour_access_text">Tenha acesso completamente criptografado em qualquer lugar, a qualquer momento</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account_text">Criar conta</string>
     <!-- category in sort by action -->
@@ -243,7 +245,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">As senhas não coincidem</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Já existe uma conta no MEGA com esse email.</string>
+    <string name="error_email_registered">Já existe uma conta no MEGA com esse email</string>
     <!--  -->
     <string name="create_account_creating_account">Conectando-se ao servidor: criando conta</string>
     <!--  -->
@@ -255,6 +257,7 @@
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
         <item quantity="one">A transferência selecionada será cancelada.</item>
+        <item quantity="many">As transferências selecionadas serão canceladas.</item>
         <item quantity="other">As transferências selecionadas serão canceladas.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
@@ -356,26 +359,31 @@
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
         <item quantity="one">Download iniciado</item>
+        <item quantity="many">%1$d downloads foram iniciados</item>
         <item quantity="other">%1$d downloads foram iniciados</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
         <item quantity="one">O download foi concluído</item>
+        <item quantity="many">%1$d downloads foram concluídos</item>
         <item quantity="other">%1$d downloads foram concluídos</item>
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="one">Envio iniciado</item>
+        <item quantity="many">%1$d uploads foram iniciados</item>
         <item quantity="other">%1$d uploads foram iniciados</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_finish">
         <item quantity="one">O upload foi concluído</item>
+        <item quantity="many">%1$d uploads foram concluídos</item>
         <item quantity="other">%1$d uploads foram concluídos</item>
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
         <item quantity="one">A pasta está vazia.</item>
+        <item quantity="many">As pastas estão vazias.</item>
         <item quantity="other">As pastas estão vazias.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
@@ -383,7 +391,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver as transferências</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4&#160;GB. O seu download provavelmente falhará.</string>
+    <string name="error_file_size_greater_than_4gb">A maioria dos dispositivos não pode baixar arquivos com mais de 4&#160;GB. O seu download provavelmente falhará</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Não existe nenhum aplicativo disponível para abrir este arquivo no seu dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -405,10 +413,11 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Remover link</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Este link já não estará disponível publicamente</string>
+    <string name="context_remove_link_warning_text">Este link já não estará disponível publicamente.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Este link já não estará disponível publicamente</item>
+        <item quantity="one">Este link já não estará disponível publicamente.</item>
+        <item quantity="many">Estes links já não estarão disponíveis.</item>
         <item quantity="other">Estes links já não estarão disponíveis.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -546,7 +555,7 @@
     <!-- error message when moving a node -->
     <string name="number_no_removed">%d itens não foram removidos</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Você saiu de %d pastas compartilhadas</string>
+    <string name="number_correctly_leaved">Você saiu de %d pastas compartilhadas.</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">esquerda compartilhada</string>
     <!-- error message when moving a node -->
@@ -594,7 +603,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Obrigado pelo seu comentário. Você tem certeza de que quer cancelar a sua assinatura do MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">A sua assinatura não foi cancelada. Por favor, indique um motivo para o cancelamento.</string>
+    <string name="reason_cancel_subscriptions">A sua assinatura não foi cancelada. Por favor, indique um motivo para o cancelamento</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
     <string name="message_user_purchased_subscription">Obrigado. O seu pagamento está sendo processado. Se a sua conta não indicar o upgrade em 24 horas, entre em contato conosco em support&#64;mega.co.nz</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
@@ -632,6 +641,7 @@
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Processando arquivo</item>
+        <item quantity="many">Processando arquivos</item>
         <item quantity="other">Processando arquivos</item>
     </plurals>
     <!-- error message when downloading a file -->
@@ -736,8 +746,6 @@
     <string name="settings_advanced_features_cache">Deletar cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Deletar arquivos offline</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Abrir arquivo ao baixar</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Deletar conta</string>
     <!-- Size of files in offline or cache folders -->
@@ -787,11 +795,11 @@
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
     <string name="verify_account_error_phone_number_register">Este número já está associado a uma conta no MEGA.</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
-    <string name="verify_account_error_reach_limit">Você atingiu o limite diário.</string>
+    <string name="verify_account_error_reach_limit">Você atingiu o limite diário</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
     <string name="verify_account_error_wrong_code">O código de verificação é incorreto.</string>
     <!-- error message that will show to user when code has been verified -->
-    <string name="verify_account_error_code_verified">O código foi confirmado.</string>
+    <string name="verify_account_error_code_verified">O código foi confirmado</string>
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Código incorreto, tente novamente.</string>
     <!-- verify phone number successfully -->
@@ -876,15 +884,17 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">1 tentativa de acesso com código incorreto</item>
+        <item quantity="many">%1$d tentativas de acesso com código incorreto</item>
         <item quantity="other">%1$d tentativas de acesso com código incorreto</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_alert">Depois de 10 tentativas incorretas, você será deslogado e os arquivos salvos em Offline serão deletados.</string>
+    <string name="pin_lock_alert">Depois de 10 tentativas incorretas, você será deslogado e os arquivos salvos em Offline serão deletados</string>
     <!-- error message when not typing the Passcode code correctly -->
     <string name="pin_lock_incorrect">Código incorreto</string>
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="one">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem 1 tentativa</item>
+        <item quantity="many">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem %2d tentativas</item>
         <item quantity="other">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem %2d tentativas</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
@@ -941,10 +951,6 @@
     <string name="zip_browser_activity">Navegador de arquivos ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Tipo de conta</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Renova em&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expira em&#160;</string>
     <!--  -->
     <string name="free_account">Grátis</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1020,7 +1026,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Um atacante externo não pode obter acesso à sua conta apenas com a sua chave. A recuperação de senha necessita tanto a chave como o acesso ao seu email.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copie a chave de recuperação à área de transferência ou salve-a como um arquivo de texto</string>
+    <string name="backup_action">Copie a chave de recuperação à área de transferência ou salve-a como um arquivo de texto.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Salvar</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1180,15 +1186,17 @@
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
         <item quantity="one">1 solicitação</item>
+        <item quantity="many">%1$d solicitações</item>
         <item quantity="other">%1$d solicitações</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Esta pasta está compartilhada com %1$d contato. Você quer deixar de compartilhar?</item>
+        <item quantity="many">Esta pasta está compartilhada com %1$d contatos. Você quer deixar de compartilhar?</item>
         <item quantity="other">Esta pasta está compartilhada com %1$d contatos. Você quer deixar de compartilhar?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Email e/ou senha inválidos. Por favor, tente novamente</string>
+    <string name="error_incorrect_email_or_password">Email e/ou senha inválidos. Por favor, tente novamente.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1206,12 +1214,13 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Esta URL está corrupta ou mal formada. O link que você está tentando acessar não existe.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Esperando confirmação por email.</string>
+    <string name="confirm_email_text">Esperando confirmação por email</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Por favor, verifique o seu e-mail e toque no link para confirmar a sua conta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 item</item>
+        <item quantity="many">%1$d itens</item>
         <item quantity="other">%1$d itens</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
@@ -1287,11 +1296,13 @@
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
         <item quantity="one">As notificações de chat serão silenciadas até a %1$s</item>
+        <item quantity="many">As notificações de chat serão silenciadas até as %1$s</item>
         <item quantity="other">As notificações de chat serão silenciadas até as %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
         <item quantity="one">As notificações de chat serão silenciadas até a %2$s de %1$s</item>
+        <item quantity="many">As notificações de chat serão silenciadas até as %2$s de %1$s</item>
         <item quantity="other">As notificações de chat serão silenciadas até as %2$s de %1$s</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
@@ -1301,6 +1312,7 @@
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="one">Silenciado até a %1$s</item>
+        <item quantity="many">Silenciado até as %1$s</item>
         <item quantity="other">Silenciado até as %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1318,7 +1330,7 @@
     <!-- Button to clear the chat history -->
     <string name="general_clear">Deletar</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
-    <string name="clear_history_success">O histórico do chat foi deletado.</string>
+    <string name="clear_history_success">O histórico do chat foi deletado</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
     <string name="clear_history_error">Não foi possível deletar o histórico do chat</string>
     <!-- Menu item to add participants to a chat -->
@@ -1390,7 +1402,7 @@
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">Você quer sair do chat de grupo?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error_already_exists">Este participante já foi incluído neste chat de grupo.</string>
+    <string name="add_participant_error_already_exists">Este participante já foi incluído neste chat de grupo</string>
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">%d participantes foram convidados corretamente</string>
     <!-- error message when inviting multiple contacts to a group chat -->
@@ -1424,7 +1436,7 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Esta mensagem foi deletada por %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">O histórico do chat foi deletado.</string>
+    <string name="history_cleared_message">O histórico do chat foi deletado</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">O histórico do chat foi deletado por %1$s</string>
     <!-- chat message when the permissions for a user has been changed -->
@@ -1448,6 +1460,7 @@
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contato</item>
+        <item quantity="many">%1$d contatos</item>
         <item quantity="other">%1$d contatos</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
@@ -1455,11 +1468,13 @@
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Todos os dados relacionados com este contato serão eliminados permanentemente.</item>
+        <item quantity="many">Todos os dados relacionados com estes contatos serão eliminados permanentemente.</item>
         <item quantity="other">Todos os dados relacionados com estes contatos serão eliminados permanentemente.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Remover contato?</item>
+        <item quantity="many">Remover contatos?</item>
         <item quantity="other">Remover contatos?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1473,6 +1488,7 @@
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]está escrevendo&#8230;[/A]</item>
+        <item quantity="many">%1$s [A]estão escrevendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]estão escrevendo&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
@@ -1532,7 +1548,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Continuidade do status</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Manter o status escolhido mesmo quando eu não estiver conectado em nenhum dispositivo.</string>
+    <string name="settings_persistence_subtitle">Manter o status escolhido mesmo quando eu não estiver conectado em nenhum dispositivo</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Estabelecer o limite de tempo</string>
     <!-- Button to set a value -->
@@ -1563,6 +1579,7 @@
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
         <item quantity="one">%1$d de %2$d arquivo</item>
+        <item quantity="many">%1$d de %2$d arquivos</item>
         <item quantity="other">%1$d de %2$d arquivos</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
@@ -1606,17 +1623,19 @@
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Não há transferências concluídas</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
-    <string name="upload_service_notification">Fazendo upload de arquivos:%1$d de %2$d</string>
+    <string name="upload_service_notification">Fazendo upload de arquivos: %1$d de %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Upload de %1$d arquivo concluído</item>
+        <item quantity="many">Upload de %1$d arquivos concluído</item>
         <item quantity="other">Upload de %1$d arquivos concluído</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">Já tinha sido feito o upload de 1 arquivo</item>
+        <item quantity="many">Já tinha sido feito o upload de %1$d arquivos</item>
         <item quantity="other">Já tinha sido feito o upload de %1$d arquivos</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
@@ -1624,31 +1643,37 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="one">Upload de %1$d arquivo não concluído</item>
+        <item quantity="many">Upload de %1$d arquivos não concluído</item>
         <item quantity="other">Upload de %1$d arquivos não concluído</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
         <item quantity="one">%1$d arquivo copiado</item>
+        <item quantity="many">%1$d arquivos copiados</item>
         <item quantity="other">%1$d arquivos copiados</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
         <item quantity="one">%1$d arquivo já tinha sido baixado</item>
+        <item quantity="many">%1$d arquivos já tinham sido baixados</item>
         <item quantity="other">%1$d arquivos já tinham sido baixados</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
         <item quantity="one">Download de %1$d arquivo concluído</item>
+        <item quantity="many">Download de %1$d arquivos concluído</item>
         <item quantity="other">Download de %1$d arquivos concluído</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">Baixado %1$d de %2$d arquivo</item>
+        <item quantity="many">Baixado %1$d de %2$d arquivos</item>
         <item quantity="other">Baixado %1$d de %2$d arquivos</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
         <item quantity="one">Download de %1$d arquivo não concluído</item>
+        <item quantity="many">Download de %1$d arquivos não concluído</item>
         <item quantity="other">Download de %1$d arquivos não concluído</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running -->
@@ -1668,6 +1693,7 @@
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d arquivo</item>
+        <item quantity="many">%1$d arquivos</item>
         <item quantity="other">%1$d arquivos</item>
     </plurals>
     <!-- Menu option -->
@@ -1707,16 +1733,19 @@
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Não foi possível remover o link. Por favor, tente novamente mais tarde.</item>
+        <item quantity="many">Não foi possível remover alguns links. Por favor, tente novamente mais tarde.</item>
         <item quantity="other">Não foi possível remover alguns links. Por favor, tente novamente mais tarde.</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Não foi possível criar o link. Por favor, tente novamente mais tarde.</item>
+        <item quantity="many">Não foi possível criar alguns links. Por favor, tente novamente mais tarde.</item>
         <item quantity="other">Não foi possível criar alguns links. Por favor, tente novamente mais tarde.</item>
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
         <item quantity="one">O link foi removido.</item>
+        <item quantity="many">Os links foram removidos.</item>
         <item quantity="other">Os links foram removidos.</item>
     </plurals>
     <!-- error message -->
@@ -1782,7 +1811,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Leitura e escrita</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">Transferências em pausa!</string>
+    <string name="attachment_uploading_state_paused">Transferências em pausa</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Enviando&#8230;</string>
     <!--  -->
@@ -1804,9 +1833,9 @@
     <!-- Success message when the attachment has been sent to a many chats -->
     <string name="success_attaching_node_from_cloud_chats">Arquivo enviado para %1$d chats</string>
     <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Erro. O arquivo não foi enviado.</string>
+    <string name="error_attaching_node_from_cloud">Erro. O arquivo não foi enviado</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_attaching_node_from_cloud_chats">Erro. O arquivo não foi enviado a nenhum dos chats selecionados.</string>
+    <string name="error_attaching_node_from_cloud_chats">Erro. O arquivo não foi enviado a nenhum dos chats selecionados</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">Erro. O anexo não foi removido.</string>
     <!-- settings option -->
@@ -1916,11 +1945,13 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Compartilhar pasta</item>
+        <item quantity="many">Pastas compartilhadas</item>
         <item quantity="other">Pastas compartilhadas</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
         <item quantity="one">Se você sair desta pasta, não será possível acessá-la novamente.</item>
+        <item quantity="many">Se você sair destas pastas compartilhadas, não poderá acessá-las novamente.</item>
         <item quantity="other">Se você sair destas pastas compartilhadas, não poderá acessá-las novamente.</item>
     </plurals>
     <!-- Info of a contact if there is no folders shared with him -->
@@ -1988,6 +2019,7 @@
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">O nome do arquivo não pode estar vazio.</item>
+        <item quantity="many">Os nomes dos arquivos não podem estar vazios.</item>
         <item quantity="other">Os nomes dos arquivos não podem estar vazios.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
@@ -2071,7 +2103,7 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">O código QR foi salvo em %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Convite não enviado.</string>
+    <string name="invite_not_sent">Convite não enviado</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">O código QR ou o link de contato é inválido. Por favor, tente escanear um código válido ou acessar um link válido.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
@@ -2101,7 +2133,7 @@
     <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
     <string name="label_set_period">Definir período</string>
     <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança.[/B]</string>
+    <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Lixeira [/A][B]vazia[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2175,28 +2207,29 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
         <item quantity="one">%1$d versão</item>
+        <item quantity="many">%1$d versões</item>
         <item quantity="other">%1$d versões</item>
     </plurals>
     <!-- Title of the section Versions for files -->
@@ -2206,6 +2239,7 @@
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="one">Versão anterior</item>
+        <item quantity="many">Versões anteriores</item>
         <item quantity="other">Versões anteriores</item>
     </plurals>
     <!-- option menu to revert a file version -->
@@ -2215,6 +2249,7 @@
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="one">Eliminar versão?</item>
+        <item quantity="many">Eliminar versões?</item>
         <item quantity="other">Eliminar versões?</item>
     </plurals>
     <!-- Content of the dialog to confirm that a version is going to be deleted -->
@@ -2247,6 +2282,7 @@
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
         <item quantity="one">%1$d arquivo com versões</item>
+        <item quantity="many">%1$d arquivos com versões</item>
         <item quantity="other">%1$d arquivos com versões</item>
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
@@ -2256,11 +2292,13 @@
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Erro. Não foi possível encaminhar a mensagem %1$d</item>
+        <item quantity="many">Erro. Não foi possível encaminhar %1$d mensagens</item>
         <item quantity="other">Erro. Não foi possível encaminhar %1$d mensagens</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
         <item quantity="one">Erro. O recurso já não está disponível</item>
+        <item quantity="many">Erro. Os recursos já não estão disponíveis</item>
         <item quantity="other">Erro. Os recursos já não estão disponíveis</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
@@ -2280,6 +2318,7 @@
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
         <item quantity="one">Arquivo enviado</item>
+        <item quantity="many">Arquivos enviados</item>
         <item quantity="other">Arquivos enviados</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
@@ -2329,11 +2368,13 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s mensagem não lida</item>
+        <item quantity="many">%1$s mensagens não lidas</item>
         <item quantity="other">%1$s mensagens não lidas</item>
     </plurals>
     <!-- Notification title to show the number of unread chats, unread messages -->
     <plurals name="plural_number_messages_chat_notification">
         <item quantity="one">%1$d chat não lido</item>
+        <item quantity="many">%1$d chats não lidos</item>
         <item quantity="other">%1$d chats não lidos</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
@@ -2359,7 +2400,7 @@
     <!-- Message when previous login is being cancelled -->
     <string name="login_in_progress">Cancelando o processo de login. Por favor, espere&#8230;</string>
     <!-- when open audio video player, the file that it try to open is not supported -->
-    <string name="unsupported_file_type">Formato de arquivo não suportado</string>
+    <string name="unsupported_file_type">Formato de arquivo não suportado.</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Erro. O arquivo é corrupto ou não existe.</string>
     <!-- Title of the screen Playlist -->
@@ -2395,6 +2436,7 @@
     <!-- Notification title to show the number of incoming contact request, contact requests -->
     <plurals name="plural_number_contact_request_notification">
         <item quantity="one">%1$d solicitação de contato pendente</item>
+        <item quantity="many">%1$d solicitações de contato pendentes</item>
         <item quantity="other">%1$d solicitações de contato pendentes</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
@@ -2498,6 +2540,7 @@
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Mensagem não encaminhada</item>
+        <item quantity="many">Mensagens não encaminhadas</item>
         <item quantity="other">Mensagens não encaminhadas</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2553,9 +2596,9 @@
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
     <string name="error_archive_chat">Erro. O chat %s não foi arquivado.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">Você deixou de arquivar o chat %s</string>
+    <string name="success_unarchive_chat">Você deixou de arquivar o chat %s.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Erro. Não foi possível deixar de arquivar o chat %s</string>
+    <string name="error_unarchive_chat">Erro. Não foi possível deixar de arquivar o chat %s.</string>
     <!-- Message shown when the user has no archived chats -->
     <string name="archived_chats_empty">[A]Não há[/A] [B]chats arquivados[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
@@ -2583,6 +2626,7 @@
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
         <item quantity="one">1 arquivo com versão, ocupando um total de %2$s</item>
+        <item quantity="many">%1$d versões de arquivos, ocupando um total de %2$s</item>
         <item quantity="other">%1$d versões de arquivos, ocupando um total de %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
@@ -2668,6 +2712,7 @@
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
         <item quantity="one">Escolher arquivo</item>
+        <item quantity="many">Enviar arquivos</item>
         <item quantity="other">Enviar arquivos</item>
     </plurals>
     <!-- Title of confirmation dialog of sending invitation to a contact -->
@@ -2675,7 +2720,7 @@
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Escolher pasta</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="login_warning_abort_transfers">Você quer fazer o login? Todas as transferências serão canceladas.</string>
+    <string name="login_warning_abort_transfers">Você quer fazer o login? Todas as transferências serão canceladas</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="logout_warning_abort_transfers">Você quer fazer o logout? Todas as transferências serão canceladas.</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -2829,6 +2874,7 @@
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d arquivo não foi baixado porque ele infringiu os nossos Termos de Serviço.</item>
+        <item quantity="many">%d arquivos não foram baixados porque eles infringiram os nossos Termos de Serviço.</item>
         <item quantity="other">%d arquivos não foram baixados porque eles infringiram os nossos Termos de Serviço.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
@@ -2912,16 +2958,19 @@
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d arquivo</item>
+        <item quantity="many">%d arquivos</item>
         <item quantity="other">%d arquivos</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d pasta</item>
+        <item quantity="many">%d pastas</item>
         <item quantity="other">%d pastas</item>
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d pastas · 1 arquivo</item>
+        <item quantity="many">%1$d pastas · %2$d arquivos</item>
         <item quantity="other">%1$d pastas · %2$d arquivos</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
@@ -2929,21 +2978,25 @@
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
         <item quantity="one">[A]%1$s [/A][B]adicionou %2$d arquivo.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]adicionou %2$d arquivos.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]adicionou %2$d arquivos.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
         <item quantity="one">[A]%1$s [/A][B]eliminou %2$d item.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]eliminou %2$d itens.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]eliminou %2$d itens.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders -->
     <plurals name="subtitle_notification_added_folders">
         <item quantity="one">[A]%1$s [/A][B]adicionou %2$d pasta.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]adicionou %2$d pastas.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]adicionou %2$d pastas.[/B]</item>
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
         <item quantity="one">%d participante</item>
+        <item quantity="many">%d participantes</item>
         <item quantity="other">%d participantes</item>
     </plurals>
     <!--  -->
@@ -2999,16 +3052,19 @@
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="one">[B]%1$s hora[/B]</item>
+        <item quantity="many">[B]%1$s horas[/B]</item>
         <item quantity="other">[B]%1$s horas[/B]</item>
     </plurals>
     <!-- Message that shows the minutes of a call when it ends, more minutes -->
     <plurals name="plural_call_ended_messages_minutes">
         <item quantity="one">[B]%1$s minuto[/B]</item>
+        <item quantity="many">[B]%1$s minutos[/B]</item>
         <item quantity="other">[B]%1$s minutos[/B]</item>
     </plurals>
     <!-- Message that shows the seconds of a call when it ends, more seconds -->
     <plurals name="plural_call_ended_messages_seconds">
         <item quantity="one">[B]%1$d segundo[/B]</item>
+        <item quantity="many">[B]%1$d segundos[/B]</item>
         <item quantity="other">[B]%1$d segundos[/B]</item>
     </plurals>
     <!-- Message to indicate a call has ended without indicate the call duration. -->
@@ -3072,12 +3128,13 @@
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
-    <string name="on_permanently_denied">Você ainda pode conceder as permissões ao MEGA nas configurações do seu dispositivo.</string>
+    <string name="on_permanently_denied">Você ainda pode conceder as permissões ao MEGA nas configurações do seu dispositivo</string>
     <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
     <string name="explanation_for_contacts_permission">Se você permitir que o MEGA acesse o seu catálogo de endereços, poderá descobrir os seus contatos mais facilmente. O MEGA não utilizará esses dados para nenhum outro propósito e nunca irá interagir com os seus contatos sem o seu consentimento.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Mensagem encaminhada</item>
+        <item quantity="many">Mensagens encaminhadas</item>
         <item quantity="other">Mensagens encaminhadas</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
@@ -3085,21 +3142,25 @@
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d arquivo não foi enviado para %d chats</item>
+        <item quantity="many">%d arquivo não foram enviados para %d chats</item>
         <item quantity="other">%d arquivo não foram enviados para %d chats</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
         <item quantity="one">%d contato não foi enviado para %d chats</item>
+        <item quantity="many">%d contatos não foram enviados para %d chats</item>
         <item quantity="other">%d contatos não foram enviados para %d chats</item>
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
         <item quantity="one">%d mensagem não foi enviada para %d chats</item>
+        <item quantity="many">%d mensagens não foram enviadas para %d chats</item>
         <item quantity="other">%d mensagens não foram enviadas para %d chats</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
         <item quantity="one">%d contato já está no MEGA</item>
+        <item quantity="many">%d contatos já estão no MEGA</item>
         <item quantity="other">%d contatos já estão no MEGA</item>
     </plurals>
     <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
@@ -3119,7 +3180,7 @@
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Enviado como mensagem.</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_sent_as_message">Erro. O arquivo não foi enviado a nenhum dos chats selecionados.</string>
+    <string name="error_sent_as_message">Erro. O arquivo não foi enviado a nenhum dos chats selecionados</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">Deletar versões anteriores</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
@@ -3133,11 +3194,13 @@
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
         <item quantity="one">%d versão foi deletada</item>
+        <item quantity="many">%d versões foram deletadas</item>
         <item quantity="other">%d versões foram deletadas</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
         <item quantity="one">%d versão não foi deletada</item>
+        <item quantity="many">%d versões não foram deletadas</item>
         <item quantity="other">%d versões não foram deletadas</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
@@ -3269,11 +3332,13 @@
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="one">Já foi feito o download de 1 arquivo.</item>
+        <item quantity="many">Já foi feito o download de %d arquivos.</item>
         <item quantity="other">Já foi feito o download de %d arquivos.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="one">1 arquivo pendente.</item>
+        <item quantity="many">%d arquivos pendentes.</item>
         <item quantity="other">%d arquivos pendentes.</item>
     </plurals>
     <!-- Title of the login screen -->
@@ -3477,6 +3542,7 @@
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="one">Enviamos um email de notificação a %1$s em %2$s, mas você ainda tem %3$s arquivos ocupando %4$s na sua conta do MEGA, o que requer que você tenha um plano %5$s.</item>
+        <item quantity="many">Enviamos um email de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
         <item quantity="other">Enviamos um email de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
@@ -3490,6 +3556,7 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="one">1 dia</item>
+        <item quantity="many">%d dias</item>
         <item quantity="other">%d dias</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3621,21 +3688,25 @@
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">hora</item>
+        <item quantity="many">horas</item>
         <item quantity="other">horas</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">dia</item>
+        <item quantity="many">dias</item>
         <item quantity="other">dias</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">semana</item>
+        <item quantity="many">semanas</item>
         <item quantity="other">semanas</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">mês</item>
+        <item quantity="many">meses</item>
         <item quantity="other">meses</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
@@ -3643,16 +3714,19 @@
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="one">1 hora</item>
+        <item quantity="many">%1$d horas</item>
         <item quantity="other">%1$d horas</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
         <item quantity="one">1 semana</item>
+        <item quantity="many">%1$d semanas</item>
         <item quantity="other">%1$d semanas</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
         <item quantity="one">1 mês</item>
+        <item quantity="many">%1$d meses</item>
         <item quantity="other">%1$d meses</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
@@ -3832,6 +3906,7 @@
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload em andamento, 1 arquivo pendente</item>
+        <item quantity="many">Upload em andamento, %1$d arquivos pendentes</item>
         <item quantity="other">Upload em andamento, %1$d arquivos pendentes</item>
     </plurals>
     <!-- Text to show as production api server option -->
@@ -3845,57 +3920,67 @@
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível</string>
+    <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Não foi possível enviar o arquivo porque destinatário ultrapassou o seu limite de armazenamento.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
         <item quantity="one">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</item>
+        <item quantity="many">Já foi feito o download de 1 arquivo. %d arquivos pendentes.</item>
         <item quantity="other">Já foi feito o download de 1 arquivo. %d arquivos pendentes.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
         <item quantity="one">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</item>
+        <item quantity="many">Já foi feito o download de %d arquivos. 1 arquivo pendente.</item>
         <item quantity="other">Já foi feito o download de %d arquivos. 1 arquivo pendente.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
         <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="many">1 item movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
         <item quantity="other">1 item movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="many">%d itens movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
         <item quantity="other">%d itens movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
         <item quantity="one">1 item foi restaurado, mas o outro item não foi restaurado. Tente novamente mais tarde.</item>
+        <item quantity="many">1 item foi restaurado, mas %d itens não foram restaurados. Tente novamente mais tarde.</item>
         <item quantity="other">1 item foi restaurado, mas %d itens não foram restaurados. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
         <item quantity="one">1 item foi restaurado, mas o outro item não foi restaurado. Tente novamente mais tarde.</item>
+        <item quantity="many">%d itens foram restaurados, mas 1 item não foi restaurado. Tente novamente mais tarde.</item>
         <item quantity="other">%d itens foram restaurados, mas 1 item não foi restaurado. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">1 item foi movido para a Lixeira corretamente</item>
+        <item quantity="many">%d itens foram movidos para a Lixeira corretamente</item>
         <item quantity="other">%d itens foram movidos para a Lixeira corretamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="one">1 item não foi movido para a Lixeira corretamente</item>
+        <item quantity="many">%d itens não foram movidos para a Lixeira corretamente</item>
         <item quantity="other">%d itens não foram movidos para a Lixeira corretamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
         <item quantity="one">1 item foi restaurado corretamente</item>
+        <item quantity="many">%d itens foram restaurados corretamente</item>
         <item quantity="other">%d itens foram restaurados corretamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
         <item quantity="one">1 item não foi restaurado corretamente</item>
+        <item quantity="many">%d itens não foram restaurados corretamente</item>
         <item quantity="other">%d itens não foram restaurados corretamente</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3905,9 +3990,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Adicione o seu telefone</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3927,6 +4012,7 @@
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
         <item quantity="one">1 conexão</item>
+        <item quantity="many">%1$d conexões</item>
         <item quantity="other">%1$d conexões</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
@@ -3944,16 +4030,19 @@
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
         <item quantity="one">O link foi enviado corretamente.</item>
+        <item quantity="many">Os links foram enviados corretamente.</item>
         <item quantity="other">Os links foram enviados corretamente.</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
         <item quantity="one">O link foi copiado para a área de transferência.</item>
-        <item quantity="other">Os links foram copiados para a área de transferência</item>
+        <item quantity="many">Os links foram copiados para a área de transferência.</item>
+        <item quantity="other">Os links foram copiados para a área de transferência.</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
         <item quantity="one">Obter link</item>
+        <item quantity="many">Obter links</item>
         <item quantity="other">Obter links</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
@@ -3995,7 +4084,7 @@
     <!-- General label for headphone-->
     <string name="general_headphone">Fones de ouvido</string>
     <!-- General label for headphone on-->
-    <string name="general_headphone_on">Os fones de ouvido estão ativados.</string>
+    <string name="general_headphone_on">Os fones de ouvido estão ativados</string>
     <!-- General label for speaker on-->
     <string name="general_speaker_on">O viva-voz está ativado</string>
     <!-- General label for speaker off-->
@@ -4039,7 +4128,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Acesse o link que você recebeu ou digite o link aqui</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">A qualidade da sua conexão não é boa.</string>
+    <string name="slow_connection_meeting">A qualidade da sua conexão não é boa</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">A reunião terminou</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -4063,7 +4152,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Você é o novo moderador.</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">O link da reunião foi copiado</string>
+    <string name="copied_meeting_link">O link da reunião foi copiado.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toque para entrar na reunião atual.</string>
     <!-- Title of fifth tour screen -->
@@ -4217,6 +4306,7 @@
     <!-- Indicates the content of the backup folder -->
     <plurals name="num_devices">
         <item quantity="one">%d dispositivo</item>
+        <item quantity="many">%d dispositivos</item>
         <item quantity="other">%d dispositivos</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
@@ -4314,7 +4404,7 @@
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Termos de Serviço infringidos</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">Este dispositivo não tem um aplicativo para selecionar pastas.</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Seguinte</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -4323,4 +4413,50 @@
     <string name="media_player_video_playlist_next">Seguinte</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Anterior</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Fotos</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Abra tipos de arquivo não suportados em aplicativos de terceiros</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Qualidade da imagem</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automático</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Envia imagens otimizadas quando o dispositivo estiver utilizando dados móveis, e imagens em tamanho original quando o dispositivo estiver utilizando Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Sempre enviar imagens em tamanho original.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Otimizada</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Sempre enviar imagens otimizadas.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Apagar permanentemente</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Deletar</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Renova em[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Expira em[/A] [B]%s[/B]</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">Hapus Cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Hapus File Offilne</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Buka file saat diunduh</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Hapus akun</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">Penjelajah ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Jenis akun</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Diperbarui pada&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Kadaluarsa pada&#160;</string>
     <!--  -->
     <string name="free_account">Gratis</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4227,4 +4221,50 @@
     <string name="media_player_video_playlist_next">Berikutnya</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Sebelumnya</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Foto</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Buka jenis file yang tidak didukung di aplikasi pihak ketiga</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Kualitas gambar</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Otomatis</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Kirim gambar yang dioptimalkan saat menggunakan data seluler tetapi gambar ukuran asli saat menggunakan Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Asli</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Selalu kirim gambar ukuran asli.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Dioptimalkan</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Selalu kirim gambar yang dioptimalkan.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Hapus secara permanen</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Hapus</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Memperbarui pada[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Kadaluarsa pada[/A] [B]%s[/B]</string>
 </resources>

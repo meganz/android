@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -746,8 +746,6 @@
     <string name="settings_advanced_features_cache">Șterge cache-ul</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Șterge fișierele offline</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Deschide fișierul când este descărcat</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Șterge contul</string>
     <!-- Size of files in offline or cache folders -->
@@ -953,10 +951,6 @@
     <string name="zip_browser_activity">Răsfoitor ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Tipul contului</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Se reînoiește &#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expiră&#160;</string>
     <!--  -->
     <string name="free_account">Gratuit</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -2631,8 +2625,9 @@
     <string name="settings_file_management_file_versions_title">Versiunile fișierelor</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 file version, taking a total of %2$s</item>
-        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+        <item quantity="one">1 versiune a unui fișier, ocupând un total de %2$s</item>
+        <item quantity="few">%1$d versiuni ale fișierelor, ocupând un total de %2$s</item>
+        <item quantity="other">%1$d de versiuni ale fișierelor, ocupând un total de %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Managementul fișierelor</string>
@@ -2878,8 +2873,9 @@
     <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="one">%d fișier nu a fost descărcat deoarece încălca Termenii de utilizare a serviciului.</item>
+        <item quantity="few">%d fișiere nu au fost descărcate deoarece încălcau Termenii de utilizare a serviciului.</item>
+        <item quantity="other">%d de fișiere nu au fost descărcate deoarece încălcau Termenii de utilizare a serviciului.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
@@ -3900,7 +3896,7 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Zile</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
-    <string name="months_view_button">Months</string>
+    <string name="months_view_button">Luni</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Ani</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
@@ -3929,33 +3925,39 @@
     <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">1 file already downloaded. %d files pending.</item>
+        <item quantity="one">1 fișier descărcat deja. 1 fișier în așteptare.</item>
+        <item quantity="few">1 fișier descărcat deja. %d fișiere în așteptare.</item>
+        <item quantity="other">1 fișier descărcat deja. %d de fișiere în așteptare.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+        <item quantity="one">1 fișier descărcat deja. 1 fișier în așteptare.</item>
+        <item quantity="few">%d fișiere descărcate deja. 1 fișier în așteptare.</item>
+        <item quantity="other">%d de fișiere descărcate deja. 1 fișier în așteptare.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost mutat în coșul de gunoi, însă %d elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost mutat în coșul de gunoi, însă %d de elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+        <item quantity="one">1 element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost restaurat, însă %d elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost restaurat, însă %d de elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+        <item quantity="one">1 element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
@@ -3988,9 +3990,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Adaugă numărul tău de telefon</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -4303,8 +4305,9 @@
     <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
     <!-- Indicates the content of the backup folder -->
     <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
+        <item quantity="one">%d dispozitiv</item>
+        <item quantity="few">%d dispozitive</item>
+        <item quantity="other">%d de dispozitive</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
@@ -4410,4 +4413,50 @@
     <string name="media_player_video_playlist_next">Înainte</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Anterior</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Fotografii</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Calitatea imaginilor</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automat</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Always send original size images.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Optimizată</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Always send optimised images.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Șterge</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Se reînnoiește în[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Expiră pe[/A] [B]%s[/B]</string>
 </resources>
