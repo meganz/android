@@ -528,7 +528,7 @@ public class FileBrowserFragment extends RotatableFragment{
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
 		managerViewModel.getUpdateBrowserNodes().observe(getViewLifecycleOwner(), nodes -> {
 			hideMultipleSelect();
-			setNodes(nodes);
+			setNodes(new ArrayList(nodes));
 			getRecyclerView().invalidate();
 		});
 

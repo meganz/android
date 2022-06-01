@@ -27,52 +27,55 @@ class ManagerViewModel @Inject constructor(
      * Monitor all global updates
      */
     @Suppress("DEPRECATION")
-    private val updates = monitorGlobalUpdates()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    private val _updates = monitorGlobalUpdates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    /**
+     * Monitor global node updates
+     */
+    private val _updateNodes = monitorNodeUpdates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     /**
      * Monitor user updates and dispatch to observers
      */
     val updateUsers: LiveData<List<MegaUser>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .also { Timber.d("onUsersUpdate") }
             .map { it.users?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
     /**
      * Monitor user alerts updates and dispatch to observers
      */
     val updateUserAlerts: LiveData<List<MegaUserAlert>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .also { Timber.d("onUserAlertsUpdate") }
             .map { it.userAlerts?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
     /**
      * Monitor global node updates and dispatch to observers
      */
     val updateNodes: LiveData<List<MegaNode>> =
-        monitorNodeUpdates()
+        _updateNodes
             .also { Timber.d("onNodesUpdate") }
-            .filterNot { it.isEmpty() }
+            .filterNotNull()
             .asLiveData()
 
     /**
      * Monitor contact request updates and dispatch to observers
      */
     val updateContactsRequests: LiveData<List<MegaContactRequest>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .also { Timber.d("onContactRequestsUpdate") }
             .map { it.requests?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
     /**
@@ -89,11 +92,10 @@ class ManagerViewModel @Inject constructor(
      * Update Rubbish Nodes when a node update callback happens
      */
     val updateRubbishBinNodes: LiveData<List<MegaNode>> =
-        updateNodes.asFlow()
+        _updateNodes
             .also { Timber.d("onRubbishNodesUpdate") }
             .map { getRubbishBinChildrenNode(rubbishBinParentHandle) }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
 
@@ -101,10 +103,9 @@ class ManagerViewModel @Inject constructor(
      * Update Browser Nodes when a node update callback happens
      */
     val updateBrowserNodes: LiveData<List<MegaNode>> =
-        updateNodes.asFlow()
+        _updateNodes
             .also { Timber.d("onBrowserNodesUpdate") }
             .map { getBrowserChildrenNode(browserParentHandle) }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 }
