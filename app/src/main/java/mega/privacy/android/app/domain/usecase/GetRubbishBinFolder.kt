@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get the rubbish bin node
  */
-interface GetRubbishBinNode {
+interface GetRubbishBinFolder {
     /**
      * Get the rubbish bin node
      *

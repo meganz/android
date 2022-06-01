@@ -28,10 +28,10 @@ abstract class ManagerUseCases {
     abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
     @Binds
-    abstract fun bindGetRootNode(useCase: DefaultGetRootNode): GetRootNode
+    abstract fun bindGetRootFolder(useCase: DefaultGetRootFolder): GetRootFolder
 
     @Binds
-    abstract fun bindGetRubbishBinNode(useCase: DefaultGetRubbishBinNode): GetRubbishBinNode
+    abstract fun bindGetRubbishBinFolder(useCase: DefaultGetRubbishBinFolder): GetRubbishBinFolder
 
     @Binds
     abstract fun bindGetChildrenNode(useCase: DefaultGetChildrenNode): GetChildrenNode

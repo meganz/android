@@ -16,7 +16,7 @@ class DefaultGetBrowserChildrenNodeTest {
     private lateinit var underTest: GetBrowserChildrenNode
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getChildrenNode = mock<GetChildrenNode>()
-    private val getRootNode = mock<GetRootNode>()
+    private val getRootFolder = mock<GetRootFolder>()
     private val sortOrderManagement = mock<SortOrderManagementInterface>()
 
     @Before
@@ -24,7 +24,7 @@ class DefaultGetBrowserChildrenNodeTest {
         underTest = DefaultGetBrowserChildrenNode(
             getNodeByHandle,
             getChildrenNode,
-            getRootNode,
+            getRootFolder,
             sortOrderManagement
         )
     }
@@ -33,7 +33,7 @@ class DefaultGetBrowserChildrenNodeTest {
     fun `test that invoke with -1L invoke getRootNode`() = runTest {
         underTest(-1L)
 
-        verify(getRootNode).invoke()
+        verify(getRootFolder).invoke()
     }
 
     @Test
@@ -47,7 +47,7 @@ class DefaultGetBrowserChildrenNodeTest {
     @Test
     fun `test that -1L invoke getChildrenNode with result of getRootNode`() = runTest {
         val result = mock<MegaNode>{}
-        whenever(getRootNode()).thenReturn(result)
+        whenever(getRootFolder()).thenReturn(result)
         underTest(-1L)
 
         verify(getChildrenNode).invoke(result, MegaApiJava.ORDER_NONE)
@@ -67,7 +67,7 @@ class DefaultGetBrowserChildrenNodeTest {
     fun `test that underTest is invoked with value of get order sort management`() = runTest {
         val sortOrder = MegaApiJava.ORDER_DEFAULT_ASC
         whenever(sortOrderManagement.getOrderCloud()).thenReturn(sortOrder)
-        whenever(getRootNode()).thenReturn(mock())
+        whenever(getRootFolder()).thenReturn(mock())
         underTest(-1L)
 
         verify(getChildrenNode).invoke(any(), eq(sortOrder))

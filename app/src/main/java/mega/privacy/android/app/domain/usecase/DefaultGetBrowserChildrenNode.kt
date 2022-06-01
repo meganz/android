@@ -10,18 +10,18 @@ import javax.inject.Inject
  *
  *  @property getNodeByHandle
  *  @property getChildrenNode
- *  @property getRootNode
+ *  @property getRootFolder
  *  @property sortOrderManagement
  */
 class DefaultGetBrowserChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
-    private val getRootNode: GetRootNode,
+    private val getRootFolder: GetRootFolder,
     private val sortOrderManagement: SortOrderManagementInterface,
 ) : GetBrowserChildrenNode {
 
     override fun invoke(parentHandle: Long): List<MegaNode>? {
-        val node = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRootNode())
+        val node = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRootFolder())
             ?: return null
         return getChildrenNode(parent = node, order = sortOrderManagement.getOrderCloud())
     }

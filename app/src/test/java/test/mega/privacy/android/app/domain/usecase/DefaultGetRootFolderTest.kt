@@ -3,8 +3,8 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.app.domain.usecase.DefaultGetRootNode
-import mega.privacy.android.app.domain.usecase.GetRootNode
+import mega.privacy.android.app.domain.usecase.DefaultGetRootFolder
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -13,14 +13,14 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetRootNodeTest {
+class DefaultGetRootFolderTest {
 
-    private lateinit var underTest: GetRootNode
+    private lateinit var underTest: GetRootFolder
     private val filesRepository = mock<FilesRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetRootNode(filesRepository)
+        underTest = DefaultGetRootFolder(filesRepository)
     }
 
     @Test

@@ -9,18 +9,18 @@ import javax.inject.Inject
  *
  *  @property getNodeByHandle
  *  @property getChildrenNode
- *  @property getRubbishBinNode
+ *  @property getRubbishBinFolder
  *  @property sortOrderManagement
  */
 class DefaultGetRubbishBinChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
-    private val getRubbishBinNode: GetRubbishBinNode,
+    private val getRubbishBinFolder: GetRubbishBinFolder,
     private val sortOrderManagement: SortOrderManagementInterface,
 ) : GetRubbishBinChildrenNode {
 
     override fun invoke(parentHandle: Long): List<MegaNode>? {
-        val rubbishNode = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinNode())
+        val rubbishNode = (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinFolder())
             ?: return null
         return getChildrenNode(parent = rubbishNode, order = sortOrderManagement.getOrderCloud())
     }

@@ -3,8 +3,8 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinNode
-import mega.privacy.android.app.domain.usecase.GetRubbishBinNode
+import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -13,14 +13,14 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetRubbishBinNodeTest {
+class DefaultGetRubbishBinFolderTest {
 
-    private lateinit var underTest: GetRubbishBinNode
+    private lateinit var underTest: GetRubbishBinFolder
     private val filesRepository = mock<FilesRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetRubbishBinNode(filesRepository)
+        underTest = DefaultGetRubbishBinFolder(filesRepository)
     }
 
     @Test

@@ -5,13 +5,13 @@ import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
- * Default get the root node
+ * Default get the rubbish bin node
  *
  *  @property filesRepository
  */
-class DefaultGetRootNode @Inject constructor(
+class DefaultGetRubbishBinFolder @Inject constructor(
     private val filesRepository: FilesRepository
-) : GetRootNode {
+) : GetRubbishBinFolder {
 
-    override fun invoke(): MegaNode? = filesRepository.getRootNode()
+    override fun invoke(): MegaNode? = filesRepository.getRubbishBinNode()
 }
