@@ -951,6 +951,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+            sharedModel.lockMic()
+
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
                         arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -974,7 +976,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         lifecycleScope.launchWhenStarted {
             sharedModel.recordAudioGranted.collect { allowed ->
-                if (allowed) {
+                if (allowed && !sharedModel.micLocked) {
                     bottomFloatingPanelViewHolder.updateMicPermissionWaring(allowed)
                 }
             }

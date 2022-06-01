@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +68,7 @@ class MeetingActivityViewModel @Inject constructor(
     val avatarLiveData: LiveData<Bitmap> = _avatarLiveData
 
     var tips: MutableLiveData<String> = MutableLiveData<String>()
+    var micLocked: Boolean = false
 
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
@@ -397,11 +399,21 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Method of locking the microphone button
+     */
+    fun lockMic() {
+        micLocked = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
+
+    /**
      * Response of clicking mic fab
      *
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
     fun clickMic(shouldAudioBeEnabled: Boolean) {
+        if(micLocked) {
+            return
+        }
         // Check audio permission. If haven't been granted, ask for the permission and return
         if (!_recordAudioGranted.value) {
             _recordAudioPermissionCheck.value = true

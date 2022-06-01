@@ -69,8 +69,7 @@ class AnswerCallUseCase @Inject constructor(
 
                 var video = enableVideo
                 if (video) {
-                    video = hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.RECORD_AUDIO) &&
-                            hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.CAMERA)
+                    video = hasPermissions(MegaApplication.getInstance().applicationContext, Manifest.permission.CAMERA)
                 }
 
                 MegaApplication.getChatManagement().addJoiningCallChatId(chatId)
