@@ -65,14 +65,21 @@ class GetCallSoundsUseCase @Inject constructor(
                                 result.isRecoverable?.let { isRecoverableSession ->
                                     if (result.call == null) {
                                         stopCountDown(INVALID_HANDLE, result.lastParticipantPeerId)
-
                                         emitter.onNext(CallSoundType.CALL_ENDED)
 
                                     } else if (isRecoverableSession) {
-                                        emitter.startCountDown(
-                                            result.call, result.lastParticipantPeerId,
-                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
-                                        )
+                                        val numParticipantsInCall: Int = result.call.numParticipants
+                                        val peerIdLastParticipant =
+                                            result.call.peeridParticipants.get(0)
+
+                                        if (numParticipantsInCall == 1 && peerIdLastParticipant == megaChatApi.myUserHandle) {
+                                            emitter.startCountDown(
+                                                result.call, result.lastParticipantPeerId,
+                                                SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                            )
+                                        } else {
+                                            Timber.d("The count down timer can't start")
+                                        }
 
                                     } else {
                                         stopCountDown(
