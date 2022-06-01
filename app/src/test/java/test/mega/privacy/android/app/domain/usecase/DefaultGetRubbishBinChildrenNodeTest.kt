@@ -56,9 +56,10 @@ class DefaultGetRubbishBinChildrenNodeTest {
     fun `test that -1L invoke getChildrenNode with result of getRubbishBinNode`() = runTest {
         val result = mock<MegaNode> {}
         whenever(getRubbishBinFolder()).thenReturn(result)
+        whenever(getCloudSortOrder()).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         underTest(-1L)
 
-        verify(getChildrenNode).invoke(result, MegaApiJava.ORDER_NONE)
+        verify(getChildrenNode).invoke(eq(result), any())
     }
 
     @Test
@@ -66,9 +67,10 @@ class DefaultGetRubbishBinChildrenNodeTest {
         val result = mock<MegaNode> {}
         val parentHandle = 0L
         whenever(getNodeByHandle(parentHandle)).thenReturn(result)
+        whenever(getCloudSortOrder()).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         underTest(parentHandle)
 
-        verify(getChildrenNode).invoke(result, MegaApiJava.ORDER_NONE)
+        verify(getChildrenNode).invoke(eq(result), any())
     }
 
     @Test
