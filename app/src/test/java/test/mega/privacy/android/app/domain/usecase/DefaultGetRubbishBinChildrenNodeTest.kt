@@ -2,13 +2,21 @@ package test.mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.*
-import mega.privacy.android.app.globalmanagement.SortOrderManagementInterface
+import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class DefaultGetRubbishBinChildrenNodeTest {
@@ -17,7 +25,7 @@ class DefaultGetRubbishBinChildrenNodeTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getRubbishBinFolder = mock<GetRubbishBinFolder>()
-    private val sortOrderManagement = mock<SortOrderManagementInterface>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
     @Before
     fun setUp() {
@@ -25,7 +33,7 @@ class DefaultGetRubbishBinChildrenNodeTest {
             getNodeByHandle,
             getChildrenNode,
             getRubbishBinFolder,
-            sortOrderManagement
+            getCloudSortOrder
         )
     }
 
@@ -46,7 +54,7 @@ class DefaultGetRubbishBinChildrenNodeTest {
 
     @Test
     fun `test that -1L invoke getChildrenNode with result of getRubbishBinNode`() = runTest {
-        val result = mock<MegaNode>{}
+        val result = mock<MegaNode> {}
         whenever(getRubbishBinFolder()).thenReturn(result)
         underTest(-1L)
 
@@ -55,7 +63,7 @@ class DefaultGetRubbishBinChildrenNodeTest {
 
     @Test
     fun `test that -1L invoke getChildrenNode with result of getNodeByHandle`() = runTest {
-        val result = mock<MegaNode>{}
+        val result = mock<MegaNode> {}
         val parentHandle = 0L
         whenever(getNodeByHandle(parentHandle)).thenReturn(result)
         underTest(parentHandle)
@@ -66,7 +74,7 @@ class DefaultGetRubbishBinChildrenNodeTest {
     @Test
     fun `test that underTest is invoked with value of get order sort management`() = runTest {
         val sortOrder = MegaApiJava.ORDER_DEFAULT_ASC
-        whenever(sortOrderManagement.getOrderCloud()).thenReturn(sortOrder)
+        whenever(getCloudSortOrder()).thenReturn(sortOrder)
         whenever(getRubbishBinFolder()).thenReturn(mock())
         underTest(-1L)
 

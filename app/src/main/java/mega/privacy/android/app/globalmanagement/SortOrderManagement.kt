@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class SortOrderManagement @Inject constructor(
     private val dbH: DatabaseHandler
-): SortOrderManagementInterface {
+) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
@@ -41,7 +41,7 @@ class SortOrderManagement @Inject constructor(
         orderOffline = ORDER_DEFAULT_ASC
     }
 
-    override fun getOrderCloud(): Int = orderCloud
+    fun getOrderCloud(): Int = orderCloud
 
     fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud

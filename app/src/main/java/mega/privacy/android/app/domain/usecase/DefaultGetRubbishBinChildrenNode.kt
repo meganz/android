@@ -1,6 +1,5 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.globalmanagement.SortOrderManagementInterface
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -10,19 +9,19 @@ import javax.inject.Inject
  *  @property getNodeByHandle
  *  @property getChildrenNode
  *  @property getRubbishBinFolder
- *  @property sortOrderManagement
+ *  @property getCloudSortOrder
  */
 class DefaultGetRubbishBinChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getChildrenNode: GetChildrenNode,
     private val getRubbishBinFolder: GetRubbishBinFolder,
-    private val sortOrderManagement: SortOrderManagementInterface,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) : GetRubbishBinChildrenNode {
 
     override suspend fun invoke(parentHandle: Long): List<MegaNode>? {
         val rubbishNode =
             (if (parentHandle != -1L) getNodeByHandle(parentHandle) else getRubbishBinFolder())
                 ?: return null
-        return getChildrenNode(parent = rubbishNode, order = sortOrderManagement.getOrderCloud())
+        return getChildrenNode(parent = rubbishNode, order = getCloudSortOrder())
     }
 }
