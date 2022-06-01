@@ -31,7 +31,7 @@ class GetSessionStatusChangesUseCase @Inject constructor(
         val call: MegaChatCall?,
         val sessionStatus: Int,
         val isRecoverable: Boolean?,
-        val lastParticipantPeerId: Long?
+        val lastParticipantPeerId: Long
     )
 
     /**
@@ -45,30 +45,36 @@ class GetSessionStatusChangesUseCase @Inject constructor(
                 Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
                     val session = callAndSession.second as MegaChatSession
                     val call = callAndSession.first
+                    val peerId: Long = session.peerid
+                    var isRecoverable: Boolean? = null
 
-                    if (session.status == MegaChatSession.SESSION_STATUS_DESTROYED || session.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                        var isRecoverable: Boolean? = null
-                        var peerId: Long? = null
-                        when (session.termCode) {
-                            MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE -> isRecoverable = false
-                            MegaChatSession.SESS_TERM_CODE_RECOVERABLE -> isRecoverable = true
-                        }
-                        if (call != null) {
-                            call.peeridParticipants?.let { list ->
-                                if (list.size().toInt() == 1) {
-                                    peerId = list.get(0)
-                                }
-                            }
-                        }
-
-                        emitter.onNext(
-                            SessionChangedResult(
-                                call,
-                                session.status,
-                                isRecoverable,
-                                peerId
+                    when (val sessionStatus = session.status) {
+                        MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                            emitter.onNext(
+                                SessionChangedResult(
+                                    call,
+                                    sessionStatus,
+                                    isRecoverable,
+                                    peerId
+                                )
                             )
-                        )
+                        }
+                        MegaChatSession.SESSION_STATUS_DESTROYED -> {
+                            when (session.termCode) {
+                                MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE -> isRecoverable =
+                                    false
+                                MegaChatSession.SESS_TERM_CODE_RECOVERABLE -> isRecoverable = true
+                            }
+
+                            emitter.onNext(
+                                SessionChangedResult(
+                                    call,
+                                    sessionStatus,
+                                    isRecoverable,
+                                    peerId
+                                )
+                            )
+                        }
                     }
                 }
 
