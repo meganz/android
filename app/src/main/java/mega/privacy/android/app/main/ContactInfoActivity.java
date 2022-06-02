@@ -973,7 +973,7 @@ public class ContactInfoActivity extends PasscodeActivity
 	/**
 	 * Start call
 	 */
-	public void startCall() {
+	private void startCall() {
 		enableCallLayouts(false);
 		startCallUseCase.startCallFromUserHandle(user.getHandle(), startVideo, true)
 				.subscribeOn(Schedulers.io())
@@ -990,19 +990,19 @@ public class ContactInfoActivity extends PasscodeActivity
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (grantResults.length == 0) return;
+
 		switch (requestCode) {
 			case REQUEST_RECORD_AUDIO:
-				if (grantResults.length > 0 && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+				if (checkCameraPermission(this)) {
 					startCall();
 				}
 				break;
 
 			case REQUEST_CAMERA:
-				if (grantResults.length > 0) {
-					startCall();
-				}
+				startCall();
 				break;
 		}
 

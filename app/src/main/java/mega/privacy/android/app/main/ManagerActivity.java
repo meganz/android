@@ -294,7 +294,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -390,7 +389,6 @@ import mega.privacy.android.app.usecase.DownloadNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -520,10 +518,6 @@ public class ManagerActivity extends TransfersManagementActivity
     GetNodeUseCase getNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    StartCallUseCase startCallUseCase;
-    @Inject
-    GetChatRoomUseCase getChatRoomUseCase;
     @Inject
     DownloadNodeUseCase downloadNodeUseCase;
     @ApplicationScope

@@ -19,10 +19,8 @@ import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INVALID_TYPE_PERMISSIONS
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
@@ -149,7 +147,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            REQUEST_RECORD_AUDIO -> if (grantResults.isNotEmpty() && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+            REQUEST_RECORD_AUDIO -> if (grantResults.isNotEmpty() && checkCameraPermission(this)) {
                 val currentFragment = getCurrentFragment()
                 if (currentFragment is ContactListFragment) {
                     currentFragment.startCall()

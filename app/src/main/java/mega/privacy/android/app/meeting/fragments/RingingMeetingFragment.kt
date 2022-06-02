@@ -225,23 +225,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         }
     }
 
-    /**
-     * Method to control the required permission
-     *
-     * @param permission Type of permission required
-     */
-    private fun requirePermission(permission: String) {
-        permissionsBuilder(
-            arrayOf(permission)
-        )
-
-            .setOnRequiresPermission { l -> onRequiresPermission(l) }
-            .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-            .build()
-            .launch(false)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder(permissions)

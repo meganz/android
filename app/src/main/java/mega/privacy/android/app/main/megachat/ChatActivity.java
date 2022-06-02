@@ -3298,15 +3298,13 @@ public class ChatActivity extends PasscodeActivity
 
         switch (requestCode) {
             case REQUEST_RECORD_AUDIO:
-                if (grantResults.length > 0 && checkCameraPermission(this, INVALID_TYPE_PERMISSIONS)) {
+                if (checkCameraPermission(this)) {
                     startCall();
                 }
                 break;
 
             case REQUEST_CAMERA:
-                if (grantResults.length > 0) {
-                    startCall();
-                }
+                startCall();
                 break;
 
             case REQUEST_CAMERA_TAKE_PICTURE:

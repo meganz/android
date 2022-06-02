@@ -1074,16 +1074,17 @@ public class CallUtil {
     /**
      * Check Camera Permission
      *
+     * @param activity Current activity
      * @return True, if granted. False, if not granted
      */
-    public static boolean checkCameraPermission(Activity activity, int typePermission) {
+    public static boolean checkCameraPermission(Activity activity) {
         boolean hasCameraPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
             if (activity == null)
                 return false;
 
             if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
+                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
             }
             requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
@@ -1095,16 +1096,17 @@ public class CallUtil {
     /**
      * Check Audio Permission
      *
+     * @param activity Current activity
      * @return True, if granted. False, if not granted
      */
-    public static boolean checkAudioPermission(Activity activity, int typePermission) {
+    public static boolean checkAudioPermission(Activity activity) {
         boolean hasRecordAudioPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
             if (activity == null)
                 return false;
 
             if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
+                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
             }
             requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
@@ -1116,16 +1118,15 @@ public class CallUtil {
     /**
      * Method for obtaining the necessary permissions in one call.
      *
-     * @param activity       The activity.
-     * @param typePermission The type of permission
+     * @param activity Current activity
      * @return True, if you have both permits. False, otherwise.
      */
-    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
-        if(!checkAudioPermission(activity, typePermission)) {
+    public static boolean checkPermissionsCall(Activity activity) {
+        if(!checkAudioPermission(activity)) {
             return false;
         }
 
-        return checkCameraPermission(activity, typePermission);
+        return checkCameraPermission(activity);
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {
@@ -1434,7 +1435,7 @@ public class CallUtil {
             return false;
         }
 
-        return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
+        return checkPermissionsCall(context);
     }
 
     /**

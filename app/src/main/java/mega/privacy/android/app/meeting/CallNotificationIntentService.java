@@ -1,8 +1,6 @@
 package mega.privacy.android.app.meeting;
 
-import android.Manifest;
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
@@ -26,7 +24,6 @@ import timber.log.Timber;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
@@ -192,10 +189,6 @@ public class CallNotificationIntentService extends IntentService implements Hang
                         openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
                         clearIncomingCallNotification(callIdIncomingCall);
                         stopSelf();
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-                            this.sendBroadcast(closeIntent);
-                        }
                     } else {
                         Util.showSnackbar(MegaApplication.getInstance().getApplicationContext(), StringResourcesUtils.getString(R.string.call_error));
                     }
