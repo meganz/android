@@ -23,7 +23,9 @@ import java.time.LocalDate
 class GalleryCardViewHolderTest {
 
     private val applicationContext = ApplicationProvider.getApplicationContext<Context>()
-    private val parent = RecyclerView(applicationContext).apply { layoutManager = GridLayoutManager(applicationContext, 1) }
+    private val parent = RecyclerView(applicationContext).apply {
+        layoutManager = GridLayoutManager(applicationContext, 1)
+    }
     private lateinit var binding: ItemGalleryCardBinding
 
     private val day = "day"
@@ -32,21 +34,26 @@ class GalleryCardViewHolderTest {
 
     private val date = "date"
 
-    private fun getCard(dayString: String = day, monthString: String = month, yearString: String? = year) = GalleryCard(
-            id = 1L,
-            name = "$day$month$year",
-            preview = null,
-            day = dayString,
-            month = monthString,
-            year = yearString,
-            date = date,
-            localDate = LocalDate.now()
+    private fun getCard(
+        dayString: String = day,
+        monthString: String = month,
+        yearString: String? = year,
+    ) = GalleryCard(
+        id = 1L,
+        name = "$day$month$year",
+        preview = null,
+        day = dayString,
+        month = monthString,
+        year = yearString,
+        date = date,
+        localDate = LocalDate.now()
     )
 
     @Before
     fun setUp() {
         Fresco.initialize(applicationContext)
-        binding = ItemGalleryCardBinding.inflate(LayoutInflater.from(applicationContext), parent, false)
+        binding =
+            ItemGalleryCardBinding.inflate(LayoutInflater.from(applicationContext), parent, false)
     }
 
     @After
@@ -57,14 +64,14 @@ class GalleryCardViewHolderTest {
     @Test
     fun `test that year card date is formatted correctly`() {
         val underTest = GalleryCardViewHolder(
-                GroupingLevel.Years.ordinal,
-                binding,
-                800,
-                8
+            GroupingLevel.Years.ordinal,
+            binding,
+            800,
+            8
         )
 
         val expectedFormat = "$year"
-        underTest.bind(0, getCard(), mock())
+        underTest.bind(getCard(), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
     }
@@ -72,14 +79,14 @@ class GalleryCardViewHolderTest {
     @Test
     fun `test that month card date is formatted correctly`() {
         val underTest = GalleryCardViewHolder(
-                GroupingLevel.Months.ordinal,
-                binding,
-                800,
-                8
+            GroupingLevel.Months.ordinal,
+            binding,
+            800,
+            8
         )
 
         val expectedFormat = "$month $year"
-        underTest.bind(0, getCard(), mock())
+        underTest.bind(getCard(), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
     }
@@ -87,14 +94,14 @@ class GalleryCardViewHolderTest {
     @Test
     fun `test that month card date is formatted correctly if year is null`() {
         val underTest = GalleryCardViewHolder(
-                GroupingLevel.Months.ordinal,
-                binding,
-                800,
-                8
+            GroupingLevel.Months.ordinal,
+            binding,
+            800,
+            8
         )
 
         val expectedFormat = "$month"
-        underTest.bind(0, getCard(yearString = null), mock())
+        underTest.bind(getCard(yearString = null), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
     }
@@ -102,14 +109,14 @@ class GalleryCardViewHolderTest {
     @Test
     fun `test that day card date is formatted correctly`() {
         val underTest = GalleryCardViewHolder(
-                GroupingLevel.Days.ordinal,
-                binding,
-                800,
-                8
+            GroupingLevel.Days.ordinal,
+            binding,
+            800,
+            8
         )
 
         val expectedFormat = "$day, $month $year"
-        underTest.bind(0, getCard(), mock())
+        underTest.bind(getCard(), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
 
@@ -118,14 +125,14 @@ class GalleryCardViewHolderTest {
     @Test
     fun `test that day card date is formatted correctly if year is null`() {
         val underTest = GalleryCardViewHolder(
-                GroupingLevel.Days.ordinal,
-                binding,
-                800,
-                8
+            GroupingLevel.Days.ordinal,
+            binding,
+            800,
+            8
         )
 
         val expectedFormat = date
-        underTest.bind(0, getCard(yearString = null), mock())
+        underTest.bind(getCard(yearString = null), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
 

@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -46,6 +45,7 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomVi
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
@@ -66,7 +66,6 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.MEDIA_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -224,7 +223,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaType.Header })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
             viewTypePanel.visibility =
                 if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {

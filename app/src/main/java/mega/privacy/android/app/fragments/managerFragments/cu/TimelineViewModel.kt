@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
@@ -29,10 +30,9 @@ import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import nz.mega.sdk.MegaApiJava
@@ -49,7 +49,7 @@ class TimelineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
-    private val sortOrderManagement: SortOrderManagement,
+    getCameraSortOrder: GetCameraSortOrder,
     private val jobUtilWrapper: JobUtilWrapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
@@ -78,7 +78,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = sortOrderManagement.getOrderCamera()
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false
@@ -315,7 +315,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * User enabled Camera Upload, so a periodic job should be scheduled if not already running
      */
-    fun startCameraUploadJob() {
+    fun startCameraUploadJob(context: Context) {
         Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
         jobUtilWrapper.fireCameraUploadJob(context, false)
     }
@@ -352,11 +352,11 @@ class TimelineViewModel @Inject constructor(
         mDbHandler.setCamSyncEnabled(enabled)
     }
 
-    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
+    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean, context: Context) {
         viewModelScope.launch(ioDispatcher) {
             runCatching {
                 enableCUSettingForDb(enableCellularSync, syncVideo)
-                startCameraUploadJob()
+                startCameraUploadJob(context)
             }.onFailure {
                 Timber.e("enableCu" + it.message)
             }

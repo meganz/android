@@ -16,14 +16,14 @@ import timber.log.Timber
  */
 fun Pair<String?, String?>.formatDateTitle(context: Context): Spanned {
     var dateText =
-            if (this.second.isNullOrBlank()) "[B]" + this.first + "[/B]" else context.getFormattedStringOrDefault(
-                    R.string.cu_month_year_date,
-                    this.first,
-                    this.second
-            )
+        if (this.second.isNullOrBlank()) "[B]" + this.first + "[/B]" else context.getFormattedStringOrDefault(
+            R.string.cu_month_year_date,
+            this.first,
+            this.second
+        )
     try {
         dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
-                .replace("[/B]", "</font>")
+            .replace("[/B]", "</font>")
     } catch (e: Exception) {
         Timber.w("Exception formatting text.", e)
     }

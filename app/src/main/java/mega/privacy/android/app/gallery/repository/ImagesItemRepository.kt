@@ -14,20 +14,20 @@ import javax.inject.Singleton
 
 @Singleton
 class ImagesItemRepository @Inject constructor(
-        @ApplicationContext context: Context,
-        @MegaApi megaApi: MegaApiAndroid,
-        dbHandler: DatabaseHandler,
-        cacheFolderGateway: CacheFolderGateway,
+    @ApplicationContext context: Context,
+    @MegaApi megaApi: MegaApiAndroid,
+    dbHandler: DatabaseHandler,
+    cacheFolderGateway: CacheFolderGateway,
 ) : GalleryItemRepository(context, megaApi, dbHandler, cacheFolderGateway) {
 
     override fun initGalleryNodeFetcher(
-            context: Context,
-            megaApi: MegaApiAndroid,
-            selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-            order: Int,
-            zoom: Int,
-            dbHandler: DatabaseHandler,
-            handle: Long?
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
+        zoom: Int,
+        dbHandler: DatabaseHandler,
+        handle: Long?,
     ): GalleryBaseFetcher {
         return ImagesFetcher(context, megaApi, selectedNodesMap, zoom)
     }

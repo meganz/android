@@ -85,4 +85,6 @@ class DefaultFilesRepository @Inject constructor(
     }
 
     override suspend fun getCloudSortOrder(): Int = megaLocalStorageGateway.getCloudSortOrder()
+
+    override suspend fun getCameraSortOrder(): Int = megaLocalStorageGateway.getCameraSortOrder()
 }

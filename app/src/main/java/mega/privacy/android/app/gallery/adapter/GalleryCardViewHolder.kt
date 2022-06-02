@@ -41,17 +41,18 @@ class GalleryCardViewHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(position: Int, card: GalleryCard, listener: GalleryCardAdapter.Listener) {
+    fun bind(card: GalleryCard, listener: GalleryCardAdapter.Listener) {
         val context = binding.root.context
-        itemView.setOnClickListener { listener.onCardClicked(position, card) }
+        itemView.setOnClickListener { listener.onCardClicked(card) }
 
         val date = when (viewType) {
             YEARS_VIEW -> Pair(card.year, "")
-            MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("", context.getFormattedStringOrDefault(
-                R.string.cu_month_year_date,
-                card.month,
-                card.year
-            ))
+            MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("",
+                context.getFormattedStringOrDefault(
+                    R.string.cu_month_year_date,
+                    card.month,
+                    card.year
+                ))
             DAYS_VIEW -> if (card.year == null) Pair(card.date, "") else
                 Pair("", context.getFormattedStringOrDefault(
                     R.string.cu_day_month_year_date,

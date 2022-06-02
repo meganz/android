@@ -21,10 +21,10 @@ import java.util.*
  * The repository to handle gallery data logic
  */
 abstract class GalleryItemRepository constructor(
-        val context: Context,
-        val megaApi: MegaApiAndroid,
-        val dbHandler: DatabaseHandler,
-        private val cacheFolderGateway: CacheFolderGateway,
+    val context: Context,
+    val megaApi: MegaApiAndroid,
+    val dbHandler: DatabaseHandler,
+    private val cacheFolderGateway: CacheFolderGateway,
 ) {
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
@@ -46,23 +46,23 @@ abstract class GalleryItemRepository constructor(
      * @param handle
      */
     suspend fun getFiles(
-            cancelCallback: CancelCallback,
-            order: Int,
-            zoom: Int,
-            handle: Long? = null
+        cancelCallback: CancelCallback,
+        order: Int,
+        zoom: Int,
+        handle: Long? = null,
     ) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
         nodesFetcher = initGalleryNodeFetcher(
-                context,
-                megaApi,
-                selectedNodesMap,
-                order,
-                zoom,
-                dbHandler,
-                handle
+            context,
+            megaApi,
+            selectedNodesMap,
+            order,
+            zoom,
+            dbHandler,
+            handle
         )
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
@@ -74,12 +74,12 @@ abstract class GalleryItemRepository constructor(
 
     suspend fun getPreviews(list: List<GalleryCard>, refreshCallback: () -> Unit) {
         val missingPreviewIds = list.filter { it.preview == null }
-                .map { it.id }
+            .map { it.id }
 
         galleryItems.value?.let { items ->
             val map = items.mapNotNull { it.node }
-                    .filter { missingPreviewIds.contains(it.handle) }
-                    .associateWith { File(previewFolder, it.previewPath).absolutePath }
+                .filter { missingPreviewIds.contains(it.handle) }
+                .associateWith { File(previewFolder, it.previewPath).absolutePath }
 
             nodesFetcher.getPreviewsFromServer(map, refreshCallback)
         }
@@ -111,13 +111,13 @@ abstract class GalleryItemRepository constructor(
     }
 
     abstract fun initGalleryNodeFetcher(
-            context: Context,
-            megaApi: MegaApiAndroid,
-            selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-            order: Int,
-            zoom: Int,
-            dbHandler: DatabaseHandler,
-            handle: Long? = null
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
+        zoom: Int,
+        dbHandler: DatabaseHandler,
+        handle: Long? = null,
     ): GalleryBaseFetcher
 
     sealed interface CancelCallback {

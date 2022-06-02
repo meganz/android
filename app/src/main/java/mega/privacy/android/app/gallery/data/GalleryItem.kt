@@ -26,17 +26,17 @@ import java.io.File
  * @param uiDirty        Force refresh the newly created Node list item
  */
 data class GalleryItem(
-        override var node: MegaNode?,
-        var indexForViewer: Int,
-        override var index: Int,
-        override var thumbnail: File?,
-        var type: MediaType,
-        var modifyDate: String,
-        var formattedDate: Spanned?,
-        var headerDate: Pair<String, String>?,
-        override var selected: Boolean,
-        override var uiDirty: Boolean,
-) : NodeItem(node, index, type == MediaType.Video, modifyDate, thumbnail, selected, uiDirty) {
+    override var node: MegaNode?,
+    var indexForViewer: Int,
+    override var index: Int,
+    override var thumbnail: File?,
+    var type: MediaCardType,
+    var modifyDate: String,
+    var formattedDate: Spanned?,
+    var headerDate: Pair<String, String>?,
+    override var selected: Boolean,
+    override var uiDirty: Boolean,
+) : NodeItem(node, index, type == MediaCardType.Video, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
      * Creates a TYPE_HEADER which represent date.
@@ -47,20 +47,28 @@ data class GalleryItem(
      *                   - Second: Year if not current year, empty otherwise.
      */
     constructor(
-            modifyDate: String,
-            headerDate: Pair<String, String>,
-            context: Context,
+        modifyDate: String,
+        headerDate: Pair<String, String>,
+        context: Context,
     ) : this(
-            null, INVALID_POSITION, INVALID_POSITION, null,
-            MediaType.Header, modifyDate, headerDate.formatDateTitle(context), headerDate, false, false
+        null,
+        INVALID_POSITION,
+        INVALID_POSITION,
+        null,
+        MediaCardType.Header,
+        modifyDate,
+        headerDate.formatDateTitle(context),
+        headerDate,
+        false,
+        false
     )
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
         override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem) =
-                oldItem.node?.handle == newItem.node?.handle
+            oldItem.node?.handle == newItem.node?.handle
 
         override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem) =
-                !newItem.uiDirty
+            !newItem.uiDirty
     }
 
 }

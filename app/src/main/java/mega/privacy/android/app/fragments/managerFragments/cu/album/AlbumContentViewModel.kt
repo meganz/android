@@ -1,8 +1,12 @@
 package mega.privacy.android.app.fragments.managerFragments.cu.album
 
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.repository.FavouriteAlbumRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
@@ -14,13 +18,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AlbumContentViewModel @Inject constructor(
-        val repository: FavouriteAlbumRepository,
-        val sortOrderManagement: SortOrderManagement,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    val repository: FavouriteAlbumRepository,
+    getCameraSortOrder: GetCameraSortOrder,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : GalleryViewModel(
-        galleryItemRepository = repository,
-        sortOrderManagement = sortOrderManagement,
-        ioDispatcher = ioDispatcher,
+    galleryItemRepository = repository,
+    ioDispatcher = ioDispatcher,
+    getCameraSortOrder = getCameraSortOrder,
 ) {
 
     override var mZoom = ZoomUtil.ALBUM_ZOOM_LEVEL
@@ -28,5 +32,5 @@ class AlbumContentViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = sortOrderManagement.getOrderCamera()
+    fun getOrder() = runBlocking{ getCameraSortOrder() }
 }

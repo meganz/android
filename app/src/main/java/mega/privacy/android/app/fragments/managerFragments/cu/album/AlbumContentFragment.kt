@@ -30,7 +30,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
-import mega.privacy.android.app.gallery.data.MediaType
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -188,7 +188,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaType.Header })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
             handleOptionsMenuUpdate(it.isNotEmpty())
         }
     }

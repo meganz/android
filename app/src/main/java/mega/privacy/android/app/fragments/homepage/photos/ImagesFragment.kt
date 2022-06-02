@@ -33,7 +33,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentImagesBinding
-import mega.privacy.android.app.gallery.data.MediaType
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -193,7 +193,7 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
             if (isGridAdapterInitialized()) {
                 gridAdapter.submitList(it)
             }
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == MediaType.Image })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == MediaCardType.Image })
             viewTypePanel.visibility = if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)

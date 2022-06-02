@@ -39,6 +39,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -65,7 +66,6 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
-import mega.privacy.android.app.gallery.data.MediaType
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -279,7 +279,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
-            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked,
+            requireContext(),
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
@@ -431,7 +432,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaType.Header })
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
 
             updateOptionsButtons()
 
@@ -476,11 +477,11 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     ) {
         binding.emptyEnableCuButton.visibility =
             if (!cuEnabled && !gridAdapterHasData) View.VISIBLE else View.GONE
-        binding.enableCuButton.visibility = (
-                if (selectedView == ALL_VIEW && !cuEnabled
-                    && gridAdapterHasData && actionMode == null
-                ) View.VISIBLE else View.GONE
-                )
+        mManagerActivity.updateEnableCUButton(
+            if (selectedView == ALL_VIEW && !cuEnabled
+                && gridAdapterHasData && actionMode == null
+            ) View.VISIBLE else View.GONE
+        )
         if (!cuEnabled) {
             hideCUProgress()
         }

@@ -1,14 +1,17 @@
 package mega.privacy.android.app.globalmanagement
 
 import mega.privacy.android.app.DatabaseHandler
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SortOrderManagement @Inject constructor(
-    private val dbH: DatabaseHandler
-) : NodeSortOrder {
+    private val dbH: DatabaseHandler,
+) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
@@ -36,16 +39,16 @@ class SortOrderManagement @Inject constructor(
     /**
      * Sets all the available orders to the value by default
      */
-    override fun resetDefaults() {
+    fun resetDefaults() {
         orderCloud = ORDER_DEFAULT_ASC
         orderOthers = ORDER_DEFAULT_ASC
         orderCamera = ORDER_MODIFICATION_DESC
         orderOffline = ORDER_DEFAULT_ASC
     }
 
-    override fun getOrderCloud(): Int = orderCloud
+    fun getOrderCloud(): Int = orderCloud
 
-    override fun setOrderCloud(newOrderCloud: Int) {
+    fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud
         dbH.setPreferredSortCloud(orderCloud.toString())
 
@@ -54,23 +57,23 @@ class SortOrderManagement @Inject constructor(
         }
     }
 
-    override fun getOrderOthers(): Int = orderOthers
+    fun getOrderOthers(): Int = orderOthers
 
-    override fun setOrderOthers(newOrderOthers: Int) {
+    fun setOrderOthers(newOrderOthers: Int) {
         orderOthers = newOrderOthers
         dbH.setPreferredSortOthers(orderOthers.toString())
     }
 
-    override fun getOrderCamera(): Int = orderCamera
+    fun getOrderCamera(): Int = orderCamera
 
-    override fun setOrderCamera(newOrderCamera: Int) {
+    fun setOrderCamera(newOrderCamera: Int) {
         orderCamera = newOrderCamera
         dbH.setPreferredSortCameraUpload(orderCamera.toString())
     }
 
-    override fun getOrderOffline(): Int = orderOffline
+    fun getOrderOffline(): Int = orderOffline
 
-    override fun setOrderOffline(newOrderOffline: Int) {
+    fun setOrderOffline(newOrderOffline: Int) {
         orderOffline = newOrderOffline
         orderCloud = newOrderOffline
         dbH.setPreferredSortCloud(orderCloud.toString())

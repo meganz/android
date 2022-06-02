@@ -1,9 +1,11 @@
 package test.mega.privacy.android.app.fragments.homepage.photos
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.MediaType
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -13,6 +15,7 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DateCardsProviderTest() {
     private val previewFolder = File("path")
 
@@ -26,7 +29,7 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that all lists are empty if input is empty`() {
+    fun `test that all lists are empty if input is empty`() = runTest {
         underTest.processGalleryItems(emptyList())
 
         assertThat(underTest.getDays()).isEmpty()
@@ -35,7 +38,7 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that a card is returned for every day`() {
+    fun `test that a card is returned for every day`() = runTest {
 
         val numberOfYears = 1
         val numberOfDaysPerMonth = 20
@@ -47,7 +50,7 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that multiple dates on the same day increases the item count`() {
+    fun `test that multiple dates on the same day increases the item count`() = runTest {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 1
@@ -63,18 +66,20 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that only one month card is returned if all dates are in the same month`() {
+    fun `test that only one month card is returned if all dates are in the same month`() = runTest {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 20
         val numberOfMonthsPerYear = 1
-        val items = getGalleryItems(numberOfYears = numberOfYears, numberOfMonthsPerYear = numberOfMonthsPerYear, numberOfDaysPerMonth = numberOfDaysPerMonth)
+        val items = getGalleryItems(numberOfYears = numberOfYears,
+            numberOfMonthsPerYear = numberOfMonthsPerYear,
+            numberOfDaysPerMonth = numberOfDaysPerMonth)
 
         underTest.processGalleryItems(items)
         assertThat(underTest.getMonths()).hasSize(numberOfYears * numberOfMonthsPerYear)
     }
 
     @Test
-    fun `test that a card is returned for every month`() {
+    fun `test that a card is returned for every month`() = runTest {
         val numberOfYears = 1
         val numberOfDaysPerMonth = 1
         val numberOfMonthsPerYear = 6
@@ -85,7 +90,7 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that only one year card is returned if all dates are in the same year`() {
+    fun `test that only one year card is returned if all dates are in the same year`() = runTest {
         val numberOfYears = 1
         val numberOfMonthsPerYear = 6
         val numberOfDaysPerMonth = 1
@@ -96,7 +101,7 @@ class DateCardsProviderTest() {
     }
 
     @Test
-    fun `test that a year card is returned for every year`() {
+    fun `test that a year card is returned for every year`() = runTest {
         val numberOfYears = 4
         val numberOfMonthsPerYear = 6
         val numberOfDaysPerMonth = 4
@@ -107,33 +112,49 @@ class DateCardsProviderTest() {
     }
 
 
-    private fun getGalleryItems(numberOfYears: Int, numberOfMonthsPerYear: Int, numberOfDaysPerMonth: Int, identifier: Int? = null): List<GalleryItem> {
+    private fun getGalleryItems(
+        numberOfYears: Int,
+        numberOfMonthsPerYear: Int,
+        numberOfDaysPerMonth: Int,
+        identifier: Int? = null,
+    ): List<GalleryItem> {
         val offset = OffsetDateTime.now().offset
 
         val items =
-                (1..numberOfYears).map { year ->
-                    (1..numberOfMonthsPerYear).map { month ->
-                        (1..numberOfDaysPerMonth).map { day ->
-                            LocalDateTime.of(year, month, day, 12, 0)
-                        }
-                    }.flatten()
+            (1..numberOfYears).map { year ->
+                (1..numberOfMonthsPerYear).map { month ->
+                    (1..numberOfDaysPerMonth).map { day ->
+                        LocalDateTime.of(year, month, day, 12, 0)
+                    }
                 }.flatten()
-                        .map { localDateTime ->
-                            val day = localDateTime.dayOfMonth
-                            val month = localDateTime.monthValue
-                            val year = localDateTime.year
-                            val node = mock<MegaNode> {
-                                on { name }.thenReturn(getHandleString(day, month, year))
-                                on { base64Handle }.thenReturn(getHandleString(day, month, year) + appendIdentifier(identifier))
-                                on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
-                            }
-                            GalleryItem(node, 1, 1, null, MediaType.Header, "", null, null, false, false)
-                        }
+            }.flatten()
+                .map { localDateTime ->
+                    val day = localDateTime.dayOfMonth
+                    val month = localDateTime.monthValue
+                    val year = localDateTime.year
+                    val node = mock<MegaNode> {
+                        on { name }.thenReturn(getHandleString(day, month, year))
+                        on { base64Handle }.thenReturn(getHandleString(day,
+                            month,
+                            year) + appendIdentifier(identifier))
+                        on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
+                    }
+                    GalleryItem(node,
+                        1,
+                        1,
+                        null,
+                        MediaCardType.Header,
+                        "",
+                        null,
+                        null,
+                        false,
+                        false)
+                }
         return items
     }
 
     private fun getHandleString(day: Int, month: Int, year: Int) =
-            "Day: $day Month:$month Year:$year"
+        "Day: $day Month:$month Year:$year"
 
     private fun appendIdentifier(identifier: Int?) = identifier?.let { " ($it)" } ?: ""
 

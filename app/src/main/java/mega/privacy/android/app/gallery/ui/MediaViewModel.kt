@@ -12,15 +12,16 @@ import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiJava
@@ -34,9 +35,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaViewModel @Inject constructor(
     private val repository: MediaItemRepository,
-    private val sortOrderManagement: SortOrderManagement,
-    savedStateHandle: SavedStateHandle,
+    getCameraSortOrder: GetCameraSortOrder,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
@@ -57,7 +58,7 @@ class MediaViewModel @Inject constructor(
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    fun getOrder() = sortOrderManagement.getOrderCamera()
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 

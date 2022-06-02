@@ -16,19 +16,19 @@ import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
-import mega.privacy.android.app.gallery.data.MediaType
+import mega.privacy.android.app.gallery.data.MediaCardType
 
 class GalleryAdapter(
-        private val actionModeViewModel: ActionModeViewModel,
-        private val itemOperationViewModel: ItemOperationViewModel,
-        private var itemSizeConfig: GalleryItemSizeConfig
+    private val actionModeViewModel: ActionModeViewModel,
+    private val itemOperationViewModel: ItemOperationViewModel,
+    private var itemSizeConfig: GalleryItemSizeConfig,
 ) : ListAdapter<GalleryItem, GalleryViewHolder>(GalleryItem.DiffCallback()),
-        SectionTitleProvider, DragThumbnailGetter {
+    SectionTitleProvider, DragThumbnailGetter {
 
     private var itemDimen = 0
 
     override fun getNodePosition(handle: Long) =
-            currentList.indexOfFirst { it.node?.handle == handle }
+        currentList.indexOfFirst { it.node?.handle == handle }
 
     override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? {
         if (viewHolder is GalleryViewHolder) {
@@ -50,34 +50,34 @@ class GalleryAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        val binding = when (MediaType.values()[viewType]) {
-            MediaType.Image ->
+        val binding = when (MediaCardType.values()[viewType]) {
+            MediaCardType.Image ->
                 ItemGalleryImageBinding.inflate(
-                        inflater,
-                        parent,
-                        false
+                    inflater,
+                    parent,
+                    false
                 ).also {
                     if (itemDimen > 0) {
                         setItemLayoutParams(it)
                         it.iconSelected.visibility = View.GONE
                     }
                 }
-            MediaType.Video ->
+            MediaCardType.Video ->
                 ItemGalleryVideoBinding.inflate(
-                        inflater,
-                        parent,
-                        false
+                    inflater,
+                    parent,
+                    false
                 ).also {
                     if (itemDimen > 0) {
                         setItemLayoutParams(it)
                         it.iconSelected.visibility = View.GONE
                     }
                 }
-            MediaType.Header ->
+            MediaCardType.Header ->
                 ItemGalleryTitleBinding.inflate(
-                        inflater,
-                        parent,
-                        false
+                    inflater,
+                    parent,
+                    false
                 )
         }
 
@@ -102,7 +102,7 @@ class GalleryAdapter(
     fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
             return when (getItem(position).type) {
-                MediaType.Header -> spanCount
+                MediaCardType.Header -> spanCount
                 else -> 1
             }
         }

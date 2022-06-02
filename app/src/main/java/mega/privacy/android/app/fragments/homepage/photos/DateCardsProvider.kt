@@ -12,7 +12,8 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /**
  * Tool class used to organize MegaNode list by years, months and days.
@@ -20,8 +21,9 @@ import java.util.*
  * Also will filter out the node which doesn't have local preview.
  */
 class DateCardsProvider(
-        private val previewFolder: File,
-        private val fileUtil: FileUtilWrapper = object : FileUtilWrapper {}) {
+    private val previewFolder: File,
+    private val fileUtil: FileUtilWrapper = object : FileUtilWrapper {},
+) {
 
     private val DATE_FORMAT_YEAR = "uuuu"
 
@@ -35,83 +37,84 @@ class DateCardsProvider(
     }
 
 
-    fun processGalleryItems(nodes: List<GalleryItem>) {
+    suspend fun processGalleryItems(nodes: List<GalleryItem>) {
         dayNodes = nodes.mapNotNull {
             val node = it.node ?: return
+            val previewExists = fileUtil.getFileIfExists(previewFolder, node.previewPath)
             object : MediaItem {
                 override val id: Long = node.handle
                 override val modifiedDate: LocalDate = Util.fromEpoch(node.modificationTime)
-                override val preview: File? = fileUtil.getFileIfExists(previewFolder, node.previewPath)
+                override val preview: File? = previewExists
                 override val name: String = node.name
             }
 
         }.groupBy { it.modifiedDate.toEpochDay() }
-                .map { (_, list) ->
-                    list.minByOrNull { it.modifiedDate }!! to list.size - 1L
-                }.toMap()
+            .map { (_, list) ->
+                list.minByOrNull { it.modifiedDate }!! to list.size - 1L
+            }.toMap()
     }
 
     private fun createMonthCard(item: MediaItem): GalleryCard {
-        val DATE_FORMAT_MONTH_STANDALONE = "LLLL"
-        val DATE_FORMAT_YEAR_OF_ERA = "yyyy"
+        val monthFormat = "LLLL"
+        val yearFormat = "yyyy"
         val modifiedDate = item.modifiedDate
         val preview = item.preview
         val sameYear = Year.from(LocalDate.now()) == Year.from(modifiedDate)
         val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
-        val month = SimpleDateFormat(DATE_FORMAT_MONTH_STANDALONE, Locale.getDefault()).format(
-                Date.from(modifiedDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+        val month = SimpleDateFormat(monthFormat, Locale.getDefault()).format(
+            Date.from(modifiedDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
         )
         val monthCardDate = if (sameYear) {
             month
         } else {
-            SimpleDateFormat("$DATE_FORMAT_MONTH_STANDALONE $DATE_FORMAT_YEAR_OF_ERA",
-                    Locale.getDefault()).format(
-                    Date.from(
-                            modifiedDate.atStartOfDay()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toInstant()
-                    )
+            SimpleDateFormat("$monthFormat $yearFormat",
+                Locale.getDefault()).format(
+                Date.from(
+                    modifiedDate.atStartOfDay()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                )
             )
         }
         return GalleryCard(
-                id = item.id,
-                name = item.name,
-                preview = preview,
-                day = null,
-                month = month,
-                year = if (sameYear) null else year,
-                date = monthCardDate,
-                localDate = modifiedDate,
-                numItems = 0
+            id = item.id,
+            name = item.name,
+            preview = preview,
+            day = null,
+            month = month,
+            year = if (sameYear) null else year,
+            date = monthCardDate,
+            localDate = modifiedDate,
+            numItems = 0
         )
     }
 
     private fun createDayCard(item: MediaItem, itemCount: Long): GalleryCard {
-        val DATE_FORMAT_DAY = "dd"
-        val DATE_FORMAT_MONTH = "MMMM"
+        val dayFormat = "dd"
+        val monthFormat = "MMMM"
         val modifiedDate = item.modifiedDate
         val preview = item.preview
-        val day = DateTimeFormatter.ofPattern(DATE_FORMAT_DAY).format(modifiedDate)
-        val monthForDayCard = DateTimeFormatter.ofPattern(DATE_FORMAT_MONTH).format(modifiedDate)
+        val day = DateTimeFormatter.ofPattern(dayFormat).format(modifiedDate)
+        val monthForDayCard = DateTimeFormatter.ofPattern(monthFormat).format(modifiedDate)
         val sameYear = Year.from(LocalDate.now()) == Year.from(modifiedDate)
         val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
         val dayCardDate = DateTimeFormatter.ofPattern(
-                if (sameYear) {
-                    "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH"
-                } else {
-                    "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH $DATE_FORMAT_YEAR"
-                }
+            if (sameYear) {
+                "$dayFormat $monthFormat"
+            } else {
+                "$dayFormat $monthFormat $DATE_FORMAT_YEAR"
+            }
         ).format(modifiedDate)
         return GalleryCard(
-                id = item.id,
-                name = item.name,
-                preview = preview,
-                day = day,
-                month = monthForDayCard,
-                year = if (sameYear) null else year,
-                date = dayCardDate,
-                localDate = modifiedDate,
-                numItems = itemCount
+            id = item.id,
+            name = item.name,
+            preview = preview,
+            day = day,
+            month = monthForDayCard,
+            year = if (sameYear) null else year,
+            date = dayCardDate,
+            localDate = modifiedDate,
+            numItems = itemCount
         )
     }
 
@@ -120,15 +123,15 @@ class DateCardsProvider(
         val preview = item.preview
         val year = DateTimeFormatter.ofPattern(DATE_FORMAT_YEAR).format(modifiedDate)
         return GalleryCard(
-                id = item.id,
-                name = item.name,
-                preview = preview,
-                day = null,
-                month = null,
-                year = year,
-                date = year,
-                localDate = modifiedDate,
-                numItems = 0
+            id = item.id,
+            name = item.name,
+            preview = preview,
+            day = null,
+            month = null,
+            year = year,
+            date = year,
+            localDate = modifiedDate,
+            numItems = 0
         )
     }
 
@@ -137,14 +140,14 @@ class DateCardsProvider(
     }
 
     fun getMonths() = dayNodes.keys
-            .sortedBy { it.modifiedDate }
-            .distinctBy {
-                YearMonth.from(it.modifiedDate)
-            }.map { createMonthCard(it) }
+        .sortedBy { it.modifiedDate }
+        .distinctBy {
+            YearMonth.from(it.modifiedDate)
+        }.map { createMonthCard(it) }
 
     fun getYears() = dayNodes.keys
-            .sortedBy { it.modifiedDate }
-            .distinctBy { it.modifiedDate.year }
-            .map { createYearCard(it) }
+        .sortedBy { it.modifiedDate }
+        .distinctBy { it.modifiedDate.year }
+        .map { createYearCard(it) }
 
 }

@@ -13,19 +13,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.MediaType
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
-import mega.privacy.android.app.globalmanagement.NodeSortOrder
 
-abstract class GalleryViewModel constructor(
+abstract class GalleryViewModel(
     private val galleryItemRepository: GalleryItemRepository,
-    private val sortOrderManagement: NodeSortOrder,
-    @IoDispatcher val ioDispatcher: CoroutineDispatcher,
+    @IoDispatcher protected val ioDispatcher: CoroutineDispatcher,
+    protected val getCameraSortOrder: GetCameraSortOrder,
     private val onNodesChange: Flow<Boolean> = MonitorNodeChangeFacade().getEvents(),
     savedStateHandle: SavedStateHandle? = null,
 ) : ViewModel() {
@@ -62,7 +61,7 @@ abstract class GalleryViewModel constructor(
      * Custom condition in sub class for filter the real photos count
      */
     open fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-        item.type != MediaType.Header
+        item.type != MediaCardType.Header
 
     /**
      * Indicate refreshing cards has finished.
@@ -79,7 +78,7 @@ abstract class GalleryViewModel constructor(
     open fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
 
-        if (item.type != MediaType.Header) {
+        if (item.type != MediaCardType.Header) {
             item.indexForViewer = tempIndex++
         }
 
@@ -92,11 +91,12 @@ abstract class GalleryViewModel constructor(
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
-                cancelToken = initNewSearch()
-                galleryItemRepository.getFiles(cancelToken ?: return@liveData,
-                    sortOrderManagement.getOrderCamera(),
-                    mZoom,
-                    currentHandle)
+                cancelToken = initNewSearch().also {
+                    galleryItemRepository.getFiles(it,
+                        getCameraSortOrder(),
+                        mZoom,
+                        currentHandle)
+                }
             } else {
                 galleryItemRepository.emitFiles()
             }
@@ -153,32 +153,84 @@ abstract class GalleryViewModel constructor(
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked year card.
-     * @return A month card corresponding to the year clicked, current month. If not exists,
+     * @return Index of a month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-        position,
+    fun yearClicked(card: GalleryCard) = yearClicked(
         card,
         dateCards.value?.get(MONTHS_INDEX),
-        dateCards.value?.get(YEARS_INDEX)
+        dateCards.value?.get(YEARS_INDEX),
     )
 
     /**
      * Checks the clicked month card and gets the day card to show after click on a month card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked month card.
-     * @return A day card corresponding to the month of the year clicked, current day. If not exists,
+     * @return Index of a day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-        position,
+    fun monthClicked(card: GalleryCard) = monthClicked(
         card,
         dateCards.value?.get(DAYS_INDEX),
         dateCards.value?.get(MONTHS_INDEX)
     )
+
+    private fun yearClicked(
+        card: GalleryCard,
+        months: List<GalleryCard>?,
+        years: List<GalleryCard>?,
+    ): Int {
+        val yearCard = getClickedCard(card.id, years) ?: return 0
+        val monthCards = months ?: return 0
+
+        val cardYear = yearCard.localDate.year
+
+        for (i in monthCards.indices) {
+            val nextLocalDate = monthCards[i].localDate
+            if (nextLocalDate.year == cardYear) {
+                //Year clicked, current month. If not exists, the closest month behind the current.
+                if (i == 0 || monthCards[i - 1].localDate.year != cardYear) {
+                    return i
+                }
+            }
+        }
+
+        //No month equal or behind the current found, then return the latest month.
+        return monthCards.size - 1
+    }
+
+    private fun monthClicked(
+        card: GalleryCard,
+        days: List<GalleryCard>?,
+        months: List<GalleryCard>?,
+    ): Int {
+        val monthCard = getClickedCard(card.id, months) ?: return 0
+        val dayCards = days ?: return 0
+
+        val cardLocalDate = monthCard.localDate
+        val cardMonth = cardLocalDate.monthValue
+        val cardYear = cardLocalDate.year
+
+        for (i in dayCards.indices) {
+            val nextLocalDate = dayCards[i].localDate
+            val nextMonth = nextLocalDate.monthValue
+            val nextYear = nextLocalDate.year
+
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                //Month of year clicked, current day. If not exists, the closest day behind the current.
+                if (i == 0 || dayCards[i - 1].localDate.monthValue != cardMonth) {
+                    return i
+                }
+            }
+        }
+        return dayCards.size - 1
+    }
+
+    private fun getClickedCard(
+        handle: Long,
+        cards: List<GalleryCard>?,
+    ) = cards?.find { it.id == handle }
 
     private val loadFinishedObserver = Observer<List<GalleryItem>> {
         loadInProgress = false
