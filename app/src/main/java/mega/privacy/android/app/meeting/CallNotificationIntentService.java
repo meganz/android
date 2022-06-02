@@ -2,8 +2,6 @@ package mega.privacy.android.app.meeting;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Build;
-
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
