@@ -124,7 +124,7 @@ class DateCardsProviderTest() {
             (1..numberOfYears).map { year ->
                 (1..numberOfMonthsPerYear).map { month ->
                     (1..numberOfDaysPerMonth).map { day ->
-                        LocalDateTime.of(year, month, day, 12, 0)
+                        LocalDateTime.of(year, month, day, 12, 0).atOffset(offset)
                     }
                 }.flatten()
             }.flatten()
@@ -137,18 +137,20 @@ class DateCardsProviderTest() {
                         on { base64Handle }.thenReturn(getHandleString(day,
                             month,
                             year) + appendIdentifier(identifier))
-                        on { modificationTime }.thenReturn(localDateTime.toEpochSecond(offset))
+                        on { modificationTime }.thenReturn(localDateTime.toEpochSecond())
                     }
-                    GalleryItem(node,
-                        1,
-                        1,
-                        null,
-                        MediaCardType.Header,
-                        "",
-                        null,
-                        null,
-                        false,
-                        false)
+                    GalleryItem(
+                        node = node,
+                        indexForViewer = 1,
+                        index = 1,
+                        thumbnail = null,
+                        type = MediaCardType.Header,
+                        modifyDate = "",
+                        formattedDate = null,
+                        headerDate = null,
+                        selected = false,
+                        uiDirty = false
+                    )
                 }
         return items
     }
