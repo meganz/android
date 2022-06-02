@@ -17,7 +17,6 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,8 +36,19 @@ class GetCallSoundsUseCase @Inject constructor(
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
     }
 
+    /**
+     * Participant info
+     *
+     * @property peerId             Peer ID of participant
+     * @property clientId           Client ID of participant
+     */
+    data class ParticipantInfo(
+        val peerId: Long,
+        val clientId: Long
+    )
+
     var countDownTimer: CustomCountDownTimer? = null
-    val peerIdList = ArrayList<Long>()
+    val participants = ArrayList<ParticipantInfo>()
 
     /**
      * Method to get the appropriate sound
@@ -54,37 +64,29 @@ class GetCallSoundsUseCase @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { result ->
+                        val participant =
+                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
                         when (result.sessionStatus) {
                             MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                                 result.call?.let { call ->
-                                    stopCountDown(call.chatid, result.lastParticipantPeerId)
+                                    stopCountDown(call.chatid, participant)
                                 }
                             }
 
                             MegaChatSession.SESSION_STATUS_DESTROYED -> {
                                 result.isRecoverable?.let { isRecoverableSession ->
                                     if (result.call == null) {
-                                        stopCountDown(INVALID_HANDLE, result.lastParticipantPeerId)
+                                        stopCountDown(INVALID_HANDLE, participant)
                                         emitter.onNext(CallSoundType.CALL_ENDED)
-
                                     } else if (isRecoverableSession) {
-                                        val numParticipantsInCall: Int = result.call.numParticipants
-                                        val peerIdLastParticipant =
-                                            result.call.peeridParticipants.get(0)
-
-                                        if (numParticipantsInCall == 1 && peerIdLastParticipant == megaChatApi.myUserHandle) {
-                                            emitter.startCountDown(
-                                                result.call, result.lastParticipantPeerId,
-                                                SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
-                                            )
-                                        } else {
-                                            Timber.d("The count down timer can't start")
-                                        }
-
+                                        emitter.startCountDown(
+                                            result.call, participant,
+                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                        )
                                     } else {
                                         stopCountDown(
                                             result.call.chatid,
-                                            result.lastParticipantPeerId
+                                            participant
                                         )
 
                                         megaChatApi.getChatRoom(result.call.chatid)
@@ -135,38 +137,41 @@ class GetCallSoundsUseCase @Inject constructor(
      */
     private fun FlowableEmitter<CallSoundType>.startCountDown(
         call: MegaChatCall,
-        peerId: Long,
+        participant: ParticipantInfo,
         seconds: Long
     ) {
         megaChatApi.getChatRoom(call.chatid)?.let { chat ->
             if (!chat.isGroup && !chat.isMeeting) {
-                peerIdList.add(peerId)
-                if (countDownTimer == null) {
-                    val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                    countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
-                    countDownTimerLiveData.observeOnce { counterState ->
-                        counterState?.let { isFinished ->
-                            if (isFinished) {
-                                stopCountDown(chat.chatId, peerId)
-                                megaChatApi.hangChatCall(call.callId,
-                                    OptionalMegaChatRequestListenerInterface(
-                                        onRequestFinish = { _, error ->
-                                            if (error.errorCode == MegaError.API_OK) {
-                                                peerIdList.remove(peerId)
-                                                MegaApplication.getInstance()
-                                                    .removeRTCAudioManager()
-                                                this.onNext(CallSoundType.CALL_ENDED)
-                                            } else {
-                                                this.onError(error.toThrowable())
+                if (participants.contains(participant)) {
+                    if (countDownTimer == null) {
+                        participants.remove(participant)
+                        val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+                        countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+                        countDownTimerLiveData.observeOnce { counterState ->
+                            counterState?.let { isFinished ->
+                                if (isFinished) {
+
+                                    megaChatApi.hangChatCall(call.callId,
+                                        OptionalMegaChatRequestListenerInterface(
+                                            onRequestFinish = { _, error ->
+                                                if (error.errorCode == MegaError.API_OK) {
+                                                    removeCountDownTimer()
+                                                    MegaApplication.getInstance()
+                                                        .removeRTCAudioManager()
+                                                    this.onNext(CallSoundType.CALL_ENDED)
+                                                } else {
+                                                    this.onError(error.toThrowable())
+                                                }
                                             }
-                                        }
-                                    ))
+                                        ))
+                                }
                             }
                         }
                     }
-                }
 
-                countDownTimer?.start(seconds)
+                    Timber.d("Count down timer starts")
+                    countDownTimer?.start(seconds)
+                }
             }
         }
     }
@@ -175,28 +180,37 @@ class GetCallSoundsUseCase @Inject constructor(
      * Method to stop the countdown
      *
      * @param chatId Chat ID
-     * @param peerId User Handle
+     * @param participant ParticipantInfo
      */
-    private fun stopCountDown(chatId: Long, peerId: Long) {
-        if (chatId == MEGACHAT_INVALID_HANDLE) {
-            if (countDownTimer != null && peerIdList.contains(peerId)) {
-                countDownTimer?.stop()
-                countDownTimer = null
-                peerIdList.remove(peerId)
-            }
-        } else {
-            megaChatApi.getChatRoom(chatId)?.let { chat ->
-                if (!chat.isGroup && !chat.isMeeting && countDownTimer != null && peerIdList.contains(
-                        peerId
-                    )
-                ) {
-                    countDownTimer?.stop()
-                    countDownTimer = null
-                    peerIdList.remove(peerId)
+    private fun stopCountDown(chatId: Long, participant: ParticipantInfo) {
+        megaChatApi.getChatRoom(chatId)?.let { chat ->
+            if (!chat.isGroup && !chat.isMeeting) {
+                var participantToRemove: ParticipantInfo? = null
+                participants.forEach { participantToCheck ->
+                    if (participantToCheck.peerId == participant.peerId) {
+                        participantToRemove = participantToCheck
+                    }
                 }
+
+                if (participantToRemove != null) {
+                    participants.remove(participantToRemove)
+                }
+
+                participants.add(participant)
+                removeCountDownTimer()
             }
         }
+    }
 
+    /**
+     * Remove Count down timer
+     */
+    private fun removeCountDownTimer() {
+        countDownTimer?.let {
+            Timber.d("Count down timer stops")
+            it.stop()
+        }
+        countDownTimer = null
     }
 }
 

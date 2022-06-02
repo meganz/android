@@ -25,13 +25,15 @@ class GetSessionStatusChangesUseCase @Inject constructor(
      * @property call               MegaChatCall
      * @property sessionStatus      Status of the session
      * @property isRecoverable      True, if termCode is SESS_TERM_CODE_RECOVERABLE, false if termCode is SESS_TERM_CODE_NON_RECOVERABLE
-     * @property lastParticipantPeerId   Peer ID of last participant in the call
+     * @property peerId             Peer ID of participant
+     * @property clientId           Client ID of participant
      */
     data class SessionChangedResult(
         val call: MegaChatCall?,
         val sessionStatus: Int,
         val isRecoverable: Boolean?,
-        val lastParticipantPeerId: Long
+        val peerId: Long,
+        val clientId: Long
     )
 
     /**
@@ -46,6 +48,7 @@ class GetSessionStatusChangesUseCase @Inject constructor(
                     val session = callAndSession.second as MegaChatSession
                     val call = callAndSession.first
                     val peerId: Long = session.peerid
+                    val clientId: Long = session.clientid
                     var isRecoverable: Boolean? = null
 
                     when (val sessionStatus = session.status) {
@@ -55,7 +58,8 @@ class GetSessionStatusChangesUseCase @Inject constructor(
                                     call,
                                     sessionStatus,
                                     isRecoverable,
-                                    peerId
+                                    peerId,
+                                    clientId
                                 )
                             )
                         }
@@ -71,7 +75,8 @@ class GetSessionStatusChangesUseCase @Inject constructor(
                                     call,
                                     sessionStatus,
                                     isRecoverable,
-                                    peerId
+                                    peerId,
+                                    clientId
                                 )
                             )
                         }
