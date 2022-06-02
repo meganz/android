@@ -699,7 +699,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private TextView cuAllButton;
     private LinearLayout cuLayout;
     private Button enableCUButton;
-    private ProgressBar cuProgressBar;
 
     //Tabs in Shares
     private TabLayout tabLayoutShares;
@@ -1964,7 +1963,6 @@ public class ManagerActivity extends TransfersManagementActivity
         cuDaysButton = findViewById(R.id.days_button);
         cuAllButton = findViewById(R.id.all_button);
         cuLayout = findViewById(R.id.cu_layout);
-        cuProgressBar = findViewById(R.id.cu_progress_bar);
         enableCUButton = findViewById(R.id.enable_cu_button);
         enableCUButton.setOnClickListener(v -> {
             if (getPhotosFragment() != null) {
@@ -7457,6 +7455,17 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Updates cuLayout view visibility.
+     *
+     * @param visibility New visibility value to set.
+     */
+    public void updateTimelineCULayout(int visibility) {
+        if (rightCUVisibilityChange(visibility)) {
+            photosFragment.setCULayoutVisibility(visibility);
+        }
+    }
+
+    /**
      * Updates enableCUButton view visibility and cuLayout if needed.
      *
      * @param visibility New visibility value to set.
@@ -7469,7 +7478,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if ((visibility == View.GONE && cuProgressBar.getVisibility() == View.GONE)
+        if ((visibility == View.GONE && getPhotosFragment() != null && photosFragment.getCUProgressBarVisibility() == View.GONE)
                 || (visibility == View.VISIBLE && cuLayout.getVisibility() == View.GONE)) {
             updateCULayout(visibility);
         }
@@ -7477,14 +7486,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rightCUVisibilityChange(visibility)) {
             enableCUButton.setVisibility(visibility);
         }
-    }
-
-    /**
-     * Hides the CU progress bar.
-     */
-    public void hideCUProgress() {
-        cuProgressBar.setVisibility(View.GONE);
-        photosFragment.updateProgress(View.GONE, 0);
     }
 
     /**
@@ -7502,20 +7503,20 @@ public class ManagerActivity extends TransfersManagementActivity
         boolean visible = pending > 0;
         int visibility = visible ? View.VISIBLE : View.GONE;
 
-        if ((!visible && enableCUButton.getVisibility() == View.GONE)
-                || (visible && cuLayout.getVisibility() == View.GONE)) {
-            updateCULayout(visibility);
+        if (
+                !visible && enableCUButton.getVisibility() == View.GONE
+                || visible && cuLayout.getVisibility() == View.GONE
+        ) {
+            updateTimelineCULayout(visibility);
         }
 
         if (getPhotosFragment() != null) {
-            photosFragment.updateProgress(visibility, pending);
+            photosFragment.updateCUProgressText(visibility, pending);
+            if (photosFragment.getCUProgressBarVisibility() != visibility) {
+                photosFragment.setCUProgressBarVisibility(visibility);
+            }
+            photosFragment.setCUProgress(progress);
         }
-
-        if (cuProgressBar.getVisibility() != visibility) {
-            cuProgressBar.setVisibility(visibility);
-        }
-
-        cuProgressBar.setProgress(progress);
     }
 
     /**
