@@ -13,7 +13,6 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.ALBUM_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.TIMELINE_INDEX
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
  * PhotosFragment is a parent fragment for both TimelineFragment and AlbumsFragment
@@ -49,7 +48,7 @@ class PhotosFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
         tabIndex = if (mManagerActivity.fromAlbumContent) {
@@ -225,37 +224,12 @@ class PhotosFragment : BaseFragment() {
     }
 
     /**
-     * Hides CU progress bar and checks the scroll
-     * in order to hide elevation if the list is not scrolled.
-     */
-    fun hideCUProgress() {
-        mManagerActivity.hideCUProgress()
-        checkScroll()
-    }
-
-    /**
      * update progress UI
      */
-    fun updateProgress(visibility: Int, pending: Int) {
-        if (binding.uploadProgress.visibility != visibility) {
-            binding.uploadProgress.visibility = visibility
-            checkScroll()
-        }
-        binding.uploadProgress.text = StringResourcesUtils
-            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
+    fun updateCUProgressText(visibility: Int, pending: Int) {
+        (currentTab as? TimelineFragment)?.updateCUProgressText(visibility, pending)
     }
 
-    /**
-     * Set UploadProgressText Visibility
-     */
-    fun setUploadProgressTextVisibility(visibility: Int) {
-        binding.uploadProgress.visibility = visibility
-    }
-
-    /**
-     * Get UploadProgressText Visibility
-     */
-    fun getUploadProgressText(): View = binding.uploadProgress
 
     /**
      * Load Photos
@@ -280,5 +254,41 @@ class PhotosFragment : BaseFragment() {
      */
     fun shouldEnableViewPager(isEnabled: Boolean) {
         binding.viewPager.isUserInputEnabled = isEnabled
+    }
+
+    /**
+     * Get the view value of the CU Progress Bar by calling the method in TimelineFragment
+     *
+     * @return View.Gone (8), View.Visible (0)
+     */
+    fun getCUProgressBarVisibility(): Int =
+        (currentTab as? TimelineFragment)?.getCUProgressBarVisibility() ?: View.GONE
+
+
+    /**
+     * Set the visibility of the CU Progress Bar by calling the method in TimelineFragment
+     *
+     * @param visibility The visibility to set the CU Progress Bar to
+     */
+    fun setCUProgressBarVisibility(visibility: Int) {
+        (currentTab as? TimelineFragment)?.setCUProgressBarVisibility(visibility)
+    }
+
+    /**
+     * Set the visibility of the CU Progress Linear Layout by calling the method in TimelineFragment
+     *
+     * @param visibility The visibility to set the CU Progress Layout to
+     */
+    fun setCULayoutVisibility(visibility: Int) {
+        (currentTab as? TimelineFragment)?.setCULayoutVisibility(visibility)
+    }
+
+    /**
+     * Set the progress percentage of the CU Progress Bar by calling the method in TimelineFragment
+     *
+     * @param progress The percentage value of the progress
+     */
+    fun setCUProgress(progress: Int) {
+        (currentTab as? TimelineFragment)?.setProgress(progress)
     }
 }

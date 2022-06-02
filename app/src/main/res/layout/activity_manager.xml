@@ -62,12 +62,6 @@
                         android:paddingEnd="16dp"
                         android:text="@string/settings_camera_upload_on"
                         android:visibility="gone" />
-
-                    <ProgressBar
-                        android:id="@+id/cu_progress_bar"
-                        style="@style/CUProgressBar"
-                        android:visibility="gone" />
-
                 </LinearLayout>
 
             </com.google.android.material.appbar.AppBarLayout>
