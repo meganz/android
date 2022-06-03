@@ -2,13 +2,11 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
 import android.app.Dialog
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +24,7 @@ import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapte
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 
 /**
  * Bottom Sheet Dialog which shows the chat options
@@ -42,7 +41,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var isMultiselectMode = false
 
     private val filesAdapter by lazy {
-        FileStorageChatAdapter(::onTakePictureClick, ::onClickItem, ::onLongClickItem)
+        FileStorageChatAdapter(::onTakePictureClick, ::onClickItem, ::onLongClickItem,  viewLifecycleOwner)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -183,10 +182,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun checkPermissionsDialog(typePermission: String, typeResult: Int) {
         val chatActivity = requireActivity() as ChatActivity
 
-        val hasStoragePermission = ContextCompat.checkSelfPermission(
-                chatActivity,
-                typePermission
-        ) == PackageManager.PERMISSION_GRANTED
+        val hasStoragePermission = hasPermissions(chatActivity, typePermission)
         if (!hasStoragePermission) {
             ActivityCompat.requestPermissions(
                     chatActivity,

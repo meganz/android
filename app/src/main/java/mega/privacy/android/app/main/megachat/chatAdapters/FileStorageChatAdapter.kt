@@ -2,6 +2,7 @@ package mega.privacy.android.app.main.megachat.chatAdapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
@@ -14,9 +15,10 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
  * @property onClickItemCallback       Callback to be called when a item is clicked
  */
 class FileStorageChatAdapter(
-        private val onTakePictureCallback: () -> Unit,
-        private val onClickItemCallback: (FileGalleryItem) -> Unit,
-        private val onLongClickItemCallback: (FileGalleryItem) -> Unit
+    private val onTakePictureCallback: () -> Unit,
+    private val onClickItemCallback: (FileGalleryItem) -> Unit,
+    private val onLongClickItemCallback: (FileGalleryItem) -> Unit,
+    private val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<FileGalleryItem, FileStorageChatHolder>(FileGalleryItem.DiffCallback()) {
 
     init {
@@ -26,9 +28,9 @@ class FileStorageChatAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageChatHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemFileStorageBinding.inflate(layoutInflater, parent, false)
-        return FileStorageChatHolder(binding).apply {
+        return FileStorageChatHolder(binding, lifecycleOwner).apply {
             binding.root.setOnLongClickListener {
-                if (isValidPosition(bindingAdapterPosition)) {
+                if (isValidPosition(bindingAdapterPosition) && bindingAdapterPosition != 0) {
                     val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
                     onLongClickItemCallback.invoke(file)
                 }
@@ -36,8 +38,12 @@ class FileStorageChatAdapter(
             }
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
-                    val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
-                    onClickItemCallback.invoke(file)
+                    if (bindingAdapterPosition == 0) {
+                        onTakePictureCallback.invoke()
+                    } else {
+                        val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
+                        onClickItemCallback.invoke(file)
+                    }
                 }
             }
             binding.takePictureButton.setOnClickListener {
@@ -53,6 +59,6 @@ class FileStorageChatAdapter(
     }
 
     override fun getItemId(position: Int): Long =
-            getItem(position).id
+        getItem(position).id
 
 }

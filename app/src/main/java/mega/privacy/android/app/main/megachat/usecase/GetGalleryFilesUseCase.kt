@@ -17,7 +17,7 @@ import javax.inject.Inject
  * Use case to retrieve images and videos from the gallery.
  */
 class GetGalleryFilesUseCase @Inject constructor(
-        @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     companion object {
@@ -25,16 +25,16 @@ class GetGalleryFilesUseCase @Inject constructor(
     }
 
     fun get(): Single<MutableList<FileGalleryItem>> =
-            Single.fromCallable {
-                val files = mutableListOf<FileGalleryItem>().apply {
-                    addAll(fetchImages())
-                    addAll(fetchVideos())
-                }
-
-                files.sortedByDescending { it.dateAdded }
-                        .toMutableList()
-
+        Single.fromCallable {
+            val files = mutableListOf<FileGalleryItem>().apply {
+                addAll(fetchImages())
+                addAll(fetchVideos())
             }
+
+            files.sortedByDescending { it.dateAdded }
+                .toMutableList()
+
+        }
 
     /**
      * Method to get the images from the gallery
@@ -47,18 +47,18 @@ class GetGalleryFilesUseCase @Inject constructor(
         val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
         val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DATE_ADDED,
-                MediaStore.Images.Media.TITLE,
-                DATA
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.TITLE,
+            DATA
         )
 
         context.contentResolver.query(
-                queryUri,
-                projection,
-                "",
-                null,
-                sortOrder
+            queryUri,
+            projection,
+            "",
+            null,
+            sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
@@ -70,21 +70,21 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val date = cursor.getString(dateColumn)
                 val title = cursor.getString(titleColumn)
                 val contentUri = ContentUris.withAppendedId(
-                        queryUri,
-                        id
+                    queryUri,
+                    id
                 )
                 val path = cursor.getString(dataColumn)
 
                 val file = FileGalleryItem(
-                        id = id,
-                        isImage = true,
-                        isTakePicture = false,
-                        title = title,
-                        fileUri = contentUri,
-                        dateAdded = date,
-                        duration = "",
-                        isSelected = false,
-                        filePath = path
+                    id = id,
+                    isImage = true,
+                    isTakePicture = false,
+                    title = title,
+                    fileUri = contentUri,
+                    dateAdded = date,
+                    duration = "",
+                    isSelected = false,
+                    filePath = path
                 )
 
                 imageList.add(file)
@@ -109,18 +109,18 @@ class GetGalleryFilesUseCase @Inject constructor(
 
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
         val projection = arrayOf(
-                MediaStore.Video.Media._ID,
-                MediaStore.Video.Media.DATE_ADDED,
-                MediaStore.Video.Media.TITLE,
-                DATA
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.TITLE,
+            DATA
         )
 
         context.contentResolver.query(
-                queryUri,
-                projection,
-                "",
-                null,
-                sortOrder
+            queryUri,
+            projection,
+            "",
+            null,
+            sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
@@ -133,19 +133,18 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val title = cursor.getString(titleColumn)
 
                 val contentUri = ContentUris.withAppendedId(
-                        queryUri,
-                        id
+                    queryUri,
+                    id
                 )
 
                 val path = cursor.getString(dataColumn)
-
-                val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(context, contentUri)
-                val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
-                retriever.release()
-                val durationText = TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
-
-                val file = FileGalleryItem(
+                Thread {
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(context, contentUri)
+                    val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
+                    val durationText =
+                        TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
+                    val file = FileGalleryItem(
                         id = id,
                         isImage = false,
                         isTakePicture = false,
@@ -155,8 +154,18 @@ class GetGalleryFilesUseCase @Inject constructor(
                         duration = durationText,
                         isSelected = false,
                         filePath = path
-                )
-                videoList.add(file)
+                    )
+                    videoList.add(file)
+
+                }.start()
+
+                /*val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(context, contentUri)
+                val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
+                retriever.release()
+                val durationText = TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)*/
+
+
             }
 
         } ?: kotlin.run {
