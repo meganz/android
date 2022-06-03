@@ -73,7 +73,6 @@ class DefaultSettingsRepository @Inject constructor(
             val defaultDownloadLocation = FileUtil.buildDefaultDownloadDir(context)
             defaultDownloadLocation.mkdirs()
             databaseHandler.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
-            databaseHandler.setFirstTime(false)
         }
     }
 
