@@ -124,6 +124,17 @@ android {
             }
         }
 
+        qa {
+            main {
+                java {
+                    srcDirs 'src/qa/java'
+                }
+            }
+            res {
+                'src/qa/res'
+            }
+        }
+
         testDebug {
             java.srcDir 'src/sharedTest/java'
         }
@@ -146,6 +157,11 @@ android {
         release {
             //  minifyEnabled false
             //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        qa {
+            initWith debug
+            debuggable true
         }
     }
 

@@ -43,6 +43,7 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -100,6 +101,7 @@ import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
@@ -494,6 +496,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * It also cancels all CameraUpload and Heartbeat workers.
      */
     public void disableCameraUpload() {
+        fireCancelCameraUploadJob(getContext());
         stopCameraUploadSyncHeartbeatWorkers(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();

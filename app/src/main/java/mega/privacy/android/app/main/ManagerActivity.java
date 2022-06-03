@@ -4,7 +4,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
@@ -18,8 +17,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER;
 import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
-import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
-import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
@@ -97,8 +94,8 @@ import static mega.privacy.android.app.utils.FileUtil.buildExternalStorageFile;
 import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
+import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -115,8 +112,8 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WA
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
@@ -706,13 +703,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private MiniAudioPlayerController miniAudioPlayerController;
 
     private LinearLayout cuViewTypes;
-    private TextView cuYearsButton;
-    private TextView cuMonthsButton;
-    private TextView cuDaysButton;
-    private TextView cuAllButton;
-    private LinearLayout cuLayout;
-    private Button enableCUButton;
-    private ProgressBar cuProgressBar;
 
     //Tabs in Shares
     private TabLayout tabLayoutShares;
@@ -1169,18 +1159,6 @@ public class ManagerActivity extends TransfersManagementActivity
             fileBrowserFragment.getRecyclerView().invalidate();
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             refreshIncomingShares();
-        }
-    };
-
-    private final BroadcastReceiver cuUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || !ACTION_UPDATE_CU.equals(intent.getAction())) {
-                return;
-            }
-
-            updateCUProgress(intent.getIntExtra(PROGRESS, 0),
-                    intent.getIntExtra(PENDING_TRANSFERS, 0));
         }
     };
 
@@ -1686,8 +1664,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).observeForever(refreshObserver);
 
-        registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
-
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
         LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).observeForever(fileBackupChangedObserver);
@@ -1969,18 +1945,6 @@ public class ManagerActivity extends TransfersManagementActivity
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
 
         cuViewTypes = findViewById(R.id.cu_view_type);
-        cuYearsButton = findViewById(R.id.years_button);
-        cuMonthsButton = findViewById(R.id.months_button);
-        cuDaysButton = findViewById(R.id.days_button);
-        cuAllButton = findViewById(R.id.all_button);
-        cuLayout = findViewById(R.id.cu_layout);
-        cuProgressBar = findViewById(R.id.cu_progress_bar);
-        enableCUButton = findViewById(R.id.enable_cu_button);
-        enableCUButton.setOnClickListener(v -> {
-            if (getPhotosFragment() != null) {
-                photosFragment.enableCameraUploadClick();
-            }
-        });
 
         //TABS section Shared Items
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares);
@@ -3332,10 +3296,6 @@ public class ManagerActivity extends TransfersManagementActivity
                                 fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
-
-                                if (drawerItem == DrawerItem.PHOTOS) {
-                                    cuLayout.setVisibility(View.VISIBLE);
-                                }
                             });
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -3534,7 +3494,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setDefaultAvatar() {
         logDebug("setDefaultAvatar");
-        nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), myAccountInfo.getFullName(), AVATAR_SIZE, true));
+        nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), megaChatApi.getMyFullname(), AVATAR_SIZE, true));
     }
 
     public void setOfflineAvatar(String email, long myHandle, String name) {
@@ -3599,7 +3559,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(transferOverQuotaUpdateReceiver);
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
-        unregisterReceiver(cuUpdateReceiver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
         LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver(fileBackupChangedObserver);
 
@@ -3645,7 +3604,6 @@ public class ManagerActivity extends TransfersManagementActivity
         isInAlbumContent = true;
         firstNavigationLevel = false;
 
-        cuLayout.setVisibility(View.GONE);
         showHideBottomNavigationView(true);
     }
 
@@ -4562,7 +4520,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Hides all views only related to CU section and sets the CU default view.
      */
     private void resetCUFragment() {
-        cuLayout.setVisibility(View.GONE);
         cuViewTypes.setVisibility(View.GONE);
 
         if (getPhotosFragment() != null) {
@@ -7470,98 +7427,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Updates cuLayout view visibility.
-     *
-     * @param visibility New visibility value to set.
-     */
-    public void updateCULayout(int visibility) {
-        if (rightCUVisibilityChange(visibility)) {
-            cuLayout.setVisibility(visibility);
-        }
-    }
-
-    /**
-     * Updates enableCUButton view visibility and cuLayout if needed.
-     *
-     * @param visibility New visibility value to set.
-     */
-    public void updateEnableCUButton(int visibility) {
-        if (enableCUButton.getVisibility() == visibility) {
-            if (enableCUButton.getVisibility() == View.VISIBLE) {
-                updateCULayout(visibility);
-            }
-            return;
-        }
-
-        if ((visibility == View.GONE && cuProgressBar.getVisibility() == View.GONE)
-                || (visibility == View.VISIBLE && cuLayout.getVisibility() == View.GONE)) {
-            updateCULayout(visibility);
-        }
-
-        if (rightCUVisibilityChange(visibility)) {
-            enableCUButton.setVisibility(visibility);
-        }
-    }
-
-    /**
-     * Hides the CU progress bar.
-     */
-    public void hideCUProgress() {
-        cuProgressBar.setVisibility(View.GONE);
-    }
-
-    /**
-     * Updates the CU progress view.
-     *
-     * @param progress The current progress.
-     * @param pending  The number of pending uploads.
-     */
-    public void updateCUProgress(int progress, int pending) {
-        if (drawerItem != DrawerItem.PHOTOS || getPhotosFragment() == null
-                || !photosFragment.shouldShowFullInfoAndOptions()) {
-            return;
-        }
-
-        boolean visible = pending > 0;
-        int visibility = visible ? View.VISIBLE : View.GONE;
-
-        if ((!visible && enableCUButton.getVisibility() == View.GONE)
-                || (visible && cuLayout.getVisibility() == View.GONE)) {
-            updateCULayout(visibility);
-        }
-
-        if (getPhotosFragment() != null) {
-            photosFragment.updateProgress(visibility, pending);
-        }
-
-        if (cuProgressBar.getVisibility() != visibility) {
-            cuProgressBar.setVisibility(visibility);
-        }
-
-        cuProgressBar.setProgress(progress);
-    }
-
-    /**
-     * Shows or hides the cuLayout and animates the transition.
-     *
-     * @param hide True if should hide it, false if should show it.
-     */
-    public void animateCULayout(boolean hide) {
-        boolean visible = cuLayout.getVisibility() == View.VISIBLE;
-        if ((hide && !visible) || !hide && visible) {
-            return;
-        }
-
-        if (hide) {
-            cuLayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
-                    .withEndAction(() -> cuLayout.setVisibility(View.GONE)).start();
-        } else if (drawerItem == DrawerItem.PHOTOS) {
-            cuLayout.setVisibility(View.VISIBLE);
-            cuLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
-        }
-    }
-
-    /**
      * Shows the bottom sheet to manage a completed transfer.
      *
      * @param transfer the completed transfer to manage.
@@ -8029,6 +7894,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case R.id.settings_section: {
+                sectionClicked = true;
                 navigateToSettingsActivity(null);
                 break;
             }
@@ -10756,20 +10622,16 @@ public class ManagerActivity extends TransfersManagementActivity
         int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
         int transparentColor = ContextCompat.getColor(this, android.R.color.transparent);
         boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
-        boolean enableCUVisible = cuLayout.getVisibility() == View.VISIBLE;
 
         if (mElevationCause > 0) {
             if (onlySetToolbar) {
                 toolbar.setBackgroundColor(toolbarElevationColor);
-                if (enableCUVisible) cuLayout.setBackgroundColor(toolbarElevationColor);
             } else {
                 toolbar.setBackgroundColor(transparentColor);
-                if (enableCUVisible) cuLayout.setBackground(null);
                 abL.setElevation(elevation);
             }
         } else {
             toolbar.setBackgroundColor(transparentColor);
-            if (enableCUVisible) cuLayout.setBackground(null);
             abL.setElevation(0);
         }
 
