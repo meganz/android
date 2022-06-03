@@ -44,26 +44,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <LinearLayout
-                    android:id="@+id/cu_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <Button
-                        android:id="@+id/enable_cu_button"
-                        style="@style/Widget.Mega.Button.Transparent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="@string/settings_camera_upload_on"
-                        android:visibility="gone" />
-                </LinearLayout>
-
             </com.google.android.material.appbar.AppBarLayout>
 
             <include
