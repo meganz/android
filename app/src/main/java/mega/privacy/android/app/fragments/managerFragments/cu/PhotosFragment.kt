@@ -213,25 +213,6 @@ class PhotosFragment : BaseFragment() {
     }
 
     /**
-     * Check should show full info and options
-     */
-    fun shouldShowFullInfoAndOptions(): Boolean? {
-        return if (currentTab is TimelineFragment) {
-            (currentTab as? TimelineFragment)?.shouldShowFullInfoAndOptions()
-        } else {
-            false
-        }
-    }
-
-    /**
-     * update progress UI
-     */
-    fun updateCUProgressText(visibility: Int, pending: Int) {
-        (currentTab as? TimelineFragment)?.updateCUProgressText(visibility, pending)
-    }
-
-
-    /**
      * Load Photos
      */
     fun loadPhotos() {
@@ -254,41 +235,5 @@ class PhotosFragment : BaseFragment() {
      */
     fun shouldEnableViewPager(isEnabled: Boolean) {
         binding.viewPager.isUserInputEnabled = isEnabled
-    }
-
-    /**
-     * Get the view value of the CU Progress Bar by calling the method in TimelineFragment
-     *
-     * @return View.Gone (8), View.Visible (0)
-     */
-    fun getCUProgressBarVisibility(): Int =
-        (currentTab as? TimelineFragment)?.getCUProgressBarVisibility() ?: View.GONE
-
-
-    /**
-     * Set the visibility of the CU Progress Bar by calling the method in TimelineFragment
-     *
-     * @param visibility The visibility to set the CU Progress Bar to
-     */
-    fun setCUProgressBarVisibility(visibility: Int) {
-        (currentTab as? TimelineFragment)?.setCUProgressBarVisibility(visibility)
-    }
-
-    /**
-     * Set the visibility of the CU Progress Linear Layout by calling the method in TimelineFragment
-     *
-     * @param visibility The visibility to set the CU Progress Layout to
-     */
-    fun setCULayoutVisibility(visibility: Int) {
-        (currentTab as? TimelineFragment)?.setCULayoutVisibility(visibility)
-    }
-
-    /**
-     * Set the progress percentage of the CU Progress Bar by calling the method in TimelineFragment
-     *
-     * @param progress The percentage value of the progress
-     */
-    fun setCUProgress(progress: Int) {
-        (currentTab as? TimelineFragment)?.setProgress(progress)
     }
 }

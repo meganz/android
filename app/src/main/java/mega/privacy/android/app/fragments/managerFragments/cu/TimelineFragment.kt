@@ -2,6 +2,10 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,6 +19,7 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
@@ -59,10 +64,9 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentTimelineBinding.inflate(inflater, container, false)
-        viewModel.checkAndUpdateCamSyncEnabledStatus()
 
         if (mManagerActivity.firstLogin || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true)
@@ -88,12 +92,49 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         super.onViewCreated(view, savedInstanceState)
         photosFragment = parentFragment as PhotosFragment
         initAfterViewCreated()
+        setInteractListener()
+    }
+
+    /**
+     * Set listener for user interaction
+     */
+    private fun setInteractListener() {
+        binding.enableCuButton.setOnClickListener {
+            enableCameraUploadClick()
+        }
+    }
+
+    /**
+     * Register Camera Upload Broadcast
+     */
+    private fun registerCUUpdateReceiver() {
+        val filter = IntentFilter(BroadcastConstants.ACTION_UPDATE_CU)
+        requireContext().registerReceiver(cuUpdateReceiver, filter)
+    }
+
+    /**
+     * Camera Upload Broadcast to recieve upload progress and pending file
+     */
+    private val cuUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val progress = intent.getIntExtra(BroadcastConstants.PROGRESS, 0)
+            val pending = intent.getIntExtra(BroadcastConstants.PENDING_TRANSFERS, 0)
+
+            updateProgressBarAndTextUI(progress, pending)
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        registerCUUpdateReceiver()
         viewModel.checkAndUpdateCamSyncEnabledStatus()
     }
+
+    override fun onPause() {
+        requireContext().unregisterReceiver(cuUpdateReceiver)
+        super.onPause()
+    }
+
 
     override fun onBackPressed() = when {
         mManagerActivity.isFirstNavigationLevel -> {
@@ -219,7 +260,6 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
      */
     private fun initAfterViewCreated() {
         if (viewModel.isEnableCUShown()) {
-            mManagerActivity.updateCULayout(View.GONE)
             mManagerActivity.updateCUViewTypes(View.GONE)
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -349,11 +389,11 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     ) {
         binding.emptyEnableCuButton.visibility =
             if (!cuEnabled && !gridAdapterHasData) View.VISIBLE else View.GONE
-        mManagerActivity.updateEnableCUButton(
-            if (selectedView == ALL_VIEW && !cuEnabled
-                && gridAdapterHasData && actionMode == null
-            ) View.VISIBLE else View.GONE
-        )
+        binding.enableCuButton.visibility = (
+                if (selectedView == ALL_VIEW && !cuEnabled
+                    && gridAdapterHasData && actionMode == null
+                ) View.VISIBLE else View.GONE
+                )
         if (!cuEnabled) {
             hideCUProgress()
         }
@@ -376,22 +416,16 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     fun isEnablePhotosFragmentShown() = viewModel.isEnableCUShown()
 
     /**
-     * Check should show full info and options
-     */
-    fun shouldShowFullInfoAndOptions() =
-        !isEnablePhotosFragmentShown() && selectedView == ALL_VIEW
-
-    /**
      * First make all the buttons unselected,
      * then apply selected style for the selected button regarding to the selected view.
      */
     override fun updateViewSelected() {
         super.updateViewSelected()
         updateFastScrollerVisibility()
-        mManagerActivity.updateEnableCUButton(
-            if (selectedView == ALL_VIEW && gridAdapterHasData() && !viewModel.isCUEnabled()
-            ) View.VISIBLE else View.GONE
-        )
+        binding.enableCuButton.visibility = (
+                if (selectedView == ALL_VIEW && gridAdapterHasData() && !viewModel.isCUEnabled()
+                ) View.VISIBLE else View.GONE
+                )
         if (selectedView != ALL_VIEW) {
             hideCUProgress()
         }
@@ -405,7 +439,11 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     fun updateOptionsButtons() {
-        if (viewModel.items.value?.isEmpty() == true || mManagerActivity.fromAlbumContent) {
+        if (viewModel.items.value?.isEmpty() == true
+            || mManagerActivity.fromAlbumContent
+            || photosFragment.tabIndex == PhotosPagerAdapter.ALBUM_INDEX
+            || viewModel.isEnableCUShown()
+        ) {
             handleOptionsMenuUpdate(shouldShow = false)
         } else {
             handleOptionsMenuUpdate(shouldShow = shouldShowZoomMenuItem())
@@ -415,8 +453,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     override fun whenStartActionMode() {
         if (!mManagerActivity.isInPhotosPage) return
         super.whenStartActionMode()
-        mManagerActivity.animateCULayout(true)
-        hideCUProgress()
+        binding.cuUiLayout.visibility = View.GONE
         with(photosFragment) {
             shouldShowTabLayout(false)
             shouldEnableViewPager(false)
@@ -429,7 +466,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
         super.whenEndActionMode()
-        mManagerActivity.animateCULayout(viewModel.isCUEnabled())
+        binding.cuUiLayout.visibility = View.VISIBLE
         with(photosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
@@ -440,7 +477,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!this::binding.isInitialized || !listViewInitialized()) return
 
         val isScrolled = listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-        mManagerActivity.changeAppBarElevation(getUploadProgressText().isVisible || isScrolled)
+        mManagerActivity.changeAppBarElevation(binding.cuProgressText.isVisible || isScrolled)
     }
 
     /**
@@ -526,65 +563,28 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
      */
     fun hideCUProgress() {
         binding.cuProgressBar.visibility = View.GONE
-        updateCUProgressText(View.GONE, 0)
+        binding.cuProgressText.visibility = View.GONE
         checkScroll()
     }
 
     /**
-     * Get UploadProgressText Visibility
+     * handle progressBar process and text UI which is the number of pending files
      */
-    fun getUploadProgressText(): View = binding.cuProgressText
-
-    /**
-     * Get the CU Progress Bar visibility
-     *
-     * @return View.GONE, View.VISIBLE
-     */
-    fun getCUProgressBarVisibility() = binding.cuProgressBar.visibility
-
-    /**
-     * Set the CU Progress Bar visibility
-     *
-     * @param visibility The visibility to set the CU Progress Bar to
-     */
-    fun setCUProgressBarVisibility(visibility: Int) {
-        val finalVisibility = if (isInActionMode()) View.GONE else visibility
-        binding.cuProgressBar.visibility = finalVisibility
-    }
-
-    /**
-     * Set the progress percentage of the CU Progress Bar
-     *
-     * @param progress The percentage value of the progress
-     */
-    fun setProgress(progress: Int) {
-        binding.cuProgressBar.progress = progress
-    }
-
-    /**
-     * Update the CU Progress Text View
-     *
-     * @param visibility The visibility of the View
-     * @param pending How more items are pending
-     */
-    fun updateCUProgressText(visibility: Int, pending: Int) {
-        val finalVisibility = if (isInActionMode()) View.GONE else visibility
-
-        if (binding.cuProgressText.visibility != finalVisibility) {
-            binding.cuProgressText.visibility = finalVisibility
-            checkScroll()
+    fun updateProgressBarAndTextUI(progress: Int, pending: Int) {
+        val visible = pending > 0
+        val visibility = if (visible) View.VISIBLE else View.GONE
+        if (isInActionMode()) {
+            binding.cuProgressText.visibility = View.GONE
+            binding.cuProgressBar.visibility = View.GONE
+        } else {
+            // Check to avoid keeping setting same visibility
+            if (binding.cuProgressBar.visibility != visibility) {
+                binding.cuProgressText.visibility = visibility
+                binding.cuProgressBar.visibility = visibility
+            }
+            binding.cuProgressText.text = StringResourcesUtils
+                .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
+            binding.cuProgressBar.progress = progress
         }
-        binding.cuProgressText.text = StringResourcesUtils
-            .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
-    }
-
-    /**
-     * Set the CU Progress Layout visibility
-     *
-     * @param visibility The visibility to set the CU Progress Layout to
-     */
-    fun setCULayoutVisibility(visibility: Int) {
-        val finalVisibility = if (isInActionMode()) View.GONE else visibility
-        binding.cuProgressLayout.visibility = finalVisibility
     }
 }

@@ -79,7 +79,7 @@
                 android:id="@+id/cu_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/cu_progress_layout"
+                android:layout_below="@id/cu_ui_layout"
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/grid_node_list_padding_bottom"
                 app:galleryItems="@{viewModel.items}"
@@ -93,12 +93,12 @@
                 android:orientation="vertical" />
 
             <LinearLayout
-                android:id="@+id/cu_progress_layout"
+                android:id="@+id/cu_ui_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/cu_progress_text"
@@ -116,6 +116,17 @@
                     android:id="@+id/cu_progress_bar"
                     style="@style/CUProgressBar"
                     android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/enable_cu_button"
+                    style="@style/Widget.Mega.Button.Transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/settings_camera_upload_on"
+                    android:visibility="gone" />
             </LinearLayout>
         </RelativeLayout>
     </mega.privacy.android.app.fragments.managerFragments.cu.TimelineContainer>
