@@ -7,11 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
@@ -35,7 +34,7 @@ class TimelineViewModel @Inject constructor(
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
     val sortOrderManagement: SortOrderManagement,
-    private val jobUtilWrapper: JobUtilWrapper
+    private val jobUtilWrapper: JobUtilWrapper,
 ) : GalleryViewModel(repository, sortOrderManagement) {
 
     override var mZoom = PHOTO_ZOOM_LEVEL
@@ -119,31 +118,37 @@ class TimelineViewModel @Inject constructor(
             .subscribe(RxUtil.IGNORE, RxUtil.logErr("setCamSyncEnabled")))
     }
 
+    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
+        viewModelScope.launch(IO) {
+            runCatching {
+                enableCUSettingForDb(enableCellularSync, syncVideo)
+                startCameraUploadJob()
+            }.onFailure {
+                Timber.e("enableCu" + it.message)
+            }
+        }
+    }
+
     /**
      * Enable CU
      */
     @Suppress("deprecation")
-    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
-        add(Completable.fromCallable {
-            val localFile = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM
-            )
-            mDbHandler.setCamSyncLocalPath(localFile?.absolutePath)
-            mDbHandler.setCameraFolderExternalSDCard(false)
-            mDbHandler.setCamSyncWifi(!enableCellularSync)
-            mDbHandler.setCamSyncFileUpload(
-                if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
-            )
-            mDbHandler.setCameraUploadVideoQuality(SettingsConstants.VIDEO_QUALITY_ORIGINAL)
-            mDbHandler.setConversionOnCharging(true)
-            mDbHandler.setChargingOnSize(SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE)
-            // After target and local folder setup, then enable CU.
-            mDbHandler.setCamSyncEnabled(true)
-            camSyncEnabled.postValue(true)
-            true
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe(RxUtil.IGNORE, RxUtil.logErr("enableCu")))
+    private suspend fun enableCUSettingForDb(enableCellularSync: Boolean, syncVideo: Boolean) {
+        val localFile = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DCIM
+        )
+        mDbHandler.setCamSyncLocalPath(localFile?.absolutePath)
+        mDbHandler.setCameraFolderExternalSDCard(false)
+        mDbHandler.setCamSyncWifi(!enableCellularSync)
+        mDbHandler.setCamSyncFileUpload(
+            if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
+        )
+        mDbHandler.setCameraUploadVideoQuality(SettingsConstants.VIDEO_QUALITY_ORIGINAL)
+        mDbHandler.setConversionOnCharging(true)
+        mDbHandler.setChargingOnSize(SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE)
+        // After target and local folder setup, then enable CU.
+        mDbHandler.setCamSyncEnabled(true)
+        camSyncEnabled.postValue(true)
     }
 
     /**

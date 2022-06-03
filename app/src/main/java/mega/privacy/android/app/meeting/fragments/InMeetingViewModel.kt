@@ -239,6 +239,7 @@ class InMeetingViewModel @Inject constructor(
         when (callStatus) {
             CALL_STATUS_CONNECTING -> {
                 _updateCallSubtitle.value = SubtitleCallType.TYPE_CONNECTING
+                _showCallDuration.value = false
             }
             CALL_STATUS_IN_PROGRESS, CALL_STATUS_JOINING -> {
                 getChat()?.let { chat ->

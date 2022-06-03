@@ -180,4 +180,12 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Converts the handle of a node to a Base64-encoded string
+     *
+     * @param handle Node handle to be converted
+     * @return Base64-encoded node handle
+     */
+    fun handleToBase64(handle: Long): String
 }

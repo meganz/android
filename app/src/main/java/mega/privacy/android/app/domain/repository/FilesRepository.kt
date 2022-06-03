@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
+import mega.privacy.android.app.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 
 /**
@@ -14,6 +15,7 @@ interface FilesRepository {
      *
      * @return info
      */
+    @Throws(MegaException::class)
     suspend fun getRootFolderVersionInfo(): FolderVersionInfo
 
     /**
@@ -22,4 +24,10 @@ interface FilesRepository {
      * @return a flow of all global node updates
      */
     fun monitorNodeUpdates(): Flow<List<MegaNode>>
+
+    /**
+     * Get cloud sort order
+     * @return cloud sort order
+     */
+    suspend fun getCloudSortOrder(): Int
 }

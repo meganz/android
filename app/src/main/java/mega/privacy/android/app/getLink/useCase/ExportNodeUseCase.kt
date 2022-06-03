@@ -67,6 +67,8 @@ class ExportNodeUseCase @Inject constructor(
 
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     if (error.errorCode == MegaError.API_OK) {
                         emitter.onSuccess(request.link)
                     } else {
