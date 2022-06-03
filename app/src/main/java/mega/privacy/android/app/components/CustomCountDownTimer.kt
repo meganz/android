@@ -21,7 +21,7 @@ class CustomCountDownTimer(var mutableLiveData: MutableLiveData<Boolean>) {
     fun start(seconds: Long) {
         timer = object : CountDownTimer(seconds * 1000, 1000) {
 
-            override fun onTick(millisUntilFinished: Long) { }
+            override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
                 mutableLiveData.postValue(true)

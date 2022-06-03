@@ -39,8 +39,8 @@ class GetCallSoundsUseCase @Inject constructor(
     /**
      * Participant info
      *
-     * @property peerId             Peer ID of participant
-     * @property clientId           Client ID of participant
+     * @property peerId     Peer ID of participant
+     * @property clientId   Client ID of participant
      */
     data class ParticipantInfo(
         val peerId: Long,
@@ -66,6 +66,7 @@ class GetCallSoundsUseCase @Inject constructor(
                     onNext = { result ->
                         val participant =
                             ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
+
                         when (result.sessionStatus) {
                             MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                                 result.call?.let { call ->
@@ -95,7 +96,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                                     emitter.onNext(CallSoundType.CALL_ENDED)
                                                 }
                                             }
-
                                     }
                                 }
                             }
@@ -132,8 +132,8 @@ class GetCallSoundsUseCase @Inject constructor(
     /**
      * Method to start the countdown to hang up the call
      *
-     * @param call MegaChatCall
-     * @param seconds Seconds to wait
+     * @param call      MegaChatCall
+     * @param seconds   Seconds to wait
      */
     private fun FlowableEmitter<CallSoundType>.startCountDown(
         call: MegaChatCall,
@@ -141,37 +141,36 @@ class GetCallSoundsUseCase @Inject constructor(
         seconds: Long
     ) {
         megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-            if (!chat.isGroup && !chat.isMeeting) {
-                if (participants.contains(participant)) {
-                    if (countDownTimer == null) {
-                        participants.remove(participant)
-                        val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                        countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
-                        countDownTimerLiveData.observeOnce { counterState ->
-                            counterState?.let { isFinished ->
-                                if (isFinished) {
+            if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
+                if (countDownTimer == null) {
+                    participants.remove(participant)
 
-                                    megaChatApi.hangChatCall(call.callId,
-                                        OptionalMegaChatRequestListenerInterface(
-                                            onRequestFinish = { _, error ->
-                                                if (error.errorCode == MegaError.API_OK) {
-                                                    removeCountDownTimer()
-                                                    MegaApplication.getInstance()
-                                                        .removeRTCAudioManager()
-                                                    this.onNext(CallSoundType.CALL_ENDED)
-                                                } else {
-                                                    this.onError(error.toThrowable())
-                                                }
+                    val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+                    countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+                    countDownTimerLiveData.observeOnce { counterState ->
+                        counterState?.let { isFinished ->
+                            if (isFinished) {
+                                Timber.d("Count down timer ends. Hang call")
+                                megaChatApi.hangChatCall(call.callId,
+                                    OptionalMegaChatRequestListenerInterface(
+                                        onRequestFinish = { _, error ->
+                                            if (error.errorCode == MegaError.API_OK) {
+                                                removeCountDownTimer()
+                                                MegaApplication.getInstance()
+                                                    .removeRTCAudioManager()
+                                                this.onNext(CallSoundType.CALL_ENDED)
+                                            } else {
+                                                this.onError(error.toThrowable())
                                             }
-                                        ))
-                                }
+                                        }
+                                    ))
                             }
                         }
                     }
-
-                    Timber.d("Count down timer starts")
-                    countDownTimer?.start(seconds)
                 }
+
+                Timber.d("Count down timer starts")
+                countDownTimer?.start(seconds)
             }
         }
     }
@@ -179,8 +178,8 @@ class GetCallSoundsUseCase @Inject constructor(
     /**
      * Method to stop the countdown
      *
-     * @param chatId Chat ID
-     * @param participant ParticipantInfo
+     * @param chatId        Chat ID
+     * @param participant   ParticipantInfo
      */
     private fun stopCountDown(chatId: Long, participant: ParticipantInfo) {
         megaChatApi.getChatRoom(chatId)?.let { chat ->
@@ -206,9 +205,9 @@ class GetCallSoundsUseCase @Inject constructor(
      * Remove Count down timer
      */
     private fun removeCountDownTimer() {
-        countDownTimer?.let {
+        countDownTimer?.apply {
             Timber.d("Count down timer stops")
-            it.stop()
+            stop()
         }
         countDownTimer = null
     }

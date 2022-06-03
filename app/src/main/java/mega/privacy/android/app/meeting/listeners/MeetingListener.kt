@@ -128,7 +128,7 @@ class MeetingListener : MegaChatCallListenerInterface {
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
             logDebug("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, call)
+            sendSessionEvent(session, call)
         }
 
         // Remote audio/video flags has changed
@@ -186,15 +186,14 @@ class MeetingListener : MegaChatCallListenerInterface {
     /**
      * Method to post a LiveEventBus with MegaChatCall and MegaChatSession
      *
-     * @param type Type of event for LiveEventBus
      * @param session MegaChatSession
      * @param call MegaChatCall
      */
-    private fun sendSessionEvent(type: String, session: MegaChatSession, call: MegaChatCall?) {
+    private fun sendSessionEvent(session: MegaChatSession, call: MegaChatCall?) {
         val sessionAndCall = Pair.create(call, session)
         LiveEventBus.get(
-                type,
-                Pair::class.java
+            EVENT_SESSION_STATUS_CHANGE,
+            Pair::class.java
         ).post(sessionAndCall)
     }
 
@@ -241,8 +240,8 @@ class MeetingListener : MegaChatCallListenerInterface {
                                 }
                             }
                         }
-
                     }
+
                     customCountDownTimer?.start(SECONDS_IN_MINUTE)
                 }
             }
@@ -250,12 +249,13 @@ class MeetingListener : MegaChatCallListenerInterface {
     }
 
     /**
-     * Cancel count down timer
+     * Stop count down timer
      */
     private fun stopCountDown() {
-        if (customCountDownTimer != null) {
-            customCountDownTimer?.stop()
-            customCountDownTimer = null
+        customCountDownTimer?.apply {
+            stop()
         }
+
+        customCountDownTimer = null
     }
 }
