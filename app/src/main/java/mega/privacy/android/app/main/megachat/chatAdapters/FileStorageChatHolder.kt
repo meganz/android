@@ -31,7 +31,6 @@ class FileStorageChatHolder(
      */
     fun bind(item: FileGalleryItem, position: Int) {
         binding.apply {
-
             takePictureLayout.isVisible = item.isTakePicture
             fileLayout.isVisible = !item.isTakePicture
 

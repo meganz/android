@@ -39,21 +39,27 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
 
     private var isMultiselectMode = false
+    private var hasCameraPermission = false
+    private var hasStoragePermission = false
 
     private val filesAdapter by lazy {
-        FileStorageChatAdapter(::onTakePictureClick, ::onClickItem, ::onLongClickItem,  viewLifecycleOwner)
+        FileStorageChatAdapter(::onTakePictureClick,
+            ::onClickItem,
+            ::onLongClickItem,
+            viewLifecycleOwner)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(), R.style.BottomSheetFragmentWithTransparentBackground).apply {
+        return BottomSheetDialog(requireContext(),
+            R.style.BottomSheetFragmentWithTransparentBackground).apply {
             setCanceledOnTouchOutside(true)
         }
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         listener = requireActivity() as ChatRoomToolbarBottomSheetDialogActionListener
         binding = BottomSheetChatRoomToolbarBinding.inflate(layoutInflater, container, false)
@@ -66,7 +72,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         val dialog = dialog ?: return
         BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
-                BottomSheetBehavior.STATE_EXPANDED
+            BottomSheetBehavior.STATE_EXPANDED
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,16 +95,34 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launchWhenStarted {
             viewModel.hasReadStoragePermissionsGranted.collect { isGranted ->
-                if (!isGranted) {
-                    checkPermissionsDialog(Manifest.permission.READ_EXTERNAL_STORAGE, Constants.REQUEST_READ_STORAGE)
+                hasStoragePermission = isGranted
+                if (!hasStoragePermission) {
+                    viewModel.checkStoragePermission()
                 }
             }
         }
 
         lifecycleScope.launchWhenStarted {
             viewModel.hasCameraPermissionsGranted.collect { isGranted ->
-                if (!isGranted) {
-                    checkPermissionsDialog(Manifest.permission.CAMERA, Constants.REQUEST_CAMERA_SHOW_PREVIEW)
+                hasCameraPermission = isGranted
+                if (!hasCameraPermission && hasStoragePermission) {
+                    viewModel.checkCameraPermission()
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.checkReadStoragePermissions.collect { shouldCheck ->
+                if (shouldCheck) {
+                    checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.checkCameraPermissions.collect { shouldCheck ->
+                if (shouldCheck) {
+                    checkPermissions(Manifest.permission.CAMERA)
                 }
             }
         }
@@ -112,7 +136,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     private fun setupView() {
         val mLayoutManager: RecyclerView.LayoutManager =
-                GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
+            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
 
         binding.list.apply {
             clipToPadding = false
@@ -177,26 +201,46 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Show node permission dialog to ask for Node permissions.
+     * Check whether a permit needs to be applied for or whether it is already granted
+     *
+     * @param typePermission Type of permission: READ_EXTERNAL_STORAGE or CAMERA
      */
-    private fun checkPermissionsDialog(typePermission: String, typeResult: Int) {
+    private fun checkPermissions(typePermission: String) {
         val chatActivity = requireActivity() as ChatActivity
+        val hasPermission =
+            hasPermissions(chatActivity, typePermission)
 
-        val hasStoragePermission = hasPermissions(chatActivity, typePermission)
-        if (!hasStoragePermission) {
-            ActivityCompat.requestPermissions(
-                    chatActivity,
-                    arrayOf(typePermission),
-                    typeResult
-            )
-        } else {
-            viewModel.updatePermissionsGranted(typePermission)
+        when (typePermission) {
+            Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                if (hasPermission) {
+                    viewModel.updatePermissionsGranted(typePermission, hasPermission)
+                } else {
+                    ActivityCompat.requestPermissions(
+                        chatActivity,
+                        arrayOf(typePermission),
+                        Constants.REQUEST_READ_STORAGE
+                    )
+                }
+            }
+            Manifest.permission.CAMERA -> {
+                if (hasPermission) {
+                    viewModel.updatePermissionsGranted(typePermission, hasPermission)
+                } else {
+                    ActivityCompat.requestPermissions(
+                        chatActivity,
+                        arrayOf(typePermission),
+                        Constants.REQUEST_CAMERA_SHOW_PREVIEW
+                    )
+                }
+            }
         }
     }
 
     private fun onTakePictureClick() {
-        listener.onTakePictureOptionClicked()
-        dismiss()
+        if (hasCameraPermission) {
+            listener.onTakePictureOptionClicked()
+            dismiss()
+        }
     }
 
     private fun onClickItem(file: FileGalleryItem) {

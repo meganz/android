@@ -13,11 +13,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomToolbarViewModel @Inject constructor(
-        private val getGalleryFilesUseCase: GetGalleryFilesUseCase,
+    private val getGalleryFilesUseCase: GetGalleryFilesUseCase,
 ) : BaseRxViewModel() {
 
     private val _filesGallery =
-            MutableStateFlow<List<FileGalleryItem>>(ArrayList())
+        MutableStateFlow<List<FileGalleryItem>>(ArrayList())
 
     val filesGallery: StateFlow<List<FileGalleryItem>>
         get() = _filesGallery
@@ -31,26 +31,47 @@ class ChatRoomToolbarViewModel @Inject constructor(
     private val _hasCameraPermissionsGranted = MutableStateFlow(false)
     val hasCameraPermissionsGranted: StateFlow<Boolean> get() = _hasCameraPermissionsGranted
 
+    private val _checkReadStoragePermissions = MutableStateFlow(false)
+    val checkReadStoragePermissions: StateFlow<Boolean> get() = _checkReadStoragePermissions
+
+    private val _checkCameraPermissions = MutableStateFlow(false)
+    val checkCameraPermissions: StateFlow<Boolean> get() = _checkCameraPermissions
+
     /**
      * Method that receives changes related to read storage permissions
      *
      * @param hasPermissions If permission is granted. False, if not.
      */
     private fun updateReadStoragePermissions(hasPermissions: Boolean) {
-        if (_hasReadStoragePermissionsGranted.value == hasPermissions) {
+        _hasReadStoragePermissionsGranted.value = hasPermissions
+        checkCameraPermission()
+        if (!hasPermissions) {
+            addTakePicture(mutableListOf())
             return
         }
 
-        _hasReadStoragePermissionsGranted.value = hasPermissions
         loadGallery()
     }
 
-    private fun updateCameraPermissions(hasPermissions: Boolean) {
-        if (_hasCameraPermissionsGranted.value == hasPermissions) {
+    fun checkCameraPermission() {
+        _checkCameraPermissions.value = true
+    }
+
+    fun checkStoragePermission() {
+        _checkReadStoragePermissions.value = true
+    }
+
+    /**
+     * Update camera permissions
+     *
+     * @param hasPermissions If permission is granted
+     */
+    private fun updateCameraPermissions(isGranted: Boolean) {
+        if (_hasCameraPermissionsGranted.value == isGranted || !isGranted) {
             return
         }
 
-        _hasCameraPermissionsGranted.value = hasPermissions
+        _hasCameraPermissionsGranted.value = isGranted
 
         _filesGallery.value = _filesGallery.value.map { file ->
             return@map when (file.isTakePicture) {
@@ -62,39 +83,53 @@ class ChatRoomToolbarViewModel @Inject constructor(
         }.toMutableList()
     }
 
-    fun updatePermissionsGranted(typePermission: String) {
+    /**
+     * Update read storage permissions
+     *
+     * @param typePermission Type of permission
+     * @param isGranted If permission is granted
+     */
+    fun updatePermissionsGranted(typePermission: String, isGranted: Boolean) {
         when (typePermission) {
             Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                updateReadStoragePermissions(true)
+                updateReadStoragePermissions(isGranted)
             }
             Manifest.permission.CAMERA -> {
-                updateCameraPermissions(true)
+                updateCameraPermissions(isGranted)
             }
         }
     }
 
     /**
-     * How to get images and videos from the gallery
+     * Add take picture option in the gallery
+     */
+    private fun addTakePicture(files: MutableList<FileGalleryItem>) {
+        files.add(0, createTakeAPictureOption())
+        _filesGallery.value = files
+    }
+
+    /**
+     * Get images and videos from the gallery
      */
     private fun loadGallery() {
         if (_hasReadStoragePermissionsGranted.value && filesGallery.value.isEmpty()) {
             val files: MutableList<FileGalleryItem> = getGalleryFilesUseCase.get().blockingGet()
-            files.add(0, createTakeAPictureOption())
-            _filesGallery.value = files
+            addTakePicture(files)
         }
     }
 
     private fun createTakeAPictureOption(): FileGalleryItem {
         return FileGalleryItem(
-                id = TAKE_PHOTO_OPTION_ID,
-                isImage = false,
-                isTakePicture = true,
-                isSelected = false
+            id = TAKE_PHOTO_OPTION_ID,
+            isImage = false,
+            isTakePicture = true,
+            hasCameraPermissions = hasCameraPermissionsGranted.value,
+            isSelected = false
         )
     }
 
     fun getDefaultLocation(): String =
-            FileUtil.getDownloadLocation()
+        FileUtil.getDownloadLocation()
 
     fun longClickItem(fileToUpload: FileGalleryItem) {
         _filesGallery.value = _filesGallery.value.map { file ->

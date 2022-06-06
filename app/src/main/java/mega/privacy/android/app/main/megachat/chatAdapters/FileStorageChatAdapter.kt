@@ -18,13 +18,21 @@ class FileStorageChatAdapter(
     private val onTakePictureCallback: () -> Unit,
     private val onClickItemCallback: (FileGalleryItem) -> Unit,
     private val onLongClickItemCallback: (FileGalleryItem) -> Unit,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
 ) : ListAdapter<FileGalleryItem, FileStorageChatHolder>(FileGalleryItem.DiffCallback()) {
 
     init {
         setHasStableIds(true)
     }
 
+    /**
+     * Method to create view holder
+     *
+     * @param parent ViewGroup
+     * @param viewType Type of View
+     *
+     * @return Holder FileStorageChatHolder
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageChatHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemFileStorageBinding.inflate(layoutInflater, parent, false)
@@ -54,10 +62,22 @@ class FileStorageChatAdapter(
         }
     }
 
+    /**
+     * Bind view for the File storage chat toolbar.
+     *
+     * @param holder FileStorageChatHolder
+     * @param position Item position
+     */
     override fun onBindViewHolder(holder: FileStorageChatHolder, position: Int) {
         holder.bind(getItem(position), position)
     }
 
+    /**
+     * Get the Id of the item
+     *
+     * @param position Item position
+     * @return Id of item
+     */
     override fun getItemId(position: Int): Long =
         getItem(position).id
 
