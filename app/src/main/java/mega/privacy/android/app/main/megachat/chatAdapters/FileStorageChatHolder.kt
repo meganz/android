@@ -20,9 +20,15 @@ import mega.privacy.android.app.utils.setImageRequestFromUri
  */
 class FileStorageChatHolder(
     private val binding: ItemFileStorageBinding,
-    private val lifecycleFragment: LifecycleOwner
+    private val lifecycleFragment: LifecycleOwner,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    /**
+     * Bind view for the File storage chat toolbar.
+     *
+     * @param item FileGalleryItem
+     * @param position Item position
+     */
     fun bind(item: FileGalleryItem, position: Int) {
         binding.apply {
 
@@ -39,11 +45,11 @@ class FileStorageChatHolder(
                             .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                             .build()
 
-                       val preview = Preview.Builder()
+                        val preview = Preview.Builder()
                             .build()
 
                         cameraProvider?.unbindAll()
-                        var camera = cameraProvider?.bindToLifecycle(
+                        cameraProvider?.bindToLifecycle(
                             lifecycleFragment,
                             cameraSelector,
                             preview)
@@ -71,6 +77,7 @@ class FileStorageChatHolder(
                     imageThumbnail.isVisible = false
                 }
             }
+
             takePictureButton.isVisible = position == 0
         }
     }
