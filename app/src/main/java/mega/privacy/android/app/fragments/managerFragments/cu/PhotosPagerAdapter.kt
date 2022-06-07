@@ -18,7 +18,7 @@ class PhotosPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
      * HashMap for managing sub Fragments for viewpager
      */
     private val tabFragmentMap = hashMapOf(
-        TIMELINE_INDEX to TimelineFragment::class.java,
+        TIMELINE_INDEX to NewTimelineFragment::class.java,
         ALBUM_INDEX to AlbumsFragment::class.java
     )
 

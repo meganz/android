@@ -91,7 +91,7 @@ class PhotosFragment : BaseFragment() {
                 currentTab?.let { currentTab ->
                     checkScroll()
 
-                    if (currentTab is TimelineFragment) {
+                    if (currentTab is NewTimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
                         mManagerActivity.fromAlbumContent = false
@@ -163,20 +163,20 @@ class PhotosFragment : BaseFragment() {
      * Enable Camera Upload
      */
     fun enableCameraUpload() {
-        (currentTab as? TimelineFragment)?.enableCameraUpload()
+        (currentTab as? NewTimelineFragment)?.enableCameraUpload()
     }
 
     /**
      * handle enable Camera Upload click UI and logic
      */
     fun enableCameraUploadClick() {
-        if (currentTab !is TimelineFragment) {
+        if (currentTab !is NewTimelineFragment) {
             viewPager.postDelayed({
                 viewPager.currentItem = TIMELINE_INDEX
-                (currentTab as TimelineFragment).enableCameraUploadClick()
+                (currentTab as NewTimelineFragment).enableCameraUploadClick()
             }, 50)
         } else {
-            (currentTab as TimelineFragment).enableCameraUploadClick()
+            (currentTab as NewTimelineFragment).enableCameraUploadClick()
         }
     }
 
@@ -184,14 +184,14 @@ class PhotosFragment : BaseFragment() {
      * Refresh view and layout after CU enabled or disabled.
      */
     fun refreshViewLayout() {
-        (currentTab as? TimelineFragment)?.refreshViewLayout()
+        (currentTab as? NewTimelineFragment)?.refreshViewLayout()
     }
 
     /**
      * handle Storage Permission when got refused
      */
     fun onStoragePermissionRefused() {
-        (currentTab as? TimelineFragment)?.onStoragePermissionRefused()
+        (currentTab as? NewTimelineFragment)?.onStoragePermissionRefused()
     }
 
     /**
@@ -199,8 +199,8 @@ class PhotosFragment : BaseFragment() {
      *
      * @return True, show it if in TimelineFragment, otherwise,falsem hide.
      */
-    fun isEnablePhotosFragmentShown() = if (currentTab is TimelineFragment) {
-        (currentTab as TimelineFragment).isEnablePhotosFragmentShown()
+    fun isEnablePhotosFragmentShown() = if (currentTab is NewTimelineFragment) {
+        (currentTab as NewTimelineFragment).isEnablePhotosFragmentShown()
     } else {
         false
     }
@@ -209,14 +209,14 @@ class PhotosFragment : BaseFragment() {
      * Set default View for TimelineFragment
      */
     fun setDefaultView() {
-        (currentTab as? TimelineFragment)?.setDefaultView()
+        (currentTab as? NewTimelineFragment)?.setDefaultView()
     }
 
     /**
      * Load Photos
      */
     fun loadPhotos() {
-        (currentTab as? TimelineFragment)?.loadPhotos()
+        (currentTab as? NewTimelineFragment)?.loadPhotos()
     }
 
     /**

@@ -78,7 +78,7 @@ import nz.mega.sdk.MegaChatApiJava
  * TimelineFragment's logic is pretty much similar to previous PhotosFragment
  */
 @AndroidEntryPoint
-class TimelineFragment : BaseFragment(), PhotosTabCallback,
+class NewTimelineFragment : BaseFragment(), PhotosTabCallback,
     GestureScaleCallback,
     GalleryCardAdapter.Listener {
 
@@ -383,7 +383,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      */
     private fun setupBinding() {
         binding.apply {
-            viewModel = this@TimelineFragment.viewModel
+            viewModel = this@NewTimelineFragment.viewModel
             lifecycleOwner = viewLifecycleOwner
         }
     }
@@ -717,21 +717,6 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             binding.cuProgressBar.progress = progress
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     fun animateBottomView(hide: Boolean) {
         val deltaY =
