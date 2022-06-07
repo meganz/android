@@ -4,8 +4,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -63,6 +68,18 @@ class SettingsViewModelTest {
             isChatLoggedIn = isChatLoggedIn,
             setSdkLogsEnabled = mock(),
             setChatLoggingEnabled = mock(),
+            putStringPreference = mock(),
+            putStringSetPreference = mock(),
+            putIntPreference = mock(),
+            putLongPreference = mock(),
+            putFloatPreference = mock(),
+            putBooleanPreference = mock(),
+            getStringPreference = mock(),
+            getStringSetPreference = mock(),
+            getIntPreference = mock(),
+            getLongPreference = mock(),
+            getFloatPreference = mock(),
+            getBooleanPreference = mock(),
         )
     }
 

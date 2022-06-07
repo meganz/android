@@ -20,7 +20,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
-import java.util.*
+import test.mega.privacy.android.app.di.TestWrapperModule
+import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -55,20 +56,20 @@ class StopCameraUploadWorkerTest {
                 WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
                     override fun startForeground(
                         workSpecId: String,
-                        foregroundInfo: ForegroundInfo
+                        foregroundInfo: ForegroundInfo,
                     ) {
                     }
 
                     override fun stopForeground(workSpecId: String) {}
                 }, workExecutor)
             ),
-            TestCameraUploadModule.cameraUploadsServiceWrapper
+            TestWrapperModule.cameraUploadsServiceWrapper
         )
     }
 
     @Test
     fun `test that the stop camera upload worker is successful if the camera upload service is running`() {
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             true
         )
         val result = worker.doWork()
@@ -77,7 +78,7 @@ class StopCameraUploadWorkerTest {
 
     @Test
     fun `test that the stop camera upload worker fails if there is no camera upload service running`() {
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
         val result = worker.doWork()
