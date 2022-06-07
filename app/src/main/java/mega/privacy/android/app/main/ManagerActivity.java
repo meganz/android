@@ -7592,7 +7592,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
                     case MegaApiJava.STORAGE_STATE_RED:
                     case MegaApiJava.STORAGE_STATE_PAYWALL:
-                        myAccountInfo.setUsedPercentage(100);
                         colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
                         break;
                 }
@@ -7635,7 +7634,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             case MegaApiJava.STORAGE_STATE_RED:
             case MegaApiJava.STORAGE_STATE_PAYWALL:
-                myAccountInfo.setUsedPercentage(100);
                 resId = R.drawable.custom_progress_bar_horizontal_exceed;
                 break;
         }

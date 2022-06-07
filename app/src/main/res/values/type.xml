@@ -495,6 +495,10 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Medium.Red600Red300">
+        <item name="android:textColor">@color/red_600_red_300</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.Medium.Black13sp">
         <item name="android:textColor">@color/black</item>
         <item name="textSize">13sp</item>

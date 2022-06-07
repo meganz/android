@@ -179,7 +179,7 @@ import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
-import mega.privacy.android.app.utils.ThemeHelper;
+import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -245,6 +245,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     GetCallSoundsUseCase getCallSoundsUseCase;
     @Inject
     HiltWorkerFactory workerFactory;
+    @Inject
+    ThemeModeState themeModeState;
     @ApplicationScope
     @Inject
     CoroutineScope sharingScope;
@@ -811,7 +813,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             initialiseLogging();
         }
 
-        ThemeHelper.INSTANCE.initTheme(this);
+        themeModeState.initialise();
 
         // Setup handler and RxJava for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
