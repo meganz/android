@@ -703,7 +703,7 @@ class NewTimelineFragment : BaseFragment(), PhotosTabCallback,
     fun updateProgressBarAndTextUI(progress: Int, pending: Int) {
         val visible = pending > 0
         val visibility = if (visible) View.VISIBLE else View.GONE
-        if (isInActionMode()) {
+        if (isInActionMode() || selectedView != ALL_VIEW) {
             binding.cuProgressText.visibility = View.GONE
             binding.cuProgressBar.visibility = View.GONE
         } else {
@@ -1198,7 +1198,7 @@ class NewTimelineFragment : BaseFragment(), PhotosTabCallback,
      * @param selectedView The selected view.
      */
     @SuppressLint("ClickableViewAccessibility")
-    protected open fun newViewClicked(selectedView: Int) {
+    private fun newViewClicked(selectedView: Int) {
         if (this.selectedView == selectedView) return
 
         this.selectedView = selectedView
@@ -1263,14 +1263,14 @@ class NewTimelineFragment : BaseFragment(), PhotosTabCallback,
      *
      * @return true, current view is all view should show the menu items, false, otherwise.
      */
-    protected fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
+    private fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
      *
      * @param isPortrait true, on portrait mode, false otherwise.
      */
-    protected fun getSpanCount(selectedView: Int, isPortrait: Boolean): Int {
+    private fun getSpanCount(selectedView: Int, isPortrait: Boolean): Int {
         return if (selectedView != ALL_VIEW) {
             if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
         } else {
