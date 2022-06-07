@@ -19,8 +19,6 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
@@ -483,31 +481,5 @@ public class ChatManagement {
                 CallUtil.enableOrDisableLocalVideo(true, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
             }
         }
-    }
-
-    /**
-     * Method to answer incoming call or joining in a in progress call
-     *
-     * @param chatId      The chat id of a chat related
-     * @param enableVideo True, if the video should be enabled. False, otherwise
-     * @param enableAudio True, if the audio should be enabled. False, otherwise
-     * @param speakerStatus True, if the speaker should be enabled. False, otherwise
-     * @param listener    MegaChatRequestListenerInterface
-     */
-    public void answerChatCall(long chatId, boolean enableVideo, boolean enableAudio, boolean speakerStatus, MegaChatRequestListenerInterface listener) {
-        if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
-            logDebug("Already participating in this call");
-            return;
-        }
-
-        if (isAlreadyJoiningCall(chatId)) {
-            logDebug("AnswerChatCall already done");
-            return;
-        }
-
-        CallUtil.addChecksForACall(chatId, speakerStatus);
-        addJoiningCallChatId(chatId);
-        logDebug("Answering call ...");
-        app.getMegaChatApi().answerChatCall(chatId, enableVideo, enableAudio, listener);
     }
 }

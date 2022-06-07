@@ -703,7 +703,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     fun updateProgressBarAndTextUI(progress: Int, pending: Int) {
         val visible = pending > 0
         val visibility = if (visible) View.VISIBLE else View.GONE
-        if (isInActionMode()) {
+        if (isInActionMode() || selectedView != ALL_VIEW) {
             binding.cuProgressText.visibility = View.GONE
             binding.cuProgressBar.visibility = View.GONE
         } else {

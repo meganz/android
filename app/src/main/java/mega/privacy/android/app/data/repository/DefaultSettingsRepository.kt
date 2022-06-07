@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
@@ -17,6 +18,7 @@ import mega.privacy.android.app.data.extensions.isTypeWithParam
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.di.ApplicationScope
@@ -32,6 +34,7 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -60,7 +63,8 @@ class DefaultSettingsRepository @Inject constructor(
     private val loggingPreferencesGateway: LoggingPreferencesGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val chatPreferencesGateway: ChatPreferencesGateway
+    private val chatPreferencesGateway: ChatPreferencesGateway,
+    private val appPreferencesGateway: AppPreferencesGateway,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -141,7 +145,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     private fun onSetContactLinksOptionRequestFinished(
         continuation: Continuation<Boolean>,
-        accept: Boolean
+        accept: Boolean,
     ) = { request: MegaRequest, error: MegaError ->
         if (isSetAutoAcceptQRResponse(request)) {
             when (error.errorCode) {
@@ -200,4 +204,66 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setChatImageQuality(quality: ChatImageQuality) =
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
+
+    override suspend fun setStringPreference(key: String?, value: String?) =
+        setPreference(key to value, appPreferencesGateway::putString)
+
+    override suspend fun setStringSetPreference(key: String?, value: MutableSet<String>?) =
+        setPreference(key to value, appPreferencesGateway::putStringSet)
+
+    override suspend fun setIntPreference(key: String?, value: Int?) =
+        setPreference(key to value, appPreferencesGateway::putInt)
+
+    override suspend fun setLongPreference(key: String?, value: Long?) =
+        setPreference(key to value, appPreferencesGateway::putLong)
+
+    override suspend fun setFloatPreference(key: String?, value: Float?) =
+        setPreference(key to value, appPreferencesGateway::putFloat)
+
+    override suspend fun setBooleanPreference(key: String?, value: Boolean?) =
+        setPreference(key to value, appPreferencesGateway::putBoolean)
+
+    private suspend fun <T> setPreference(
+        preference: Pair<String?, T?>,
+        setFunction: suspend (String, T) -> Unit,
+    ) {
+        val (key, value) = preference.toNonNullPairOrNull()
+            ?: Timber.w("Failed to set value ${preference.second} on preference ${preference.first}")
+                .run { return }
+        withContext(ioDispatcher) { setFunction(key, value) }
+    }
+
+    private fun <A, B> Pair<A?, B?>.toNonNullPairOrNull(): Pair<A, B>? =
+        this.takeIf { first != null && second != null }?.let { Pair(first!!, second!!) }
+
+    override fun monitorStringPreference(key: String?, defaultValue: String?) =
+        monitorPreference(key, defaultValue, appPreferencesGateway::monitorString)
+
+    override fun monitorStringSetPreference(
+        key: String?,
+        defaultValue: MutableSet<String>?,
+    ) = monitorPreference(key, defaultValue, appPreferencesGateway::monitorStringSet)
+
+    override fun monitorIntPreference(key: String?, defaultValue: Int) =
+        monitorPreference(key, defaultValue, appPreferencesGateway::monitorInt)
+
+    override fun monitorLongPreference(key: String?, defaultValue: Long) =
+        monitorPreference(key, defaultValue, appPreferencesGateway::monitorLong)
+
+    override fun monitorFloatPreference(key: String?, defaultValue: Float) =
+        monitorPreference(key, defaultValue, appPreferencesGateway::monitorFloat)
+
+    override fun monitorBooleanPreference(key: String?, defaultValue: Boolean) =
+        monitorPreference(key, defaultValue, appPreferencesGateway::monitorBoolean)
+
+    private fun <T> monitorPreference(
+        key: String?,
+        defaultValue: T,
+        monitorFunction: (String, T) -> Flow<T>,
+    ) = if (key.isNullOrBlank()) {
+        Timber.w("Failed to fetch preference with an empty or null key")
+        emptyFlow()
+    } else {
+        monitorFunction(key, defaultValue)
+    }
 }

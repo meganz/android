@@ -350,7 +350,7 @@ class HomepageFragment : Fragment() {
         }
 
         searchInputView.setOngoingCallClickListener {
-            doIfOnline(false) { activity.returnCallWithPermissions() }
+            doIfOnline(false) { activity.returnCall() }
         }
     }
 

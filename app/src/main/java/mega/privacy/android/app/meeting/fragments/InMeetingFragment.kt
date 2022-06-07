@@ -73,9 +73,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -89,7 +87,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
-    StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
     @Inject
@@ -400,11 +397,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val chatConnectionStatusObserver =
         Observer<Pair<Long, Int>> { chatAndState ->
             if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall()) {
-                inMeetingViewModel.startMeeting(
-                    camIsEnable,
-                    micIsEnable,
-                    StartChatCallListener(meetingActivity, this, this)
-                )
+                startCall()
             }
         }
 
@@ -647,12 +640,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 logDebug("Action ringing with video on")
-                sharedModel.micInitiallyOn()
-                sharedModel.camInitiallyOn()
+                inMeetingViewModel.getCall()?.let {
+                    if (it.hasLocalAudio()) {
+                        sharedModel.micInitiallyOn()
+                    }
+                    if (it.hasLocalVideo()) {
+                        sharedModel.camInitiallyOn()
+                    }
+                }
             }
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
                 logDebug("Action ringing with video off")
-                sharedModel.micInitiallyOn()
+                inMeetingViewModel.getCall()?.let {
+                    if (it.hasLocalAudio()) {
+                        sharedModel.micInitiallyOn()
+                    }
+                }
             }
             MEETING_ACTION_START -> {
                 logDebug("Action need answer call")
@@ -909,54 +912,74 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updateSpeaker(it)
         }
 
-        sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
-            if (it) {
-                permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA)
-                )
-                    .setOnRequiresPermission { l ->
-                        run {
-                            onRequiresPermission(l)
-                            // Continue expected action after granted
-                            sharedModel.clickCamera(true)
-                            bottomFloatingPanelViewHolder.updateCamPermissionWaring(true)
-                        }
-                    }
-                    .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
-                    .build().launch(false)
-            }
-        }
-        sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
-            if (it) {
-                permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO)
-                )
-                    .setOnRequiresPermission { l ->
-                        run {
-                            onRequiresPermission(l)
-                            // Continue expected action after granted
-                            sharedModel.clickMic(true)
-                            bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
-                        }
-                    }
-                    .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
-                    .build().launch(false)
-            }
-        }
-
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
             }
         }
 
-        sharedModel.cameraGranted.observe(viewLifecycleOwner) {
-            bottomFloatingPanelViewHolder.updateCamPermissionWaring(it)
+        lifecycleScope.launchWhenStarted {
+            sharedModel.cameraGranted.collect { allowed ->
+                if (allowed) {
+                    bottomFloatingPanelViewHolder.updateCamPermissionWaring(allowed)
+                }
+            }
         }
-        sharedModel.recordAudioGranted.observe(viewLifecycleOwner) {
-            bottomFloatingPanelViewHolder.updateMicPermissionWaring(it)
+
+        sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+            if (allowed) {
+                permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.CAMERA)
+                )
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+
+                                // Continue expected action after granted
+                                sharedModel.clickCamera(true)
+                            }
+                        }
+                        .setOnShowRationale { l ->
+                            onShowRationale(l)
+
+                        }
+                        .setOnNeverAskAgain { l ->
+                            onPermNeverAskAgain(l) }
+                        .build()
+                permissionsRequester.launch(false)
+            }
+        }
+
+        sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+            sharedModel.lockMic()
+
+            if (allowed) {
+                permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.RECORD_AUDIO)
+                )
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickMic(true)
+                            }
+                        }
+                        .setOnShowRationale { l ->
+                            onShowRationale(l)
+                        }
+                        .setOnNeverAskAgain { l ->
+                            onPermNeverAskAgain(l) }
+                        .build()
+                permissionsRequester.launch(false)
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            sharedModel.recordAudioGranted.collect { allowed ->
+                if (allowed && !sharedModel.micLocked) {
+                    bottomFloatingPanelViewHolder.updateMicPermissionWaring(allowed)
+                }
+            }
         }
 
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
@@ -1091,6 +1114,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * user denies the RECORD_AUDIO or CAMERA permission
+     *
+     * @param permissions permission list
+     */
+    private fun onPermNeverAskAgain(permissions: java.util.ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            onAudioNeverAskAgain(permissions)
+        } else  if (permissions.contains(Manifest.permission.CAMERA)) {
+            onCameraNeverAskAgain(permissions)
         }
     }
 
@@ -1684,11 +1720,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             logDebug("Starting meeting ...")
-            inMeetingViewModel.startMeeting(
-                camIsEnable,
-                micIsEnable,
-                StartChatCallListener(requireContext(), this, this)
-            )
+            startCall()
         }
     }
 
@@ -2558,11 +2590,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         showMuteBanner()
     }
 
-    override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
-        logDebug("Call started")
-        checkCallStarted(chatId)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 
@@ -2591,19 +2618,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onStop()
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
-    }
-
-    override fun onCallAnswered(chatId: Long, flag: Boolean) {
-        if (chatId == inMeetingViewModel.getChatId()) {
-            logDebug("Call answered")
-            MegaApplication.getChatManagement().setSpeakerStatus(chatId, true)
-            checkCallStarted(chatId)
-        }
-    }
-
-    override fun onErrorAnsweredCall(errorCode: Int) {
-        logDebug("Error answering the meeting so close it: $errorCode")
-        finishActivity()
     }
 
     /**
@@ -2655,12 +2669,32 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         } else {
             isWaitingForAnswerCall = false
             logDebug("Joined to chat, answer call")
-            inMeetingViewModel.answerChatCall(
-                camIsEnable,
-                micIsEnable,
-                speakerIsEnable,
-                AnswerChatCallListener(requireContext(), this)
-            )
+            answerCall()
+        }
+    }
+
+    /**
+     * Method to answer the call
+     */
+    private fun answerCall() {
+        sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable).observe(viewLifecycleOwner) {
+                result ->
+                MegaApplication.getChatManagement().setSpeakerStatus(result.chatHandle,
+                    result.enableVideo
+                )
+                checkCallStarted(result.chatHandle)
+        }
+    }
+
+    /**
+     * Method to start the call
+     */
+    private fun startCall() {
+        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable).observe(viewLifecycleOwner) {
+                result ->
+           result?.let {
+               checkCallStarted(result.chatHandle)
+           }
         }
     }
 
@@ -2704,9 +2738,5 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dialog?.let {
             if (it.isShowing) it.dismiss()
         }
-    }
-
-    override fun onCallFailed(chatId: Long) {
-        logError("Call with chat ID $chatId failed")
     }
 }

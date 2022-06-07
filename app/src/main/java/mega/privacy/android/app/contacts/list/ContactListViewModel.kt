@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.list.data.ContactActionItem
@@ -18,11 +19,15 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.call.StartCallUseCase
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaUser
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -39,7 +44,9 @@ class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val removeContactUseCase: RemoveContactUseCase
+    private val removeContactUseCase: RemoveContactUseCase,
+    private val startCallUseCase: StartCallUseCase,
+    private val passcodeManagement: PasscodeManagement
 ) : BaseRxViewModel() {
 
     companion object {
@@ -172,5 +179,23 @@ class ContactListViewModel @Inject constructor(
     fun setQuery(query: String?) {
         queryString = query
         contacts.notifyObserver()
+    }
+
+    /**
+     * Method for checking the necessary actions to start a call.
+     */
+    fun startCall() {
+        startCallUseCase.startCallFromUserHandle(MegaApplication.getUserWaitingForCall(), enableVideo = false, enableAudio = true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                        onSuccess = { resultStartCall ->
+                            CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext, resultStartCall.chatHandle, resultStartCall.enableAudio, resultStartCall.enableVideo, passcodeManagement)
+                        },
+                        onError = { error ->
+                            Timber.e(error.stackTraceToString())
+                        }
+                )
+                .addTo(composite)
     }
 }
