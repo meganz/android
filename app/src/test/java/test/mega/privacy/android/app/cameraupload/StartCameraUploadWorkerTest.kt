@@ -21,7 +21,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
-import java.util.*
+import test.mega.privacy.android.app.di.TestWrapperModule
+import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -56,29 +57,29 @@ class StartCameraUploadWorkerTest {
                 WorkForegroundUpdater(workDatabase, object : ForegroundProcessor {
                     override fun startForeground(
                         workSpecId: String,
-                        foregroundInfo: ForegroundInfo
+                        foregroundInfo: ForegroundInfo,
                     ) {
                     }
 
                     override fun stopForeground(workSpecId: String) {}
                 }, workExecutor)
             ),
-            TestCameraUploadModule.permissionUtilWrapper,
-            TestCameraUploadModule.jobUtilWrapper,
-            TestCameraUploadModule.cameraUploadsServiceWrapper
+            TestWrapperModule.permissionUtilWrapper,
+            TestWrapperModule.jobUtilWrapper,
+            TestWrapperModule.cameraUploadsServiceWrapper
         )
     }
 
     @Test
     fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota and the camera upload service is not yet started`() {
         whenever(
-            TestCameraUploadModule.permissionUtilWrapper.hasPermissions(
+            TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
                 READ_EXTERNAL_STORAGE
             )
         ).thenReturn(true)
-        whenever(TestCameraUploadModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
         val result = worker.doWork()
@@ -88,13 +89,13 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if read external storage permission is not granted`() {
         whenever(
-            TestCameraUploadModule.permissionUtilWrapper.hasPermissions(
+            TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
                 READ_EXTERNAL_STORAGE
             )
         ).thenReturn(false)
-        whenever(TestCameraUploadModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
         val result = worker.doWork()
@@ -104,13 +105,13 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if the user is over quota`() {
         whenever(
-            TestCameraUploadModule.permissionUtilWrapper.hasPermissions(
+            TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
                 READ_EXTERNAL_STORAGE
             )
         ).thenReturn(true)
-        whenever(TestCameraUploadModule.jobUtilWrapper.isOverQuota(context)).thenReturn(true)
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(true)
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
         val result = worker.doWork()
@@ -120,13 +121,13 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if the camera upload service is already running`() {
         whenever(
-            TestCameraUploadModule.permissionUtilWrapper.hasPermissions(
+            TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
                 READ_EXTERNAL_STORAGE
             )
         ).thenReturn(true)
-        whenever(TestCameraUploadModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
-        whenever(TestCameraUploadModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             true
         )
         val result = worker.doWork()

@@ -4,11 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.domain.repository.SettingsRepository
-import mega.privacy.android.app.domain.usecase.*
-import javax.inject.Singleton
-import kotlin.contracts.ExperimentalContracts
+import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.DefaultAreChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.DefaultAreSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.DefaultSetChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.DefaultSetSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
 
 /**
  * Settings module
@@ -30,4 +33,5 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun bindAreSdkLogsEnabled(useCase: DefaultAreSdkLogsEnabled): AreSdkLogsEnabled
+
 }

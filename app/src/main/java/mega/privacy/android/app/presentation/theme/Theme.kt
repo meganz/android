@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import mega.privacy.android.app.domain.entity.ThemeMode
 
 private val DarkColorPalette = darkColors(
 
@@ -16,9 +17,10 @@ private val LightColorPalette = lightColors(
 
 @Composable
 fun AndroidTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    mode: ThemeMode,
+    content: @Composable () -> Unit,
 ) {
+    val darkTheme: Boolean = isAppDarkTheme(mode)
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -32,3 +34,11 @@ fun AndroidTheme(
         content = content
     )
 }
+
+@Composable
+fun isAppDarkTheme(mode: ThemeMode) = when (mode) {
+    ThemeMode.Light -> false
+    ThemeMode.Dark -> true
+    ThemeMode.System -> isSystemInDarkTheme()
+}
+
