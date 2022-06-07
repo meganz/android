@@ -58,7 +58,7 @@ interface MegaApiGateway {
      * initialised yet for some reason.
      *
      */
-    val rootNode: MegaNode?
+    suspend fun getRootNode(): MegaNode?
 
     /**
      * Rubbish bin node of the account
@@ -67,7 +67,7 @@ interface MegaApiGateway {
      * initialised yet for some reason.
      *
      */
-    val rubbishBinNode: MegaNode?
+    suspend fun getRubbishBinNode(): MegaNode?
 
     /**
      * Global updates
@@ -87,7 +87,7 @@ interface MegaApiGateway {
      * @param nodeHandle node handle
      * @return MegaNode
      */
-    fun getMegaNodeByHandle(nodeHandle: Long): MegaNode
+    suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode
 
     /**
      * Check the node if has version
@@ -102,7 +102,7 @@ interface MegaApiGateway {
      * @param order order for the returned list, if null the default order is applied
      * @return children nodes list
      */
-    fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
 
     /**
      * Get child folder number of current folder

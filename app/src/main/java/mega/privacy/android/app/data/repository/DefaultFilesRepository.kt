@@ -35,8 +35,9 @@ class DefaultFilesRepository @Inject constructor(
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {
+            val rootNode = megaApiGateway.getRootNode()
             suspendCoroutine { continuation ->
-                megaApiGateway.getFolderInfo(megaApiGateway.rootNode,
+                megaApiGateway.getFolderInfo(rootNode,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestFolderInfoCompleted(continuation)
                     ))
@@ -67,11 +68,11 @@ class DefaultFilesRepository @Inject constructor(
             .mapNotNull { it.nodeList?.toList() }
 
     override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.rootNode
+        megaApiGateway.getRootNode()
     }
 
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.rubbishBinNode
+        megaApiGateway.getRubbishBinNode()
     }
 
     override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =

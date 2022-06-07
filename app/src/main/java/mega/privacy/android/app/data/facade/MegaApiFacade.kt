@@ -53,10 +53,10 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isBusinessAccount
     override val isMasterBusinessAccount: Boolean
         get() = megaApi.isMasterBusinessAccount
-    override val rootNode: MegaNode?
-        get() = megaApi.rootNode
-    override val rubbishBinNode: MegaNode?
-        get() = megaApi.rubbishNode
+
+    override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
+
+    override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
 
     override val globalUpdates: Flow<GlobalUpdate>
         get() = callbackFlow {
@@ -118,12 +118,12 @@ class MegaApiFacade @Inject constructor(
         megaApi.getFavourites(node, count, listener)
     }
 
-    override fun getMegaNodeByHandle(nodeHandle: Long): MegaNode =
+    override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode =
         megaApi.getNodeByHandle(nodeHandle)
 
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
-    override fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
+    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
         if (order == null)
             megaApi.getChildren(parentNode)
         else
@@ -158,7 +158,7 @@ class MegaApiFacade @Inject constructor(
     override fun getThumbnail(
         node: MegaNode,
         thumbnailFilePath: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)

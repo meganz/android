@@ -1,7 +1,9 @@
 package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.extensions.failWithError
@@ -37,22 +39,24 @@ class DefaultFavouritesRepository @Inject constructor(
                 0,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
-                        if (error.errorCode == MegaError.API_OK) {
-                            val favourites = mutableListOf<FavouriteInfo>()
-                            val megaHandleList = request.megaHandleList
-                            for (i in 0 until megaHandleList.size()) {
-                                val favouriteItem =
-                                    megaApiGateway.getMegaNodeByHandle(megaHandleList[i])
-                                favourites.add(
-                                    favouriteInfoMapper(
-                                        favouriteItem,
-                                        megaApiGateway
+                        CoroutineScope(ioDispatcher).launch {
+                            if (error.errorCode == MegaError.API_OK) {
+                                val favourites = mutableListOf<FavouriteInfo>()
+                                val megaHandleList = request.megaHandleList
+                                for (i in 0 until megaHandleList.size()) {
+                                    val favouriteItem =
+                                        megaApiGateway.getMegaNodeByHandle(megaHandleList[i])
+                                    favourites.add(
+                                        favouriteInfoMapper(
+                                            favouriteItem,
+                                            megaApiGateway
+                                        )
                                     )
-                                )
+                                }
+                                continuation.resumeWith(Result.success(favourites))
+                            } else {
+                                continuation.failWithError(error)
                             }
-                            continuation.resumeWith(Result.success(favourites))
-                        } else {
-                            continuation.failWithError(error)
                         }
                     }
                 ))
