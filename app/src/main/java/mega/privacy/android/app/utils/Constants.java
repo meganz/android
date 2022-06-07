@@ -485,8 +485,6 @@ public class Constants {
     public static final int RICH_WARNING_CONFIRMATION = 2;
 
     public static final int TAKE_PICTURE_OPTION = 0;
-    public static final int START_CALL_PERMISSIONS = 1;
-    public static final int RETURN_CALL_PERMISSIONS = 2;
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;

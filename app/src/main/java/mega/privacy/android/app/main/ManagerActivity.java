@@ -62,10 +62,8 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorag
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
-import static mega.privacy.android.app.utils.CallUtil.checkPermissionsCall;
 import static mega.privacy.android.app.utils.CallUtil.hideCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.hideCallWidget;
-import static mega.privacy.android.app.utils.CallUtil.isChatConnectedInOrderToInitiateACall;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
 import static mega.privacy.android.app.utils.CallUtil.openMeetingToCreate;
@@ -75,7 +73,6 @@ import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
-import static mega.privacy.android.app.utils.CallUtil.startCallWithChatOnline;
 import static mega.privacy.android.app.utils.CameraUploadUtil.backupTimestampsAndFolderHandle;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableMediaUploadProcess;
@@ -1194,9 +1191,6 @@ public class ManagerActivity extends TransfersManagementActivity
                             typesCameraPermission = INVALID_TYPE_PERMISSIONS;
                         }
                     }
-                } else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
-                        grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    controlCallPermissions();
                 }
                 break;
             }
@@ -1280,13 +1274,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
 
-            case REQUEST_RECORD_AUDIO:
-                if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
-                        grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    controlCallPermissions();
-                }
-                break;
-
             case REQUEST_BT_CONNECT:
                 logDebug("get Bluetooth Connect permission");
                 if (permissions.length == 0) {
@@ -1300,27 +1287,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
                 }
                 break;
-        }
-    }
-
-    /**
-     * Method for checking the necessary actions when you have permission to start a call or return to one in progress.
-     */
-    private void controlCallPermissions() {
-        if (checkPermissionsCall(this, typesCameraPermission)) {
-            switch (typesCameraPermission) {
-                case RETURN_CALL_PERMISSIONS:
-                    returnActiveCall(this, passcodeManagement);
-                    break;
-
-                case START_CALL_PERMISSIONS:
-                    MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
-                    if (chat != null) {
-                        startCallWithChatOnline(this, chat);
-                    }
-                    break;
-            }
-            typesCameraPermission = INVALID_TYPE_PERMISSIONS;
         }
     }
 
@@ -5684,7 +5650,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case R.id.action_return_call: {
                 logDebug("Action menu return to call in progress pressed");
-                returnCallWithPermissions();
+                returnCall();
                 return true;
             }
             case R.id.action_menu_retry_transfers:
@@ -5727,10 +5693,11 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void returnCallWithPermissions() {
-        if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-            returnActiveCall(this, passcodeManagement);
-        }
+    /**
+     * Method to return to an ongoing call
+     */
+    public void returnCall() {
+        returnActiveCall(this, passcodeManagement);
     }
 
     public void checkBeforeOpeningQR(boolean openScanQR) {
@@ -7892,7 +7859,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             case R.id.call_in_progress_layout: {
-                returnCallWithPermissions();
+                returnCall();
                 break;
             }
         }
@@ -10497,12 +10464,6 @@ public class ManagerActivity extends TransfersManagementActivity
 				}
 			}
 		}
-
-        MegaChatApiJava api = MegaApplication.getInstance().getMegaChatApi();
-        MegaChatRoom chatRoom = api.getChatRoom(chatid);
-        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-            startCallWithChatOnline(this, api.getChatRoom(chatid));
-        }
     }
 
     public void copyError() {
