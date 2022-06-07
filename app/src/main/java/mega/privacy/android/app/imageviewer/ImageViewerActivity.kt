@@ -58,15 +58,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
          *
          * @param context       Required to build the Intent.
          * @param nodeHandle    Node handle to request image from.
+         * @param isFileVersion True if is a file version, false otherwise.
          * @return              Image Viewer Intent.
          */
         @JvmStatic
         fun getIntentForSingleNode(
             context: Context,
-            nodeHandle: Long
+            nodeHandle: Long,
+            isFileVersion: Boolean = false
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                putExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, isFileVersion)
             }
 
         /**
@@ -220,6 +223,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
     private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
+    private val isFileVersion by lazy {
+        intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION,
+            false)
+    }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
@@ -413,12 +420,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         binding.txtTitle.text = imageItem?.name
         if (imageItem?.nodeItem != null) {
             binding.toolbar.menu?.apply {
-                findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
-                findItem(R.id.action_share)?.isVisible = imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption()
+                findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption() && !isFileVersion
+                findItem(R.id.action_share)?.isVisible = imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption() && !isFileVersion
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
-                findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption()
-                findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn())
-                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null
+                findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption() && !isFileVersion
+                findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
+                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
             }
         }
     }

@@ -3,6 +3,9 @@ package mega.privacy.android.app.main.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
@@ -25,18 +28,20 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapter.ViewHolderVersion> implements OnClickListener, View.OnLongClickListener {
+public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapter.ViewHolderVersion> implements OnClickListener, View.OnLongClickListener, DragThumbnailGetter {
 
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -54,6 +59,24 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	RecyclerView listFragment;
 
 	boolean multipleSelect;
+
+	@Override
+	public int getNodePosition(long handle) {
+		for (int i = 0; i < nodes.size(); i++) {
+			MegaNode node = nodes.get(i);
+			if (node != null && node.getHandle() == handle) {
+				return i;
+			}
+		}
+
+		return INVALID_POSITION;
+	}
+
+	@Nullable
+	@Override
+	public View getThumbnail(@NonNull ViewHolder viewHolder) {
+		return viewHolder.itemView;
+	}
 
 	/* public static view holder class */
 	public static class ViewHolderVersion extends ViewHolder {
