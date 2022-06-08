@@ -98,39 +98,39 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         const val VIEW_TYPE = "VIEW_TYPE"
     }
 
-    protected lateinit var mManagerActivity: ManagerActivity
+    private lateinit var mManagerActivity: ManagerActivity
 
     // View type panel
-    protected lateinit var viewTypePanel: View
-    protected lateinit var yearsButton: TextView
-    protected lateinit var monthsButton: TextView
-    protected lateinit var daysButton: TextView
-    protected lateinit var allButton: TextView
+    private lateinit var viewTypePanel: View
+    private lateinit var yearsButton: TextView
+    private lateinit var monthsButton: TextView
+    private lateinit var daysButton: TextView
+    private lateinit var allButton: TextView
 
     // List view
-    protected lateinit var listView: RecyclerView
-    protected lateinit var gridAdapter: GalleryAdapter
-    protected lateinit var cardAdapter: GalleryCardAdapter
-    protected lateinit var layoutManager: GridLayoutManager
-    protected lateinit var scroller: FastScroller
-    protected lateinit var scaleGestureHandler: ScaleGestureHandler
+    private lateinit var listView: RecyclerView
+    private lateinit var gridAdapter: GalleryAdapter
+    private lateinit var cardAdapter: GalleryCardAdapter
+    private lateinit var layoutManager: GridLayoutManager
+    private lateinit var scroller: FastScroller
+    private lateinit var scaleGestureHandler: ScaleGestureHandler
 
-    protected lateinit var menu: Menu
+    private lateinit var menu: Menu
 
     // Action mode
-    protected var actionMode: ActionMode? = null
-    protected lateinit var actionModeCallback: ActionModeCallback
+    private var actionMode: ActionMode? = null
+    private lateinit var actionModeCallback: ActionModeCallback
 
     // View model
     private val viewModel by viewModels<TimelineViewModel>()
-    protected val zoomViewModel by viewModels<ZoomViewModel>()
-    protected val actionModeViewModel by viewModels<ActionModeViewModel>()
-    protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+    private val zoomViewModel by viewModels<ZoomViewModel>()
+    private val actionModeViewModel by viewModels<ActionModeViewModel>()
+    private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
-    protected var showBottomNav = true
+    private var showBottomNav = true
 
-    protected var selectedView = ALL_VIEW
-    protected open var adapterType = 0
+    private var selectedView = ALL_VIEW
+    private var adapterType = 0
 
 
     private lateinit var binding: FragmentTimelineBinding
@@ -919,7 +919,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     /**
      * Display the view type buttons panel with animation effect, after a card is clicked.
      */
-    protected fun showViewTypePanel() {
+    private fun showViewTypePanel() {
         val params = viewTypePanel.layoutParams as ViewGroup.MarginLayoutParams
         params.setMargins(
             0, 0, 0,
@@ -969,7 +969,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             }
     }
 
-    fun gridAdapterHasData() = viewModel.items.value?.isNotEmpty()?:false
+    fun gridAdapterHasData() = viewModel.items.value?.isNotEmpty() ?: false
 
     fun layoutManagerInitialized() = this::layoutManager.isInitialized
 
@@ -1138,7 +1138,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         handleZoomMenuItemStatus()
     }
 
-    protected fun getCurrentZoom(): Int {
+    private fun getCurrentZoom(): Int {
         return zoomViewModel.getCurrentZoom()
     }
 
@@ -1164,7 +1164,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         )
     }
 
-    protected fun setupTimePanel() {
+    private fun setupTimePanel() {
         yearsButton.setOnClickListener {
             newViewClicked(YEARS_VIEW)
         }
@@ -1230,7 +1230,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      *          The second element is the cards of months.
      *          The third element is the cards of years.
      */
-    protected fun showCards(dateCards: List<List<GalleryCard>?>?) {
+    private fun showCards(dateCards: List<List<GalleryCard>?>?) {
         val index = when (selectedView) {
             DAYS_VIEW -> DAYS_INDEX
             MONTHS_VIEW -> MONTHS_INDEX
@@ -1245,7 +1245,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         updateFastScrollerVisibility()
     }
 
-    protected fun updateFastScrollerVisibility() {
+    private fun updateFastScrollerVisibility() {
         if (!this::cardAdapter.isInitialized) return
 
         val gridView = selectedView == ALL_VIEW
@@ -1283,7 +1283,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      *
      * @return true is initialized, false is not initialized
      */
-    fun isGridAdapterInitialized():Boolean{
+    fun isGridAdapterInitialized(): Boolean {
         return this::gridAdapter.isInitialized
     }
 
