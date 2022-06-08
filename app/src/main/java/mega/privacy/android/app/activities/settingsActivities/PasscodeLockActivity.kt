@@ -547,6 +547,10 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Skips successfully the passcode screen because the passcode or the password
+     * was correctly introduced.
+     */
     private fun skipPasscode() {
         passcodeUtil.pauseUpdate()
         resetAttempts()
@@ -554,7 +558,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     /**
-     * Checks if the typed password is the same as the current loged in account.
+     * Checks if the typed password is the same as the current logged in account.
      */
     private fun checkPassword() {
         val typedPassword = binding.passwordField.text.toString()
