@@ -12,9 +12,11 @@ import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
+import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
@@ -25,24 +27,20 @@ class FavouriteFolderViewModelTest {
 
     private val getFavouriteFolderInfo = mock<GetFavouriteFolderInfo>()
     private val stringUtilWrapper = mock<StringUtilWrapper>()
+    private val favouriteMapper = mock<FavouriteMapper>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = FavouriteFolderViewModel(
             context = mock(),
+            ioDispatcher = UnconfinedTestDispatcher(),
             getFavouriteFolderInfo = getFavouriteFolderInfo,
             stringUtilWrapper = stringUtilWrapper,
             megaUtilWrapper = mock(),
-            savedStateHandle = SavedStateHandle()
+            savedStateHandle = SavedStateHandle(),
+            favouriteMapper = favouriteMapper
         )
-    }
-
-    @Test
-    fun `test default is loading state` () = runTest {
-        underTest.childrenNodesState.test {
-            assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
-        }
     }
 
     @Test
@@ -67,6 +65,8 @@ class FavouriteFolderViewModelTest {
     fun `test that start with loading state and children nodes is not empty`() = runTest {
         val node = mock<MegaNode>()
         whenever(node.handle).thenReturn(123)
+        whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
+        whenever(node.size).thenReturn(1000L)
         whenever(node.parentHandle).thenReturn(1234)
         whenever(node.base64Handle).thenReturn("base64Handle")
         whenever(node.modificationTime).thenReturn(1234567890)
@@ -75,6 +75,9 @@ class FavouriteFolderViewModelTest {
         whenever(node.name).thenReturn("testName.txt")
         val favourite = FavouriteInfo(
             id = node.handle,
+            name = node.name,
+            label = node.label,
+            size = node.size,
             parentId = node.parentHandle,
             base64Id = node.base64Handle,
             modificationTime = node.modificationTime,
@@ -95,6 +98,7 @@ class FavouriteFolderViewModelTest {
                 )
             )
         )
+        whenever(favouriteMapper(any(), any(), any(), any())).thenReturn(mock())
         underTest.childrenNodesState.test {
             assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
             assertTrue(awaitItem() is ChildrenNodesLoadState.Success)

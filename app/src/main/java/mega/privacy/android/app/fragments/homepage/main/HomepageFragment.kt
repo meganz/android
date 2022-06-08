@@ -130,7 +130,7 @@ class HomepageFragment : Fragment() {
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
             val direction = when (it) {
-                categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+                categoryFavourites -> HomepageFragmentDirections.actionHomepageFragmentToFavourites()
                 categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
                 categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
                 categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
@@ -462,7 +462,7 @@ class HomepageFragment : Fragment() {
      * Set the click listeners for file categories buttons
      */
     private fun setupCategories() {
-        viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryFavourites.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryVideo.setOnClickListener(categoryClickListener)
@@ -478,7 +478,6 @@ class HomepageFragment : Fragment() {
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
             BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
-            BottomSheetPagerAdapter.FAVOURITE_INDEX -> return resources.getString(R.string.title_favourites_album)
         }
 
         return ""

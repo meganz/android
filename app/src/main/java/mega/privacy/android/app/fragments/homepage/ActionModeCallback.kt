@@ -9,7 +9,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
 import java.util.*
