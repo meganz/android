@@ -4359,6 +4359,8 @@
     <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">Favourites</string>
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_renews_on">[A]Renews on[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->

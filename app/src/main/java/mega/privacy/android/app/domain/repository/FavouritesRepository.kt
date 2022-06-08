@@ -20,11 +20,17 @@ interface FavouritesRepository {
      * @param parentHandle the parent node handle
      * @return FavouriteFolderInfo
      */
-    suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo
+    suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo?
 
     /**
      * Monitor the node change
      * @return Flow<Boolean>
      */
     fun monitorNodeChange(): Flow<Boolean>
+
+    /**
+     * Removing favourites
+     * @param handles the handle of items that are removed.
+     */
+    suspend fun removeFavourites(handles: List<Long>)
 }

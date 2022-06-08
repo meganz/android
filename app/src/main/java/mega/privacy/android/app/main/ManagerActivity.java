@@ -725,7 +725,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
     private enum HomepageScreen {
-        HOMEPAGE, IMAGES, DOCUMENTS, AUDIO, VIDEO,
+        HOMEPAGE, IMAGES, FAVOURITES, DOCUMENTS, AUDIO, VIDEO,
         FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
     }
 
@@ -3872,8 +3872,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 int titleId = -1;
 
                 switch (mHomepageScreen) {
-                    case IMAGES:
-                        titleId = R.string.section_images;
+                    case FAVOURITES:
+                        titleId = R.string.favourites_category_title;
                         break;
                     case DOCUMENTS:
                         titleId = R.string.section_documents;
@@ -4437,8 +4437,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 setDrawerLockMode(false);
                 return;
-            } else if (destinationId == R.id.photosFragment) {
-                mHomepageScreen = HomepageScreen.IMAGES;
+            } else if (destinationId == R.id.favouritesFragment) {
+                mHomepageScreen = HomepageScreen.FAVOURITES;
             } else if (destinationId == R.id.documentsFragment) {
                 mHomepageScreen = HomepageScreen.DOCUMENTS;
             } else if (destinationId == R.id.audioFragment) {
