@@ -7,7 +7,8 @@ import java.time.LocalDate
 /**
  * Data class used to manage Camera Uploads and Media Uploads content as cards.
  *
- * @param node      MegaNode representing the card item.
+ * @param id        The MegaNode handle
+ * @param name      The MegaNode name
  * @param preview   Preview of the node if exists, null otherwise.
  * @param day       Day of the modified date if a day card, null otherwise.
  * @param month     Month of the modified date if a day or month card, null otherwise.
