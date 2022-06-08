@@ -4322,7 +4322,7 @@
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
     <string name="settings_file_management_auto_open_downloaded_file">Nicht unterstützte Dateitypen in Drittanbieter-Apps öffnen</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">Nicht unterstützte Dateitypen werden in Drittanbieter-Apps statt in der MEGA-App geöffnet.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Bildqualität</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
@@ -4338,22 +4338,22 @@
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality_text">Bilder immer optimiert übertragen.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s ist beigetreten</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
-    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s und %2$s sind beigetreten</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s hat aufgelegt</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s und %2$s haben aufgelegt</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
-        <item quantity="other">%1$s and %2$d others joined</item>
+        <item quantity="one">%1$s und 1 weitere Person sind beigetreten</item>
+        <item quantity="other">%1$s und %2$d weitere Personen sind beigetreten</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s und 1 weitere Person haben aufgelegt</item>
+        <item quantity="other">%1$s und %2$d weitere Personen haben aufgelegt</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Endgültig löschen</string>

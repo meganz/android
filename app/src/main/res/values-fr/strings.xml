@@ -4444,14 +4444,14 @@
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">Se sont joints&#160;: %1$s et 1 autre</item>
-        <item quantity="many">Se sont joints&#160;: %1$s et %2$d autres</item>
+        <item quantity="many">Se sont joints&#160;: %1$s et %2$d d’autres</item>
         <item quantity="other">Se sont joints&#160;: %1$s et %2$d autres</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
         <item quantity="one">%1$s et 1 autre ont quitté l’appel</item>
-        <item quantity="many">%1$s et %2$d autres ont quitté l’appel</item>
-        <item quantity="other">%1$s et %2$d autres ont quitté l’appel</item>
+        <item quantity="many">%1$s et %2$d d’autres ont quitté l’appel</item>
+        <item quantity="other">%1$s et %2$d autres ont quitté l’appel«</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Supprimer définitivement</string>

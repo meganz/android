@@ -587,13 +587,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">A pasta não está mais compartilhado</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Não foi possível deixar de compartilhar a pasta com o seu contato</string>
+    <string name="context_no_removed_sharing_contacts">Ocorreu um erro. Não foi possível deixar de compartilhar a pasta com o seu contato</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Selecione somente um arquivo</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Lixeira esvaziada com êxito</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Não foi possível esvaziar a lixeira</string>
+    <string name="rubbish_bin_no_emptied">Ocorreu um erro. Não foi possível esvaziar a lixeira</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Você está prestes a cancelar a sua assinatura MEGA. Por favor, deixe-nos saber se há alguma coisa que podemos fazer para ajudar a mudar a sua mente.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -1332,7 +1332,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">O histórico do chat foi deletado</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">Não foi possível deletar o histórico do chat</string>
+    <string name="clear_history_error">Ocorreu um erro. O histórico do chat não foi apagado com sucesso.</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adicionar participantes</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1464,7 +1464,7 @@
         <item quantity="other">%1$d contatos</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
-    <string name="error_sharing_folder">Não foi possível compartilhar a pasta. Por favor, tente novamente.</string>
+    <string name="error_sharing_folder">Erro ao tentar compartilhar a pasta. Por favor, tente novamente.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Todos os dados relacionados com este contato serão eliminados permanentemente.</item>
@@ -2039,7 +2039,7 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Reconectando ao chat</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Não foi possível estabelecer a chamada.</string>
+    <string name="call_error">Ocorreu um erro e não foi possível estabelecer a chamada.</string>
     <!-- Title of dialog to evaluate the app -->
     <string name="title_evaluate_the_app_panel">Você gosta do aplicativo do MEGA para dispositivos móveis?</string>
     <!-- Label to show rate the app -->
@@ -2085,9 +2085,9 @@
     <!-- Text shown when it has been deleted the QR code successfully -->
     <string name="qrcode_delete_successfully">Código QR deletado corretamente</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
-    <string name="qrcode_reset_not_successfully">Não foi possível resetar o código QR. Por favor, tente novamente.</string>
+    <string name="qrcode_reset_not_successfully">Não foi possível resetar o código QR devido a um erro. Por favor, tente novamente.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
-    <string name="qrcode_delete_not_successfully">Não foi possível deletar o código QR. Por favor, tente novamente.</string>
+    <string name="qrcode_delete_not_successfully">Não foi possível deletar o código QR devido a um erro. Por favor, tente novamente.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
     <string name="invite_sent">Convite enviado</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
@@ -2095,9 +2095,9 @@
     <!-- Text of dialog shown when multiple contacts request has been sent -->
     <string name="invite_sent_text_multi">Os usuários foram convidados e aparecerão na sua lista de contatos assim que aceitarem.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
-    <string name="error_share_qr">Não foi possível compartilhar o código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_share_qr">Um erro ocorreu ao tentar compartilhar o código QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
-    <string name="error_upload_qr">Não foi possível fazer o upload do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_upload_qr">Ocorreu um erro ao tentar fazer o upload do código QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Não foi possível fazer o download do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
@@ -2109,7 +2109,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">O convite não foi enviado. %s já está na sua lista de contatos.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Não foi possível enviar o convite.</string>
+    <string name="invite_not_sent_text_error">Ocorreu um erro. Não foi possível enviar o convite.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Gerando o código QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -2572,7 +2572,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurado para %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Não foi possível restaurar este item.</string>
+    <string name="context_no_restored">Ocorreu um erro. Não foi possível restaurar este item.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensagem</string>
     <!-- Error message on opening a MEGAdrop folder link -->
@@ -2640,7 +2640,7 @@
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">As versões de arquivos foram deletadas</string>
     <!-- error message when deleting all the versions of the account -->
-    <string name="error_delete_versions">Não foi possível deletar todas as versões anteriores dos arquivos. Tente novamente mais tarde.</string>
+    <string name="error_delete_versions">Um erro ocorreu ao tentar deletar todas as versões anteriores dos arquivos. Tente novamente mais tarde.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Controle das versões de arquivos</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
@@ -2798,7 +2798,7 @@
     <!-- Message on the title of the chat screen if there were any error loading the chat link -->
     <string name="error_chat_link">Não foi possível carregar o link do chat.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">Não foi possível carregar o link do chat.</string>
+    <string name="error_chat_link_init_error">Erro ao iniciar quando carregando o link do chat.</string>
     <!-- Message on the alert to preview a chat link if the user is already a participant -->
     <string name="alert_already_participant_chat_link">Você já está participando deste chat.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
@@ -3100,7 +3100,7 @@
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">Não é possível colocar a chamada em espera.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Não foi possível abrir o arquivo com este aplicativo.</string>
+    <string name="error_open_file_with">Ocorreu um erro. Não foi possível abrir o arquivo com este aplicativo.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Chamada recebida&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3378,7 +3378,7 @@
     <!-- Error message when trying to record a voice message while on a call in progress -->
     <string name="not_allowed_recording_voice_clip">Não é possível gravar mensagens de voz enquanto houver uma chamada em andamento.</string>
     <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
-    <string name="error_upload_voice_clip">Não foi possível fazer o upload da mensagem de voz.</string>
+    <string name="error_upload_voice_clip">Ocorreu um erro ao tentar fazer o upload da mensagem de voz.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Chamada recebida</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -3450,7 +3450,7 @@
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Arquivos dos meus chats</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
-    <string name="error_creating_folder">Não foi possível criar a pasta %1$s</string>
+    <string name="error_creating_folder">Erro. Não foi possível criar a pasta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Confirme o seu email</string>
     <!-- Text informing user that their account has been suspended -->
@@ -3478,7 +3478,7 @@
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">Apelido removido</string>
     <!-- Label showing that a nickname has not been added -->
-    <string name="error_snackbar_nickname_added">Não foi possível adicionar o apelido</string>
+    <string name="error_snackbar_nickname_added">Um erro ocorreu ao tentar adicionar o apelido</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">Apelido</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
@@ -4418,7 +4418,7 @@
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
     <string name="settings_file_management_auto_open_downloaded_file">Abra tipos de arquivo não suportados em aplicativos de terceiros</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">Tipos de arquivos não suportados serão abertos em aplicativos de terceiros em vez do aplicativo do MEGA.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Qualidade da imagem</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
@@ -4434,22 +4434,24 @@
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality_text">Sempre enviar imagens otimizadas.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s entrou</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
-    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s e %2$s entraram</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s saiu</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s e %2$s saíram</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
-        <item quantity="other">%1$s and %2$d others joined</item>
+        <item quantity="one">%1$s e 1 outro entraram</item>
+        <item quantity="many">%1$s e outros %2$d entraram</item>
+        <item quantity="other">%1$s e outros %2$d entraram</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s e 1 outro saíram</item>
+        <item quantity="many">%1$s e outros %2$d saíram</item>
+        <item quantity="other">%1$s e outros %2$d saíram</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Apagar permanentemente</string>

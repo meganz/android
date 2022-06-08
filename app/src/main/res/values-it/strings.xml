@@ -1210,7 +1210,7 @@
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link non disponibile</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
+    <string name="file_link_unavaible_ToS_violation">Il link del file è stato rimosso in quanto violava i nostri Termini di Servizio.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Questo URL è corrotto o deformato. Il link a cui stai cercando di accedere non esiste.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2870,11 +2870,12 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contesta chiusura</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
+    <string name="error_download_takendown_node">Non accessibile in quanto violava i nostri Termini di Servizio</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="one">%d file non è stato scaricato in quanto violava i nostri Termini di Servizio.</item>
+        <item quantity="many">%d file non sono stati scaricati in quanto violavano i nostri Termini di Servizio.</item>
+        <item quantity="other">%d file non sono stati scaricati in quanto violavano i nostri Termini di Servizio.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] [C]è stato reintegrato.[/C]</string>
@@ -3623,11 +3624,11 @@
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]Nessuna[/B] [A]immagine[/A] [B]trovata[/B]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_documents">[B]Nessun[/B] [A]documento[/A] [B]trovato[/B]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_audio">[B]Nessun[/B] [A]file audio[/A] [B]trovato[/B]</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_video">[B]Nessun[/B] [A]video[/A] [B]trovato[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Cerca su GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3924,33 +3925,39 @@
     <string name="warning_share_owner_storage_quota">Il file non può essere inviato in quanto l\’utente destinatario ha superato il limite dello spazio di archiviazione.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">1 file already downloaded. %d files pending.</item>
+        <item quantity="one">1 file già scaricato. 1 file in attesa.</item>
+        <item quantity="many">1 file già scaricato. %d file in attesa.</item>
+        <item quantity="other">1 file già scaricato. %d file in attesa.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+        <item quantity="one">1 file già scaricato. 1 file in attesa.</item>
+        <item quantity="many">%d file già scaricati. 1 file in attesa.</item>
+        <item quantity="other">%d file già scaricati. 1 file in attesa.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="one">1 oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="many">1 oggetto spostato nel Cestino e %d oggetti non spostati. Riprova più tardi.</item>
+        <item quantity="other">1 oggetto spostato nel Cestino e %d oggetti non spostati. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="one">1 oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="many">%d oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="other">%d oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+        <item quantity="one">1 oggetto ripristinato e 1 oggetto non ripristinato. Riprova più tardi.</item>
+        <item quantity="many">1 oggetto ripristinato e %d oggetti non ripristinati. Riprova più tardi.</item>
+        <item quantity="other">1 oggetto ripristinato e %d oggetti non ripristinati. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+        <item quantity="one">1 oggetto ripristinato e 1 oggetto non ripristinato. Riprova più tardi.</item>
+        <item quantity="many">%d oggetti ripristinati e 1 oggetto non ripristinato. Riprova più tardi.</item>
+        <item quantity="other">%d oggetti ripristinati e 1 oggetto non ripristinato. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
@@ -4395,9 +4402,9 @@
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">File rimosso perché viola i nostri Termini di Servizio.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <string name="error_download_takendown_file">Termini di Servizio violati</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">Questo dispositivo non ha app per selezionare le cartelle.</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Avanti</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -4409,43 +4416,45 @@
     <!-- Setting option available to choose for the preferred start screen. -->
     <string name="settings_start_screen_photos_option">Foto</string>
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <string name="settings_file_management_auto_open_downloaded_file">Apri i file non supportati in app di terze parti</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">I tipi di file non supportati verranno aperti tramite app di terze parti invece che tramite l\’app di MEGA.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Qualità delle immagini</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
     <string name="automatic_image_quality">Automatico</string>
     <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <string name="automatic_image_quality_text">Invia immagini ottimizzate tramite connessione dati e immagini a grandezza originale tramite Wi-Fi.</string>
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
     <string name="high_image_quality">Originale</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality_text">Always send original size images.</string>
+    <string name="high_image_quality_text">Invia sempre immagini a grandezza originale.</string>
     <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality">Ottimizzata</string>
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="optimised_image_quality_text">Always send optimised images.</string>
+    <string name="optimised_image_quality_text">Invia sempre immagini ottimizzate.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s è in chiamata</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
-    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s e %2$s sono in chiamata</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s non è più in chiamata</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s e %2$s non sono più in chiamata</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
-        <item quantity="other">%1$s and %2$d others joined</item>
+        <item quantity="one">%1$s e 1 altro utente sono in chiamata</item>
+        <item quantity="many">%1$s e altri %2$d utenti sono in chiamata</item>
+        <item quantity="other">%1$s e altri %2$d utenti sono in chiamata</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s e 1 altro utente non sono più in chiamata</item>
+        <item quantity="many">%1$s e altri %2$d utenti non sono più in chiamata</item>
+        <item quantity="other">%1$s e altri %2$d utenti non sono più in chiamata</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
-    <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
+    <string name="rubbish_bin_bottom_menu_option_delete">Elimina permanentemente</string>
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Cancella</string>
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->

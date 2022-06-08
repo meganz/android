@@ -1534,7 +1534,7 @@
     <string name="error_editing_message">此訊息無法被編輯</string>
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
-        <item quantity="other">%2$d個檔案中的第%1$d個檔案</item>
+        <item quantity="other">%2$d之%1$d的檔案</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
     <string name="label_process_finishing">處理正在完成中&#8230;</string>
@@ -1608,7 +1608,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
-        <item quantity="other">已下載%2$d個%1$d個檔案</item>
+        <item quantity="other">已下載%2$d之%1$d個檔案</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
@@ -4070,9 +4070,9 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">打開聯絡人連結</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
+    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度圖片</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度影像。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
+    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度圖片。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">您正在更改預設備份資料夾位置。這可能會影響您將來查找備份資料夾。所以請記住它的位置以便將來可以找到它。</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4160,7 +4160,7 @@
     <!-- Title of DCIM folder warning dialog -->
     <string name="title_dcim_folder_dialog">DCIM資料夾</string>
     <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的照片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
+    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的圖片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -4232,15 +4232,15 @@
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
     <string name="automatic_image_quality">自動的</string>
     <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality_text">使用行動數據網路時發送最佳化的圖像，但使用Wi-Fi時則發送原始大小的圖像。</string>
+    <string name="automatic_image_quality_text">使用行動數據網路時發送最佳化的圖片，但使用Wi-Fi時則發送原始大小的圖片。</string>
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
     <string name="high_image_quality">原始的</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality_text">總是發送原始大小的圖像。</string>
+    <string name="high_image_quality_text">總是發送原始大小的圖片。</string>
     <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality">最佳化</string>
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="optimised_image_quality_text">總是發送最佳化的圖像。</string>
+    <string name="optimised_image_quality_text">總是發送最佳化的圖片。</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_joined_call">%1$s已加入</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
