@@ -2,14 +2,18 @@ package mega.privacy.android.app.main;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Looper;
@@ -21,13 +25,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,10 +43,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -51,10 +60,15 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaShare.*;
@@ -558,10 +572,129 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 		logDebug("Position: " + position);
 
 		MegaNode vNode = nodeVersions.get(position);
+		MimeTypeList mimetype = MimeTypeList.typeForName(vNode.getName());
+
 		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
-		} else if (MimeTypeList.typeForName(vNode.getName()).isOpenableTextFile(vNode.getSize())) {
+		} else if (mimetype.isImage()) {
+			Intent intent = ImageViewerActivity.getIntentForSingleNode(this, vNode.getHandle(), true);
+			putThumbnailLocation(intent, listView, position, VIEWER_FROM_FILE_VERSIONS, adapter);
+			startActivity(intent);
+			overridePendingTransition(0, 0);
+		} else if (mimetype.isVideoReproducible() || mimetype.isAudio()) {
+			Intent mediaIntent;
+			boolean internalIntent;
+			boolean opusFile = false;
+			if (mimetype.isVideoNotSupported() || mimetype.isAudioNotSupported()) {
+				mediaIntent = new Intent(Intent.ACTION_VIEW);
+				internalIntent = false;
+				String[] s = vNode.getName().split("\\.");
+				if (s.length > 1 && s[s.length - 1].equals("opus")) {
+					opusFile = true;
+				}
+			} else {
+				mediaIntent = getMediaIntent(this, vNode.getName());
+				internalIntent = true;
+			}
+
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VERSIONS_ADAPTER);
+			putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FILE_BROWSER, adapter);
+
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, vNode.getName());
+
+			String localPath = getLocalFile(vNode);
+
+			if (localPath != null) {
+				File mediaFile = new File(localPath);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+					Uri mediaFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
+					if (mediaFileUri == null) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+					} else {
+						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(vNode.getName()).getType());
+					}
+				} else {
+					Uri mediaFileUri = Uri.fromFile(mediaFile);
+					if (mediaFileUri == null) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+					} else {
+						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(vNode.getName()).getType());
+					}
+				}
+				mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			} else {
+				setupStreamingServer(megaApi, this);
+
+				String url = megaApi.httpServerGetLocalLink(vNode);
+				if (url != null) {
+					Uri parsedUri = Uri.parse(url);
+					if (parsedUri != null) {
+						mediaIntent.setDataAndType(parsedUri, mimetype.getType());
+					} else {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+					}
+				} else {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+				}
+			}
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, vNode.getHandle());
+			if (opusFile) {
+				mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+			}
+			if (internalIntent) {
+				startActivity(mediaIntent);
+			} else {
+				if (isIntentAvailable(this, mediaIntent)) {
+					startActivity(mediaIntent);
+				} else {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+					downloadNodes(Collections.singletonList(vNode));
+				}
+			}
+			overridePendingTransition(0, 0);
+		} else if (mimetype.isURL()) {
+			manageURLNode(this, megaApi, vNode);
+		} else if (mimetype.isPdf()) {
+			Intent pdfIntent = new Intent(this, PdfViewerActivity.class);
+
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VERSIONS_ADAPTER);
+
+			String localPath = getLocalFile(vNode);
+
+			if (localPath != null) {
+				File mediaFile = new File(localPath);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+					pdfIntent.setDataAndType(FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(vNode.getName()).getType());
+				} else {
+					pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(vNode.getName()).getType());
+				}
+				pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			} else {
+				setupStreamingServer(megaApi, this);
+				String url = megaApi.httpServerGetLocalLink(vNode);
+				if (url != null) {
+					Uri parsedUri = Uri.parse(url);
+					if (parsedUri != null) {
+						pdfIntent.setDataAndType(parsedUri, mimetype.getType());
+					} else {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+					}
+				} else {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+				}
+			}
+			pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, vNode.getHandle());
+			putThumbnailLocation(pdfIntent, listView, position, VIEWER_FROM_FILE_BROWSER, adapter);
+			if (isIntentAvailable(this, pdfIntent)) {
+				startActivity(pdfIntent);
+			} else {
+				Toast.makeText(this, StringResourcesUtils.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				downloadNodes(Collections.singletonList(vNode));
+			}
+			overridePendingTransition(0, 0);
+		} else if (mimetype.isOpenableTextFile(vNode.getSize())) {
 			manageTextFileIntent(this, vNode, VERSIONS_ADAPTER);
 		} else {
 			showOptionsPanel(vNode, position);

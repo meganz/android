@@ -1,8 +1,13 @@
 package mega.privacy.android.app.utils.contacts
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.text.TextUtils
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.di.CoroutineScopesModule
+import mega.privacy.android.app.di.CoroutinesDispatchersModule
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.contacts.ContactsUtil.LocalContact
@@ -10,36 +15,42 @@ import nz.mega.sdk.*
 import timber.log.Timber
 import java.util.*
 
-class MegaContactGetter(context: Context) {
+class MegaContactGetter(val context: Context) {
 
     companion object {
         private const val INDEX_ID = 1
         private const val INDEX_DATA = 0
-
         const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         const val LAST_SYNC_TIMESTAMP_KEY = "last_sync_mega_contacts_timestamp"
     }
 
     private val dbH = DatabaseHandler.getDbHandler(context)
-    private val preferences = context.getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
-    private var lastSyncTimestamp = preferences.getLong(LAST_SYNC_TIMESTAMP_KEY, 0)
+    val preferences: SharedPreferences by lazy {
+        context.getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
+    }
     private var updater: MegaContactUpdater? = null
     private val megaContacts = mutableListOf<MegaContact>()
     private val megaContactsWithEmail = mutableListOf<MegaContact>()
     private var currentContactIndex = 0
     private var requestInProgress = false
+    private val coroutineScope = CoroutineScopesModule
+        .provideCoroutineScope(CoroutinesDispatchersModule.providesIoDispatcher())
+
+    private suspend fun getLastSyncTimeStamp(): Long =
+        withContext(coroutineScope.coroutineContext) {
+            return@withContext preferences.getLong(LAST_SYNC_TIMESTAMP_KEY, 0)
+        }
 
     fun setMegaContactUpdater(updater: MegaContactUpdater?) {
         this.updater = updater
     }
 
-    fun clearLastSyncTimeStamp() {
+    suspend fun clearLastSyncTimeStamp() = withContext(coroutineScope.coroutineContext) {
         preferences.edit().clear().apply()
     }
 
-    private fun updateLastSyncTimestamp() {
-        lastSyncTimestamp = System.currentTimeMillis()
-        preferences.edit().putLong(LAST_SYNC_TIMESTAMP_KEY, lastSyncTimestamp).apply()
+    private suspend fun updateLastSyncTimestamp() = withContext(coroutineScope.coroutineContext) {
+        preferences.edit().putLong(LAST_SYNC_TIMESTAMP_KEY, System.currentTimeMillis()).apply()
     }
 
     private fun getUserEmail(userHandle: Long, api: MegaApiJava) {
@@ -171,11 +182,13 @@ class MegaContactGetter(context: Context) {
         // filter out
         val filteredList = list.filterOut(api)
         //when request is successful, update the timestamp.
-        updateLastSyncTimestamp()
+        coroutineScope.launch {
+            updateLastSyncTimestamp()
+        }
         updater?.onFinish(filteredList)
     }
 
-    private fun MutableList<MegaContact>.filterOut(api: MegaApiJava): List<MegaContact> {
+    private fun MutableList<MegaContact>.filterOut(api: MegaApiJava): MutableList<MegaContact> {
         val emails = this.map { it.email }
         ContactsFilter.filterOutContacts(api, emails)
         ContactsFilter.filterOutPendingContacts(api, emails)
@@ -188,7 +201,9 @@ class MegaContactGetter(context: Context) {
             }
         }
 
-        return sortedBy { it.localName ?: "" }
+        sortedBy { it.localName ?: "" }
+
+        return this
     }
 
     private fun getCurrentContactIndex(): MegaContact? {
@@ -207,57 +222,63 @@ class MegaContactGetter(context: Context) {
             Timber.d("haven't logged in, return")
             return
         }
-        if (System.currentTimeMillis() - lastSyncTimestamp > period && !requestInProgress) {
-            requestInProgress = true
-            Timber.d("getMegaContacts request from server")
-            val requestParam = getRequestParameter(ContactsUtil.getLocalContactList(context))
-            api.getRegisteredContacts(requestParam, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    requestInProgress = false
-                    resetAfterRequest()
-                    if (error.errorCode == MegaError.API_OK) {
-                        // The table contains all the mathced users.
-                        val table = request.megaStringTable
+        coroutineScope.launch {
+            if (System.currentTimeMillis() - getLastSyncTimeStamp() > period && !requestInProgress) {
+                requestInProgress = true
+                Timber.d("getMegaContacts request from server")
+                val requestParam = getRequestParameter(ContactsUtil.getLocalContactList(context))
+                api.getRegisteredContacts(requestParam, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        requestInProgress = false
+                        resetAfterRequest()
+                        if (error.errorCode == MegaError.API_OK) {
+                            // The table contains all the mathced users.
+                            val table = request.megaStringTable
 
-                        // When there's no matched user, should be considered as successful
-                        if (table.size() == 0) {
-                            updateLastSyncTimestamp()
-                        } else {
-                            val map = request.megaStringMap
-                            val contacts = parseMatchedContacts(map, table)
-                            fillContactsList(contacts)
-                            // Need to ask for email from server.
-                            if (megaContacts.size > 0) {
-                                val firstContact = getCurrentContactIndex()
-                                if (firstContact != null) {
-                                    getUserEmail(firstContact.handle, api)
+                            // When there's no matched user, should be considered as successful
+                            if (table.size() == 0) {
+                                coroutineScope.launch {
+                                    updateLastSyncTimestamp()
                                 }
                             } else {
-                                // All the contacts are matched by email.
-                                if (megaContactsWithEmail.size > 0) {
-                                    processFinished(api, megaContactsWithEmail)
+                                val map = request.megaStringMap
+                                val contacts = parseMatchedContacts(map, table)
+                                fillContactsList(contacts)
+                                // Need to ask for email from server.
+                                if (megaContacts.size > 0) {
+                                    val firstContact = getCurrentContactIndex()
+                                    if (firstContact != null) {
+                                        getUserEmail(firstContact.handle, api)
+                                    }
                                 } else {
-                                    Timber.w("No mega contacts.")
-                                    updater?.noContacts()
+                                    // All the contacts are matched by email.
+                                    if (megaContactsWithEmail.size > 0) {
+                                        processFinished(api, megaContactsWithEmail)
+                                    } else {
+                                        Timber.w("No mega contacts.")
+                                        updater?.noContacts()
+                                    }
                                 }
                             }
+                        } else {
+                            Timber.e("Get registered contacts failed with error code: " + error.errorCode)
+                            // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
+                            // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
+                            if (error.errorCode == MegaError.API_ETOOMANY || error.errorCode == MegaError.API_EPAYWALL) {
+                                coroutineScope.launch {
+                                    updateLastSyncTimestamp()
+                                }
+                            }
+                            updater?.onException(error.errorCode, request.requestString)
                         }
-                    } else {
-                        Timber.e("Get registered contacts failed with error code: " + error.errorCode)
-                        // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
-                        // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
-                        if (error.errorCode == MegaError.API_ETOOMANY || error.errorCode == MegaError.API_EPAYWALL) {
-                            updateLastSyncTimestamp()
-                        }
-                        updater?.onException(error.errorCode, request.requestString)
                     }
+                ))
+            } else {
+                if (!requestInProgress) {
+                    Timber.d("getMegaContacts load from database")
+                    val list = dbH.megaContacts.apply { this.filterOut(api) }
+                    updater?.onFinish(list)
                 }
-            ))
-        } else {
-            if (!requestInProgress) {
-                Timber.d("getMegaContacts load from database")
-                val list = dbH.megaContacts.apply { this.filterOut(api) }
-                updater?.onFinish(list)
             }
         }
     }
@@ -288,7 +309,7 @@ class MegaContactGetter(context: Context) {
          *
          * @param megaContacts Registerd mega contacts with all the info needed.
          */
-        fun onFinish(megaContacts: List<MegaContact>?)
+        fun onFinish(megaContacts: MutableList<MegaContact>?)
 
         /**
          * When mega request failed.

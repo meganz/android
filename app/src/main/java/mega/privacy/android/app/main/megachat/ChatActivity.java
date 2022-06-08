@@ -103,16 +103,16 @@ import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
+import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -196,6 +196,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
@@ -238,15 +239,9 @@ public class ChatActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
-        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
+        SnackbarShower, AttachNodeToChatListener, HangChatCallListener.OnCallHungUpCallback,
         SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
         LoadPreviewListener.OnChatPreviewLoadedCallback {
-
-    @Inject
-    GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    GetPushToken getPushToken;
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -336,6 +331,14 @@ public class ChatActivity extends PasscodeActivity
     GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
     @Inject
     GetPublicNodeUseCase getPublicNodeUseCase;
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    AnswerCallUseCase answerCallUseCase;
+    @Inject
+    StartCallUseCase startCallUseCase;
+    @Inject
+    GetPushToken getPushToken;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -675,22 +678,7 @@ public class ChatActivity extends PasscodeActivity
                 call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
-        MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), false, true, false, new AnswerChatCallListener(this, this));
-    }
-
-    @Override
-    public void onCallAnswered(long chatId, boolean flag) {
-        logDebug("The call has been answered success");
-        callInProgressLayout.setEnabled(true);
-        openMeetingInProgress(this, chatId, true, passcodeManagement);
-    }
-
-
-    @Override
-    public void onErrorAnsweredCall(int errorCode) {
-        callInProgressLayout.setEnabled(true);
-
-        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+        answerCall(chatRoom.getChatId(), false, true, false);
     }
 
     @Override
@@ -704,17 +692,7 @@ public class ChatActivity extends PasscodeActivity
                 return;
 
         logDebug("Active call on hold. Answer call.");
-        MegaApplication.getChatManagement().answerChatCall(idChat, false, true, false, new AnswerChatCallListener(this, this));
-    }
-
-    @Override
-    public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
-        if (idChat == chatId) {
-            // In this case, the callMenuItem will be reset to enabled after resuming this activity (it calls invalidateOptionMenu())
-            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
-        } else {
-            enableCallMenuItems(true);
-        }
+        answerCall(idChat, false, true, false);
     }
 
     @Override
@@ -830,9 +808,27 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    @Override
-    public void onCallFailed(long chatId) {
-        enableCallMenuItems(true);
+    /**
+     * Method for answering a call
+     *
+     * @param chatId  Chat ID
+     * @param video   True, video ON. False, video OFF.
+     * @param audio   True, audio ON. False, audio OFF.
+     * @param speaker True, speaker ON. False, speaker OFF.
+     */
+    private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
+        callInProgressLayout.setEnabled(false);
+        answerCallUseCase.answerCall(chatId, video, audio, speaker)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        callInProgressLayout.setEnabled(true);
+                        openMeetingInProgress(this, chatId, true, passcodeManagement);
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+                    }
+                });
     }
 
     private class UserTyping {
@@ -1103,6 +1099,8 @@ public class ChatActivity extends PasscodeActivity
         if (shouldRefreshSessionDueToKarere()) {
             return;
         }
+
+        shouldRefreshSessionDueToSDK();
 
         handler = new Handler();
 
@@ -2723,13 +2721,10 @@ public class ChatActivity extends PasscodeActivity
                 }
 
                 startVideo = false;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+                checkCallInThisChat();
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
@@ -2738,9 +2733,7 @@ public class ChatActivity extends PasscodeActivity
                 }
 
                 startVideo = true;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+                checkCallInThisChat();
                 break;
             }
             case R.id.cab_menu_select_messages:
@@ -3165,7 +3158,12 @@ public class ChatActivity extends PasscodeActivity
         if (emojiKeyboard != null) emojiKeyboard.setListenerActivated(true);
     }
 
-    private void startCall(){
+    /**
+     * Method to make the correct action in the call of this chat.
+     * If a call already exists, I will return to it or join it.
+     * If it does not exist, I will initiate a call.
+     */
+    private void checkCallInThisChat(){
         stopReproductions();
         hideKeyboard();
 
@@ -3174,17 +3172,17 @@ public class ChatActivity extends PasscodeActivity
 
         MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
         if(callInThisChat != null){
-            logDebug("There is a call in this chat");
+            Timber.d("There is a call in this chat");
             if (participatingInACall()) {
                 MegaChatCall currentCallInProgress = getCallInProgress();
                 if (callInThisChat.isOnHold() ||
                         (currentCallInProgress != null && currentCallInProgress.getChatid() == chatRoom.getChatId())) {
-                    logDebug("I'm participating in the call of this chat");
+                    Timber.d("I'm participating in the call of this chat");
                     returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     return;
                 }
 
-                logDebug("I'm participating in another call from another chat");
+                Timber.d("I'm participating in another call from another chat");
                 ArrayList<Long> numCallsParticipating = getCallsParticipating();
                 if (numCallsParticipating == null || numCallsParticipating.isEmpty())
                     return;
@@ -3208,22 +3206,37 @@ public class ChatActivity extends PasscodeActivity
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                logDebug("The call in this chat is In progress, but I do not participate");
-                callInProgressLayout.setEnabled(false);
-                MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo, new AnswerChatCallListener(this, this));
+                Timber.d("The call in this chat is In progress, but I do not participate");
+                answerCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo);
             }
             return;
         }
 
-        if (!participatingInACall()) {
-            logDebug("There is not a call in this chat and I am NOT in another call");
-            addChecksForACall(chatRoom.getChatId(), startVideo);
-            enableCallMenuItems(false);
-            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
-        }else{
-            logDebug("There is not a call in this chat and I am in another call");
+        if (!participatingInACall() && canCallBeStartedFromContactOption(this, passcodeManagement)) {
+            Timber.d("There is not a call in this chat and I am NOT in another call");
+            startCall();
         }
+    }
 
+    /**
+     * Start a call
+     */
+    private void startCall() {
+        enableCallMenuItems(false);
+        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    enableCallMenuItems(true);
+                    if (throwable == null) {
+                        long chatId = result.component1();
+                        if (chatId == chatRoom.getChatId()) {
+                            boolean videoEnable = result.component2();
+                            boolean audioEnable = result.component3();
+                            openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+                        }
+                    }
+                });
     }
 
     private void enableCallMenuItems(Boolean enable) {
@@ -3278,45 +3291,45 @@ public class ChatActivity extends PasscodeActivity
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) return;
+        if (grantResults.length == 0) return;
 
         if (nodeSaver.handleRequestPermissionsResult(requestCode)) {
             return;
         }
 
         switch (requestCode) {
-            case REQUEST_CAMERA:
-            case REQUEST_RECORD_AUDIO:{
-                logDebug("REQUEST_CAMERA || RECORD_AUDIO");
-                if (checkPermissionsCall()) {
+            case REQUEST_RECORD_AUDIO:
+                if (checkCameraPermission(this)) {
                     startCall();
                 }
                 break;
-            }
+
+            case REQUEST_CAMERA:
+                startCall();
+                break;
+
             case REQUEST_CAMERA_TAKE_PICTURE:
             case REQUEST_WRITE_STORAGE_TAKE_PICTURE:{
-                logDebug("REQUEST_CAMERA_TAKE_PICTURE || REQUEST_WRITE_STORAGE_TAKE_PICTURE");
-                if (checkPermissionsTakePicture()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
                     takePicture();
                 }
                 break;
             }
             case RECORD_VOICE_CLIP:
             case REQUEST_STORAGE_VOICE_CLIP:{
-                logDebug("RECORD_VOICE_CLIP || REQUEST_STORAGE_VOICE_CLIP");
-                if (checkPermissionsVoiceClip()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsVoiceClip()) {
                    cancelRecording();
                 }
                 break;
             }
             case REQUEST_READ_STORAGE:{
-                if (checkPermissionsReadStorage()) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsReadStorage()) {
                     this.attachFromFileStorage();
                 }
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {
@@ -3850,7 +3863,7 @@ public class ChatActivity extends PasscodeActivity
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                                 callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
-                            MegaApplication.getChatManagement().answerChatCall(callInThisChat, false, true, false, new AnswerChatCallListener(this, this));
+                            answerCall(callInThisChat, false, true, false);
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
@@ -3961,9 +3974,7 @@ public class ChatActivity extends PasscodeActivity
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
-                    if (checkPermissionsCall()) {
-                        startCall();
-                    }
+                    checkCallInThisChat();
                 } else {
                     returnCall(this, chatIdBanner, passcodeManagement);
                 }
@@ -6955,49 +6966,22 @@ public class ChatActivity extends PasscodeActivity
     public void clearHistory(AndroidMegaChatMessage androidMsg){
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
-        int indexToChange=-1;
         // Iterate in reverse.
         while(itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
 
-            if(!messageToCheck.isUploading()){
-                if(messageToCheck.getMessage().getStatus()!=MegaChatMessage.STATUS_SENDING){
-
-                    indexToChange = itr.nextIndex();
-                    logDebug("Found index of last sent and confirmed message: " + indexToChange);
-                    break;
-                }
+            if(messageToCheck.isUploading()){
+                // Remove pending uploading messages.
+                megaApi.cancelTransferByTag(messageToCheck.pendingMessage.transferTag);
+            } else {
+                break;
             }
         }
 
-        if(indexToChange != messages.size()-1){
-            logDebug("Clear history of confirmed messages: " + indexToChange);
-
-            List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
-            messages.clear();
-            messages.add(androidMsg);
-
-            for(int i = indexToChange+1; i<messagesCopy.size();i++){
-                messages.add(messagesCopy.get(i));
-            }
-        }
-        else{
-            logDebug("Clear all messages");
-            messages.clear();
-            messages.add(androidMsg);
-        }
-
-        removedMessages.clear();
-
-        if(messages.size()==1){
-            androidMsg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
-        }
-        else{
-            for(int i=0; i<messages.size();i++){
-                adjustInfoToShow(i);
-            }
-        }
-
+        logDebug("Clear all messages");
+        messages.clear();
+        messages.add(androidMsg);
+        androidMsg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
         updateMessages();
     }
 
@@ -9147,6 +9131,7 @@ public class ChatActivity extends PasscodeActivity
             return;
 
         showCallInProgressLayout(text, true, call);
+
         callInProgressLayout.setOnClickListener(this);
         if (chatRoom != null && chatRoom.isGroup() && megaChatApi.getChatCall(chatRoom.getChatId()) != null) {
             subtitleCall.setVisibility(View.VISIBLE);

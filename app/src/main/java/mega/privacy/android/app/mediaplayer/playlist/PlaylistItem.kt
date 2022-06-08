@@ -4,7 +4,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToLong
+import kotlin.math.roundToInt
 
 /**
  * UI data class for playlist screen.
@@ -29,7 +29,7 @@ data class PlaylistItem(
     val size: Long,
     var isSelected: Boolean = false,
     var headerIsVisible: Boolean = false,
-    var duration: Long = 0L,
+    var duration: Int = 0,
     var currentPosition: Long = 0L
 ) {
     /**
@@ -47,7 +47,7 @@ data class PlaylistItem(
         index: Int,
         type: Int,
         isSelected: Boolean = false,
-        duration: Long = 0L,
+        duration: Int = 0,
         currentPosition: Long = 0L
     ): PlaylistItem {
         return PlaylistItem(
@@ -85,25 +85,38 @@ data class PlaylistItem(
      * @return strings of time
      */
     fun formatCurrentPositionAndDuration() =
-        "${getTimeString(currentPosition)} / ${getTimeString(duration)}"
+        "${formatMillisecondsToString(milliseconds = currentPosition)} / ${
+            formatSecondsToString(seconds = duration)
+        }"
 
     /**
-     * Format long to time string
-     * @param time long value of time
+     * Format milliseconds to time string
+     * @param milliseconds time value that unit is milliseconds
      * @return strings of time
      */
-    private fun getTimeString(time: Long): String {
+    private fun formatMillisecondsToString(milliseconds: Long): String {
         // Make the time displayed is same as Exoplayer
-        val totalSeconds = (time.toFloat() / 1000).roundToLong()
-        val hour = TimeUnit.SECONDS.toHours(totalSeconds)
-        val minutes = TimeUnit.SECONDS.toMinutes(totalSeconds) - TimeUnit.HOURS.toMinutes(hour)
-        val seconds =
-            totalSeconds - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(totalSeconds))
+        val totalSeconds = (milliseconds.toFloat() / 1000).roundToInt()
+        return formatSecondsToString(seconds = totalSeconds)
+    }
+
+    /**
+     * Format seconds to time string
+     * @param seconds time value that unit is seconds
+     * @return strings of time
+     */
+    private fun formatSecondsToString(seconds: Int): String {
+        val hour = TimeUnit.SECONDS.toHours(seconds.toLong())
+        val minutes =
+            TimeUnit.SECONDS.toMinutes(seconds.toLong()) - TimeUnit.HOURS.toMinutes(hour)
+        val resultSeconds =
+            seconds.toLong() - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(
+                seconds.toLong()))
 
         return if (hour >= 1) {
-            String.format("%2d:%02d:%02d", hour, minutes, seconds)
+            String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
         } else {
-            String.format("%02d:%02d", minutes, seconds)
+            String.format("%02d:%02d", minutes, resultSeconds)
         }
     }
 
@@ -111,7 +124,7 @@ data class PlaylistItem(
      * Format duration
      * @return time strings
      */
-    fun formatDuration() = getTimeString(this.duration)
+    fun formatDuration() = formatSecondsToString(seconds = this.duration)
 
     companion object {
         const val TYPE_PREVIOUS = 1
@@ -130,8 +143,7 @@ data class PlaylistItem(
                 when (type) {
                     TYPE_PREVIOUS -> if (isAudio) {
                         R.string.media_player_audio_playlist_previous
-                    }
-                    else {
+                    } else {
                         R.string.media_player_video_playlist_previous
                     }
                     else -> {

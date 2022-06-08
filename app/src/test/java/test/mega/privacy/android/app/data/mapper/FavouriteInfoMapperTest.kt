@@ -13,11 +13,17 @@ class FavouriteInfoMapperTest {
     fun `test that values returned by gateway are used`() {
 
         val expectedId = 1L
+        val expectedName = "testName"
+        val expectedSize = 1000L
+        val expectedLabel = MegaNode.NODE_LBL_RED
         val expectedParentId = 2L
         val expectedBase64Id = "1L"
         val expectedModificationTime = 123L
 
         val node = mock<MegaNode> {
+            on { name }.thenReturn(expectedName)
+            on { size }.thenReturn(expectedSize)
+            on { label }.thenReturn(expectedLabel)
             on { handle }.thenReturn(expectedId)
             on { parentHandle }.thenReturn(expectedParentId)
             on { base64Handle }.thenReturn(expectedBase64Id)
@@ -32,9 +38,16 @@ class FavouriteInfoMapperTest {
             on { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
         }
 
-        val actual = toFavouriteInfo(node, gateway)
+        val actual = toFavouriteInfo(node,
+            null,
+            gateway.hasVersion(node),
+            gateway.getNumChildFolders(node),
+            gateway.getNumChildFiles(node))
 
         assertThat(actual.node).isSameInstanceAs(node)
+        assertThat(actual.name).isEqualTo(expectedName)
+        assertThat(actual.size).isEqualTo(expectedSize)
+        assertThat(actual.label).isEqualTo(expectedLabel)
         assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
         assertThat(actual.numChildFolders).isEqualTo(expectedNumChildFolders)
         assertThat(actual.numChildFiles).isEqualTo(expectedNumChildFiles)

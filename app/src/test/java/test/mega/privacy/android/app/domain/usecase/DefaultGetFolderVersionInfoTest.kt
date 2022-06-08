@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetFolderVersionInfo
 import mega.privacy.android.app.domain.usecase.GetFolderVersionInfo
@@ -41,6 +42,12 @@ class DefaultGetFolderVersionInfoTest {
         val expected = FolderVersionInfo(8, 20)
         whenever(filesRepository.getRootFolderVersionInfo()).thenReturn(expected)
         assertThat(underTest()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that returns null when error from api is thrown`() = runTest {
+        whenever(filesRepository.getRootFolderVersionInfo()).thenThrow(MegaException(null, null))
+        assertThat(underTest()).isEqualTo(null)
     }
 
 }

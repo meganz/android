@@ -301,7 +301,8 @@ class MediaPlayerServiceViewModel(
                             LINKS_ADAPTER,
                             INCOMING_SHARES_ADAPTER,
                             OUTGOING_SHARES_ADAPTER,
-                            CONTACT_FILE_ADAPTER -> {
+                            CONTACT_FILE_ADAPTER,
+                            -> {
                                 val parentHandle = intent.getLongExtra(
                                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
@@ -462,7 +463,8 @@ class MediaPlayerServiceViewModel(
             val node = megaApi.getNodeByHandle(firstPlayHandle)
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
-                    offlineThumbnailFileWrapper.getThumbnailFile(context, firstPlayHandle.toString())
+                    offlineThumbnailFileWrapper.getThumbnailFile(context,
+                        firstPlayHandle.toString())
                 }
                 node == null -> {
                     null
@@ -473,8 +475,13 @@ class MediaPlayerServiceViewModel(
             }
 
             val playlistItem = PlaylistItem(
-                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING,
-                node?.size ?: INVALID_SIZE
+                nodeHandle = firstPlayHandle,
+                nodeName = firstPlayNodeName,
+                thumbnail = thumbnail,
+                index = 0,
+                type = PlaylistItem.TYPE_PLAYING,
+                size = node?.size ?: INVALID_SIZE,
+                duration = node.duration
             )
             playlistItems.add(playlistItem)
             playlistItemsMap[firstPlayHandle.toString()] = playlistItem
@@ -530,7 +537,8 @@ class MediaPlayerServiceViewModel(
             VIDEO_BROWSE_ADAPTER,
             FROM_CHAT,
             FILE_LINK_ADAPTER,
-            PHOTO_SYNC_ADAPTER -> {
+            PHOTO_SYNC_ADAPTER,
+            -> {
                 return oldType == type
             }
             FILE_BROWSER_ADAPTER,
@@ -540,7 +548,8 @@ class MediaPlayerServiceViewModel(
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
-            FOLDER_LINK_ADAPTER -> {
+            FOLDER_LINK_ADAPTER,
+            -> {
                 val oldParentHandle = oldIntent.getLongExtra(
                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
@@ -624,7 +633,11 @@ class MediaPlayerServiceViewModel(
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
         cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
+            megaApi,
+            megaApi.searchByType(cancelToken ?: return,
+                order,
+                FILE_TYPE_AUDIO,
+                SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
     }
@@ -633,8 +646,12 @@ class MediaPlayerServiceViewModel(
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
         cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
-            firstPlayHandle
+            api = megaApi,
+            nodes = megaApi.searchByType(cancelToken ?: return,
+                order,
+                FILE_TYPE_VIDEO,
+                SEARCH_TARGET_ROOTNODE),
+            firstPlayHandle = firstPlayHandle
         )
     }
 
@@ -769,8 +786,17 @@ class MediaPlayerServiceViewModel(
 
             val playlistItem =
                 PlaylistItem(
-                    handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT,
-                    sizeGetter(node)
+                    nodeHandle = handle,
+                    nodeName = nameGetter(node),
+                    thumbnail = thumbnail,
+                    index = index,
+                    type = PlaylistItem.TYPE_NEXT,
+                    size = sizeGetter(node),
+                    duration = if (node is MegaNode) {
+                        node.duration
+                    } else {
+                        0
+                    }
                 )
             playlistItems.add(playlistItem)
             playlistItemsMap[handle.toString()] = playlistItem
@@ -821,7 +847,10 @@ class MediaPlayerServiceViewModel(
      */
     private fun postPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
         logDebug("postPlaylistItems")
-        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems(currentPosition, isScroll) }
+        compositeDisposable.add(Completable.fromCallable {
+            doPostPlaylistItems(currentPosition,
+                isScroll)
+        }
             .subscribeOn(Schedulers.single())
             .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
     }
@@ -871,7 +900,7 @@ class MediaPlayerServiceViewModel(
 
         val searchQuery = playlistSearchQuery
         if (!TextUtil.isTextEmpty(searchQuery)) {
-            filterPlaylistItems(items, searchQuery!!)
+            filterPlaylistItems(items, searchQuery ?: return)
             return
         }
         for ((index, item) in items.withIndex()) {
@@ -881,17 +910,17 @@ class MediaPlayerServiceViewModel(
                 else -> PlaylistItem.TYPE_NEXT
             }
             items[index] =
-                    item.finalizeItem(
-                            index = index,
-                            type = type,
-                            isSelected = item.isSelected,
-                            duration = item.duration,
-                            currentPosition = if (playingIndex == index) {
-                                currentPosition ?: item.currentPosition
-                            } else {
-                                item.currentPosition
-                            }
-                    )
+                item.finalizeItem(
+                    index = index,
+                    type = type,
+                    isSelected = item.isSelected,
+                    duration = item.duration,
+                    currentPosition = if (playingIndex == index) {
+                        currentPosition ?: item.currentPosition
+                    } else {
+                        item.currentPosition
+                    }
+                )
         }
 
         val hasPrevious = playingIndex > 0
@@ -920,20 +949,6 @@ class MediaPlayerServiceViewModel(
      */
     fun setCurrentPosition(currentPosition: Long) {
         postPlaylistItems(currentPosition, false)
-    }
-
-    fun setDuration(duration: Long) {
-        val list = mutableListOf<PlaylistItem>()
-        list.addAll(playlistItems.map { playListItem ->
-            if (playListItem.nodeHandle == playingHandle) {
-                playListItem.copy(duration = duration)
-            } else {
-                playListItem
-            }
-        })
-        playlistItems.clear()
-        playlistItems.addAll(list)
-        postPlaylistItems(isScroll = false)
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
@@ -1019,7 +1034,7 @@ class MediaPlayerServiceViewModel(
      * Clear the all selections
      */
     fun clearSelections() {
-        playlistItems.forEach{
+        playlistItems.forEach {
             it.isSelected = false
             itemsSelectedMap.clear()
             _isActionMode.value = false
@@ -1140,7 +1155,7 @@ class MediaPlayerServiceViewModel(
      * @param item clicked item
      * @return the index of clicked item in playlistItems
      */
-    fun getIndexFromPlaylistItems(item: PlaylistItem) : Int {
+    fun getIndexFromPlaylistItems(item: PlaylistItem): Int {
         return playlistItems.indexOfFirst {
             it.nodeName == item.nodeName
         }
@@ -1149,7 +1164,7 @@ class MediaPlayerServiceViewModel(
     /**
      * Updated the play source of exoplayer after reordered.
      */
-    fun updatePlaySource(){
+    fun updatePlaySource() {
         val newPlayerSource = mutableListOf<MediaItem>()
         newPlayerSource.addAll(playSourceChanged)
         _playerSource.value?.run {
@@ -1165,6 +1180,13 @@ class MediaPlayerServiceViewModel(
      */
     fun getPlayingPosition(): Int {
         return playingPosition
+    }
+
+    /**
+     * Scroll the list to current playing position
+     */
+    fun scrollToPlayingPosition() {
+        postPlaylistItems(isScroll = true)
     }
 
     private fun initPlayerSourceChanged() {

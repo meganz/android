@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -939,10 +939,6 @@
     <string name="zip_browser_activity">ZIP Browser</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Account Type</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Renews on&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on&#160;</string>
     <!--  -->
     <string name="free_account">Free</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -2173,13 +2169,13 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -3898,14 +3894,14 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
-    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
-    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
+    <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Add your phone number</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -4326,7 +4322,7 @@
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
     <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">MEGA will open in-app unsupported file types in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Image quality</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
@@ -4363,4 +4359,14 @@
     <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">Favourites</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Renews on[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Expires on[/A] [B]%s[/B]</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">Enter your password</string>
 </resources>

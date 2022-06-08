@@ -32,15 +32,6 @@ interface AccountRepository {
     fun requestAccount()
 
     /**
-     * Get root node
-     *
-     * This method requires some refactoring as MegaNode is not a domain entity and thus violates the architecture
-     *
-     * @return the mega root node.
-     */
-    fun getRootNode(): MegaNode?
-
-    /**
      * Is multi factor auth available
      *
      * @return true if multi-factor auth is available for the current user, else false

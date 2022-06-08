@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -756,8 +756,6 @@
     <string name="settings_advanced_features_cache">Очистить кэш</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Очистка локальных файлов</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Открыть файл после скачивания</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Удалить уч. запись</string>
     <!-- Size of files in offline or cache folders -->
@@ -965,10 +963,6 @@
     <string name="zip_browser_activity">Просмотр ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Тип учётной записи</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Продлевается&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Истекает&#160;</string>
     <!--  -->
     <string name="free_account">Бесплатно</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4515,4 +4509,54 @@
     <string name="media_player_video_playlist_next">Далее</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Назад</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Фотографии</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Открывать неподдерживаемые типы файлов в сторонних приложениях</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Неподдерживаемые типы файлов будут открываться в сторонних приложениях, а не в приложении MEGA.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Качество изображения</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Автоматическое</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Отправлять оптимизированные изображения при использовании мобильного Интернета и изображения в исходном качестве при подключении по Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Исходное</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Всегда отправлять изображения в исходном качестве.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Оптимизированное</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Всегда отправлять оптимизированные изображения.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s присоединился</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s и %2$s присоединились</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s вышел</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s вышли</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s и ещё 1 присоединились</item>
+        <item quantity="few">%1$s и ещё %2$d присоединились</item>
+        <item quantity="many">%1$s и ещё %2$d присоединились</item>
+        <item quantity="other">%1$s и ещё %2$d присоединились</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s и ещё 1 вышли</item>
+        <item quantity="few">%1$s и ещё %2$d вышли</item>
+        <item quantity="many">%1$s и ещё %2$d вышли</item>
+        <item quantity="other">%1$s и ещё %2$d вышли</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Удалить безвозвратно</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Удалить</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Продлевается[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Истекает[/A] [B]%s[/B]</string>
 </resources>

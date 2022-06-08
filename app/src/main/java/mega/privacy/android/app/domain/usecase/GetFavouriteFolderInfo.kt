@@ -12,5 +12,5 @@ interface GetFavouriteFolderInfo {
      * @param parentHandle parent node handle
      * @return Flow<FavouriteFolderInfo>
      */
-    operator fun invoke(parentHandle: Long): Flow<FavouriteFolderInfo>
+    operator fun invoke(parentHandle: Long): Flow<FavouriteFolderInfo?>
 }

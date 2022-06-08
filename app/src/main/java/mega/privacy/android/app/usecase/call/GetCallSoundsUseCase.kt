@@ -1,21 +1,22 @@
 package mega.privacy.android.app.usecase.call
 
-import android.util.Pair
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
+import androidx.lifecycle.MutableLiveData
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.CustomCountDownTimer
+import mega.privacy.android.app.data.extensions.observeOnce
+import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.utils.Constants.TYPE_JOIN
-import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,57 +27,189 @@ import javax.inject.Inject
  * @property getParticipantsChangesUseCase GetParticipantsChangesUseCase
  */
 class GetCallSoundsUseCase @Inject constructor(
-        private val megaChatApi: MegaChatApiAndroid,
-        private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase
+    private val megaChatApi: MegaChatApiAndroid,
+    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
+    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase
 ) {
 
-    fun get(): Flowable<CallSoundType> =
-            Flowable.create({ emitter ->
-                val disposable = CompositeDisposable()
+    companion object {
+        const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
+    }
 
-                val sessionStatusObserver = Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
-                    val session = callAndSession.second as MegaChatSession
-                    val call = callAndSession.first
-                    if (session.status == MegaChatSession.SESSION_STATUS_DESTROYED && session.termCode == MegaChatSession.SESS_TERM_CODE_NON_RECOVERABLE) {
-                        if (call == null) {
-                            emitter.onNext(CallSoundType.CALL_ENDED)
-                        } else {
-                            megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-                                if (!chat.isGroup && !chat.isMeeting) {
-                                    emitter.onNext(CallSoundType.CALL_ENDED)
+    /**
+     * Participant info
+     *
+     * @property peerId     Peer ID of participant
+     * @property clientId   Client ID of participant
+     */
+    data class ParticipantInfo(
+        val peerId: Long,
+        val clientId: Long
+    )
+
+    var countDownTimer: CustomCountDownTimer? = null
+    val participants = ArrayList<ParticipantInfo>()
+
+    /**
+     * Method to get the appropriate sound
+     *
+     * @return CallSoundType
+     */
+    fun get(): Flowable<CallSoundType> =
+        Flowable.create({ emitter ->
+            val disposable = CompositeDisposable()
+
+            getSessionStatusChangesUseCase.getSessionChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { result ->
+                        val participant =
+                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
+
+                        when (result.sessionStatus) {
+                            MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                result.call?.let { call ->
+                                    stopCountDown(call.chatid, participant)
                                 }
+                            }
+
+                            MegaChatSession.SESSION_STATUS_DESTROYED -> {
+                                result.isRecoverable?.let { isRecoverableSession ->
+                                    if (result.call == null) {
+                                        stopCountDown(INVALID_HANDLE, participant)
+                                        emitter.onNext(CallSoundType.CALL_ENDED)
+                                    } else if (isRecoverableSession) {
+                                        emitter.startCountDown(
+                                            result.call, participant,
+                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                        )
+                                    } else {
+                                        stopCountDown(
+                                            result.call.chatid,
+                                            participant
+                                        )
+
+                                        megaChatApi.getChatRoom(result.call.chatid)
+                                            ?.let { chat ->
+                                                if (!chat.isGroup && !chat.isMeeting) {
+                                                    emitter.onNext(CallSoundType.CALL_ENDED)
+                                                }
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            getParticipantsChangesUseCase.getChangesFromParticipants()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { result ->
+                        when (result.typeChange) {
+                            TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
+                            TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            emitter.setCancellable {
+                disposable.clear()
+            }
+
+        }, BackpressureStrategy.LATEST)
+
+    /**
+     * Method to start the countdown to hang up the call
+     *
+     * @param call      MegaChatCall
+     * @param seconds   Seconds to wait
+     */
+    private fun FlowableEmitter<CallSoundType>.startCountDown(
+        call: MegaChatCall,
+        participant: ParticipantInfo,
+        seconds: Long
+    ) {
+        megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+            if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
+                if (countDownTimer == null) {
+                    participants.remove(participant)
+
+                    val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+                    countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+                    countDownTimerLiveData.observeOnce { counterState ->
+                        counterState?.let { isFinished ->
+                            if (isFinished) {
+                                Timber.d("Count down timer ends. Hang call")
+                                megaChatApi.hangChatCall(call.callId,
+                                    OptionalMegaChatRequestListenerInterface(
+                                        onRequestFinish = { _, error ->
+                                            if (error.errorCode == MegaError.API_OK) {
+                                                removeCountDownTimer()
+                                                MegaApplication.getInstance()
+                                                    .removeRTCAudioManager()
+                                                this.onNext(CallSoundType.CALL_ENDED)
+                                            } else {
+                                                this.onError(error.toThrowable())
+                                            }
+                                        }
+                                    ))
                             }
                         }
                     }
                 }
 
-                @Suppress("UNCHECKED_CAST")
-                LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-                        .observeForever(sessionStatusObserver as Observer<Any>)
+                Timber.d("Count down timer starts")
+                countDownTimer?.start(seconds)
+            }
+        }
+    }
 
-                getParticipantsChangesUseCase.getChangesFromParticipants()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                                onNext = { result ->
-                                    when (result.typeChange) {
-                                        TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
-                                        TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
-                                    }
-                                },
-                                onError = { error ->
-                                    Timber.e(error.stackTraceToString())
-                                }
-                        )
-                        .addTo(disposable)
-
-                emitter.setCancellable {
-                    @Suppress("UNCHECKED_CAST")
-                    LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-                            .removeObserver(sessionStatusObserver as Observer<Any>)
-
-                    disposable.clear()
+    /**
+     * Method to stop the countdown
+     *
+     * @param chatId        Chat ID
+     * @param participant   ParticipantInfo
+     */
+    private fun stopCountDown(chatId: Long, participant: ParticipantInfo) {
+        megaChatApi.getChatRoom(chatId)?.let { chat ->
+            if (!chat.isGroup && !chat.isMeeting) {
+                var participantToRemove: ParticipantInfo? = null
+                participants.forEach { participantToCheck ->
+                    if (participantToCheck.peerId == participant.peerId) {
+                        participantToRemove = participantToCheck
+                    }
                 }
-            }, BackpressureStrategy.LATEST)
+
+                if (participantToRemove != null) {
+                    participants.remove(participantToRemove)
+                }
+
+                participants.add(participant)
+                removeCountDownTimer()
+            }
+        }
+    }
+
+    /**
+     * Remove Count down timer
+     */
+    private fun removeCountDownTimer() {
+        countDownTimer?.apply {
+            Timber.d("Count down timer stops")
+            stop()
+        }
+        countDownTimer = null
+    }
 }
 

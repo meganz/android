@@ -44,8 +44,8 @@ open class MeetingBaseFragment : BaseFragment() {
 
     // Default permission array for meeting
     protected val permissions = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAMERA
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,11 +75,11 @@ open class MeetingBaseFragment : BaseFragment() {
         permissions.forEach {
             logDebug("user check the permissions: $it")
             when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(true)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(true)
                 }
             }
         }
@@ -94,11 +94,11 @@ open class MeetingBaseFragment : BaseFragment() {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
                 }
             }
         }
@@ -113,11 +113,11 @@ open class MeetingBaseFragment : BaseFragment() {
         permissions.forEach {
             logDebug("user requires the permissions: $it")
             when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(true)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(true)
                 }
             }
         }
@@ -148,11 +148,11 @@ open class MeetingBaseFragment : BaseFragment() {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
                 }
             }
         }
@@ -176,11 +176,11 @@ open class MeetingBaseFragment : BaseFragment() {
         permissions.forEach {
             logDebug("user denies and never ask for the permissions: $it")
             when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
                 }
             }
         }
@@ -206,7 +206,7 @@ open class MeetingBaseFragment : BaseFragment() {
     protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.CAMERA)) {
             logDebug("user requires the Camera permissions")
-            sharedModel.setRecordAudioPermission(true)
+            sharedModel.setCameraPermission(true)
         }
     }
 
@@ -248,11 +248,11 @@ open class MeetingBaseFragment : BaseFragment() {
                     val bPermission =
                         PermissionUtils.hasPermissions(requireContext(), permission[i])
                     when (permission[i]) {
-                        Manifest.permission.CAMERA -> {
-                            it.setCameraPermission(bPermission)
-                        }
                         Manifest.permission.RECORD_AUDIO -> {
                             it.setRecordAudioPermission(bPermission)
+                        }
+                        Manifest.permission.CAMERA -> {
+                            it.setCameraPermission(bPermission)
                         }
                     }
                 }
@@ -274,11 +274,11 @@ open class MeetingBaseFragment : BaseFragment() {
         while (i < grantResults.size) {
             val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
             when (permissions[i]) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(bPermission)
-                }
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(bPermission)
+                }
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(bPermission)
                 }
             }
             i++

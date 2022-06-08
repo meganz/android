@@ -18,6 +18,7 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
@@ -77,11 +78,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
         )
 
-        paymentAlertBinding.renewExpiryDateText.apply {
-            setTextStyle(textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White)
-            (layoutParams as RelativeLayout.LayoutParams).topMargin = 0
-        }
-
         binding.rubbishSeparator.isVisible = false
         binding.previousVersionsStorageContainer.isVisible = false
 
@@ -120,11 +116,19 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private fun setupAccountDetails() {
         if (megaApi.isBusinessAccount) {
             usageBinding.businessUpdate(viewModel)
-            paymentAlertBinding.businessUpdate(megaApi, viewModel, true)
+            paymentAlertBinding.businessUpdate(
+                megaApi,
+                viewModel,
+                true,
+                ActiveFragment.MY_ACCOUNT_USAGE
+            )
             paymentAlertBinding.root.isVisible = true
         } else {
             usageBinding.update(viewModel)
-            paymentAlertBinding.root.isVisible = paymentAlertBinding.update(viewModel)
+            paymentAlertBinding.root.isVisible = paymentAlertBinding.update(
+                viewModel,
+                ActiveFragment.MY_ACCOUNT_USAGE
+            )
         }
 
         binding.cloudStorageText.text = viewModel.getCloudStorage()

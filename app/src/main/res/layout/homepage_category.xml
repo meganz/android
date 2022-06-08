@@ -14,27 +14,27 @@
         tools:viewBindingIgnore="true">
 
         <mega.privacy.android.app.components.CategoryButton
-            android:id="@+id/category_photo"
+            android:id="@+id/category_favourites"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            app:icon="@drawable/ic_photos"
+            app:icon="@drawable/ic_category_favourites"
             app:layout_constraintEnd_toStartOf="@+id/category_document"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_document"
-            app:name="@string/section_images" />
+            app:name="@string/favourites_category_title" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_document"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            app:icon="@drawable/ic_documents"
+            app:icon="@drawable/ic_category_docs"
             app:layout_constraintEnd_toStartOf="@+id/category_audio"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/category_photo"
+            app:layout_constraintStart_toEndOf="@+id/category_favourites"
             app:layout_constraintTop_toTopOf="@+id/category_audio"
             app:name="@string/category_documents" />
 
@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            app:icon="@drawable/ic_audios"
+            app:icon="@drawable/ic_category_audio"
             app:layout_constraintEnd_toStartOf="@+id/category_video"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_document"
@@ -54,7 +54,7 @@
             android:id="@+id/category_video"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_videos"
+            app:icon="@drawable/ic_category_videos"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_audio"

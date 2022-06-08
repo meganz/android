@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -756,8 +756,6 @@
     <string name="settings_advanced_features_cache">Wyczyść pamięć podręczną</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Usuń pliki offline</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Otwórz plik po pobraniu</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Usuń konto</string>
     <!-- Size of files in offline or cache folders -->
@@ -965,10 +963,6 @@
     <string name="zip_browser_activity">Podgląd ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Rodzaj konta</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Odnawia się w dniu&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Wygasa z dniem&#160;</string>
     <!--  -->
     <string name="free_account">Darmowe</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -2081,7 +2075,7 @@
     <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
     <string name="not_permited_add_email_to_invite">Tylko kontakty z MEGA mogą być dodane</string>
     <!-- Info label about the connectivity state of the chat -->
-    <string name="invalid_connection_state">Ponowne łączenie się na czacie</string>
+    <string name="invalid_connection_state">Ponowne łączenie do czatu</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Wystąpił błąd i połączenie nie może zostać nawiązane.</string>
     <!-- Title of dialog to evaluate the app -->
@@ -3561,7 +3555,7 @@
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Numer telefonu</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
-    <string name="reconnecting_message">Ponowne połączenie</string>
+    <string name="reconnecting_message">Ponowne łączenie</string>
     <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
     <string name="connected_message">Wróciłeś.</string>
     <!-- Text shown in a call when the own internet connection is of low quality -->
@@ -4506,7 +4500,7 @@
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Naruszenie warunków korzystania z usługi</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">To urządzenie nie ma aplikacji do wybierania folderów.</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Dalej</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -4515,4 +4509,50 @@
     <string name="media_player_video_playlist_next">Dalej</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Poprzedni</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Zdjęcia</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Otwieranie nieobsługiwanych typów plików w aplikacjach innych firm</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Jakość obrazu</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automatyczny</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Wysyłaj zoptymalizowane obrazy w przypadku korzystania z danych mobilnych, a obrazy w oryginalnym rozmiarze w przypadku korzystania z sieci Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Oryginalny</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Zawsze wysyłaj obrazy w oryginalnym rozmiarze.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Zoptymalizowany</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Zawsze wysyłaj zoptymalizowane obrazy.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Usuń trwale</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Usuń</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Odnawia się w dniu[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Wygasa w dniu[/A] [B]%s[/B]</string>
 </resources>

@@ -37,7 +37,7 @@
     <!-- Body text shown on document scanner dialog to delete current scan -->
     <string name="scan_dialog_delete_body">Deletar esta digitalização?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
-    <string name="scan_requires_permission">Permita o acesso à sua câmera para escanear documentos.</string>
+    <string name="scan_requires_permission">Permita o acesso à sua câmera para escanear documentos</string>
     <!-- Error text for incorrect name -->
     <string name="scan_incorrect_name">Nome inválido</string>
     <!-- Error text for invalid characters -->
