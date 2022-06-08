@@ -119,7 +119,7 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         binding = FragmentImagesBinding.inflate(inflater, container, false)
         adapterType = PHOTOS_BROWSE_ADAPTER

@@ -112,7 +112,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         binding = FragmentAlbumContentBinding.inflate(inflater, container, false)
         adapterType = ALBUM_CONTENT_ADAPTER
