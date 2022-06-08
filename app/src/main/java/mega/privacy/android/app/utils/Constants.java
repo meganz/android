@@ -332,6 +332,7 @@ public class Constants {
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
     public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
     public static final String INTENT_EXTRA_KEY_SHOW_NEARBY_FILES = "INTENT_EXTRA_KEY_SHOW_NEARBY_FILES";
+    public static final String INTENT_EXTRA_KEY_IS_FILE_VERSION = "INTENT_EXTRA_KEY_IS_FILE_VERSION";
     public static final String INTENT_EXTRA_COLLISION_RESULTS = "INTENT_EXTRA_COLLISION_RESULTS";
     public static final String INTENT_EXTRA_SINGLE_COLLISION_RESULT = "INTENT_EXTRA_SINGLE_COLLISION_RESULT";
 
@@ -392,6 +393,7 @@ public class Constants {
     public static final int VIEWER_FROM_INBOX = 15;
     public static final int VIEWER_FROM_RUBBISH_BIN = 16;
     public static final int VIEWER_FROM_SEARCH = 17;
+    public static final int VIEWER_FROM_FILE_VERSIONS = 18;
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
     public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
@@ -486,8 +488,6 @@ public class Constants {
     public static final int RICH_WARNING_CONFIRMATION = 2;
 
     public static final int TAKE_PICTURE_OPTION = 0;
-    public static final int START_CALL_PERMISSIONS = 1;
-    public static final int RETURN_CALL_PERMISSIONS = 2;
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
@@ -582,6 +582,7 @@ public class Constants {
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
     public static final int ITEM_PROGRESS = 2;
+    public static final int ITEM_PLACEHOLDER_TYPE = 3;
 
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
@@ -915,6 +916,7 @@ public class Constants {
     public static final int ORDER_OTHERS = 1;
     public static final int ORDER_CAMERA = 2;
     public static final int ORDER_OFFLINE = 3;
+    public static final int ORDER_FAVOURITES = 4;
 
     public final static float MAX_WIDTH_APPBAR_LAND = 400;
     public final static float MAX_WIDTH_APPBAR_PORT = 200;

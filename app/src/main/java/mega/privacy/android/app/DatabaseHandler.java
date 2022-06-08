@@ -4151,7 +4151,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void removePendingMessageByChatId(long idChat){
 		logDebug("removePendingMessageByChatId");
-		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_ID_CHAT + "="+idChat, null);
+		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_ID_CHAT + " = '"+ encrypt(idChat + "") +"'", null);
 	}
 
 	public void removePendingMessageById(long idMsg){

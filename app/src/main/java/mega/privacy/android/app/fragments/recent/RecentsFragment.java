@@ -392,7 +392,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             } else {
                 intent = ImageViewerActivity.getIntentForSingleNode(
                         requireContext(),
-                        node.getHandle()
+                        node.getHandle(),
+                        false
                 );
             }
 

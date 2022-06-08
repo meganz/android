@@ -6,17 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="72dp">
 
-    <ImageView
-        android:id="@+id/item_thumbnail"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:scaleType="fitCenter"
+    <FrameLayout
+        android:id="@+id/layout_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:src="@android:drawable/ic_menu_report_image" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/item_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription"
+            android:layout_marginStart="16dp"
+            tools:src="@android:drawable/ic_menu_report_image" />
+
+        <ImageView
+            android:id="@+id/image_selected"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_select_folder"/>
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/item_three_dots"
@@ -31,6 +45,7 @@
         app:tint="?android:attr/textColorSecondary"
         tools:ignore="ContentDescription" />
 
+
     <TextView
         android:id="@+id/item_filename"
         style="@style/textAppearanceSubtitle1"
@@ -43,7 +58,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@id/guideline"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/item_thumbnail"
+        app:layout_constraintStart_toEndOf="@id/layout_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView

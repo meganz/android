@@ -257,8 +257,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 notificationNetworkState.observe(viewLifecycleOwner) {
                     logDebug("Network state changed, Online :$it")
                 }
-                cameraPermissionCheck.observe(viewLifecycleOwner) {
-                    if (it) {
+
+                sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+                    if (allowed) {
                         permissionsRequester = permissionsBuilder(
                             arrayOf(Manifest.permission.CAMERA)
                         )
@@ -275,8 +276,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                         permissionsRequester.launch(false)
                     }
                 }
-                recordAudioPermissionCheck.observe(viewLifecycleOwner) {
-                    if (it) {
+
+                sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+                    if (allowed) {
                         permissionsRequester = permissionsBuilder(
                             arrayOf(Manifest.permission.RECORD_AUDIO)
                         )
