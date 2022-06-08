@@ -687,16 +687,23 @@ object CameraUploadSyncManager {
      * Only call in Worker class.
      */
     fun doRegularHeartbeat() {
-        if (megaApi.rootNode == null) {
+        val isLoggingIn = MegaApplication.isLoggingIn()
+        if (megaApi.rootNode == null && !isLoggingIn) {
             logWarning("RootNode = null, need to login again")
             val dbH = DatabaseHandler.getDbHandler(megaApplication)
             val credentials: UserCredentials = dbH.credentials
             val gSession = credentials.session
-            megaApi.fastLogin(gSession, createOnFinishListener {
-                megaApi.fetchNodes(createOnFinishListener {
+            MegaApplication.setLoggingIn(true)
+            megaApi.fastLogin(gSession, createOnFinishListener(onSuccess = {
+                megaApi.fetchNodes(createOnFinishListener(onSuccess = {
+                    MegaApplication.setLoggingIn(false)
                     sendRegularHeartbeat()
-                })
-            })
+                }, onError = {
+                    MegaApplication.setLoggingIn(false)
+                }))
+            }, onError = {
+                MegaApplication.setLoggingIn(false)
+            }))
         } else {
             sendRegularHeartbeat()
         }
@@ -719,7 +726,7 @@ object CameraUploadSyncManager {
                 0,
                 0,
                 cuLastUploadedHandle,
-                createOnFinishListener(null)
+                createOnFinishListener()
             )
         }
 
@@ -734,7 +741,7 @@ object CameraUploadSyncManager {
                 0,
                 0,
                 muLastUploadedHandle,
-                createOnFinishListener(null)
+                createOnFinishListener()
             )
         }
     }
@@ -742,18 +749,21 @@ object CameraUploadSyncManager {
     /**
      * Create a listener to listen to the send inactive heartbeat event.
      *
-     * @param onFinish Callback when the request finished.
+     * @param onSuccess Callback when the request finished.
      *
      * @return MegaRequestListenerInterface object listen to the request.
      */
-    private fun createOnFinishListener(onFinish: (() -> Unit)?) =
+    private fun createOnFinishListener(
+        onSuccess: (() -> Unit)? = null,
+        onError: (() -> Unit)? = null,
+    ) =
         OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
             Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
-
             if (e.errorCode == MegaError.API_OK) {
-                onFinish?.invoke()
+                onSuccess?.invoke()
             } else {
                 Timber.e("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
+                onError?.invoke()
             }
         })
 

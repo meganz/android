@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">ล้างแคช</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">ล้างไฟล์ออฟไลน์</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">เปิดไฟล์เมื่อดาวน์โหลดเสร็จแล้ว</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">ลบบัญชี</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">ดูไฟล์ซิบ</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">ประเภทบัญชี</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">ต่ออายุเมื่อ&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">หมดอายุเมื่อ&#160;</string>
     <!--  -->
     <string name="free_account">ฟรี</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1184,11 +1178,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">ลิงก์โฟลเดอร์ยังไม่พร้อมใช้งาน</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed as it violated our Terms of Service.</string>
+    <string name="folder_link_unavaible_ToS_violation">ลิงก์โฟลเดอร์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">ลิงก์ไฟล์ไม่พร้อมใช้งาน</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
+    <string name="file_link_unavaible_ToS_violation">ลิงก์ไฟล์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL นี้เสียหายหรือผิดรูปแบบ ไม่มีลิงก์ที่คุณพยายามเข้าถึง</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -2774,11 +2768,10 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">ระงับข้อพิพาท</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
+    <string name="error_download_takendown_node">ไม่สามารถเข้าถึงได้เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="other">ดาวน์โหลดไฟล์ %d ไฟล์ไม่ได้ เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ไฟล์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B][C] ถูกคืนสถานะแล้ว[/C]</string>
@@ -3485,11 +3478,11 @@
     <!-- Text that indicates that there’s no image to show in image section -->
     <string name="homepage_empty_hint_photos">[B]ไม่[/B][B]พบ[/B][A]รูปภาพ[/A]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_documents">[B]ไม่[/B][B]พบ[/B][A]เอกสาร[/A]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_audio">[B]ไม่[/B][B]พบ[/B][A]ไฟล์เสียง[/A]</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_video">[B]ไม่[/B][B]พบ[/B][A]วิดีโอ[/A]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">ค้นหาใน GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3770,33 +3763,27 @@
     <string name="warning_share_owner_storage_quota">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">1 file already downloaded. %d files pending.</item>
+        <item quantity="other">ดาวน์โหลดแล้ว 1 ไฟล์ อีก %d ไฟล์อยู่ระหว่างดำเนินการ</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+        <item quantity="other">ดาวน์โหลดแล้ว %d ไฟล์ อีก 1 ไฟล์อยู่ระหว่างดำเนินการ</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="other">ย้าย 1 รายการไปที่ถังขยะสำเร็จแต่อีก %d รายการไม่สามารถย้ายได้ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="other">ย้าย %d รายการไปที่ถังขยะสำเร็จแต่อีก 1 รายการไม่สามารถย้ายได้ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+        <item quantity="other">กู้คืนสำเร็จ 1 รายการแต่อีก %d รายการไม่สามารถกู้คืนได้ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+        <item quantity="other">กู้คืนสำเร็จ %d รายการแต่อีก 1 รายการไม่สามารถกู้คืนได้ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
@@ -4223,9 +4210,9 @@
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">ไฟล์ถูกลบเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <string name="error_download_takendown_file">ละเมิดเงื่อนไขการให้บริการ</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">อุปกรณ์นี้ไม่มีแอปจัดการไฟล์สำหรับให้เลือกโฟลเดอร์</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">ต่อไป</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -4234,4 +4221,50 @@
     <string name="media_player_video_playlist_next">ต่อไป</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">ก่อนหน้า</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">รูปถ่าย</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">เปิดประเภทไฟล์ที่ไม่สนับสนุนผ่านแอปของบริษัทอื่น</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">คุณภาพของรูป</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">อัตโนมัติ</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">เมื่อใช้เน็ตมือถือให้ส่งภาพที่ผ่านการปรับให้เหมาะสมแล้ว แต่ถ้าใช้ Wi-Fi เมื่อไหร่ให้ส่งเป็นภาพต้นฉบับ</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">ต้นฉบับ</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">ส่งเป็นภาพต้นฉบับเสมอ</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">ปรับให้เหมาะสม</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">ส่งเป็นภาพที่ผ่านการปรับให้เหมาะสมเสมอ</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">ลบอย่างถาวร</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">ลบ</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]วันที่ต่ออายุ[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]วันที่หมดอายุ[/A] [B]%s[/B]</string>
 </resources>

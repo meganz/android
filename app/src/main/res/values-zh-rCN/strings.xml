@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">清除缓存</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">清除离线文件</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">下载完成后打开文件</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">删除帐户</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">ZIP浏览器</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">帐户类型</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">续订日期&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">到期日期&#160;</string>
     <!--  -->
     <string name="free_account">免费</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4227,4 +4221,48 @@
     <string name="media_player_video_playlist_next">下一个</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">上一个</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">照片</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">在第三方应用程序中打开不受支持的文件类型</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">不受支持的文件类型将在第三方应用程序而不是MEGA应用程序中打开。</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">图片质量</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">自动</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">使用移动数据时发送优化的图像，而使用Wi-Fi时发送原始大小的图像。</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">原图</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">始终发送原始大小的图像。</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">优化</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">始终发送优化的图像。</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s已加入</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s和%2$s已加入</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s已离开</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s和%2$s已离开</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="other">%1$s和其他%2$d人已加入</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="other">%1$s和其他%2$d人已离开</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">永久删除</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">删除</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]续订日期[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]到期日期[/A] [B]%s[/B]</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">キャッシュ消去</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">オフラインのファイルをクリア</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">ダウンロード時にファイルを開く</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">アカウントを削除</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">ZIP ブラウザ</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">アカウントタイプ</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">更新日&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">有効期限&#160;</string>
     <!--  -->
     <string name="free_account">無料</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4227,4 +4221,48 @@
     <string name="media_player_video_playlist_next">次</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">前</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">写真</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">サードパーティアプリでサポートされていないファイル形式を開く</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">サポートされていない種類のファイルは、MEGAアプリではなくサードパーティアプリで開かれます。</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">画質</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">自動</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">モバイルデータ通信時は最適化された画像を送信し、Wi-Fi時は元サイズの画像を送信します。</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">元の</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">常に元のサイズの画像を送信してください。</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">最適化</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">常に最適化された画像を送信してください。</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$sさんが参加しました</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$sさんと%2$sさんが参加しました</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$sさんが抜けました</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$sさんと%2$sさんが抜けました</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="other">%1$sさんとその他%2$d人の方々が参加しました</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="other">%1$sさんとその他%2$d人の方々が抜けました</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">恒久的に削除</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">削除</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]更新日[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]有効期限[/A] [B]%s[/B]</string>
 </resources>
