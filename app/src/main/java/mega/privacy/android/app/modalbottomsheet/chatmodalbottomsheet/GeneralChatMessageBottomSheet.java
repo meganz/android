@@ -13,6 +13,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -21,6 +24,7 @@ import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -30,6 +34,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -43,10 +48,12 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private MegaNode node;
-    private MegaNodeList nodeList;
+    private MegaNode node = null;
     private AndroidMegaChatMessage message = null;
     private long chatId;
     private long messageId;
@@ -56,6 +63,34 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private MegaChatRoom chatRoom;
     private LinearLayout reactionsLayout;
     private ChatReactionsView reactionsFragment;
+    private RelativeLayout optionOpenWith;
+    private View reactionSeparator;
+    private RelativeLayout optionForward;
+    private RelativeLayout optionEdit;
+    private RelativeLayout optionCopy;
+    private RelativeLayout optionShare;
+    private RelativeLayout optionSelect;
+    private RelativeLayout optionViewContacts;
+    private RelativeLayout optionInfoContacts;
+    private RelativeLayout optionStartConversation;
+    private RelativeLayout optionInviteContact;
+    private RelativeLayout optionImport;
+    private RelativeLayout optionDownload;
+    private SwitchMaterial offlineSwitch;
+    private RelativeLayout optionDelete;
+    private LinearLayout forwardSeparator;
+    private LinearLayout editSeparator;
+    private LinearLayout copySeparator;
+    private LinearLayout shareSeparator;
+    private  LinearLayout selectSeparator;
+    private LinearLayout infoSeparator;
+    private LinearLayout inviteSeparator;
+    private LinearLayout infoFileSeparator;
+    private LinearLayout optionSaveOffline;
+    private LinearLayout deleteSeparator;
+
+    @Inject
+    GetNodeUseCase getNodeUseCase;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -83,37 +118,36 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(requireActivity());
-
         return contentView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        View reactionSeparator = contentView.findViewById(R.id.separator);
-        RelativeLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
-        LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
-        RelativeLayout optionForward = contentView.findViewById(R.id.forward_layout);
-        LinearLayout editSeparator = contentView.findViewById(R.id.edit_separator);
-        RelativeLayout optionEdit = contentView.findViewById(R.id.edit_layout);
-        LinearLayout copySeparator = contentView.findViewById(R.id.copy_separator);
-        RelativeLayout optionCopy = contentView.findViewById(R.id.copy_layout);
-        LinearLayout shareSeparator = contentView.findViewById(R.id.share_separator);
-        RelativeLayout optionShare = contentView.findViewById(R.id.share_layout);
-        LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
-        RelativeLayout optionSelect = contentView.findViewById(R.id.select_layout);
-        LinearLayout infoSeparator = contentView.findViewById(R.id.info_separator);
-        RelativeLayout optionViewContacts = contentView.findViewById(R.id.option_view_layout);
-        RelativeLayout optionInfoContacts = contentView.findViewById(R.id.option_info_layout);
-        LinearLayout inviteSeparator = contentView.findViewById(R.id.invite_separator);
-        RelativeLayout optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
-        RelativeLayout optionInviteContact = contentView.findViewById(R.id.option_invite_layout);
-        LinearLayout infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
-        RelativeLayout optionImport = contentView.findViewById(R.id.option_import_layout);
-        RelativeLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
-        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
-        LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
-        RelativeLayout optionDelete = contentView.findViewById(R.id.delete_layout);
+        reactionSeparator = contentView.findViewById(R.id.separator);
+        optionOpenWith = contentView.findViewById(R.id.open_with_layout);
+        forwardSeparator = contentView.findViewById(R.id.forward_separator);
+        optionForward = contentView.findViewById(R.id.forward_layout);
+        editSeparator = contentView.findViewById(R.id.edit_separator);
+        optionEdit = contentView.findViewById(R.id.edit_layout);
+        copySeparator = contentView.findViewById(R.id.copy_separator);
+        optionCopy = contentView.findViewById(R.id.copy_layout);
+        shareSeparator = contentView.findViewById(R.id.share_separator);
+        optionShare = contentView.findViewById(R.id.share_layout);
+        selectSeparator = contentView.findViewById(R.id.select_separator);
+        optionSelect = contentView.findViewById(R.id.select_layout);
+        infoSeparator = contentView.findViewById(R.id.info_separator);
+        optionViewContacts = contentView.findViewById(R.id.option_view_layout);
+        optionInfoContacts = contentView.findViewById(R.id.option_info_layout);
+        inviteSeparator = contentView.findViewById(R.id.invite_separator);
+        optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
+        optionInviteContact = contentView.findViewById(R.id.option_invite_layout);
+        infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
+        optionImport = contentView.findViewById(R.id.option_import_layout);
+        optionDownload = contentView.findViewById(R.id.option_download_layout);
+        optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
+        offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
+        deleteSeparator = contentView.findViewById(R.id.delete_separator);
+        optionDelete = contentView.findViewById(R.id.delete_layout);
         TextView textDelete = contentView.findViewById(R.id.delete_text);
 
         optionOpenWith.setOnClickListener(this);
@@ -131,12 +165,126 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        boolean isRemovedOrPendingMsg =  message != null && message.getMessage() != null
-                && ((ChatActivity) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
+        if(message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
+            Timber.w("Message is null");
+            closeDialog();
+            return;
+        }
 
-        boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
-                requireActivity() instanceof ChatActivity && shouldReactionBeClicked(chatRoom) &&
-                !isRemovedOrPendingMsg && !message.isUploading();
+        boolean isRemovedOrPendingMsg = ((ChatActivity) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
+        if (isRemovedOrPendingMsg) {
+            Timber.w("Message is removed or pending");
+            closeDialog();
+            return;
+        }
+
+        hideAllOptions();
+
+        checkReactionsFragment();
+
+        MegaChatMessage megaChatMessage = message.getMessage();
+        int typeMessage = megaChatMessage.getType();
+
+        optionSelect.setVisibility(View.VISIBLE);
+
+        if (typeMessage == MegaChatMessage.TYPE_NORMAL || isGeolocation(megaChatMessage) ||
+                (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
+                        megaChatMessage.getContainsMeta() != null &&
+                        (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW))) {
+            optionCopy.setVisibility(View.VISIBLE);
+        } else {
+            optionCopy.setVisibility(View.GONE);
+        }
+
+        if ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()) {
+            optionForward.setVisibility(View.GONE);
+            optionEdit.setVisibility(View.GONE);
+            optionDelete.setVisibility(View.GONE);
+            optionShare.setVisibility(View.GONE);
+
+        } else {
+            optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT
+                    || !isOnline(requireContext()) || chatC.isInAnonymousMode()
+                    ? View.GONE : View.VISIBLE);
+
+            optionForward.setVisibility((!isOnline(requireContext()) || chatC.isInAnonymousMode()) ? View.GONE : View.VISIBLE);
+
+            if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
+                    !megaChatMessage.isEditable() ||
+                    typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                optionEdit.setVisibility(View.GONE);
+            } else {
+                optionEdit.setVisibility(typeMessage == MegaChatMessage.TYPE_NORMAL ||
+                        typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
+            }
+
+            if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() || !megaChatMessage.isDeletable()) {
+                optionDelete.setVisibility(View.GONE);
+            } else {
+                if (megaChatMessage.getType() == MegaChatMessage.TYPE_NORMAL ||
+                        (megaChatMessage.getType() == MegaChatMessage.TYPE_CONTAINS_META &&
+                                megaChatMessage.getContainsMeta() != null &&
+                                megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)) {
+                    textDelete.setText(getString(R.string.delete_button));
+                } else {
+                    textDelete.setText(getString(R.string.context_remove));
+                }
+                optionDelete.setVisibility(View.VISIBLE);
+            }
+        }
+
+        optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+        optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+        optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
+
+        if (typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+            long userCount = megaChatMessage.getUsersCount();
+            long userHandle = megaChatMessage.getUserHandle(0);
+            String userEmail = megaChatMessage.getUserEmail(0);
+
+            optionInfoContacts.setVisibility((userCount == 1 &&
+                    userHandle != megaChatApi.getMyUserHandle() &&
+                    megaApi.getContact(userEmail) != null &&
+                    megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
+
+            optionViewContacts.setVisibility(userCount > 1 ? View.VISIBLE : View.GONE);
+
+            if (userCount == 1) {
+                optionInviteContact.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                        (megaApi.getContact(userEmail) == null ||
+                                megaApi.getContact(userEmail).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
+
+                optionStartConversation.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                        megaApi.getContact(userEmail) != null &&
+                        megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
+                        (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
+            } else {
+                optionStartConversation.setVisibility(View.VISIBLE);
+                optionInviteContact.setVisibility(View.GONE);
+
+                for (int i = 0; i < userCount; i++) {
+                    String email = megaChatMessage.getUserEmail(i);
+                    MegaUser contact = megaApi.getContact(email);
+                    if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+                        optionStartConversation.setVisibility(View.GONE);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+            getNode();
+        } else {
+            checkSeparatorsVisibility();
+        }
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void checkReactionsFragment(){
+        boolean shouldReactionOptionBeVisible = shouldReactionBeClicked(chatRoom) && !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
             reactionsFragment.init(requireActivity(), this, chatId, messageId, positionMessage);
@@ -145,201 +293,24 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             reactionsLayout.setVisibility(View.GONE);
         }
         reactionSeparator.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
-
-        if (message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
-            optionOpenWith.setVisibility(View.GONE);
-            forwardSeparator.setVisibility(View.GONE);
-            optionForward.setVisibility(View.GONE);
-            editSeparator.setVisibility(View.GONE);
-            optionEdit.setVisibility(View.GONE);
-            copySeparator.setVisibility(View.GONE);
-            optionCopy.setVisibility(View.GONE);
-            shareSeparator.setVisibility(View.GONE);
-            optionShare.setVisibility(View.GONE);
-            selectSeparator.setVisibility(View.GONE);
-            optionSelect.setVisibility(View.GONE);
-            infoSeparator.setVisibility(View.GONE);
-            optionViewContacts.setVisibility(View.GONE);
-            optionInfoContacts.setVisibility(View.GONE);
-            inviteSeparator.setVisibility(View.GONE);
-            optionStartConversation.setVisibility(View.GONE);
-            optionInviteContact.setVisibility(View.GONE);
-            infoFileSeparator.setVisibility(View.GONE);
-            optionImport.setVisibility(View.GONE);
-            optionDownload.setVisibility(View.GONE);
-            optionSaveOffline.setVisibility(View.GONE);
-            deleteSeparator.setVisibility(View.GONE);
-            optionDelete.setVisibility(View.GONE);
-            return;
-        } else {
-            MegaChatMessage megaChatMessage = message.getMessage();
-            int typeMessage = megaChatMessage.getType();
-
-            if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                nodeList = megaChatMessage.getMegaNodeList();
-
-                if (nodeList == null || nodeList.size() == 0) {
-                    logWarning("Error: nodeList is NULL or empty");
-                    return;
-                }
-
-                node = handle == INVALID_HANDLE ? nodeList.get(0) : getNodeByHandle(handle);
-                if (node == null) {
-                    logWarning("Node is NULL");
-                    return;
-                }
-            }
-
-            optionSelect.setVisibility(View.VISIBLE);
-
-            if (typeMessage == MegaChatMessage.TYPE_NORMAL || isGeolocation(megaChatMessage) ||
-                    (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
-                            megaChatMessage.getContainsMeta() != null &&
-                            (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW))) {
-                optionCopy.setVisibility(View.VISIBLE);
-            } else {
-                optionCopy.setVisibility(View.GONE);
-            }
-
-            if (((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
-                optionForward.setVisibility(View.GONE);
-                optionEdit.setVisibility(View.GONE);
-                optionDelete.setVisibility(View.GONE);
-                optionShare.setVisibility(View.GONE);
-
-            } else {
-                optionShare.setVisibility(isRemovedOrPendingMsg
-                        || typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT
-                        || !isOnline(requireContext()) || chatC.isInAnonymousMode()
-                        ? View.GONE : View.VISIBLE);
-
-                optionForward.setVisibility((isRemovedOrPendingMsg || !isOnline(requireContext())
-                        || chatC.isInAnonymousMode()) ? View.GONE : View.VISIBLE);
-
-                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
-                        !megaChatMessage.isEditable() ||
-                        typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                    optionEdit.setVisibility(View.GONE);
-                } else {
-                    optionEdit.setVisibility(typeMessage == MegaChatMessage.TYPE_NORMAL ||
-                            typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
-                }
-
-                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
-                        !megaChatMessage.isDeletable()) {
-                    optionDelete.setVisibility(View.GONE);
-                } else {
-                    if (megaChatMessage.getType() == MegaChatMessage.TYPE_NORMAL ||
-                            (megaChatMessage.getType() == MegaChatMessage.TYPE_CONTAINS_META &&
-                                    megaChatMessage.getContainsMeta() != null &&
-                                    megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)) {
-                        textDelete.setText(getString(R.string.delete_button));
-                    } else {
-                        textDelete.setText(getString(R.string.context_remove));
-                    }
-                    optionDelete.setVisibility(View.VISIBLE);
-                }
-            }
-
-            optionOpenWith.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
-
-            optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
-
-            optionImport.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
-            boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
-
-            if (shouldShowOfflineOption && !isRemovedOrPendingMsg) {
-                offlineSwitch.setChecked(availableOffline(requireContext(), node));
-                optionSaveOffline.setVisibility(View.VISIBLE);
-            } else {
-                optionSaveOffline.setVisibility(View.GONE);
-            }
-
-            if (typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                long userCount = megaChatMessage.getUsersCount();
-                long userHandle = megaChatMessage.getUserHandle(0);
-                String userEmail = megaChatMessage.getUserEmail(0);
-
-                optionInfoContacts.setVisibility(!isRemovedOrPendingMsg && (userCount == 1 &&
-                        userHandle != megaChatApi.getMyUserHandle() &&
-                        megaApi.getContact(userEmail) != null &&
-                        megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
-
-                optionViewContacts.setVisibility(!isRemovedOrPendingMsg && userCount > 1 ? View.VISIBLE : View.GONE);
-
-                if(userCount == 1){
-                    optionInviteContact.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
-                            (megaApi.getContact(userEmail) == null ||
-                                    megaApi.getContact(userEmail).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
-
-                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
-                            megaApi.getContact(userEmail) != null &&
-                            megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
-                            (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
-                } else {
-                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg? View.VISIBLE : View.GONE);
-                    optionInviteContact.setVisibility(View.GONE);
-
-                    for (int i = 0; i < userCount; i++) {
-                        String email = megaChatMessage.getUserEmail(i);
-                        MegaUser contact = megaApi.getContact(email);
-                        if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-                            optionStartConversation.setVisibility(View.GONE);
-                            break;
-                        }
-                    }
-
-                }
-            }
-        }
-
-        forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
-                optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        editSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
-                optionEdit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        copySeparator.setVisibility((optionEdit.getVisibility() == View.VISIBLE ||
-                optionForward.getVisibility() == View.VISIBLE) &&
-                optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        shareSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
-                optionShare.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE &&
-                (optionForward.getVisibility() == View.VISIBLE ||
-                        optionCopy.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
-
-        infoSeparator.setVisibility((optionViewContacts.getVisibility() == View.VISIBLE ||
-                optionInfoContacts.getVisibility() == View.VISIBLE) &&
-                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        inviteSeparator.setVisibility((optionStartConversation.getVisibility() == View.VISIBLE ||
-                optionInviteContact.getVisibility() == View.VISIBLE) &&
-                (optionViewContacts.getVisibility() == View.VISIBLE ||
-                        optionInfoContacts.getVisibility() == View.VISIBLE ||
-                        selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
-
-        infoFileSeparator.setVisibility((optionImport.getVisibility() == View.VISIBLE ||
-                optionDownload.getVisibility() == View.VISIBLE ||
-                optionSaveOffline.getVisibility() == View.VISIBLE) &&
-                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-
-        deleteSeparator.setVisibility(optionDelete.getVisibility());
-
-        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
-
-        super.onViewCreated(view, savedInstanceState);
     }
 
-    public MegaNode getNodeByHandle(long handle) {
-        for (int i = 0; i < nodeList.size(); i++) {
-            MegaNode node = nodeList.get(i);
-            if (node.getHandle() == handle) {
-                return node;
-            }
-        }
-        return null;
+    private void hideAllOptions(){
+        optionSaveOffline.setVisibility(View.GONE);
+        optionOpenWith.setVisibility(View.GONE);
+        optionForward.setVisibility(View.GONE);
+        optionEdit.setVisibility(View.GONE);
+        optionCopy.setVisibility(View.GONE);
+        optionShare.setVisibility(View.GONE);
+        optionSelect.setVisibility(View.GONE);
+        optionViewContacts.setVisibility(View.GONE);
+        optionInfoContacts.setVisibility(View.GONE);
+        optionStartConversation.setVisibility(View.GONE);
+        optionInviteContact.setVisibility(View.GONE);
+        optionImport.setVisibility(View.GONE);
+        optionDownload.setVisibility(View.GONE);
+        optionDelete.setVisibility(View.GONE);
+        checkSeparatorsVisibility();
     }
 
     @Override
@@ -351,7 +322,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        Intent i;
         switch (view.getId()) {
             case R.id.open_with_layout:
                 if (node == null) {
@@ -451,7 +421,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivity) requireActivity()).downloadNodeList(nodeList);
+
+                MegaNodeList nodeList = message.getMessage().getMegaNodeList();
+                if (nodeList != null && nodeList.size() > 0) {
+                    ((ChatActivity) requireActivity()).downloadNodeList(nodeList);
+                }
                 break;
 
             case R.id.option_import_layout:
@@ -465,8 +439,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.file_properties_switch:
             case R.id.option_save_offline_layout:
-                if (message == null) {
-                    logWarning("Message is NULL");
+                if (message == null || node == null) {
+                    Timber.w("Message or node is NULL");
                     return;
                 }
 
@@ -488,6 +462,80 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
         }
         closeDialog();
+    }
+
+    /**
+     * Method to get the node related to the message
+     */
+    private void getNode() {
+        getNodeUseCase.get(message.getMessage().getMegaNodeList().get(0).getHandle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        node = result;
+                    }
+
+                    if (node == null) {
+                        optionOpenWith.setVisibility(View.GONE);
+                        optionForward.setVisibility(View.GONE);
+                        optionEdit.setVisibility(View.GONE);
+                        optionCopy.setVisibility(View.GONE);
+                        optionShare.setVisibility(View.GONE);
+                        optionViewContacts.setVisibility(View.GONE);
+                        optionInfoContacts.setVisibility(View.GONE);
+                        optionStartConversation.setVisibility(View.GONE);
+                        optionInviteContact.setVisibility(View.GONE);
+                        optionImport.setVisibility(View.GONE);
+                        optionDownload.setVisibility(View.GONE);
+                        optionSaveOffline.setVisibility(View.GONE);
+                        offlineSwitch.setVisibility(View.GONE);
+                    } else if (!chatC.isInAnonymousMode()) {
+                        offlineSwitch.setChecked(availableOffline(requireContext(), node));
+                        optionSaveOffline.setVisibility(View.VISIBLE);
+                    }
+
+                    checkSeparatorsVisibility();
+                });
+    }
+
+    /**
+     * Method for checking the visibility of option separators
+     */
+    private void checkSeparatorsVisibility() {
+        forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
+                optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        editSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
+                optionEdit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        copySeparator.setVisibility((optionEdit.getVisibility() == View.VISIBLE ||
+                optionForward.getVisibility() == View.VISIBLE) &&
+                optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        shareSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
+                optionShare.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE &&
+                (optionForward.getVisibility() == View.VISIBLE ||
+                        optionCopy.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
+
+        infoSeparator.setVisibility((optionViewContacts.getVisibility() == View.VISIBLE ||
+                optionInfoContacts.getVisibility() == View.VISIBLE) &&
+                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        inviteSeparator.setVisibility((optionStartConversation.getVisibility() == View.VISIBLE ||
+                optionInviteContact.getVisibility() == View.VISIBLE) &&
+                (optionViewContacts.getVisibility() == View.VISIBLE ||
+                        optionInfoContacts.getVisibility() == View.VISIBLE ||
+                        selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+
+        infoFileSeparator.setVisibility((optionImport.getVisibility() == View.VISIBLE ||
+                optionDownload.getVisibility() == View.VISIBLE ||
+                optionSaveOffline.getVisibility() == View.VISIBLE) &&
+                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        deleteSeparator.setVisibility(optionDelete.getVisibility());
     }
 
     public void closeDialog() {
