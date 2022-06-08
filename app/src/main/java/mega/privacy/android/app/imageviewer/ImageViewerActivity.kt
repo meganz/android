@@ -443,12 +443,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 color = R.color.white_black
                 binding.motion.transitionToEnd()
             } else {
-                color = android.R.color.transparent
+                color = android.R.color.black
                 binding.motion.transitionToStart()
             }
-            if (enableTransparency) {
-                binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
-            }
+            binding.motion.setBackgroundColor(ContextCompat.getColor(this,
+                if (enableTransparency && !show) {
+                    android.R.color.transparent
+                } else {
+                    color
+                }))
         }
     }
 

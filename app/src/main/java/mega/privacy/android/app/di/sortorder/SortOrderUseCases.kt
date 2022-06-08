@@ -14,6 +14,9 @@ import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
 @InstallIn(SingletonComponent::class)
 abstract class SortOrderUseCases {
 
+    /**
+     * Provide the GetCloudSortOrder implementation
+     */
     @Binds
     abstract fun bindGetCloudSortOrder(getCloudSortOrder: DefaultGetCloudSortOrder): GetCloudSortOrder
 }

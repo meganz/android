@@ -80,7 +80,7 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getChildrenByNode(parentNode, order)
         }
 
-    override suspend fun getNodeByHandle(handle: Long): MegaNode = withContext(ioDispatcher) {
+    override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)
     }
 

@@ -87,7 +87,7 @@ interface MegaApiGateway {
      * @param nodeHandle node handle
      * @return MegaNode
      */
-    suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode
+    suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
 
     /**
      * Check the node if has version
@@ -145,6 +145,14 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+    
+    /**
+     * Set node favourite as a node attribute.
+     *
+     * @param node      Node that will receive the information.
+     * @param favourite if true set node as favourite, otherwise remove the attribute
+     */
+    fun setNodeFavourite(node: MegaNode?, favourite: Boolean)
 
     /**
      * Add logger

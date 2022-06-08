@@ -760,7 +760,6 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
         int notificationId = getCallNotificationId(callToAnswer.getCallId());
         boolean shouldVibrate = !participatingInACall();
-        boolean hasPermissions = checkPermissionsCall(null, INVALID_TYPE_PERMISSIONS);
 
         PendingIntent intentIgnore = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
         PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + ONE_REQUEST_NEEDED);
@@ -791,7 +790,7 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentIgnore);
             }
             PendingIntent intentAnswer = getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId);
-            expandedView.setOnClickPendingIntent(R.id.answer_button_layout, hasPermissions ? intentAnswer : callScreen);
+            expandedView.setOnClickPendingIntent(R.id.answer_button_layout, intentAnswer);
 
         } else {
             collapsedViews.setViewVisibility(R.id.arrow, View.VISIBLE);
@@ -809,8 +808,8 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setTextViewText(R.id.second_button_text, StringResourcesUtils.getString(R.string.hold_and_answer_call_incoming));
                 expandedView.setTextViewText(R.id.third_button_text, StringResourcesUtils.getString(R.string.end_and_answer_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentDecline);
-                expandedView.setOnClickPendingIntent(R.id.second_button_layout, hasPermissions ? intentHoldAnswer : callScreen);
-                expandedView.setOnClickPendingIntent(R.id.third_button_layout, hasPermissions ? intentEndAnswer : callScreen);
+                expandedView.setOnClickPendingIntent(R.id.second_button_layout, intentHoldAnswer);
+                expandedView.setOnClickPendingIntent(R.id.third_button_layout, intentEndAnswer);
             } else {
                 PendingIntent intentHoldJoin = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_JOIN, notificationId);
                 PendingIntent intentEndJoin = getPendingIntent(callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_JOIN, notificationId);
@@ -819,8 +818,8 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setTextViewText(R.id.second_button_text, StringResourcesUtils.getString(R.string.hold_and_join_call_incoming));
                 expandedView.setTextViewText(R.id.third_button_text, StringResourcesUtils.getString(R.string.end_and_join_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentIgnore);
-                expandedView.setOnClickPendingIntent(R.id.second_button_layout, hasPermissions ? intentHoldJoin : callScreen);
-                expandedView.setOnClickPendingIntent(R.id.third_button_layout, hasPermissions ? intentEndJoin : callScreen);
+                expandedView.setOnClickPendingIntent(R.id.second_button_layout, intentHoldJoin);
+                expandedView.setOnClickPendingIntent(R.id.third_button_layout, intentEndJoin);
             }
 
             if (numberButtons.equals(VERTICAL_TWO_BUTTONS)) {
@@ -952,8 +951,7 @@ public final class ChatAdvancedNotificationBuilder {
             expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentIgnore);
         }
 
-        expandedView.setOnClickPendingIntent(R.id.answer_button_layout,
-                checkPermissionsCall(null, INVALID_TYPE_PERMISSIONS) ? intentAnswer : callScreen);
+        expandedView.setOnClickPendingIntent(R.id.answer_button_layout, intentAnswer);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             //Create a channel for android Oreo or higher

@@ -13,5 +13,5 @@ class DefaultGetNodeByHandle @Inject constructor(
     private val filesRepository: FilesRepository
 ) : GetNodeByHandle {
 
-    override suspend fun invoke(handle: Long): MegaNode = filesRepository.getNodeByHandle(handle)
+    override suspend fun invoke(handle: Long): MegaNode? = filesRepository.getNodeByHandle(handle)
 }

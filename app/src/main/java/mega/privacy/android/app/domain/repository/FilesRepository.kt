@@ -53,7 +53,7 @@ interface FilesRepository {
      *
      * @param handle
      */
-    suspend fun getNodeByHandle(handle: Long): MegaNode
+    suspend fun getNodeByHandle(handle: Long): MegaNode?
 
     /**
      * Get cloud sort order

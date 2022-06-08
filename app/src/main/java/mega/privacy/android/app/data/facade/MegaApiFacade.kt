@@ -118,7 +118,7 @@ class MegaApiFacade @Inject constructor(
         megaApi.getFavourites(node, count, listener)
     }
 
-    override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode =
+    override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
@@ -143,6 +143,10 @@ class MegaApiFacade @Inject constructor(
 
     override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
         megaApi.getFolderInfo(node, listener)
+
+    override fun setNodeFavourite(node: MegaNode?, favourite: Boolean) {
+        megaApi.setNodeFavourite(node, favourite)
+    }
 
     override fun addLogger(logger: MegaLoggerInterface) = MegaApiAndroid.addLoggerObject(logger)
 
