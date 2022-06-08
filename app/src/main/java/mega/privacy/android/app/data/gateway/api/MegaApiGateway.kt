@@ -58,7 +58,16 @@ interface MegaApiGateway {
      * initialised yet for some reason.
      *
      */
-    val rootNode: MegaNode?
+    suspend fun getRootNode(): MegaNode?
+
+    /**
+     * Rubbish bin node of the account
+     *
+     * All accounts have a rubbish bin node, therefore if it is null the account has not been logged in or
+     * initialised yet for some reason.
+     *
+     */
+    suspend fun getRubbishBinNode(): MegaNode?
 
     /**
      * Global updates
@@ -90,9 +99,10 @@ interface MegaApiGateway {
     /**
      * Get children nodes by node
      * @param parentNode parent node
+     * @param order order for the returned list, if null the default order is applied
      * @return children nodes list
      */
-    fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode>
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
 
     /**
      * Get child folder number of current folder

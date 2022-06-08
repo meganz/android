@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -55,7 +56,7 @@ class SettingsViewModelTest {
             areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             areChatLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isCameraSyncEnabled = mock(),
-            rootNodeExists = mock { on { invoke() }.thenReturn(true) },
+            rootNodeExists = mock { on { runBlocking { invoke() } }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             fetchMultiFactorAuthSetting = fetchMultiFactorAuthSetting,
