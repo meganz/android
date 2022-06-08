@@ -6965,49 +6965,22 @@ public class ChatActivity extends PasscodeActivity
     public void clearHistory(AndroidMegaChatMessage androidMsg){
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
-        int indexToChange=-1;
         // Iterate in reverse.
         while(itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
 
-            if(!messageToCheck.isUploading()){
-                if(messageToCheck.getMessage().getStatus()!=MegaChatMessage.STATUS_SENDING){
-
-                    indexToChange = itr.nextIndex();
-                    logDebug("Found index of last sent and confirmed message: " + indexToChange);
-                    break;
-                }
+            if(messageToCheck.isUploading()){
+                // Remove pending uploading messages.
+                megaApi.cancelTransferByTag(messageToCheck.pendingMessage.transferTag);
+            } else {
+                break;
             }
         }
 
-        if(indexToChange != messages.size()-1){
-            logDebug("Clear history of confirmed messages: " + indexToChange);
-
-            List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
-            messages.clear();
-            messages.add(androidMsg);
-
-            for(int i = indexToChange+1; i<messagesCopy.size();i++){
-                messages.add(messagesCopy.get(i));
-            }
-        }
-        else{
-            logDebug("Clear all messages");
-            messages.clear();
-            messages.add(androidMsg);
-        }
-
-        removedMessages.clear();
-
-        if(messages.size()==1){
-            androidMsg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
-        }
-        else{
-            for(int i=0; i<messages.size();i++){
-                adjustInfoToShow(i);
-            }
-        }
-
+        logDebug("Clear all messages");
+        messages.clear();
+        messages.add(androidMsg);
+        androidMsg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
         updateMessages();
     }
 
