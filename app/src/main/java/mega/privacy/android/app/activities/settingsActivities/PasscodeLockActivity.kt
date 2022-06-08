@@ -396,6 +396,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Hides pin views.
+     */
     private fun hidePins() {
         binding.passFirstInput.isVisible = false
         binding.passSecondInput.isVisible = false
@@ -405,11 +408,14 @@ class PasscodeLockActivity : BaseActivity() {
         binding.passSixthInput.isVisible = false
     }
 
+    /**
+     * Hides error views.
+     */
     private fun hideErrorElements() {
         binding.failedAttemptsText.isVisible = false
         binding.failedAttemptsErrorText.isVisible = false
         binding.logoutButton.isVisible = false
-        binding.forgetPasswordButton.isVisible = false
+        binding.forgetPasscodeButton.isVisible = false
     }
 
     /**
@@ -442,7 +448,7 @@ class PasscodeLockActivity : BaseActivity() {
             askConfirmLogout()
         }
 
-        binding.forgetPasswordButton.setOnClickListener {
+        binding.forgetPasscodeButton.setOnClickListener {
             forgetPasscode = true
             initPasscodeScreen()
         }
@@ -547,6 +553,9 @@ class PasscodeLockActivity : BaseActivity() {
         finish()
     }
 
+    /**
+     * Checks if the typed password is the same as the current loged in account.
+     */
     private fun checkPassword() {
         val typedPassword = binding.passwordField.text.toString()
 
@@ -582,17 +591,17 @@ class PasscodeLockActivity : BaseActivity() {
             attempts >= MIN_ATTEMPTS_TO_SHOW_WARNING -> {
                 binding.failedAttemptsErrorText.isVisible = true
                 binding.logoutButton.isVisible = true
-                binding.forgetPasswordButton.isVisible = true
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
             attempts > 0 -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = true
-                binding.forgetPasswordButton.isVisible = true
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
             else -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = false
-                binding.forgetPasswordButton.isVisible = true
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
         }
     }
