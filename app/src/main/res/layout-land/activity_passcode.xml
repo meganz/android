@@ -183,10 +183,13 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:text="@string/settings_passcode_forgot_passcode_button"
                 android:textAllCaps="false"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/logout_button" />
+                app:layout_constraintBottom_toBottomOf="@+id/logout_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text"
+                app:layout_constraintTop_toTopOf="@+id/logout_button" />
 
             <Button
                 android:id="@+id/passcode_options_button"

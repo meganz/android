@@ -62,9 +62,9 @@ class PasscodeLockActivity : BaseActivity() {
         private const val KEY_NAME = "MEGA_KEY"
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
         private const val FORGET_PASSCODE = "FORGET_PASSCODE"
+        private const val PASSWORD_ALREADY_TYPED = "PASSWORD_ALREADY_TYPED"
     }
 
-    private var forgetPasscode = false
     private var attempts = 0
     private var mode = UNLOCK_MODE
     private var setOrUnlockMode = true
@@ -92,6 +92,8 @@ class PasscodeLockActivity : BaseActivity() {
     private lateinit var keyGenerator: KeyGenerator
     private var fingerprintEnabled = false
     private var fingerprintSkipped = false
+    private var forgetPasscode = false
+    private var passwordAlreadyTyped = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +120,7 @@ class PasscodeLockActivity : BaseActivity() {
             fingerprintEnabled = savedInstanceState.getBoolean(FINGERPRINT_ENABLED, false)
             fingerprintSkipped = savedInstanceState.getBoolean(FINGERPRINT_SKIPPED, false)
             forgetPasscode = savedInstanceState.getBoolean(FORGET_PASSCODE, false)
+            passwordAlreadyTyped = savedInstanceState.getBoolean(PASSWORD_ALREADY_TYPED, false)
 
             if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
                 askConfirmLogout()
@@ -248,6 +251,10 @@ class PasscodeLockActivity : BaseActivity() {
                     checkPassword()
                     true
                 } else false
+            }
+
+            if (passwordAlreadyTyped) {
+                showAttemptsError()
             }
 
             return
@@ -546,7 +553,10 @@ class PasscodeLockActivity : BaseActivity() {
         if (megaApi.checkPassword(typedPassword)) {
             skipPasscode()
         } else {
-            //TODO show error
+            passwordAlreadyTyped = true
+            incrementAttempts()
+            binding.passwordField.text?.clear()
+            showAttemptsError()
         }
     }
 
@@ -721,6 +731,7 @@ class PasscodeLockActivity : BaseActivity() {
         outState.putBoolean(FINGERPRINT_ENABLED, fingerprintEnabled)
         outState.putBoolean(FINGERPRINT_SKIPPED, fingerprintSkipped)
         outState.putBoolean(FORGET_PASSCODE, forgetPasscode)
+        outState.putBoolean(PASSWORD_ALREADY_TYPED, passwordAlreadyTyped)
 
         passcodeManagement.needsOpenAgain = true
 
