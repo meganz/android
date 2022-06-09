@@ -20,7 +20,7 @@ import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 abstract class AccountModule {
 
     @Binds
-    abstract fun bindCredentialsExists(useCase: DefaultGetCredentials): GetCredentials
+    abstract fun bindGetCredentials(useCase: DefaultGetCredentials): GetCredentials
 
     @Binds
     abstract fun bindRetryPendingConnections(useCase: DefaultRetryPendingConnections): RetryPendingConnections
