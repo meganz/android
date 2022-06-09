@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fcm
+package mega.privacy.android.app.domain.entity.pushes
 
 import androidx.work.Data
 

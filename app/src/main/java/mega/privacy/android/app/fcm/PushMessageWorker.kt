@@ -24,7 +24,7 @@ import mega.privacy.android.app.domain.usecase.InitMegaChat
 import mega.privacy.android.app.domain.usecase.PushReceived
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 import mega.privacy.android.app.domain.usecase.RootNodeExists
-import mega.privacy.android.app.fcm.PushMessage.Companion.toPushMessage
+import mega.privacy.android.app.domain.entity.pushes.PushMessage.Companion.toPushMessage
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import timber.log.Timber
 

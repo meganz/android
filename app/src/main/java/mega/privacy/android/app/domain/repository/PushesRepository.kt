@@ -2,6 +2,9 @@ package mega.privacy.android.app.domain.repository
 
 import nz.mega.sdk.MegaChatRequest
 
+/**
+ * Pushes repository.
+ */
 interface PushesRepository {
 
     /**

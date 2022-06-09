@@ -8,7 +8,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.FirebaseMessaging
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
-import mega.privacy.android.app.fcm.MegaRemoteMessage
+import mega.privacy.android.app.domain.entity.pushes.MegaRemoteMessage
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
 import timber.log.Timber
 import java.util.concurrent.Executors

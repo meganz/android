@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fcm
+package mega.privacy.android.app.domain.entity.pushes
 
 /**
  * Generic push message object, used to unify corresponding platform dependent RemoteMessage object.

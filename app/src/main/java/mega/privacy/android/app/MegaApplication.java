@@ -167,6 +167,7 @@ import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
+import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
@@ -1442,7 +1443,22 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					this.startActivity(tourIntent);
 				}
 			}
-		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+		} else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
+            logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
+
+            //Temporary HMS code to show pushes until AND-13803 is resolved.
+            if (BuildFlavorHelper.INSTANCE.isHMS()) {
+                if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                    logDebug("OK:TYPE_PUSH_RECEIVED");
+                    if (!getMegaApi().isEphemeralPlusPlus()) {
+                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
+                        notificationBuilder.generateChatNotification(request);
+                    }
+                } else {
+                    logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
+                }
+            }
+        } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
 			chatManagement.removeJoiningChatId(request.getChatHandle());
 			chatManagement.removeJoiningChatId(request.getUserHandle());
 		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM

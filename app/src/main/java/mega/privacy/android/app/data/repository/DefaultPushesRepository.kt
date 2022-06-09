@@ -27,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property context        Required for getting shared preferences.
  * @property megaApi        Required for registering push notifications.
  * @property ioDispatcher   Required for launching coroutines.
+ * @property megaChatApi    Required for notifying about pushes.
  */
 class DefaultPushesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
