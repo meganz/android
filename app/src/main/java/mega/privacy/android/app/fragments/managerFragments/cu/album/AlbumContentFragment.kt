@@ -8,11 +8,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
@@ -36,10 +33,7 @@ import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
-import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
-import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -49,7 +43,6 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ALBUM_CONTENT_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StyleUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
@@ -65,17 +58,9 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
 
     private lateinit var mManagerActivity: ManagerActivity
 
-    // View type panel
-    private lateinit var viewTypePanel: View
-    private lateinit var yearsButton: TextView
-    private lateinit var monthsButton: TextView
-    private lateinit var daysButton: TextView
-    private lateinit var allButton: TextView
-
     // List view
     private lateinit var listView: RecyclerView
     private lateinit var gridAdapter: GalleryAdapter
-    private lateinit var cardAdapter: GalleryCardAdapter
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var scroller: FastScroller
     private lateinit var scaleGestureHandler: ScaleGestureHandler
@@ -93,7 +78,6 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
 
     private var showBottomNav = true
 
-    private var selectedView = ALL_VIEW
     private var adapterType = 0
 
     val viewModel by viewModels<AlbumContentViewModel>()
@@ -106,17 +90,6 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
     private var order = 0
 
     companion object {
-        const val ALL_VIEW = 0
-
-        const val SPAN_CARD_PORTRAIT = 1
-        const val SPAN_CARD_LANDSCAPE = 2
-
-        const val DAYS_INDEX = 0
-        const val MONTHS_INDEX = 1
-        const val YEARS_INDEX = 2
-
-        const val VIEW_TYPE = "VIEW_TYPE"
-
         @JvmStatic
         fun getInstance(): AlbumContentFragment {
             return AlbumContentFragment()
@@ -308,10 +281,6 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
                 gridAdapter.submitList(newList)
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
     }
 
     private fun subscribeBaseObservers() {
