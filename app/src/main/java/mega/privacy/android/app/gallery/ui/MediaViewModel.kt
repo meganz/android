@@ -88,7 +88,12 @@ class MediaViewModel @Inject constructor(
         if (forceUpdate) {
             viewModelScope.launch {
                 cancelToken = initNewSearch()
-                repository.getFiles(cancelToken!!, sortOrderManagement.getOrderCamera(), mZoom, currentHandle)
+                repository.getFiles(
+                    cancelToken!!,
+                    sortOrderManagement.getOrderCamera(),
+                    mZoom,
+                    currentHandle!!
+                )
             }
         } else {
             repository.emitFiles()
