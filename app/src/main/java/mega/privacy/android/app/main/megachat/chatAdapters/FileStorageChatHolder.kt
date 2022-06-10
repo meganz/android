@@ -4,6 +4,7 @@ package mega.privacy.android.app.main.megachat.chatAdapters
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
@@ -53,6 +54,7 @@ class FileStorageChatHolder(
                             cameraSelector,
                             preview)
 
+                        previewView.scaleType = PreviewView.ScaleType.FILL_START
                         preview.setSurfaceProvider(previewView.surfaceProvider)
 
                     }, ContextCompat.getMainExecutor(root.context))

@@ -12,35 +12,35 @@
             android:id="@+id/take_picture_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/self_feed_floating_window_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
-                android:id="@+id/container"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/self_feed_floating_window_background">
+                app:cardCornerRadius="12dp">
 
                 <androidx.camera.view.PreviewView
                     android:id="@+id/preview_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:background="@android:color/transparent" />
-            </FrameLayout>
+                    android:background="@android:color/transparent"
+                    android:foreground="@android:color/transparent" />
 
-            <ImageView
-                android:id="@+id/take_picture_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_take_photo"
-                android:visibility="visible"
-                app:tint="@color/white"
-                tools:ignore="ContentDescription" />
-
+                <ImageView
+                    android:id="@+id/take_picture_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:src="@drawable/ic_take_photo"
+                    android:visibility="visible"
+                    app:tint="@color/white"
+                    tools:ignore="ContentDescription" />
+            </androidx.cardview.widget.CardView>
         </RelativeLayout>
 
         <RelativeLayout
