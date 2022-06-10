@@ -26,7 +26,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.favourites.model.ClickEventState
+import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -38,6 +38,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FavouriteFolderFragment: Fragment() {
     private val viewModel by viewModels<FavouriteFolderViewModel>()
+    private val thumbnailViewModel by viewModels<ThumbnailViewModel>()
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
@@ -85,11 +86,14 @@ class FavouriteFolderFragment: Fragment() {
      */
     private fun setupAdapter(){
         adapter = FavouritesAdapter(
-            onItemClicked = { item ->
+            onItemClicked = { item, _, _->
                 viewModel.openFile(item)
             },
             onThreeDotsClicked = { item ->
                 viewModel.threeDotsClicked(item)
+            },
+            getThumbnail = { handle, onFinished ->
+                thumbnailViewModel.getThumbnail(handle, onFinished)
             }
         )
         binding.fileListViewBrowser.adapter = adapter
@@ -107,7 +111,9 @@ class FavouriteFolderFragment: Fragment() {
                         setToolbarText(childrenState.title)
                         adapter.submitList(childrenState.children)
                     } else if (childrenState is ChildrenNodesLoadState.Empty) {
-                        setToolbarText(childrenState.title)
+                        setToolbarText(
+                            childrenState.title ?: getString(R.string.favourites_category_title)
+                        )
                     }
                 }
             }
@@ -115,31 +121,32 @@ class FavouriteFolderFragment: Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.clickEventState.collect { clickEventState ->
-                    when (clickEventState) {
-                        is ClickEventState.Offline -> {
+                viewModel.favouritesEventState.collect { eventState ->
+                    when (eventState) {
+                        is FavouritesEventState.Offline -> {
                             Snackbar.make(
                                 requireView(),
                                 getString(R.string.error_server_connection_problem),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
-                        is ClickEventState.OpenBottomSheetFragment -> {
+                        is FavouritesEventState.OpenBottomSheetFragment -> {
                             (activity as ManagerActivity).showNodeOptionsPanel(
-                                clickEventState.favourite.node,
+                                eventState.favourite.node,
                                 NodeOptionsBottomSheetDialogFragment.FAVOURITES_MODE
                             )
                         }
-                        is ClickEventState.OpenFile -> {
-                            openNode(clickEventState.favouriteFile)
+                        is FavouritesEventState.OpenFile -> {
+                            openNode(eventState.favouriteFile)
                         }
-                        is ClickEventState.OpenFolder -> {
+                        is FavouritesEventState.OpenFolder -> {
                             findNavController().navigate(
                                 HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
-                                    clickEventState.parentHandle
+                                    eventState.parentHandle
                                 )
                             )
                         }
+                        is FavouritesEventState.ActionModeState -> {}
                     }
                 }
             }

@@ -13,6 +13,11 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaOffline
@@ -22,17 +27,26 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.DefaultDispatcher
 import mega.privacy.android.app.di.MainDispatcher
 import mega.privacy.android.app.domain.usecase.GetThumbnail
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
+import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
+import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
+import mega.privacy.android.app.utils.FileUtil.getFileInfo
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
 import mega.privacy.android.app.utils.RxUtil.logErr
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
-import java.util.*
+import java.util.Locale
+import java.util.Stack
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
 
@@ -40,6 +54,7 @@ import javax.inject.Inject
 class OfflineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
+    monitorNodeUpdates: MonitorNodeUpdates,
     private val getThumbnail: GetThumbnail,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -99,6 +114,15 @@ class OfflineViewModel @Inject constructor(
     var skipNextAutoScroll = false
 
     /**
+     * Monitor global node updates
+     */
+    var updateNodes: Flow<List<MegaNode>> =
+        monitorNodeUpdates()
+            .also { Timber.d("onNodesUpdate") }
+            .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+
+    /**
      * Job for processing OfflineNodes loading
      */
     var loadOfflineNodesJob: Job? = null
@@ -128,6 +152,14 @@ class OfflineViewModel @Inject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
+
+        viewModelScope.launch {
+            updateNodes =
+                monitorNodeUpdates()
+                    .also { Timber.d("onNodesUpdate") }
+                    .filterNot { it.isEmpty() }
+                    .stateIn(viewModelScope)
+        }
     }
 
     fun getSelectedNodes(): List<MegaOffline> {

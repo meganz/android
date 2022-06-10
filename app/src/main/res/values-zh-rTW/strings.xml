@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -325,7 +325,7 @@
     <!-- send a file to a MEGA user -->
     <string name="file_properties_send_file_select_contact">寄至</string>
     <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">所有者</string>
+    <string name="file_properties_owner">擁有者</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">邀請</string>
     <!-- option to reinvite a contact -->
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">清除快取</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">清除可離線存取檔案</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">下載完成後開啟檔案</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">刪除帳戶</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">ZIP Browser</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">帳戶類型</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">&#160;更新</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">到期&#160;</string>
     <!--  -->
     <string name="free_account">免費</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1094,7 +1088,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">現在就升級</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro方案帳戶以獲得更大儲存空間和傳輸配額。</string>
+    <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到您的還原金鑰檔案。[/A]注意：當您登出時，您的還原金鑰檔案將被刪除，因此請將它保存至您帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1540,7 +1534,7 @@
     <string name="error_editing_message">此訊息無法被編輯</string>
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
-        <item quantity="other">%2$d個檔案中的第%1$d個檔案</item>
+        <item quantity="other">%2$d之%1$d的檔案</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
     <string name="label_process_finishing">處理正在完成中&#8230;</string>
@@ -1614,7 +1608,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
-        <item quantity="other">已下載%2$d個%1$d個檔案</item>
+        <item quantity="other">已下載%2$d之%1$d個檔案</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
@@ -3348,7 +3342,7 @@
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">電話號碼</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
-    <string name="reconnecting_message">重新連線中</string>
+    <string name="reconnecting_message">正在重新連線</string>
     <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
     <string name="connected_message">你回來了。</string>
     <!-- Text shown in a call when the own internet connection is of low quality -->
@@ -4076,9 +4070,9 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">打開聯絡人連結</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
+    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度圖片</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度影像。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
+    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度圖片。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">您正在更改預設備份資料夾位置。這可能會影響您將來查找備份資料夾。所以請記住它的位置以便將來可以找到它。</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4166,7 +4160,7 @@
     <!-- Title of DCIM folder warning dialog -->
     <string name="title_dcim_folder_dialog">DCIM資料夾</string>
     <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的照片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
+    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的圖片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -4227,4 +4221,48 @@
     <string name="media_player_video_playlist_next">接下來</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">已播放</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">照片</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">在第三方應用程式中開啟不支援的檔案類型</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">不支援的檔案類型將在第三方應用程式而不是MEGA應用程式中開啟。</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">圖片品質</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">自動的</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">使用行動數據網路時發送最佳化的圖片，但使用Wi-Fi時則發送原始大小的圖片。</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">原始的</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">總是發送原始大小的圖片。</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">最佳化</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">總是發送最佳化的圖片。</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s已加入</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s和%2$s已加入</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s已離開</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s和%2$s已離開</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="other">%1$s和其他%2$d人已加入</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="other">%1$s和其他%2$d人已離開</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">永久刪除</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">刪除</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[B]%s[/B][A]更新[/A]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[B]%s[/B][A]到期[/A]</string>
 </resources>

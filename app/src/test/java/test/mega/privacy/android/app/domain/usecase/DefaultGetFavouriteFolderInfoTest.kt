@@ -39,7 +39,7 @@ class DefaultGetFavouriteFolderInfoTest {
                 favouriteFolderInfo
             )
             underTest(1).collect {
-                assertTrue(it.children.isNotEmpty())
+                assertTrue((it ?: return@collect).children.isNotEmpty())
             }
 
         }
@@ -58,7 +58,7 @@ class DefaultGetFavouriteFolderInfoTest {
                 favouriteFolderInfo
             )
             underTest(1).collect {
-                assertTrue(it.children.isNullOrEmpty())
+                assertTrue((it ?: return@collect).children.isEmpty())
             }
         }
     }

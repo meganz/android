@@ -5,17 +5,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.hasSibling
+import androidx.test.espresso.matcher.ViewMatchers.isChecked
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
+import androidx.test.espresso.matcher.ViewMatchers.isNotChecked
+import androidx.test.espresso.matcher.ViewMatchers.isNotEnabled
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.settings.advanced.SettingsAdvancedUseCases
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matcher
@@ -156,7 +160,7 @@ class SettingsAdvancedFragmentTest {
         rootNodeExists: Boolean = true
     ) {
         whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(isOnline)
-        whenever(TestInitialiseUseCases.rootNodeExists()).thenReturn(rootNodeExists)
+        runBlocking { whenever(TestInitialiseUseCases.rootNodeExists()).thenReturn(rootNodeExists) }
     }
 
     private fun verifyPreference(enabled: Matcher<View>?): ViewInteraction? {

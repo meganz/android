@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_gird_favourite"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_grid_folder"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_margin="2dp"
+        android:background="@drawable/background_item_grid"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/folder_icon_layout"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/folder_grid_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/folder_ic_selected"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_select_folder"
+            tools:ignore="ContentDescription" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/folder_grid_filename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/folder_grid_taken_down"
+            app:layout_constraintStart_toEndOf="@id/folder_icon_layout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/folder_grid_taken_down"
+            style="@style/taken_down_icon"
+            android:src="@drawable/ic_input_warning"
+            android:visibility="visible"
+            app:tint="@color/red_600_red_300"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/folder_grid_three_dots"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <ImageButton
+            android:id="@+id/folder_grid_three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/ic_dots_vertical_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorSecondary"
+            tools:ignore="ContentDescription" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/itemGridFile"
+        android:layout_width="match_parent"
+        android:layout_height="219dp"
+        android:layout_margin="2dp"
+        android:background="@drawable/background_item_grid"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/itemThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/grid_node_item_width"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="1dp"
+            android:paddingTop="1dp"
+            android:paddingRight="1dp"
+            app:actualImageScaleType="fitCenter" />
+
+        <!-- For Video only, video icon and duration -->
+        <FrameLayout
+            android:id="@+id/video_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="147dp"
+            android:background="@drawable/gradient_cam_uploads">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_play_arrow_white_24dp"
+                app:tint="?android:attr/textColorPrimary"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/videoDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="33dp"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/ic_selected"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:src="@drawable/ic_select_folder"
+            tools:ignore="ContentDescription" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/grid_node_item_width"
+            android:background="@color/grey_012_white_012" />
+
+        <LinearLayout
+            android:id="@+id/filename_container"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_marginTop="@dimen/grid_node_item_width"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/filename"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:textSize="14sp"
+                tools:text="2048.jpg" />
+
+            <ImageView
+                android:id="@+id/taken_down"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:src="@drawable/ic_input_warning"
+                app:tint="@color/red_600_red_300"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:src="@drawable/ic_dots_vertical_grey"
+                app:tint="?android:attr/textColorSecondary"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

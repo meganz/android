@@ -76,8 +76,6 @@ class DefaultAccountRepository @Inject constructor(
 
     override fun requestAccount() = (context as MegaApplication).askForAccountDetails()
 
-    override fun getRootNode(): MegaNode? = megaApiGateway.rootNode
-
     override fun isMultiFactorAuthAvailable() = megaApiGateway.multiFactorAuthAvailable()
 
     @Throws(MegaException::class)

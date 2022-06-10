@@ -71,6 +71,13 @@ class ContactListFragment : Fragment() {
         super.onDestroyView()
     }
 
+    /**
+     * Start call
+     */
+    fun startCall() {
+        viewModel.startCall()
+    }
+
     private fun setupView() {
         val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
         binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
