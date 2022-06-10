@@ -1,6 +1,14 @@
 package mega.privacy.android.app.gallery.ui
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -85,21 +93,17 @@ class MediaViewModel @Inject constructor(
      * the showing data from the UI layer, it will come from liveDataRoot
      */
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
-        if (forceUpdate) {
-            viewModelScope.launch {
-                cancelToken = initNewSearch()
+        liveData(viewModelScope.coroutineContext) {
+            if (forceUpdate) {
                 repository.getFiles(
-                    cancelToken!!,
                     sortOrderManagement.getOrderCamera(),
                     mZoom,
-                    currentHandle!!
-                )
+                    currentHandle ?: return@liveData)
+            } else {
+                repository.emitFiles()
             }
-        } else {
-            repository.emitFiles()
+            emit(repository.galleryItems.value ?: return@liveData)
         }
-
-        repository.galleryItems
     }.map {
         var index = 0
         var photoIndex = 0
@@ -241,14 +245,5 @@ class MediaViewModel @Inject constructor(
                 return it.size
             }
         return 0
-    }
-
-    fun initNewSearch(): MegaCancelToken {
-        cancelSearch()
-        return MegaCancelToken.createInstance()
-    }
-
-    fun cancelSearch() {
-        cancelToken?.cancel()
     }
 }

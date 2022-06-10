@@ -6,13 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.fetcher.MediaFetcher
-import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.util.*
 import javax.inject.Inject
@@ -42,7 +39,6 @@ class MediaItemRepository @Inject constructor(
      * @param handle
      */
     suspend fun getFiles(
-        cancelToken: MegaCancelToken,
         order: Int,
         zoom: Int,
         handle: Long
@@ -56,7 +52,7 @@ class MediaItemRepository @Inject constructor(
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
         withContext(Dispatchers.IO) {
-            nodesFetcher.getGalleryItems(cancelToken)
+            nodesFetcher.getGalleryItems()
         }
     }
 
