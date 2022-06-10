@@ -209,7 +209,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
                 testers = readTesters()
             }
         }
