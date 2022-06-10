@@ -22,25 +22,13 @@ import javax.inject.Singleton
 class MediaItemRepository @Inject constructor(
     @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbHandler: DatabaseHandler,
 ) {
-
-    fun initGalleryNodeFetcher(
-        context: Context,
-        megaApi: MegaApiAndroid,
-        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-        order: Int,
-        zoom: Int,
-        handle: Long?
-    ): GalleryBaseFetcher {
-        return MediaFetcher(context, megaApi, selectedNodesMap, order, zoom, handle!!)
-    }
 
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
 
     /** Current effective NodeFetcher */
-    lateinit var nodesFetcher: GalleryBaseFetcher
+    lateinit var nodesFetcher: MediaFetcher
 
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem> = LinkedHashMap()
@@ -57,20 +45,13 @@ class MediaItemRepository @Inject constructor(
         cancelToken: MegaCancelToken,
         order: Int,
         zoom: Int,
-        handle: Long? = null
+        handle: Long
     ) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = initGalleryNodeFetcher(
-            context,
-            megaApi,
-            selectedNodesMap,
-            order,
-            zoom,
-            handle
-        )
+        nodesFetcher = MediaFetcher(context, megaApi, selectedNodesMap, order, zoom, handle)
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
