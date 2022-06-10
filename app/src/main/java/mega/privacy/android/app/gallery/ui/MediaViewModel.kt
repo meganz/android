@@ -9,7 +9,6 @@ import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
@@ -28,6 +27,22 @@ class MediaViewModel @Inject constructor(
     private val sortOrderManagement: SortOrderManagement,
     savedStateHandle: SavedStateHandle? = null
 ) : ViewModel() {
+
+    companion object {
+        const val ALL_VIEW = 0
+        const val DAYS_VIEW = 1
+        const val MONTHS_VIEW = 2
+        const val YEARS_VIEW = 3
+
+        const val SPAN_CARD_PORTRAIT = 1
+        const val SPAN_CARD_LANDSCAPE = 2
+
+        const val DAYS_INDEX = 0
+        const val MONTHS_INDEX = 1
+        const val YEARS_INDEX = 2
+
+        const val VIEW_TYPE = "VIEW_TYPE"
+    }
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
@@ -141,8 +156,8 @@ class MediaViewModel @Inject constructor(
     fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
         position,
         card,
-        dateCards.value?.get(BaseZoomFragment.MONTHS_INDEX),
-        dateCards.value?.get(BaseZoomFragment.YEARS_INDEX)
+        dateCards.value?.get(MONTHS_INDEX),
+        dateCards.value?.get(YEARS_INDEX)
     )
 
     /**
@@ -156,8 +171,8 @@ class MediaViewModel @Inject constructor(
     fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
         position,
         card,
-        dateCards.value?.get(BaseZoomFragment.DAYS_INDEX),
-        dateCards.value?.get(BaseZoomFragment.MONTHS_INDEX)
+        dateCards.value?.get(DAYS_INDEX),
+        dateCards.value?.get(MONTHS_INDEX)
     )
 
     private val nodesChangeObserver = Observer<Boolean> {
