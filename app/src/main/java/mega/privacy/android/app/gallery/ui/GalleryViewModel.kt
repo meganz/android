@@ -1,6 +1,13 @@
 package mega.privacy.android.app.gallery.ui
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -16,7 +23,6 @@ import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -24,7 +30,7 @@ import nz.mega.sdk.MegaNode
 abstract class GalleryViewModel constructor(
     private val repository: GalleryItemRepository,
     private val sortOrderManagement: SortOrderManagement,
-    savedStateHandle: SavedStateHandle? = null
+    savedStateHandle: SavedStateHandle? = null,
 ) : BaseRxViewModel(), SearchCallback.Data {
 
     var currentHandle: Long? = null
@@ -81,16 +87,18 @@ abstract class GalleryViewModel constructor(
      * the showing data from the UI layer, it will come from liveDataRoot
      */
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
-        if (forceUpdate) {
-            viewModelScope.launch {
+        liveData(viewModelScope.coroutineContext) {
+            if (forceUpdate) {
                 cancelToken = initNewSearch()
-                repository.getFiles(cancelToken!!, sortOrderManagement.getOrderCamera(), mZoom, currentHandle)
+                repository.getFiles(cancelToken ?: return@liveData,
+                    sortOrderManagement.getOrderCamera(),
+                    mZoom,
+                    currentHandle)
+            } else {
+                repository.emitFiles()
             }
-        } else {
-            repository.emitFiles()
+            emit(repository.galleryItems.value ?: return@liveData)
         }
-
-        repository.galleryItems
     }.map {
         var index = 0
         var photoIndex = 0

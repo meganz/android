@@ -308,6 +308,7 @@ import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
@@ -1452,10 +1453,26 @@ public class ManagerActivity extends TransfersManagementActivity
         logDebug("onCreate after call super");
 
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
-        viewModel.getUpdateUsers().observe(this, this::updateUsers);
-        viewModel.getUpdateUserAlerts().observe(this, this::updateUserAlerts);
-        viewModel.getUpdateNodes().observe(this, this::updateNodes);
-        viewModel.getUpdateContactsRequests().observe(this, this::updateContactRequests);
+        viewModel.getUpdateUsers().observe(this,
+                new EventObserver<>(users -> {
+                    updateUsers(users);
+                    return null;
+                }));
+        viewModel.getUpdateUserAlerts().observe(this,
+                new EventObserver<>(userAlerts -> {
+                    updateUserAlerts(userAlerts);
+                    return null;
+                }));
+        viewModel.getUpdateNodes().observe(this,
+                new EventObserver<>(nodes -> {
+                    updateNodes(nodes);
+                    return null;
+                }));
+        viewModel.getUpdateContactsRequests().observe(this,
+                new EventObserver<>(contactRequests -> {
+                    updateContactRequests(contactRequests);
+                    return null;
+                }));
 
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,

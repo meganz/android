@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
@@ -105,18 +106,17 @@ class TimelineViewModel @Inject constructor(
      * the showing data from the UI layer, it will come from liveDataRoot
      */
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
-        if (forceUpdate) {
-            viewModelScope.launch {
+        liveData(viewModelScope.coroutineContext) {
+            if (forceUpdate) {
                 cancelToken = initNewSearch()
-                repository.getFiles(cancelToken ?: return@launch,
+                repository.getFiles(cancelToken ?: return@liveData,
                     sortOrderManagement.getOrderCamera(),
                     mZoom)
+            } else {
+                repository.emitFiles()
             }
-        } else {
-            repository.emitFiles()
+            emit(repository.galleryItems.value ?: return@liveData)
         }
-
-        repository.galleryItems
     }.map {
         var index = 0
         var photoIndex = 0
