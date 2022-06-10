@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.Preference
+    android:title="@string/settings_qa"
+    android:fragment="mega.privacy.android.app.presentation.settings.QASettingsFragment"
+    />
+</PreferenceScreen>
