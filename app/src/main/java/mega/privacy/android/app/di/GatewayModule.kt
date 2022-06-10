@@ -14,9 +14,11 @@ import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
 
 /**
@@ -53,5 +55,10 @@ abstract class GatewayModule {
     @Binds
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
 
+    /**
+     * Binds @FeatureFlagPreferencesGateway
+     */
+    @Binds
+    abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
 }

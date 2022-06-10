@@ -382,6 +382,9 @@ dependencies {
     implementation "com.github.tony19:logback-android:$logbackVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
+    // Preference DataStore
+    implementation "androidx.datastore:datastore-preferences:$prefrenceDataStoreVersion"
+
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"

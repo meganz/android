@@ -52,4 +52,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalUpdatesRepository): GlobalUpdatesRepository
+
+    /**
+     * Binds @FeatureFlagRepository
+     */
+    @Binds
+    abstract fun bindFeatureFlagRepository(repository: DefaultFeatureFlagRepository): FeatureFlagRepository
 }

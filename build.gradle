@@ -16,7 +16,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.gms:google-services:$googleServicesVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
@@ -68,7 +68,7 @@ ext {
     bannerViewPagerVersion = '3.4.0'
     biometricVersion = '1.1.0'
     cardViewVersion = '1.0.0'
-    composeVersion = '1.1.1'
+    composeVersion = '1.2.0-beta02'
     constraintLayoutVersion = '2.1.1'
     coroutinesVersion = "1.6.0"
     coroutineTestVersion = '1.6.0'
@@ -107,4 +107,5 @@ ext {
     turbineVersion = '0.7.0'
     viewPagerVersion = '1.0.0'
     workVersion = '2.7.1'
+    prefrenceDataStoreVersion = '1.0.0'
 }
