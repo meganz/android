@@ -17,7 +17,7 @@ class DefaultGetFavouriteFolderInfo @Inject constructor(private val repository: 
     GetFavouriteFolderInfo {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun invoke(parentHandle: Long): Flow<FavouriteFolderInfo> =
+    override fun invoke(parentHandle: Long): Flow<FavouriteFolderInfo?> =
         flow {
             emit(repository.getChildren(parentHandle))
             emitAll(repository.monitorNodeChange().mapLatest {

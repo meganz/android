@@ -67,7 +67,7 @@
     <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
     <string name="payment_efraud">Recusado pelo sistema de antifraude</string>
     <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-    <string name="payment_etoomay">Solicitações em excesso.</string>
+    <string name="payment_etoomay">Solicitações em excesso</string>
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
     <string name="payment_ebalance">Erro no saldo</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->

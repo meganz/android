@@ -1,17 +1,52 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.CONTACT_SHARED_FOLDER_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PORT;
+import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
+import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeBackupDeviceInfo;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderLinkInfo;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
+import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownDialog;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewForList;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewOrCreateForList;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
+import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOffline;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -28,6 +63,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,10 +84,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.databinding.SortByHeaderBinding;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
 import mega.privacy.android.app.main.ContactSharedFolderFragment;
@@ -59,7 +100,6 @@ import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
 import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
 import mega.privacy.android.app.main.managerSections.RubbishBinFragment;
 import mega.privacy.android.app.main.managerSections.SearchFragment;
-
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
@@ -68,19 +108,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, NodeTakenDownDialogListener, DragThumbnailGetter {
 
@@ -91,7 +118,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private Context context;
     private MegaApiAndroid megaApi;
 
-    private ArrayList<MegaNode> nodes;
+    private List<MegaNode> nodes;
 
     private Object fragment;
     private long parentHandle = -1;
@@ -466,7 +493,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @param nodes Origin nodes to show.
      * @return Nodes list with placeholder.
      */
-    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+    private List<MegaNode> insertPlaceHolderNode(List<MegaNode> nodes) {
         if (adapterType == ITEM_VIEW_TYPE_LIST) {
             if (shouldShowSortByHeader(nodes)) {
                 placeholderCount = 1;
@@ -514,7 +541,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @param nodes List of nodes to check if is empty or not.
      * @return True if should show the sort by header, false otherwise.
      */
-    private boolean shouldShowSortByHeader(ArrayList<MegaNode> nodes) {
+    private boolean shouldShowSortByHeader(List<MegaNode> nodes) {
         return !nodes.isEmpty() && type != FOLDER_LINK_ADAPTER
                 && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
     }
@@ -528,12 +555,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         });
     }
 
-    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+    public MegaNodeAdapter(Context context, Object fragment, List<MegaNode> nodes,
                            long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
         initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
     }
 
-    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+    public MegaNodeAdapter(Context context, Object fragment, List<MegaNode> nodes,
                            long parentHandle, RecyclerView recyclerView, int type, int adapterType,
                            SortByHeaderViewModel sortByHeaderViewModel) {
         initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
@@ -551,7 +578,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @param type         Fragment adapter type.
      * @param adapterType  List or grid adapter type.
      */
-    private void initAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+    private void initAdapter(Context context, Object fragment, List<MegaNode> nodes,
                              long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
 
         this.context = context;
@@ -595,7 +622,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     }
 
-    public void setNodes(ArrayList<MegaNode> nodes) {
+    public void setNodes(List<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         logDebug("setNodes size: " + this.nodes.size());
         notifyDataSetChanged();

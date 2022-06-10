@@ -6756,6 +6756,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .getDefaultAvatarDrawable(context, name, getColorAvatar(userHandle), GetAvatarUseCase.AvatarType.MINI));
 
         /*Avatar*/
+        holder.contactImageView.setImageRequest(null);
         File avatar = CacheFolderManager.buildAvatarFile(context, userHandleEncoded + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 

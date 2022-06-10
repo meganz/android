@@ -188,7 +188,7 @@ class MegaContactGetter(val context: Context) {
         updater?.onFinish(filteredList)
     }
 
-    private fun MutableList<MegaContact>.filterOut(api: MegaApiJava): List<MegaContact> {
+    private fun MutableList<MegaContact>.filterOut(api: MegaApiJava): MutableList<MegaContact> {
         val emails = this.map { it.email }
         ContactsFilter.filterOutContacts(api, emails)
         ContactsFilter.filterOutPendingContacts(api, emails)
@@ -201,7 +201,9 @@ class MegaContactGetter(val context: Context) {
             }
         }
 
-        return sortedBy { it.localName ?: "" }
+        sortedBy { it.localName ?: "" }
+
+        return this
     }
 
     private fun getCurrentContactIndex(): MegaContact? {
@@ -307,7 +309,7 @@ class MegaContactGetter(val context: Context) {
          *
          * @param megaContacts Registerd mega contacts with all the info needed.
          */
-        fun onFinish(megaContacts: List<MegaContact>?)
+        fun onFinish(megaContacts: MutableList<MegaContact>?)
 
         /**
          * When mega request failed.

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">برو لايت Pro Lite</string>
@@ -776,8 +776,6 @@
     <string name="settings_advanced_features_cache">حذف ذاكرة التخزين المؤقت Cache</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">حذف ملفات المحملة دون اتصال</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">افتح الملف عند التنزيل</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">حذف الحساب</string>
     <!-- Size of files in offline or cache folders -->
@@ -989,10 +987,6 @@
     <string name="zip_browser_activity">متصفح مضغوط</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">نوع الحساب</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">يتجدد في&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">تنتهي صلاحيته في&#160;</string>
     <!--  -->
     <string name="free_account">مجاناً</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -4707,4 +4701,58 @@
     <string name="media_player_video_playlist_next">التالي</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">السابق</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">تطبيق الصور</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">افتح أنواع الملفات غير المدعومة في تطبيقات الطرف الثالث</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">سيتم فتح أنواع الملفات غير المدعومة في تطبيقات الطرف الثالث بدلاً من تطبيق ميغا MEGA.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">جودة الصورة</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">تلقائي</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">أرسل صورًا معدلة الجودة عندما تكون على بيانات الهاتف المحمول ولكن صور بالحجم الأصلي عند الاتصال بشبكة واي فاي Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">الأصلية</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">دائما إرسال الصور بالحجم الأصلي.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">معدل</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">دائما إرسال الصور بالحجم المعدل.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s انضم</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s و %2$s انضما</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s غادر</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s و%2$s غادرا</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="zero">انضم %1$s و %2$d آخر</item>
+        <item quantity="one">انضم %1$s و 1 آخر</item>
+        <item quantity="two">انضم %1$s و %2$d آخران</item>
+        <item quantity="few">انضم %1$s و %2$d آخرون</item>
+        <item quantity="many">انضم %1$s و %2$d آخرون</item>
+        <item quantity="other">انضم %1$s و %2$d آخرون</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="zero">غادر %1$s و %2$d آخر</item>
+        <item quantity="one">غادر %1$s و 1 آخر</item>
+        <item quantity="two">غادر %1$s و %2$d آخران</item>
+        <item quantity="few">غادر %1$s و %2$d آخرون</item>
+        <item quantity="many">غادر %1$s و %2$d آخرون</item>
+        <item quantity="other">غادر %1$s و %2$d آخرون</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">حذف بشكل دائم</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">حذف</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]يتجدد في[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]ينتهي في[/A] [B]%s[/B]</string>
 </resources>

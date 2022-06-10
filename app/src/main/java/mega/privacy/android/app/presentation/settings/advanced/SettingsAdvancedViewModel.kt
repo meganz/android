@@ -4,7 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.IsUseHttpsEnabled
@@ -44,15 +50,15 @@ class SettingsAdvancedViewModel @Inject constructor(
             merge(
                 checkPreferenceCheckedState(isUseHttpsEnabled),
                 checkPreferenceEnabledState(monitorConnectivity, rootNodeExists),
-            ).collect{
+            ).collect {
                 _state.update(it)
             }
         }
     }
 
-    private fun checkPreferenceEnabledState(
+    private suspend fun checkPreferenceEnabledState(
         monitorConnectivity: MonitorConnectivity,
-        rootNodeExists: RootNodeExists
+        rootNodeExists: RootNodeExists,
     ) = combine(
         monitorConnectivity(),
         flowOf(rootNodeExists())

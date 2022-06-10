@@ -1,15 +1,13 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.MegaAttributes
-import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.domain.entity.ChatImageQuality
 
 /**
  * Settings repository - class for handling all calls relating to settings
  *
  */
-interface SettingsRepository{
+interface SettingsRepository {
     /**
      * Is sdk logging enabled
      *
@@ -131,4 +129,108 @@ interface SettingsRepository{
      */
     suspend fun setChatImageQuality(quality: ChatImageQuality)
 
+    /**
+     * Set string preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setStringPreference(key: String?, value: String?)
+
+    /**
+     * Set string set preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setStringSetPreference(key: String?, value: MutableSet<String>?)
+
+    /**
+     * Set int preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setIntPreference(key: String?, value: Int?)
+
+    /**
+     * Set long preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setLongPreference(key: String?, value: Long?)
+
+    /**
+     * Set float preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setFloatPreference(key: String?, value: Float?)
+
+    /**
+     * Set boolean preference
+     *
+     * @param key
+     * @param value
+     */
+    suspend fun setBooleanPreference(key: String?, value: Boolean?)
+
+    /**
+     * Monitor string preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorStringPreference(key: String?, defaultValue: String?): Flow<String?>
+
+    /**
+     * Monitor string set preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorStringSetPreference(
+        key: String?,
+        defaultValue: MutableSet<String>?,
+    ): Flow<MutableSet<String>?>
+
+    /**
+     * Monitor int preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorIntPreference(key: String?, defaultValue: Int): Flow<Int>
+
+    /**
+     * Monitor long preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorLongPreference(key: String?, defaultValue: Long): Flow<Long>
+
+    /**
+     * Monitor float preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorFloatPreference(key: String?, defaultValue: Float): Flow<Float>
+
+    /**
+     * Monitor boolean preference
+     *
+     * @param key
+     * @param defaultValue
+     * @return current preference and future updates as a flow
+     */
+    fun monitorBooleanPreference(key: String?, defaultValue: Boolean): Flow<Boolean>
 }

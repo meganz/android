@@ -1,15 +1,16 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.domain.repository.AccountRepository
+import mega.privacy.android.app.domain.repository.FilesRepository
 import javax.inject.Inject
 
 /**
  * Default root node exists
  *
- * @property accountRepository
+ * @property filesRepository
  */
-class DefaultRootNodeExists @Inject constructor(private val accountRepository: AccountRepository) : RootNodeExists {
-    override fun invoke(): Boolean {
-        return accountRepository.getRootNode() != null
+class DefaultRootNodeExists @Inject constructor(private val filesRepository: FilesRepository) :
+    RootNodeExists {
+    override suspend fun invoke(): Boolean {
+        return filesRepository.getRootNode() != null
     }
 }

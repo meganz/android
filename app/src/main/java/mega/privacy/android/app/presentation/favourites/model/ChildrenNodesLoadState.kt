@@ -6,9 +6,9 @@ package mega.privacy.android.app.presentation.favourites.model
 sealed interface ChildrenNodesLoadState {
     /**
      * Get children nodes success
-     * @param children List<FavouriteItemUIO>
+     * @param children List<FavouriteItem>
      */
-    data class Success(val title: String, val children: List<Favourite>): ChildrenNodesLoadState
+    data class Success(val title: String, val children: List<FavouriteItem>): ChildrenNodesLoadState
 
     /**
      * Loading state
@@ -17,6 +17,7 @@ sealed interface ChildrenNodesLoadState {
 
     /**
      * The children nodes is empty
+     * @param title title of current folder
      */
-    data class Empty(val title: String): ChildrenNodesLoadState
+    data class Empty(val title: String?): ChildrenNodesLoadState
 }

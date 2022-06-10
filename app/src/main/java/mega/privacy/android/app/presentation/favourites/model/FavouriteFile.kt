@@ -6,20 +6,6 @@ import nz.mega.sdk.MegaNode
 
 /**
  * The favourite file entity
- * @param handle handle
- * @param icon icon drawable resource id
- * @param name name
- * @param labelColour label color resource id
- * @param showLabel label icon whether is shown
- * @param node MegaNode
- * @param hasVersion The current item if has version
- * @param info the current file info
- * @param isFavourite whether is favourite
- * @param isExported whether is exported
- * @param isTakenDown whether is taken down
- * @param isAvailableOffline whether is available for offline
- * @param lastModifiedTime file last modified time
- * @param size file size
  */
 data class FavouriteFile(
     override val handle: Long,
@@ -34,8 +20,11 @@ data class FavouriteFile(
     override val isExported: Boolean,
     override val isTakenDown: Boolean,
     override val isAvailableOffline: Boolean,
-    val lastModifiedTime: Long,
-    val size: Long
-) : Favourite{
+    override val isSelected: Boolean = false,
+    override val thumbnailPath: String?,
+    override val size: Long,
+    override val label: Int,
+    override val modificationTime: Long
+) : Favourite {
     override val isFolder = false
 }

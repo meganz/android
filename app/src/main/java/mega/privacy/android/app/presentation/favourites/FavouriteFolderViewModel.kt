@@ -6,32 +6,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
-import mega.privacy.android.app.presentation.extensions.toFavourite
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
-import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.favourites.model.ClickEventState
-import mega.privacy.android.app.presentation.favourites.model.Favourite
-import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
-import nz.mega.sdk.MegaNode
+import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.favourites.model.*
+import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import javax.inject.Inject
 
 /**
  * The view model regarding favourite folder
  * @param context Context
  * @param getFavouriteFolderInfo DefaultGetChildrenByNode
+ * @param favouriteMapper FavouriteMapper
  * @param stringUtilWrapper StringUtilWrapper
  * @param savedStateHandle SavedStateHandle
  */
 @HiltViewModel
 class FavouriteFolderViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFavouriteFolderInfo: GetFavouriteFolderInfo,
+    private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
     private val megaUtilWrapper: MegaUtilWrapper,
     savedStateHandle: SavedStateHandle
@@ -42,8 +45,8 @@ class FavouriteFolderViewModel @Inject constructor(
         MutableStateFlow<ChildrenNodesLoadState>(ChildrenNodesLoadState.Loading)
     val childrenNodesState = _childrenNodesState.asStateFlow()
 
-    private val _clickEventState = MutableSharedFlow<ClickEventState>(replay = 0)
-    val clickEventState = _clickEventState.asSharedFlow()
+    private val _favouritesEventState = MutableSharedFlow<FavouritesEventState>(replay = 0)
+    val favouritesEventState = _favouritesEventState.asSharedFlow()
 
     private var currentFavouriteFolderInfo: FavouriteFolderInfo? = null
 
@@ -67,32 +70,42 @@ class FavouriteFolderViewModel @Inject constructor(
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            getFavouriteFolderInfo(parentHandle).collect { folderInfo ->
+            getFavouriteFolderInfo(parentHandle).collectLatest { folderInfo ->
                 currentFavouriteFolderInfo = folderInfo
                 _childrenNodesState.update {
-                    when {
-                        folderInfo.children.isNullOrEmpty() -> {
-                            ChildrenNodesLoadState.Empty(folderInfo.name)
-                        }
-                        folderInfo.children.isNotEmpty() -> {
-                            ChildrenNodesLoadState.Success(
-                                folderInfo.name,
-                                folderInfo.children.map { favouriteInfo ->
-                                    favouriteInfo.toFavourite(
-                                        { node: MegaNode ->
-                                            megaUtilWrapper.availableOffline(
-                                                context,
-                                                node
+                    folderInfo?.run {
+                        when {
+                            children.isEmpty() -> {
+                                ChildrenNodesLoadState.Empty(folderInfo.name)
+                            }
+                            children.isNotEmpty() -> {
+                                withContext(ioDispatcher) {
+                                    ChildrenNodesLoadState.Success(
+                                        title = name,
+                                        children = children.map { favouriteInfo ->
+                                            FavouriteListItem(
+                                                favourite = favouriteMapper(
+                                                    favouriteInfo,
+                                                    { node ->
+                                                        megaUtilWrapper.availableOffline(
+                                                            context,
+                                                            node
+                                                        )
+                                                    },
+                                                    stringUtilWrapper,
+                                                    { name ->
+                                                        MimeTypeList.typeForName(name).iconResourceId
+                                                    }
+                                                )
                                             )
-                                        },
-                                        stringUtilWrapper
-                                    )
-                                })
+                                        })
+                                }
+                            }
+                            else -> {
+                                ChildrenNodesLoadState.Loading
+                            }
                         }
-                        else -> {
-                            ChildrenNodesLoadState.Loading
-                        }
-                    }
+                    } ?: ChildrenNodesLoadState.Empty(null)
                 }
             }
         }
@@ -124,7 +137,7 @@ class FavouriteFolderViewModel @Inject constructor(
             getChildrenNodes(favourite.handle)
         } else {
             viewModelScope.launch {
-                _clickEventState.emit(ClickEventState.OpenFile(favourite as FavouriteFile))
+                _favouritesEventState.emit(FavouritesEventState.OpenFile(favourite as FavouriteFile))
             }
         }
     }
@@ -135,11 +148,11 @@ class FavouriteFolderViewModel @Inject constructor(
      */
     fun threeDotsClicked(favourite: Favourite) {
         viewModelScope.launch {
-            _clickEventState.emit(
+            _favouritesEventState.emit(
                 if (megaUtilWrapper.isOnline(context)) {
-                    ClickEventState.OpenBottomSheetFragment(favourite)
+                    FavouritesEventState.OpenBottomSheetFragment(favourite)
                 } else {
-                    ClickEventState.Offline
+                    FavouritesEventState.Offline
                 }
             )
         }

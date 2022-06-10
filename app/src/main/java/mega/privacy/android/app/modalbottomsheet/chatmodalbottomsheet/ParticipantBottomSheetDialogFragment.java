@@ -10,10 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
@@ -238,10 +238,9 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                if (canCallBeStartedFromContactOption((GroupChatInfoActivity) requireActivity(), passcodeManagement)) {
-                    startNewCall((GroupChatInfoActivity) requireActivity(),
-                            (SnackbarShower) requireActivity(),
-                            megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
+                MegaApplication.setUserWaitingForCall(participantHandle);
+                if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
+                    ((GroupChatInfoActivity) requireActivity()).startCall();
                 }
                 break;
 

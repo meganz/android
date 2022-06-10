@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -739,15 +739,13 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">Comprimarea video folosește cantități considerabile de energie. Te rugăm să conectezi dispozitivul la priză pentru încărcare dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Dacă opțiunea este activată, informațiile privind locația vor fi incluse în fotografii. Te rugăm să fii atent(ă) atunci când le partajezi.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Avansat</string>
     <!-- Settings preference title for cache -->
     <string name="settings_advanced_features_cache">Șterge cache-ul</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Șterge fișierele offline</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Deschide fișierul când este descărcat</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Șterge contul</string>
     <!-- Size of files in offline or cache folders -->
@@ -953,10 +951,6 @@
     <string name="zip_browser_activity">Răsfoitor ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Tipul contului</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Se reînoiește &#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expiră&#160;</string>
     <!--  -->
     <string name="free_account">Gratuit</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1765,7 +1759,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Utilizatorul nu este un contact</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Folosește conexiune celulară</string>
+    <string name="camera_uploads_cellular_connection">Folosește conexiunea de rețea celulară</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Încarcă videoclipuri</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -2631,8 +2625,9 @@
     <string name="settings_file_management_file_versions_title">Versiunile fișierelor</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 file version, taking a total of %2$s</item>
-        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+        <item quantity="one">1 versiune a unui fișier, ocupând un total de %2$s</item>
+        <item quantity="few">%1$d versiuni ale fișierelor, ocupând un total de %2$s</item>
+        <item quantity="other">%1$d de versiuni ale fișierelor, ocupând un total de %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Managementul fișierelor</string>
@@ -2878,8 +2873,9 @@
     <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="one">%d fișier nu a fost descărcat deoarece încălca Termenii de utilizare a serviciului.</item>
+        <item quantity="few">%d fișiere nu au fost descărcate deoarece încălcau Termenii de utilizare a serviciului.</item>
+        <item quantity="other">%d de fișiere nu au fost descărcate deoarece încălcau Termenii de utilizare a serviciului.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
@@ -2918,9 +2914,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Unică (un an)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
+    <string name="billed_monthly_text">[A]Facturat lunar[/A] %s/lună</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
+    <string name="billed_yearly_text">[A]Facturat anual[/A] %s/an</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Anulează</string>
     <!-- dialog option continue in alert dialog -->
@@ -3626,13 +3622,13 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Chat nou</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]No[/B] [A]images[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_photos">[B]Nicio[/B] [A]imagine[/A] [B]găsită[/B]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_documents">[B]No[/B] [A]documents[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_documents">[B]Niciun[/B] [A]document[/A] [B]găsit[/B]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audio files[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_audio">[B]Niciun[/B] [A]fișier audio[/A] [B]găsit[/B]</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_video">[B]Niciun[/B] [A]video[/A] [B]găsit[/B]</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Caută pe GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3762,7 +3758,7 @@
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Upgradează la Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
-    <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
+    <string name="link_upgrade_pro_explanation">Utilizatorii MEGA Pro au acces exclusiv la funcții suplimentare de siguranță pentru linkuri, făcând contul și mai securizat.</string>
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
@@ -3886,7 +3882,7 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Informații</string>
     <!-- settings of the Media section -->
-    <string name="settings_media">Mass-media</string>
+    <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Fișiere audio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
@@ -3900,7 +3896,7 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Zile</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
-    <string name="months_view_button">Months</string>
+    <string name="months_view_button">Luni</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Ani</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
@@ -3929,33 +3925,39 @@
     <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">1 file already downloaded. %d files pending.</item>
+        <item quantity="one">1 fișier descărcat deja. 1 fișier în așteptare.</item>
+        <item quantity="few">1 fișier descărcat deja. %d fișiere în așteptare.</item>
+        <item quantity="other">1 fișier descărcat deja. %d de fișiere în așteptare.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
-        <item quantity="other">%d files already downloaded. 1 file pending.</item>
+        <item quantity="one">1 fișier descărcat deja. 1 fișier în așteptare.</item>
+        <item quantity="few">%d fișiere descărcate deja. 1 fișier în așteptare.</item>
+        <item quantity="other">%d de fișiere descărcate deja. 1 fișier în așteptare.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost mutat în coșul de gunoi, însă %d elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost mutat în coșul de gunoi, însă %d de elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+        <item quantity="one">1 element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost restaurat, însă %d elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost restaurat, însă %d de elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+        <item quantity="one">1 element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
@@ -3988,17 +3990,17 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Adaugă numărul tău de telefon</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">Modifică name</string>
+    <string name="change_name_action">Modifică numele</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Add photo</string>
+    <string name="add_photo_action">Adaugă o fotografie</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Adaugă un număr de telefon</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -4044,7 +4046,7 @@
         <item quantity="other">Obține linkurile</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
-    <string name="clear_offline_confirmation">Clear all offline files?</string>
+    <string name="clear_offline_confirmation">Ștergi toate fișierele offline?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Ești singura persoană de aici</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4110,7 +4112,7 @@
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Te rugăm să desemnezi unul sau mai mulți moderatori noi.</string>
     <!-- The title of dialog for changing meeting name-->
-    <string name="change_meeting_name">Schimbă numele întâlnirii</string>
+    <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">Participanți: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
@@ -4180,23 +4182,23 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vizualizare principală</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Logging out deletes your offline content.</string>
+    <string name="offline_warning">Deconectarea șterge conținutul tău offline.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Interfața utilizatorului</string>
     <!-- Setting which allows to choose the start screen. -->
-    <string name="start_screen_setting">Start screen</string>
+    <string name="start_screen_setting">Ecran de start</string>
     <!-- Setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting">Ascunde activitatea recentă</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting_context">Hide recent activity in Home section.</string>
+    <string name="hide_recent_setting_context">Ascunde activitatea recentă în secțiunea Start.</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_title">Choose your start screen</string>
+    <string name="choose_start_screen_title">Alege ecranul de start</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Change settings to choose which screen opens when you next launch the MEGA app.</string>
+    <string name="choose_start_screen_text">Modifică setările pentru a alege ecranul care se deschide la următoarea lansare a aplicației MEGA.</string>
     <!-- Action button which allows to change a setting. -->
-    <string name="change_setting_action">Change setting</string>
+    <string name="change_setting_action">Modifică setarea</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
-    <string name="configure_start_screen">Configure default start screen</string>
+    <string name="configure_start_screen">Configurează ecranul de start implicit</string>
     <!-- Homepage section. -->
     <string name="home_section">Start</string>
     <!-- Action button which allows to show the recent activity. -->
@@ -4224,7 +4226,7 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Dezactivează versionarea fișierelor</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <string name="disable_versioning_warning">Funcția noastră de versionare a fișierelor ne asigură că păstrăm copiile mai vechi ale fișierelor tale dacă le înlocuiești cu versiuni mai noi. Dacă dezactivezi versionarea fișierelor, nu vei mai avea această protecție; copia veche se va pierde atunci când o înlocuiești.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
@@ -4258,9 +4260,9 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">Deschide un link de contact</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <string name="settings_mobile_data_resoluton_title">Folosește datele mobile pentru a previzualiza imagini de înaltă rezoluție</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
+    <string name="settings_mobile_data_resoluton_summary">Permite folosirea datelor mobile pentru a încărca imagini de înaltă rezoluție la previzualizare. Dacă opțiunea este dezactivată, imaginea originală va fi încărcată numai când faci zoom in.</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">You are changing a default backup folder location. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4303,8 +4305,9 @@
     <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
     <!-- Indicates the content of the backup folder -->
     <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
+        <item quantity="one">%d dispozitiv</item>
+        <item quantity="few">%d dispozitive</item>
+        <item quantity="other">%d de dispozitive</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
@@ -4319,9 +4322,9 @@
     <!-- Title of the Payments screen -->
     <string name="payment">Plată</string>
     <!-- Label indicating payment methods -->
-    <string name="payment_methods">Payment methods</string>
+    <string name="payment_methods">Metode de plată</string>
     <!-- Button to proceed with a payment -->
-    <string name="proceed">Proceed</string>
+    <string name="proceed">Continuă</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
     <!-- Pro Lite monthly subscription -->
@@ -4379,13 +4382,13 @@
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
     <!-- Title of timeline tab in photos section -->
-    <string name="tab_title_timeline">Timeline</string>
+    <string name="tab_title_timeline">Cronologie</string>
     <!-- Title of album tab in photos section. -->
     <string name="tab_title_album">Albume</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favorite</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <string name="empty_hint_favourite_album">[B]Niciun[/B] [A]favorit[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remove favourites</string>
     <!-- Message of notice that the zip file format is error -->
@@ -4410,4 +4413,50 @@
     <string name="media_player_video_playlist_next">Înainte</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Anterior</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Fotografii</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Calitatea imaginilor</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automat</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Always send original size images.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Optimizată</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Always send optimised images.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="other">%1$s and %2$d others joined</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s and 1 other left</item>
+        <item quantity="other">%1$s and %2$d others left</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Șterge</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Se reînnoiește în[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Expiră pe[/A] [B]%s[/B]</string>
 </resources>

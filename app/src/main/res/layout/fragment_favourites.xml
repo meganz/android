@@ -5,14 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="multipleChoice"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_height="0dp"
+        android:paddingBottom="10dp"
+        android:columnWidth="@dimen/grid_node_item_width"
+        app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/fastscroll"
@@ -66,5 +68,32 @@
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_fab_button"
+        android:layout_width="@dimen/fab_button_diameter"
+        android:layout_height="@dimen/fab_button_diameter"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="@dimen/elevation_low"
+        android:src="@drawable/ic_add_white"
+        android:stateListAnimator="@anim/button_elevation"
+        android:tint="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/mini_audio_player"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/audio_player_mini_controller_height"
+        android:background="?attr/colorPrimary"
+        android:visibility="gone"
+        app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:player_layout_id="@layout/audio_player_view_controller_only"
+        app:surface_type="none"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

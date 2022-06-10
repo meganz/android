@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +31,7 @@ import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
+import mega.privacy.android.app.usecase.call.AnswerCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -44,6 +46,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -54,7 +57,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
-    getLocalAudioChangesUseCase:GetLocalAudioChangesUseCase,
+    private val answerCallUseCase: AnswerCallUseCase,
+    getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -64,6 +68,7 @@ class MeetingActivityViewModel @Inject constructor(
     val avatarLiveData: LiveData<Bitmap> = _avatarLiveData
 
     var tips: MutableLiveData<String> = MutableLiveData<String>()
+    var micLocked: Boolean = false
 
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
@@ -82,14 +87,15 @@ class MeetingActivityViewModel @Inject constructor(
     val speakerLiveData: LiveData<AppRTCAudioManager.AudioDevice> = _speakerLiveData
 
     // Permissions
-    private val _cameraGranted = MutableLiveData(false)
-    val cameraGranted: LiveData<Boolean> = _cameraGranted
-    private val _cameraPermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    private val _cameraGranted = MutableStateFlow(false)
+    val cameraGranted: StateFlow<Boolean> get() = _cameraGranted
+    private val _recordAudioGranted = MutableStateFlow(false)
+    val recordAudioGranted: StateFlow<Boolean> get() = _recordAudioGranted
+
+    private val _cameraPermissionCheck = MutableLiveData<Boolean>()
     val cameraPermissionCheck: LiveData<Boolean> = _cameraPermissionCheck
-    private val _recordAudioGranted = MutableLiveData(false)
-    val recordAudioGranted: LiveData<Boolean> = _recordAudioGranted
-    private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
-        MutableLiveData<Boolean>(false)
+
+    private val _recordAudioPermissionCheck = MutableLiveData<Boolean>()
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
     // Network State
@@ -393,13 +399,23 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Method of locking the microphone button
+     */
+    fun lockMic() {
+        micLocked = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
+
+    /**
      * Response of clicking mic fab
      *
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
     fun clickMic(shouldAudioBeEnabled: Boolean) {
+        if(micLocked) {
+            return
+        }
         // Check audio permission. If haven't been granted, ask for the permission and return
-        if (_recordAudioGranted.value == false) {
+        if (!_recordAudioGranted.value) {
             _recordAudioPermissionCheck.value = true
             return
         }
@@ -429,7 +445,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun clickCamera(shouldVideoBeEnabled: Boolean) {
         //Check camera permission. If haven't been granted, ask for the permission and return
-        if (_cameraGranted.value == false) {
+        if (!_cameraGranted.value) {
             _cameraPermissionCheck.value = true
             return
         }
@@ -492,6 +508,9 @@ class MeetingActivityViewModel @Inject constructor(
      * @param cameraPermission true: the permission is granted
      */
     fun setCameraPermission(cameraPermission: Boolean) {
+        if(_cameraGranted.value == cameraPermission)
+            return
+
         _cameraGranted.value = cameraPermission
     }
 
@@ -501,6 +520,9 @@ class MeetingActivityViewModel @Inject constructor(
      * @param recordAudioPermission true: the permission is granted
      */
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
+        if(_recordAudioGranted.value == recordAudioPermission)
+            return
+
         _recordAudioGranted.value = recordAudioPermission
     }
 
@@ -661,5 +683,37 @@ class MeetingActivityViewModel @Inject constructor(
         currentChatId.value?.let {
             meetingActivityRepository.changeParticipantPermissions(it, userHandle, permission, listener)
         }
+    }
+
+    /**
+     * Answer chat call
+     *
+     * @param enableVideo The video should be enabled
+     * @param enableAudio The audio should be enabled
+     * @param speakerAudio The speaker should be enabled
+     * @return Result of the call
+     */
+    fun answerCall(
+        enableVideo: Boolean,
+        enableAudio: Boolean,
+        speakerAudio: Boolean
+    ): LiveData<AnswerCallUseCase.AnswerCallResult> {
+        val result = MutableLiveData<AnswerCallUseCase.AnswerCallResult>()
+        _currentChatId.value?.let {
+            answerCallUseCase.answerCall(it, enableVideo, enableAudio, speakerAudio)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { resultAnswerCall ->
+                        result.value = resultAnswerCall
+                    },
+                    onError = { error ->
+                        _finishMeetingActivity.value = true
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(composite)
+        }
+        return result
     }
 }

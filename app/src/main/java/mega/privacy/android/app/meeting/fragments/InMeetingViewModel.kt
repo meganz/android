@@ -44,6 +44,7 @@ import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
+import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -55,6 +56,7 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -62,6 +64,7 @@ import kotlin.collections.ArrayList
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
     private val getCallUseCase: GetCallUseCase,
+    private val startCallUseCase: StartCallUseCase,
     getParticipantsChangesUseCase: GetParticipantsChangesUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -969,43 +972,49 @@ class InMeetingViewModel @Inject constructor(
         _callLiveData.value?.let { it.status != CALL_STATUS_CONNECTING && it.hasLocalVideo() && !it.isOnHold }
             ?: false
 
+
     /**
-     * Method to start a meeting from create meeting
+     * Start chat call
      *
-     * @param videoEnable if the video is enable
-     * @param audioEnable if the audio is enable
-     * @param listener MegaChatRequestListenerInterface
+     * @param enableVideo The video should be enabled
+     * @param enableAudio The audio should be enabled
+     * @return Result of the call
      */
     fun startMeeting(
-        videoEnable: Boolean,
-        audioEnable: Boolean,
-        listener: MegaChatRequestListenerInterface
-    ) {
+        enableVideo: Boolean,
+        enableAudio: Boolean
+    ): LiveData<StartCallUseCase.StartCallResult> {
+        val result = MutableLiveData<StartCallUseCase.StartCallResult>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            logDebug("The chat exists")
+            Timber.d("The chat exists")
             if (CallUtil.isStatusConnected(
                     MegaApplication.getInstance().applicationContext,
                     it.chatId
                 )
             ) {
-                logDebug("Chat status is connected")
-                inMeetingRepository.startCall(
-                    it.chatId,
-                    videoEnable,
-                    audioEnable,
-                    listener
-                )
-
-                MegaApplication.setIsWaitingForCall(false)
+                Timber.d("Chat status is connected")
+                startCallUseCase.startCallFromChatId(currentChatId, enableVideo, enableAudio)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onSuccess = { resultStartCall ->
+                            result.value = resultStartCall
+                        },
+                        onError = { error ->
+                            Timber.e(error.stackTraceToString())
+                        }
+                    )
+                    .addTo(composite)
             }
-            return
+            return result
         }
 
-        logDebug("The chat doesn't exists")
+        Timber.d("The chat doesn't exists")
         inMeetingRepository.createMeeting(
             _chatTitle.value!!,
             CreateGroupChatWithPublicLink()
         )
+        return result
     }
 
     /**
@@ -1968,26 +1977,6 @@ class InMeetingViewModel @Inject constructor(
      */
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
-
-    /**
-     * Method for answer a call
-     *
-     * @param videoEnable if video should be on
-     * @param audioEnable if audio should be on
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun answerChatCall(
-        videoEnable: Boolean,
-        audioEnable: Boolean,
-        speakerStatus:Boolean,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            logDebug("The chat exists")
-            MegaApplication.getChatManagement().answerChatCall(it.chatId, videoEnable, audioEnable, speakerStatus, listener)
-            return
-        }
-    }
 
     /**
      * Get my own information
