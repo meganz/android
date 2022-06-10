@@ -526,11 +526,14 @@ public class FileBrowserFragment extends RotatableFragment{
 				new EventObserver<>(this::showSortByPanel));
 
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
-		managerViewModel.getUpdateBrowserNodes().observe(getViewLifecycleOwner(), nodes -> {
-			hideMultipleSelect();
-			setNodes(new ArrayList(nodes));
-			getRecyclerView().invalidate();
-		});
+		managerViewModel.getUpdateBrowserNodes().observe(getViewLifecycleOwner(),
+				new EventObserver<>(nodes -> {
+					hideMultipleSelect();
+					setNodes(new ArrayList(nodes));
+					getRecyclerView().invalidate();
+					return null;
+				})
+		);
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit.class).observe(this, this::showMediaDiscovery);
 
