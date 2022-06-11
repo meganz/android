@@ -16,9 +16,6 @@ import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_INDEX
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_INDEX
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_INDEX
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.search.callback.SearchCallback
@@ -32,6 +29,12 @@ abstract class GalleryViewModel constructor(
     private val sortOrderManagement: SortOrderManagement,
     savedStateHandle: SavedStateHandle? = null,
 ) : BaseRxViewModel(), SearchCallback.Data {
+
+    companion object {
+        const val DAYS_INDEX = 0
+        const val MONTHS_INDEX = 1
+        const val YEARS_INDEX = 2
+    }
 
     var currentHandle: Long? = null
 

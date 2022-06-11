@@ -7,9 +7,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryCardBinding
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_VIEW
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_VIEW
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_VIEW
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.formatDateTitle
@@ -28,6 +25,12 @@ class GalleryCardViewHolder(
     cardWidth: Int,
     cardMargin: Int
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    companion object {
+        const val DAYS_VIEW = 1
+        const val MONTHS_VIEW = 2
+        const val YEARS_VIEW = 3
+    }
 
     init {
         val params = binding.root.layoutParams as GridLayoutManager.LayoutParams

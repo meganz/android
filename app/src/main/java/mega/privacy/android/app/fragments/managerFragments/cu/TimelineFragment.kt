@@ -47,6 +47,17 @@ import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_LANDSCAPE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_PORTRAIT
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.VIEW_TYPE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.YEARS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.YEARS_VIEW
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -81,22 +92,6 @@ import nz.mega.sdk.MegaChatApiJava
 class TimelineFragment : BaseFragment(), PhotosTabCallback,
     GestureScaleCallback,
     GalleryCardAdapter.Listener {
-
-    companion object {
-        const val ALL_VIEW = 0
-        const val DAYS_VIEW = 1
-        const val MONTHS_VIEW = 2
-        const val YEARS_VIEW = 3
-
-        const val SPAN_CARD_PORTRAIT = 1
-        const val SPAN_CARD_LANDSCAPE = 2
-
-        const val DAYS_INDEX = 0
-        const val MONTHS_INDEX = 1
-        const val YEARS_INDEX = 2
-
-        const val VIEW_TYPE = "VIEW_TYPE"
-    }
 
     private lateinit var mManagerActivity: ManagerActivity
 

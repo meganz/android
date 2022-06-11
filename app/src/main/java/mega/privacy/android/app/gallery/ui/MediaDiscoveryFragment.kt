@@ -43,6 +43,16 @@ import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.ALL_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.MONTHS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.MONTHS_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.SPAN_CARD_LANDSCAPE
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.SPAN_CARD_PORTRAIT
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.VIEW_TYPE
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.YEARS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.YEARS_VIEW
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -101,20 +111,6 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
     private var order = 0
 
     companion object {
-        const val ALL_VIEW = 0
-        const val DAYS_VIEW = 1
-        const val MONTHS_VIEW = 2
-        const val YEARS_VIEW = 3
-
-        const val SPAN_CARD_PORTRAIT = 1
-        const val SPAN_CARD_LANDSCAPE = 2
-
-        const val DAYS_INDEX = 0
-        const val MONTHS_INDEX = 1
-        const val YEARS_INDEX = 2
-
-        const val VIEW_TYPE = "VIEW_TYPE"
-
         @JvmStatic
         fun getInstance(mediaHandle: Long): MediaDiscoveryFragment {
             val fragment = MediaDiscoveryFragment()
