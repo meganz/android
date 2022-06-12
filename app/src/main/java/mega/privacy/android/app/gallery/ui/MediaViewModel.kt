@@ -13,20 +13,17 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
@@ -35,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaViewModel @Inject constructor(
     private val repository: MediaItemRepository,
-    getCameraSortOrder: GetCameraSortOrder,
+    private val getCameraSortOrder: GetCameraSortOrder,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -78,13 +75,11 @@ class MediaViewModel @Inject constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    private var cancelToken: MegaCancelToken? = null
-
     /**
      * Custom condition in sub class for filter the real photos count
      */
     fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-        item.type != GalleryItem.TYPE_HEADER
+        item.type != MediaCardType.Header
 
     /**
      * Indicate refreshing cards has finished.
@@ -101,7 +96,7 @@ class MediaViewModel @Inject constructor(
     fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
 
-        if (item.type != GalleryItem.TYPE_HEADER) {
+        if (item.type != MediaCardType.Header) {
             item.indexForViewer = tempIndex++
         }
 
@@ -115,9 +110,9 @@ class MediaViewModel @Inject constructor(
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
                 repository.getFiles(
-                    sortOrderManagement.getOrderCamera(),
-                    mZoom,
-                    currentHandle ?: return@liveData)
+                    order = getCameraSortOrder(),
+                    zoom = mZoom,
+                    handle = currentHandle ?: return@liveData)
             } else {
                 repository.emitFiles()
             }
@@ -135,53 +130,123 @@ class MediaViewModel @Inject constructor(
         it
     }
 
-    var dateCards: LiveData<List<List<GalleryCard>>> = items.map {
-        val cardsProvider = DateCardsProvider()
-        cardsProvider.extractCardsFromNodeList(
-            repository.context,
-            it.mapNotNull { item -> item.node }
-                // Sort by modification time and name desc.
-                .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }.thenByDescending { node -> node.name })
-        )
+    var dateCards: LiveData<List<List<GalleryCard>>> = items.switchMap { galleryItems ->
+        liveData(context = ioDispatcher) {
+            val previewFolder = repository.previewFolder
+                ?: return@liveData
+            val cardsProvider = DateCardsProvider(
+                previewFolder = previewFolder,
+            )
+            cardsProvider.processGalleryItems(
+                nodes = galleryItems
+            )
 
-        viewModelScope.launch {
-            repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
-                _refreshCards.value = true
-            }
+            val days = cardsProvider.getDays()
+
+
+            emit(
+                listOf(
+                    days.sortDescending(),
+                    cardsProvider.getMonths().sortDescending(),
+                    cardsProvider.getYears().sortDescending())
+            )
+
+            fetchMissingPreviews(days)
         }
+    }
 
-        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
+    fun List<GalleryCard>.sortDescending() = sortedWith(
+        compareByDescending<GalleryCard> { it.localDate }
+            .thenByDescending { it.name }
+    )
+
+    private suspend fun fetchMissingPreviews(days: List<GalleryCard>) {
+        repository.getPreviews(days) {
+            _refreshCards.value = true
+        }
     }
 
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked year card.
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-        position,
-        card,
-        dateCards.value?.get(MONTHS_INDEX),
-        dateCards.value?.get(YEARS_INDEX)
+    fun yearClicked(card: GalleryCard) = yearClicked(
+        card = card,
+        months = dateCards.value?.get(MONTHS_INDEX),
+        years = dateCards.value?.get(YEARS_INDEX),
     )
+
+    private fun yearClicked(
+        card: GalleryCard,
+        months: List<GalleryCard>?,
+        years: List<GalleryCard>?,
+    ): Int {
+        val yearCard = getClickedCard(card.id, years) ?: return 0
+        val monthCards = months ?: return 0
+
+        val cardYear = yearCard.localDate.year
+
+        for (i in monthCards.indices) {
+            val nextLocalDate = monthCards[i].localDate
+            if (nextLocalDate.year == cardYear) {
+                //Year clicked, current month. If not exists, the closest month behind the current.
+                if (i == 0 || monthCards[i - 1].localDate.year != cardYear) {
+                    return i
+                }
+            }
+        }
+
+        //No month equal or behind the current found, then return the latest month.
+        return monthCards.size - 1
+    }
+
+    private fun getClickedCard(
+        handle: Long,
+        cards: List<GalleryCard>?,
+    ) = cards?.find { it.id == handle }
 
     /**
      * Checks the clicked month card and gets the day card to show after click on a month card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked month card.
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-        position,
+    fun monthClicked(card: GalleryCard) = monthClicked(
         card,
         dateCards.value?.get(DAYS_INDEX),
         dateCards.value?.get(MONTHS_INDEX)
     )
+
+    private fun monthClicked(
+        card: GalleryCard,
+        days: List<GalleryCard>?,
+        months: List<GalleryCard>?,
+    ): Int {
+        val monthCard = getClickedCard(card.id, months) ?: return 0
+        val dayCards = days ?: return 0
+
+        val cardLocalDate = monthCard.localDate
+        val cardMonth = cardLocalDate.monthValue
+        val cardYear = cardLocalDate.year
+
+        for (i in dayCards.indices) {
+            val nextLocalDate = dayCards[i].localDate
+            val nextMonth = nextLocalDate.monthValue
+            val nextYear = nextLocalDate.year
+
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                //Month of year clicked, current day. If not exists, the closest day behind the current.
+                if (i == 0 || dayCards[i - 1].localDate.monthValue != cardMonth) {
+                    return i
+                }
+            }
+        }
+        return dayCards.size - 1
+    }
 
     private val nodesChangeObserver = Observer<Boolean> {
         if (it) {

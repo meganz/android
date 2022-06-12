@@ -9,9 +9,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.extension.previewPath
 import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
 import mega.privacy.android.app.gallery.repository.fetcher.PhotosFetcher
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
@@ -46,6 +49,8 @@ class PhotosItemRepository @Inject constructor(
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem> =
         LinkedHashMap()
 
+    val previewFolder = cacheFolderGateway.getCacheFolder(CacheFolderManager.PREVIEW_FOLDER)
+
     /**
      * Gets the image items.
      *
@@ -74,8 +79,17 @@ class PhotosItemRepository @Inject constructor(
         }
     }
 
-    suspend fun getPreviews(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
-        nodesFetcher.getPreviewsFromServer(map, refreshCallback)
+    suspend fun getPreviews(list: List<GalleryCard>, refreshCallback: () -> Unit) {
+        val missingPreviewIds = list.filter { it.preview == null }
+            .map { it.id }
+
+        galleryItems.value?.let { items ->
+            val map = items.mapNotNull { it.node }
+                .filter { missingPreviewIds.contains(it.handle) }
+                .associateWith { File(previewFolder, it.previewPath).absolutePath }
+
+            nodesFetcher.getPreviewsFromServer(map, refreshCallback)
+        }
     }
 
     fun emitFiles() {
