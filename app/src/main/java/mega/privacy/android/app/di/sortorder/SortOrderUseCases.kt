@@ -22,6 +22,9 @@ abstract class SortOrderUseCases {
     @Binds
     abstract fun bindGetCloudSortOrder(getCloudSortOrder: DefaultGetCloudSortOrder): GetCloudSortOrder
 
+    /**
+     * Provide the GetCameraSortOrder implementation
+     */
     @Binds
     abstract fun bindGetCameraSortOrder(getCameraSortOrder: DefaultGetCameraSortOrder): GetCameraSortOrder
 }
