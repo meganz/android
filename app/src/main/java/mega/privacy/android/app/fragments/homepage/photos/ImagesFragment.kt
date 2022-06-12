@@ -464,21 +464,21 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 
