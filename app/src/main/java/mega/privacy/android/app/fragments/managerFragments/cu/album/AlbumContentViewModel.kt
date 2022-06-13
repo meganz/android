@@ -1,15 +1,12 @@
 package mega.privacy.android.app.fragments.managerFragments.cu.album
 
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.repository.FavouriteAlbumRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil
 import javax.inject.Inject
 
@@ -32,5 +29,5 @@ class AlbumContentViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = runBlocking{ getCameraSortOrder() }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 }
