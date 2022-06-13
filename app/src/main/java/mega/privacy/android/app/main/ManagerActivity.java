@@ -9886,8 +9886,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        onNodesSearchUpdate();
-
         onNodesSharedUpdate();
 
         onNodesInboxUpdate();

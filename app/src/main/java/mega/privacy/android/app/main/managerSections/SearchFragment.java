@@ -104,6 +104,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -123,6 +124,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	private ManagerViewModel managerViewModel;
+	private SearchViewModel viewModel;
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -540,6 +542,15 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				new EventObserver<>(this::showSortByPanel));
 
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+		viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
+				new EventObserver<>(nodes -> {
+					//stop from query for empty string.
+					managerViewModel.setTextSubmitted(true);
+					refresh();
+					return null;
+				})
+		);
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
