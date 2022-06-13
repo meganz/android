@@ -265,7 +265,7 @@ class MediaViewModel @Inject constructor(
     }
 
     init {
-        currentHandle = savedStateHandle?.get<Long>(INTENT_KEY_MEDIA_HANDLE)
+        currentHandle = savedStateHandle.get<Long>(INTENT_KEY_MEDIA_HANDLE)
 
         items.observeForever(loadFinishedObserver)
         // Calling ObserveForever() here instead of calling observe()
