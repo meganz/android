@@ -179,7 +179,7 @@ import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
-import mega.privacy.android.app.utils.ThemeHelper;
+import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -246,6 +246,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     GetCallSoundsUseCase getCallSoundsUseCase;
     @Inject
     HiltWorkerFactory workerFactory;
+    @Inject
+    ThemeModeState themeModeState;
 
     @ApplicationScope
     @Inject
@@ -421,6 +423,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() + ")");
                 if (e.getErrorCode() == MegaError.API_OK) {
                     logDebug("END logout sdk request - wait chat logout");
+                    setLoggingOut(false);
                 } else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
                     if (request.getParamType() == MegaError.API_ESSL) {
                         logWarning("SSL verification failed");
@@ -810,7 +813,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             initialiseLogging();
         }
 
-        ThemeHelper.INSTANCE.initTheme(this);
+        themeModeState.initialise();
 
         // Setup handler and RxJava for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));

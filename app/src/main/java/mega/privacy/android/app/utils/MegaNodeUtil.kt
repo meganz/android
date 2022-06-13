@@ -134,24 +134,9 @@ object MegaNodeUtil {
      * @return how many nodes are folders in array list
      */
     @JvmStatic
-    fun getNumberOfFolders(nodes: ArrayList<MegaNode?>?): Int {
-        if (nodes == null) {
-            return 0
-        }
-
-        var folderCount = 0
-        val safeList = CopyOnWriteArrayList(nodes)
-
-        for (node in safeList) {
-            if (node == null) {
-                safeList.remove(node)
-            } else if (node.isFolder) {
-                folderCount++
-            }
-        }
-
-        return folderCount
-    }
+    fun getNumberOfFolders(nodes: List<MegaNode?>?): Int = nodes?.let {
+        CopyOnWriteArrayList(it).count { node -> node?.isFolder == true }
+    } ?: 0
 
     /**
      * @param node the detected node
@@ -1997,44 +1982,42 @@ object MegaNodeUtil {
      * if multiple nodes selected without MyBackup folder, return BACKUP_NONE
      */
     @JvmStatic
-    fun checkBackupNodeTypeInList(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int {
-        if (handleList != null) {
-            if (handleList.size == 1) {
-                // Only one node
-                val p: MegaNode? = megaApi.getNodeByHandle(handleList[0])
-                return checkBackupNodeTypeByHandle(megaApi, p)
-            } else {
-                val node = megaApi.getNodeByHandle(handleList[0])
+    fun checkBackupNodeTypeInList(megaApi: MegaApiAndroid, handleList: List<Long>?): Int {
+        if (handleList == null) return BACKUP_NONE
 
-                if (node.parentHandle == megaApi.rootNode.handle) {
+        if (handleList.size == 1) {
+            // Only one node
+            val p: MegaNode? = megaApi.getNodeByHandle(handleList[0])
+            return checkBackupNodeTypeByHandle(megaApi, p)
+        } else {
+            val node = megaApi.getNodeByHandle(handleList[0])
+
+            when (node.parentHandle) {
+                // the nodes in the handleList belong to the root node
+                megaApi.rootNode.handle -> {
                     // Check if handleList contains backup root node
-                    for (l in handleList) {
-                        if (isRootBackupFolder(megaApi.getNodeByHandle(l))) {
-                            return BACKUP_ROOT
-                        }
-                    }
-                    return BACKUP_NONE
-                } else {
-                    // the nodes in the handleList are belong to "My Backups"
-                    if (node.parentHandle == myBackupHandle) {
-                        // Check if handleList contains device nodes
-                        for (l in handleList) {
-                            if (isDeviceBackupFolder(megaApi.getNodeByHandle(l))) {
-                                return BACKUP_DEVICE
-                            }
-                        }
-                        return BACKUP_NONE
-                    } else {
-                        for (l in handleList) {
-                            val nodeType =
-                                checkBackupNodeTypeByHandle(megaApi, megaApi.getNodeByHandle(l))
-                            if (nodeType != BACKUP_NONE) return nodeType
-                        }
-                    }
+                    return handleList.firstOrNull {
+                        isRootBackupFolder(megaApi.getNodeByHandle(it))
+                    }?.let { BACKUP_ROOT } ?: BACKUP_NONE
+                }
+
+                // the nodes in the handleList belong to "My Backups"
+                myBackupHandle -> {
+                    // Check if handleList contains device nodes
+                    return handleList.firstOrNull {
+                        isDeviceBackupFolder(megaApi.getNodeByHandle(it))
+                    }?.let { BACKUP_DEVICE } ?: BACKUP_NONE
+                }
+
+                else -> {
+                    return handleList.firstNotNullOfOrNull {
+                        val nodeType =
+                            checkBackupNodeTypeByHandle(megaApi, megaApi.getNodeByHandle(it))
+                        if (nodeType != BACKUP_NONE) nodeType else null
+                    } ?: BACKUP_NONE
                 }
             }
         }
-        return BACKUP_NONE
     }
 
     /**

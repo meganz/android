@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.model.Favourite
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
@@ -27,6 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
@@ -37,41 +39,18 @@ class FavouriteFolderFragmentTest {
     companion object {
         const val KEY_PARENT_HANDLE_ARGUMENT = "parentHandle"
     }
+
     @get: Rule
     val hiltRule = HiltAndroidRule(this)
 
     @Before
     fun setUp() {
+        initData()
         hiltRule.inject()
     }
 
     @Test
     fun test_that_the_recycler_view_is_displayed_when_children_of_current_folder_is_not_empty() {
-        val node = mock<MegaNode>()
-        whenever(node.handle).thenReturn(123)
-        whenever(node.parentHandle).thenReturn(1234)
-        whenever(node.base64Handle).thenReturn("base64Handle")
-        whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.name).thenReturn("test name")
-        val favouriteInfo = FavouriteInfo(
-            id = node.handle,
-            parentId = node.parentHandle,
-            base64Id = node.base64Handle,
-            modificationTime = node.modificationTime,
-            node = node,
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0)
-        val favourites = listOf(
-            favouriteInfo
-        )
-        val favouriteFolderInfo = FavouriteFolderInfo(favourites, "test name", 1, 1)
-        runBlocking {
-            whenever(FavouritesTestModule.getFavouriteFolderInfo(1)).thenReturn(
-                flowOf(favouriteFolderInfo)
-            )
-        }
-
         launchFragmentInHiltContainer<FavouriteFolderFragment>(
             fragmentArgs = Bundle().apply {
                 putLong(KEY_PARENT_HANDLE_ARGUMENT, 1)
@@ -109,38 +88,6 @@ class FavouriteFolderFragmentTest {
 
     @Test
     fun test_that_clicked_three_dot_and_the_snack_bar_shows_error_message_when_offline() {
-        val node = mock<MegaNode>()
-        whenever(node.handle).thenReturn(123)
-        whenever(node.parentHandle).thenReturn(1234)
-        whenever(node.base64Handle).thenReturn("base64Handle")
-        whenever(node.modificationTime).thenReturn(1234567890)
-        val favouriteInfo = FavouriteInfo(
-            id = node.handle,
-            parentId = node.parentHandle,
-            base64Id = node.base64Handle,
-            modificationTime = node.modificationTime,
-            node = node,
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0
-        )
-        whenever(node.name).thenReturn("test folder")
-        whenever(FavouritesTestModule.megaUtilWrapper.isOnline(any())).thenReturn(false)
-        val favourites = listOf(
-            favouriteInfo
-        )
-        val favouriteFolderInfo = FavouriteFolderInfo(
-            favourites,
-            "test folder",
-            1,
-            1
-        )
-        runBlocking {
-            whenever(FavouritesTestModule.getFavouriteFolderInfo(1)).thenReturn(
-                flowOf(favouriteFolderInfo)
-            )
-        }
-
         launchFragmentInHiltContainer<FavouriteFolderFragment>(
             fragmentArgs = Bundle().apply {
                 putLong(KEY_PARENT_HANDLE_ARGUMENT, 1)
@@ -167,6 +114,51 @@ class FavouriteFolderFragmentTest {
         )
 
         snackBarView().check(matches(withText(R.string.error_server_connection_problem)))
+    }
+
+    private fun initData() {
+        val node = mock<MegaNode>()
+        whenever(node.isFolder).thenReturn(true)
+        whenever(node.isInShare).thenReturn(true)
+        whenever(node.name).thenReturn("testName.txt")
+        whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
+        whenever(node.size).thenReturn(1000L)
+        val favouriteInfo = FavouriteInfo(
+            id = 123,
+            name = node.name,
+            size = node.size,
+            label = node.label,
+            parentId = 1234,
+            base64Id = "base64Handle",
+            modificationTime = 1234567890,
+            node = node,
+            hasVersion = false,
+            numChildFolders = 0,
+            numChildFiles = 0
+        )
+        val favourites = listOf(
+            favouriteInfo
+        )
+        val favouriteFolderInfo = FavouriteFolderInfo(
+            favourites,
+            "test folder",
+            1,
+            1
+        )
+        val favourite = mock<Favourite>()
+        whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)
+        whenever(favourite.isFolder).thenReturn(true)
+
+        runBlocking {
+            whenever(FavouritesTestModule.getFavouriteFolderInfo(anyOrNull())).thenReturn(
+                flowOf(favouriteFolderInfo)
+            )
+            whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(any(), any())).thenReturn(
+                "")
+            whenever(FavouritesTestModule.favouriteMapper(any(), any(), any(), any())).thenReturn(
+                favourite)
+            whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
+        }
     }
 
     private fun emptyView() = onView(withId(R.id.empty_hint))

@@ -3,12 +3,43 @@ package mega.privacy.android.app.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.CanDeleteAccount
+import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.app.domain.usecase.GetAccountDetails
+import mega.privacy.android.app.domain.usecase.GetPreference
+import mega.privacy.android.app.domain.usecase.GetStartScreen
+import mega.privacy.android.app.domain.usecase.IsCameraSyncEnabled
+import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
+import mega.privacy.android.app.domain.usecase.IsHideRecentActivityEnabled
+import mega.privacy.android.app.domain.usecase.IsMultiFactorAuthAvailable
+import mega.privacy.android.app.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.app.domain.usecase.MonitorConnectivity
+import mega.privacy.android.app.domain.usecase.PutPreference
+import mega.privacy.android.app.domain.usecase.RefreshPasscodeLockPreference
+import mega.privacy.android.app.domain.usecase.RequestAccountDeletion
+import mega.privacy.android.app.domain.usecase.RootNodeExists
+import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.app.presentation.settings.model.SettingsState
-import mega.privacy.android.app.utils.LogUtil
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,6 +63,18 @@ class SettingsViewModel @Inject constructor(
     private val isChatLoggedIn: IsChatLoggedIn,
     private val setSdkLogsEnabled: SetSdkLogsEnabled,
     private val setChatLoggingEnabled: SetChatLogsEnabled,
+    private val putStringPreference: PutPreference<String>,
+    private val putStringSetPreference: PutPreference<MutableSet<String>>,
+    private val putIntPreference: PutPreference<Int>,
+    private val putLongPreference: PutPreference<Long>,
+    private val putFloatPreference: PutPreference<Float>,
+    private val putBooleanPreference: PutPreference<Boolean>,
+    private val getStringPreference: GetPreference<String?>,
+    private val getStringSetPreference: GetPreference<MutableSet<String>?>,
+    private val getIntPreference: GetPreference<Int>,
+    private val getLongPreference: GetPreference<Long>,
+    private val getFloatPreference: GetPreference<Float>,
+    private val getBooleanPreference: GetPreference<Boolean>,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -114,7 +157,6 @@ class SettingsViewModel @Inject constructor(
             ).collect {
                 state.update(it)
             }
-
         }
 
     }
@@ -128,55 +170,82 @@ class SettingsViewModel @Inject constructor(
             )
         }
 
-    fun refreshAccount() {
-        viewModelScope.launch {
-            state.update(updateAccountState(getAccountDetails(true)))
+    fun refreshAccount() = viewModelScope.launch {
+        state.update(updateAccountState(getAccountDetails(true)))
+    }
+
+    fun toggleAutoAcceptPreference() = viewModelScope.launch {
+        runCatching {
+            toggleAutoAcceptQRLinks()
         }
     }
 
-    fun toggleAutoAcceptPreference() {
-        viewModelScope.launch {
-            kotlin.runCatching {
-                toggleAutoAcceptQRLinks()
+    suspend fun deleteAccount() = runCatching { requestAccountDeletion() }
+        .fold(
+            { true },
+            { e ->
+                Timber.e(e, "Error when asking for the cancellation link")
+                false
             }
-        }
+        )
+
+    fun disableLogger() = if (sdkLogsEnabled.value) {
+        viewModelScope.launch { setSdkLogsEnabled(false) }
+        true
+    } else {
+        false
     }
 
-    suspend fun deleteAccount(): Boolean {
-        return kotlin.runCatching { requestAccountDeletion() }
-            .fold(
-                { true },
-                { e ->
-                    LogUtil.logError("Error when asking for the cancellation link: ${e.message}")
-                    false
-                }
-            )
+    fun disableChatLogger() = if (chatLogsEnabled.value) {
+        viewModelScope.launch { setChatLoggingEnabled(false) }
+        true
+    } else {
+        false
     }
 
-    fun disableLogger(): Boolean {
-        return if (sdkLogsEnabled.value) {
-            viewModelScope.launch { setSdkLogsEnabled(false) }
-            true
-        } else {
-            false
-        }
+    fun enableLogger() = viewModelScope.launch { setSdkLogsEnabled(true) }
+
+    fun enableChatLogger() = viewModelScope.launch { setChatLoggingEnabled(true) }
+
+    fun putString(key: String?, value: String?) {
+        viewModelScope.launch { putStringPreference(key, value) }
     }
 
-    fun disableChatLogger(): Boolean {
-        return if (chatLogsEnabled.value) {
-            viewModelScope.launch { setChatLoggingEnabled(false) }
-            true
-        } else {
-            false
-        }
+    fun putStringSet(key: String?, values: MutableSet<String>?) {
+        viewModelScope.launch { putStringSetPreference(key, values) }
     }
 
-    fun enableLogger() {
-        viewModelScope.launch { setSdkLogsEnabled(true) }
+    fun putInt(key: String?, value: Int) {
+        viewModelScope.launch { putIntPreference(key, value) }
     }
 
-    fun enableChatLogger() {
-        viewModelScope.launch { setChatLoggingEnabled(true) }
+    fun putLong(key: String?, value: Long) {
+        viewModelScope.launch { putLongPreference(key, value) }
     }
 
+    fun putFloat(key: String?, value: Float) {
+        viewModelScope.launch { putFloatPreference(key, value) }
+    }
+
+    fun putBoolean(key: String?, value: Boolean) {
+        viewModelScope.launch { putBooleanPreference(key, value) }
+    }
+
+    fun getString(key: String?, defValue: String?) =
+        runBlocking { getStringPreference(key, defValue).firstOrNull() }
+
+    fun getStringSet(key: String?, defValue: MutableSet<String>?) =
+        runBlocking { getStringSetPreference(key, defValue).firstOrNull() }
+
+    fun getInt(key: String?, defValue: Int) =
+        runBlocking { getIntPreference(key, defValue).first() }
+
+    fun getLong(key: String?, defValue: Long) =
+        runBlocking { getLongPreference(key, defValue).first() }
+
+    fun getFloat(key: String?, defValue: Float) =
+        runBlocking { getFloatPreference(key, defValue).first() }
+
+    fun getBoolean(key: String?, defValue: Boolean) =
+        runBlocking { getBooleanPreference(key, defValue).first() }
 }

@@ -124,14 +124,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     abstract fun handleOnCreateOptionsMenu()
 
     open fun animateBottomView(hide: Boolean) {
-        // AlbumContentFragment doesn't have view type panel.
-        if (
-            this is AlbumContentFragment ||
-            !isInActionMode() && viewTypePanel.isVisible
-        ) {
-            return
-        }
-
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
@@ -764,7 +756,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      * Sub fragment can custom operation when start ActionMode
      */
     open fun whenStartActionMode() {
-        if (this is AlbumContentFragment) return
         mManagerActivity.showHideBottomNavigationView(true)
         animateBottomView(true)
     }
@@ -773,7 +764,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      * Sub fragment can custom operation when end ActionMode
      */
     open fun whenEndActionMode() {
-        if (this is AlbumContentFragment) return
         mManagerActivity.showHideBottomNavigationView(!showBottomNav)
         if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) {
             animateBottomView(false)

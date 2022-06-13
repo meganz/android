@@ -323,8 +323,9 @@ class AccountController(private val context: Context) {
 
             //clear mega contacts and reset last sync time.
             dbH.clearMegaContacts()
-            MegaContactGetter(context).clearLastSyncTimeStamp()
-
+            CoroutineScope(Dispatchers.IO).launch {
+                MegaContactGetter(context).clearLastSyncTimeStamp()
+            }
             // clean time stamps preference settings after logout
             context.getSharedPreferences(
                 MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE,

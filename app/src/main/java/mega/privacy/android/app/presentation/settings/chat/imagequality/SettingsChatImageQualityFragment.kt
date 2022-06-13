@@ -11,7 +11,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.domain.entity.ThemeMode
+import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import javax.inject.Inject
 
 /**
  * Fragment of [SettingsChatImageQualityActivity] which allows to change the chat image quality setting.
@@ -21,13 +24,16 @@ class SettingsChatImageQualityFragment : Fragment() {
 
     private val viewModel: SettingsChatImageQualityViewModel by viewModels()
 
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            AndroidTheme {
+            AndroidTheme(getThemeMode().collectAsState(initial = ThemeMode.System).value) {
                 ChatImageQualitySettingBody()
             }
         }

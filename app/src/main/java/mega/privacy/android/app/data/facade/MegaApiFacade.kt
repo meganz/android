@@ -53,8 +53,10 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isBusinessAccount
     override val isMasterBusinessAccount: Boolean
         get() = megaApi.isMasterBusinessAccount
-    override val rootNode: MegaNode?
-        get() = megaApi.rootNode
+
+    override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
+
+    override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
 
     override val globalUpdates: Flow<GlobalUpdate>
         get() = callbackFlow {
@@ -116,13 +118,16 @@ class MegaApiFacade @Inject constructor(
         megaApi.getFavourites(node, count, listener)
     }
 
-    override fun getMegaNodeByHandle(nodeHandle: Long): MegaNode =
+    override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
-    override fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode> =
-        megaApi.getChildren(parentNode)
+    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
+        if (order == null)
+            megaApi.getChildren(parentNode)
+        else
+            megaApi.getChildren(parentNode, order)
 
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
@@ -139,6 +144,10 @@ class MegaApiFacade @Inject constructor(
     override fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface) =
         megaApi.getFolderInfo(node, listener)
 
+    override fun setNodeFavourite(node: MegaNode?, favourite: Boolean) {
+        megaApi.setNodeFavourite(node, favourite)
+    }
+
     override fun addLogger(logger: MegaLoggerInterface) = MegaApiAndroid.addLoggerObject(logger)
 
     override fun removeLogger(logger: MegaLoggerInterface) =
@@ -153,7 +162,7 @@ class MegaApiFacade @Inject constructor(
     override fun getThumbnail(
         node: MegaNode,
         thumbnailFilePath: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)

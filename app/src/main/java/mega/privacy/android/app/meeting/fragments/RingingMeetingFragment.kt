@@ -23,7 +23,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
-import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
@@ -37,11 +36,11 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import timber.log.Timber
 import java.util.*
 
 @AndroidEntryPoint
-class RingingMeetingFragment : MeetingBaseFragment(),
-    AnswerChatCallListener.OnCallAnsweredCallback {
+class RingingMeetingFragment : MeetingBaseFragment() {
 
     private val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
@@ -118,16 +117,22 @@ class RingingMeetingFragment : MeetingBaseFragment(),
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
     private fun answerCall(enableVideo: Boolean) {
-        inMeetingViewModel.getCall()?.let {
-            inMeetingViewModel.answerChatCall(
-                enableVideo,
-                true,
-                enableVideo,
-                AnswerChatCallListener(requireContext(), this)
+        sharedModel.answerCall(enableVideo, true, enableVideo).observe(viewLifecycleOwner) { result ->
+            val actionString = if (result.enableVideo) {
+                Timber.d("Call answered with video ON and audio ON")
+                MEETING_ACTION_RINGING_VIDEO_ON
+            } else {
+                Timber.d("Call answered with video OFF and audio ON")
+                MEETING_ACTION_RINGING_VIDEO_OFF
+            }
+
+            val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                actionString,
+                result.chatHandle
             )
+            findNavController().navigate(action)
         }
     }
-
 
     /**
      * Initialize ViewModel
@@ -181,28 +186,40 @@ class RingingMeetingFragment : MeetingBaseFragment(),
                 }
             }
 
-        sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
-            if (it) {
+        sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+            if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA)
+                        arrayOf(Manifest.permission.CAMERA)
                 )
-                    .setOnRequiresPermission { l -> onRequiresPermission(l) }
-                    .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-                    .build()
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickCamera(true)
+                            }
+                        }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                        .build()
                 permissionsRequester.launch(false)
             }
         }
 
-        sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
-            if (it) {
+        sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
+            if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO)
+                        arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
-                    .setOnRequiresPermission { l -> onRequiresPermission(l) }
-                    .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-                    .build()
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickMic(true)
+                            }
+                        }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                        .build()
                 permissionsRequester.launch(false)
             }
         }
@@ -238,27 +255,5 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     override fun onDestroy() {
         RunOnUIThreadUtils.stop()
         super.onDestroy()
-    }
-
-    override fun onCallAnswered(chatId: Long, flag: Boolean) {
-        val actionString = if (flag) {
-            logDebug("Call answered with video ON and audio ON")
-            MEETING_ACTION_RINGING_VIDEO_ON
-        } else {
-            logDebug("Call answered with video OFF and audio ON")
-            MEETING_ACTION_RINGING_VIDEO_OFF
-        }
-
-        val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-            actionString,
-            chatId
-        )
-        findNavController().navigate(action)
-    }
-
-    override fun onErrorAnsweredCall(errorCode: Int) {
-        logDebug("Error answering the call")
-        inMeetingViewModel.removeIncomingCallNotification(chatId)
-        requireActivity().finish()
     }
 }

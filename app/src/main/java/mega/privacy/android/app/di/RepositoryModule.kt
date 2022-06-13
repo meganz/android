@@ -48,5 +48,8 @@ abstract class RepositoryModule {
     abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
 
     @Binds
+    abstract fun bindThumbnailRepository(repository: DefaultThumbnailRepository): ThumbnailRepository
+
+    @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalUpdatesRepository): GlobalUpdatesRepository
 }

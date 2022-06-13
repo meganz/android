@@ -8,6 +8,8 @@ import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.mapper.toFavourite
 
 /**
  * Module for providing mapper dependencies
@@ -21,4 +23,7 @@ class MapperModule {
 
     @Provides
     fun provideFavouriteInfoMapper(): FavouriteInfoMapper = ::toFavouriteInfo
+
+    @Provides
+    fun provideFavouriteMapper(): FavouriteMapper = ::toFavourite
 }

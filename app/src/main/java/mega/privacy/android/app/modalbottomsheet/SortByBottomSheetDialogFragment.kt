@@ -77,6 +77,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
             ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
             ORDER_OFFLINE -> sortOrderManagement.getOrderOffline()
+            ORDER_FAVOURITES -> sortOrderManagement.getOrderCloud()
             else -> ORDER_DEFAULT_ASC
         }
 
@@ -105,6 +106,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByDateSeparator.isVisible = false
                 binding.sortByFavoritesType.isVisible = false
                 binding.sortByLabelType.isVisible = false
+            }
+            ORDER_FAVOURITES -> {
+                binding.sortByFavoritesType.isVisible = false
             }
         }
 
@@ -182,6 +186,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         when (orderType) {
+            ORDER_FAVOURITES,
             ORDER_CLOUD -> {
                 sortOrderManagement.setOrderCloud(order)
                 LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
@@ -257,7 +262,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         requireActivity().sendBroadcast(
             Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER).putExtra(
                 IS_CLOUD_ORDER,
-                orderType == ORDER_CLOUD
+                orderType == ORDER_CLOUD || orderType == ORDER_FAVOURITES
             ).putExtra(NEW_ORDER, order)
         )
     }

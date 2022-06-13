@@ -1,28 +1,16 @@
 package mega.privacy.android.app.presentation.manager
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
+import mega.privacy.android.app.domain.usecase.*
+import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel associated to {@link mega.privacy.android.app.main.ManagerActivity}
+ * ViewModel associated to [mega.privacy.android.app.main.ManagerActivity]
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
@@ -31,58 +19,93 @@ import javax.inject.Inject
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorGlobalUpdates: MonitorGlobalUpdates,
+    getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
+    getBrowserChildrenNode: GetBrowserChildrenNode,
 ) : ViewModel() {
 
     /**
      * Monitor all global updates
      */
     @Suppress("DEPRECATION")
-    private val updates = monitorGlobalUpdates()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    private val _updates = monitorGlobalUpdates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    /**
+     * Monitor global node updates
+     */
+    private val _updateNodes = monitorNodeUpdates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     /**
      * Monitor user updates and dispatch to observers
      */
     val updateUsers: LiveData<List<MegaUser>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .also { Timber.d("onUsersUpdate") }
             .map { it.users?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
     /**
      * Monitor user alerts updates and dispatch to observers
      */
     val updateUserAlerts: LiveData<List<MegaUserAlert>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .also { Timber.d("onUserAlertsUpdate") }
             .map { it.userAlerts?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
     /**
      * Monitor global node updates and dispatch to observers
      */
     val updateNodes: LiveData<List<MegaNode>> =
-        monitorNodeUpdates()
+        _updateNodes
             .also { Timber.d("onNodesUpdate") }
-            .filterNot { it.isEmpty() }
+            .filterNotNull()
             .asLiveData()
 
     /**
      * Monitor contact request updates and dispatch to observers
      */
     val updateContactsRequests: LiveData<List<MegaContactRequest>> =
-        updates
+        _updates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .also { Timber.d("onContactRequestsUpdate") }
             .map { it.requests?.toList() }
             .filterNotNull()
-            .filterNot { it.isEmpty() }
             .asLiveData()
 
+    /**
+     * Current rubbish bin parent handle
+     */
+    var rubbishBinParentHandle: Long = -1L
+
+    /**
+     * Current browser parent handle
+     */
+    var browserParentHandle: Long = -1L
+
+    /**
+     * Update Rubbish Nodes when a node update callback happens
+     */
+    val updateRubbishBinNodes: LiveData<List<MegaNode>> =
+        _updateNodes
+            .also { Timber.d("onRubbishNodesUpdate") }
+            .map { getRubbishBinChildrenNode(rubbishBinParentHandle) }
+            .filterNotNull()
+            .asLiveData()
+
+
+    /**
+     * Update Browser Nodes when a node update callback happens
+     */
+    val updateBrowserNodes: LiveData<List<MegaNode>> =
+        _updateNodes
+            .also { Timber.d("onBrowserNodesUpdate") }
+            .map { getBrowserChildrenNode(browserParentHandle) }
+            .filterNotNull()
+            .asLiveData()
 }

@@ -14,6 +14,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.domain.usecase.DefaultGetThemeMode
+import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -87,4 +89,8 @@ class AppModule {
             MegaThreadFactory(Process.THREAD_PRIORITY_BACKGROUND)
         )
     }
+
+    @Provides
+    fun provideGetThemeModePreference(useCase: DefaultGetThemeMode): GetThemeMode =
+        useCase
 }

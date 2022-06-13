@@ -129,6 +129,7 @@ import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
+import static mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
 import static mega.privacy.android.app.utils.Constants.ZIP_ADAPTER;
 import static mega.privacy.android.app.utils.FileUtil.addPdfFileExtension;
@@ -1252,29 +1253,18 @@ public class PdfViewerActivity extends PasscodeActivity
                 else {
                     copyMenuItem.setVisible(true);
 
-                    if(node.isExported()){
+                    if (node.isExported()) {
                         getlinkMenuItem.setVisible(false);
                         removelinkMenuItem.setVisible(true);
-                    }
-                    else{
-                        if(type==CONTACT_FILE_ADAPTER){
-                            getlinkMenuItem.setVisible(false);
-                            removelinkMenuItem.setVisible(false);
-                        }
-                        else{
-                            if(isFolderLink){
-                                getlinkMenuItem.setVisible(false);
-                                removelinkMenuItem.setVisible(false);
-
-                            }
-                            else{
-                                getlinkMenuItem.setVisible(true);
-                                removelinkMenuItem.setVisible(false);
-                            }
-                        }
+                    } else if (type == CONTACT_FILE_ADAPTER || isFolderLink || type == VERSIONS_ADAPTER) {
+                        getlinkMenuItem.setVisible(false);
+                        removelinkMenuItem.setVisible(false);
+                    } else {
+                        getlinkMenuItem.setVisible(true);
+                        removelinkMenuItem.setVisible(false);
                     }
 
-                    if(isFolderLink){
+                    if(isFolderLink || type == VERSIONS_ADAPTER){
                         propertiesMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
                         removeMenuItem.setVisible(false);

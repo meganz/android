@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -726,8 +726,6 @@
     <string name="settings_advanced_features_cache">Dọn Bộ Nhớ Tạm</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Dọn Các Tệp Ngoại Tuyến</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Mở tệp tin khi tải xong</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Xóa tài khoản</string>
     <!-- Size of files in offline or cache folders -->
@@ -929,10 +927,6 @@
     <string name="zip_browser_activity">Quản lý tệp ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Hạng Tài Khoản</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Ngày tự gia hạn&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Thời điểm hết hạn&#160;</string>
     <!--  -->
     <string name="free_account">Miễn phí</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -3906,7 +3900,7 @@
     <!-- General label for speaker off-->
     <string name="general_speaker_off">Loa hiện đang bị tắt</string>
     <!-- Label for end meeting-->
-    <string name="meeting_end">Chấm dứt</string>
+    <string name="meeting_end">Gác</string>
     <!-- Invite contacts as participants of the meeting-->
     <string name="invite_participants">Mời thêm thành viên</string>
     <!-- The number of participants in the meeting-->
@@ -4227,4 +4221,48 @@
     <string name="media_player_video_playlist_next">Tiếp</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Trước</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Ảnh</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Mở các dạng tệp tin không được hỗ trợ với ứng dụng bên thứ ba</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Các dạng tệp tin không được hỗ trợ có trong MEGA sẽ được mở bằng ứng dụng bên thứ ba.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Chất lượng hình ảnh</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Tự điều chỉnh</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Gửi hình ảnh với chất lượng chỉnh tối ưu khi dùng mạng di động và gửi với kích thước gốc khi dùng Wi-Fi.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Nguyên gốc</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Luôn gửi hình ảnh với kích thước gốc.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Tối ưu</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Luôn gửi hình ảnh với chất lượng chỉnh tối ưu.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s đã tham gia</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s và %2$s đã tham gia</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s đã rời khỏi</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s và %2$s đã rời khỏi</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="other">%1$s và %2$d người khác đã tham gia</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="other">%1$s và %2$d người khác đã rời khỏi</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Xóa vĩnh viễn</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Xóa</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Tự động gia hạn chu kỳ vào [/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Hết hạn vào ngày[/A] [B]%s[/B]</string>
 </resources>

@@ -10,5 +10,5 @@ interface RootNodeExists {
      *
      * @return
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }
