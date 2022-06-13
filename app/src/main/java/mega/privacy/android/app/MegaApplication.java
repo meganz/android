@@ -269,8 +269,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
     // Flag to indicate if the current Activity is going through configuration change like orientation switch
     private boolean isActivityChangingConfigurations = false;
 
-	private static boolean isLoggingIn = false;
-	private static boolean isLoggingOut = false;
+    private static boolean isLoggingIn = false;
+    private static boolean isLoggingOut = false;
+
+    private static boolean isHeartBeatAlive = false;
 
     private static boolean showInfoChatMessages = false;
 
@@ -462,6 +464,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
                     //Login check resumed pending transfers
                     TransfersManagement.checkResumedPendingTransfers();
+                    scheduleCameraUploadJob(getApplicationContext());
                 }
             } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
                 if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
@@ -841,7 +844,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         LiveEventBus.config().enableLogger(false);
 
-        scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
@@ -1247,6 +1249,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public static void setLoggingOut(boolean loggingOut) {
         isLoggingOut = loggingOut;
+    }
+
+    public static boolean isIsHeartBeatAlive() {
+        return isHeartBeatAlive;
+    }
+
+    public static void setHeartBeatAlive(boolean heartBeatAlive) {
+        isHeartBeatAlive = heartBeatAlive;
     }
 
     public static void setOpenChatId(long openChatId) {
