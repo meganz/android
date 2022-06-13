@@ -971,6 +971,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.setAction(R.string.tab_sent_requests, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
+
+            case RESUME_TRANSFERS_TYPE:
+                snackbar.setAction(R.string.button_resume_individual_transfer, new SnackbarNavigateOption(view.getContext(), type));
+                snackbar.show();
+                break;
         }
     }
 

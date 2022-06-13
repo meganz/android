@@ -33,6 +33,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
@@ -44,7 +45,6 @@ import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
-import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
@@ -64,6 +64,7 @@ import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -782,6 +783,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         observeItemLongClick()
         observeSelectedItems()
         observeAnimatedItems()
+        observeActionBarMessage()
         observeActionModeDestroy()
     }
 
@@ -1066,6 +1068,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
+        }
+    }
+
+    private fun observeActionBarMessage() {
+        actionModeViewModel.onActionBarMessage().observe(viewLifecycleOwner) {
+            callManager { manager -> manager.showTransfersSnackBar(StringResourcesUtils.getString(it)) }
         }
     }
 

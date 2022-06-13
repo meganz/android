@@ -291,6 +291,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
@@ -489,6 +490,12 @@ public class ManagerActivity extends TransfersManagementActivity
      * True if any TabLayout is visible
      */
     private boolean mShowAnyTabLayout;
+
+    /**
+     * Indicates that ManagerActivity was called from Image Viewer;
+     * Transfers tab should go back to {@link mega.privacy.android.app.imageviewer.ImageViewerActivity}
+     */
+    private boolean transfersToImageViewer = false;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
@@ -5465,6 +5472,9 @@ public class ManagerActivity extends TransfersManagementActivity
                             || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
 
                         backToDrawerItem(bottomNavigationCurrentItem);
+                        if (transfersToImageViewer) {
+                            switchImageViewerToFront();
+                        }
                     } else {
                         drawerLayout.openDrawer(nV);
                     }
@@ -5954,6 +5964,9 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (drawerItem == DrawerItem.TRANSFERS) {
             backToDrawerItem(bottomNavigationCurrentItem);
 
+            if (transfersToImageViewer) {
+                switchImageViewerToFront();
+            }
         } else if (drawerItem == DrawerItem.INBOX) {
             inboxFragment = (InboxFragment) getSupportFragmentManager()
                     .findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -6017,6 +6030,16 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             handleBackPressIfFullscreenOfflineFragmentOpened();
         }
+    }
+
+    /**
+     * This activity was called by {@link mega.privacy.android.app.imageviewer.ImageViewerActivity}
+     * by putting itself to the front of the history stack. Switching back to the image viewer requires
+     * the same process again (reordering and therefore putting the image viewer to the front).
+     */
+    private void switchImageViewerToFront() {
+        transfersToImageViewer = false;
+        startActivity(ImageViewerActivity.getIntentFromBackStack(this));
     }
 
     /**
@@ -7706,6 +7729,9 @@ public class ManagerActivity extends TransfersManagementActivity
             } else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())) {
                 if (intent.getBooleanExtra(OPENED_FROM_CHAT, false)) {
                     sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
+                }
+                if (intent.getBooleanExtra(OPENED_FROM_IMAGE_VIEWER, false)) {
+                    transfersToImageViewer = true;
                 }
 
                 drawerItem = DrawerItem.TRANSFERS;
