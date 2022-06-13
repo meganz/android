@@ -112,7 +112,8 @@ class ManagerViewModel @Inject constructor(
             .asLiveData()
 
     /**
-     * Flag to control if a search needs to allow search to be performed
+     * Flag to control if a search has been performed
+     * It is also used to prevent a search to be performed if the user is not manually triggering it
      */
     var textSubmitted: Boolean = false
 }
