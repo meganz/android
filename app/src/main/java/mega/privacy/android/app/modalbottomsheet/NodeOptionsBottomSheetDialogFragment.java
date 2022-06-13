@@ -1,5 +1,60 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.utils.Constants.DISPUTE_URL;
+import static mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE;
+import static mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FIRST_NAVIGATION_LEVEL;
+import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
+import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
+import static mega.privacy.android.app.utils.Constants.FROM_OTHERS;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
+import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isOutShare;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFile;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFileName;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -16,6 +71,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -36,6 +92,7 @@ import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -43,23 +100,6 @@ import mega.privacy.android.app.utils.ViewUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
@@ -95,6 +135,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private DrawerItem drawerItem;
 
+    private ManagerViewModel managerViewModel;
+
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
             mMode = mode;
@@ -110,6 +152,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
+
+        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
@@ -829,6 +873,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.open_folder_option:
+                managerViewModel.setTextSubmitted(true);
                 nC.openFolderFromSearch(node.getHandle());
                 dismissAllowingStateLoss();
                 break;

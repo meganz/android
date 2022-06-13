@@ -11,7 +11,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel associated to [mega.privacy.android.app.main.ManagerActivity]
+ * ViewModel associated to ManagerActivity
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
@@ -110,4 +110,9 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    /**
+     * Flag to control if a search needs to allow search to be performed
+     */
+    var textSubmitted: Boolean = false
 }

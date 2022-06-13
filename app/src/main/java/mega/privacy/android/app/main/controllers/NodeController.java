@@ -1,5 +1,31 @@
 package mega.privacy.android.app.main.controllers;
 
+import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
+import static mega.privacy.android.app.listeners.ShareListener.SHARE_LISTENER;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
+import static mega.privacy.android.app.utils.Constants.CHAT_LINK;
+import static mega.privacy.android.app.utils.Constants.CONTACT_LINK;
+import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
+import static mega.privacy.android.app.utils.Constants.ERROR_LINK;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.MULTIPLE_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,16 +56,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
-
-import static mega.privacy.android.app.listeners.ShareListener.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
-import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 public class NodeController {
 
@@ -326,7 +342,6 @@ public class NodeController {
 
     public void openFolderFromSearch(long folderHandle){
         logDebug("openFolderFromSearch: " + folderHandle);
-        ((ManagerActivity)context).textSubmitted = true;
         ((ManagerActivity)context).openFolderRefresh = true;
         boolean firstNavigationLevel=true;
         int access = -1;
