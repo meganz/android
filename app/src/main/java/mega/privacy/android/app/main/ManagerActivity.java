@@ -2118,8 +2118,9 @@ public class ManagerActivity extends TransfersManagementActivity
             aC.renameRK(fRKOld);
         }
 
+        boolean isHeartBeatAlive = MegaApplication.isIsHeartBeatAlive();
         rootNode = megaApi.getRootNode();
-        if (rootNode == null || LoginActivity.isBackFromLoginPage) {
+        if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
             if (getIntent() != null) {
                 logDebug("Action: " + getIntent().getAction());
                 if (getIntent().getAction() != null) {
