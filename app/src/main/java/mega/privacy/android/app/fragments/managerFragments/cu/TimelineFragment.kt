@@ -47,7 +47,6 @@ import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
@@ -928,26 +927,13 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
-                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
                 val childrenNodes = viewModel.getItemsHandle()
-                val intent = when (adapterType) {
-                    Constants.ALBUM_CONTENT_ADAPTER, Constants.PHOTOS_BROWSE_ADAPTER -> {
-                        ImageViewerActivity.getIntentForChildren(
-                            requireContext(),
-                            childrenNodes,
-                            nodeHandle
-                        )
-                    }
-                    else -> {
-                        ImageViewerActivity.getIntentForParentNode(
-                            requireContext(),
-                            parentNodeHandle,
-                            getOrder(),
-                            nodeHandle
-                        )
-                    }
-                }
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    childrenNodes,
+                    nodeHandle
+                )
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
