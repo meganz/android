@@ -127,20 +127,4 @@
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom"
         />
-
-    <item
-        android:id="@+id/action_photos_filter"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="190"
-        android:title="@string/photos_action_filter"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_photos_sortby"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="195"
-        android:title="@string/action_sort_by"
-        android:visible="false"
-        app:showAsAction="never" />
 </menu>

@@ -47,7 +47,6 @@ import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
@@ -635,7 +634,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             return
         }
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_images_toolbar, menu)
+        inflater.inflate(R.menu.fragment_photos_toolbar, menu)
         this.menu = menu
         handleOnCreateOptionsMenu()
         handleZoomMenuItemStatus()
@@ -1127,8 +1126,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (this::menu.isInitialized) {
             menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
             menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-            menu.removeItem(R.id.action_menu_sort_by)
-
+            menu.findItem(R.id.action_photos_filter).isVisible = shouldShow
+            menu.findItem(R.id.action_photos_sortby).isVisible = shouldShow
         }
     }
 

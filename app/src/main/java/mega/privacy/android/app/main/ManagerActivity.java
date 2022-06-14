@@ -803,8 +803,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private MenuItem returnCallMenuItem;
     private MenuItem openMeetingMenuItem;
     private MenuItem openLinkMenuItem;
-    private MenuItem photosFilterMenuItem;
-    private MenuItem photosSortByMenuItem;
     private Chronometer chronometerMenuItem;
     private LinearLayout layoutCallMenuItem;
 
@@ -5235,8 +5233,6 @@ public class ManagerActivity extends TransfersManagementActivity
         scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
         returnCallMenuItem = menu.findItem(R.id.action_return_call);
         openMeetingMenuItem = menu.findItem(R.id.action_menu_open_meeting);
-        photosFilterMenuItem = menu.findItem(R.id.action_photos_filter);
-        photosSortByMenuItem = menu.findItem(R.id.action_photos_sortby);
         RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
         layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
         chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
@@ -5288,11 +5284,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                     break;
                 case PHOTOS:
-                    if (isInPhotosPage()) {
-                        photosSortByMenuItem.setVisible(true);
-                        photosFilterMenuItem.setVisible(true);
-                    }
-
                     break;
 
                 case INBOX:
@@ -5697,12 +5688,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 showNodeOptionsPanel(getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE));
                 return true;
 
-            case R.id.action_photos_filter:
-                return true;
-
-            case R.id.action_photos_sortby:
-                return true;
-
             default: {
                 return super.onOptionsItemSelected(item);
             }
@@ -5722,8 +5707,6 @@ public class ManagerActivity extends TransfersManagementActivity
             searchMenuItem.setVisible(false);
             openMeetingMenuItem.setVisible(false);
             openLinkMenuItem.setVisible(false);
-            photosSortByMenuItem.setVisible(false);
-            photosFilterMenuItem.setVisible(false);
         }
     }
 
