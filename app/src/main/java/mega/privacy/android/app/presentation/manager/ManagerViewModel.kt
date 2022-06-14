@@ -81,16 +81,6 @@ class ManagerViewModel @Inject constructor(
             .asLiveData()
 
     /**
-     * Current rubbish bin parent handle
-     */
-    var rubbishBinParentHandle: Long = -1L
-
-    /**
-     * Current browser parent handle
-     */
-    var browserParentHandle: Long = -1L
-
-    /**
      * Update Rubbish Nodes when a node update callback happens
      */
     val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
@@ -110,6 +100,33 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    /**
+     * Current rubbish bin parent handle
+     */
+    var rubbishBinParentHandle: Long = -1L
+        set(value) {
+            Timber.d("setRubbishparentHandle")
+            field = value
+        }
+
+    /**
+     * Current browser parent handle
+     */
+    var browserParentHandle: Long = -1L
+        set(value) {
+            Timber.d("setBrowserParentHandle")
+            field = value
+        }
+
+    /**
+     * Current search parent handle
+     */
+    var searchParentHandle: Long = -1L
+        set(value) {
+            Timber.d("setSearchParentHandle")
+            field = value
+        }
 
     /**
      * Flag to control if a search has been performed

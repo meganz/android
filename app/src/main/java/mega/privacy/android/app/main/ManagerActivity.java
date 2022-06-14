@@ -740,7 +740,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private long parentHandleIncoming;
     private long parentHandleLinks;
     private long parentHandleOutgoing;
-    private long parentHandleSearch;
     private long parentHandleInbox;
     private String pathNavigationOffline;
     public int deepBrowserTreeIncoming = 0;
@@ -1311,7 +1310,6 @@ public class ManagerActivity extends TransfersManagementActivity
         logDebug("IN BUNDLE -> parentHandleOutgoing: " + parentHandleOutgoing);
         outState.putLong(PARENT_HANDLE_LINKS, parentHandleLinks);
         outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
-        outState.putLong("parentHandleSearch", parentHandleSearch);
         outState.putLong("parentHandleInbox", parentHandleInbox);
         outState.putSerializable("drawerItem", drawerItem);
         outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
@@ -1507,7 +1505,6 @@ public class ManagerActivity extends TransfersManagementActivity
             parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
             logDebug("savedInstanceState -> parentHandleOutgoing: " + parentHandleOutgoing);
             parentHandleLinks = savedInstanceState.getLong(PARENT_HANDLE_LINKS, INVALID_HANDLE);
-            parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
             parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
             deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
             deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
@@ -1582,7 +1579,6 @@ public class ManagerActivity extends TransfersManagementActivity
             parentHandleIncoming = -1;
             parentHandleOutgoing = -1;
             parentHandleLinks = INVALID_HANDLE;
-            parentHandleSearch = -1;
             parentHandleInbox = -1;
             deepBrowserTreeIncoming = 0;
             deepBrowserTreeOutgoing = 0;
@@ -3837,7 +3833,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case SEARCH: {
                 aB.setSubtitle(null);
-                if (parentHandleSearch == -1) {
+                if (viewModel.getSearchParentHandle() == -1L) {
                     firstNavigationLevel = true;
                     if (searchQuery != null) {
                         viewModel.setTextSubmitted(true);
@@ -3851,7 +3847,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                 } else {
-                    MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSearch);
+                    MegaNode parentNode = megaApi.getNodeByHandle(viewModel.getSearchParentHandle());
                     if (parentNode != null) {
                         aB.setTitle(parentNode.getName());
                         firstNavigationLevel = false;
@@ -5107,7 +5103,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (drawerItem != DrawerItem.CHAT) {
                     textsearchQuery = false;
                     firstNavigationLevel = true;
-                    parentHandleSearch = -1;
+                    viewModel.setSearchParentHandle(-1L);
                     levelsSearch = -1;
                     setSearchDrawerItem();
                     selectDrawerItem(drawerItem);
@@ -5377,7 +5373,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private void openSearchOnHomepage() {
         textsearchQuery = false;
         firstNavigationLevel = true;
-        parentHandleSearch = -1;
+        viewModel.setSearchParentHandle(-1L);
         levelsSearch = -1;
         setSearchDrawerItem();
         selectDrawerItem(drawerItem);
@@ -6472,7 +6468,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                 case SEARCH:
-                    parentHandleSearch = levelsSearch > 0 ? result.getOldParentHandle() : INVALID_HANDLE;
+                    viewModel.setSearchParentHandle(levelsSearch > 0 ? result.getOldParentHandle() : INVALID_HANDLE);
                     levelsSearch--;
                     refreshSearch();
                     break;
@@ -6860,8 +6856,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case SEARCH:
-                if (parentHandleSearch != -1) {
-                    parentHandle = parentHandleSearch;
+                if (viewModel.getSearchParentHandle() != -1L) {
+                    parentHandle = viewModel.getSearchParentHandle();
                     break;
                 }
                 switch (searchDrawerItem) {
@@ -7687,11 +7683,6 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.setRubbishBinParentHandle(parentHandleRubbish);
     }
 
-    public void setParentHandleSearch(long parentHandleSearch) {
-        logDebug("setParentHandleSearch");
-        this.parentHandleSearch = parentHandleSearch;
-    }
-
     public void setParentHandleIncoming(long parentHandleIncoming) {
         logDebug("setParentHandleIncoming: " + parentHandleIncoming);
         this.parentHandleIncoming = parentHandleIncoming;
@@ -7714,7 +7705,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (intent != null) {
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 searchQuery = intent.getStringExtra(SearchManager.QUERY);
-                parentHandleSearch = -1;
+                viewModel.setSearchParentHandle(-1L);
                 setToolbarTitle();
                 isSearching = true;
 
@@ -10953,10 +10944,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public long getParentHandleOutgoing() {
         return parentHandleOutgoing;
-    }
-
-    public long getParentHandleSearch() {
-        return parentHandleSearch;
     }
 
     public long getParentHandleLinks() {
