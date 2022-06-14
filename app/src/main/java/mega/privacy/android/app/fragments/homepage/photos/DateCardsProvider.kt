@@ -39,15 +39,15 @@ class DateCardsProvider(
 
     suspend fun processGalleryItems(nodes: List<GalleryItem>) {
         dayNodes = nodes.mapNotNull {
-            val node = it.node ?: return
-            val previewExists = fileUtil.getFileIfExists(previewFolder, node.previewPath)
-            object : MediaItem {
-                override val id: Long = node.handle
-                override val modifiedDate: LocalDate = Util.fromEpoch(node.modificationTime)
-                override val preview: File? = previewExists
-                override val name: String = node.name
+            it.node?.let { node ->
+                val previewExists = fileUtil.getFileIfExists(previewFolder, node.previewPath)
+                object : MediaItem {
+                    override val id: Long = node.handle
+                    override val modifiedDate: LocalDate = Util.fromEpoch(node.modificationTime)
+                    override val preview: File? = previewExists
+                    override val name: String = node.name
+                }
             }
-
         }.groupBy { it.modifiedDate.toEpochDay() }
             .map { (_, list) ->
                 list.minByOrNull { it.modifiedDate }!! to list.size - 1L

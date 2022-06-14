@@ -111,6 +111,30 @@ class DateCardsProviderTest() {
         assertThat(underTest.getYears()).hasSize(numberOfYears)
     }
 
+    @Test
+    fun `test that an item with a null node is excluded, but other items are still returned`() =
+        runTest {
+            val numberOfYears = 1
+            val numberOfDaysPerMonth = 20
+            val numberOfMonthsPerYear = 1
+            val items = getGalleryItems(numberOfYears,
+                numberOfMonthsPerYear,
+                numberOfDaysPerMonth).toMutableList()
+            items.add(0, GalleryItem(node = null, indexForViewer = 1,
+                index = 1,
+                thumbnail = null,
+                type = MediaCardType.Header,
+                modifyDate = "",
+                formattedDate = null,
+                headerDate = null,
+                selected = false,
+                uiDirty = false))
+
+
+            underTest.processGalleryItems(items)
+            assertThat(underTest.getDays()).hasSize(numberOfYears * numberOfMonthsPerYear * numberOfDaysPerMonth)
+        }
+
 
     private fun getGalleryItems(
         numberOfYears: Int,
