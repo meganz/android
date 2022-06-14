@@ -22,6 +22,10 @@ class GetFileVersionsOptionUseCase @Inject constructor(
         Completable.create { emitter ->
             megaApi.getFileVersionsOption(OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
+                    if (emitter.isDisposed) {
+                        return@OptionalMegaRequestListenerInterface
+                    }
+
                     if (error.errorCode == MegaError.API_OK) {
                         MegaApplication.setDisableFileVersions(request.flag)
                         emitter.onComplete()

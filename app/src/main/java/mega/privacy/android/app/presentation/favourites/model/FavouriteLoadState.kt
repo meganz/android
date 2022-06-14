@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.favourites.model
 
-import mega.privacy.android.app.usecase.MegaException
+import mega.privacy.android.app.usecase.exception.MegaException
 
 /**
  * The favourite list load state

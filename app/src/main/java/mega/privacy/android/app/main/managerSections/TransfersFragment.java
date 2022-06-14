@@ -80,7 +80,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
 		setTransfers();
 
-		adapter = new MegaTransfersAdapter(context, tL, listView, this);
+		adapter = new MegaTransfersAdapter(context, tL, listView, this, transfersManagement);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);

@@ -57,8 +57,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -124,6 +129,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -132,9 +138,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		MegaChatRequestListenerInterface, View.OnClickListener,
 		ActionNodeCallback, SnackbarShower {
-
-	@Inject
-	GetChatChangesUseCase getChatChangesUseCase;
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -182,6 +185,14 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	GetChatChangesUseCase getChatChangesUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	UploadUseCase uploadUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -288,6 +299,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private FileExplorerActivityViewModel mViewModel;
+
+	private long parentHandle;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -405,6 +418,9 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
+				result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
 		mViewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
 		mViewModel.info.observe(this, this::onProcessAsyncInfo);
@@ -1609,7 +1625,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		finishActivity();
 	}
 
-	public void checkIfFilesExistsInMEGA () {
+	public void checkIfFilesExistsInMEGA() {
 		for (ShareInfo info : filePreparedInfos) {
 			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
@@ -1618,13 +1634,29 @@ public class FileExplorerActivity extends TransfersManagementActivity
 //					File is in My Chat Files --> Add to attach
 					attachNodes.add(node);
 					filesChecked++;
-				}
-				else {
+				} else {
 //					File is in Cloud --> Copy in My Chat Files
-					megaApi.copyNode(node, myChatFilesNode, this);
+					copyNodeUseCase.copy(node, myChatFilesNode, null)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(() -> {
+								filesChecked++;
+								attachNodes.add(node);
+
+								if (filesChecked == filePreparedInfos.size()) {
+									startChatUploadService();
+								}
+							}, throwable -> {
+								filesChecked++;
+								logWarning("Error copying node into My Chat Files");
+								if (filesChecked == filePreparedInfos.size()) {
+									startChatUploadService();
+								}
+
+								manageCopyMoveException(throwable);
+							});
 				}
-			}
-			else {
+			} else {
 				uploadInfos.add(info);
 				filesChecked++;
 			}
@@ -1664,52 +1696,63 @@ public class FileExplorerActivity extends TransfersManagementActivity
 			getIntent().setAction(ACTION_PROCESSED);
 		}
 
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
 
 		logDebug("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				showSnackbar(getString(R.string.upload_can_not_open));
+				dismissAlertDialogIfExists(statusDialog);
+				showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));
+				return;
 			}
-			else {
-				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-					showOverDiskQuotaPaywallWarning();
-					return;
-				}
 
-				long parentHandle;
-				if (cDriveExplorer != null){
-					parentHandle = cDriveExplorer.getParentHandle();
-				}
-				else{
-					parentHandle = parentHandleCloud;
-				}
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				dismissAlertDialogIfExists(statusDialog);
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
 
-				backToCloud(parentNode.getHandle(), infos.size());
-				for (ShareInfo info : infos) {
-					Intent intent = new Intent(this, UploadService.class);
-					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-					if (nameFiles != null && nameFiles.get(info.getTitle()) != null && !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
-						intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
-					}
-					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					ContextCompat.startForegroundService(this, intent);
-				}
-				filePreparedInfos = null;
-				logDebug("finish!!!");
-				finishActivity();
-			}	
+			parentHandle = cDriveExplorer != null
+					? cDriveExplorer.getParentHandle()
+					: parentHandleCloud;
+
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null) {
+				parentNode = megaApi.getRootNode();
+				parentHandle = parentNode.getHandle();
+			}
+
+			MegaNode finalParentNode = parentNode;
+			checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						dismissAlertDialogIfExists(statusDialog);
+
+						if (throwable != null) {
+							showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
+						} else {
+							ArrayList<NameCollision> collisions = result.getFirst();
+							List<ShareInfo> withoutCollisions = result.getSecond();
+
+							if (!collisions.isEmpty()) {
+								nameCollisionActivityContract.launch(collisions);
+							}
+
+							if (!withoutCollisions.isEmpty()) {
+								String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
+								uploadUseCase.uploadInfos(this, infos, nameFiles, finalParentNode.getHandle())
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() -> {
+											showSnackbar(text);
+											backToCloud(finalParentNode.getHandle(), infos.size(), null);
+											filePreparedInfos = null;
+											logDebug("finish!!!");
+											finishActivity();
+										});
+							}
+						}
+					});
 		}
 	}
 
@@ -1913,17 +1956,33 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		}
 	}
 
-	private void backToCloud(long handle, int numberUploads){
+	/**
+	 * Goes back to Cloud.
+	 *
+	 * @param handle        Parent handle of the folder to open.
+	 * @param numberUploads Numer of uploads.
+	 * @param message       Message to show.
+	 */
+	private void backToCloud(long handle, int numberUploads, String message) {
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivity.class)
-				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
-				.putExtra(NUMBER_UPLOADS, numberUploads);
-		if(handle!=-1){
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+		if (handle != INVALID_HANDLE) {
 			startIntent.setAction(ACTION_OPEN_FOLDER);
-			startIntent.putExtra("PARENT_HANDLE", handle);
+			startIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, handle);
 		}
+
+		if (numberUploads > 0) {
+			startIntent.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
+					.putExtra(NUMBER_UPLOADS, numberUploads);
+		}
+
+		if (message != null) {
+			startIntent.putExtra(EXTRA_MESSAGE, message);
+		}
+
 		startActivity(startIntent);
 	}
 
@@ -1931,34 +1990,51 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		showSnackbar(fragmentContainer, s);
     }
 
-    public void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+	public void createFile(String name, String data, MegaNode parentNode, boolean isURL) {
 		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
 			showOverDiskQuotaPaywallWarning();
 			return;
 		}
 
 		File file;
-		if (isURL){
+		if (isURL) {
 			file = createTemporalURLFile(this, name, data);
-		}
-		else {
+		} else {
 			file = createTemporalTextFile(this, name, data);
 		}
-		if(file!=null){
-			Intent intent = new Intent(this, UploadService.class);
-			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-			ContextCompat.startForegroundService(this, intent);
 
-			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(parentNode.getHandle(), 1);
-			finishActivity();
+		if (file == null) {
+			showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
+			return;
 		}
-		else{
-			showSnackbar(getString(R.string.general_text_error));
-		}
+
+		parentHandle = parentNode.getHandle();
+		checkNameCollisionUseCase.check(file.getName(), parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(handle -> {
+							ArrayList<NameCollision> list = new ArrayList<>();
+							list.add(NameCollision.Upload.getUploadCollision(handle, file,
+									parentNode.getHandle()));
+							nameCollisionActivityContract.launch(list);
+						},
+						throwable -> {
+							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
+								showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
+							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+								String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1);
+
+								uploadUseCase.upload(this, file, parentNode.getHandle())
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() -> {
+											showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE);
+											logDebug("After UPLOAD click - back to Cloud");
+											this.backToCloud(parentNode.getHandle(), 1, null);
+											finishActivity();
+										});
+							}
+						});
 	}
 
 	@Override
@@ -2123,20 +2199,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 				MegaApplication.setLoggingIn(false);
 				afterLoginAndFetch();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY) {
-			filesChecked++;
-			if (error.getErrorCode() == MegaError.API_OK) {
-				MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-				if (node != null) {
-					attachNodes.add(node);
-				}
-			} else {
-				logWarning("Error copying node into My Chat Files");
-			}
-			if (filesChecked == filePreparedInfos.size()) {
-				startChatUploadService();
 			}
 		}
 	}

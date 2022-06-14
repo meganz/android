@@ -415,6 +415,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
         }
+        viewModel.onCopyMoveException().observe(this) { error ->
+            manageCopyMoveException(error)
+        }
+        viewModel.onCollision().observe(this) { collision ->
+            nameCollisionActivityContract.launch(arrayListOf(collision))
+        }
         viewModel.onActionBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showTransfersSnackBar(StringResourcesUtils.getString(message))

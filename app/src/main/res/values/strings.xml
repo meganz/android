@@ -3681,8 +3681,6 @@
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Upload folder</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel upload?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Payment</string>
     <!-- Label indicating payment methods -->
@@ -3707,10 +3705,6 @@
     <string name="pro_iii_monthly">Pro III monthly</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III yearly</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Cancel upload</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Don’t cancel</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remove moderator</string>
     <!-- Title message of existing subscription dialog -->
@@ -3823,6 +3817,80 @@
     <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Enter your password</string>
+    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
+    <string name="warning_scanning_transfers">Please do not close the application.</string>
+    <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
+    <string name="scanning_transfers">Scanning&#8230;</string>
+    <!-- Label cancel transfers. -->
+    <string name="cancel_transfers">Cancel transfers</string>
+    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
+    <string name="warning_cancel_transfers">Interrupting this process may leave some of your transfers incomplete.</string>
+    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
+    <string name="button_proceed">Proceed</string>
+    <!-- Warning informing transfers were cancelled. -->
+    <string name="transfers_cancelled">Transfers have been cancelled.</string>
+    <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
+    <string name="title_duplicated_items">Duplicated items</string>
+    <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
+    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists in this location.</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
+    <string name="choose_file">Select the file you want to keep</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose. -->
+    <string name="choose_folder">Select whether you want to merge the folders</string>
+    <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_upload_and_replace">The current version of the file will be replaced with the file you are uploading.</string>
+    <!-- Upload and replace action button for a name collision. -->
+    <string name="upload_and_replace">Upload and replace</string>
+    <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
+    <string name="warning_versioning_upload_and_update">The file will be updated with version history:</string>
+    <!-- Upload and update action button for a name collision. -->
+    <string name="upload_and_update">Upload and update</string>
+    <!-- Don’t upload action button for a name collision. -->
+    <string name="do_not_upload">Don’t upload</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
+    <string name="warning_upload_and_rename">The file you are uploading will be renamed as:</string>
+    <!-- Upload and rename action button for a name collision. -->
+    <string name="upload_and_rename">Upload and rename</string>
+    <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_move_and_replace">Replace the file in the destination folder with the file you are moving.</string>
+    <!-- Move and replace action button for a name collision. -->
+    <string name="move_and_replace">Move and replace</string>
+    <!-- Don’t move action button for a name collision. -->
+    <string name="do_not_move">Don’t move</string>
+    <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
+    <string name="warning_move_and_rename">The file you are moving will be renamed as:</string>
+    <!-- Move and rename action button for a name collision. -->
+    <string name="move_and_rename">Move and rename</string>
+    <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_copy_and_replace">Replace the file in the destination folder with the file you are copying.</string>
+    <!-- Copy and replace action button for a name collision. -->
+    <string name="copy_and_replace">Copy and replace</string>
+    <!-- Don’t copy action button for a name collision. -->
+    <string name="do_not_copy">Don’t copy</string>
+    <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
+    <string name="warning_copy_and_rename">The file you are copying will be renamed as:</string>
+    <!-- Copy and rename action button for a name collision. -->
+    <string name="copy_and_rename">Copy and rename</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <string name="file_apply_for_all">Apply this option on the next %1$d conflicts</string>
+    <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
+    <string name="warning_copy_and_merge">Merge the folder at the destination with the folder you are copying.</string>
+    <!-- Copy and merge action button for a name collision. -->
+    <string name="copy_and_merge">Copy and merge</string>
+    <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
+    <string name="warning_move_and_merge">Merge the folder at the destination with the folder you are moving.</string>
+    <!-- Move and merge action button for a name collision. -->
+    <string name="move_and_merge">Move and merge</string>
+    <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
+    <string name="warning_upload_and_merge">Merge the folder at the destination with the folder you are uploading.</string>
+    <!-- Upload and merge action button for a name collision. -->
+    <string name="upload_and_merge">Upload and merge</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
+    <string name="skip_file">No files will be changed. You will keep the file below:</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
+    <string name="skip_folder">Skip this folder</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists in this location.</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->

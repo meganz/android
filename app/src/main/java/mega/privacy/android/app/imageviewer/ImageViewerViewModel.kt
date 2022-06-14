@@ -23,19 +23,24 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.HttpMegaException
 import mega.privacy.android.app.usecase.LoggedInUseCase
-import mega.privacy.android.app.usecase.MegaException
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
-import mega.privacy.android.app.usecase.ResourceAlreadyExistsMegaException
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.usecase.exception.HttpMegaException
+import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -64,7 +69,11 @@ import javax.inject.Inject
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
- * @property transfersPausedUseCase     UseCase required to check if transfers are paused
+ * @property areTransfersPaused         UseCase required to check if transfers are paused
+ * @property copyNodeUseCase            UseCase required to copy nodes
+ * @property moveNodeUseCase            UseCase required to move nodes
+ * @property removeNodeUseCase          UseCase required to remove nodes
+ * @property checkNameCollisionUseCase  UseCase required to check name collisions
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -72,14 +81,15 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase,
-    private val removeNodeUseCase: RemoveNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
     private val areTransfersPaused: AreTransfersPaused,
+    private val copyNodeUseCase: CopyNodeUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
+    private val removeNodeUseCase: RemoveNodeUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -87,6 +97,9 @@ class ImageViewerViewModel @Inject constructor(
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackBarMessage = SingleLiveEvent<String>()
     private val actionBarMessage = SingleLiveEvent<Int>()
+    private val copyMoveException = SingleLiveEvent<Throwable>()
+    private val collision = SingleLiveEvent<NameCollision>()
+
     private var isUserLoggedIn = false
 
     init {
@@ -120,6 +133,10 @@ class ImageViewerViewModel @Inject constructor(
     fun onSnackBarMessage(): SingleLiveEvent<String> = snackBarMessage
 
     fun onActionBarMessage(): SingleLiveEvent<Int> = actionBarMessage
+
+    fun onCopyMoveException(): LiveData<Throwable> = copyMoveException
+
+    fun onCollision(): LiveData<NameCollision> = collision
 
     fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
@@ -506,21 +523,81 @@ class ImageViewerViewModel @Inject constructor(
         return result
     }
 
+    /**
+     * Copies a node if there is no name collision.
+     *
+     * @param nodeHandle        Node handle to copy.
+     * @param newParentHandle   Parent handle in which the node will be copied.
+     */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        copyNodeUseCase.copy(
-            node = getExistingNode(nodeHandle),
-            nodeHandle = nodeHandle,
-            toParentHandle = newParentHandle
-        ).subscribeAndComplete(false) {
-            snackBarMessage.value = getString(R.string.context_correctly_copied)
+
+        val node = getExistingNode(nodeHandle) ?: return
+
+        checkNameCollision(
+            node = node,
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.COPY
+        ) {
+            copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
+                .subscribeAndComplete(
+                    completeAction = {
+                        snackBarMessage.value = getString(R.string.context_correctly_copied)
+                    }, errorAction = { error -> copyMoveException.value = error })
         }
     }
 
+    /**
+     * Moves a node if there is no name collision.
+     *
+     * @param nodeHandle        Node handle to move.
+     * @param newParentHandle   Parent handle in which the node will be moved.
+     */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        moveNodeUseCase.move(nodeHandle, newParentHandle)
-            .subscribeAndComplete(false) {
-                snackBarMessage.value = getString(R.string.context_correctly_moved)
-            }
+        val node = getExistingNode(nodeHandle) ?: return
+
+        checkNameCollision(
+            node = node,
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.MOVE
+        ) {
+            moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
+                .subscribeAndComplete(
+                    completeAction = {
+                        snackBarMessage.value = getString(R.string.context_correctly_moved)
+                    }, errorAction = { error -> copyMoveException.value = error }
+                )
+        }
+    }
+
+    /**
+     * Checks if there is a name collision before proceeding with the action.
+     *
+     * @param node              Node to check the name collision.
+     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
+     * @param type              [NameCollisionType]
+     * @param completeAction    Action to complete after checking the name collision.
+     */
+    private fun checkNameCollision(
+        node: MegaNode,
+        newParentHandle: Long,
+        type: NameCollisionType,
+        completeAction: (() -> Unit)
+    ) {
+        checkNameCollisionUseCase.check(
+            node = node,
+            parentHandle = newParentHandle,
+            type = type
+        ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { collisionResult -> collision.value = collisionResult },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                        else -> logError(error.stackTraceToString())
+                    }
+                }
+            )
+            .addTo(composite)
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
@@ -638,6 +715,7 @@ class ImageViewerViewModel @Inject constructor(
     private fun Completable.subscribeAndComplete(
         addToComposite: Boolean = false,
         completeAction: (() -> Unit)? = null,
+        errorAction: ((Throwable) -> Unit)? = null
     ) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -646,6 +724,7 @@ class ImageViewerViewModel @Inject constructor(
                     completeAction?.invoke()
                 },
                 onError = { error ->
+                    errorAction?.invoke(error)
                     logError(error.stackTraceToString())
                 }
             ).also {
