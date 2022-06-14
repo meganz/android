@@ -22,8 +22,9 @@ class GalleryCardAdapter(
     private val cardViewType: Int,
     private val cardWidth: Int,
     private val cardMargin: Int,
-    private val listener: Listener
-) : ListAdapter<GalleryCard, GalleryCardViewHolder>(GalleryCard.DiffCallback()), SectionTitleProvider {
+    private val listener: Listener,
+) : ListAdapter<GalleryCard, GalleryCardViewHolder>(GalleryCard.DiffCallback()),
+    SectionTitleProvider {
 
     init {
         setHasStableIds(true)
@@ -38,7 +39,7 @@ class GalleryCardAdapter(
         )
 
     override fun onBindViewHolder(holder: GalleryCardViewHolder, position: Int) {
-        holder.bind(position, getItem(position), listener)
+        holder.bind(getItem(position), listener)
     }
 
     override fun getSectionTitle(position: Int): String =
@@ -49,9 +50,9 @@ class GalleryCardAdapter(
         }
 
     override fun getItemId(position: Int): Long =
-        getItem(position).node.handle
+        getItem(position).id
 
     interface Listener {
-        fun onCardClicked(position: Int, card: GalleryCard)
+        fun onCardClicked(card: GalleryCard)
     }
 }

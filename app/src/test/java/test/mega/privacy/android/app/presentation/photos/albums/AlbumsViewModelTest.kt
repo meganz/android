@@ -29,7 +29,7 @@ class AlbumsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = AlbumsViewModel(
-                getAlbums = getAlbums,
+            getAlbums = getAlbums,
         )
     }
 
@@ -43,9 +43,9 @@ class AlbumsViewModelTest {
     @Test
     fun `test that start with loading state and load albums success`() = runTest {
         whenever(getAlbums()).thenReturn(
-                flowOf(
-                        createAlbums()
-                )
+            flowOf(
+                createAlbums()
+            )
         )
         underTest.albumsState.test {
             assertTrue(awaitItem() is AlbumsLoadState.Loading)
@@ -65,11 +65,11 @@ class AlbumsViewModelTest {
 
     private fun createAlbums(): List<Album> {
         val favouriteAlbum = Album.FavouriteAlbum(
-                null,
-                0
+            null,
+            0
         )
         return listOf(
-                favouriteAlbum
+            favouriteAlbum
         )
     }
 }

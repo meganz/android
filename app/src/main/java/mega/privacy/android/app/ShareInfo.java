@@ -58,6 +58,7 @@ public class ShareInfo implements Serializable {
 	public static ShareInfo infoFromFile(File file) {
 		ShareInfo info = new ShareInfo();
 		info.file = file;
+		info.lastModified = file.lastModified();
 		info.size = file.length();
 		info.title = file.getName();
 		try {
