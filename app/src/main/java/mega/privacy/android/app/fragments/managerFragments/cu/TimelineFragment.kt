@@ -39,6 +39,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -278,7 +279,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
-            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked,
+            requireContext(),
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
@@ -430,7 +432,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
 
             updateOptionsButtons()
 
@@ -892,21 +894,21 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 
