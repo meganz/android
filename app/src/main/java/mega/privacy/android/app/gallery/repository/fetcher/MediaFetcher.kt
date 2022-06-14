@@ -8,12 +8,13 @@ import kotlinx.coroutines.delay
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.MediaCardType
+import mega.privacy.android.app.gallery.extension.formatDateTitle
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiAndroid
@@ -168,16 +169,16 @@ class MediaFetcher(
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
             val galleryItem = GalleryItem(
-                node,
-                Constants.INVALID_POSITION,
-                Constants.INVALID_POSITION,
-                thumbnail,
-                if (node.duration == -1) GalleryItem.TYPE_IMAGE else GalleryItem.TYPE_VIDEO,
-                dateString,
-                null,
-                null,
-                selected,
-                true
+                node = node,
+                indexForViewer = Constants.INVALID_POSITION,
+                index = Constants.INVALID_POSITION,
+                thumbnail = thumbnail,
+                type = if (node.duration == -1) MediaCardType.Image else MediaCardType.Video,
+                modifyDate = dateString,
+                formattedDate = null,
+                headerDate = null,
+                selected = selected,
+                uiDirty = true,
             )
             fileNodesMap[node.handle] = galleryItem
         }
@@ -194,21 +195,21 @@ class MediaFetcher(
     private fun addPhotoDateTitle(dateString: String, date: Pair<String, String>) {
         // RandomUUID() can ensure non-repetitive values in practical purpose
         fileNodesMap[UUID.randomUUID()] = GalleryItem(
-            null,
-            Constants.INVALID_POSITION,
-            Constants.INVALID_POSITION,
-            null,
-            GalleryItem.TYPE_HEADER,
-            dateString,
-            date.formatDateTitle(),
-            null,
-            false,
-            uiDirty = true
+            node = null,
+            indexForViewer = Constants.INVALID_POSITION,
+            index = Constants.INVALID_POSITION,
+            thumbnail = null,
+            type = MediaCardType.Header,
+            modifyDate = dateString,
+            formattedDate = date.formatDateTitle(context),
+            headerDate = null,
+            selected = false,
+            uiDirty = true,
         )
     }
 
     suspend fun getPreviewsFromServer(
-        map: MutableMap<MegaNode, String>,
+        map: Map<MegaNode, String>,
         refreshCallback: () -> Unit,
     ) {
         for (item in map) {

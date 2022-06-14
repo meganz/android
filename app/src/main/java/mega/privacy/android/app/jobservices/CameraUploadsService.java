@@ -4,8 +4,6 @@ import static android.content.ContentResolver.QUERY_ARG_OFFSET;
 import static android.content.ContentResolver.QUERY_ARG_SQL_LIMIT;
 import static android.content.ContentResolver.QUERY_ARG_SQL_SELECTION;
 import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
@@ -128,6 +126,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -807,7 +807,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        megaApi.startUpload(path, parent, APP_DATA_CU, file.getFileName(), lastModified / 1000, this);
+                        megaApi.startUpload(path, parent, file.getFileName(), lastModified / 1000,
+                                APP_DATA_CU, false, false, null, this);
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.");
@@ -1638,7 +1639,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
+            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e), dbH);
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {

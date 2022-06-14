@@ -14,24 +14,23 @@ import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import nz.mega.sdk.MegaApiJava
@@ -48,8 +47,9 @@ class TimelineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
-    private val sortOrderManagement: SortOrderManagement,
+    private val getCameraSortOrder: GetCameraSortOrder,
     private val jobUtilWrapper: JobUtilWrapper,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
 ) : ViewModel() {
 
@@ -76,7 +76,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = sortOrderManagement.getOrderCamera()
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false
@@ -125,7 +125,7 @@ class TimelineViewModel @Inject constructor(
             if (forceUpdate) {
                 cancelToken = initNewSearch()
                 repository.getFiles(cancelToken ?: return@liveData,
-                    sortOrderManagement.getOrderCamera(),
+                    getCameraSortOrder(),
                     mZoom)
             } else {
                 repository.emitFiles()
@@ -144,22 +144,40 @@ class TimelineViewModel @Inject constructor(
         it
     }
 
-    var dateCards: LiveData<List<List<GalleryCard>>> = items.map {
-        val cardsProvider = DateCardsProvider()
-        cardsProvider.extractCardsFromNodeList(
-            context,
-            it.mapNotNull { item -> item.node }
-                // Sort by modification time and name desc.
-                .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }.thenByDescending { node -> node.name })
-        )
+    var dateCards: LiveData<List<List<GalleryCard>>> = items.switchMap { galleryItems ->
+        liveData(context = ioDispatcher) {
+            val previewFolder = repository.previewFolder
+                ?: return@liveData
+            val cardsProvider = DateCardsProvider(
+                previewFolder = previewFolder,
+            )
+            cardsProvider.processGalleryItems(
+                nodes = galleryItems
+            )
 
-        viewModelScope.launch {
-            repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
-                _refreshCards.value = true
-            }
+            val days = cardsProvider.getDays()
+
+
+            emit(
+                listOf(
+                    days.sortDescending(),
+                    cardsProvider.getMonths().sortDescending(),
+                    cardsProvider.getYears().sortDescending())
+            )
+
+            fetchMissingPreviews(days)
         }
+    }
 
-        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
+    fun List<GalleryCard>.sortDescending() = sortedWith(
+        compareByDescending<GalleryCard> { it.localDate }
+            .thenByDescending { it.name }
+    )
+
+    private suspend fun fetchMissingPreviews(days: List<GalleryCard>) {
+        repository.getPreviews(days) {
+            _refreshCards.value = true
+        }
     }
 
     init {
@@ -179,7 +197,7 @@ class TimelineViewModel @Inject constructor(
      * Custom condition in sub class for filter the real photos count
      */
     private fun getFilterRealPhotoCountCondition(item: GalleryItem) =
-        item.type != GalleryItem.TYPE_HEADER
+        item.type != MediaCardType.Header
 
     /**
      * Indicate refreshing cards has finished.
@@ -196,7 +214,7 @@ class TimelineViewModel @Inject constructor(
     private fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
 
-        if (item.type != GalleryItem.TYPE_HEADER) {
+        if (item.type != MediaCardType.Header) {
             item.indexForViewer = tempIndex++
         }
 
@@ -206,32 +224,86 @@ class TimelineViewModel @Inject constructor(
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked year card.
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-        position,
-        card,
-        dateCards.value?.get(MONTHS_INDEX),
-        dateCards.value?.get(YEARS_INDEX)
+    fun yearClicked(card: GalleryCard) = yearClicked(
+        card = card,
+        months = dateCards.value?.get(MONTHS_INDEX),
+        years = dateCards.value?.get(YEARS_INDEX),
     )
+
+    private fun yearClicked(
+        card: GalleryCard,
+        months: List<GalleryCard>?,
+        years: List<GalleryCard>?,
+    ): Int {
+        val yearCard = getClickedCard(card.id, years) ?: return 0
+        val monthCards = months ?: return 0
+
+        val cardYear = yearCard.localDate.year
+
+        for (i in monthCards.indices) {
+            val nextLocalDate = monthCards[i].localDate
+            if (nextLocalDate.year == cardYear) {
+                //Year clicked, current month. If not exists, the closest month behind the current.
+                if (i == 0 || monthCards[i - 1].localDate.year != cardYear) {
+                    return i
+                }
+            }
+        }
+
+        //No month equal or behind the current found, then return the latest month.
+        return monthCards.size - 1
+    }
+
+
 
     /**
      * Checks the clicked month card and gets the day card to show after click on a month card.
      *
-     * @param position Clicked position in the list.
      * @param card     Clicked month card.
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-        position,
-        card,
-        dateCards.value?.get(DAYS_INDEX),
-        dateCards.value?.get(MONTHS_INDEX)
+    fun monthClicked(card: GalleryCard) = monthClicked(
+        card = card,
+        days = dateCards.value?.get(DAYS_INDEX),
+        months = dateCards.value?.get(MONTHS_INDEX),
     )
+
+    private fun monthClicked(
+        card: GalleryCard,
+        days: List<GalleryCard>?,
+        months: List<GalleryCard>?,
+    ): Int {
+        val monthCard = getClickedCard(card.id, months) ?: return 0
+        val dayCards = days ?: return 0
+
+        val cardLocalDate = monthCard.localDate
+        val cardMonth = cardLocalDate.monthValue
+        val cardYear = cardLocalDate.year
+
+        for (i in dayCards.indices) {
+            val nextLocalDate = dayCards[i].localDate
+            val nextMonth = nextLocalDate.monthValue
+            val nextYear = nextLocalDate.year
+
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                //Month of year clicked, current day. If not exists, the closest day behind the current.
+                if (i == 0 || dayCards[i - 1].localDate.monthValue != cardMonth) {
+                    return i
+                }
+            }
+        }
+        return dayCards.size - 1
+    }
+
+    private fun getClickedCard(
+        handle: Long,
+        cards: List<GalleryCard>?,
+    ) = cards?.find { it.id == handle }
 
     /**
      * Load photos by calling Mega Api or just filter loaded nodes
@@ -296,9 +368,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Check is enable CU shown UI
      */
-    fun isEnableCUShown(): Boolean {
-        return enableCUShown
-    }
+    fun isEnableCUShown(): Boolean = enableCUShown
 
     /**
      * set enable CU shown UI
@@ -310,14 +380,12 @@ class TimelineViewModel @Inject constructor(
     /**
      * Check is CU enabled
      */
-    fun isCUEnabled(): Boolean {
-        return if (camSyncEnabled.value != null) camSyncEnabled.value!! else false
-    }
+    fun isCUEnabled(): Boolean = camSyncEnabled.value ?: false
 
     /**
      * User enabled Camera Upload, so a periodic job should be scheduled if not already running
      */
-    fun startCameraUploadJob() {
+    fun startCameraUploadJob(context: Context) {
         Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
         jobUtilWrapper.fireCameraUploadJob(context, false)
     }
@@ -325,50 +393,40 @@ class TimelineViewModel @Inject constructor(
     /**
      * Set Initial Preferences
      */
-    fun setInitialPreferences() {
-        add(Completable.fromCallable {
-            Timber.d("setInitialPreferences")
-            mDbHandler.setFirstTime(false)
-            mDbHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation =
-                repository.buildDefaultDownloadDir()
-            defaultDownloadLocation.mkdirs()
-            mDbHandler.setStorageDownloadLocation(
-                defaultDownloadLocation.absolutePath
-            )
-            mDbHandler.isPasscodeLockEnabled = false
-            mDbHandler.passcodeLockCode = ""
-            val nodeLinks: ArrayList<MegaNode> = repository.getPublicLinks()
-            if (nodeLinks.size == 0) {
-                Timber.d("No public links: showCopyright set true")
-                mDbHandler.setShowCopyright(true)
-            } else {
-                Timber.d("Already public links: showCopyright set false")
-                mDbHandler.setShowCopyright(false)
-            }
-            true
+    fun setInitialPreferences() = viewModelScope.launch(ioDispatcher) {
+        Timber.d("setInitialPreferences")
+        mDbHandler.setFirstTime(false)
+        mDbHandler.setStorageAskAlways(true)
+        val defaultDownloadLocation =
+            repository.buildDefaultDownloadDir()
+        defaultDownloadLocation.mkdirs()
+        mDbHandler.setStorageDownloadLocation(
+            defaultDownloadLocation.absolutePath
+        )
+        mDbHandler.isPasscodeLockEnabled = false
+        mDbHandler.passcodeLockCode = ""
+        val nodeLinks: ArrayList<MegaNode> = repository.getPublicLinks()
+        if (nodeLinks.size == 0) {
+            Timber.d("No public links: showCopyright set true")
+            mDbHandler.setShowCopyright(true)
+        } else {
+            Timber.d("Already public links: showCopyright set false")
+            mDbHandler.setShowCopyright(false)
         }
-            .subscribeOn(Schedulers.io())
-            .subscribe(RxUtil.IGNORE, RxUtil.logErr("setInitialPreferences")))
     }
 
     /**
      * Set CamSync Enabled to db
      */
-    fun setCamSyncEnabled(enabled: Boolean) {
-        add(Completable.fromCallable {
-            mDbHandler.setCamSyncEnabled(enabled)
-            enabled
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe(RxUtil.IGNORE, RxUtil.logErr("setCamSyncEnabled")))
+    fun setCamSyncEnabled(enabled: Boolean) = viewModelScope.launch(ioDispatcher) {
+        mDbHandler.setCamSyncEnabled(enabled)
     }
 
-    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
-        viewModelScope.launch(IO) {
+    fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean, context: Context) {
+        viewModelScope.launch(ioDispatcher) {
             runCatching {
                 enableCUSettingForDb(enableCellularSync, syncVideo)
-                startCameraUploadJob()
+                startCameraUploadJob(context)
             }.onFailure {
                 Timber.e("enableCu" + it.message)
             }
@@ -406,10 +464,8 @@ class TimelineViewModel @Inject constructor(
         return camSyncEnabled
     }
 
-    fun checkAndUpdateCamSyncEnabledStatus() {
-        viewModelScope.launch(IO) {
-            camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
-        }
+    fun checkAndUpdateCamSyncEnabledStatus() = viewModelScope.launch(ioDispatcher) {
+        camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
     }
 
     private fun add(disposable: Disposable) {

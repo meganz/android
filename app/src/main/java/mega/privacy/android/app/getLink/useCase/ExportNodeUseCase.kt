@@ -5,7 +5,7 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.toMegaException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -67,12 +67,10 @@ class ExportNodeUseCase @Inject constructor(
 
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onSuccess(request.link)
-                    } else {
-                        emitter.onError(error.toMegaException())
+                    when {
+                        emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                        error.errorCode == MegaError.API_OK -> emitter.onSuccess(request.link)
+                        else -> emitter.onError(error.toMegaException())
                     }
                 }
             )
@@ -108,10 +106,10 @@ class ExportNodeUseCase @Inject constructor(
 
             megaApi.disableExport(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onComplete()
-                    } else {
-                        emitter.onError(error.toMegaException())
+                    when {
+                        emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                        error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                        else -> emitter.onError(error.toMegaException())
                     }
                 }
             ))

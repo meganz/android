@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -15,6 +14,12 @@ import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -28,6 +33,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentImagesBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -113,7 +119,7 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         binding = FragmentImagesBinding.inflate(inflater, container, false)
         adapterType = PHOTOS_BROWSE_ADAPTER
@@ -187,9 +193,8 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
             if (isGridAdapterInitialized()) {
                 gridAdapter.submitList(it)
             }
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
-            viewTypePanel.visibility =
-                if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == MediaCardType.Image })
+            viewTypePanel.visibility = if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
             } else {
@@ -459,21 +464,21 @@ class ImagesFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 

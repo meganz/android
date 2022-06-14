@@ -99,8 +99,9 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.DrawerItem;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
@@ -122,6 +123,8 @@ public class FileBrowserFragment extends RotatableFragment{
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	TransfersManagement transfersManagement;
 
 	private ManagerViewModel managerViewModel;
 
@@ -506,7 +509,7 @@ public class FileBrowserFragment extends RotatableFragment{
 		if (recyclerView == null) return;
 
 		boolean visible = (adapter != null && adapter.isMultipleSelect())
-				|| MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()
+				|| transfersManagement.isTransferOverQuotaBannerShown()
 				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
 
 		((ManagerActivity) context).changeAppBarElevation(visible);
@@ -1357,7 +1360,7 @@ public class FileBrowserFragment extends RotatableFragment{
 	 * Sets the "transfer over quota" banner visibility.
 	 */
 	public void setTransferOverQuotaBannerVisibility() {
-    	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
+    	if (transfersManagement.isTransferOverQuotaBannerShown()) {
     		transferOverQuotaBanner.setVisibility(View.VISIBLE);
     		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
 			createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota, transferOverQuotaBanner, transferOverQuotaBannerText);
@@ -1370,7 +1373,7 @@ public class FileBrowserFragment extends RotatableFragment{
 	 * Hides the "transfer over quota" banner.
 	 */
 	private void hideTransferOverQuotaBanner() {
-		MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
+		transfersManagement.setTransferOverQuotaBannerShown(false);
 		setTransferOverQuotaBannerVisibility();
 	}
 

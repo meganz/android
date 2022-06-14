@@ -2,6 +2,7 @@ package mega.privacy.android.app.uploadFolder.list.data
 
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.DiffUtil
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
@@ -52,6 +53,7 @@ sealed class FolderContent(val id: Long) {
                 TimeUtils.formatLongDateTime(lastModified / 1000)
             )
         }
+        var nameCollision: NameCollision? = null
 
         override fun getSectionTitle(): String =
             document.name?.substring(0, 1) ?: ""
