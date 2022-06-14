@@ -7,13 +7,27 @@ import mega.privacy.android.app.domain.entity.FeatureFlag
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
 import javax.inject.Inject
 
+/**
+ * Implementation of @FeatureFlagRepository
+ * @param preferencesGateway: Data Store Preferences gateway
+ */
 class DefaultFeatureFlagRepository @Inject constructor(
-        private val preferencesGateway: FeatureFlagPreferencesGateway
+    private val preferencesGateway: FeatureFlagPreferencesGateway,
 ) : FeatureFlagRepository {
 
+    /**
+     * Sets value of feature flag
+     *
+     * @param featureName: Name of the feature
+     * @param isEnabled: Boolean value
+     */
     override suspend fun setFeature(featureName: String, isEnabled: Boolean) =
-            preferencesGateway.setFeature(featureName, isEnabled)
+        preferencesGateway.setFeature(featureName, isEnabled)
 
+    /**
+     * Gets a fow of list of all feature flags
+     * @return: Flow of List of @FeatureFlag
+     */
     override suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
         return flow {
             val list = mutableListOf<FeatureFlag>()

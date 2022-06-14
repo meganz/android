@@ -18,4 +18,5 @@ abstract class FeatureFlagModule {
 
     @Binds
     abstract fun bindGetAllFeatureFlags(useCase: DefaultGetAllFeatureFlags): GetAllFeatureFlags
+
 }
