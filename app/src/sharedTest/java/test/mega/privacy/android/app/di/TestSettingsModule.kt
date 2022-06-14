@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.di.LoggingModule
@@ -32,6 +33,7 @@ import mega.privacy.android.app.domain.usecase.SetChatImageQuality
 import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -192,4 +194,8 @@ object TestSettingsModule {
     @Provides
     fun provideGetBooleanPreference(): GetPreference<Boolean> =
         mock { on { invoke(anyOrNull(), any()) }.thenAnswer{ flowOf(it.arguments[1])} }
+
+    @Provides
+    @ElementsIntoSet
+    fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
 }

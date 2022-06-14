@@ -1,6 +1,9 @@
 package mega.privacy.android.app.interfaces
 
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 interface SnackbarShower {
@@ -15,6 +18,10 @@ interface SnackbarShower {
 
 fun SnackbarShower.showSnackbar(content: String) {
     showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
+}
+
+fun SnackbarShower.showTransfersSnackBar(content: String) {
+    showSnackbar(RESUME_TRANSFERS_TYPE, content, MEGACHAT_INVALID_HANDLE)
 }
 
 fun SnackbarShower.showSnackbarWithChat(content: String?, chatId: Long) {

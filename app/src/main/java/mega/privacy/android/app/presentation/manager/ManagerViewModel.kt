@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.fragments.homepage.Event
 import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,54 +29,55 @@ class ManagerViewModel @Inject constructor(
      */
     @Suppress("DEPRECATION")
     private val _updates = monitorGlobalUpdates()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Monitor global node updates
      */
     private val _updateNodes = monitorNodeUpdates()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Monitor user updates and dispatch to observers
      */
-    val updateUsers: LiveData<List<MegaUser>> =
+    val updateUsers: LiveData<Event<List<MegaUser>>> =
         _updates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .also { Timber.d("onUsersUpdate") }
-            .map { it.users?.toList() }
-            .filterNotNull()
+            .mapNotNull { it.users?.toList() }
+            .map { Event(it) }
             .asLiveData()
 
     /**
      * Monitor user alerts updates and dispatch to observers
      */
-    val updateUserAlerts: LiveData<List<MegaUserAlert>> =
+    val updateUserAlerts: LiveData<Event<List<MegaUserAlert>>> =
         _updates
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .also { Timber.d("onUserAlertsUpdate") }
-            .map { it.userAlerts?.toList() }
-            .filterNotNull()
+            .mapNotNull { it.userAlerts?.toList() }
+            .map { Event(it) }
             .asLiveData()
 
     /**
      * Monitor global node updates and dispatch to observers
      */
-    val updateNodes: LiveData<List<MegaNode>> =
+    val updateNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onNodesUpdate") }
             .filterNotNull()
+            .map { Event(it) }
             .asLiveData()
 
     /**
      * Monitor contact request updates and dispatch to observers
      */
-    val updateContactsRequests: LiveData<List<MegaContactRequest>> =
+    val updateContactsRequests: LiveData<Event<List<MegaContactRequest>>> =
         _updates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .also { Timber.d("onContactRequestsUpdate") }
-            .map { it.requests?.toList() }
-            .filterNotNull()
+            .mapNotNull { it.requests?.toList() }
+            .map { Event(it) }
             .asLiveData()
 
     /**
@@ -91,21 +93,21 @@ class ManagerViewModel @Inject constructor(
     /**
      * Update Rubbish Nodes when a node update callback happens
      */
-    val updateRubbishBinNodes: LiveData<List<MegaNode>> =
+    val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onRubbishNodesUpdate") }
-            .map { getRubbishBinChildrenNode(rubbishBinParentHandle) }
-            .filterNotNull()
+            .mapNotNull { getRubbishBinChildrenNode(rubbishBinParentHandle) }
+            .map { Event(it) }
             .asLiveData()
 
 
     /**
      * Update Browser Nodes when a node update callback happens
      */
-    val updateBrowserNodes: LiveData<List<MegaNode>> =
+    val updateBrowserNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onBrowserNodesUpdate") }
-            .map { getBrowserChildrenNode(browserParentHandle) }
-            .filterNotNull()
+            .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
+            .map { Event(it) }
             .asLiveData()
 }

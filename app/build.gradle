@@ -207,7 +207,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
                 testers = readTesters()
             }
         }
@@ -434,8 +434,9 @@ dependencies {
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
     //Showkase
-    implementation "com.airbnb.android:showkase:$showkaseVersion"
-    kapt "com.airbnb.android:showkase-processor:$showkaseVersion"
+    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
+    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

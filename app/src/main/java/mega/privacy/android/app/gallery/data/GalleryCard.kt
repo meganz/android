@@ -1,14 +1,14 @@
 package mega.privacy.android.app.gallery.data
 
 import androidx.recyclerview.widget.DiffUtil
-import nz.mega.sdk.MegaNode
 import java.io.File
 import java.time.LocalDate
 
 /**
  * Data class used to manage Camera Uploads and Media Uploads content as cards.
  *
- * @param node      MegaNode representing the card item.
+ * @param id        The MegaNode handle
+ * @param name      The MegaNode name
  * @param preview   Preview of the node if exists, null otherwise.
  * @param day       Day of the modified date if a day card, null otherwise.
  * @param month     Month of the modified date if a day or month card, null otherwise.
@@ -21,15 +21,17 @@ import java.time.LocalDate
  * @param numItems  Number of items contained in a card. Should be used only on day cards as per design.
  */
 data class GalleryCard(
-    val node: MegaNode,
+    val id: Long,
+    val name: String,
     var preview: File?,
     var day: String? = null,
     var month: String? = null,
     val year: String?,
     val date: String,
     val localDate: LocalDate,
-    var numItems: Long = 0
+    var numItems: Long = 0,
 ) {
+
 
     fun incrementNumItems() {
         numItems++
@@ -37,7 +39,7 @@ data class GalleryCard(
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryCard>() {
         override fun areItemsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
-            oldItem.node.handle == newItem.node.handle
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
             oldItem == newItem
