@@ -29,7 +29,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactFileBaseFragment extends RotatableFragment {
 
-    public static int REQUEST_CODE_GET_LOCAL = 1003;
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
     

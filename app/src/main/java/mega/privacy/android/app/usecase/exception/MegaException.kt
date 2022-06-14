@@ -1,4 +1,4 @@
-package mega.privacy.android.app.usecase
+package mega.privacy.android.app.usecase.exception
 
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatError

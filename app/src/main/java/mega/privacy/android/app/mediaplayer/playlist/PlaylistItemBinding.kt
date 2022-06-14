@@ -24,10 +24,10 @@ fun setPlaylistItemThumbnail(
 
                 val param = layoutParams as FrameLayout.LayoutParams
                 param.width =
-                    resources.getDimensionPixelSize(R.dimen.playlist_non_default_thumbnail_size)
+                    resources.getDimensionPixelSize(R.dimen.non_default_thumbnail_size)
                 param.height = param.width
                 param.marginStart =
-                    resources.getDimensionPixelSize(R.dimen.playlist_non_default_thumbnail_margin_start)
+                    resources.getDimensionPixelSize(R.dimen.non_default_thumbnail_margin_start)
                 layoutParams = param
             }
             else -> {
@@ -35,10 +35,10 @@ fun setPlaylistItemThumbnail(
 
                 val param = layoutParams as FrameLayout.LayoutParams
                 param.width =
-                    resources.getDimensionPixelSize(R.dimen.playlist_default_thumbnail_size)
+                    resources.getDimensionPixelSize(R.dimen.default_thumbnail_size)
                 param.height = param.width
                 param.marginStart =
-                    resources.getDimensionPixelSize(R.dimen.playlist_default_thumbnail_margin_start)
+                    resources.getDimensionPixelSize(R.dimen.default_thumbnail_margin_start)
                 layoutParams = param
             }
         }
