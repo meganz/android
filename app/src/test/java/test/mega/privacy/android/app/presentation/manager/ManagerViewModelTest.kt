@@ -103,7 +103,7 @@ class ManagerViewModelTest {
         runCatching {
             underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
         }.onSuccess { result ->
-            result.assertValue { it.size == 1 }
+            result.assertValue { it.getContentIfNotHandled()?.size == 1 }
         }
     }
 
@@ -117,7 +117,7 @@ class ManagerViewModelTest {
         runCatching {
             underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
         }.onSuccess { result ->
-            result.assertValue { it.size == 2 }
+            result.assertValue { it.getContentIfNotHandled()?.size == 2 }
         }
     }
 
@@ -145,7 +145,7 @@ class ManagerViewModelTest {
         runCatching {
             underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
         }.onSuccess { result ->
-            result.assertValue { it.size == 2 }
+            result.assertValue { it.getContentIfNotHandled()?.size == 2 }
         }
     }
 
@@ -170,7 +170,7 @@ class ManagerViewModelTest {
             runCatching {
                 underTest.updateUsers.test().awaitValue(50, TimeUnit.MILLISECONDS)
             }.onSuccess { result ->
-                result.assertValue { it.size == 1 }
+                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
             }
         }
     }
@@ -193,7 +193,7 @@ class ManagerViewModelTest {
             runCatching {
                 underTest.updateUserAlerts.test().awaitValue(50, TimeUnit.MILLISECONDS)
             }.onSuccess { result ->
-                result.assertValue { it.size == 1 }
+                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
             }
         }
     }
@@ -216,7 +216,7 @@ class ManagerViewModelTest {
             runCatching {
                 underTest.updateContactsRequests.test().awaitValue(50, TimeUnit.MILLISECONDS)
             }.onSuccess { result ->
-                result.assertValue { it.size == 1 }
+                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
             }
         }
     }

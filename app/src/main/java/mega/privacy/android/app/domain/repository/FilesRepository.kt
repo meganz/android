@@ -60,4 +60,10 @@ interface FilesRepository {
      * @return cloud sort order
      */
     suspend fun getCloudSortOrder(): Int
+
+    /**
+     * Get camera sort order
+     * @return camera sort order
+     */
+    suspend fun getCameraSortOrder(): Int
 }

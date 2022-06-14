@@ -103,6 +103,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
@@ -341,6 +342,8 @@ public class ChatActivity extends PasscodeActivity
     @Inject
     StartCallUseCase startCallUseCase;
     @Inject
+    GetNodeUseCase getNodeUseCase;
+    @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
@@ -492,6 +495,23 @@ public class ChatActivity extends PasscodeActivity
     private MenuItem archiveMenuItem;
     private MenuItem muteMenuItem;
     private MenuItem unMuteMenuItem;
+    private MenuItem editIcon;
+    private MenuItem copyIcon;
+    private MenuItem deleteIcon;
+    private MenuItem forwardIcon;
+    private MenuItem downloadIcon;
+    private MenuItem shareIcon;
+    private MenuItem inviteIcon;
+    private MenuItem startConversationIcon;
+
+    private boolean isUploading = false;
+    private boolean showDelete = true;
+    private boolean showCopy = true;
+    private boolean showForward = true;
+    private boolean allNodeAttachments = true;
+    private boolean allNodeImages = true;
+    private boolean isRemoved = false;
+    private boolean allNodeNonContacts = true;
 
     String intentAction;
     MegaChatAdapter adapter;
@@ -4573,6 +4593,14 @@ public class ChatActivity extends PasscodeActivity
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
+            editIcon = menu.findItem(R.id.chat_cab_menu_edit);
+            copyIcon = menu.findItem(R.id.chat_cab_menu_copy);
+            deleteIcon = menu.findItem(R.id.chat_cab_menu_delete);
+            forwardIcon = menu.findItem(R.id.chat_cab_menu_forward);
+            downloadIcon = menu.findItem(R.id.chat_cab_menu_download);
+            shareIcon = menu.findItem(R.id.chat_cab_menu_share);
+            inviteIcon = menu.findItem(R.id.chat_cab_menu_invite);
+            startConversationIcon = menu.findItem(R.id.chat_cab_menu_start_conversation);
 
             ColorUtils.changeStatusBarColorForElevation(ChatActivity.this, true);
             // No App bar in this activity, control tool bar instead.
@@ -4600,17 +4628,17 @@ public class ChatActivity extends PasscodeActivity
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
-            if(selected.size() == 0){
-                menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                importIcon.setVisible(false);
-            }else {
+            editIcon.setVisible(false);
+            copyIcon.setVisible(false);
+            deleteIcon.setVisible(false);
+            forwardIcon.setVisible(false);
+            downloadIcon.setVisible(false);
+            shareIcon.setVisible(false);
+            inviteIcon.setVisible(false);
+            startConversationIcon.setVisible(false);
+            importIcon.setVisible(false);
+
+            if (selected.size() > 0) {
                 if((chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()){
                     logDebug("Chat without permissions || without preview");
                     boolean showCopy = true;
@@ -4626,82 +4654,60 @@ public class ChatActivity extends PasscodeActivity
                         }
                     }
 
-                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                    importIcon.setVisible(false);
+                    copyIcon.setVisible(showCopy);
                 }
                 else{
                     logDebug("Chat with permissions or preview");
                     if (selected.size() == 1) {
                         boolean isRemovedMsg = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(0).getMessage());
+                        if (selected.get(0).isUploading()) {
+                            return false;
+                        }
+
                         boolean shouldForwardOptionVisible = !selected.get(0).isUploading() && !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
-                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(shouldForwardOptionVisible);
+                        forwardIcon.setVisible(shouldForwardOptionVisible);
 
-                        if(selected.get(0).isUploading()) {
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                            importIcon.setVisible(false);
+                        boolean shouldDeleteOptionVisible = !isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
+                                selected.get(0).getMessage().isDeletable();
+                        deleteIcon.setVisible(shouldDeleteOptionVisible);
 
-                        }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                            menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
-                                    selected.get(0).getMessage().isDeletable() && !isRemovedMsg);
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode()&& !isRemovedMsg);
-                            importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
+                        if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                            MegaNodeList nodeList = selected.get(0).getMessage().getMegaNodeList();
+                            if (nodeList != null && nodeList.size() > 0) {
+                                getNodeUseCase.get(nodeList.get(0).getHandle())
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe((result, throwable) -> {
+                                            if (throwable == null) {
+                                                shareIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                                                shareIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
+                                                downloadIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
+                                                importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
+                                            } else {
+                                                editIcon.setVisible(false);
+                                                copyIcon.setVisible(false);
+                                                forwardIcon.setVisible(false);
+                                                downloadIcon.setVisible(false);
+                                                shareIcon.setVisible(false);
+                                                inviteIcon.setVisible(false);
+                                                startConversationIcon.setVisible(false);
+                                                importIcon.setVisible(false);
+                                            }
+                                        });
+                            }
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             logDebug("TYPE_CONTACT_ATTACHMENT selected");
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-
                             if (isOnline(chatActivity)) {
                                 String userEmail = selected.get(0).getMessage().getUserEmail(0);
                                 long userHandle = selected.get(0).getMessage().getUserHandle(0);
                                 MegaUser contact = megaApi.getContact(userEmail);
                                 if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(!isRemovedMsg && (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)));
+                                    startConversationIcon.setVisible(!isRemovedMsg && (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)));
                                 } else {
-                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(!isRemovedMsg && userHandle != myUserHandle);
-                                    menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
+                                    inviteIcon.setVisible(!isRemovedMsg && userHandle != myUserHandle);
                                 }
-                            } else {
-                                menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                                menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             }
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
-                                    selected.get(0).getMessage().isDeletable());
-                            importIcon.setVisible(false);
-                        }
-                        else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP){
-                            logDebug("TYPE_VOICE_CLIP selected");
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
-                                    selected.get(0).getMessage().isDeletable());
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                            importIcon.setVisible(false);
                         }
                         else{
                             logDebug("Other type: " + selected.get(0).getMessage().getType());
@@ -4709,72 +4715,22 @@ public class ChatActivity extends PasscodeActivity
                             if(messageSelected == null){
                                 messageSelected = megaChatApi.getMessage(idChat, selected.get(0).getMessage().getTempId());
                                 if(messageSelected == null){
-                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                                    importIcon.setVisible(false);
                                     return false;
                                 }
                             }
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-
-                            if (messageSelected.getType() == MegaChatMessage.TYPE_CONTAINS_META
-                                    && messageSelected.getContainsMeta() != null
-                                    && messageSelected.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY) {
-                                menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            } else {
-                                menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-                            }
 
                             int type = selected.get(0).getMessage().getType();
+                            copyIcon.setVisible(type != MegaChatMessage.TYPE_CONTAINS_META || messageSelected.getContainsMeta() != null);
 
-                            if(messageSelected.getUserHandle()==myUserHandle){
-                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(!isRemovedMsg && messageSelected.isEditable());
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && messageSelected.isDeletable());
+                            forwardIcon.setVisible(!isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode() && type != MegaChatMessage.TYPE_TRUNCATE &&
+                                    type != MegaChatMessage.TYPE_ALTER_PARTICIPANTS && type != MegaChatMessage.TYPE_CHAT_TITLE && type != MegaChatMessage.TYPE_PRIV_CHANGE &&
+                                    type != MegaChatMessage.TYPE_CALL_ENDED & type != MegaChatMessage.TYPE_CALL_STARTED);
 
-                                if (isRemovedMsg || !isOnline(chatActivity) || chatC.isInAnonymousMode() || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                                }
-                                else{
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                                }
-                            }
-                            else{
-                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                importIcon.setVisible(false);
-
-                                if (isRemovedMsg || !isOnline(chatActivity) || chatC.isInAnonymousMode() || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                                }
-                                else{
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                                }
-                            }
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-
-                            importIcon.setVisible(false);
+                            editIcon.setVisible(messageSelected.getUserHandle() == myUserHandle && !isRemovedMsg && messageSelected.isEditable());
                         }
                     }
                     else{
                         logDebug("Many items selected");
-                        boolean isUploading = false;
-                        boolean showDelete = true;
-                        boolean showCopy = true;
-                        boolean showForward = true;
-                        boolean allNodeAttachments = true;
-                        boolean allNodeImages = true;
-                        boolean isRemoved = false;
-                        boolean allNodeNonContacts = true;
-
-                        menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
-
                         for(int i=0; i<selected.size();i++) {
                             isRemoved = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(i).getMessage());
 
@@ -4823,41 +4779,53 @@ public class ChatActivity extends PasscodeActivity
                                     }
                                 }
                             }
-                    }
+
+                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                                MegaNodeList nodeList = selected.get(i).getMessage().getMegaNodeList();
+                                if (nodeList != null && nodeList.size() > 0) {
+                                    getNodeUseCase.get(nodeList.get(i).getHandle())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe((result, throwable) -> {
+                                                if (throwable != null) {
+                                                    showCopy = false;
+                                                    showForward = false;
+                                                }
+                                            });
+                                }
+                            }
+                        }
 
                         if (isUploading) {
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
+                            copyIcon.setVisible(false);
+                            deleteIcon.setVisible(false);
+                            editIcon.setVisible(false);
+                            forwardIcon.setVisible(false);
+                            downloadIcon.setVisible(false);
+                            inviteIcon.setVisible(false);
+                            importIcon.setVisible(false);
+                        } else if (allNodeAttachments && isOnline(chatActivity) && !isRemoved) {
+                            if (chatC.isInAnonymousMode()) {
+                                downloadIcon.setVisible(false);
+                                shareIcon.setVisible(false);
+                                importIcon.setVisible(false);
+                            } else {
+                                downloadIcon.setVisible(true);
+                                shareIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                                shareIcon.setVisible(true);
+                                importIcon.setVisible(true);
+                            }
+                        } else {
+                            downloadIcon.setVisible(false);
                             importIcon.setVisible(false);
                         }
-                        else {
-                            if (allNodeAttachments && isOnline(chatActivity) && !isRemoved) {
-                                if (chatC.isInAnonymousMode()) {
-                                    menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                                    importIcon.setVisible(false);
-                                } else {
-                                    menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                                    menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
-                                    importIcon.setVisible(true);
-                                }
-                            } else {
-                                menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                                importIcon.setVisible(false);
-                            }
 
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(!chatC.isInAnonymousMode() && showCopy);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemoved && !chatC.isInAnonymousMode() && showDelete);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(!isRemoved && isOnline(chatActivity) && !chatC.isInAnonymousMode() && showForward);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(!isRemoved && allNodeNonContacts &&
-                                    isOnline(chatActivity) && !chatC.isInAnonymousMode());
-                        }
+                        editIcon.setVisible(false);
+                        copyIcon.setVisible(!chatC.isInAnonymousMode() && showCopy);
+                        deleteIcon.setVisible(!isRemoved && !chatC.isInAnonymousMode() && showDelete);
+                        forwardIcon.setVisible(!isRemoved && isOnline(chatActivity) && !chatC.isInAnonymousMode() && showForward);
+                        inviteIcon.setVisible(!isRemoved && allNodeNonContacts &&
+                                isOnline(chatActivity) && !chatC.isInAnonymousMode());
                     }
                 }
             }
@@ -5076,6 +5044,172 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    /**
+     * Method to control when to click on an attached node
+     *
+     * @param node               The MegaNode
+     * @param msgId              msg ID
+     * @param screenPosition     position in screen
+     * @param positionInMessages position in array messages
+     */
+    private void nodeAttachmentClicked(MegaNode node, long msgId, int [] screenPosition, int positionInMessages){
+        if (MimeTypeList.typeForName(node.getName()).isImage()) {
+            if (node.hasPreview()) {
+                Timber.d("Show full screen viewer");
+                showFullScreenViewer(msgId);
+            } else {
+                Timber.d("Image without preview - open with");
+                openWith(this, node);
+            }
+        } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+            String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+            Intent mediaIntent;
+            boolean internalIntent;
+            boolean opusFile = false;
+            if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()) {
+                mediaIntent = new Intent(Intent.ACTION_VIEW);
+                internalIntent = false;
+                String[] s = node.getName().split("\\.");
+                if (s.length > 1 && s[s.length - 1].equals("opus")) {
+                    opusFile = true;
+                }
+            } else {
+                mediaIntent = getMediaIntent(this, node.getName());
+                internalIntent = true;
+            }
+
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT);
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_MSG_ID, msgId);
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, idChat);
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
+
+            String localPath = getLocalFile(node);
+
+            if (localPath != null) {
+                File mediaFile = new File(localPath);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                    Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                    if (mediaFileUri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                    } else {
+                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                    }
+                } else {
+                    Uri mediaFileUri = Uri.fromFile(mediaFile);
+                    if (mediaFileUri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                    } else {
+                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                    }
+                }
+                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                if (isOnline(this)) {
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        Timber.d("megaApi.httpServerIsRunning() == 0");
+                        megaApi.httpServerStart();
+                        mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
+                    } else {
+                        Timber.w("ERROR:httpServerAlreadyRunning");
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+                    megaApi.httpServerSetMaxBufferSize(mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
+
+                    String url = megaApi.httpServerGetLocalLink(node);
+                    if (url != null && Uri.parse(url) != null) {
+                        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                    }
+                } else {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem) + ". " + getString(R.string.no_network_connection_on_play_file), MEGACHAT_INVALID_HANDLE);
+                }
+            }
+            mediaIntent.putExtra("HANDLE", node.getHandle());
+
+            if (opusFile) {
+                mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+            }
+
+            if (internalIntent || isIntentAvailable(this, mediaIntent)) {
+                startActivity(mediaIntent);
+            } else {
+                openWith(this, node);
+            }
+            overridePendingTransition(0, 0);
+
+            if (adapter != null) {
+                adapter.setNodeAttachmentVisibility(false, holder_imageDrag, positionInMessages);
+            }
+        } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
+            String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+            Intent pdfIntent = new Intent(this, PdfViewerActivity.class);
+            pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
+            pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT);
+            pdfIntent.putExtra(INTENT_EXTRA_KEY_MSG_ID, msgId);
+            pdfIntent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, idChat);
+
+            String localPath = getLocalFile(node);
+
+            if (localPath != null) {
+                File mediaFile = new File(localPath);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                    Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                    if (mediaFileUri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                    } else {
+                        pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                    }
+                } else {
+                    Uri mediaFileUri = Uri.fromFile(mediaFile);
+                    if (mediaFileUri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                    } else {
+                        pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                    }
+                }
+                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else if (isOnline(this)) {
+                if (megaApi.httpServerIsRunning() == 0) {
+                    megaApi.httpServerStart();
+                    pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
+                } else {
+                    Timber.e("ERROR:httpServerAlreadyRunning");
+                }
+                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                activityManager.getMemoryInfo(mi);
+                megaApi.httpServerSetMaxBufferSize(mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB: MAX_BUFFER_16MB);
+
+                String url = megaApi.httpServerGetLocalLink(node);
+                if (url != null && Uri.parse(url) != null) {
+                    pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+                } else {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                }
+            } else {
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem) + ". " + getString(R.string.no_network_connection_on_play_file), MEGACHAT_INVALID_HANDLE);
+            }
+            pdfIntent.putExtra("HANDLE", node.getHandle());
+
+            if (isIntentAvailable(this, pdfIntent)) {
+                startActivity(pdfIntent);
+            } else {
+                openWith(this, node);
+            }
+            overridePendingTransition(0, 0);
+        } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+            manageTextFileIntent(this, msgId, idChat);
+        } else {
+            onNodeTapped(this, node, this::saveNodeByTap, this, this);
+        }
+    }
+
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         if(messages == null || messages.isEmpty()){
             logError("Messages null or empty");
@@ -5122,231 +5256,20 @@ public class ChatActivity extends PasscodeActivity
                             }
                         }
                         else{
-                            if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                            if (m.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                                if(nodeList.size()==1){
-                                    MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
-                                    if (MimeTypeList.typeForName(node.getName()).isImage()){
-                                        if(node.hasPreview()){
-                                            logDebug("Show full screen viewer");
-                                            showFullScreenViewer(m.getMessage().getMsgId());
-                                        }
-                                        else{
-                                            logDebug("Image without preview - open with");
-                                            openWith(this, node);
-                                        }
-                                    }
-                                    else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
-                                        logDebug("isFile:isVideoReproducibleOrIsAudio");
-                                        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-                                        logDebug("FILE HANDLE: " + node.getHandle() + " TYPE: " + mimeType);
-
-                                        Intent mediaIntent;
-                                        boolean internalIntent;
-                                        boolean opusFile = false;
-                                        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()){
-                                            mediaIntent = new Intent(Intent.ACTION_VIEW);
-                                            internalIntent=false;
-                                            String[] s = node.getName().split("\\.");
-                                            if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
-                                                opusFile = true;
-                                            }
-                                        }
-                                        else {
-                                            logDebug("setIntentToAudioVideoPlayer");
-                                            mediaIntent = getMediaIntent(this, node.getName());
-                                            internalIntent=true;
-                                        }
-                                        logDebug("putExtra: screenPosition("+screenPosition+"), msgId("+m.getMessage().getMsgId()+"), chatId("+idChat+"), filename("+node.getName()+")");
-
-                                        mediaIntent.putExtra("screenPosition", screenPosition);
-                                        mediaIntent.putExtra("adapterType", FROM_CHAT);
-                                        mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-                                        mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
-                                        mediaIntent.putExtra("chatId", idChat);
-                                        mediaIntent.putExtra("FILENAME", node.getName());
-
-                                        String localPath = getLocalFile(node);
-
-                                        if (localPath != null){
-                                            logDebug("localPath != null");
-
-                                            File mediaFile = new File(localPath);
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                                logDebug("FileProviderOption");
-                                                Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                                                if(mediaFileUri==null){
-                                                    logDebug("ERROR:NULLmediaFileUri");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+                                if (nodeList.size() == 1) {
+                                    getNodeUseCase.get(nodeList.get(0).getHandle())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe((result, throwable) -> {
+                                                if (throwable == null) {
+                                                    MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
+                                                    nodeAttachmentClicked(node, m.getMessage().getMsgId(), screenPosition, positionInMessages);
+                                                } else {
+                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_file_not_available), MEGACHAT_INVALID_HANDLE);
                                                 }
-                                                else{
-                                                    mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                                }
-                                            }else{
-                                                Uri mediaFileUri = Uri.fromFile(mediaFile);
-                                                if(mediaFileUri==null){
-                                                    logError("ERROR:NULLmediaFileUri");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                }
-                                                else{
-                                                    mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                                }
-                                            }
-                                            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        }else {
-                                            logDebug("localPathNULL");
-                                            if (isOnline(this)){
-                                                if (megaApi.httpServerIsRunning() == 0) {
-                                                    logDebug("megaApi.httpServerIsRunning() == 0");
-                                                    megaApi.httpServerStart();
-                                                    mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-                                                }
-                                                else{
-                                                    logWarning("ERROR:httpServerAlreadyRunning");
-                                                }
-
-                                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                                                activityManager.getMemoryInfo(mi);
-
-                                                if(mi.totalMem>BUFFER_COMP){
-                                                    logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                                                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                                                }else{
-                                                    logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                                                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                                                }
-
-                                                String url = megaApi.httpServerGetLocalLink(node);
-                                                if(url!=null){
-                                                    logDebug("URL generated: " + url);
-                                                    Uri parsedUri = Uri.parse(url);
-                                                    if(parsedUri!=null){
-                                                        logDebug("parsedUri!=null ---> " + parsedUri);
-                                                        mediaIntent.setDataAndType(parsedUri, mimeType);
-                                                    }else{
-                                                        logError("ERROR:httpServerGetLocalLink");
-                                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                    }
-                                                }else{
-                                                    logError("ERROR:httpServerGetLocalLink");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                }
-                                            }
-                                            else {
-                                                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file), -1);
-                                            }
-                                        }
-                                        mediaIntent.putExtra("HANDLE", node.getHandle());
-                                        if (opusFile){
-                                            logDebug("opusFile ");
-                                            mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-                                        }
-
-                                        if(internalIntent || isIntentAvailable(this, mediaIntent)){
-                                            startActivity(mediaIntent);
-                                        } else {
-                                            openWith(this, node);
-                                        }
-                                        overridePendingTransition(0,0);
-                                        if (adapter != null) {
-                                            adapter.setNodeAttachmentVisibility(false, holder_imageDrag, positionInMessages);
-                                        }
-
-                                    }else if (MimeTypeList.typeForName(node.getName()).isPdf()){
-
-                                        logDebug("isFile:isPdf");
-                                        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-                                        logDebug("FILE HANDLE: " + node.getHandle() + " TYPE: " + mimeType);
-                                        Intent pdfIntent = new Intent(this, PdfViewerActivity.class);
-                                        pdfIntent.putExtra("inside", true);
-                                        pdfIntent.putExtra("adapterType", FROM_CHAT);
-                                        pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
-                                        pdfIntent.putExtra("chatId", idChat);
-
-                                        String localPath = getLocalFile(node);
-
-                                        if (localPath != null){
-                                            File mediaFile = new File(localPath);
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                                logDebug("FileProviderOption");
-                                                Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                                                if(mediaFileUri==null){
-                                                    logError("ERROR:NULLmediaFileUri");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                }
-                                                else{
-                                                    pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                                }
-                                            }
-                                            else{
-                                                Uri mediaFileUri = Uri.fromFile(mediaFile);
-                                                if(mediaFileUri==null){
-                                                    logError("ERROR:NULLmediaFileUri");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                }
-                                                else{
-                                                    pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                                }
-                                            }
-                                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        }
-                                        else {
-                                            logWarning("localPathNULL");
-                                            if (isOnline(this)){
-                                                if (megaApi.httpServerIsRunning() == 0) {
-                                                    megaApi.httpServerStart();
-                                                    pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-                                                }
-                                                else{
-                                                    logError("ERROR:httpServerAlreadyRunning");
-                                                }
-                                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                                                activityManager.getMemoryInfo(mi);
-                                                if(mi.totalMem>BUFFER_COMP){
-                                                    logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                                                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                                                }
-                                                else{
-                                                    logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                                                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                                                }
-                                                String url = megaApi.httpServerGetLocalLink(node);
-                                                if(url!=null){
-                                                    logDebug("URL generated: " + url);
-                                                    Uri parsedUri = Uri.parse(url);
-                                                    if(parsedUri!=null){
-                                                        pdfIntent.setDataAndType(parsedUri, mimeType);
-                                                    }
-                                                    else{
-                                                        logError("ERROR:httpServerGetLocalLink");
-                                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                    }
-                                                }
-                                                else{
-                                                    logError("ERROR:httpServerGetLocalLink");
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-                                                }
-                                            }
-                                            else {
-                                                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file), -1);
-                                            }
-                                        }
-                                        pdfIntent.putExtra("HANDLE", node.getHandle());
-
-                                        if (isIntentAvailable(this, pdfIntent)) {
-                                            startActivity(pdfIntent);
-                                        } else {
-                                            logWarning("noAvailableIntent");
-                                            openWith(this, node);
-                                        }
-                                        overridePendingTransition(0,0);
-                                    } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
-                                        manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
-                                    } else {
-                                        onNodeTapped(this, node, this::saveNodeByTap, this, this);
-                                    }
+                                            });
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -6768,7 +6691,7 @@ public class ChatActivity extends PasscodeActivity
                 if (adapter == null) {
                     adapter = new MegaChatAdapter(this, chatRoom, messages,
                             messagesPlaying, removedMessages, listView, inviteContactUseCase,
-                            getAvatarUseCase);
+                            getAvatarUseCase, getNodeUseCase);
 
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
@@ -7784,7 +7707,7 @@ public class ChatActivity extends PasscodeActivity
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatAdapter(this, chatRoom, messages, messagesPlaying,
-                removedMessages, listView, inviteContactUseCase, getAvatarUseCase);
+                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase);
 
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);

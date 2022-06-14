@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -13,8 +14,10 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.domain.usecase.AreTransfersPaused
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
@@ -24,7 +27,14 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.*
+import mega.privacy.android.app.usecase.CancelTransferUseCase
+import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
+import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LoggedInUseCase
+import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.HttpMegaException
@@ -59,6 +69,7 @@ import javax.inject.Inject
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property areTransfersPaused         UseCase required to check if transfers are paused
  * @property copyNodeUseCase            UseCase required to copy nodes
  * @property moveNodeUseCase            UseCase required to move nodes
  * @property removeNodeUseCase          UseCase required to remove nodes
@@ -74,6 +85,7 @@ class ImageViewerViewModel @Inject constructor(
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val areTransfersPaused: AreTransfersPaused,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
@@ -83,7 +95,8 @@ class ImageViewerViewModel @Inject constructor(
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
-    private val snackbarMessage = SingleLiveEvent<String>()
+    private val snackBarMessage = SingleLiveEvent<String>()
+    private val actionBarMessage = SingleLiveEvent<Int>()
     private val copyMoveException = SingleLiveEvent<Throwable>()
     private val collision = SingleLiveEvent<NameCollision>()
 
@@ -117,7 +130,9 @@ class ImageViewerViewModel @Inject constructor(
     fun getImageItem(itemId: Long): ImageItem? =
         images.value?.find { it.id == itemId }
 
-    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+    fun onSnackBarMessage(): SingleLiveEvent<String> = snackBarMessage
+
+    fun onActionBarMessage(): SingleLiveEvent<Int> = actionBarMessage
 
     fun onCopyMoveException(): LiveData<Throwable> = copyMoveException
 
@@ -145,7 +160,7 @@ class ImageViewerViewModel @Inject constructor(
     fun retrieveImagesFromParent(
         parentNodeHandle: Long,
         childOrder: Int? = null,
-        currentNodeHandle: Long? = null
+        currentNodeHandle: Long? = null,
     ) {
         getImageHandlesUseCase.get(parentNodeHandle = parentNodeHandle, sortOrder = childOrder)
             .subscribeAndUpdateImages(currentNodeHandle)
@@ -154,7 +169,7 @@ class ImageViewerViewModel @Inject constructor(
     fun retrieveImages(
         nodeHandles: LongArray,
         currentNodeHandle: Long? = null,
-        isOffline: Boolean = false
+        isOffline: Boolean = false,
     ) {
         getImageHandlesUseCase.get(nodeHandles = nodeHandles, isOffline = isOffline)
             .subscribeAndUpdateImages(currentNodeHandle)
@@ -163,7 +178,7 @@ class ImageViewerViewModel @Inject constructor(
     fun retrieveChatImages(
         chatRoomId: Long,
         messageIds: LongArray,
-        currentNodeHandle: Long? = null
+        currentNodeHandle: Long? = null,
     ) {
         getImageHandlesUseCase.get(chatRoomId = chatRoomId, chatMessageIds = messageIds)
             .subscribeAndUpdateImages(currentNodeHandle)
@@ -210,7 +225,7 @@ class ImageViewerViewModel @Inject constructor(
                 onError = { error ->
                     logError(error.stackTraceToString())
                     if (itemId == getCurrentImageItem()?.id && error is MegaException) {
-                        snackbarMessage.value = error.getTranslatedErrorString()
+                        snackBarMessage.value = error.getTranslatedErrorString()
                     }
                 }
             )
@@ -241,7 +256,12 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.PublicNode ->
                 getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
             is ImageItem.ChatNode ->
-                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
+                getImageUseCase.get(
+                    imageItem.chatRoomId,
+                    imageItem.chatMessageId,
+                    fullSize,
+                    highPriority
+                )
             is ImageItem.OfflineNode ->
                 getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
             is ImageItem.Node ->
@@ -265,7 +285,7 @@ class ImageViewerViewModel @Inject constructor(
                     if (itemId == getCurrentImageItem()?.id
                         && error is MegaException && error !is ResourceAlreadyExistsMegaException
                     ) {
-                        snackbarMessage.value = error.getTranslatedErrorString()
+                        snackBarMessage.value = error.getTranslatedErrorString()
                     }
                 }
             )
@@ -283,7 +303,7 @@ class ImageViewerViewModel @Inject constructor(
     private fun updateItemIfNeeded(
         itemId: Long,
         nodeItem: MegaNodeItem? = null,
-        imageResult: ImageResult? = null
+        imageResult: ImageResult? = null,
     ) {
         if (nodeItem == null && imageResult == null) return
 
@@ -334,7 +354,8 @@ class ImageViewerViewModel @Inject constructor(
 
                     val dirtyNodeHandles = mutableListOf<Long>()
                     (change as Result.OnNodesUpdate).nodes?.forEach { changedNode ->
-                        val currentIndex = items.indexOfFirst { changedNode.handle == it.getNodeHandle() }
+                        val currentIndex =
+                            items.indexOfFirst { changedNode.handle == it.getNodeHandle() }
                         when {
                             currentIndex == INVALID_POSITION -> {
                                 return@subscribeBy // Not found
@@ -394,7 +415,7 @@ class ImageViewerViewModel @Inject constructor(
 
     fun switchNodeOfflineAvailability(
         nodeItem: MegaNodeItem,
-        activity: Activity
+        activity: Activity,
     ) {
         getNodeUseCase.setNodeAvailableOffline(
             node = nodeItem.node,
@@ -433,7 +454,8 @@ class ImageViewerViewModel @Inject constructor(
             if (items.isNullOrEmpty()) {
                 0
             } else {
-                val currentPositionNewIndex = newItems.indexOfFirst { it.id == getCurrentImageItem()?.id }
+                val currentPositionNewIndex =
+                    newItems.indexOfFirst { it.id == getCurrentImageItem()?.id }
                 val currentItemPosition = currentPosition.value ?: 0
                 when {
                     currentPositionNewIndex != INVALID_POSITION ->
@@ -450,10 +472,15 @@ class ImageViewerViewModel @Inject constructor(
         updateCurrentPosition(newPosition, true)
     }
 
+    fun showTransfersAction() {
+        actionBarMessage.value = R.string.resume_paused_transfers_text
+    }
+
     fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
         getNodeUseCase.removeOfflineNode(nodeHandle, activity)
             .subscribeAndComplete {
-                val index = images.value?.indexOfFirst { nodeHandle == it.getNodeHandle() } ?: INVALID_POSITION
+                val index = images.value?.indexOfFirst { nodeHandle == it.getNodeHandle() }
+                    ?: INVALID_POSITION
                 removeImageItemAt(index)
             }
     }
@@ -461,18 +488,20 @@ class ImageViewerViewModel @Inject constructor(
     fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
             .subscribeAndComplete {
-                snackbarMessage.value = getQuantityString(R.plurals.context_link_removal_success, 1)
+                snackBarMessage.value = getQuantityString(R.plurals.context_link_removal_success, 1)
             }
     }
 
     fun removeChatMessage(nodeHandle: Long) {
-        val imageItem = images.value?.firstOrNull { nodeHandle == it.getNodeHandle() } as? ImageItem.ChatNode ?: return
+        val imageItem =
+            images.value?.firstOrNull { nodeHandle == it.getNodeHandle() } as? ImageItem.ChatNode
+                ?: return
         deleteChatMessageUseCase.delete(imageItem.chatRoomId, imageItem.chatMessageId)
             .subscribeAndComplete {
                 val index = images.value?.indexOfFirst { it.id == imageItem.id } ?: INVALID_POSITION
                 removeImageItemAt(index)
 
-                snackbarMessage.value = getString(R.string.context_correctly_removed)
+                snackBarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
 
@@ -501,6 +530,7 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
+
         val node = getExistingNode(nodeHandle) ?: return
 
         checkNameCollision(
@@ -511,7 +541,7 @@ class ImageViewerViewModel @Inject constructor(
             copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete(
                     completeAction = {
-                        snackbarMessage.value = getString(R.string.context_correctly_copied)
+                        snackBarMessage.value = getString(R.string.context_correctly_copied)
                     }, errorAction = { error -> copyMoveException.value = error })
         }
     }
@@ -533,7 +563,7 @@ class ImageViewerViewModel @Inject constructor(
             moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete(
                     completeAction = {
-                        snackbarMessage.value = getString(R.string.context_correctly_moved)
+                        snackBarMessage.value = getString(R.string.context_correctly_moved)
                     }, errorAction = { error -> copyMoveException.value = error }
                 )
         }
@@ -573,14 +603,14 @@ class ImageViewerViewModel @Inject constructor(
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         moveNodeUseCase.moveToRubbishBin(nodeHandle)
             .subscribeAndComplete(false) {
-                snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
+                snackBarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
         removeNodeUseCase.remove(nodeHandle)
             .subscribeAndComplete(false) {
-                snackbarMessage.value = getString(R.string.context_correctly_removed)
+                snackBarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
 
@@ -624,6 +654,19 @@ class ImageViewerViewModel @Inject constructor(
         images.value?.find { it.getNodeHandle() == nodeHandle }?.nodeItem?.node
 
     /**
+     * Check if transfers are paused.
+     */
+    fun executeTransfer(transferAction: () -> Unit) {
+        viewModelScope.launch {
+            if (areTransfersPaused()) {
+                showTransfersAction()
+            } else {
+                transferAction()
+            }
+        }
+    }
+
+    /**
      * Check if current user is logged in
      */
     private fun checkIfUserIsLoggedIn() {
@@ -653,7 +696,8 @@ class ImageViewerViewModel @Inject constructor(
                 onSuccess = { items ->
                     images.value = items.toList()
 
-                    val position = items.indexOfFirst { currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id }
+                    val position =
+                        items.indexOfFirst { currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id }
                     if (position != INVALID_POSITION) {
                         updateCurrentPosition(position, true)
                     } else {

@@ -33,26 +33,39 @@ import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
-import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_LANDSCAPE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_PORTRAIT
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.VIEW_TYPE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.YEARS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.YEARS_VIEW
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -81,22 +94,6 @@ import nz.mega.sdk.MegaChatApiJava
 class TimelineFragment : BaseFragment(), PhotosTabCallback,
     GestureScaleCallback,
     GalleryCardAdapter.Listener {
-
-    companion object {
-        const val ALL_VIEW = 0
-        const val DAYS_VIEW = 1
-        const val MONTHS_VIEW = 2
-        const val YEARS_VIEW = 3
-
-        const val SPAN_CARD_PORTRAIT = 1
-        const val SPAN_CARD_LANDSCAPE = 2
-
-        const val DAYS_INDEX = 0
-        const val MONTHS_INDEX = 1
-        const val YEARS_INDEX = 2
-
-        const val VIEW_TYPE = "VIEW_TYPE"
-    }
 
     private lateinit var mManagerActivity: ManagerActivity
 
@@ -282,7 +279,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
-            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked,
+            requireContext(),
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
@@ -434,7 +432,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
 
             updateOptionsButtons()
 
@@ -787,6 +785,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         observeItemLongClick()
         observeSelectedItems()
         observeAnimatedItems()
+        observeActionBarMessage()
         observeActionModeDestroy()
     }
 
@@ -895,21 +894,21 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 
@@ -1071,6 +1070,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
+        }
+    }
+
+    private fun observeActionBarMessage() {
+        actionModeViewModel.onActionBarMessage().observe(viewLifecycleOwner) {
+            callManager { manager -> manager.showTransfersSnackBar(StringResourcesUtils.getString(it)) }
         }
     }
 

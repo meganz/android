@@ -1,28 +1,92 @@
 package mega.privacy.android.app.fragments.managerFragments.cu.album
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
+import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.GestureScaleListener
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport
+import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
+import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.getRoundingParams
+import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
+import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
+import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ALBUM_CONTENT_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.app.utils.callManager
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava
 
 /**
  * AlbumContentFragment is using to show album content when click album cover.
  */
 @AndroidEntryPoint
-class AlbumContentFragment : BaseZoomFragment() {
+class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback {
 
-    override val viewModel by viewModels<AlbumContentViewModel>()
+    private lateinit var mManagerActivity: ManagerActivity
+
+    // List view
+    private lateinit var listView: RecyclerView
+    private lateinit var gridAdapter: GalleryAdapter
+    private lateinit var layoutManager: GridLayoutManager
+    private lateinit var scroller: FastScroller
+    private lateinit var scaleGestureHandler: ScaleGestureHandler
+
+    private lateinit var menu: Menu
+
+    // Action mode
+    private var actionMode: ActionMode? = null
+    private lateinit var actionModeCallback: ActionModeCallback
+
+    // View model
+    private val zoomViewModel by viewModels<ZoomViewModel>()
+    private val actionModeViewModel by viewModels<ActionModeViewModel>()
+    private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+
+    private var showBottomNav = true
+
+    private var adapterType = 0
+
+    val viewModel by viewModels<AlbumContentViewModel>()
 
     private lateinit var binding: FragmentAlbumContentBinding
 
@@ -32,7 +96,6 @@ class AlbumContentFragment : BaseZoomFragment() {
     private var order = 0
 
     companion object {
-
         @JvmStatic
         fun getInstance(): AlbumContentFragment {
             return AlbumContentFragment()
@@ -41,6 +104,7 @@ class AlbumContentFragment : BaseZoomFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mManagerActivity = activity as ManagerActivity
         order = viewModel.getOrder()
         showBottomNav = false
     }
@@ -68,6 +132,8 @@ class AlbumContentFragment : BaseZoomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        subscribeBaseObservers()
+        setHasOptionsMenu(true)
         initViewCreated()
         subscribeObservers()
     }
@@ -98,7 +164,7 @@ class AlbumContentFragment : BaseZoomFragment() {
         setupListAdapter(currentZoom, viewModel.items.value)
     }
 
-    override fun handleZoomChange(zoom: Int, needReload: Boolean) {
+    fun handleZoomChange(zoom: Int, needReload: Boolean) {
         ZoomUtil.ALBUM_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
@@ -106,7 +172,7 @@ class AlbumContentFragment : BaseZoomFragment() {
         }
     }
 
-    override fun handleOnCreateOptionsMenu() {
+    fun handleOnCreateOptionsMenu() {
         val hasImages = gridAdapterHasData()
         handleOptionsMenuUpdate(hasImages)
     }
@@ -122,7 +188,7 @@ class AlbumContentFragment : BaseZoomFragment() {
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
             handleOptionsMenuUpdate(it.isNotEmpty())
         }
     }
@@ -166,19 +232,36 @@ class AlbumContentFragment : BaseZoomFragment() {
         if (isAdded) viewModel.loadPhotos(true)
     }
 
-    override fun getOrder() = viewModel.getOrder()
+    fun getOrder() = viewModel.getOrder()
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!isInThisPage()) {
             return
         }
         super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_images_toolbar, menu)
+        this.menu = menu
+        handleOnCreateOptionsMenu()
+        handleZoomMenuItemStatus()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (!isInThisPage()) {
             true
-        } else super.onOptionsItemSelected(item)
+        } else {
+            when (item.itemId) {
+                R.id.action_zoom_in -> {
+                    zoomIn()
+                }
+                R.id.action_zoom_out -> {
+                    zoomOut()
+                }
+                R.id.action_menu_sort_by -> {
+                    mManagerActivity.showNewSortByPanel(Constants.ORDER_CAMERA)
+                }
+            }
+            return super.onOptionsItemSelected(item)
+        }
     }
 
     /**
@@ -194,4 +277,365 @@ class AlbumContentFragment : BaseZoomFragment() {
         viewModel.cancelSearch()
         super.onDestroyView()
     }
+
+    private fun getNodeCount() = viewModel.getRealPhotoCount()
+
+    private fun updateUiWhenAnimationEnd() {
+        viewModel.items.value?.let {
+            val newList = ArrayList(it)
+            if (isGridAdapterInitialized()) {
+                gridAdapter.submitList(newList)
+            }
+        }
+    }
+
+    private fun subscribeBaseObservers() {
+        zoomViewModel.zoom.observe(viewLifecycleOwner) { zoom: Int ->
+            val needReload = ZoomUtil.needReload(getCurrentZoom(), zoom)
+            zoomViewModel.setCurrentZoom(zoom)
+            handleZoomChange(zoom, needReload)
+        }
+
+        setupNavigation()
+        setupActionMode()
+
+        DragToExitSupport.observeDragSupportEvents(
+            viewLifecycleOwner,
+            listView,
+            Constants.VIEWER_FROM_PHOTOS
+        )
+    }
+
+    private fun setupActionMode() {
+        actionModeCallback =
+            ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
+        observeItemLongClick()
+        observeSelectedItems()
+        observeAnimatedItems()
+        observeActionModeDestroy()
+    }
+
+    private fun setupNavigation() {
+        itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
+            openPhoto(it as GalleryItem)
+        })
+
+        itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
+            doIfOnline {
+                callManager { manager ->
+                    manager.showNodeOptionsPanel(
+                        it.node,
+                        NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
+                    )
+                }
+            }
+        })
+    }
+
+    /**
+     * Set recycle view and its inner layout depends on card view selected and zoom level.
+     *
+     * @param currentZoom Zoom level.
+     */
+    fun setupListAdapter(currentZoom: Int, data: List<GalleryItem>?) {
+        val isPortrait =
+            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val spanCount = getSpanCount(isPortrait)
+
+        val params = listView.layoutParams as ViewGroup.MarginLayoutParams
+
+        layoutManager = GridLayoutManager(context, spanCount)
+        listView.layoutManager = layoutManager
+
+        val imageMargin = ZoomUtil.getMargin(context, currentZoom)
+        ZoomUtil.setMargin(context, params, currentZoom)
+        val gridWidth =
+            ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
+        val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(context, currentZoom)
+        val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(context, currentZoom)
+        val itemSizeConfig = GalleryItemSizeConfig(
+            currentZoom, gridWidth,
+            icSelectedWidth, imageMargin,
+            resources.getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+            icSelectedMargin,
+            resources.getDimensionPixelSize(
+                R.dimen.cu_fragment_selected_round_corner_radius
+            )
+        )
+
+        gridAdapter =
+            GalleryAdapter(actionModeViewModel, itemOperationViewModel, itemSizeConfig)
+
+        layoutManager.apply {
+            spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+            val itemDimen =
+                ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
+            gridAdapter.setItemDimen(itemDimen)
+        }
+
+        gridAdapter.submitList(data)
+        listView.adapter = gridAdapter
+
+        // Set fast scroller after adapter is set.
+        scroller.setRecyclerView(listView)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupListView() {
+        scaleGestureHandler = ScaleGestureHandler(
+            context,
+            this
+        )
+        with(listView) {
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+            clipToPadding = false
+            setHasFixedSize(true)
+            setOnTouchListener(scaleGestureHandler)
+        }
+    }
+
+    private fun openPhoto(nodeItem: GalleryItem) {
+        listView.findViewHolderForLayoutPosition(nodeItem.index)
+            ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
+                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
+                val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
+                val childrenNodes = viewModel.getItemsHandle()
+                val intent = when (adapterType) {
+                    ALBUM_CONTENT_ADAPTER, Constants.PHOTOS_BROWSE_ADAPTER -> {
+                        ImageViewerActivity.getIntentForChildren(
+                            requireContext(),
+                            childrenNodes,
+                            nodeHandle
+                        )
+                    }
+                    else -> {
+                        ImageViewerActivity.getIntentForParentNode(
+                            requireContext(),
+                            parentNodeHandle,
+                            getOrder(),
+                            nodeHandle
+                        )
+                    }
+                }
+
+                (listView.adapter as? DragThumbnailGetter)?.let { getter ->
+                    DragToExitSupport.putThumbnailLocation(
+                        intent,
+                        listView,
+                        nodeItem.index,
+                        Constants.VIEWER_FROM_PHOTOS,
+                        getter
+                    )
+                }
+
+                startActivity(intent)
+                mManagerActivity.overridePendingTransition(0, 0)
+            }
+    }
+
+    fun gridAdapterHasData() = viewModel.items.value?.isNotEmpty() ?: false
+
+    fun layoutManagerInitialized() = this::layoutManager.isInitialized
+
+    fun listViewInitialized() = this::listView.isInitialized
+
+    private fun observeItemLongClick() =
+        actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
+            if (zoomViewModel.getCurrentZoom() != ZoomUtil.ZOOM_OUT_2X) {
+                doIfOnline { actionModeViewModel.enterActionMode(it) }
+
+            }
+        })
+
+    private fun observeSelectedItems() =
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                if (actionMode != null) {
+                    actionMode?.apply {
+                        finish()
+                    }
+                }
+            } else {
+                actionModeCallback.nodeCount = getNodeCount()
+
+                if (actionMode == null) {
+                    callManager { manager ->
+                        manager.hideKeyboardSearch()
+                    }
+
+                    actionMode = (activity as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
+                } else {
+                    actionMode?.invalidate()  // Update the action items based on the selected nodes
+                }
+
+                actionMode?.title = it.size.toString()
+            }
+        }
+
+    private fun observeAnimatedItems() {
+        var animatorSet: AnimatorSet? = null
+
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
+            val animatorList = mutableListOf<Animator>()
+
+            animatorSet?.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    updateUiWhenAnimationEnd()
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+                }
+            })
+
+            it.forEach { pos ->
+                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+                    // Draw the green outline for the thumbnail view at once
+                    val thumbnailView =
+                        itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
+
+                    val imageView = itemView.findViewById<ImageView>(
+                        R.id.icon_selected
+                    )
+
+                    imageView?.run {
+                        setImageResource(R.drawable.ic_select_folder)
+                        visibility = View.VISIBLE
+
+                        val animator =
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                        animator.setTarget(this)
+                        animatorList.add(animator)
+                    }
+                }
+            }
+
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
+        }
+    }
+
+    private fun observeActionModeDestroy() =
+        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
+            actionMode = null
+            callManager { manager ->
+                manager.showKeyboardForSearch()
+            }
+        })
+
+    fun doIfOnline(operation: () -> Unit) {
+        if (Util.isOnline(context)) {
+            operation()
+        } else {
+            val activity = activity as ManagerActivity
+
+            activity.hideKeyboardSearch()  // Make the snack bar visible to the user
+            activity.showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                context.getString(R.string.error_server_connection_problem),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        }
+    }
+
+    fun handleZoomMenuItemStatus() {
+        val canZoomOut = zoomViewModel.canZoomOut()
+        val canZoomIn = zoomViewModel.canZoomIn()
+        //handle can zoom in then handle can zoom out
+        handleEnableToolbarMenuIcon(R.id.action_zoom_in, canZoomIn)
+        handleEnableToolbarMenuIcon(R.id.action_zoom_out, canZoomOut)
+    }
+
+    private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
+        if (!this::menu.isInitialized)
+            return
+        val menuItem = this.menu.findItem(menuItemId)
+        var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
+        if (!isEnable) {
+            colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
+        }
+        DrawableCompat.setTint(
+            menuItem.icon,
+            colorRes
+        )
+        menuItem.isEnabled = isEnable
+    }
+
+    fun handleOptionsMenuUpdate(shouldShow: Boolean) {
+        if (this::menu.isInitialized) {
+            menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
+            menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
+            menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+        }
+    }
+
+    override fun zoomIn() {
+        zoomViewModel.zoomIn()
+        handleZoomMenuItemStatus()
+    }
+
+    override fun zoomOut() {
+        zoomViewModel.zoomOut()
+        handleZoomMenuItemStatus()
+    }
+
+    private fun getCurrentZoom(): Int {
+        return zoomViewModel.getCurrentZoom()
+    }
+
+    /**
+     * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
+     *
+     * @param isPortrait true, on portrait mode, false otherwise.
+     */
+    private fun getSpanCount(isPortrait: Boolean): Int {
+        return ZoomUtil.getSpanCount(isPortrait, zoomViewModel.getCurrentZoom())
+
+    }
+
+    /**
+     * Check gridAdapter is initialized
+     *
+     * @return true is initialized, false is not initialized
+     */
+    fun isGridAdapterInitialized(): Boolean {
+        return this::gridAdapter.isInitialized
+    }
+
+    /**
+     * Check is in action mode.
+     *
+     * @return true in, false not in
+     */
+    fun isInActionMode() = actionMode != null
 }

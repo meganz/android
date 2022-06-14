@@ -301,6 +301,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
@@ -315,6 +316,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -495,6 +497,12 @@ public class ManagerActivity extends TransfersManagementActivity
      * True if any TabLayout is visible
      */
     private boolean mShowAnyTabLayout;
+
+    /**
+     * Indicates that ManagerActivity was called from Image Viewer;
+     * Transfers tab should go back to {@link mega.privacy.android.app.imageviewer.ImageViewerActivity}
+     */
+    private boolean transfersToImageViewer = false;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
@@ -1464,10 +1472,26 @@ public class ManagerActivity extends TransfersManagementActivity
         logDebug("onCreate after call super");
 
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
-        viewModel.getUpdateUsers().observe(this, this::updateUsers);
-        viewModel.getUpdateUserAlerts().observe(this, this::updateUserAlerts);
-        viewModel.getUpdateNodes().observe(this, this::updateNodes);
-        viewModel.getUpdateContactsRequests().observe(this, this::updateContactRequests);
+        viewModel.getUpdateUsers().observe(this,
+                new EventObserver<>(users -> {
+                    updateUsers(users);
+                    return null;
+                }));
+        viewModel.getUpdateUserAlerts().observe(this,
+                new EventObserver<>(userAlerts -> {
+                    updateUserAlerts(userAlerts);
+                    return null;
+                }));
+        viewModel.getUpdateNodes().observe(this,
+                new EventObserver<>(nodes -> {
+                    updateNodes(nodes);
+                    return null;
+                }));
+        viewModel.getUpdateContactsRequests().observe(this,
+                new EventObserver<>(contactRequests -> {
+                    updateContactRequests(contactRequests);
+                    return null;
+                }));
 
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
@@ -2048,8 +2072,9 @@ public class ManagerActivity extends TransfersManagementActivity
             aC.renameRK(fRKOld);
         }
 
+        boolean isHeartBeatAlive = MegaApplication.isIsHeartBeatAlive();
         rootNode = megaApi.getRootNode();
-        if (rootNode == null || LoginActivity.isBackFromLoginPage) {
+        if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
             if (getIntent() != null) {
                 logDebug("Action: " + getIntent().getAction());
                 if (getIntent().getAction() != null) {
@@ -5461,6 +5486,9 @@ public class ManagerActivity extends TransfersManagementActivity
                             || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
 
                         backToDrawerItem(bottomNavigationCurrentItem);
+                        if (transfersToImageViewer) {
+                            switchImageViewerToFront();
+                        }
                     } else {
                         drawerLayout.openDrawer(nV);
                     }
@@ -5948,6 +5976,9 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (drawerItem == DrawerItem.TRANSFERS) {
             backToDrawerItem(bottomNavigationCurrentItem);
 
+            if (transfersToImageViewer) {
+                switchImageViewerToFront();
+            }
         } else if (drawerItem == DrawerItem.INBOX) {
             inboxFragment = (InboxFragment) getSupportFragmentManager()
                     .findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -6011,6 +6042,16 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             handleBackPressIfFullscreenOfflineFragmentOpened();
         }
+    }
+
+    /**
+     * This activity was called by {@link mega.privacy.android.app.imageviewer.ImageViewerActivity}
+     * by putting itself to the front of the history stack. Switching back to the image viewer requires
+     * the same process again (reordering and therefore putting the image viewer to the front).
+     */
+    private void switchImageViewerToFront() {
+        transfersToImageViewer = false;
+        startActivity(ImageViewerActivity.getIntentFromBackStack(this));
     }
 
     /**
@@ -7712,6 +7753,9 @@ public class ManagerActivity extends TransfersManagementActivity
             } else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())) {
                 if (intent.getBooleanExtra(OPENED_FROM_CHAT, false)) {
                     sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
+                }
+                if (intent.getBooleanExtra(OPENED_FROM_IMAGE_VIEWER, false)) {
+                    transfersToImageViewer = true;
                 }
 
                 drawerItem = DrawerItem.TRANSFERS;

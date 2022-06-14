@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -19,7 +18,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -47,7 +45,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_KARERE_VER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_PRIVACY_POLICY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_SDK_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_TOS
-import mega.privacy.android.app.constants.SettingsConstants.KEY_APPEARANCE_COLOR_THEME
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CANCEL_ACCOUNT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHANGE_PASSWORD
@@ -71,14 +68,19 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
+import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
+import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
 class SettingsFragment :
     PreferenceFragmentCompat() {
+
+    @Inject
+    lateinit var additionalPreferences: Set<@JvmSuppressWildcards PreferenceResource>
 
     private var numberOfClicksKarere = 0
     private var numberOfClicksAppVersion = 0
@@ -106,6 +108,9 @@ class SettingsFragment :
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = ViewModelPreferenceDataStore(viewModel)
         setPreferencesFromResource(R.xml.preferences, rootKey)
+        additionalPreferences.forEach {
+            addPreferencesFromResource(it.resource)
+        }
     }
 
 

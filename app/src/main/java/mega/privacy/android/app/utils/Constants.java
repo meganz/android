@@ -237,6 +237,7 @@ public class Constants {
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
+    public static final String OPENED_FROM_IMAGE_VIEWER = "OPENED_FROM_IMAGE_VIEWER";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
@@ -575,6 +576,7 @@ public class Constants {
     public static final int DISMISS_ACTION_SNACKBAR = 6;
     public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
     public static final int SENT_REQUESTS_TYPE = 8;
+    public static final int RESUME_TRANSFERS_TYPE = 9;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
