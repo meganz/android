@@ -40,6 +40,12 @@ class SearchViewModel @Inject constructor(
     var searchQuery: String? = ""
 
     /**
+     * Current search depth count
+     *
+     */
+    var searchDepth: Int = -1
+
+    /**
      * Check is the search query is valid
      *
      * @return true if the query is not null and not empty
@@ -51,6 +57,27 @@ class SearchViewModel @Inject constructor(
      */
     fun resetSearchQuery() {
         searchQuery = ""
+    }
+
+    /**
+     * Reset the search level to initial value
+     */
+    fun resetSearchDepth() {
+        searchDepth = -1
+    }
+
+    /**
+     * Decrease by 1 the search depth
+     */
+    fun decreaseSearchDepth() {
+        searchDepth--
+    }
+
+    /**
+     * Increase by 1 the search depth
+     */
+    fun increaseSearchDepth() {
+        searchDepth++
     }
 
 }

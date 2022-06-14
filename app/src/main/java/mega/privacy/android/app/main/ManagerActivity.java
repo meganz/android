@@ -717,9 +717,7 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean firstTimeAfterInstallation = true;
     SearchView searchView;
     public boolean searchExpand = false;
-    public boolean textsearchQuery = false;
     boolean isSearching = false;
-    public int levelsSearch = -1;
     boolean openLink = false;
 
     long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
@@ -1339,14 +1337,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         outState.putString("pathNavigationOffline", pathNavigationOffline);
 
-        if (searchViewModel.getSearchQuery() != null) {
-            outState.putInt("levelsSearch", levelsSearch);
-            textsearchQuery = true;
-            outState.putBoolean("textsearchQuery", textsearchQuery);
-        } else {
-            textsearchQuery = false;
-        }
-
         if (turnOnNotifications) {
             outState.putBoolean("turnOnNotifications", turnOnNotifications);
         }
@@ -1522,8 +1512,6 @@ public class ManagerActivity extends TransfersManagementActivity
             pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
             logDebug("savedInstanceState -> pathNavigationOffline: " + pathNavigationOffline);
             selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
-            textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
-            levelsSearch = savedInstanceState.getInt("levelsSearch");
             turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
             orientationSaved = savedInstanceState.getInt("orientationSaved");
             isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
@@ -3378,7 +3366,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 case SEARCH: {
                     if (searchExpand) {
-                        textsearchQuery = false;
                         break;
                     }
 
@@ -5101,10 +5088,9 @@ public class ManagerActivity extends TransfersManagementActivity
                         openSearchOnHomepage();
                     }
                 } else if (drawerItem != DrawerItem.CHAT) {
-                    textsearchQuery = false;
                     firstNavigationLevel = true;
                     viewModel.setSearchParentHandle(-1L);
-                    levelsSearch = -1;
+                    searchViewModel.resetSearchDepth();
                     setSearchDrawerItem();
                     selectDrawerItem(drawerItem);
                 } else {
@@ -5205,9 +5191,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (viewModel.getTextSubmitted()) {
                         viewModel.setTextSubmitted(false);
                     } else {
-                        if (!textsearchQuery) {
-                            searchViewModel.setSearchQuery(newText);
-                        }
+                        searchViewModel.setSearchQuery(newText);
                         if (getSearchFragment() != null) {
                             searchFragment.newSearchNodesTask();
                         }
@@ -5371,10 +5355,9 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void openSearchOnHomepage() {
-        textsearchQuery = false;
         firstNavigationLevel = true;
         viewModel.setSearchParentHandle(-1L);
-        levelsSearch = -1;
+        searchViewModel.resetSearchDepth();
         setSearchDrawerItem();
         selectDrawerItem(drawerItem);
         resetActionBar(aB);
@@ -6468,8 +6451,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                 case SEARCH:
-                    viewModel.setSearchParentHandle(levelsSearch > 0 ? result.getOldParentHandle() : INVALID_HANDLE);
-                    levelsSearch--;
+                    viewModel.setSearchParentHandle(searchViewModel.getSearchDepth() > 0 ? result.getOldParentHandle() : INVALID_HANDLE);
+                    searchViewModel.decreaseSearchDepth();
                     refreshSearch();
                     break;
 

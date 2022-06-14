@@ -797,7 +797,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			if (nodes.get(position).isFolder()){
 				logDebug("is a folder");
 				managerViewModel.setSearchParentHandle(nodes.get(position).getHandle());
-				((ManagerActivity)context).levelsSearch ++;
+				viewModel.increaseSearchDepth();
 
 				int lastFirstVisiblePosition;
 				if(((ManagerActivity)context).isList){
@@ -1083,7 +1083,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 		cancelSearch();
-		int levelSearch = ((ManagerActivity)context).levelsSearch;
+		int levelSearch = viewModel.getSearchDepth();
 
 		if (levelSearch >= 0) {
 			if (levelSearch > 0) {
@@ -1103,7 +1103,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				managerViewModel.setSearchParentHandle(-1L);
 			}
 
-			((ManagerActivity)context).levelsSearch--;
+			viewModel.decreaseSearchDepth();
 			clickAction();
 
 			int lastVisiblePosition = 0;
