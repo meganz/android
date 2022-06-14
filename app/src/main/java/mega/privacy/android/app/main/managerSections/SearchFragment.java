@@ -550,6 +550,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 					return null;
 				})
 		);
+		viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -654,7 +655,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		String query = ((ManagerActivity) context).getSearchQuery();
+		String query = viewModel.getSearchQuery();
 		if (isAdded() && query != null) {
 			newSearchNodesTask();
 			((ManagerActivity) context).showFabButton();
@@ -669,7 +670,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			return;
 		}
 
-		String query = ((ManagerActivity) context).getSearchQuery();
+		String query = viewModel.getSearchQuery();
 		long parentHandleSearch = managerViewModel.getSearchParentHandle();
 		DrawerItem drawerItem = ((ManagerActivity) context).getSearchDrawerItem();
 		int sharesTab = ((ManagerActivity) context).getSearchSharedTab();
@@ -787,7 +788,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			((ManagerActivity) context).setTextSubmitted();
 
 			// If search text is empty and try to open a folder in search fragment.
-			if (!((ManagerActivity) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
+			if (!viewModel.isSearchQueryValid() && nodes.get(position).isFolder()) {
 				((ManagerActivity) context).closeSearchView();
 				((ManagerActivity) context).openSearchFolder(nodes.get(position));
 				return;
@@ -853,7 +854,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 					}
                     mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					mediaIntent.putExtra("position", position);
-					mediaIntent.putExtra("searchQuery", ((ManagerActivity)context).getSearchQuery());
+					mediaIntent.putExtra("searchQuery", viewModel.getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
 					if (managerViewModel.getSearchParentHandle() == -1L){
 						mediaIntent.putExtra("parentNodeHandle", -1L);

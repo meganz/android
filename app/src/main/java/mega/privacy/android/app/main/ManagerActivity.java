@@ -291,7 +291,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
@@ -325,6 +324,7 @@ import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
@@ -374,6 +374,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -500,6 +501,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
     private ManagerViewModel viewModel;
+    private SearchViewModel searchViewModel;
 
     @Inject
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
@@ -715,7 +717,6 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean firstTimeAfterInstallation = true;
     SearchView searchView;
     public boolean searchExpand = false;
-    private String searchQuery = "";
     public boolean textsearchQuery = false;
     boolean isSearching = false;
     public int levelsSearch = -1;
@@ -1338,9 +1339,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         outState.putString("pathNavigationOffline", pathNavigationOffline);
 
-        if (searchQuery != null) {
+        if (searchViewModel.getSearchQuery() != null) {
             outState.putInt("levelsSearch", levelsSearch);
-            outState.putString("searchQuery", searchQuery);
             textsearchQuery = true;
             outState.putBoolean("textsearchQuery", textsearchQuery);
         } else {
@@ -1457,6 +1457,7 @@ public class ManagerActivity extends TransfersManagementActivity
         logDebug("onCreate after call super");
 
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
                     updateUsers(users);
@@ -1521,7 +1522,6 @@ public class ManagerActivity extends TransfersManagementActivity
             pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
             logDebug("savedInstanceState -> pathNavigationOffline: " + pathNavigationOffline);
             selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
-            searchQuery = savedInstanceState.getString("searchQuery");
             textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
             levelsSearch = savedInstanceState.getInt("levelsSearch");
             turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
@@ -3835,10 +3835,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 if (viewModel.getSearchParentHandle() == -1L) {
                     firstNavigationLevel = true;
-                    if (searchQuery != null) {
+                    if (searchViewModel.getSearchQuery() != null) {
                         viewModel.setTextSubmitted(true);
-                        if (!searchQuery.isEmpty()) {
-                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + searchQuery);
+                        if (!searchViewModel.getSearchQuery().isEmpty()) {
+                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + searchViewModel.getSearchQuery());
                         } else {
                             aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + "");
                         }
@@ -5059,7 +5059,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void closeSearchSection() {
-        searchQuery = "";
+        searchViewModel.resetSearchQuery();
         drawerItem = searchDrawerItem;
         selectDrawerItem(drawerItem);
         searchDrawerItem = null;
@@ -5090,11 +5090,11 @@ public class ManagerActivity extends TransfersManagementActivity
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 logDebug("onMenuItemActionExpand");
-                searchQuery = "";
+                searchViewModel.resetSearchQuery();
                 searchExpand = true;
                 if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-                        setFullscreenOfflineFragmentSearchQuery(searchQuery);
+                        setFullscreenOfflineFragmentSearchQuery(searchViewModel.getSearchQuery());
                     } else if (mHomepageSearchable != null) {
                         mHomepageSearchable.searchReady();
                     } else {
@@ -5136,7 +5136,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         supportInvalidateOptionsMenu();
                     } else if (mHomepageSearchable != null) {
                         mHomepageSearchable.exitSearch();
-                        searchQuery = "";
+                        searchViewModel.resetSearchQuery();
                         supportInvalidateOptionsMenu();
                     }
                 } else {
@@ -5170,7 +5170,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else {
                     searchExpand = false;
-                    searchQuery = "" + query;
+                    searchViewModel.setSearchQuery("" + query);
                     setToolbarTitle();
                     logDebug("Search query: " + query);
                     viewModel.setTextSubmitted(true);
@@ -5183,7 +5183,7 @@ public class ManagerActivity extends TransfersManagementActivity
             public boolean onQueryTextChange(String newText) {
                 logDebug("onQueryTextChange");
                 if (drawerItem == DrawerItem.CHAT) {
-                    searchQuery = newText;
+                    searchViewModel.setSearchQuery(newText);
                     recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
                     if (recentChatsFragment != null) {
                         recentChatsFragment.filterChats(newText, false);
@@ -5195,18 +5195,18 @@ public class ManagerActivity extends TransfersManagementActivity
                             return true;
                         }
 
-                        searchQuery = newText;
-                        setFullscreenOfflineFragmentSearchQuery(searchQuery);
+                        searchViewModel.setSearchQuery(newText);
+                        setFullscreenOfflineFragmentSearchQuery(searchViewModel.getSearchQuery());
                     } else if (mHomepageSearchable != null) {
-                        searchQuery = newText;
-                        mHomepageSearchable.searchQuery(searchQuery);
+                        searchViewModel.setSearchQuery(newText);
+                        mHomepageSearchable.searchQuery(searchViewModel.getSearchQuery());
                     }
                 } else {
                     if (viewModel.getTextSubmitted()) {
                         viewModel.setTextSubmitted(false);
                     } else {
                         if (!textsearchQuery) {
-                            searchQuery = newText;
+                            searchViewModel.setSearchQuery(newText);
                         }
                         if (getSearchFragment() != null) {
                             searchFragment.newSearchNodesTask();
@@ -7704,7 +7704,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (intent != null) {
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                searchQuery = intent.getStringExtra(SearchManager.QUERY);
+                searchViewModel.setSearchQuery(intent.getStringExtra(SearchManager.QUERY));
                 viewModel.setSearchParentHandle(-1L);
                 setToolbarTitle();
                 isSearching = true;
@@ -10777,11 +10777,10 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void openSearchView() {
-        String querySaved = searchQuery;
         if (searchMenuItem != null) {
             searchMenuItem.expandActionView();
             if (searchView != null) {
-                searchView.setQuery(querySaved, false);
+                searchView.setQuery(searchViewModel.getSearchQuery(), false);
             }
         }
     }
@@ -10798,10 +10797,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         searchView.setIconified(false);
-    }
-
-    public boolean isValidSearchQuery() {
-        return searchQuery != null && !searchQuery.isEmpty();
     }
 
     public void openSearchFolder(MegaNode node) {
@@ -10844,13 +10839,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setTextSubmitted() {
         if (searchView != null) {
-            if (!isValidSearchQuery()) return;
-            searchView.setQuery(searchQuery, true);
+            if (!searchViewModel.isSearchQueryValid()) return;
+            searchView.setQuery(searchViewModel.getSearchQuery(), true);
         }
     }
 
     public boolean isSearchOpen() {
-        return searchQuery != null && searchExpand;
+        return searchViewModel.getSearchQuery() != null && searchExpand;
     }
 
     private void refreshAddPhoneNumberButton() {
@@ -10923,16 +10918,12 @@ public class ManagerActivity extends TransfersManagementActivity
         searchMenuItem.expandActionView();
     }
 
-    public String getSearchQuery() {
-        return searchQuery;
-    }
-
     public int getSearchSharedTab() {
         return searchSharedTab;
     }
 
     public void setSearchQuery(String searchQuery) {
-        this.searchQuery = searchQuery;
+        searchViewModel.setSearchQuery(searchQuery);
         if (this.searchView != null) {
             this.searchView.setQuery(searchQuery, false);
         }

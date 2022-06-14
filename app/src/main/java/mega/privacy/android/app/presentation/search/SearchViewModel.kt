@@ -34,4 +34,23 @@ class SearchViewModel @Inject constructor(
             .map { Event(it) }
             .asLiveData()
 
+    /**
+     * Current search query
+     */
+    var searchQuery: String? = ""
+
+    /**
+     * Check is the search query is valid
+     *
+     * @return true if the query is not null and not empty
+     */
+    fun isSearchQueryValid(): Boolean = !searchQuery.isNullOrEmpty()
+
+    /**
+     * Reset the search query an empty string
+     */
+    fun resetSearchQuery() {
+        searchQuery = ""
+    }
+
 }
