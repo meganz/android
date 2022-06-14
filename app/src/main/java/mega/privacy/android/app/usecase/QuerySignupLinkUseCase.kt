@@ -3,6 +3,7 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.exception.toMegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import javax.inject.Inject

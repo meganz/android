@@ -6,24 +6,32 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.interfaces.ActivityLauncher
-import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
@@ -31,14 +39,12 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -48,11 +54,23 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
 
+/**
+ * Main ViewModel to handle all logic related to the [TextEditorActivity].
+ *
+ * @property megaApi                    Needed to manage nodes.
+ * @property megaChatApi                Needed to get text file info from chats.
+ * @property checkNameCollisionUseCase  UseCase required to check name collisions.
+ * @property moveNodeUseCase            UseCase required to move nodes.
+ * @property copyNodeUseCase            UseCase required to copy nodes.
+ */
 @HiltViewModel
 class TextEditorViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -70,6 +88,9 @@ class TextEditorViewModel @Inject constructor(
     private val mode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
+    private val snackbarMessage = SingleLiveEvent<String>()
+    private val collision = SingleLiveEvent<NameCollision>()
+    private val throwable = SingleLiveEvent<Throwable>()
 
     private var needsReadContent = false
     private var isReadingContent = false
@@ -85,6 +106,12 @@ class TextEditorViewModel @Inject constructor(
     fun getFileName(): LiveData<String> = fileName
 
     fun onContentTextRead(): LiveData<Pagination> = pagination
+
+    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+
+    fun getCollision(): LiveData<NameCollision> = collision
+
+    fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     fun getPagination(): Pagination? = pagination.value
 
@@ -420,24 +447,68 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val uploadIntent = Intent(activity, UploadService::class.java)
-            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-            .putExtra(FROM_HOME_PAGE, fromHome)
-            .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
-            .putExtra(UploadService.EXTRA_NAME, fileName.value)
-            .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
-            .putExtra(
-                UploadService.EXTRA_PARENT_HASH,
-                if (mode.value == CREATE_MODE && getNode() == null) {
-                    megaApi.rootNode.handle
-                } else if (mode.value == CREATE_MODE) {
-                    getNode()?.handle
-                } else {
-                    getNode()?.parentHandle
+        val parentHandle = if (mode.value == CREATE_MODE && getNode() == null) {
+            megaApi.rootNode?.handle
+        } else if (mode.value == CREATE_MODE) {
+            getNode()?.handle
+        } else {
+            getNode()?.parentHandle
+        }
+
+        if (parentHandle == null) {
+            logError("Parent handle not valid.")
+            return
+        }
+
+        if (mode.value == EDIT_MODE) {
+            uploadFile(activity, fromHome, tempFile, parentHandle)
+            return
+        }
+
+        checkNameCollisionUseCase.check(tempFile.name, parentHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { handle ->
+                    collision.value =
+                        NameCollision.Upload.getUploadCollision(handle, tempFile, parentHandle)
+                },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ParentDoesNotExistException -> {
+                            logError(error.message)
+                        }
+                        is MegaNodeException.ChildDoesNotExistsException -> {
+                            uploadFile(activity, fromHome, tempFile, parentHandle)
+                        }
+                    }
                 }
             )
+            .addTo(composite)
+    }
 
-        ContextCompat.startForegroundService(activity, uploadIntent)
+    /**
+     * Uploads the file.
+     *
+     * @param activity Current activity.
+     * @param fromHome True if is creating file from Home page, false otherwise.
+     * @param tempFile  The file to upload.
+     * @param parentHandle  The handle of the folder in which the file will be uploaded.
+     */
+    private fun uploadFile(
+        activity: Activity,
+        fromHome: Boolean,
+        tempFile: File,
+        parentHandle: Long
+    ) {
+        activity.startService(
+            Intent(activity, UploadService::class.java)
+                .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+                .putExtra(FROM_HOME_PAGE, fromHome)
+                .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
+                .putExtra(UploadService.EXTRA_NAME, fileName.value)
+                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+        )
         activity.finish()
     }
 
@@ -452,58 +523,90 @@ class TextEditorViewModel @Inject constructor(
     }
 
     /**
-     * Handle activity result.
+     * Copies a node if there is no name collision.
      *
-     * @param context          Current Context
-     * @param requestCode      RequestCode of onActivityResult
-     * @param resultCode       ResultCode of onActivityResult
-     * @param data             Intent of onActivityResult
-     * @param snackbarShower   Interface to show snackbar
-     * @param activityLauncher Interface to start activity
+     * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun handleActivityResult(
-        context: Context,
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-        snackbarShower: SnackbarShower,
-        activityLauncher: ActivityLauncher
-    ) {
-        if (resultCode != Activity.RESULT_OK || data == null) {
-            return
-        }
-
-        when (requestCode) {
-            REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
-                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-                if (toHandle == INVALID_HANDLE) {
-                    return
-                }
-
-                handleSelectFolderToImportResult(
-                    resultCode,
-                    toHandle,
-                    getNode()!!,
-                    snackbarShower,
-                    activityLauncher
+    fun copyNode(newParentHandle: Long) {
+        checkNameCollision(
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.COPY
+        ) {
+            copyNodeUseCase.copy(
+                node = getNode(),
+                parentHandle = newParentHandle
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        snackbarMessage.value =
+                            StringResourcesUtils.getString(R.string.context_correctly_copied)
+                    },
+                    onError = { error ->
+                        throwable.value = error
+                        logError("Not copied: ", error)
+                    }
                 )
-            }
-            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> handleSelectFolderToMoveResult(
-                context,
-                requestCode,
-                resultCode,
-                data,
-                snackbarShower
-            )
-            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> handleSelectFolderToCopyResult(
-                context,
-                requestCode,
-                resultCode,
-                data,
-                snackbarShower,
-                activityLauncher
-            )
+                .addTo(composite)
         }
+    }
+
+    /**
+     * Moves a node if there is no name collision.
+     *
+     * @param newParentHandle   Parent handle in which the node will be moved.
+     */
+    fun moveNode(newParentHandle: Long) {
+        checkNameCollision(
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.MOVE
+        ) {
+            moveNodeUseCase.move(
+                handle = getNode()?.handle ?: return@checkNameCollision,
+                parentHandle = newParentHandle
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        snackbarMessage.value =
+                            StringResourcesUtils.getString(R.string.context_correctly_moved)
+                    },
+                    onError = { error ->
+                        throwable.value = error
+                        logError("Not moved: ", error)
+                    }
+                )
+                .addTo(composite)
+        }
+    }
+
+    /**
+     * Checks if there is a name collision before proceeding with the action.
+     *
+     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
+     * @param type              [NameCollisionType]
+     * @param completeAction    Action to complete after checking the name collision.
+     */
+    private fun checkNameCollision(
+        newParentHandle: Long,
+        type: NameCollisionType,
+        completeAction: (() -> Unit)
+    ) {
+        checkNameCollisionUseCase.check(
+            handle = getNode()?.handle ?: return,
+            parentHandle = newParentHandle,
+            type = type
+        ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { collisionResult -> collision.value = collisionResult },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                        else -> logError(error.stackTraceToString())
+                    }
+                }
+            )
+            .addTo(composite)
     }
 
     /**
