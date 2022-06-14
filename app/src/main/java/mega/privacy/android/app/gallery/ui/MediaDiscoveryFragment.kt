@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -15,6 +14,12 @@ import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -40,9 +45,20 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomVi
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.ALL_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.MONTHS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.MONTHS_VIEW
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.SPAN_CARD_LANDSCAPE
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.SPAN_CARD_PORTRAIT
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.VIEW_TYPE
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.YEARS_INDEX
+import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.YEARS_VIEW
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -50,6 +66,11 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.MEDIA_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.ZoomUtil
 
 /**
  * Class to handle Media Discovery
@@ -101,20 +122,6 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
     private var order = 0
 
     companion object {
-        const val ALL_VIEW = 0
-        const val DAYS_VIEW = 1
-        const val MONTHS_VIEW = 2
-        const val YEARS_VIEW = 3
-
-        const val SPAN_CARD_PORTRAIT = 1
-        const val SPAN_CARD_LANDSCAPE = 2
-
-        const val DAYS_INDEX = 0
-        const val MONTHS_INDEX = 1
-        const val YEARS_INDEX = 2
-
-        const val VIEW_TYPE = "VIEW_TYPE"
-
         @JvmStatic
         fun getInstance(mediaHandle: Long): MediaDiscoveryFragment {
             val fragment = MediaDiscoveryFragment()
@@ -216,7 +223,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
             viewTypePanel.visibility =
                 if (it.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
             if (it.isEmpty()) {
@@ -469,21 +476,21 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 

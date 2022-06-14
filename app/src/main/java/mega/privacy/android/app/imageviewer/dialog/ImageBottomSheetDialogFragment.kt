@@ -375,6 +375,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val toHandle = result.second
                 if (moveHandle != null && moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.moveNode(moveHandle, toHandle)
+                    dismissAllowingStateLoss()
                 }
             }
         }
@@ -384,6 +385,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val toHandle = result.second
                 if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.copyNode(copyHandle, toHandle)
+                    dismissAllowingStateLoss()
                 }
             }
         }
@@ -393,6 +395,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val toHandle = result.second
                 if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.copyNode(copyHandle, toHandle)
+                    dismissAllowingStateLoss()
                 }
             }
         }

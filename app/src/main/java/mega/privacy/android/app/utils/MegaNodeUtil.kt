@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils
 
 import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -33,9 +32,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -46,6 +43,10 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
 import mega.privacy.android.app.utils.Constants.BUFFER_COMP
@@ -1210,61 +1211,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
-     *
-     * @param context        Current Context.
-     * @param requestCode    RequestCode parameter of onActivityResult
-     * @param resultCode     ResultCode parameter of onActivityResult
-     * @param data           Data parameter of onActivityResult
-     * @param snackbarShower Interface to show snackbar
-     */
-    @JvmStatic
-    fun handleSelectFolderToMoveResult(
-        context: Context,
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-        snackbarShower: SnackbarShower
-    ): List<Long> {
-        if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
-            || resultCode != RESULT_OK || data == null
-        ) {
-            return emptyList()
-        }
-
-        val moveHandles = data.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
-
-        if (moveHandles == null || moveHandles.isEmpty()) {
-            return emptyList()
-        }
-
-        val megaApp = MegaApplication.getInstance()
-        val megaApi = megaApp.megaApi
-
-        val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
-        val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
-
-        val listener = MoveListener(snackbarShower) { _, isForeignOverQuota ->
-            if (isForeignOverQuota) {
-                showForeignStorageOverQuotaWarningDialog(context)
-            }
-        }
-
-        val result = ArrayList<Long>()
-
-        for (handle in moveHandles) {
-            val node = megaApi.getNodeByHandle(handle)
-
-            if (node != null) {
-                result.add(handle)
-                megaApi.moveNode(node, parent, listener)
-            }
-        }
-
-        return result
-    }
-
-    /**
      * Start [FileExplorerActivity] to select folder to copy nodes.
      *
      * @param activity current Android activity
@@ -1281,86 +1227,6 @@ object MegaNodeUtil {
         intent.action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
         intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, handles)
         activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
-    }
-
-    /**
-     * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
-     *
-     * @param context          Current Context.
-     * @param requestCode      RequestCode parameter of onActivityResult
-     * @param resultCode       ResultCode parameter of onActivityResult
-     * @param data             Data parameter of onActivityResult
-     * @param snackbarShower   Interface to show snackbar
-     * @param activityLauncher Interface to start activity
-     */
-    @JvmStatic
-    fun handleSelectFolderToCopyResult(
-        context: Context,
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-        snackbarShower: SnackbarShower,
-        activityLauncher: ActivityLauncher
-    ): Boolean {
-        if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
-            || resultCode != RESULT_OK || data == null
-        ) {
-            return false
-        }
-
-        val copyHandles = data.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)
-
-        if (copyHandles == null || copyHandles.isEmpty()) {
-            return false
-        }
-
-        val megaApp = MegaApplication.getInstance()
-        val megaApi = megaApp.megaApi
-
-        val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
-        val parent = megaApi.getNodeByHandle(toHandle) ?: return false
-
-        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, context)
-
-        for (handle in copyHandles) {
-            val node = megaApi.getNodeByHandle(handle)
-
-            if (node != null) {
-                megaApi.copyNode(node, parent, listener)
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Handle activity result of REQUEST_CODE_SELECT_IMPORT_FOLDER.
-     *
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param toHandle the copy target node handle
-     * @param node the node to copy
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
-     */
-    @JvmStatic
-    fun handleSelectFolderToImportResult(
-        resultCode: Int, toHandle: Long, node: MegaNode,
-        snackbarShower: SnackbarShower, activityLauncher: ActivityLauncher
-    ): Boolean {
-        if (resultCode != RESULT_OK) {
-            return false
-        }
-
-        val megaApp = MegaApplication.getInstance()
-        val megaApi = megaApp.megaApi
-
-        val parent = megaApi.getNodeByHandle(toHandle) ?: return false
-
-        megaApi.copyNode(
-            node, parent, CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
-        )
-
-        return true
     }
 
     /**
