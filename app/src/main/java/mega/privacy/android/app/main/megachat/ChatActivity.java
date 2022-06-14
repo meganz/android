@@ -1183,8 +1183,6 @@ public class ChatActivity extends PasscodeActivity
                 new IntentFilter(BROADCAST_ACTION_RETRY_PENDING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        GetCallStatusChangesUseCase getCallStatusChangesUseCase;
-
 
         setContentView(R.layout.activity_chat);
 
