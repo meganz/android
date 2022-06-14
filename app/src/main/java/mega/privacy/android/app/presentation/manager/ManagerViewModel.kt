@@ -127,10 +127,4 @@ class ManagerViewModel @Inject constructor(
             Timber.d("setSearchParentHandle")
             field = value
         }
-
-    /**
-     * Flag to control if a search has been performed
-     * It is also used to prevent a search to be performed if the user is not manually triggering it
-     */
-    var textSubmitted: Boolean = false
 }

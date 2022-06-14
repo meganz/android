@@ -3823,7 +3823,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (viewModel.getSearchParentHandle() == -1L) {
                     firstNavigationLevel = true;
                     if (searchViewModel.getSearchQuery() != null) {
-                        viewModel.setTextSubmitted(true);
+                        searchViewModel.setTextSubmitted(true);
                         if (!searchViewModel.getSearchQuery().isEmpty()) {
                             aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + searchViewModel.getSearchQuery());
                         } else {
@@ -3902,7 +3902,7 @@ public class ManagerActivity extends TransfersManagementActivity
         aB.setTitle(title);
         this.firstNavigationLevel = firstNavigationLevel;
         updateNavigationToolbarIcon();
-        viewModel.setTextSubmitted(true);
+        searchViewModel.setTextSubmitted(true);
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(showSearch);
         }
@@ -5115,9 +5115,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-                        if (!viewModel.getTextSubmitted()) {
+                        if (!searchViewModel.getTextSubmitted()) {
                             setFullscreenOfflineFragmentSearchQuery(null);
-                            viewModel.setTextSubmitted(true);
+                            searchViewModel.setTextSubmitted(true);
                         }
                         supportInvalidateOptionsMenu();
                     } else if (mHomepageSearchable != null) {
@@ -5127,7 +5127,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else {
                     cancelSearch();
-                    viewModel.setTextSubmitted(true);
+                    searchViewModel.setTextSubmitted(true);
                     closeSearchSection();
                 }
                 return true;
@@ -5144,7 +5144,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                         searchExpand = false;
-                        viewModel.setTextSubmitted(true);
+                        searchViewModel.setTextSubmitted(true);
                         hideKeyboard(managerActivity, 0);
                         if (fullscreenOfflineFragment != null) {
                             fullscreenOfflineFragment.onSearchQuerySubmitted();
@@ -5159,7 +5159,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     searchViewModel.setSearchQuery("" + query);
                     setToolbarTitle();
                     logDebug("Search query: " + query);
-                    viewModel.setTextSubmitted(true);
+                    searchViewModel.setTextSubmitted(true);
                     supportInvalidateOptionsMenu();
                 }
                 return true;
@@ -5176,8 +5176,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-                        if (viewModel.getTextSubmitted()) {
-                            viewModel.setTextSubmitted(false);
+                        if (searchViewModel.getTextSubmitted()) {
+                            searchViewModel.setTextSubmitted(false);
                             return true;
                         }
 
@@ -5188,8 +5188,8 @@ public class ManagerActivity extends TransfersManagementActivity
                         mHomepageSearchable.searchQuery(searchViewModel.getSearchQuery());
                     }
                 } else {
-                    if (viewModel.getTextSubmitted()) {
-                        viewModel.setTextSubmitted(false);
+                    if (searchViewModel.getTextSubmitted()) {
+                        searchViewModel.setTextSubmitted(false);
                     } else {
                         searchViewModel.setSearchQuery(newText);
                         if (getSearchFragment() != null) {
@@ -5673,7 +5673,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void hideItemsWhenSearchSelected() {
-        viewModel.setTextSubmitted(false);
+        searchViewModel.setTextSubmitted(false);
 
         if (searchMenuItem != null) {
             doNotDisturbMenuItem.setVisible(false);
@@ -9782,7 +9782,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void onNodesSearchUpdate() {
         if (getSearchFragment() != null) {
             //stop from query for empty string.
-            viewModel.setTextSubmitted(true);
+            searchViewModel.setTextSubmitted(true);
             searchFragment.refresh();
         }
     }
@@ -10775,7 +10775,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void requestSearchViewFocus() {
-        if (searchView == null || viewModel.getTextSubmitted()) {
+        if (searchView == null || searchViewModel.getTextSubmitted()) {
             return;
         }
 
@@ -10815,6 +10815,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void closeSearchView() {
+        searchViewModel.setTextSubmitted(true);
         if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
             searchMenuItem.collapseActionView();
         }

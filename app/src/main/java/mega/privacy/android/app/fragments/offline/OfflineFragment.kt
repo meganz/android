@@ -409,7 +409,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.closeSearchView.observe(viewLifecycleOwner) {
             callManager { manager ->
-                managerViewModel.textSubmitted = true
                 manager.closeSearchView()
             }
         }

@@ -545,7 +545,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		managerViewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
 				new EventObserver<>(nodes -> {
 					//stop from query for empty string.
-					managerViewModel.setTextSubmitted(true);
+					viewModel.setTextSubmitted(true);
 					refresh();
 					return null;
 				})

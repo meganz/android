@@ -34,6 +34,13 @@ class SearchViewModel @Inject constructor(
             .map { Event(it) }
             .asLiveData()
 
+
+    /**
+     * Flag to control if a search has been performed
+     * It is also used to prevent a search to be performed if the user is not manually triggering it
+     */
+    var textSubmitted: Boolean = false
+
     /**
      * Current search query
      */
@@ -41,7 +48,6 @@ class SearchViewModel @Inject constructor(
 
     /**
      * Current search depth count
-     *
      */
     var searchDepth: Int = -1
 

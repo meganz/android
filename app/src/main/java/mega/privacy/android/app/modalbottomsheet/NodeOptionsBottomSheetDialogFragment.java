@@ -92,7 +92,7 @@ import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.presentation.manager.ManagerViewModel;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -135,7 +135,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private DrawerItem drawerItem;
 
-    private ManagerViewModel managerViewModel;
+    private SearchViewModel searchViewModel;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
@@ -153,7 +153,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
 
-        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
@@ -873,7 +873,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.open_folder_option:
-                managerViewModel.setTextSubmitted(true);
+                searchViewModel.setTextSubmitted(true);
                 nC.openFolderFromSearch(node.getHandle());
                 dismissAllowingStateLoss();
                 break;
