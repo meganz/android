@@ -1,66 +1,165 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.app.Activity.RESULT_OK
-import android.content.Context
-import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.interfaces.ActivityLauncher
-import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
  * ViewModel for main audio player UI logic.
+ *
+ * @property checkNameCollisionUseCase  Required for checking name collisions.
+ * @property copyNodeUseCase            Required for copying nodes.
+ * @property moveNodeUseCase            Required for moving nodes.
  */
 @HiltViewModel
-class MediaPlayerViewModel @Inject constructor() : BaseRxViewModel() {
+class MediaPlayerViewModel @Inject constructor(
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase
+) : BaseRxViewModel() {
+
+    private val collision = SingleLiveEvent<NameCollision>()
+    private val throwable = SingleLiveEvent<Throwable>()
+    private val snackbarMessage = SingleLiveEvent<String>()
+
+    fun getCollision(): LiveData<NameCollision> = collision
+    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+    fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove
 
     /**
-     * Handle activity result.
+     * Copies a node if there is no name collision.
      *
-     * @param context          Current Context.
-     * @param requestCode      RequestCode of onActivityResult
-     * @param resultCode       ResultCode of onActivityResult
-     * @param data             Data of onActivityResult
-     * @param snackbarShower   Interface to show snackbar
-     * @param activityLauncher Interface to start activity
+     * @param node              Node to copy.
+     * @param nodeHandle        Node handle to copy.
+     * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun handleActivityResult(
-        context: Context,
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-        snackbarShower: SnackbarShower,
-        activityLauncher: ActivityLauncher
-    ) {
-        if (resultCode != RESULT_OK || data == null) {
-            return
+    fun copyNode(node: MegaNode? = null, nodeHandle: Long? = null, newParentHandle: Long) {
+        checkNameCollision(
+            node = node,
+            nodeHandle = nodeHandle,
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.COPY
+        ) {
+            if (node != null) {
+                copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
+                    .subscribeAndCompleteCopy()
+            } else {
+                copyNodeUseCase.copy(handle = nodeHandle!!, parentHandle = newParentHandle)
+                    .subscribeAndCompleteCopy()
+            }
         }
+    }
 
-        when (requestCode) {
-            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                val handles = handleSelectFolderToMoveResult(
-                    context, requestCode, resultCode, data, snackbarShower
-                )
-
-                for (handle in handles) {
-                    _itemToRemove.value = handle
+    private fun Completable.subscribeAndCompleteCopy() {
+        subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    snackbarMessage.value =
+                        StringResourcesUtils.getString(R.string.context_correctly_copied)
+                },
+                onError = { error ->
+                    throwable.value = error
+                    LogUtil.logError("Error not copied.", error)
                 }
-            }
-            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                handleSelectFolderToCopyResult(
-                    context, requestCode, resultCode, data, snackbarShower, activityLauncher
+            )
+            .addTo(composite)
+    }
+
+    /**
+     * Moves a node if there is no name collision.
+     *
+     * @param nodeHandle        Node handle to move.
+     * @param newParentHandle   Parent handle in which the node will be moved.
+     */
+    fun moveNode(nodeHandle: Long, newParentHandle: Long) {
+        checkNameCollision(
+            nodeHandle = nodeHandle,
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.MOVE
+        ) {
+            moveNodeUseCase.move(handle = nodeHandle, parentHandle = newParentHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        _itemToRemove.value = nodeHandle
+                        snackbarMessage.value =
+                            StringResourcesUtils.getString(R.string.context_correctly_moved)
+                    },
+                    onError = { error ->
+                        throwable.value = error
+                        LogUtil.logError("Error not moved.", error)
+                    }
                 )
-            }
+                .addTo(composite)
         }
+    }
+
+    /**
+     * Checks if there is a name collision before proceeding with the action.
+     *
+     * @param node              Node to check the name collision.
+     * @param nodeHandle        Handle of the node to check the name collision.
+     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
+     * @param type              [NameCollisionType]
+     * @param completeAction    Action to complete after checking the name collision.
+     */
+    private fun checkNameCollision(
+        node: MegaNode? = null,
+        nodeHandle: Long? = null,
+        newParentHandle: Long,
+        type: NameCollisionType,
+        completeAction: (() -> Unit)
+    ) {
+        if (node != null) {
+            checkNameCollisionUseCase.check(
+                node = node,
+                parentHandle = newParentHandle,
+                type = type
+            ).subscribeAndShowCollisionResult(completeAction)
+        } else {
+            checkNameCollisionUseCase.check(
+                handle = nodeHandle!!,
+                parentHandle = newParentHandle,
+                type = type
+            ).subscribeAndShowCollisionResult(completeAction)
+        }
+    }
+
+    private fun Single<NameCollision>.subscribeAndShowCollisionResult(completeAction: (() -> Unit)) {
+        observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { collisionResult -> collision.value = collisionResult },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                        else -> LogUtil.logError(error.stackTraceToString())
+                    }
+                }
+            )
+            .addTo(composite)
     }
 }

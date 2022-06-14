@@ -294,11 +294,14 @@ public class RubbishBinFragment extends Fragment{
 				new EventObserver<>(this::showSortByPanel));
 
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
-		managerViewModel.getUpdateRubbishBinNodes().observe(getViewLifecycleOwner(), nodes -> {
-			hideMultipleSelect();
-			setNodes(nodes);
-			getRecyclerView().invalidate();
-		});
+		managerViewModel.getUpdateRubbishBinNodes().observe(getViewLifecycleOwner(),
+				new EventObserver<>(nodes -> {
+					hideMultipleSelect();
+					setNodes(new ArrayList(nodes));
+					getRecyclerView().invalidate();
+					return null;
+				})
+		);
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();

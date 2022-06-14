@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
@@ -57,6 +58,10 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isEphemeralPlusPlus
     override val accountAuth: String
         get() = megaApi.accountAuth
+
+    override suspend fun areTransfersPaused(): Boolean =
+        megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
+                megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 

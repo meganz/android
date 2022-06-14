@@ -1,10 +1,11 @@
 package mega.privacy.android.app.gallery.data
 
+import android.content.Context
 import android.text.Spanned
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.gallery.extension.formatDateTitle
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.MegaNode
 import java.io.File
 
@@ -29,13 +30,13 @@ data class GalleryItem(
     var indexForViewer: Int,
     override var index: Int,
     override var thumbnail: File?,
-    var type: Int,
+    var type: MediaCardType,
     var modifyDate: String,
     var formattedDate: Spanned?,
     var headerDate: Pair<String, String>?,
     override var selected: Boolean,
-    override var uiDirty: Boolean
-) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
+    override var uiDirty: Boolean,
+) : NodeItem(node, index, type == MediaCardType.Video, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
      * Creates a TYPE_HEADER which represent date.
@@ -47,10 +48,19 @@ data class GalleryItem(
      */
     constructor(
         modifyDate: String,
-        headerDate: Pair<String, String>
+        headerDate: Pair<String, String>,
+        context: Context,
     ) : this(
-        null, INVALID_POSITION, INVALID_POSITION, null,
-        TYPE_HEADER, modifyDate, headerDate.formatDateTitle(), headerDate, false, false
+        null,
+        INVALID_POSITION,
+        INVALID_POSITION,
+        null,
+        MediaCardType.Header,
+        modifyDate,
+        headerDate.formatDateTitle(context),
+        headerDate,
+        false,
+        false
     )
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
@@ -61,13 +71,4 @@ data class GalleryItem(
             !newItem.uiDirty
     }
 
-    companion object {
-
-        /**
-         * Three different types of nodes.
-         */
-        const val TYPE_HEADER = 1
-        const val TYPE_IMAGE = 2
-        const val TYPE_VIDEO = 3
-    }
 }

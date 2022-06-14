@@ -1,11 +1,16 @@
 package mega.privacy.android.app.globalmanagement
 
 import mega.privacy.android.app.DatabaseHandler
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SortOrderManagement @Inject constructor(
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
 ) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC

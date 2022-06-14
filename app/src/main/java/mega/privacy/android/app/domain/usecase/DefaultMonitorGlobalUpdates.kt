@@ -2,18 +2,18 @@ package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.repository.GlobalUpdatesRepository
+import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import javax.inject.Inject
 
 /**
  * Default monitor global updates implementation
  *
- * @property globalUpdatesRepository
+ * @property globalStatesRepository
  */
 class DefaultMonitorGlobalUpdates @Inject constructor(
-    private val globalUpdatesRepository: GlobalUpdatesRepository
+    private val globalStatesRepository: GlobalStatesRepository
 ) : MonitorGlobalUpdates {
     @Suppress("DEPRECATION")
     @Deprecated("See GlobalUpdatesRepository for individual replacements to use instead.")
-    override fun invoke(): Flow<GlobalUpdate> = globalUpdatesRepository.monitorGlobalUpdates()
+    override fun invoke(): Flow<GlobalUpdate> = globalStatesRepository.monitorGlobalUpdates()
 }

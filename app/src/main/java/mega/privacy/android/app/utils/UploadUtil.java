@@ -8,72 +8,29 @@ import android.content.Intent;
 import android.net.Uri;
 
 import java.io.File;
-import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
-import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
-import androidx.core.content.ContextCompat;
 
 public class UploadUtil {
-
-    /**
-     * This method is to start upload file service within context
-     *
-     * @param context      the passed context to start upload service
-     * @param filePath     the path of file to be uploaded
-     * @param parentHandle the handle of parent node where file would be uploaded
-     * @param megaApi      the api to process the upload                 '
-     */
-
-    public static void uploadFile(Context context, String filePath, long parentHandle, MegaApiAndroid megaApi) {
-        logDebug("uploadTakePicture, parentHandle: " + parentHandle);
-
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        if (parentHandle == -1) {
-            parentHandle = megaApi.getRootNode().getHandle();
-        }
-
-        Intent intent = new Intent(context, UploadService.class);
-        File file = new File(filePath);
-        intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-        intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-        intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle);
-        intent.putExtra(UploadService.EXTRA_SIZE, file.length());
-        ContextCompat.startForegroundService(context, intent);
-    }
 
     /**
      * This method is to upload camera taken photos to Cloud
      *
      * @param context The context where to start the upload service
-     * @param parentHandle The handle of the folder where photo would be located
-     * @param megaApi The Mega Api to upload the picture
+     * @return The temporal file in which the picture is stored.
      */
-    public static void uploadTakePicture(Context context, long parentHandle, MegaApiAndroid megaApi) {
+    public static File getTemporalTakePictureFile(Context context) {
         logDebug("uploadTakePicture");
         File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
-            Util.showSnackbar(context, context.getString(R.string.general_error));
-            return;
+            Util.showSnackbar(context, StringResourcesUtils.getString(R.string.general_error));
+            return null;
         }
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
@@ -81,7 +38,7 @@ public class UploadUtil {
         File newFile = CacheFolderManager.buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
-        uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
+        return newFile;
     }
 
     /**
@@ -126,40 +83,6 @@ public class UploadUtil {
                         .setData(uri)
                         .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle),
                 Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
-    }
-
-    /**
-     * Uploads the result obtained from UploadFolderActivity.
-     *
-     * @param activity   Activity to start the Intent.
-     * @param resultCode Result code of the onActivityResult with the content to upload.
-     * @param data       Intent received in onActivityResult with the .
-     */
-    @SuppressWarnings("unchecked")
-    public static void uploadFolder(Activity activity, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK || data == null) {
-            logWarning("resultCode: " + resultCode);
-            return;
-        }
-
-        List<UploadFolderResult> uploadResults = (List<UploadFolderResult>) data.getSerializableExtra(UPLOAD_RESULTS);
-        if (uploadResults == null) {
-            logWarning("Upload results are null");
-            return;
-        }
-
-        for (UploadFolderResult result : uploadResults) {
-            ContextCompat.startForegroundService(activity, new Intent(activity, UploadService.class)
-                    .putExtra(UploadService.EXTRA_FILEPATH, result.getAbsolutePath())
-                    .putExtra(UploadService.EXTRA_NAME, result.getName())
-                    .putExtra(UploadService.EXTRA_LAST_MODIFIED, result.getLastModified())
-                    .putExtra(UploadService.EXTRA_PARENT_HASH, result.getParentHandle()));
-        }
-
-        int size = uploadResults.size();
-        Util.showSnackbar(activity, size > 0
-                ? getQuantityString(R.plurals.upload_began, size, size)
-                : getString(R.string.no_uploads_empty_folder));
     }
 
     /** The method is to return sdcard root of the file

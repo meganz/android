@@ -855,7 +855,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             }
             else{
                 MegaNode rootNode = megaApi.getRootNode();
-                if (rootNode != null && !((LoginActivity)context).isFetchingNodes){
+                boolean isHeartBeatAlive = MegaApplication.isIsHeartBeatAlive();
+                if (rootNode != null && !((LoginActivity)context).isFetchingNodes && !isHeartBeatAlive){
 
                     logDebug("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivity.class);
@@ -910,7 +911,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     ((LoginActivity) context).finish();
                 }
                 else{
-                    logWarning("rootNode == null");
+                    logDebug("rootNode is null or heart beat is alive -> do fast login");
+                    MegaApplication.setHeartBeatAlive(false);
                     startFastLogin();
                     return v;
                 }

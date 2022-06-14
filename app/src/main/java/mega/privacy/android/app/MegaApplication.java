@@ -139,7 +139,6 @@ import kotlinx.coroutines.CoroutineScope;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -153,6 +152,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieTy
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
@@ -211,7 +211,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     final String TAG = "MegaApplication";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
-    private static TransfersManagement transfersManagement;
     private static ChatManagement chatManagement;
 
     private LegacyLogUtil legacyLoggingUtil = new LegacyLogUtil();
@@ -246,10 +245,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
     HiltWorkerFactory workerFactory;
     @Inject
     ThemeModeState themeModeState;
-
     @ApplicationScope
     @Inject
     CoroutineScope sharingScope;
+    @Inject
+    public TransfersManagement transfersManagement;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -269,8 +269,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
     // Flag to indicate if the current Activity is going through configuration change like orientation switch
     private boolean isActivityChangingConfigurations = false;
 
-	private static boolean isLoggingIn = false;
-	private static boolean isLoggingOut = false;
+    private static boolean isLoggingIn = false;
+    private static boolean isLoggingOut = false;
+
+    private static boolean isHeartBeatAlive = false;
 
     private static boolean showInfoChatMessages = false;
 
@@ -460,7 +462,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     new CUBackupInitializeChecker(megaApi).initCuSync();
 
                     //Login check resumed pending transfers
-                    TransfersManagement.checkResumedPendingTransfers();
+                    transfersManagement.checkResumedPendingTransfers();
+                    scheduleCameraUploadJob(getApplicationContext());
                 }
             } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
                 if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
@@ -824,12 +827,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
             initLoggers();
         }
 
-		checkAppUpgrade();
-		checkMegaStandbyBucket();
-		getTombstoneInfo();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-			checkForUnsafeIntentLaunch();
-		}
+        checkAppUpgrade();
+        checkMegaStandbyBucket();
+        getTombstoneInfo();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkForUnsafeIntentLaunch();
+        }
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -837,14 +840,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         LiveEventBus.config().enableLogger(false);
 
-        scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
-        transfersManagement = new TransfersManagement();
+
         chatManagement = new ChatManagement();
 
         //Logout check resumed pending transfers
-        TransfersManagement.checkResumedPendingTransfers();
+        transfersManagement.checkResumedPendingTransfers();
 
         int apiServerValue = getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
                 .getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
@@ -872,9 +874,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
             dbH.resetExtendedAccountDetailsTimestamp();
         }
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        networkStateReceiver = new NetworkStateReceiver();
+        networkStateReceiver.addListener(this);
+        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -1011,9 +1013,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         megaApi.creditCardQuerySubscriptions(null);
     }
 
-	public void askForPricing(){
-		megaApi.getPricing(null);
-	}
+    public void askForPricing() {
+        megaApi.getPricing(null);
+    }
 
     public void askForPaymentMethods() {
         logDebug("askForPaymentMethods");
@@ -1212,9 +1214,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         return getCurrentActivity() != null;
     }
 
-	public static boolean isShowInfoChatMessages() {
-		return showInfoChatMessages;
-	}
+    public static boolean isShowInfoChatMessages() {
+        return showInfoChatMessages;
+    }
 
     public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
         MegaApplication.showInfoChatMessages = showInfoChatMessages;
@@ -1243,6 +1245,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public static void setLoggingOut(boolean loggingOut) {
         isLoggingOut = loggingOut;
+    }
+
+    public static boolean isIsHeartBeatAlive() {
+        return isHeartBeatAlive;
+    }
+
+    public static void setHeartBeatAlive(boolean heartBeatAlive) {
+        isHeartBeatAlive = heartBeatAlive;
     }
 
     public static void setOpenChatId(long openChatId) {
@@ -1409,7 +1419,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                         return;
                     }
 
-					Intent loginIntent = new Intent(this, LoginActivity.class);
+                    Intent loginIntent = new Intent(this, LoginActivity.class);
 
                     if (getUrlConfirmationLink() != null) {
                         loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
@@ -1758,76 +1768,76 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
     }
 
-	/**
-	 * Get the current standby bucket of the app.
-	 * The system determines the standby state of the app based on app usage patterns.
-	 *
-	 * @return the current standby bucket of the app：
-	 * STANDBY_BUCKET_ACTIVE,
-	 * STANDBY_BUCKET_WORKING_SET,
-	 * STANDBY_BUCKET_FREQUENT,
-	 * STANDBY_BUCKET_RARE,
-	 * STANDBY_BUCKET_RESTRICTED,
-	 * STANDBY_BUCKET_NEVER
-	 */
-	public int checkMegaStandbyBucket(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
-			if (usageStatsManager != null) {
-				int standbyBucket = usageStatsManager.getAppStandbyBucket();
-				logDebug("getAppStandbyBucket(): " +standbyBucket);
-				return standbyBucket;
-			}
-		}
-		return  -1;
-	}
+    /**
+     * Get the current standby bucket of the app.
+     * The system determines the standby state of the app based on app usage patterns.
+     *
+     * @return the current standby bucket of the app：
+     * STANDBY_BUCKET_ACTIVE,
+     * STANDBY_BUCKET_WORKING_SET,
+     * STANDBY_BUCKET_FREQUENT,
+     * STANDBY_BUCKET_RARE,
+     * STANDBY_BUCKET_RESTRICTED,
+     * STANDBY_BUCKET_NEVER
+     */
+    public int checkMegaStandbyBucket() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
+            if (usageStatsManager != null) {
+                int standbyBucket = usageStatsManager.getAppStandbyBucket();
+                logDebug("getAppStandbyBucket(): " + standbyBucket);
+                return standbyBucket;
+            }
+        }
+        return -1;
+    }
 
-	/**
-	 * Get the tombstone information.
-	 */
-	public void getTombstoneInfo(){
-		new Thread(() -> {
-			logDebug("getTombstoneInfo");
-			ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-			List<ApplicationExitInfo> exitReasons;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-				exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
-				for (ApplicationExitInfo aei : exitReasons) {
-					if (aei.getReason() == REASON_CRASH_NATIVE) {
-						// Get the tombstone input stream.
-						try {
-							InputStream tombstoneInputStream = aei.getTraceInputStream();
-							if(tombstoneInputStream != null) {
-								// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-								TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-								logError("Tombstone Info" + tombstone.toString());
-								tombstoneInputStream.close();
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}).start();
-	}
+    /**
+     * Get the tombstone information.
+     */
+    public void getTombstoneInfo() {
+        new Thread(() -> {
+            logDebug("getTombstoneInfo");
+            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            List<ApplicationExitInfo> exitReasons;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
+                for (ApplicationExitInfo aei : exitReasons) {
+                    if (aei.getReason() == REASON_CRASH_NATIVE) {
+                        // Get the tombstone input stream.
+                        try {
+                            InputStream tombstoneInputStream = aei.getTraceInputStream();
+                            if (tombstoneInputStream != null) {
+                                // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+                                TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
+                                logError("Tombstone Info" + tombstone.toString());
+                                tombstoneInputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
 
-	@RequiresApi(api = Build.VERSION_CODES.S)
-	private void checkForUnsafeIntentLaunch() {
-		boolean isDebug = ((this.getApplicationInfo().flags &
-				ApplicationInfo.FLAG_DEBUGGABLE) != 0);
-		if (isDebug) {
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-					// Other StrictMode checks that you've previously added.
-					.detectUnsafeIntentLaunch()
-					.penaltyLog()
-					.build());
-		}
-	}
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void checkForUnsafeIntentLaunch() {
+        boolean isDebug = ((this.getApplicationInfo().flags &
+                ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+        if (isDebug) {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    // Other StrictMode checks that you've previously added.
+                    .detectUnsafeIntentLaunch()
+                    .penaltyLog()
+                    .build());
+        }
+    }
 
-	public AppRTCAudioManager getAudioManager() {
-		return rtcAudioManager;
-	}
+    public AppRTCAudioManager getAudioManager() {
+        return rtcAudioManager;
+    }
 
     public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
         logDebug("Create or update audio manager, type is " + type);
@@ -1985,6 +1995,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         sortOrderManagement.resetDefaults();
         passcodeManagement.resetDefaults();
         myAccountInfo.resetDefaults();
+        transfersManagement.resetDefaults();
     }
 
     public static boolean isShowRichLinkWarning() {
@@ -2093,10 +2104,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public static PushNotificationSettingManagement getPushNotificationSettingManagement() {
         return pushNotificationSettingManagement;
-    }
-
-    public static TransfersManagement getTransfersManagement() {
-        return transfersManagement;
     }
 
     public static ChatManagement getChatManagement() {

@@ -14,20 +14,18 @@ import nz.mega.sdk.MegaNode
  * @property count              Number of requests.
  * @property errorCount         Number of requests which finished with an error.
  * @property oldParentHandle    Handle of the old parent.
- * @property isForeignNode      True if should show a foreign storage over quota warning, false otherwise.
  */
 sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
-    val oldParentHandle: Long? = INVALID_HANDLE,
-    val isForeignNode: Boolean
+    val oldParentHandle: Long? = INVALID_HANDLE
 ) {
 
     val successCount = count - errorCount
     val isSingleAction: Boolean = count == 1
     val isSuccess: Boolean = errorCount == 0
 
-    abstract fun getResultText(): String?
+    abstract fun getResultText(): String
 
     /**
      * Resets the account details timestamp if some request finished with success.
@@ -44,16 +42,14 @@ sealed class MoveRequestResult(
     class GeneralMovement(
         count: Int,
         errorCount: Int,
-        oldParentHandle: Long?,
-        isForeignNode: Boolean
+        oldParentHandle: Long? = null
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
-        oldParentHandle = oldParentHandle,
-        isForeignNode = isForeignNode
+        oldParentHandle = oldParentHandle
     ) {
 
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> getString(R.string.context_correctly_moved)
                 count == 1 -> getString(R.string.context_no_moved)
@@ -75,10 +71,9 @@ sealed class MoveRequestResult(
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
-        oldParentHandle = oldParentHandle,
-        isForeignNode = false
+        oldParentHandle = oldParentHandle
     ) {
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> {
                     getString(R.string.context_correctly_moved_to_rubbish)
@@ -134,14 +129,12 @@ sealed class MoveRequestResult(
     class Restoration(
         count: Int,
         errorCount: Int,
-        isForeignNode: Boolean,
         val destination: MegaNode?
     ) : MoveRequestResult(
         count = count,
-        errorCount = errorCount,
-        isForeignNode = isForeignNode
+        errorCount = errorCount
     ) {
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> {
 

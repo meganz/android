@@ -3,7 +3,6 @@ package mega.privacy.android.app.usecase.call
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.app.usecase.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -14,6 +13,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import android.Manifest
+import mega.privacy.android.app.usecase.exception.toMegaException
 import javax.inject.Inject
 
 /**

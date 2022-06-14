@@ -62,6 +62,11 @@ interface MegaApiGateway {
     val accountAuth: String
 
     /**
+     * Are transfers paused (downloads and uploads)
+     */
+    suspend fun areTransfersPaused(): Boolean
+
+    /**
      * Root node of the account
      *
      * All accounts have a root node, therefore if it is null the account has not been logged in or
@@ -136,8 +141,8 @@ interface MegaApiGateway {
      * @param listener
      */
     fun setAutoAcceptContactsFromLink(
-            disableAutoAccept: Boolean,
-            listener: MegaRequestListenerInterface
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface,
     )
 
     /**
@@ -155,7 +160,7 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
-    
+
     /**
      * Set node favourite as a node attribute.
      *
@@ -207,7 +212,11 @@ interface MegaApiGateway {
      * @param thumbnailFilePath thumbnail file path
      * @param listener
      */
-    fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
+    fun getThumbnail(
+        node: MegaNode,
+        thumbnailFilePath: String,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Converts the handle of a node to a Base64-encoded string
