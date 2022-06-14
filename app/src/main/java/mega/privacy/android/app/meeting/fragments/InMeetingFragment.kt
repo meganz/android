@@ -4,13 +4,14 @@ import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Pair
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
@@ -95,6 +96,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Views
     lateinit var toolbar: MaterialToolbar
+    lateinit var blink: Animation
 
     private var toolbarTitle: EmojiTextView? = null
     private var toolbarSubtitle: TextView? = null
@@ -207,7 +209,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) && !inMeetingViewModel.isFromReconnectingStatus) {
+                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
                         logDebug("Change in my privileges")
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                             showSnackbar(
@@ -258,13 +260,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.isCallOnHold()
                     )
 
-                    if (inMeetingViewModel.isReconnectingStatus) {
-                        reconnecting()
-                    } else {
-                        binding.reconnecting.isVisible = false
-                        checkInfoBanner(TYPE_RECONNECTING)
-                    }
-
                     checkMenuItemsVisibility()
                 }
                 MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
@@ -293,7 +288,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.status != INVALID_CALL_STATUS &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
-            if (inMeetingViewModel.isFromReconnectingStatus || inMeetingViewModel.isReconnectingStatus || !isOnline(
+            if (inMeetingViewModel.showReconnectingBanner.value || !isOnline(
                     requireContext()
                 )
             ) {
@@ -524,6 +519,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onViewCreated(view, savedInstanceState)
 
         logDebug("In the meeting fragment")
+
+        blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
         initViewModel()
         MegaApplication.getInstance().startProximitySensor()
@@ -978,7 +975,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
-            checkInfoBanner(TYPE_NO_CONNECTION)
         }
 
         lifecycleScope.launchWhenStarted {
@@ -1112,12 +1108,60 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showPoorConnectionBanner.collect { shouldBeShown ->
-                bannerInfo?.let {
+            inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
+                bannerInfo?.apply {
+                    alpha = 1f
+                    isVisible = shouldBeShown
                     if (shouldBeShown) {
-                        showFixedBanner(it, TYPE_NETWORK_QUALITY)
+                        setBackgroundColor(ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            R.color.teal_300
+                        ))
+                        text =
+                            StringResourcesUtils.getString(R.string.banner_alone_on_the_call)
                     } else {
-                        hideFixedBanner(it)
+                        inMeetingViewModel.checkBannerInfo()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showPoorConnectionBanner.collect { shouldBeShown ->
+                bannerInfo?.apply {
+                    alpha = 1f
+                    isVisible = shouldBeShown
+                    if (shouldBeShown) {
+                        setBackgroundColor(ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            R.color.dark_grey_alpha_070
+                        ))
+                        text =
+                            StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
+
+                        reconnecting()
+                    } else {
+                        inMeetingViewModel.checkBannerInfo()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showReconnectingBanner.collect { shouldBeShown ->
+                bannerInfo?.apply {
+                    alpha = 1f
+                    isVisible = shouldBeShown
+                    if (shouldBeShown) {
+                        setBackgroundColor(ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            android.R.color.transparent))
+                        text =
+                            StringResourcesUtils.getString(R.string.reconnecting_message)
+                        startAnimation(blink)
+                    } else {
+                        clearAnimation()
+                        inMeetingViewModel.checkBannerInfo()
                     }
                 }
             }
@@ -1440,7 +1484,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         removeListenersAndFragments()
         binding.reconnecting.isVisible = true
-        checkInfoBanner(TYPE_RECONNECTING)
     }
 
     /**
@@ -1498,7 +1541,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             session?.let { userSession ->
                 logDebug("Show one to one call UI")
                 inMeetingViewModel.status = TYPE_IN_ONE_TO_ONE
-                checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
                 logDebug("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
@@ -1530,7 +1572,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show waiting for connection call UI")
         inMeetingViewModel.status = TYPE_WAITING_CONNECTION
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         removeListenersAndFragments()
 
@@ -1599,7 +1640,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show group call - Speaker View UI")
         inMeetingViewModel.status = TYPE_IN_SPEAKER_VIEW
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
         inMeetingViewModel.removeAllParticipantVisible()
 
         gridViewCallFragment?.let {
@@ -1639,7 +1679,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show group call - Grid View UI")
         inMeetingViewModel.status = TYPE_IN_GRID_VIEW
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         inMeetingViewModel.removeAllParticipantVisible()
 
@@ -1936,85 +1975,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder.updateMicIcon(isMicOn)
         updateParticipantsBottomPanel()
         showMuteBanner()
-    }
-
-    /**
-     * Method that controls whether the fixed banner should be displayed.
-     * This banner is displayed when my network quality is low,
-     * I am in a state of reconnection or I am alone on the call
-     *
-     * @param type Type of banner
-     */
-    private fun checkInfoBanner(type: Int) {
-        bannerInfo?.let {
-            val shouldShow = inMeetingViewModel.shouldShowFixedBanner(
-                type
-            )
-            if (shouldShow) {
-                showFixedBanner(it, type)
-                return
-            }
-
-            if (type != TYPE_RECONNECTING) {
-                val shouldShowReconnectingBanner = inMeetingViewModel.shouldShowFixedBanner(
-                    TYPE_RECONNECTING,
-                )
-                if (shouldShowReconnectingBanner) {
-                    showFixedBanner(it, TYPE_RECONNECTING)
-                    return
-                }
-            }
-
-            if (type != TYPE_NETWORK_QUALITY) {
-                val shouldShowNetworkQualityBanner = inMeetingViewModel.shouldShowFixedBanner(
-                    TYPE_NETWORK_QUALITY
-                )
-                if (shouldShowNetworkQualityBanner) {
-                    showFixedBanner(it, TYPE_NETWORK_QUALITY)
-                    return
-                }
-            }
-
-            if (type != TYPE_SINGLE_PARTICIPANT) {
-                val shouldShowSingleParticipantBanner =
-                    inMeetingViewModel.shouldShowFixedBanner(
-                        TYPE_SINGLE_PARTICIPANT
-                    )
-                if (shouldShowSingleParticipantBanner) {
-                    showFixedBanner(it, TYPE_SINGLE_PARTICIPANT)
-                    return
-                }
-            }
-
-            hideFixedBanner(it)
-        }
-    }
-
-    /**
-     * Method of displaying the banner
-     *
-     * @param textView The text in the banner
-     * @param type The type of banner
-     */
-    private fun showFixedBanner(textView: TextView, type: Int) {
-        logDebug("Show fixed banner: type = $type")
-        inMeetingViewModel.updateFixedBanner(textView, type)
-        textView.apply {
-            isVisible = true
-            alpha =
-                if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
-                else 1f
-
-            if (type == TYPE_JOIN || type == TYPE_LEFT) {
-                animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
-            }
-        }
-    }
-
-    private fun hideFixedBanner(textView: TextView) {
-        logDebug("Hide fixed banner")
-        textView.alpha = 1f
-        textView.isVisible = false
     }
 
     /**

@@ -6,8 +6,6 @@ import android.view.TextureView
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -42,6 +40,7 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
@@ -52,7 +51,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
@@ -67,7 +65,8 @@ class InMeetingViewModel @Inject constructor(
     private val getCallUseCase: GetCallUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
-    getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
+    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -91,14 +90,14 @@ class InMeetingViewModel @Inject constructor(
     var previousState: Int = CALL_STATUS_INITIAL
 
     var isSpeakerSelectionAutomatic: Boolean = true
-    var isFromReconnectingStatus: Boolean = false
-    var isReconnectingStatus: Boolean = false
 
     private var haveConnection: Boolean = false
 
     private var callInProgressDisposable: Disposable? = null
     private var anotherCallInProgressDisposable: Disposable? = null
     private var networkQualityDisposable: Disposable? = null
+    private var reconnectingDisposable: Disposable? = null
+    private var onlyMeDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -108,6 +107,12 @@ class InMeetingViewModel @Inject constructor(
 
     private val _showPoorConnectionBanner = MutableStateFlow(false)
     val showPoorConnectionBanner: StateFlow<Boolean> get() = _showPoorConnectionBanner
+
+    private val _showReconnectingBanner = MutableStateFlow(false)
+    val showReconnectingBanner: StateFlow<Boolean> get() = _showReconnectingBanner
+
+    private val _showOnlyMeBanner = MutableStateFlow(false)
+    val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -167,8 +172,6 @@ class InMeetingViewModel @Inject constructor(
         Observer<MegaChatCall> { call ->
             if (isSameChatRoom(call.chatid)) {
                 checkSubtitleToolbar(call.status, call.isOutgoing)
-                checkPreviousReconnectingStatus(call.status)
-                checkReconnectingStatus(call.status)
                 previousState = call.status
             }
         }
@@ -337,6 +340,26 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Method to check if a info banner should be displayed
+     */
+    fun checkBannerInfo() {
+        if (_showOnlyMeBanner.value) {
+            _showOnlyMeBanner.value = false
+            _showOnlyMeBanner.value = true
+        }
+
+        if (_showPoorConnectionBanner.value) {
+            _showPoorConnectionBanner.value = false
+            _showPoorConnectionBanner.value = true
+        }
+
+        if (_showReconnectingBanner.value) {
+            _showReconnectingBanner.value = false
+            _showReconnectingBanner.value = true
+        }
+    }
+
+    /**
      * Method that controls whether to display the bad connection banner
      */
     private fun checkNetworkQualityChanges() {
@@ -356,30 +379,45 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method to check if I am in Reconnecting status
-     *
-     * @param currentStatus Status of the call
+     * Method that controls whether to display the I am the only one in the call banner
      */
-    private fun checkReconnectingStatus(currentStatus: Int) {
-        isReconnectingStatus = currentStatus == CALL_STATUS_CONNECTING
-                && (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING
-                || previousState == CALL_STATUS_CONNECTING)
+    private fun checkOnlyYouChanges() {
+        getChat()?.let { chat ->
+            if (chat.isMeeting || chat.isGroup) {
+                onlyMeDisposable?.dispose()
+                onlyMeDisposable =
+                    getParticipantsChangesUseCase.checkIfIAmAloneOnTheCall(currentChatId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                            onNext = {
+                                _showOnlyMeBanner.value = it
+                            },
+                            onError = { error ->
+                                LogUtil.logError(error.stackTraceToString())
+                            }
+                        ).addTo(composite)
+            }
+        }
     }
 
-    /**
-     * Method to check if I am coming back from the reconnected state
-     *
-     * @param currentStatus Status of the call
-     */
-    private fun checkPreviousReconnectingStatus(currentStatus: Int) {
-        if (currentStatus == CALL_STATUS_JOINING || currentStatus == CALL_STATUS_IN_PROGRESS) {
-            if (previousState == CALL_STATUS_CONNECTING && isReconnectingStatus) {
-                isFromReconnectingStatus = true
-            }
-            return
-        }
 
-        isFromReconnectingStatus = false
+    /**
+     * Method that controls whether to display the reconnecting banner
+     */
+    private fun checkReconnectingChanges() {
+        reconnectingDisposable?.dispose()
+        reconnectingDisposable = getCallStatusChangesUseCase.getReconnectingStatus(currentChatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    _showReconnectingBanner.value = it
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            ).addTo(composite)
     }
 
     /**
@@ -424,6 +462,8 @@ class InMeetingViewModel @Inject constructor(
                     checkToolbarClickability()
                     checkParticipantsList()
                     checkNetworkQualityChanges()
+                    checkReconnectingChanges()
+                    checkOnlyYouChanges()
                 }
 
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
@@ -803,122 +843,6 @@ class InMeetingViewModel @Inject constructor(
     fun setAnotherCallOnHold(chatId: Long, isCallOnHold: Boolean) {
         inMeetingRepository.getChatRoom(chatId)?.let {
             inMeetingRepository.setCallOnHold(it.chatId, isCallOnHold)
-        }
-    }
-
-    /**
-     * Method for determining whether a banner should be displayed
-     *
-     * @param type type of banner
-     * @return True, if should be shown. False, otherwise.
-     */
-    fun shouldShowFixedBanner(type: Int): Boolean {
-        when (type) {
-            TYPE_NO_CONNECTION -> {
-                if (showShouldNoConnectionBanner())
-                    return true
-            }
-
-            TYPE_RECONNECTING -> {
-                _callLiveData.value?.let {
-                    if (isReconnectingStatus) {
-                        return true
-                    }
-                }
-            }
-
-            TYPE_NETWORK_QUALITY -> {
-                _callLiveData.value?.let { call ->
-                    val quality = call.networkQuality
-                    if (quality == 0) {
-                        return true
-                    }
-                }
-            }
-
-            TYPE_SINGLE_PARTICIPANT -> {
-                _callLiveData.value?.let {
-                    if (it.status >= CALL_STATUS_JOINING && !isRequestSent() && amIAloneOnTheCall(
-                            currentChatId
-                        ) && isOnline(MegaApplication.getInstance().applicationContext)
-                    ) {
-                        val sessionsInTheCall: MegaHandleList? = it.sessionsClientid
-                        if (sessionsInTheCall == null || sessionsInTheCall.size() < 1) {
-                            return true
-                        }
-                    }
-                }
-            }
-        }
-
-        return false
-    }
-
-    /**
-     * Method to show the appropriate banner
-     *
-     * @param bannerText the text of the banner to be edited
-     * @param type type of banner
-     * @return True, if should be shown. False, otherwise.
-     */
-    fun updateFixedBanner(
-        bannerText: TextView?,
-        type: Int,
-    ) {
-        when (type) {
-            TYPE_NO_CONNECTION ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.amber_700_amber_300
-                    ),
-                    StringResourcesUtils.getString(R.string.error_server_connection_problem)
-                )
-            TYPE_RECONNECTING ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.amber_700_amber_300
-                    ),
-                    StringResourcesUtils.getString(R.string.reconnecting_message)
-                )
-
-            TYPE_NETWORK_QUALITY ->{
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.dark_grey_alpha_070
-                    ),
-                    StringResourcesUtils.getString(R.string.slow_connection_meeting)
-                )
-            }
-
-            TYPE_SINGLE_PARTICIPANT ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.teal_300
-                    ),
-                    StringResourcesUtils.getString(R.string.banner_alone_on_the_call)
-                )
-        }
-    }
-
-    /**
-     * Method to update the banner
-     *
-     * @param bannerText The textView of the banner
-     * @param color The color of the banner
-     * @param text The text of the banner
-     */
-    private fun updateFixedBanner(bannerText: TextView?, color: Int, text: String) {
-        bannerText?.let {
-            it.setBackgroundColor(color)
-            it.text = text
         }
     }
 

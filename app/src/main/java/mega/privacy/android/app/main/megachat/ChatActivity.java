@@ -103,6 +103,7 @@ import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -338,6 +339,8 @@ public class ChatActivity extends PasscodeActivity
     AnswerCallUseCase answerCallUseCase;
     @Inject
     StartCallUseCase startCallUseCase;
+    @Inject
+    GetCallStatusChangesUseCase getCallStatusChangesUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -1122,6 +1125,15 @@ public class ChatActivity extends PasscodeActivity
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
+        getCallStatusChangesUseCase.callCannotBeRecovered()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result) -> {
+                    if (result) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.calls_chat_screen_unable_to_reconnect_the_call), MEGACHAT_INVALID_HANDLE);
+                    }
+                });
+
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
@@ -1145,6 +1157,8 @@ public class ChatActivity extends PasscodeActivity
                 new IntentFilter(BROADCAST_ACTION_RETRY_PENDING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        GetCallStatusChangesUseCase getCallStatusChangesUseCase;
+
 
         setContentView(R.layout.activity_chat);
 
