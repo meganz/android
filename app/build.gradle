@@ -125,13 +125,11 @@ android {
         }
 
         qa {
-            main {
-                java {
-                    srcDirs 'src/qa/java'
-                }
+            java {
+                srcDirs += 'src/qa/java'
             }
             res {
-                'src/qa/res'
+                srcDirs += 'src/qa/res'
             }
         }
 
@@ -291,6 +289,7 @@ dependencies {
     implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
     implementation 'androidx.activity:activity-compose:1.4.0'
+    implementation 'androidx.preference:preference:1.2.0'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
@@ -433,6 +432,11 @@ dependencies {
 
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
+
+    //Showkase
+    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
+    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

@@ -3,13 +3,20 @@ package mega.privacy.android.app.fragments.homepage
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.AreTransfersPaused
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @HiltViewModel
-class ActionModeViewModel @Inject constructor() : ViewModel() {
+class ActionModeViewModel @Inject constructor(
+    private val areTransfersPaused: AreTransfersPaused,
+) : ViewModel() {
 
     // The full set of nodes
     private lateinit var nodesData: List<NodeItem>
@@ -31,11 +38,29 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     private val selectedNodeList = mutableListOf<NodeItem>()
 
+    private val actionBarMessage = SingleLiveEvent<Int>()
+
     fun onNodeClick(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
 
     fun onNodeLongClick(nodeItem: NodeItem): Boolean {
         _longClick.value = Event(nodeItem)
         return true
+    }
+
+    fun onActionBarMessage(): SingleLiveEvent<Int> = actionBarMessage
+
+    fun showTransfersAction() {
+        actionBarMessage.value = R.string.resume_paused_transfers_text
+    }
+
+    fun executeTransfer(transferAction: () -> Unit) {
+        viewModelScope.launch {
+            if (areTransfersPaused()) {
+                showTransfersAction()
+            } else {
+                transferAction()
+            }
+        }
     }
 
     fun enterActionMode(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
@@ -114,9 +139,9 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     /**
      * Set all the Favourite nodes to unFavourite
      */
-    fun removeFavourites(megaApi: MegaApiAndroid, nodeItems: List<MegaNode> ) {
+    fun removeFavourites(megaApi: MegaApiAndroid, nodeItems: List<MegaNode>) {
         nodeItems.forEach {
-                megaApi.setNodeFavourite(it,false)
+            megaApi.setNodeFavourite(it, false)
         }
     }
 }
