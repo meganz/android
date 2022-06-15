@@ -940,26 +940,13 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
-                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
                 val childrenNodes = viewModel.getItemsHandle()
-                val intent = when (adapterType) {
-                    Constants.ALBUM_CONTENT_ADAPTER, Constants.PHOTOS_BROWSE_ADAPTER -> {
-                        ImageViewerActivity.getIntentForChildren(
-                            requireContext(),
-                            childrenNodes,
-                            nodeHandle
-                        )
-                    }
-                    else -> {
-                        ImageViewerActivity.getIntentForParentNode(
-                            requireContext(),
-                            parentNodeHandle,
-                            getOrder(),
-                            nodeHandle
-                        )
-                    }
-                }
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    childrenNodes,
+                    nodeHandle
+                )
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
@@ -1038,17 +1025,17 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     updateUiWhenAnimationEnd()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 
@@ -1127,7 +1114,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
-            menuItem.icon,
+            menuItem.icon ?: return,
             colorRes
         )
         menuItem.isEnabled = isEnable

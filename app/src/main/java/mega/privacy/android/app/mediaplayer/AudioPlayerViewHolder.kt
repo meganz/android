@@ -107,9 +107,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
         if (listener != null) {
             animator.setListener(object : SimpleAnimatorListener() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     animator.setListener(null)
-
                     listener()
                 }
             })
