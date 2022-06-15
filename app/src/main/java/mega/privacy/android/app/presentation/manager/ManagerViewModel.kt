@@ -3,9 +3,13 @@ package mega.privacy.android.app.presentation.manager
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.settings.model.SettingsState
 import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,6 +27,24 @@ class ManagerViewModel @Inject constructor(
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
 ) : ViewModel() {
+
+    /**
+     * private UI state
+     */
+    private val _uiState = MutableStateFlow(initializeState())
+
+    /**
+     * public UI State
+     */
+    val uiState: StateFlow<ManagerState> = _uiState
+
+    /**
+     * Initialize the UI State
+     */
+    private fun initializeState(): ManagerState =
+        ManagerState(
+            searchParentHandle = -1L
+        )
 
     /**
      * Monitor all global updates
@@ -120,11 +142,12 @@ class ManagerViewModel @Inject constructor(
         }
 
     /**
-     * Current search parent handle
+     * Set the current search parent handle
      */
-    var searchParentHandle: Long = -1L
-        set(value) {
-            Timber.d("setSearchParentHandle")
-            field = value
+    fun setSearchParentHandle(handle: Long) = viewModelScope.launch {
+        Timber.d("setSearchParentHandle")
+        _uiState.update {
+            it.copy(searchParentHandle = handle)
         }
+    }
 }

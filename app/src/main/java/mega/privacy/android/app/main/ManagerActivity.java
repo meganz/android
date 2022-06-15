@@ -3820,7 +3820,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case SEARCH: {
                 aB.setSubtitle(null);
-                if (viewModel.getSearchParentHandle() == -1L) {
+                if (viewModel.getUiState().getValue().getSearchParentHandle() == -1L) {
                     firstNavigationLevel = true;
                     if (searchViewModel.getSearchQuery() != null) {
                         searchViewModel.setTextSubmitted(true);
@@ -3834,7 +3834,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                 } else {
-                    MegaNode parentNode = megaApi.getNodeByHandle(viewModel.getSearchParentHandle());
+                    MegaNode parentNode = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getSearchParentHandle());
                     if (parentNode != null) {
                         aB.setTitle(parentNode.getName());
                         firstNavigationLevel = false;
@@ -6838,8 +6838,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case SEARCH:
-                if (viewModel.getSearchParentHandle() != -1L) {
-                    parentHandle = viewModel.getSearchParentHandle();
+                if (viewModel.getUiState().getValue().getSearchParentHandle() != -1L) {
+                    parentHandle = viewModel.getUiState().getValue().getSearchParentHandle();
                     break;
                 }
                 switch (searchDrawerItem) {

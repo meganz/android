@@ -595,7 +595,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getSearchParentHandle(), recyclerView,
+						managerViewModel.getUiState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
@@ -629,7 +629,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getSearchParentHandle(), recyclerView,
+						managerViewModel.getUiState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
@@ -671,7 +671,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		}
 
 		String query = viewModel.getSearchQuery();
-		long parentHandleSearch = managerViewModel.getSearchParentHandle();
+		long parentHandleSearch = managerViewModel.getUiState().getValue().getSearchParentHandle();
 		DrawerItem drawerItem = ((ManagerActivity) context).getSearchDrawerItem();
 		int sharesTab = ((ManagerActivity) context).getSearchSharedTab();
 		boolean isFirstNavigationLevel = ((ManagerActivity) context).isFirstNavigationLevel();
@@ -856,7 +856,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("searchQuery", viewModel.getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (managerViewModel.getSearchParentHandle() == -1L){
+					if (managerViewModel.getUiState().getValue().getSearchParentHandle() == -1L){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -1087,7 +1087,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 		if (levelSearch >= 0) {
 			if (levelSearch > 0) {
-				MegaNode node = megaApi.getNodeByHandle(managerViewModel.getSearchParentHandle());
+				MegaNode node = megaApi.getNodeByHandle(managerViewModel.getUiState().getValue().getSearchParentHandle());
 
 				if (node == null) {
 					managerViewModel.setSearchParentHandle(-1L);
@@ -1184,14 +1184,14 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			if (managerViewModel.getSearchParentHandle() == -1L) {
+			if (managerViewModel.getUiState().getValue().getSearchParentHandle() == -1L) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				emptyTextViewFirst.setText(R.string.no_results_found);
-			} else if (megaApi.getRootNode().getHandle() == managerViewModel.getSearchParentHandle()) {
+			} else if (megaApi.getRootNode().getHandle() == managerViewModel.getUiState().getValue().getSearchParentHandle()) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
 				} else {
