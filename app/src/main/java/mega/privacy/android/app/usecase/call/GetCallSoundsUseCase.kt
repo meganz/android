@@ -29,7 +29,8 @@ import javax.inject.Inject
 class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase
+    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
+    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase
 ) {
 
     companion object {
@@ -78,7 +79,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                 result.isRecoverable?.let { isRecoverableSession ->
                                     if (result.call == null) {
                                         stopCountDown(INVALID_HANDLE, participant)
-                                        emitter.onNext(CallSoundType.CALL_ENDED)
                                     } else if (isRecoverableSession) {
                                         emitter.startCountDown(
                                             result.call, participant,
@@ -89,13 +89,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                             result.call.chatid,
                                             participant
                                         )
-
-                                        megaChatApi.getChatRoom(result.call.chatid)
-                                            ?.let { chat ->
-                                                if (!chat.isGroup && !chat.isMeeting) {
-                                                    emitter.onNext(CallSoundType.CALL_ENDED)
-                                                }
-                                            }
                                     }
                                 }
                             }
@@ -107,6 +100,22 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
+            getCallStatusChangesUseCase.getCallStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { status ->
+                        if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                            MegaApplication.getInstance()
+                                .removeRTCAudioManager()
+                            emitter.onNext(CallSoundType.CALL_ENDED)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
             getParticipantsChangesUseCase.getChangesFromParticipants()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -156,9 +165,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                         onRequestFinish = { _, error ->
                                             if (error.errorCode == MegaError.API_OK) {
                                                 removeCountDownTimer()
-                                                MegaApplication.getInstance()
-                                                    .removeRTCAudioManager()
-                                                this.onNext(CallSoundType.CALL_ENDED)
                                             } else {
                                                 this.onError(error.toThrowable())
                                             }
