@@ -15,16 +15,6 @@
         tools:text="Renews on" />
 
     <TextView
-        android:id="@+id/renew_expiry_date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="-2dp"
-        android:layout_toEndOf="@+id/renew_expiry_text"
-        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.WhiteGrey87"
-        tools:text="Monday, 1 Feb 2021" />
-
-    <TextView
         android:id="@+id/business_status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

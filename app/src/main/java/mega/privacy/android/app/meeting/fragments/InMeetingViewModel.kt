@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -42,6 +43,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
+import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -54,11 +56,13 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
-    private val getCallUseCase: GetCallUseCase
+    private val getCallUseCase: GetCallUseCase,
+    getParticipantsChangesUseCase: GetParticipantsChangesUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -140,6 +144,9 @@ class InMeetingViewModel @Inject constructor(
     private val _anotherChatTitle = MutableStateFlow(" ")
     val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
+    private val _getParticipantsChangesText = MutableStateFlow(" ")
+    val getParticipantsChangesText: StateFlow<String> get() = _getParticipantsChangesText
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -167,6 +174,23 @@ class InMeetingViewModel @Inject constructor(
     }
 
     init {
+        getParticipantsChangesUseCase.getChangesFromParticipants()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                        onNext = { result ->
+                            if (currentChatId == result.chatId) {
+                                result.peers?.let { list ->
+                                    getParticipantChangesText(list, result.typeChange)
+                                }
+                            }
+                        },
+                        onError = { error ->
+                            LogUtil.logError(error.stackTraceToString())
+                        }
+                )
+                .addTo(composite)
+
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
@@ -175,6 +199,34 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
+    }
+
+    /**
+     * Method to get right text to display on the banner
+     *
+     * @param list List of participants with changes
+     * @param type Type of change
+     */
+    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
+        val numParticipants = list.size
+
+        _getParticipantsChangesText.value = when (numParticipants) {
+            1 -> StringResourcesUtils.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_one_participant_joined_call
+                    else
+                        R.string.meeting_call_screen_one_participant_left_call, getParticipantFullName(list[0]))
+            2 -> StringResourcesUtils.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_two_participants_joined_call
+                    else
+                        R.string.meeting_call_screen_two_participants_left_call, getParticipantFullName(list[0]), getParticipantFullName(list[1]))
+            else -> StringResourcesUtils.getQuantityString(
+                    if (type == TYPE_JOIN)
+                        R.plurals.meeting_call_screen_more_than_two_participants_joined_call
+                    else
+                        R.plurals.meeting_call_screen_more_than_two_participants_left_call, numParticipants, getParticipantFullName(list[0]), (numParticipants - 1))
+        }
     }
 
     /**
@@ -770,13 +822,11 @@ class InMeetingViewModel @Inject constructor(
      * Method to show the appropriate banner
      *
      * @param bannerText the text of the banner to be edited
-     * @param peerId user handle of a participant
      * @param type type of banner
      * @return True, if should be shown. False, otherwise.
      */
     fun updateFixedBanner(
         bannerText: TextView?,
-        peerId: Long,
         type: Int
     ) {
         when (type) {
@@ -789,32 +839,6 @@ class InMeetingViewModel @Inject constructor(
                     ),
                     StringResourcesUtils.getString(R.string.error_server_connection_problem)
                 )
-            TYPE_JOIN ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.teal_300
-                    ),
-                    StringResourcesUtils.getString(
-                        R.string.contact_joined_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                )
-
-            TYPE_LEFT ->
-                updateFixedBanner(
-                    bannerText,
-                    ContextCompat.getColor(
-                        MegaApplication.getInstance().applicationContext,
-                        R.color.teal_300
-                    ),
-                    StringResourcesUtils.getString(
-                        R.string.contact_left_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                )
-
             TYPE_RECONNECTING ->
                 updateFixedBanner(
                     bannerText,
@@ -2332,7 +2356,8 @@ class InMeetingViewModel @Inject constructor(
         }
         AccountController.logout(
             meetingActivity,
-            MegaApplication.getInstance().megaApi
+            MegaApplication.getInstance().megaApi,
+            viewModelScope
         )
     }
 

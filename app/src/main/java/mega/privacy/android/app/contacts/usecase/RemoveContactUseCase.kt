@@ -66,24 +66,22 @@ class RemoveContactUseCase @Inject constructor(
     fun hangCurrentCallIfNeeded(userHandle: Long): Completable =
         Completable.create { emitter ->
             if (CallUtil.participatingInACall()) {
-                val currentChatId = megaChatApi.getChatRoomByUser(userHandle)?.chatId
-                if (currentChatId != null) {
-                    megaChatApi.hangChatCall(currentChatId, OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { _, error ->
-                            if (emitter.isDisposed) return@OptionalMegaChatRequestListenerInterface
+                megaChatApi.getChatRoomByUser(userHandle)?.chatId?.let { currentChatId ->
+                    megaChatApi.getChatCall(currentChatId)?.let { call ->
+                        megaChatApi.hangChatCall(call.callId, OptionalMegaChatRequestListenerInterface(
+                                onRequestFinish = { _, error ->
+                                    if (emitter.isDisposed) return@OptionalMegaChatRequestListenerInterface
 
-                            if (error.errorCode == MegaError.API_OK) {
-                                emitter.onComplete()
-                            } else {
-                                emitter.onError(error.toThrowable())
-                            }
-                        }
-                    ))
-                } else {
-                    emitter.onComplete()
+                                    if (error.errorCode == MegaError.API_OK) {
+                                        emitter.onComplete()
+                                    } else {
+                                        emitter.onError(error.toThrowable())
+                                    }
+                                }
+                        ))
+                    }
                 }
-            } else {
-                emitter.onComplete()
             }
+            emitter.onComplete()
         }
 }

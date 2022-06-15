@@ -845,7 +845,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private void getMegaContact() {
         //clear cache
         isGettingMegaContact = true;
-        megaContactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
+        megaContactGetter.getMegaContacts(megaApi, TimeUtils.DAY, this);
     }
 
     private void onGetContactCompleted() {
@@ -874,7 +874,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             isGettingLocalContact = true;
 
             //add new value
-            List<ContactsUtil.LocalContact> rawLocalContacts = megaContactGetter.getLocalContacts();
+            List<ContactsUtil.LocalContact> rawLocalContacts = ContactsUtil.getLocalContactList(getBaseContext());
             filteredContacts.addAll(megaContacts);
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             filteredContacts.addAll(phoneContacts);

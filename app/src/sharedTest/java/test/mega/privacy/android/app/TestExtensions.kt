@@ -3,11 +3,15 @@ package test.mega.privacy.android.app
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import androidx.compose.ui.test.onNodeWithText
 import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 
@@ -53,6 +57,13 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T: Fragment> HiltTestActivity.testFragment(): T {
+internal fun <T : Fragment> HiltTestActivity.testFragment(): T {
     return supportFragmentManager.findFragmentByTag(testFragmentTag) as T
 }
+
+internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
+    @StringRes id: Int
+) = onNodeWithText(fromId(id = id))
+
+internal fun fromId(@StringRes id: Int) =
+    InstrumentationRegistry.getInstrumentation().targetContext.getString(id)

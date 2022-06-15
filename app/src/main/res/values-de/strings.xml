@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -736,8 +736,6 @@
     <string name="settings_advanced_features_cache">Zwischenspeicher leeren</string>
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Löschung der Offline-Daten</string>
-    <!-- description of switch ‘Open file when download is completed’ -->
-    <string name="settings_auto_play_label">Datei nach Herunterladen öffnen</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Account löschen</string>
     <!-- Size of files in offline or cache folders -->
@@ -941,10 +939,6 @@
     <string name="zip_browser_activity">ZIP-Browser</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Accountart</string>
-    <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Verlängert sich am&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Läuft ab am&#160;</string>
     <!--  -->
     <string name="free_account">Kostenlos</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -2825,11 +2819,11 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Löschbeanstandung</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
+    <string name="error_download_takendown_node">Kein Zugriff aufgrund eines Verstoßes gegen unsere Nutzungsbedingungen</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file was not downloaded as it violated our Terms of Service.</item>
-        <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
+        <item quantity="one">%d Datei wurde nicht heruntergeladen, da sie gegen unsere Nutzungsbedingungen verstößt.</item>
+        <item quantity="other">%d Dateien wurden nicht heruntergeladen, da sie gegen unsere Nutzungsbedingungen verstoßen.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Ihr Dateilink [/A][B]%s[/B][C] wurde wiederhergestellt.[/C]</string>
@@ -4312,9 +4306,9 @@
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">Die Datei wurde entfernt, da sie gegen unsere Nutzungsbedingungen verstieß.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <string name="error_download_takendown_file">Verstoß gegen die Nutzungsbedingungen</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">Dieses Gerät verfügt nicht über eine App, mit der Ordner ausgewählt werden können.</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Weiter</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -4323,4 +4317,50 @@
     <string name="media_player_video_playlist_next">Weiter</string>
     <!-- Previous videos have been already played in the video playlist -->
     <string name="media_player_video_playlist_previous">Zurück</string>
+    <!-- Setting option available to choose for the preferred start screen. -->
+    <string name="settings_start_screen_photos_option">Fotos</string>
+    <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file">Nicht unterstützte Dateitypen in Drittanbieter-Apps öffnen</string>
+    <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
+    <string name="settings_file_management_auto_open_downloaded_file_description">Nicht unterstützte Dateitypen werden in Drittanbieter-Apps statt in der MEGA-App geöffnet.</string>
+    <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="settings_chat_image_quality">Bildqualität</string>
+    <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality">Automatisch</string>
+    <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="automatic_image_quality_text">Bilder bei mobiler Datenverbindung optimieren und bei WLAN-Verbindung in Originalgröße übertragen.</string>
+    <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality">Original</string>
+    <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="high_image_quality_text">Bilder immer in Originalgröße übertragen.</string>
+    <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality">Optimiert</string>
+    <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
+    <string name="optimised_image_quality_text">Bilder immer optimiert übertragen.</string>
+    <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s ist beigetreten</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s und %2$s sind beigetreten</string>
+    <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
+    <string name="meeting_call_screen_one_participant_left_call">%1$s hat aufgelegt</string>
+    <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
+    <string name="meeting_call_screen_two_participants_left_call">%1$s und %2$s haben aufgelegt</string>
+    <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
+    <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
+        <item quantity="one">%1$s und 1 weitere Person sind beigetreten</item>
+        <item quantity="other">%1$s und %2$d weitere Personen sind beigetreten</item>
+    </plurals>
+    <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
+    <plurals name="meeting_call_screen_more_than_two_participants_left_call">
+        <item quantity="one">%1$s und 1 weitere Person haben aufgelegt</item>
+        <item quantity="other">%1$s und %2$d weitere Personen haben aufgelegt</item>
+    </plurals>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Endgültig löschen</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Löschen</string>
+    <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_renews_on">[A]Verlängerung am[/A] [B]%s[/B]</string>
+    <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
+    <string name="account_info_expires_on">[A]Gültig bis[/A] [B]%s[/B]</string>
 </resources>

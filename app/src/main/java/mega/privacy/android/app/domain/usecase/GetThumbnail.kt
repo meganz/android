@@ -7,8 +7,8 @@ import java.io.File
  */
 interface GetThumbnail {
     /**
-     * get thumbnail from server
+     * get thumbnail from local if exist, from server otherwise
      * @return File
      */
-    suspend operator fun invoke(nodeId: Long): File
+    suspend operator fun invoke(nodeId: Long): File?
 }

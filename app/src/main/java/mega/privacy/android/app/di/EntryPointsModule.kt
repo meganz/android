@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import java.util.concurrent.ThreadPoolExecutor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,5 +22,11 @@ class EntryPointsModule {
     @InstallIn(SingletonComponent::class)
     interface CacheFolderManagerEntryPoint {
         val cacheFolderGateway: CacheFolderGateway
+    }
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface MegaThreadPoolExecutorEntryPoint {
+        val megaThreadPoolExecutor: ThreadPoolExecutor
     }
 }

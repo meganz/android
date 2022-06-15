@@ -38,36 +38,36 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
          */
         @JvmStatic
         fun getListIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java)
+                Intent(context, ContactsActivity::class.java)
 
         /**
          * Show Contact group list screen
          */
         @JvmStatic
         fun getGroupsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_GROUPS, true)
-            }
+                Intent(context, ContactsActivity::class.java).apply {
+                    putExtra(EXTRA_SHOW_GROUPS, true)
+                }
 
         /**
          * Show Contact sent requests screen
          */
         @JvmStatic
         fun getSentRequestsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
-                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
-            }
+                Intent(context, ContactsActivity::class.java).apply {
+                    putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
+                    putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
+                }
 
         /**
          * Show Contact received requests screen
          */
         @JvmStatic
         fun getReceivedRequestsIntent(context: Context): Intent =
-            Intent(context, ContactsActivity::class.java).apply {
-                putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
-                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
-            }
+                Intent(context, ContactsActivity::class.java).apply {
+                    putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
+                    putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
+                }
     }
 
     private lateinit var binding: ActivityContactsBinding
@@ -77,11 +77,11 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
-            topLevelDestinationIds = setOf(),
-            fallbackOnNavigateUpListener = {
-                onBackPressed()
-                true
-            }
+                topLevelDestinationIds = setOf(),
+                fallbackOnNavigateUpListener = {
+                    onBackPressed()
+                    true
+                }
         )
     }
 
@@ -105,23 +105,24 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
         navController.apply {
             navController.setGraph(
-                navController.navInflater.inflate(R.navigation.nav_contacts).apply {
-                    startDestination = when {
-                        showGroups -> R.id.contact_groups
-                        showSentRequests || showReceivedRequests -> R.id.contact_requests
-                        else -> R.id.contact_list
-                    }
-                },
-                intent.extras
+                    navController.navInflater.inflate(R.navigation.nav_contacts).apply {
+                        val startDestination = when {
+                            showGroups -> R.id.contact_groups
+                            showSentRequests || showReceivedRequests -> R.id.contact_requests
+                            else -> R.id.contact_list
+                        }
+                        setStartDestination(startDestination)
+                    },
+                    intent.extras
             )
 
             addOnDestinationChangedListener { _, _, _ ->
                 supportActionBar?.title = StringResourcesUtils.getString(
-                    when (this.currentDestination?.id) {
-                        R.id.contact_requests -> R.string.section_requests
-                        R.id.contact_groups -> R.string.section_groups
-                        else -> R.string.section_contacts
-                    }
+                        when (this.currentDestination?.id) {
+                            R.id.contact_requests -> R.string.section_requests
+                            R.id.contact_groups -> R.string.section_groups
+                            else -> R.string.section_contacts
+                        }
                 ).uppercase(Locale.getDefault())
             }
         }
@@ -145,8 +146,8 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSupportNavigateUp(): Boolean =
-        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+            getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
     private fun getNavController(): NavController =
-        (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController
+            (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController
 }

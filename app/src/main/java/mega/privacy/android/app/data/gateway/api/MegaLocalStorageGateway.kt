@@ -16,4 +16,10 @@ interface MegaLocalStorageGateway {
      * Media Uploads handle
      */
     suspend fun getMegaHandleSecondaryFolder(): Long?
+
+    /**
+     * Get cloud sort order
+     * @return cloud sort order
+     */
+    suspend fun getCloudSortOrder(): Int
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
 import mega.privacy.android.app.domain.repository.FilesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -11,6 +12,14 @@ import javax.inject.Inject
  */
 class DefaultGetFolderVersionInfo @Inject constructor(private val filesRepository: FilesRepository) : GetFolderVersionInfo {
     override suspend fun invoke(): FolderVersionInfo? {
-        return filesRepository.getRootFolderVersionInfo().takeIf { it.numberOfVersions >= 0 }
+        return runCatching {
+            filesRepository.getRootFolderVersionInfo().takeIf { it.numberOfVersions >= 0 }
+        }.fold(
+            onSuccess = { it },
+            onFailure = {
+                Timber.e(it)
+                null
+            }
+        )
     }
 }

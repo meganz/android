@@ -12,7 +12,6 @@ public class Constants {
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
     public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
     public static final int BOOT_JOB_ID = 10097;
-    public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
@@ -165,6 +164,7 @@ public class Constants {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_BT_CONNECT = 16;
+    public static final int REQUEST_ACCESS_MEDIA_LOCATION = 17;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;

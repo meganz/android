@@ -127,12 +127,6 @@ class PasscodeFacade @Inject constructor(
         } else if (passcodeManagement.showPasscodeScreen) {
             passcodeUtil.resume()
         }
-
-        if (System.currentTimeMillis() - lastStart > 1000
-            && megaApi.rootNode != null && !MegaApplication.isLoggingIn()
-        ) {
-            JobUtil.startCameraUploadServiceIgnoreAttr(context)
-        }
     }
 
     override fun saveState(): Bundle =

@@ -10,9 +10,9 @@ import mega.privacy.android.app.objects.GifData
 
 class ViewGifActivityContract : ActivityResultContract<GifData, GifData?>() {
 
-    override fun createIntent(context: Context, gifData: GifData): Intent =
+    override fun createIntent(context: Context, input: GifData): Intent =
         Intent(context, GiphyViewerActivity::class.java)
-            .putExtra(GiphyPickerActivity.GIF_DATA, gifData)
+            .putExtra(GiphyPickerActivity.GIF_DATA, input)
 
     override fun parseResult(resultCode: Int, intent: Intent?): GifData? =
         when (resultCode) {
