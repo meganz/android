@@ -9,7 +9,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.presentation.search.SearchViewModel
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +25,8 @@ class SearchViewModelTest {
     private lateinit var underTest: SearchViewModel
 
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val rootNodeExists = mock<RootNodeExists>()
+    private val searchNodesUseCase = mock<SearchNodesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -38,6 +42,8 @@ class SearchViewModelTest {
     private fun setUnderTest() {
         underTest = SearchViewModel(
             monitorNodeUpdates,
+            rootNodeExists,
+            searchNodesUseCase
         )
     }
 

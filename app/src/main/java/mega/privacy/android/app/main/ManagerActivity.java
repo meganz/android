@@ -3522,9 +3522,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void cancelSearch() {
-        if (getSearchFragment() != null) {
-            searchFragment.cancelSearch();
-        }
+        searchViewModel.cancelSearch();
     }
 
     public void skipToMediaDiscoveryFragment(Fragment f) {

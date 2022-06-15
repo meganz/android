@@ -5,7 +5,6 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.putT
 import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_GENERAL;
 import static mega.privacy.android.app.utils.CloudStorageOptionControlUtil.MAX_ACTION_COUNT;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
@@ -76,15 +75,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -105,19 +101,16 @@ import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
-import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 @AndroidEntryPoint
-public class SearchFragment extends RotatableFragment implements SearchCallback.View,
-		SearchCallback.Data {
+public class SearchFragment extends RotatableFragment {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -157,7 +150,6 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 	private String downloadLocationDefaultPath;
 
-	private MegaCancelToken searchCancelToken;
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
 
@@ -542,15 +534,22 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				new EventObserver<>(this::showSortByPanel));
 
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
-		managerViewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
+		viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
+		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
 				new EventObserver<>(nodes -> {
-					//stop from query for empty string.
-					viewModel.setTextSubmitted(true);
 					refresh();
 					return null;
 				})
 		);
-		viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
+		viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(),
+				new EventObserver<>(state -> {
+					updateSearchProgressView(state.isInProgress());
+					if (state.getNodes() != null) {
+						setNodes(new ArrayList(state.getNodes()));
+					}
+					return null;
+				})
+		);
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -665,27 +664,12 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	}
 
 	public void newSearchNodesTask() {
-		if (megaApi.getRootNode() == null) {
-			logError("Root node is null.");
-			return;
-		}
-
-		String query = viewModel.getUiState().getValue().getSearchQuery();
-		long parentHandleSearch = viewModel.getUiState().getValue().getSearchParentHandle();
-		DrawerItem drawerItem = managerViewModel.getUiState().getValue().getSearchDrawerItem();
-		int sharesTab = managerViewModel.getUiState().getValue().getSearchSharedTab();
-		boolean isFirstNavigationLevel = managerViewModel.getUiState().getValue().isFirstNavigationLevel();
-
-		searchCancelToken = initNewSearch();
-		searchNodesUseCase.get(query, parentHandleSearch, getParentHandleForSearch(drawerItem),
-				TYPE_GENERAL, searchCancelToken, drawerItem, sharesTab, isFirstNavigationLevel)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe((searchedNodes, throwable) -> {
-					if (throwable == null) {
-						finishSearch(searchedNodes);
-					}
-				});
+		viewModel.performSearch(
+				managerViewModel.getUiState().getValue(),
+				getParentHandleForSearch(
+						managerViewModel.getUiState().getValue().getSearchDrawerItem()
+				)
+		);
 	}
 
 	private long getParentHandleForSearch(DrawerItem drawerItem) {
@@ -720,16 +704,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		}
 	}
 
-	@NonNull
-	@Override
-	public MegaCancelToken initNewSearch() {
-		updateSearchProgressView(true);
-		cancelSearch();
-		return Objects.requireNonNull(MegaCancelToken.createInstance());
-	}
-
-	@Override
-	public void updateSearchProgressView(boolean inProgress) {
+	private void updateSearchProgressView(boolean inProgress) {
 		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
 			logWarning("Cannot set search progress view, one or more parameters are NULL.");
 			return;
@@ -739,19 +714,6 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
 		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
 		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
-	}
-
-	@Override
-	public void cancelSearch() {
-		if (searchCancelToken != null) {
-			searchCancelToken.cancel();
-		}
-	}
-
-	@Override
-	public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
-		updateSearchProgressView(false);
-		setNodes(searchedNodes);
 	}
 
 	@Override
@@ -1082,7 +1044,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	
 	public int onBackPressed(){
 		logDebug("onBackPressed");
-		cancelSearch();
+		viewModel.cancelSearch();
 		int levelSearch = viewModel.getUiState().getValue().getSearchDepth();
 
 		if (levelSearch >= 0) {
@@ -1141,11 +1103,6 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	public void refresh(){
 		logDebug("refresh ");
 		newSearchNodesTask();
-
-		if(adapter != null){
-			adapter.notifyDataSetChanged();
-		}
-
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		visibilityFastScroller();
 
@@ -1254,6 +1211,8 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			reDoTheSelectionAfterRotation();
 			reSelectUnhandledItem();
 		}
+
+		notifyDataSetChanged();
 	}
 
 	public static SearchFragment newInstance() {

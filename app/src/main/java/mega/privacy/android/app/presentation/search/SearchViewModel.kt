@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +15,13 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,10 +30,14 @@ import javax.inject.Inject
  * ViewModel associated to SearchFragment
  *
  * @param monitorNodeUpdates Monitor global node updates
+ * @param rootNodeExists Check if the root node exists
+ * @param searchNodesUseCase Perform a search request
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
+    private val rootNodeExists: RootNodeExists,
+    private val searchNodesUseCase: SearchNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -40,6 +51,13 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchState> = _uiState
 
     /**
+     * Temporary live data that can be observed from the search fragment
+     * Should be replace by directly observing uiState flow
+     * after migrating SearchFragment to kotlin
+     */
+    val uiStateLiveData = _uiState.map { Event(it) }.asLiveData()
+
+    /**
      * Monitor global node updates
      */
     var updateNodes: LiveData<Event<List<MegaNode>>> =
@@ -51,13 +69,15 @@ class SearchViewModel @Inject constructor(
 
 
     /**
+     * Current search cancel token after a search request has been performed
+     */
+    private var searchCancelToken: MegaCancelToken? = null
+
+    /**
      * Set the current search parent handle
      */
     fun setSearchParentHandle(handle: Long) = viewModelScope.launch {
-        Timber.d("setSearchParentHandle")
-        _uiState.update {
-            it.copy(searchParentHandle = handle)
-        }
+        _uiState.update { it.copy(searchParentHandle = handle) }
     }
 
     /**
@@ -114,14 +134,107 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
+     * Perform a search request
+     *
+     * @param managerState the manager UI state of the ManagerViewModel
+     * @param parentHandleForSearch
+     */
+    fun performSearch(
+        managerState: ManagerState,
+        parentHandleForSearch: Long,
+    ) = viewModelScope.launch {
+        if (!rootNodeExists()) {
+            Timber.e("Root node is null.")
+            return@launch
+        }
+
+        //stop from query for empty string.
+        setTextSubmitted(true)
+
+        val query = uiState.value.searchQuery
+        val parentHandleSearch = uiState.value.searchParentHandle
+        val drawerItem = managerState.searchDrawerItem
+        val sharesTab = managerState.searchSharedTab
+        val isFirstNavigationLevel = managerState.isFirstNavigationLevel
+
+        cancelSearch()
+        searchCancelToken = initNewSearch()
+        searchCancelToken?.let { token ->
+            searchNodesUseCase.get(
+                query,
+                parentHandleSearch,
+                parentHandleForSearch,
+                TYPE_GENERAL,
+                token,
+                drawerItem,
+                sharesTab,
+                isFirstNavigationLevel
+            )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { nodes, _ ->
+                    finishSearch(nodes ?: emptyList())
+                }
+        }
+    }
+
+    /**
+     * Cancel a search request
+     */
+    fun cancelSearch() {
+        setNodes(null)
+        searchCancelToken?.cancel()
+    }
+
+    /**
+     * Initialize a new search request
+     *
+     * @return a mega cancel token
+     */
+    private fun initNewSearch(): MegaCancelToken {
+        setIsInSearchProgress(true)
+        return MegaCancelToken.createInstance()
+    }
+
+    /**
+     * Set the search result after a search request has been performed
+     *
+     * @param nodes the list of nodes to set
+     */
+    private fun finishSearch(nodes: List<MegaNode>) {
+        setIsInSearchProgress(false)
+        setNodes(nodes)
+    }
+
+    /**
+     * Set the nodes in the UI state
+     *
+     * @param nodes a list of nodes to set
+     */
+    private fun setNodes(nodes: List<MegaNode>?) = viewModelScope.launch {
+        _uiState.update { it.copy(nodes = nodes) }
+    }
+
+    /**
+     * Set the flag is in search progress in the UI state
+     *
+     * @param isInProgress true if a search request is in progress
+     */
+    private fun setIsInSearchProgress(isInProgress: Boolean) = viewModelScope.launch {
+        _uiState.update { it.copy(isInProgress = isInProgress) }
+    }
+
+    /**
      * Initialize the UI State
      */
     private fun initializeState(): SearchState =
         SearchState(
+            nodes = null,
             searchParentHandle = -1L,
             textSubmitted = false,
             searchQuery = "",
             searchDepth = -1,
+            isInProgress = false
         )
 
 }
