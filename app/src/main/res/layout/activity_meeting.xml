@@ -154,7 +154,25 @@
     </LinearLayout>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
-        android:id="@+id/meeting_banner"
+        android:id="@+id/participants_changes_banner"
+        style="@style/MeetingBanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="9dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tool:text="Anna Sould joined" />
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
+        android:id="@+id/call_will_end_banner"
         style="@style/MeetingBanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

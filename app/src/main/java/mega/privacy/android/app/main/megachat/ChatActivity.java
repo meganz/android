@@ -80,6 +80,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -107,6 +108,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -258,6 +260,8 @@ public class ChatActivity extends PasscodeActivity
     private static final String MESSAGE_HANDLE_PLAYING = "messageHandleVoicePlaying";
     private static final String USER_HANDLE_PLAYING = "userHandleVoicePlaying";
     private final static String JOIN_CALL_DIALOG = "isJoinCallDialogShown";
+    private final static String ONLY_ME_IN_CALL_DIALOG = "isOnlyMeInCallDialogShown";
+
     private static final String LAST_MESSAGE_SEEN = "LAST_MESSAGE_SEEN";
     private static final String GENERAL_UNREAD_COUNT = "GENERAL_UNREAD_COUNT";
     private static final String SELECTED_ITEMS = "selectedItems";
@@ -347,6 +351,8 @@ public class ChatActivity extends PasscodeActivity
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    GetParticipantsChangesUseCase getParticipantsChangesUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -537,6 +543,8 @@ public class ChatActivity extends PasscodeActivity
     private AlertDialog locationDialog;
     private boolean isLocationDialogShown = false;
     private boolean isJoinCallDialogShown = false;
+    private boolean isOnlyMeInCallDialogShown = false;
+
     private RelativeLayout inputTextLayout;
     private View separatorOptions;
 
@@ -1145,6 +1153,21 @@ public class ChatActivity extends PasscodeActivity
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
+
+        getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result) -> {
+                    Long chatId = result.component1();
+                    if (chatId == chatRoom.getChatId()) {
+                        if (result.component2()) {
+                            showOnlyMeInTheCallDialog();
+                        } else if (dialogCall != null) {
+                            dialogCall.dismiss();
+                        }
+                    }
+                });
+
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
@@ -1671,6 +1694,7 @@ public class ChatActivity extends PasscodeActivity
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
                         isJoinCallDialogShown = savedInstanceState.getBoolean(JOIN_CALL_DIALOG, false);
+                        isOnlyMeInCallDialogShown = savedInstanceState.getBoolean(ONLY_ME_IN_CALL_DIALOG, false);
                         recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
 
                         if(visibilityMessageJump){
@@ -1825,7 +1849,7 @@ public class ChatActivity extends PasscodeActivity
 
     /**
      * Opens a new chat conversation, checking if the id is valid and if the ChatRoom exists.
-     * If an error ocurred opening the chat, an error dialog is shown.
+     * If an error occurred opening the chat, an error dialog is shown.
      *
      * @return True if the chat was successfully opened, false otherwise
      */
@@ -1925,6 +1949,10 @@ public class ChatActivity extends PasscodeActivity
         logDebug("On create: stateHistory: " + stateHistory);
         if (isLocationDialogShown) {
             showSendLocationDialog();
+        }
+
+        if (isOnlyMeInCallDialogShown) {
+            showOnlyMeInTheCallDialog();
         }
 
         if (isJoinCallDialogShown) {
@@ -3820,6 +3848,49 @@ public class ChatActivity extends PasscodeActivity
     }
 
     /**
+     * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
+     */
+    private void showOnlyMeInTheCallDialog() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
+        TextView title = dialogLayout.findViewById(R.id.title_call_dialog);
+        title.setText(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
+        TextView description = dialogLayout.findViewById(R.id.description_call_dialog);
+        description.setText(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
+
+        final Button firstButton = dialogLayout.findViewById(R.id.first_button);
+        final Button secondButton = dialogLayout.findViewById(R.id.second_button);
+        final Button thirdButton = dialogLayout.findViewById(R.id.cancel_button);
+        firstButton.setVisibility(View.VISIBLE);
+        secondButton.setVisibility(View.VISIBLE);
+        thirdButton.setVisibility(View.GONE);
+
+        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call).toUpperCase(Locale.ROOT));
+        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call).toUpperCase(Locale.ROOT));
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setView(dialogLayout);
+        dialogCall = builder.create();
+        isOnlyMeInCallDialogShown = true;
+        dialogCall.show();
+
+        dialogCall.setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false);
+        firstButton.setOnClickListener(v13 -> {
+            MegaApplication.getChatManagement().stopCounterToFinishCall();
+            MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
+            if (call != null) {
+                megaChatApi.hangChatCall(call.getCallId(), null);
+            }
+            dialogCall.dismiss();
+        });
+
+        secondButton.setOnClickListener(v13 -> {
+            MegaApplication.getChatManagement().stopCounterToFinishCall();
+            dialogCall.dismiss();
+        });
+    }
+
+    /**
      * Dialog to allow joining a group call when another one is active.
      *
      * @param callInThisChat  The chat ID of the group call.
@@ -3829,11 +3900,13 @@ public class ChatActivity extends PasscodeActivity
     public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall, boolean existsMoreThanOneCall) {
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
-        TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.join_call_dialog_title);
+        TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.title_call_dialog);
         joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
+        TextView description = dialogLayout.findViewById(R.id.description_call_dialog);
+        description.setText(StringResourcesUtils.getString(R.string.text_join_another_call));
 
-        final Button holdJoinButton = dialogLayout.findViewById(R.id.hold_join_button);
-        final Button endJoinButton = dialogLayout.findViewById(R.id.end_join_button);
+        final Button holdJoinButton = dialogLayout.findViewById(R.id.first_button);
+        final Button endJoinButton = dialogLayout.findViewById(R.id.second_button);
         final Button cancelButton = dialogLayout.findViewById(R.id.cancel_button);
 
         holdJoinButton.setText(chatRoom.isGroup() ? R.string.hold_and_join_call_incoming : R.string.hold_and_answer_call_incoming);
@@ -3848,7 +3921,7 @@ public class ChatActivity extends PasscodeActivity
 
         View.OnClickListener clickListener = v -> {
             switch (v.getId()) {
-                case R.id.hold_join_button:
+                case R.id.first_button:
                     if(anotherCall.isOnHold()){
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
@@ -3860,7 +3933,7 @@ public class ChatActivity extends PasscodeActivity
                     }
                     break;
 
-                case R.id.end_join_button:
+                case R.id.second_button:
                     endCall(anotherCall.getCallId());
                     break;
 

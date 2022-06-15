@@ -3899,4 +3899,16 @@
     <string name="skip_folder">Skip this folder</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists in this location.</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">You’re the only one here</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Call will automatically end in 2 mins unless you want to stay on it.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">End call now</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Stay on call</string>
 </resources>

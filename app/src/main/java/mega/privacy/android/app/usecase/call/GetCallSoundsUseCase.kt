@@ -35,6 +35,7 @@ class GetCallSoundsUseCase @Inject constructor(
 
     companion object {
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
+        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
     }
 
     /**
@@ -92,6 +93,26 @@ class GetCallSoundsUseCase @Inject constructor(
                                     }
                                 }
                             }
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { (chatId, onlyMeInTheCall) ->
+                        if (onlyMeInTheCall) {
+                            chatId?.let {
+                                MegaApplication.getChatManagement().startCounterToFinishCall(it,
+                                    SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+                            }
+                        } else {
+                            MegaApplication.getChatManagement().stopCounterToFinishCall()
                         }
                     },
                     onError = { error ->

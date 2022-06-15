@@ -103,6 +103,9 @@ class InMeetingViewModel @Inject constructor(
     private val _showCallDuration = MutableStateFlow(false)
     val showCallDuration: StateFlow<Boolean> get() = _showCallDuration
 
+    private val _showOnlyMeBanner = MutableStateFlow(false)
+    val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
+
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
     }
@@ -178,21 +181,36 @@ class InMeetingViewModel @Inject constructor(
 
     init {
         getParticipantsChangesUseCase.getChangesFromParticipants()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onNext = { result ->
-                            if (currentChatId == result.chatId) {
-                                result.peers?.let { list ->
-                                    getParticipantChangesText(list, result.typeChange)
-                                }
-                            }
-                        },
-                        onError = { error ->
-                            LogUtil.logError(error.stackTraceToString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { (chatId, typeChange, peers) ->
+                    if (currentChatId == chatId) {
+                        peers?.let { list ->
+                            getParticipantChangesText(list, typeChange)
                         }
-                )
-                .addTo(composite)
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+
+        getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { (chatId, onlyMeInTheCall) ->
+                    if (currentChatId == chatId) {
+                        _showOnlyMeBanner.value = onlyMeInTheCall
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
 
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
