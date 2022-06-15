@@ -125,13 +125,11 @@ android {
         }
 
         qa {
-            main {
-                java {
-                    srcDirs 'src/qa/java'
-                }
+            java {
+                srcDirs += 'src/qa/java'
             }
             res {
-                'src/qa/res'
+                srcDirs += 'src/qa/res'
             }
         }
 
@@ -209,7 +207,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
                 testers = readTesters()
             }
         }
@@ -293,6 +291,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.4.0'
     implementation 'androidx.camera:camera-view:1.0.0-alpha26'
     implementation 'androidx.camera:camera-lifecycle:1.0.0'
+    implementation 'androidx.preference:preference:1.2.0'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
@@ -435,6 +434,11 @@ dependencies {
 
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
+
+    //Showkase
+    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
+    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

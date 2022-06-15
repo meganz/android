@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".namecollision.NameCollisionActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" />
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:paddingBottom="50dp">
+
+            <TextView
+                android:id="@+id/already_exists_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey500Grey300"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="A file named IMG000012.jpeg already exists in this location." />
+
+            <TextView
+                android:id="@+id/select_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey900White"
+                app:layout_constraintTop_toBottomOf="@+id/already_exists_text"
+                tools:text="Select the file you want to keep" />
+
+            <View
+                android:id="@+id/header_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/select_text" />
+
+            <TextView
+                android:id="@+id/replace_update_merge_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                app:layout_constraintTop_toBottomOf="@+id/header_separator"
+                tools:text="The current version of the file will be replaced with the file you are uploading." />
+
+            <TextView
+                android:id="@+id/learn_more"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/learn_more_option"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
+                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_info" />
+
+            <include
+                android:id="@+id/replace_update_merge_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/learn_more" />
+
+            <Button
+                android:id="@+id/replace_update_merge_button"
+                style="@style/Widget.Mega.Button.Transparent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_view"
+                tools:text="UPLOAD AND REPLACE" />
+
+            <View
+                android:id="@+id/replace_update_merge_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_button" />
+
+            <TextView
+                android:id="@+id/cancel_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_separator"
+                tools:text="No files will be changed. You will keep the file below:" />
+
+            <include
+                android:id="@+id/cancel_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_info" />
+
+            <Button
+                android:id="@+id/cancel_button"
+                style="@style/Widget.Mega.Button.Transparent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_view"
+                tools:text="DON'T UPLOAD" />
+
+            <View
+                android:id="@+id/cancel_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_button" />
+
+            <TextView
+                android:id="@+id/rename_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_separator"
+                tools:text="The file you are uploading will be renamed as:" />
+
+            <include
+                android:id="@+id/rename_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rename_info" />
+
+            <Button
+                android:id="@+id/rename_button"
+                style="@style/Widget.Mega.Button.Transparent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rename_view"
+                tools:text="UPLOAD AND RENAME" />
+
+            <CheckBox
+                android:id="@+id/apply_for_all_check"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                app:layout_constraintTop_toBottomOf="@+id/rename_button"
+                tools:text="@string/file_apply_for_all" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

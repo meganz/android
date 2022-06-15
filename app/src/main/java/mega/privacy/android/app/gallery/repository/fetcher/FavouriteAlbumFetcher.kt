@@ -6,7 +6,11 @@ import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.LogUtil
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 
 /**
  * FavouriteAlbumFetcher helps FavouriteAlbumRepository gets data, like megaNodes.
@@ -23,7 +27,7 @@ class FavouriteAlbumFetcher(
     selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
     private val order: Int,
     zoom: Int,
-    private val dbHandler: DatabaseHandler
+    private val dbHandler: DatabaseHandler,
 ) : GalleryBaseFetcher(
     context = context,
     megaApi = megaApi,
@@ -55,7 +59,7 @@ class FavouriteAlbumFetcher(
      */
     private fun sortByModifiedTime(
         orderStrategy: Int,
-        cancelToken: MegaCancelToken?
+        cancelToken: MegaCancelToken?,
     ): List<MegaNode> {
         val favourites = ArrayList<MegaNode>()
         val images = filterFavImagesByTimeOrder(cancelToken)
@@ -173,7 +177,7 @@ class FavouriteAlbumFetcher(
      */
     private fun getAllNodesFromCUAndMU(
         cuFolderNode: MegaNode?,
-        muFolderNode: MegaNode?
+        muFolderNode: MegaNode?,
     ): List<MegaNode> {
         if (!hasNode(cuFolderNode) && !hasNode(muFolderNode)) {
             return emptyList()
@@ -219,7 +223,7 @@ class FavouriteAlbumFetcher(
      */
     private fun stringHandleToLong(
         stringHandle: String,
-        errorMsg: String = "parse handle error"
+        errorMsg: String = "parse handle error",
     ): Long {
         var longHandle = 0L
         try {
