@@ -115,7 +115,7 @@ class GalleryCardViewHolderTest {
             8
         )
 
-        val expectedFormat = "$day, $month $year"
+        val expectedFormat = "$day $month, $year"
         underTest.bind(getCard(), mock())
 
         assertThat(binding.dateText.text.toString()).isEqualTo(expectedFormat)
