@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.favourites
+package test.mega.privacy.android.app.presentation.featureflag
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
