@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -40,17 +39,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -75,8 +80,17 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class FileContactListActivity extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface {
+
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	UploadUseCase uploadUseCase;
 
 	private ContactController cC;
 	private NodeController nC;
@@ -712,39 +726,52 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 	 */
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){
-				logError(ex.getMessage());
-			}
-		}
-		
+
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-		if(parentNode == null){
-			showSnackbar(getString(R.string.error_temporary_unavaible));
+		if (parentNode == null) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+			showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 			return;
 		}
-		
+
 		if (infos == null) {
-			showSnackbar(getString(R.string.upload_can_not_open));
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+			showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));
+			return;
 		}
-		else {
-			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-				showOverDiskQuotaPaywallWarning();
-				return;
-			}
-			showSnackbar(getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
-			for (ShareInfo info : infos) {
-				Intent intent = new Intent(this, UploadService.class);
-				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				ContextCompat.startForegroundService(this, intent);
-			}
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+			showOverDiskQuotaPaywallWarning();
+			return;
 		}
+
+		checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+
+					if (throwable != null) {
+						showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
+					} else {
+						ArrayList<NameCollision> collisions = result.getFirst();
+						List<ShareInfo> withoutCollisions = result.getSecond();
+
+						if (!collisions.isEmpty()) {
+							nameCollisionActivityContract.launch(collisions);
+						}
+
+						if (!withoutCollisions.isEmpty()) {
+							String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
+
+							uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe(() -> showSnackbar(text));
+						}
+					}
+				});
 	}
 	
 	@Override

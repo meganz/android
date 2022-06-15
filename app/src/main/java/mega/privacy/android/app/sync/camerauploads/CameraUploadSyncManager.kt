@@ -695,8 +695,11 @@ object CameraUploadSyncManager {
             val gSession = credentials.session
             MegaApplication.setLoggingIn(true)
             megaApi.fastLogin(gSession, createOnFinishListener(onSuccess = {
+                saveCredentials()
+                logDebug("CameraUploadSyncManager: fast logged in and saved session")
                 megaApi.fetchNodes(createOnFinishListener(onSuccess = {
                     MegaApplication.setLoggingIn(false)
+                    MegaApplication.setHeartBeatAlive(true)
                     sendRegularHeartbeat()
                 }, onError = {
                     MegaApplication.setLoggingIn(false)
@@ -707,6 +710,20 @@ object CameraUploadSyncManager {
         } else {
             sendRegularHeartbeat()
         }
+    }
+
+    private fun saveCredentials() {
+        val fastLoginSession = megaApi.dumpSession()
+        val myUser = megaApi.myUser
+        var lastEmail = ""
+        var myUserHandle = ""
+        if (myUser != null) {
+            lastEmail = megaApi.myUser.email
+            myUserHandle = megaApi.myUser.handle.toString() + ""
+        }
+        val credentials = UserCredentials(lastEmail, fastLoginSession, "", "", myUserHandle)
+        val dbH = DatabaseHandler.getDbHandler(megaApplication)
+        dbH.saveCredentials(credentials)
     }
 
     /**

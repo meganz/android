@@ -88,7 +88,11 @@ import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -122,6 +126,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATU
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -158,6 +163,10 @@ public class ContactInfoActivity extends PasscodeActivity
 	GetChatChangesUseCase getChatChangesUseCase;
 	@Inject
 	StartCallUseCase startCallUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -1335,39 +1344,51 @@ public class ContactInfoActivity extends PasscodeActivity
 
 			megaAttacher.handleSelectFileResult(intent, user, this);
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-                return;
-            }
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+				return;
+			}
 
-            statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
-            
-            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-            final long toHandle = intent.getLongExtra("COPY_TO", 0);
-            final int totalCopy = copyHandles.length;
-            
-            MegaNode parent = megaApi.getNodeByHandle(toHandle);
-            for (int i = 0; i < copyHandles.length; i++) {
-				logDebug("NODE TO COPY: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
-				logDebug("WHERE: " + parent.getName());
-				logDebug("NODES: " + copyHandles[i] + "_" + parent.getHandle());
-                MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                if (cN != null){
-					logDebug("cN != null");
-                    megaApi.copyNode(cN, parent, this);
-                }
-                else{
-					logWarning("cN == null");
-                    try {
-                        statusDialog.dismiss();
-                        if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                            showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_sent_node), -1);
-                        }
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-        }
+			statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
+
+			final long[] copyHandles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES);
+			final long toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, 0);
+
+			checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						if (throwable == null) {
+							ArrayList<NameCollision> collisions = result.getFirst();
+
+							if (!collisions.isEmpty()) {
+								dismissAlertDialogIfExists(statusDialog);
+								nameCollisionActivityContract.launch(collisions);
+							}
+
+							long[] handlesWithoutCollision = result.getSecond();
+
+							if (handlesWithoutCollision.length > 0) {
+								copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe((copyResult, copyThrowable) -> {
+											dismissAlertDialogIfExists(statusDialog);
+
+											if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+												sharedFoldersFragment.clearSelections();
+												sharedFoldersFragment.hideMultipleSelect();
+											}
+											if (copyThrowable == null) {
+												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
+											} else {
+												manageCopyMoveException(copyThrowable);
+											}
+										});
+							}
+						}
+					});
+		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
 	}
@@ -1447,51 +1468,7 @@ public class ContactInfoActivity extends PasscodeActivity
                     sharedFoldersFragment.setNodes();
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_COPY) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-            }
-            
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    sharedFoldersFragment.clearSelections();
-                    sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-                }
-            }
-            else{
-                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					if (api.isForeignNode(request.getParentHandle())) {
-						showForeignStorageOverQuotaWarningDialog(this);
-						return;
-					}
-
-					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-					logDebug("PRE OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-                    }
-                }
-            }
-
-			logDebug("Copy nodes request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_MOVE) {
+        } else if (request.getType() == MegaRequest.TYPE_MOVE) {
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {

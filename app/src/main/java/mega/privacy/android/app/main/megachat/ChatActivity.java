@@ -99,6 +99,9 @@ import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
@@ -151,7 +154,6 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
-import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
@@ -201,8 +203,8 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
@@ -211,7 +213,7 @@ import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.
 import static mega.privacy.android.app.main.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -341,6 +343,10 @@ public class ChatActivity extends PasscodeActivity
     StartCallUseCase startCallUseCase;
     @Inject
     GetNodeUseCase getNodeUseCase;
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -3682,81 +3688,46 @@ public class ChatActivity extends PasscodeActivity
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
-    public void importNodes(final long toHandle, final long[] importMessagesHandles){
-        logDebug("importNode: " + toHandle +  " -> " + importMessagesHandles.length);
+    public void importNodes(final long toHandle, final long[] importMessagesHandles) {
+        logDebug("importNode: " + toHandle + " -> " + importMessagesHandles.length);
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
-        MegaNode target = null;
-        target = megaApi.getNodeByHandle(toHandle);
-        if(target == null){
-            target = megaApi.getRootNode();
-        }
-        logDebug("TARGET handle: " + target.getHandle());
+        checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, idChat, toHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        ArrayList<NameCollision> collisions = result.getFirst();
 
-        if(importMessagesHandles.length==1){
-            for (int k = 0; k < importMessagesHandles.length; k++){
-                MegaChatMessage message = megaChatApi.getMessage(idChat, importMessagesHandles[k]);
-                if(message!=null){
-
-                    MegaNodeList nodeList = message.getMegaNodeList();
-
-                    for(int i=0;i<nodeList.size();i++){
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT: " + document.getHandle());
-                            document = chatC.authorizeNodeIfPreview(document, chatRoom);
-                            if (target != null) {
-                                megaApi.copyNode(document, target, this);
-                            } else {
-                                logError("TARGET: null");
-                               showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                            }
+                        if (!collisions.isEmpty()) {
+                            dismissAlertDialogIfExists(statusDialog);
+                            nameCollisionActivityContract.launch(collisions);
                         }
-                        else{
-                            logError("DOCUMENT: null");
-                            showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
+
+                        List<MegaNode> nodesWithoutCollision = result.getSecond();
+
+                        if (!nodesWithoutCollision.isEmpty()) {
+                            copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe((copyResult, copyThrowable) -> {
+                                        dismissAlertDialogIfExists(statusDialog);
+
+                                        if (copyThrowable != null) {
+                                            manageCopyMoveException(copyThrowable);
+                                        }
+
+                                        showSnackbar(SNACKBAR_TYPE, copyThrowable == null
+                                                        ? copyResult.getResultText()
+                                                        : StringResourcesUtils.getString(R.string.import_success_error),
+                                                MEGACHAT_INVALID_HANDLE);
+                                    });
                         }
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
                     }
-
-                }
-                else{
-                    logError("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                }
-            }
-        }
-        else {
-            MultipleRequestListener listener = new MultipleRequestListener(MULTIPLE_CHAT_IMPORT, this);
-
-            for (int k = 0; k < importMessagesHandles.length; k++){
-                MegaChatMessage message = megaChatApi.getMessage(idChat, importMessagesHandles[k]);
-                if(message!=null){
-
-                    MegaNodeList nodeList = message.getMegaNodeList();
-
-                    for(int i=0;i<nodeList.size();i++){
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT: " + document.getHandle());
-                            document = chatC.authorizeNodeIfPreview(document, chatRoom);
-                            if (target != null) {
-                                megaApi.copyNode(document, target, listener);
-                            } else {
-                                logError("TARGET: null");
-                            }
-                        }
-                        else{
-                            logError("DOCUMENT: null");
-                        }
-                    }
-                }
-                else{
-                    logError("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                }
-            }
-        }
+                });
     }
 
     public void retryNodeAttachment(long nodeHandle){
@@ -8193,41 +8164,7 @@ public class ChatActivity extends PasscodeActivity
                     logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }
             }
-        }
-        else if(request.getType() == MegaRequest.TYPE_COPY){
-            if (e.getErrorCode() != MegaError.API_OK) {
-
-                logDebug("e.getErrorCode() != MegaError.API_OK");
-
-                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                    if (api.isForeignNode(request.getParentHandle())) {
-                        showForeignStorageOverQuotaWarningDialog(this);
-                        return;
-                    }
-
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else
-                {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                }
-
-            }else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_message), -1);
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
             int tag = request.getTransferTag();
             ChatManagement chatManagement = MegaApplication.getChatManagement();
             long pMsgId = chatManagement.getPendingMsgIdToBeCancelled(tag);

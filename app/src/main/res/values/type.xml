@@ -57,6 +57,10 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey500Grey300">
+        <item name="android:textColor">@color/grey_500_grey_300</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Variant3">
         <item name="android:textColor">@color/grey_012_white_012</item>
     </style>
@@ -155,6 +159,10 @@
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Grey900White">
+        <item name="android:textColor">@color/grey_900_white</item>
     </style>
 
     <!-- Mainly for login/create account screen titles -->
@@ -274,12 +282,20 @@
         <item name="android:textColor">@color/grey_054_white_087</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey700White075">
+        <item name="android:textColor">@color/grey_700_white_alpha_075</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White60">
         <item name="android:textColor">@color/grey_054_white_060</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey87White87">
         <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey60White54">
+        <item name="android:textColor">@color/grey_060_white_054</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White60.15sp">
@@ -399,6 +415,10 @@
     <style name="TextAppearance.Mega.Caption.Secondary.13sp" >
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Secondary.13sp.Grey38White38" >
+        <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
     <style name="TextAppearance.Mega.Caption.Secondary.13sp.Grey54White60" >
