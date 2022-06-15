@@ -992,7 +992,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case OPEN_FILE_SNACKBAR_TYPE:
-                snackbar.setAction(R.string.action_see, (v) -> openDownloadedFile());
+                snackbar.setAction(R.string.general_confirmation_open, (v) -> openDownloadedFile());
                 snackbar.show();
                 break;
 

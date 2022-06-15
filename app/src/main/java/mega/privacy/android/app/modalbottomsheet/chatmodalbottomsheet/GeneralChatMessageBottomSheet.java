@@ -25,6 +25,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -47,11 +48,14 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    private static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
 
     private MegaNode node = null;
     private AndroidMegaChatMessage message = null;
@@ -88,6 +92,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private LinearLayout infoFileSeparator;
     private LinearLayout optionSaveOffline;
     private LinearLayout deleteSeparator;
+
+    private AlertDialog cannotOpenFileDialog;
 
     @Inject
     GetNodeUseCase getNodeUseCase;
@@ -280,7 +286,17 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         }
         offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
+        if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
+            cannotOpenFileDialog = showCannotOpenFileDialog(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
+        }
+
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        AlertDialogUtil.dismissAlertDialogIfExists(cannotOpenFileDialog);
+        super.onDestroyView();
     }
 
     private void checkReactionsFragment(){
@@ -328,8 +344,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                openWith(requireContext(), node);
-                break;
+                cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
+                return;
 
             case R.id.forward_layout:
                 ((ChatActivity) requireActivity()).forwardMessages(messagesSelected);
@@ -549,5 +565,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         outState.putLong(MESSAGE_ID, messageId);
         outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
         outState.putLong(HANDLE, handle);
+        outState.putBoolean(CANNOT_OPEN_FILE_SHOWN, AlertDialogUtil.isAlertDialogShown(cannotOpenFileDialog));
     }
 }

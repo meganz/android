@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -36,6 +37,7 @@ import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -86,6 +88,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";
 
+    private static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
+
     private int mMode;
 
     private MegaNode node = null;
@@ -94,6 +98,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private TextView nodeInfo;
 
     private DrawerItem drawerItem;
+
+    private AlertDialog cannotOpenFileDialog;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
@@ -671,7 +677,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionLabelCurrent.setVisibility(View.GONE);
         }
 
+        if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
+            cannotOpenFileDialog = showCannotOpenFileDialog(this, requireActivity(), node, ((ManagerActivity) requireActivity())::saveNodeByTap);
+        }
+
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        AlertDialogUtil.dismissAlertDialogIfExists(cannotOpenFileDialog);
+        super.onDestroyView();
     }
 
     private void showOwnerSharedFolder() {
@@ -834,8 +850,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.open_with_option:
-                openWith(requireActivity(), node);
-                break;
+                cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ManagerActivity) requireActivity())::saveNodeByTap);
+                return;
 
             case R.id.restore_option:
                 List<MegaNode> nodes = new ArrayList<>();
@@ -937,6 +953,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
         outState.putInt(SAVED_STATE_KEY_MODE, mMode);
+        outState.putBoolean(CANNOT_OPEN_FILE_SHOWN, AlertDialogUtil.isAlertDialogShown(cannotOpenFileDialog));
     }
 
     private void mapDrawerItemToMode(DrawerItem drawerItem) {

@@ -663,7 +663,7 @@ class PasscodeLockActivity : BaseActivity() {
      * Opens the bottom sheet dialog to change the passcode type.
      */
     private fun showPasscodeOptions() {
-        if (isBottomSheetDialogShown(passcodeOptionsBottomSheetDialogFragment)) return
+        if (passcodeOptionsBottomSheetDialogFragment.isBottomSheetDialogShown()) return
 
         passcodeOptionsBottomSheetDialogFragment =
             PasscodeOptionsBottomSheetDialogFragment.newInstance(passcodeType)
