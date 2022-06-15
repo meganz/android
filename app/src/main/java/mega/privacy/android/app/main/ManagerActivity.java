@@ -586,7 +586,6 @@ public class ManagerActivity extends TransfersManagementActivity
     ShareInfo infoManager;
     MegaNode parentNodeManager;
 
-    boolean firstNavigationLevel = true;
     public DrawerLayout drawerLayout;
     ArrayList<MegaUser> contacts = new ArrayList<>();
     ArrayList<MegaUser> visibleContacts = new ArrayList<>();
@@ -679,8 +678,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean turnOnNotifications = false;
 
-    private int searchSharedTab = -1;
-    private DrawerItem searchDrawerItem = null;
     private DrawerItem drawerItem;
     static MenuItem drawerMenuItem = null;
     LinearLayout fragmentLayout;
@@ -1313,8 +1310,6 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putSerializable("drawerItem", drawerItem);
         outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
                 bottomItemBeforeOpenFullscreenOffline);
-        outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
-        outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
         outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
         outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 
@@ -1505,8 +1500,6 @@ public class ManagerActivity extends TransfersManagementActivity
             askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
             drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
             bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
-            searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
-            searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
             indexShares = savedInstanceState.getInt("indexShares", indexShares);
             logDebug("savedInstanceState -> indexShares: " + indexShares);
             pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
@@ -3544,7 +3537,7 @@ public class ManagerActivity extends TransfersManagementActivity
         albumContentFragment = (AlbumContentFragment) f;
         replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
         isInAlbumContent = true;
-        firstNavigationLevel = false;
+        viewModel.setIsFirstNavigationLevel(false);
 
         showHideBottomNavigationView(true);
     }
@@ -3697,10 +3690,10 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || viewModel.getBrowserParentHandle() == -1) {
                             aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
-                            firstNavigationLevel = true;
+                            viewModel.setIsFirstNavigationLevel(true);
                         } else {
                             aB.setTitle(parentNode.getName());
-                            firstNavigationLevel = false;
+                            viewModel.setIsFirstNavigationLevel(false);
                         }
                     } else {
                         viewModel.setBrowserParentHandle(-1);
@@ -3709,10 +3702,10 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (megaApi.getRootNode() != null) {
                         viewModel.setBrowserParentHandle(megaApi.getRootNode().getHandle());
                         aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
-                        firstNavigationLevel = true;
+                        viewModel.setIsFirstNavigationLevel(true);
                     } else {
                         viewModel.setBrowserParentHandle(-1);
-                        firstNavigationLevel = true;
+                        viewModel.setIsFirstNavigationLevel(true);
                     }
                 }
                 break;
@@ -3723,13 +3716,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode rubbishNode = megaApi.getRubbishNode();
                 if (rubbishNode == null) {
                     viewModel.setRubbishBinParentHandle(INVALID_HANDLE);
-                    firstNavigationLevel = true;
+                    viewModel.setIsFirstNavigationLevel(true);
                 } else if (viewModel.getRubbishBinParentHandle() == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()) {
                     aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin).toUpperCase());
-                    firstNavigationLevel = true;
+                    viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     aB.setTitle(node.getName());
-                    firstNavigationLevel = false;
+                    viewModel.setIsFirstNavigationLevel(false);
                 }
                 break;
             }
@@ -3749,10 +3742,10 @@ public class ManagerActivity extends TransfersManagementActivity
                                     aB.setTitle(node.getName());
                                 }
 
-                                firstNavigationLevel = false;
+                                viewModel.setIsFirstNavigationLevel(false);
                             } else {
                                 aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
-                                firstNavigationLevel = true;
+                                viewModel.setIsFirstNavigationLevel(true);
                             }
                         } else {
                             logDebug("selectDrawerItemSharedItems: inSFLol == null");
@@ -3765,10 +3758,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (parentHandleOutgoing != -1) {
                                 MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
                                 aB.setTitle(node.getName());
-                                firstNavigationLevel = false;
+                                viewModel.setIsFirstNavigationLevel(false);
                             } else {
                                 aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
-                                firstNavigationLevel = true;
+                                viewModel.setIsFirstNavigationLevel(true);
                             }
                         }
                         break;
@@ -3777,17 +3770,17 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (isLinksAdded()) {
                             if (parentHandleLinks == INVALID_HANDLE) {
                                 aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
-                                firstNavigationLevel = true;
+                                viewModel.setIsFirstNavigationLevel(true);
                             } else {
                                 MegaNode node = megaApi.getNodeByHandle(parentHandleLinks);
                                 aB.setTitle(node.getName());
-                                firstNavigationLevel = false;
+                                viewModel.setIsFirstNavigationLevel(false);
                             }
                         }
                         break;
                     default: {
                         aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
-                        firstNavigationLevel = true;
+                        viewModel.setIsFirstNavigationLevel(true);
                         break;
                     }
                 }
@@ -3797,31 +3790,31 @@ public class ManagerActivity extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 if (parentHandleInbox == megaApi.getInboxNode().getHandle() || parentHandleInbox == -1) {
                     aB.setTitle(getResources().getString(R.string.section_inbox).toUpperCase());
-                    firstNavigationLevel = true;
+                    viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
                     aB.setTitle(node.getName());
-                    firstNavigationLevel = false;
+                    viewModel.setIsFirstNavigationLevel(false);
                 }
                 break;
             }
             case NOTIFICATIONS: {
                 aB.setSubtitle(null);
                 aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
-                firstNavigationLevel = true;
+                viewModel.setIsFirstNavigationLevel(true);
                 break;
             }
             case CHAT: {
                 abL.setVisibility(View.VISIBLE);
                 aB.setTitle(getString(R.string.section_chat).toUpperCase());
 
-                firstNavigationLevel = true;
+                viewModel.setIsFirstNavigationLevel(true);
                 break;
             }
             case SEARCH: {
                 aB.setSubtitle(null);
                 if (searchViewModel.getUiState().getValue().getSearchParentHandle() == -1L) {
-                    firstNavigationLevel = true;
+                    viewModel.setIsFirstNavigationLevel(true);
                     if (searchViewModel.getUiState().getValue().getSearchQuery() != null) {
                         searchViewModel.setTextSubmitted(true);
                         if (!searchViewModel.getUiState().getValue().getSearchQuery().isEmpty()) {
@@ -3837,7 +3830,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     MegaNode parentNode = megaApi.getNodeByHandle(searchViewModel.getUiState().getValue().getSearchParentHandle());
                     if (parentNode != null) {
                         aB.setTitle(parentNode.getName());
-                        firstNavigationLevel = false;
+                        viewModel.setIsFirstNavigationLevel(false);
                     }
                 }
                 break;
@@ -3900,7 +3893,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                                              boolean firstNavigationLevel, boolean showSearch) {
         aB.setSubtitle(null);
         aB.setTitle(title);
-        this.firstNavigationLevel = firstNavigationLevel;
+        viewModel.setIsFirstNavigationLevel(firstNavigationLevel);
         updateNavigationToolbarIcon();
         searchViewModel.setTextSubmitted(true);
         if (searchMenuItem != null) {
@@ -5047,9 +5040,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void closeSearchSection() {
         searchViewModel.resetSearchQuery();
-        drawerItem = searchDrawerItem;
+        drawerItem = viewModel.getUiState().getValue().getSearchDrawerItem();
         selectDrawerItem(drawerItem);
-        searchDrawerItem = null;
+        viewModel.resetCurrentSearchDrawerItem();
     }
 
     @Override
@@ -5087,7 +5080,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         openSearchOnHomepage();
                     }
                 } else if (drawerItem != DrawerItem.CHAT) {
-                    firstNavigationLevel = true;
+                    viewModel.setIsFirstNavigationLevel(true);
                     searchViewModel.setSearchParentHandle(-1L);
                     searchViewModel.resetSearchDepth();
                     setSearchDrawerItem();
@@ -5354,7 +5347,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void openSearchOnHomepage() {
-        firstNavigationLevel = true;
+        viewModel.setIsFirstNavigationLevel(true);
         searchViewModel.setSearchParentHandle(-1L);
         searchViewModel.resetSearchDepth();
         setSearchDrawerItem();
@@ -5444,7 +5437,7 @@ public class ManagerActivity extends TransfersManagementActivity
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
-                if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH) {
+                if (isFirstNavigationLevel() && drawerItem != DrawerItem.SEARCH) {
                     if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX
                             || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
 
@@ -6842,22 +6835,28 @@ public class ManagerActivity extends TransfersManagementActivity
                     parentHandle = searchViewModel.getUiState().getValue().getSearchParentHandle();
                     break;
                 }
-                switch (searchDrawerItem) {
-                    case CLOUD_DRIVE:
-                        parentHandle = getParentHandleBrowser();
-                        break;
-                    case SHARED_ITEMS:
-                        if (searchSharedTab == INCOMING_TAB) {
-                            parentHandle = parentHandleIncoming;
-                        } else if (searchSharedTab == OUTGOING_TAB) {
-                            parentHandle = parentHandleOutgoing;
-                        } else if (searchSharedTab == LINKS_TAB) {
-                            parentHandle = parentHandleLinks;
-                        }
-                        break;
-                    case INBOX:
-                        parentHandle = getParentHandleInbox();
-                        break;
+                if (viewModel.getUiState().getValue().getSearchDrawerItem() != null) {
+                    switch (viewModel.getUiState().getValue().getSearchDrawerItem()) {
+                        case CLOUD_DRIVE:
+                            parentHandle = getParentHandleBrowser();
+                            break;
+                        case SHARED_ITEMS:
+                            switch (viewModel.getUiState().getValue().getSearchSharedTab()) {
+                                case INCOMING_TAB:
+                                    parentHandle = parentHandleIncoming;
+                                    break;
+                                case OUTGOING_TAB:
+                                    parentHandle = parentHandleOutgoing;
+                                    break;
+                                case LINKS_TAB:
+                                    parentHandle = parentHandleLinks;
+                                    break;
+                            }
+                            break;
+                        case INBOX:
+                            parentHandle = getParentHandleInbox();
+                            break;
+                    }
                 }
                 break;
 
@@ -7647,11 +7646,11 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setFirstNavigationLevel(boolean firstNavigationLevel) {
         logDebug("Set value to: " + firstNavigationLevel);
-        this.firstNavigationLevel = firstNavigationLevel;
+        viewModel.setIsFirstNavigationLevel(firstNavigationLevel);
     }
 
     public boolean isFirstNavigationLevel() {
-        return firstNavigationLevel;
+        return viewModel.getUiState().getValue().isFirstNavigationLevel();
     }
 
     public void setParentHandleBrowser(long parentHandleBrowser) {
@@ -10869,14 +10868,10 @@ public class ManagerActivity extends TransfersManagementActivity
     private void setSearchDrawerItem() {
         if (drawerItem == DrawerItem.SEARCH) return;
 
-        searchDrawerItem = drawerItem;
-        searchSharedTab = getTabItemShares();
+        viewModel.setCurrentSearchDrawerItem(drawerItem);
+        viewModel.setCurrentSearchSharedTab(getTabItemShares());
 
         drawerItem = DrawerItem.SEARCH;
-    }
-
-    public DrawerItem getSearchDrawerItem() {
-        return searchDrawerItem;
     }
 
     /**
@@ -10899,10 +10894,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void homepageToSearch() {
         hideItemsWhenSearchSelected();
         searchMenuItem.expandActionView();
-    }
-
-    public int getSearchSharedTab() {
-        return searchSharedTab;
     }
 
     public void setSearchQuery(String searchQuery) {

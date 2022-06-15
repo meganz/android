@@ -672,9 +672,9 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 		String query = viewModel.getUiState().getValue().getSearchQuery();
 		long parentHandleSearch = viewModel.getUiState().getValue().getSearchParentHandle();
-		DrawerItem drawerItem = ((ManagerActivity) context).getSearchDrawerItem();
-		int sharesTab = ((ManagerActivity) context).getSearchSharedTab();
-		boolean isFirstNavigationLevel = ((ManagerActivity) context).isFirstNavigationLevel();
+		DrawerItem drawerItem = managerViewModel.getUiState().getValue().getSearchDrawerItem();
+		int sharesTab = managerViewModel.getUiState().getValue().getSearchSharedTab();
+		boolean isFirstNavigationLevel = managerViewModel.getUiState().getValue().isFirstNavigationLevel();
 
 		searchCancelToken = initNewSearch();
 		searchNodesUseCase.get(query, parentHandleSearch, getParentHandleForSearch(drawerItem),
@@ -699,7 +699,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				return ((ManagerActivity) context).getParentHandleBrowser();
 
 			case SHARED_ITEMS:
-				switch (((ManagerActivity) context).getSearchSharedTab()) {
+				switch (managerViewModel.getUiState().getValue().getSearchSharedTab()) {
 					case OUTGOING_TAB:
 						return ((ManagerActivity) context).getParentHandleOutgoing();
 					case LINKS_TAB:

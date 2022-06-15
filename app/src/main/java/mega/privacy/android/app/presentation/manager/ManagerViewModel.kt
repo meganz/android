@@ -5,11 +5,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.ManagerState
-import mega.privacy.android.app.presentation.settings.model.SettingsState
 import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,15 +27,15 @@ class ManagerViewModel @Inject constructor(
     getBrowserChildrenNode: GetBrowserChildrenNode,
 ) : ViewModel() {
 
-//    /**
-//     * private UI state
-//     */
-//    private val _uiState = MutableStateFlow(initializeState())
-//
-//    /**
-//     * public UI State
-//     */
-//    val uiState: StateFlow<ManagerState> = _uiState
+    /**
+     * private UI state
+     */
+    private val _uiState = MutableStateFlow(initializeState())
+
+    /**
+     * public UI State
+     */
+    val uiState: StateFlow<ManagerState> = _uiState
 
     /**
      * Monitor all global updates
@@ -133,11 +132,48 @@ class ManagerViewModel @Inject constructor(
             field = value
         }
 
-//    /**
-//     * Initialize the UI State
-//     */
-//    private fun initializeState(): ManagerState =
-//        ManagerState(
-//            searchParentHandle = -1L
-//        )
+    /**
+     * Reset the current search drawer item to initial value
+     */
+    fun resetCurrentSearchDrawerItem() = viewModelScope.launch {
+        _uiState.update { it.copy(searchDrawerItem = null) }
+    }
+
+    /**
+     * Set current search drawer item
+     *
+     * @param drawerItem
+     */
+    fun setCurrentSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
+        _uiState.update { it.copy(searchDrawerItem = drawerItem) }
+    }
+
+    /**
+     * Set the current search shared tab
+     *
+     * @param sharedTab
+     */
+    fun setCurrentSearchSharedTab(sharedTab: Int) = viewModelScope.launch {
+        _uiState.update { it.copy(searchSharedTab = sharedTab) }
+    }
+
+    /**
+     * Set a flag to know if the current navigation level is the first one
+     *
+     * @param isFirstNavigationLevel true if the current navigation level corresponds to the first level
+     */
+    fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
+        _uiState.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
+    }
+
+    /**
+     * Initialize the UI State
+     */
+    private fun initializeState(): ManagerState =
+        ManagerState(
+            searchDrawerItem = null,
+            searchSharedTab = -1,
+            isFirstNavigationLevel = true
+        )
+
 }
