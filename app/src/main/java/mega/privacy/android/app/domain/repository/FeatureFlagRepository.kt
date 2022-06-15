@@ -4,23 +4,21 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.FeatureFlag
 
 /**
- * Repository for feature flags
+ * Repository for feature flag
  */
-
 interface FeatureFlagRepository {
 
     /**
-     * Sets feature value to true or false
+     * Sets value of feature flag
      *
-     * @param featureName : name of the feature
+     * @param featureName: Name of the feature
      * @param isEnabled: Boolean value
      */
     suspend fun setFeature(featureName: String, isEnabled: Boolean)
 
     /**
-     * Gets all features
-     *
-     * @return Flow of List of @FeatureFlag
+     * Gets a fow of list of all feature flags
+     * @return: Flow of List of @FeatureFlag
      */
     suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>>
 }

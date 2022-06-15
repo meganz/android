@@ -5,16 +5,23 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 
 
 /**
- * Global updates repository
+ * Global states repository
  *
- * This is a temporary repository to handle global updates. Individual global updates should be
+ * This is a temporary repository to handle global states. Individual global states should be
  * handled through their respective repositories instead.
  *
  * Current replacements:
  * [nz.mega.sdk.MegaGlobalListenerInterface.onUsersUpdate] onUserUpdate - [AccountRepository.monitorUserUpdates]
  */
-interface GlobalUpdatesRepository {
+interface GlobalStatesRepository {
 
     @Deprecated("See documentation for individual replacements to use instead.")
     fun monitorGlobalUpdates(): Flow<GlobalUpdate>
+
+    /**
+     * Are transfers paused (downloads and uploads)
+     *
+     * @return true if downloads and uploads are paused
+     */
+    suspend fun areTransfersPaused(): Boolean
 }

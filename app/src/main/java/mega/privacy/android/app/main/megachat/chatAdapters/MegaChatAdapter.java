@@ -96,6 +96,7 @@ import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
@@ -214,6 +215,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private InviteContactUseCase inviteContactUseCase;
     private GetAvatarUseCase getAvatarUseCase;
+    private GetNodeUseCase getNodeUseCase;
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatAdapter.ViewHolderMessageChat holder;
@@ -301,7 +303,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
 
                     if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                        setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC));
+                        setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC), message.getMessage());
                         if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message.getMessage())) {
                             setErrorStateOnPreview(holder, preview, message.getMessage().getStatus());
                         }
@@ -392,7 +394,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 if (nodeMessageHandle == node.getHandle()) {
                     if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                        setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC));
+                        setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC), message.getMessage());
                         if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message.getMessage())) {
                             setErrorStateOnPreview(holder, preview, message.getMessage().getStatus());
                         }
@@ -567,7 +569,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                            ArrayList<MessageVoiceClip> _messagesPlaying,
                            ArrayList<RemovedMessage> _removedMessages,
                            RecyclerView _listView, InviteContactUseCase inviteContactUseCase,
-                           GetAvatarUseCase getAvatarUseCase) {
+                           GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase) {
         logDebug("New adapter");
         this.context = _context;
         this.messages = _messages;
@@ -577,6 +579,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.messagesPlaying = _messagesPlaying;
         this.inviteContactUseCase =  inviteContactUseCase;
         this.getAvatarUseCase = getAvatarUseCase;
+        this.getNodeUseCase = getNodeUseCase;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -4164,6 +4167,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.forwardOwnFile.setVisibility(View.VISIBLE);
                 holder.forwardOwnFile.setOnClickListener(this);
                 holder.forwardOwnFile.setEnabled(positionClicked == INVALID_POSITION || positionClicked != position);
+                getNodeUseCase.get(message.getMegaNodeList().get(0).getHandle())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((result, throwable) -> {
+                            if (throwable != null) {
+                                holder.forwardOwnFile.setVisibility(View.GONE);
+                            }
+                        });
             } else {
                 holder.forwardOwnFile.setVisibility(View.GONE);
             }
@@ -4216,7 +4227,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         preview = getPreviewFromCache(node);
                         if (preview != null) {
                             previewCache.put(node.getHandle(), preview);
-                            setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC));
+                            setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC), message);
                             if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)) {
                                 setErrorStateOnPreview(holder, preview, status);
                             }
@@ -4285,6 +4296,15 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                     holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
                                     holder.forwardOwnPortrait.setOnClickListener(this);
                                     holder.forwardOwnPortrait.setEnabled(positionClicked == INVALID_POSITION || positionClicked != position);
+                                    getNodeUseCase.get(message.getMegaNodeList().get(0).getHandle())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe((result, throwable) -> {
+                                                if (throwable != null) {
+                                                    holder.forwardOwnPortrait.setVisibility(View.GONE);
+                                                }
+                                            });
+
                                 } else {
                                     holder.forwardOwnPortrait.setVisibility(View.GONE);
                                 }
@@ -4345,6 +4365,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                     holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
                                     holder.forwardOwnLandscape.setOnClickListener(this);
                                     holder.forwardOwnLandscape.setEnabled(positionClicked == INVALID_POSITION || positionClicked != position);
+                                    getNodeUseCase.get(message.getMegaNodeList().get(0).getHandle())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe((result, throwable) -> {
+                                                if (throwable != null) {
+                                                    holder.forwardOwnLandscape.setVisibility(View.GONE);
+                                                }
+                                            });
                                 } else {
                                     holder.forwardOwnLandscape.setVisibility(View.GONE);
                                 }
@@ -4859,7 +4887,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             } else {
                 if (node.hasPreview()) {
-                    setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC));
+                    setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC), message);
                 } else {
                     setGIFProperties(node, holder, orientationPortrait, true);
                     setBitmapAndUpdateDimensions(orientationPortrait ? holder.contentOwnMessageThumbPort : holder.contentOwnMessageThumbLand, preview);
@@ -7086,7 +7114,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //Error
         holder.uploadingProgressBarPort.setVisibility(View.GONE);
         holder.uploadingProgressBarLand.setVisibility(View.GONE);
-
         holder.forwardOwnFile.setVisibility(View.GONE);
         holder.forwardOwnPortrait.setVisibility(View.GONE);
         holder.forwardOwnLandscape.setVisibility(View.GONE);
@@ -7136,7 +7163,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    private void setOwnPreview(MegaChatAdapter.ViewHolderMessageChat holder, Bitmap bitmap, MegaNode node, boolean shouldForwardBeVisible) {
+    private void setOwnPreview(MegaChatAdapter.ViewHolderMessageChat holder, Bitmap bitmap, MegaNode node, boolean shouldForwardBeVisible, MegaChatMessage message) {
         logDebug("setOwnPreview()");
 
         if (holder != null) {
@@ -7178,6 +7205,15 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.forwardOwnLandscape.setVisibility(View.GONE);
                 if (shouldForwardBeVisible) {
                     holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
+                    getNodeUseCase.get(message.getMegaNodeList().get(0).getHandle())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable != null) {
+                                    holder.forwardOwnPortrait.setVisibility(View.GONE);
+                                }
+                            });
+
                 } else {
                     holder.forwardOwnPortrait.setVisibility(View.GONE);
                 }
@@ -7230,6 +7266,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                 if (shouldForwardBeVisible) {
                     holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                    getNodeUseCase.get(message.getMegaNodeList().get(0).getHandle())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable != null) {
+                                    holder.forwardOwnLandscape.setVisibility(View.GONE);
+                                }
+                            });
                 }
                 else {
                     holder.forwardOwnLandscape.setVisibility(View.GONE);
@@ -7437,6 +7481,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if (checkForwardVisibilityInOwnMsg(removedMessages, megaMessage.getMessage(), isMultipleSelect(), cC)) {
                     holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
                     holder.forwardOwnPortrait.setOnClickListener(this);
+                    getNodeUseCase.get(megaMessage.getMessage().getMegaNodeList().get(0).getHandle())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable != null) {
+                                    holder.forwardOwnPortrait.setVisibility(View.GONE);
+                                }
+                            });
                 } else {
                     holder.forwardOwnPortrait.setVisibility(View.GONE);
                 }
@@ -7490,6 +7542,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if (checkForwardVisibilityInOwnMsg(removedMessages, megaMessage.getMessage(), isMultipleSelect(), cC)) {
                     holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
                     holder.forwardOwnLandscape.setOnClickListener(this);
+                    getNodeUseCase.get(megaMessage.getMessage().getMegaNodeList().get(0).getHandle())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable != null) {
+                                    holder.forwardOwnLandscape.setVisibility(View.GONE);
+                                }
+                            });
                 } else {
                     holder.forwardOwnLandscape.setVisibility(View.GONE);
                 }

@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.app.domain.entity.FeatureFlag
 import javax.inject.Inject
 
 private val Context.featureFlagDataStore: DataStore<Preferences> by preferencesDataStore(name = "FEATURE_FLAG_PREFERENCES")

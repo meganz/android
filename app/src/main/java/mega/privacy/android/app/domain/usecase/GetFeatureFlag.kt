@@ -1,10 +1,8 @@
 package mega.privacy.android.app.domain.usecase
 
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Use case to get a single feature flag value
- */
 interface GetFeatureFlag {
 
     /**

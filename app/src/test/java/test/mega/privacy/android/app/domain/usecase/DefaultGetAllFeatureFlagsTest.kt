@@ -31,10 +31,8 @@ class DefaultGetAllFeatureFlagsTest {
     fun `test that features list is not empty`() {
         runTest {
             val list = mutableListOf<FeatureFlag>()
-            list.add(FeatureFlag(
-                "featureName",
-                false,
-            ))
+            list.add(FeatureFlag("featureName",
+                false))
             whenever(featureFlagRepository.getAllFeatures()).thenReturn(flowOf(list))
             underTest().collect {
                 assertEquals(it[0].featureName, "featureName")

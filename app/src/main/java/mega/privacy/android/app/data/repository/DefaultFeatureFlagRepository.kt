@@ -9,26 +9,24 @@ import javax.inject.Inject
 
 /**
  * Implementation of @FeatureFlagRepository
- *
- * @param preferencesGateway: Preference Gateway
+ * @param preferencesGateway: Data Store Preferences gateway
  */
 class DefaultFeatureFlagRepository @Inject constructor(
     private val preferencesGateway: FeatureFlagPreferencesGateway,
 ) : FeatureFlagRepository {
 
     /**
-     * Sets feature value to true or false
+     * Sets value of feature flag
      *
-     * @param featureName : name of the feature
+     * @param featureName: Name of the feature
      * @param isEnabled: Boolean value
      */
     override suspend fun setFeature(featureName: String, isEnabled: Boolean) =
         preferencesGateway.setFeature(featureName, isEnabled)
 
     /**
-     * Gets all features
-     *
-     * @return Flow of List of @FeatureFlag
+     * Gets a fow of list of all feature flags
+     * @return: Flow of List of @FeatureFlag
      */
     override suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
         return flow {

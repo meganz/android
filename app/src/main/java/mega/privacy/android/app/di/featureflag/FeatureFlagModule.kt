@@ -13,9 +13,4 @@ abstract class FeatureFlagModule {
     @Binds
     abstract fun bindGetFeatureFlag(useCase: DefaultGetFeatureFlag): GetFeatureFlag
 
-    @Binds
-    abstract fun bindInsertFeatureFlag(useCase: DefaultSetFeatureFlag): SetFeatureFlag
-
-    @Binds
-    abstract fun bindGetAllFeatureFlags(useCase: DefaultGetAllFeatureFlags): GetAllFeatureFlags
 }

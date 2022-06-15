@@ -15,11 +15,7 @@ import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagState
 import javax.inject.Inject
 
 /**
- * ViewModel for feature flag menu.
- *
- * @param setFeatureFlag : Use case for set feature flag to enable/disable
- * @param getAllFeatureFlags: Use case to get all feature flags
- * @param ioDispatcher: Coroutine dispatcher
+ * View model for feature flag menu
  */
 @HiltViewModel
 class FeatureFlagMenuViewModel @Inject constructor(
@@ -42,17 +38,18 @@ class FeatureFlagMenuViewModel @Inject constructor(
     }
 
     /**
-     * Sets feature flag value to true or false
+     * Sets feature flag value
      * @param featureName : Name of the feature
      * @param isEnabled: Boolean value
-     *
      */
     suspend fun setFeatureEnabled(featureName: String, isEnabled: Boolean) {
         setFeatureFlag(featureName, isEnabled)
     }
 
     /**
-     * Gets flow of list of all @FeatureFlag
+     * Returns flow of list of all feature flags
+     *
+     * @return flow of list of @FeatureFlag
      */
     suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
         return getAllFeatureFlags()

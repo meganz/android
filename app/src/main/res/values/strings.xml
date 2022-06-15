@@ -4295,6 +4295,8 @@
     <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remove favourites</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
@@ -4369,4 +4371,18 @@
     <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Enter your password</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

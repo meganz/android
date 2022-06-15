@@ -4,13 +4,13 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.FeatureFlag
 
 /**
- * Gets all feature flags
+ * Use case to get all feature flags
  */
 interface GetAllFeatureFlags {
 
     /**
-     * Invoke.
-     * @return Flow of list of @FeatureFlag
+     * Gets a fow of list of all feature flags
+     * @return: Flow of List of @FeatureFlag
      */
     suspend operator fun invoke(): Flow<MutableList<FeatureFlag>>
 }

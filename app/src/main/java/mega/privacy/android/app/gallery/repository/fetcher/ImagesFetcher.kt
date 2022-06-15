@@ -4,10 +4,11 @@ import android.content.Context
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.gallery.data.GalleryItem
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.FILE_TYPE_PHOTO
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import java.util.*
 
 class ImagesFetcher(
     context: Context,
