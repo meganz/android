@@ -1451,7 +1451,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         if (context instanceof ManagerActivity) {
             if (((ManagerActivity) context).isSearchOpen()) {
-                filterChats(searchViewModel.getSearchQuery(), false);
+                filterChats(searchViewModel.getUiState().getValue().getSearchQuery(), false);
             }
             ((ManagerActivity) context).invalidateOptionsMenu();
         }

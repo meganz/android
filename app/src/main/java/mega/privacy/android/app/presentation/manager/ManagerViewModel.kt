@@ -28,23 +28,15 @@ class ManagerViewModel @Inject constructor(
     getBrowserChildrenNode: GetBrowserChildrenNode,
 ) : ViewModel() {
 
-    /**
-     * private UI state
-     */
-    private val _uiState = MutableStateFlow(initializeState())
-
-    /**
-     * public UI State
-     */
-    val uiState: StateFlow<ManagerState> = _uiState
-
-    /**
-     * Initialize the UI State
-     */
-    private fun initializeState(): ManagerState =
-        ManagerState(
-            searchParentHandle = -1L
-        )
+//    /**
+//     * private UI state
+//     */
+//    private val _uiState = MutableStateFlow(initializeState())
+//
+//    /**
+//     * public UI State
+//     */
+//    val uiState: StateFlow<ManagerState> = _uiState
 
     /**
      * Monitor all global updates
@@ -141,13 +133,11 @@ class ManagerViewModel @Inject constructor(
             field = value
         }
 
-    /**
-     * Set the current search parent handle
-     */
-    fun setSearchParentHandle(handle: Long) = viewModelScope.launch {
-        Timber.d("setSearchParentHandle")
-        _uiState.update {
-            it.copy(searchParentHandle = handle)
-        }
-    }
+//    /**
+//     * Initialize the UI State
+//     */
+//    private fun initializeState(): ManagerState =
+//        ManagerState(
+//            searchParentHandle = -1L
+//        )
 }
