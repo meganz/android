@@ -61,7 +61,4 @@ abstract class GatewayModule {
     @Binds
     abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
-    @Binds
-    abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore) : FeatureFlagPreferencesGateway
-
 }
