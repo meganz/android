@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
@@ -18,8 +19,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -30,6 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -83,6 +88,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * TimelineFragment is a sub fragment of PhotosFragment. Its sibling is AlbumsFragment
@@ -653,8 +659,11 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 R.id.action_zoom_out -> {
                     zoomOut()
                 }
-                R.id.action_menu_sort_by -> {
-                    mManagerActivity.showNewSortByPanel(Constants.ORDER_CAMERA)
+                R.id.action_photos_filter -> {
+                    createFilterDialog(mManagerActivity)
+                }
+                R.id.action_photos_sortby -> {
+                    createSortByDialogue(mManagerActivity)
                 }
             }
             return super.onOptionsItemSelected(item)
@@ -1128,8 +1137,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (this::menu.isInitialized) {
             menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
             menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-            menu.findItem(R.id.action_photos_filter).isVisible = shouldShow
-            menu.findItem(R.id.action_photos_sortby).isVisible = shouldShow
+            menu.findItem(R.id.action_photos_filter)?.isVisible = shouldShow
+            menu.findItem(R.id.action_photos_sortby)?.isVisible = shouldShow
         }
     }
 
@@ -1298,4 +1307,77 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      * @return true in, false not in
      */
     fun isInActionMode() = actionMode != null
+
+
+    fun createFilterDialog(
+        context: Activity,
+    ) {
+        val filterDialog: AlertDialog
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+        val itemClicked = AtomicReference<Int>()
+
+        val stringsArray: List<String> = listOf(
+            getString(R.string.photos_filter_all_photos),
+            getString(R.string.photos_filter_cloud_drive),
+            getString(R.string.photos_filter_camera_uploads),
+            getString(R.string.photos_filter_videos_only),
+        )
+        val itemsAdapter =
+            ArrayAdapter(context, R.layout.checked_text_view_dialog_button, stringsArray)
+        val listView = ListView(context)
+        listView.adapter = itemsAdapter
+
+        dialogBuilder.setSingleChoiceItems(
+            itemsAdapter,
+            Constants.INVALID_POSITION
+        ) { _: DialogInterface, item: Int ->
+            itemClicked.set(item)
+        }
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
+                dialog: DialogInterface,
+                _,
+            ->
+            dialog.dismiss()
+        }
+
+        filterDialog = dialogBuilder.create()
+        filterDialog.setTitle(R.string.photos_action_filter)
+        filterDialog.show()
+    }
+
+    fun createSortByDialogue(
+        context: Activity,
+    ) {
+        val sortDialog: AlertDialog
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+        val itemClicked = AtomicReference<Int>()
+
+        val stringsArray: List<String> = listOf(
+            getString(R.string.sortby_date_newest),
+            getString(R.string.sortby_date_oldest),
+        )
+        val itemsAdapter =
+            ArrayAdapter(context, R.layout.checked_text_view_dialog_button, stringsArray)
+        val listView = ListView(context)
+        listView.adapter = itemsAdapter
+
+        dialogBuilder.setSingleChoiceItems(
+            itemsAdapter,
+            Constants.INVALID_POSITION
+        ) { _: DialogInterface, item: Int ->
+            itemClicked.set(item)
+        }
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
+                dialog: DialogInterface,
+                _,
+            ->
+            dialog.dismiss()
+        }
+
+        sortDialog = dialogBuilder.create()
+        sortDialog.setTitle(R.string.action_sort_by)
+        sortDialog.show()
+    }
 }
