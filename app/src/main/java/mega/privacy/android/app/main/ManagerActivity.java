@@ -5077,7 +5077,6 @@ public class ManagerActivity extends TransfersManagementActivity
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 logDebug("onMenuItemActionExpand");
-                searchViewModel.resetSearchQuery();
                 searchExpand = true;
                 if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
