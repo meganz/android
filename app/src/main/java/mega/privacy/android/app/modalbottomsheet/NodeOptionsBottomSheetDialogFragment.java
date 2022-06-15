@@ -677,11 +677,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionLabelCurrent.setVisibility(View.GONE);
         }
 
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
-            cannotOpenFileDialog = showCannotOpenFileDialog(this, requireActivity(), node, ((ManagerActivity) requireActivity())::saveNodeByTap);
+            contentView.post(() -> cannotOpenFileDialog =
+                    showCannotOpenFileDialog(this, requireActivity(),
+                            node, ((ManagerActivity) requireActivity())::saveNodeByTap));
         }
 
-        super.onViewCreated(view, savedInstanceState);
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override

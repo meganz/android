@@ -286,11 +286,17 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         }
         offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
-            cannotOpenFileDialog = showCannotOpenFileDialog(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
-        }
-
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
+            contentView.post(() -> cannotOpenFileDialog =
+                    showCannotOpenFileDialog(this, requireActivity(),
+                            node, ((ChatActivity) requireActivity())::saveNodeByTap));
+        }
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override

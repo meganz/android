@@ -133,12 +133,10 @@ object ModalBottomSheetUtil {
             .setMessage(getString(R.string.dialog_cannot_open_file_text))
             .setPositiveButton(getString(R.string.context_download)
             ) { _, _ ->
-                run {
-                    nodeDownloader(node)
-                    this.dismiss()
-                }
+                nodeDownloader(node)
+                this.dismissAllowingStateLoss()
             }
-            .setNegativeButton(getString(R.string.general_cancel)) { _, _ -> this.dismiss() }
+            .setNegativeButton(getString(R.string.general_cancel), null)
             .show()
 
     /**
