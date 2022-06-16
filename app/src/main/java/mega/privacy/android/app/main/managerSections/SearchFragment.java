@@ -685,7 +685,7 @@ public class SearchFragment extends RotatableFragment {
 			case SHARED_ITEMS:
 				switch (managerViewModel.getUiState().getValue().getSearchSharedTab()) {
 					case OUTGOING_TAB:
-						return ((ManagerActivity) context).getParentHandleOutgoing();
+						return managerViewModel.getUiState().getValue().getOutgoingParentHandle();
 					case LINKS_TAB:
 						return ((ManagerActivity) context).getParentHandleLinks();
 					case INCOMING_TAB:

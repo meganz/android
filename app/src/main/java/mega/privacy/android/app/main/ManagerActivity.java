@@ -745,7 +745,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public boolean isList = true;
 
     private long parentHandleLinks;
-    private long parentHandleOutgoing;
     private long parentHandleInbox;
     private String pathNavigationOffline;
     public int deepBrowserTreeIncoming = 0;
@@ -1311,9 +1310,7 @@ public class ManagerActivity extends TransfersManagementActivity
             logWarning("DrawerItem is null");
         }
         super.onSaveInstanceState(outState);
-        logDebug("IN BUNDLE -> parentHandleOutgoing: " + parentHandleOutgoing);
         outState.putLong(PARENT_HANDLE_LINKS, parentHandleLinks);
-        outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
         outState.putLong("parentHandleInbox", parentHandleInbox);
         outState.putSerializable("drawerItem", drawerItem);
         outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
@@ -1325,7 +1322,7 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
         }
 
-        if (parentHandleOutgoing != INVALID_HANDLE) {
+        if (viewModel.getUiState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
             outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
         }
 
@@ -1494,8 +1491,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
-            parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
-            logDebug("savedInstanceState -> parentHandleOutgoing: " + parentHandleOutgoing);
             parentHandleLinks = savedInstanceState.getLong(PARENT_HANDLE_LINKS, INVALID_HANDLE);
             parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
             deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
@@ -1563,7 +1558,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else {
             logDebug("Bundle is NULL");
-            parentHandleOutgoing = -1;
             parentHandleLinks = INVALID_HANDLE;
             parentHandleInbox = -1;
             deepBrowserTreeIncoming = 0;
@@ -3767,8 +3761,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB: {
                         logDebug("setToolbarTitle: OUTGOING TAB");
                         if (isOutgoingAdded()) {
-                            if (parentHandleOutgoing != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+                            if (viewModel.getUiState().getValue().getOutgoingParentHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getOutgoingParentHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
@@ -4313,7 +4307,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 int tabItemShares = getTabItemShares();
 
                 if ((tabItemShares == INCOMING_TAB && viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
+                        || (tabItemShares == OUTGOING_TAB && viewModel.getUiState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
                     viewPagerShares.disableSwipe(true);
@@ -4368,7 +4362,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
 
                     case OUTGOING_TAB:
-                        if (!isOutgoingAdded() || (!hide && parentHandleOutgoing != INVALID_HANDLE)) {
+                        if (!isOutgoingAdded() || (!hide && viewModel.getUiState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -6166,8 +6160,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (getTabItemShares() == INCOMING_TAB && viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
                         viewModel.setIncomingParentHandle(INVALID_HANDLE);
                         refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-                    } else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE) {
-                        parentHandleOutgoing = INVALID_HANDLE;
+                    } else if (getTabItemShares() == OUTGOING_TAB && viewModel.getUiState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
+                        viewModel.setOutgoingParentHandle(INVALID_HANDLE);
                         refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
                     } else if (getTabItemShares() == LINKS_TAB && parentHandleLinks != INVALID_HANDLE) {
                         parentHandleLinks = INVALID_HANDLE;
@@ -6439,9 +6433,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         case OUTGOING_TAB:
                             decreaseDeepBrowserTreeOutgoing();
-                            parentHandleOutgoing = deepBrowserTreeOutgoing == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+                            viewModel.setOutgoingParentHandle(deepBrowserTreeOutgoing == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (parentHandleOutgoing == INVALID_HANDLE) {
+                            if (viewModel.getUiState().getValue().getOutgoingParentHandle() == INVALID_HANDLE) {
                                 hideTabs(false, OUTGOING_TAB);
                             }
 
@@ -6833,7 +6827,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (getTabItemShares() == INCOMING_TAB) {
                     parentHandle = viewModel.getUiState().getValue().getIncomingParentHandle();
                 } else if (getTabItemShares() == OUTGOING_TAB) {
-                    parentHandle = parentHandleOutgoing;
+                    parentHandle = viewModel.getUiState().getValue().getOutgoingParentHandle();
                 } else if (getTabItemShares() == LINKS_TAB) {
                     parentHandle = parentHandleLinks;
                 }
@@ -6855,7 +6849,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     parentHandle = viewModel.getUiState().getValue().getIncomingParentHandle();
                                     break;
                                 case OUTGOING_TAB:
-                                    parentHandle = parentHandleOutgoing;
+                                    parentHandle = viewModel.getUiState().getValue().getOutgoingParentHandle();
                                     break;
                                 case LINKS_TAB:
                                     parentHandle = parentHandleLinks;
@@ -7686,7 +7680,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setParentHandleOutgoing(long parentHandleOutgoing) {
         logDebug("Outgoing parent handle: " + parentHandleOutgoing);
-        this.parentHandleOutgoing = parentHandleOutgoing;
+        viewModel.setOutgoingParentHandle(parentHandleOutgoing);
     }
 
     @Override
@@ -10845,7 +10839,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     viewModel.setIncomingParentHandle(node.getHandle());
                     increaseDeepBrowserTreeIncoming();
                 } else if (getTabItemShares() == OUTGOING_TAB) {
-                    setParentHandleOutgoing(node.getHandle());
+                    viewModel.setOutgoingParentHandle(node.getHandle());
                     increaseDeepBrowserTreeOutgoing();
                 } else if (getTabItemShares() == LINKS_TAB) {
                     setParentHandleLinks(node.getHandle());
@@ -10957,7 +10951,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public long getParentHandleOutgoing() {
-        return parentHandleOutgoing;
+        return viewModel.getUiState().getValue().getOutgoingParentHandle();
     }
 
     public long getParentHandleLinks() {
