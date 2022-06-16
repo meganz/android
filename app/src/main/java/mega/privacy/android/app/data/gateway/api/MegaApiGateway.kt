@@ -215,4 +215,19 @@ interface MegaApiGateway {
      * @return Base64-encoded node handle
      */
     fun handleToBase64(handle: Long): String
+
+    /**
+     * Inbox node of the account
+     *
+     * @return The Inbox node if exists, null otherwise.
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
+     * Checks if the provided node has children.
+     *
+     * @param node  The MegaNode to check.
+     * @return True if the node has children, false otherwise.
+     */
+    suspend fun hasChildren(node: MegaNode): Boolean
 }

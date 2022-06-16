@@ -1493,6 +1493,13 @@ public class ManagerActivity extends TransfersManagementActivity
                     return null;
                 }));
 
+        viewModel.onInboxSectionUpdate().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean hasChildren) {
+                updateInboxSectionVisibility(hasChildren);
+            }
+        });
+
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
         // and then switch the app to foreground, causing the app to create a new instantiation.
@@ -8628,21 +8635,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (inboxSection != null) {
-            if (inboxNode == null) {
-                inboxSection.setVisibility(View.GONE);
-                logDebug("Inbox Node is NULL");
-            } else {
-                boolean hasChildren = megaApi.hasChildren(inboxNode);
-                if (hasChildren) {
-                    inboxSection.setEnabled(true);
-                    inboxSection.setVisibility(View.VISIBLE);
-                    ((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(
-                            ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
-                } else {
-                    logDebug("Inbox Node NO children");
-                    inboxSection.setVisibility(View.GONE);
-                }
-            }
+            viewModel.checkInboxSectionVisibility();
         }
 
         if (contactsSection != null) {
@@ -11488,5 +11481,25 @@ public class ManagerActivity extends TransfersManagementActivity
                 }, (error) -> logError("Error " + error));
 
         composite.add(chatSubscription);
+    }
+
+    /**
+     * Updates Inbox section visibility depending on if it has children.
+     *
+     * @param hasChildren True if the Inbox node has children, false otherwise.
+     */
+    private void updateInboxSectionVisibility(boolean hasChildren) {
+        if (inboxSection == null) {
+            return;
+        }
+
+        if (hasChildren) {
+            inboxSection.setEnabled(true);
+            inboxSection.setVisibility(View.VISIBLE);
+            ((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(
+                    ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
+        } else {
+            inboxSection.setVisibility(View.GONE);
+        }
     }
 }

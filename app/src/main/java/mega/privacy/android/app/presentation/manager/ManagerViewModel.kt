@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.manager
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.fragments.homepage.Event
@@ -15,6 +16,10 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
+ * @param getRubbishBinChildrenNode
+ * @param getBrowserChildrenNode
+ * @param getInboxNode
+ * @param hasChildren
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -22,6 +27,8 @@ class ManagerViewModel @Inject constructor(
     monitorGlobalUpdates: MonitorGlobalUpdates,
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
+    private val getInboxNode: GetInboxNode,
+    private val hasChildren: HasChildren,
 ) : ViewModel() {
 
     /**
@@ -110,4 +117,21 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    private val inboxSectionVisible: MutableLiveData<Boolean> = MutableLiveData()
+
+    /**
+     * Notifies about updates on Inbox section visibility.
+     */
+    fun onInboxSectionUpdate(): LiveData<Boolean> = inboxSectionVisible
+
+    /**
+     * Checks the Inbox section visibility.
+     */
+    fun checkInboxSectionVisibility() {
+        viewModelScope.launch {
+            val inboxNode = getInboxNode()
+            inboxSectionVisible.value = if (inboxNode == null) false else hasChildren(inboxNode)
+        }
+    }
 }

@@ -39,4 +39,9 @@ abstract class ManagerUseCases {
     @Binds
     abstract fun bindGetNodeByHandle(useCase: DefaultGetNodeByHandle): GetNodeByHandle
 
+    @Binds
+    abstract fun bindGetInboxNode(useCase: DefaultGetInboxNode): GetInboxNode
+
+    @Binds
+    abstract fun bindHasChildren(useCase: DefaultHasChildren): HasChildren
 }

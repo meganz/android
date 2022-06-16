@@ -171,4 +171,8 @@ class MegaApiFacade @Inject constructor(
     ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
+
+    override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
+
+    override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
 }
