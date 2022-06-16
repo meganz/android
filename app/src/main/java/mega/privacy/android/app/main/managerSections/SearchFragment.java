@@ -687,7 +687,7 @@ public class SearchFragment extends RotatableFragment {
 					case OUTGOING_TAB:
 						return managerViewModel.getUiState().getValue().getOutgoingParentHandle();
 					case LINKS_TAB:
-						return ((ManagerActivity) context).getParentHandleLinks();
+						return managerViewModel.getUiState().getValue().getLinksParentHandle();
 					case INCOMING_TAB:
 					default:
 						return managerViewModel.getUiState().getValue().getIncomingParentHandle();

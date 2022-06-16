@@ -186,6 +186,14 @@ class ManagerViewModel @Inject constructor(
         _uiState.update { it.copy(outgoingParentHandle = handle) }
     }
 
+    /**
+     * Set the current links parent handle to the UI state
+     *
+     * @param handle the id of the current links parent handle to set
+     */
+    fun setLinksParentHandle(handle: Long) = viewModelScope.launch {
+        _uiState.update { it.copy(linksParentHandle = handle) }
+    }
 
     /**
      * Reset the current search drawer item to initial value
@@ -230,6 +238,7 @@ class ManagerViewModel @Inject constructor(
             rubbishBinParentHandle = -1L,
             incomingParentHandle = -1L,
             outgoingParentHandle = -1L,
+            linksParentHandle = -1L,
             searchDrawerItem = null,
             searchSharedTab = -1,
             isFirstNavigationLevel = true,
