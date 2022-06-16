@@ -47,26 +47,26 @@ class SearchViewModelTest {
         )
     }
 
-    @Test
-    fun `test that node updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            setUnderTest()
-
-            underTest.updateNodes.test().assertNoValue()
-        }
-
-    @Test
-    fun `test that node updates live data is set when node updates triggered from use case`() =
-        runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-
-            setUnderTest()
-
-            runCatching {
-                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-            }
-        }
+//    @Test
+//    fun `test that node updates live data is not set when no updates triggered from use case`() =
+//        runTest {
+//            setUnderTest()
+//
+//            underTest.updateNodes.test().assertNoValue()
+//        }
+//
+//    @Test
+//    fun `test that node updates live data is set when node updates triggered from use case`() =
+//        runTest {
+//            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+//
+//            setUnderTest()
+//
+//            runCatching {
+//                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+//            }.onSuccess { result ->
+//                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
+//            }
+//        }
 
 }
