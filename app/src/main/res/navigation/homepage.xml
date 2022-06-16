@@ -31,6 +31,9 @@
             android:id="@+id/action_homepageFragment_to_videoFragment"
             app:destination="@id/videoFragment" />
         <action
+            android:id="@+id/action_homepageFragment_to_favourites"
+            app:destination="@id/favouritesFragment"/>
+        <action
             android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
             app:destination="@id/favouritesFolderFragment"
             app:popUpTo="@id/homepageFragment"/>
@@ -103,6 +106,14 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+    </fragment>
+
+    <fragment android:id="@+id/favouritesFragment"
+        android:name="mega.privacy.android.app.presentation.favourites.FavouritesFragment"
+        android:label="FavouritesFragment">
+        <action
+            android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
+            app:destination="@id/favouritesFolderFragment"/>
     </fragment>
     <fragment
         android:id="@+id/favouritesFolderFragment"

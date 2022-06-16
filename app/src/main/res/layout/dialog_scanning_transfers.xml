@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="24dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:id="@+id/scanning_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scanning_transfers"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey60White60"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/scanning_progress"
+        style="@style/UsedSpaceProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="18dp"
+        android:indeterminate="true"
+        app:layout_constraintTop_toBottomOf="@+id/scanning_text" />
+
+    <TextView
+        android:id="@+id/scanning_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/warning_scanning_transfers"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp.Grey38White38"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scanning_progress" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

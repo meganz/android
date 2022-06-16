@@ -2,9 +2,9 @@ package mega.privacy.android.app.usecase
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
+import mega.privacy.android.app.usecase.exception.toMegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
@@ -30,11 +30,14 @@ class GetPublicNodeUseCase @Inject constructor(
                     val publicNode = request.publicMegaNode
 
                     when {
+                        emitter.isDisposed -> {
+                            return@OptionalMegaRequestListenerInterface
+                        }
                         error.errorCode == API_OK && publicNode != null -> {
                             emitter.onSuccess(AndroidMegaRichLinkMessage(link, publicNode))
                         }
                         else -> {
-                            emitter.onError(MegaException(error.errorCode, error.errorString))
+                            emitter.onError(error.toMegaException())
                         }
                     }
                 })

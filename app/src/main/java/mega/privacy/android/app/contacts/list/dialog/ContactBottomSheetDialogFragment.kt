@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
@@ -24,7 +25,6 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -190,15 +190,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
+            MegaApplication.setUserWaitingForCall(megaUser.handle)
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                CallUtil.startNewCall(
-                    activity,
-                    activity as SnackbarShower,
-                    megaUser,
-                    passcodeManagement
-                )
-                dismiss()
+                viewModel.startCall()
             }
+            dismiss()
         }
 
         binding.optionSendMessage.setOnClickListener {

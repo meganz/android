@@ -16,7 +16,6 @@ public class Constants {
     public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
-    public static final int REQUEST_CODE_GET_LOCAL = 1003;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
     public static final int REQUEST_CODE_SORT_BY = 1006;
@@ -74,6 +73,8 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
+
+    public static final String EXTRA_ACTION_RESULT = "EXTRA_ACTION_RESULT";
 
     public static final String FROM_HOME_PAGE = "FROM_HOME_PAGE";
 
@@ -236,6 +237,7 @@ public class Constants {
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
+    public static final String OPENED_FROM_IMAGE_VIEWER = "OPENED_FROM_IMAGE_VIEWER";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
@@ -331,6 +333,9 @@ public class Constants {
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
     public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
     public static final String INTENT_EXTRA_KEY_SHOW_NEARBY_FILES = "INTENT_EXTRA_KEY_SHOW_NEARBY_FILES";
+    public static final String INTENT_EXTRA_KEY_IS_FILE_VERSION = "INTENT_EXTRA_KEY_IS_FILE_VERSION";
+    public static final String INTENT_EXTRA_COLLISION_RESULTS = "INTENT_EXTRA_COLLISION_RESULTS";
+    public static final String INTENT_EXTRA_SINGLE_COLLISION_RESULT = "INTENT_EXTRA_SINGLE_COLLISION_RESULT";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -389,6 +394,7 @@ public class Constants {
     public static final int VIEWER_FROM_INBOX = 15;
     public static final int VIEWER_FROM_RUBBISH_BIN = 16;
     public static final int VIEWER_FROM_SEARCH = 17;
+    public static final int VIEWER_FROM_FILE_VERSIONS = 18;
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
     public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
@@ -483,8 +489,6 @@ public class Constants {
     public static final int RICH_WARNING_CONFIRMATION = 2;
 
     public static final int TAKE_PICTURE_OPTION = 0;
-    public static final int START_CALL_PERMISSIONS = 1;
-    public static final int RETURN_CALL_PERMISSIONS = 2;
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
@@ -572,6 +576,7 @@ public class Constants {
     public static final int DISMISS_ACTION_SNACKBAR = 6;
     public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
     public static final int SENT_REQUESTS_TYPE = 8;
+    public static final int RESUME_TRANSFERS_TYPE = 9;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -579,6 +584,7 @@ public class Constants {
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
     public static final int ITEM_PROGRESS = 2;
+    public static final int ITEM_PLACEHOLDER_TYPE = 3;
 
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
@@ -644,6 +650,7 @@ public class Constants {
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
+    public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 
     public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
 
@@ -911,6 +918,7 @@ public class Constants {
     public static final int ORDER_OTHERS = 1;
     public static final int ORDER_CAMERA = 2;
     public static final int ORDER_OFFLINE = 3;
+    public static final int ORDER_FAVOURITES = 4;
 
     public final static float MAX_WIDTH_APPBAR_LAND = 400;
     public final static float MAX_WIDTH_APPBAR_PORT = 200;
@@ -935,6 +943,6 @@ public class Constants {
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
     public static final int FIRST_NAVIGATION_LEVEL = 0;
-
-    public static final int LONG_SNACKBAR_DURATION = 2750;
+    
+    public static final long LONG_SNACKBAR_DURATION = 2750;
 }

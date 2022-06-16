@@ -120,8 +120,8 @@ public class ChatController {
 
     public void clearHistory(long chatId){
         logDebug("Chat ID: " + chatId);
-        megaChatApi.clearChatHistory(chatId, new TruncateHistoryListener(context));
         dbH.removePendingMessageByChatId(chatId);
+        megaChatApi.clearChatHistory(chatId, new TruncateHistoryListener(context));
     }
 
     public void archiveChat(long chatId){

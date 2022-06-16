@@ -12,17 +12,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
-
+@AndroidEntryPoint
 public class TransfersBaseFragment extends RotatableFragment {
+
+    @Inject
+    public TransfersManagement transfersManagement;
 
     protected ImageView emptyImage;
     protected TextView emptyText;
@@ -98,7 +104,7 @@ public class TransfersBaseFragment extends RotatableFragment {
      */
     public void setGetMoreQuotaViewVisibility() {
         if (getMoreQuotaView != null) {
-            if (isOnTransferOverQuota()) {
+            if (transfersManagement.isOnTransferOverQuota()) {
                 getMoreQuotaView.setVisibility(View.VISIBLE);
                 if (Util.isDarkMode(context)) {
                     getMoreQuotaView.setBackgroundColor(ColorUtils.getColorForElevation(context, 6));

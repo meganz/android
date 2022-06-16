@@ -27,14 +27,15 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
@@ -259,7 +260,6 @@ class GetImageUseCase @Inject constructor(
                                     else ->
                                         emitter.onError(megaException)
                                 }
-
                                 resetTotalDownloadsIfNeeded()
                             },
                             onTransferTemporaryError = { _, error ->
@@ -274,21 +274,15 @@ class GetImageUseCase @Inject constructor(
                             }
                         )
 
-                        if (highPriority) {
-                            megaApi.startDownloadWithTopPriority(
-                                node,
-                                fullFile.absolutePath,
-                                Constants.APP_DATA_BACKGROUND_TRANSFER,
-                                listener
-                            )
-                        } else {
-                            megaApi.startDownloadWithData(
-                                node,
-                                fullFile.absolutePath,
-                                Constants.APP_DATA_BACKGROUND_TRANSFER,
-                                listener
-                            )
-                        }
+                        megaApi.startDownload(
+                            node,
+                            fullFile.absolutePath,
+                            Constants.APP_DATA_BACKGROUND_TRANSFER,
+                            null,
+                            highPriority,
+                            null,
+                            listener
+                        )
                     }
                 }
             }

@@ -16,11 +16,12 @@ import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.data.MediaCardType
 
 class GalleryAdapter(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
-    private var itemSizeConfig: GalleryItemSizeConfig
+    private var itemSizeConfig: GalleryItemSizeConfig,
 ) : ListAdapter<GalleryItem, GalleryViewHolder>(GalleryItem.DiffCallback()),
     SectionTitleProvider, DragThumbnailGetter {
 
@@ -43,44 +44,41 @@ class GalleryAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position).type
+        return getItem(position).type.ordinal
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        val binding = when (viewType) {
-            GalleryItem.TYPE_IMAGE ->
+        val binding = when (MediaCardType.values()[viewType]) {
+            MediaCardType.Image ->
                 ItemGalleryImageBinding.inflate(
                     inflater,
                     parent,
                     false
-                )
-            GalleryItem.TYPE_VIDEO ->
+                ).also {
+                    if (itemDimen > 0) {
+                        setItemLayoutParams(it)
+                        it.iconSelected.visibility = View.GONE
+                    }
+                }
+            MediaCardType.Video ->
                 ItemGalleryVideoBinding.inflate(
                     inflater,
                     parent,
                     false
-                )
-            else ->
+                ).also {
+                    if (itemDimen > 0) {
+                        setItemLayoutParams(it)
+                        it.iconSelected.visibility = View.GONE
+                    }
+                }
+            MediaCardType.Header ->
                 ItemGalleryTitleBinding.inflate(
                     inflater,
                     parent,
                     false
                 )
-        }
-
-        if (itemDimen > 0) {
-            when (viewType) {
-                GalleryItem.TYPE_IMAGE -> {
-                    setItemLayoutParams(binding)
-                    (binding as ItemGalleryImageBinding).iconSelected.visibility = View.GONE
-                }
-                GalleryItem.TYPE_VIDEO -> {
-                    setItemLayoutParams(binding)
-                    (binding as ItemGalleryVideoBinding).iconSelected.visibility = View.GONE
-                }
-            }
         }
 
         return GalleryViewHolder(binding, itemSizeConfig)
@@ -104,7 +102,7 @@ class GalleryAdapter(
     fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
             return when (getItem(position).type) {
-                GalleryItem.TYPE_HEADER -> spanCount
+                MediaCardType.Header -> spanCount
                 else -> 1
             }
         }

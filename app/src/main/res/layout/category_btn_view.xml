@@ -12,7 +12,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:srcCompat="@drawable/ic_photos" />
+        tools:ignore="ContentDescription"
+        tools:srcCompat="@drawable/ic_category_audio" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView_category"
@@ -32,5 +33,5 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView_category"
         app:layout_constraintStart_toStartOf="@+id/imageView_category"
         app:layout_constraintBottom_toBottomOf="@+id/imageView_category"
-        tools:text="@string/section_images" />
+        tools:text="@string/upload_to_audio" />
 </merge>

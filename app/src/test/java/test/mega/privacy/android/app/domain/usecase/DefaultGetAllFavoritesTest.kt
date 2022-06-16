@@ -42,7 +42,7 @@ class DefaultGetAllFavoritesTest {
         runTest {
             whenever(favouritesRepository.getAllFavorites()).thenReturn(emptyList())
             underTest().collect {
-                assertTrue(it.isNullOrEmpty())
+                assertTrue(it.isEmpty())
             }
         }
     }

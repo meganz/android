@@ -4,7 +4,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.domain.usecase.DefaultGetCameraSortOrder
 import mega.privacy.android.app.domain.usecase.DefaultGetCloudSortOrder
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
 
 /**
@@ -14,6 +16,15 @@ import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
 @InstallIn(SingletonComponent::class)
 abstract class SortOrderUseCases {
 
+    /**
+     * Provide the GetCloudSortOrder implementation
+     */
     @Binds
     abstract fun bindGetCloudSortOrder(getCloudSortOrder: DefaultGetCloudSortOrder): GetCloudSortOrder
+
+    /**
+     * Provide the GetCameraSortOrder implementation
+     */
+    @Binds
+    abstract fun bindGetCameraSortOrder(getCameraSortOrder: DefaultGetCameraSortOrder): GetCameraSortOrder
 }

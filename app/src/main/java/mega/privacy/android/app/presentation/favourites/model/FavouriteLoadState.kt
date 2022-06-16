@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.favourites.model
 
-import mega.privacy.android.app.usecase.MegaException
+import mega.privacy.android.app.usecase.exception.MegaException
 
 /**
  * The favourite list load state
@@ -8,9 +8,9 @@ import mega.privacy.android.app.usecase.MegaException
 sealed interface FavouriteLoadState {
     /**
      * Get favourite list success
-     * @param favourites Favourite list
+     * @param favourites FavouriteItem list
      */
-    data class Success(val favourites: List<Favourite>): FavouriteLoadState
+    data class Success(val favourites: List<FavouriteItem>): FavouriteLoadState
 
     /**
      * Loading state

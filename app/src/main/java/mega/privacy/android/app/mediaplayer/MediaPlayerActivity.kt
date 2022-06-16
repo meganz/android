@@ -46,6 +46,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -58,7 +59,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -196,6 +196,16 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
         serviceBound = true
+
+        viewModel.getCollision().observe(this) { collision ->
+            nameCollisionActivityContract.launch(arrayListOf(collision))
+        }
+
+        viewModel.onSnackbarMessage().observe(this) { message ->
+            showSnackbar(message)
+        }
+
+        viewModel.onExceptionThrown().observe(this, ::manageException)
 
         viewModel.itemToRemove.observe(this) {
             playerService?.viewModel?.removeItem(it)
@@ -463,7 +473,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                     return
                 }
 
-                if (adapterType == FOLDER_LINK_ADAPTER || adapterType == FROM_IMAGE_VIEWER) {
+                if (adapterType == FOLDER_LINK_ADAPTER || adapterType == FROM_IMAGE_VIEWER || adapterType == VERSIONS_ADAPTER) {
                     menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true
@@ -823,17 +833,29 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             return
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER) {
-            val node = getChatMessageNode() ?: return
+        when (requestCode) {
+            REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
+                val node = getChatMessageNode() ?: return
 
-            val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-            if (toHandle == null || toHandle == INVALID_HANDLE) {
-                return
+                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                    ?: return
+
+                viewModel.copyNode(node = node, newParentHandle = toHandle)
             }
+            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
+                val moveHandles = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
+                    ?: return
+                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
-            handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
-        } else {
-            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
+                viewModel.moveNode(moveHandles[0], toHandle)
+            }
+            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
+                val copyHandles = data?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
+                    ?: return
+                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+
+                viewModel.copyNode(nodeHandle = copyHandles[0], newParentHandle = toHandle)
+            }
         }
     }
 
@@ -973,6 +995,17 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
+    }
+
+    /**
+     * Shows the result of an exception.
+     *
+     * @param throwable The exception.
+     */
+    private fun manageException(throwable: Throwable) {
+        if (!manageCopyMoveException(throwable) && throwable is MegaException) {
+            showSnackbar(throwable.message!!)
+        }
     }
 
     companion object {

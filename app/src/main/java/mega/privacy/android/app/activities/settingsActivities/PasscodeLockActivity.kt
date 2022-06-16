@@ -61,6 +61,8 @@ class PasscodeLockActivity : BaseActivity() {
         private const val FINGERPRINT_ENABLED = "FINGERPRINT_ENABLED"
         private const val KEY_NAME = "MEGA_KEY"
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
+        private const val FORGET_PASSCODE = "FORGET_PASSCODE"
+        private const val PASSWORD_ALREADY_TYPED = "PASSWORD_ALREADY_TYPED"
     }
 
     private var attempts = 0
@@ -90,6 +92,8 @@ class PasscodeLockActivity : BaseActivity() {
     private lateinit var keyGenerator: KeyGenerator
     private var fingerprintEnabled = false
     private var fingerprintSkipped = false
+    private var forgetPasscode = false
+    private var passwordAlreadyTyped = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,6 +119,8 @@ class PasscodeLockActivity : BaseActivity() {
             passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
             fingerprintEnabled = savedInstanceState.getBoolean(FINGERPRINT_ENABLED, false)
             fingerprintSkipped = savedInstanceState.getBoolean(FINGERPRINT_SKIPPED, false)
+            forgetPasscode = savedInstanceState.getBoolean(FORGET_PASSCODE, false)
+            passwordAlreadyTyped = savedInstanceState.getBoolean(PASSWORD_ALREADY_TYPED, false)
 
             if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
                 askConfirmLogout()
@@ -134,7 +140,7 @@ class PasscodeLockActivity : BaseActivity() {
         setContentView(binding.root)
 
         if (mode == UNLOCK_MODE) {
-            binding.toolbarPasscodeLockTitle.isVisible = false
+            binding.toolbarPasscode.isVisible = false
         } else {
             setSupportActionBar(binding.toolbarPasscode)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -230,21 +236,40 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding.doNotMatchWarning.isVisible = false
 
+        if (forgetPasscode) {
+            hidePins()
+            hideErrorElements()
+            binding.passwordInput.isVisible = false
+
+            binding.passwordLayout.apply {
+                isVisible = true
+                requestFocus()
+            }
+
+            binding.passwordField.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == IME_ACTION_DONE) {
+                    checkPassword()
+                    true
+                } else false
+            }
+
+            if (passwordAlreadyTyped) {
+                showAttemptsError()
+            }
+
+            return
+        }
+
+        binding.passwordLayout.isVisible = false
+
         if (attempts > 0) {
             showAttemptsError()
         } else {
-            binding.failedAttemptsText.isVisible = false
-            binding.failedAttemptsErrorText.isVisible = false
-            binding.logoutButton.isVisible = false
+            hideErrorElements()
         }
 
         if (passcodeType == PIN_ALPHANUMERIC) {
-            binding.passFirstInput.isVisible = false
-            binding.passSecondInput.isVisible = false
-            binding.passThirdInput.isVisible = false
-            binding.passFourthInput.isVisible = false
-            binding.passFifthInput.isVisible = false
-            binding.passSixthInput.isVisible = false
+            hidePins()
 
             binding.passwordInput.apply {
                 isVisible = true
@@ -372,14 +397,39 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     /**
+     * Hides pin views.
+     */
+    private fun hidePins() {
+        binding.passFirstInput.isVisible = false
+        binding.passSecondInput.isVisible = false
+        binding.passThirdInput.isVisible = false
+        binding.passFourthInput.isVisible = false
+        binding.passFifthInput.isVisible = false
+        binding.passSixthInput.isVisible = false
+    }
+
+    /**
+     * Hides error views.
+     */
+    private fun hideErrorElements() {
+        binding.failedAttemptsText.isVisible = false
+        binding.failedAttemptsErrorText.isVisible = false
+        binding.logoutButton.isVisible = false
+        binding.forgetPasscodeButton.isVisible = false
+    }
+
+    /**
      * Sets the text of the title depending on the current situation.
      */
     private fun setTitleText() {
         binding.titleText.text = StringResourcesUtils.getString(
-            if (secondRound && setOrUnlockMode) R.string.unlock_pin_title_2
-            else if (secondRound) R.string.reset_pin_title_2
-            else if (setOrUnlockMode) R.string.unlock_pin_title
-            else R.string.reset_pin_title
+            when {
+                forgetPasscode -> R.string.settings_passcode_enter_password_title
+                secondRound && setOrUnlockMode -> R.string.unlock_pin_title_2
+                secondRound -> R.string.reset_pin_title_2
+                setOrUnlockMode -> R.string.unlock_pin_title
+                else -> R.string.reset_pin_title
+            }
         )
     }
 
@@ -396,6 +446,11 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding.logoutButton.setOnClickListener {
             askConfirmLogout()
+        }
+
+        binding.forgetPasscodeButton.setOnClickListener {
+            forgetPasscode = true
+            initPasscodeScreen()
         }
 
         binding.passcodeOptionsButton.setOnClickListener {
@@ -483,13 +538,37 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun confirmUnlockPasscode() {
         if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
-            passcodeUtil.pauseUpdate()
-            resetAttempts()
-            finish()
+            skipPasscode()
         } else {
             sbFirst.clear()
             incrementAttempts()
             clearTypedPasscode()
+            showAttemptsError()
+        }
+    }
+
+    /**
+     * Skips successfully the passcode screen because the passcode or the password
+     * was correctly introduced.
+     */
+    private fun skipPasscode() {
+        passcodeUtil.pauseUpdate()
+        resetAttempts()
+        finish()
+    }
+
+    /**
+     * Checks if the typed password is the same as the current logged in account.
+     */
+    private fun checkPassword() {
+        val typedPassword = binding.passwordField.text.toString()
+
+        if (megaApi.checkPassword(typedPassword)) {
+            skipPasscode()
+        } else {
+            passwordAlreadyTyped = true
+            incrementAttempts()
+            binding.passwordField.text?.clear()
             showAttemptsError()
         }
     }
@@ -516,14 +595,17 @@ class PasscodeLockActivity : BaseActivity() {
             attempts >= MIN_ATTEMPTS_TO_SHOW_WARNING -> {
                 binding.failedAttemptsErrorText.isVisible = true
                 binding.logoutButton.isVisible = true
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
             attempts > 0 -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = true
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
             else -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = false
+                binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
         }
     }
@@ -611,9 +693,17 @@ class PasscodeLockActivity : BaseActivity() {
 
     override fun onBackPressed() {
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
-                UNLOCK_MODE -> return
+                UNLOCK_MODE -> {
+                    if (forgetPasscode) {
+                        forgetPasscode = false
+                        initPasscodeScreen()
+                    } else {
+                        return
+                    }
+                }
                 RESET_MODE -> passcodeManagement.showPasscodeScreen = false
                 else -> finish()
             }
@@ -653,6 +743,8 @@ class PasscodeLockActivity : BaseActivity() {
         outState.putBoolean(IS_CONFIRM_LOGOUT_SHOWN, isConfirmLogoutDialogShown)
         outState.putBoolean(FINGERPRINT_ENABLED, fingerprintEnabled)
         outState.putBoolean(FINGERPRINT_SKIPPED, fingerprintSkipped)
+        outState.putBoolean(FORGET_PASSCODE, forgetPasscode)
+        outState.putBoolean(PASSWORD_ALREADY_TYPED, passwordAlreadyTyped)
 
         passcodeManagement.needsOpenAgain = true
 
@@ -715,7 +807,6 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * Gets the secret key to encrypt the authentication.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun getSecretKey(): SecretKey {
         if (!this::keyStore.isInitialized) {
             keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
@@ -750,7 +841,6 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * Gets the Cipher object to encrypt the authentication.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun getCipher(): Cipher {
         if (!this::cipher.isInitialized) {
             val secretKey = getSecretKey()

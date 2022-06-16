@@ -623,8 +623,12 @@
         <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop"/>
+
+        <activity
+            android:name="mega.privacy.android.app.namecollision.NameCollisionActivity"
+            android:label="@string/title_duplicated_items"
+            android:launchMode="singleTop"/>
 
         <activity
             android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"

@@ -6,18 +6,20 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
+import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
+import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
-import java.util.*
 
 class ActionModeCallback constructor(
     private val mainActivity: ManagerActivity,
     private val viewModel: ActionModeViewModel,
-    private val megaApi: MegaApiAndroid
+    private val megaApi: MegaApiAndroid,
 ) : ActionMode.Callback {
 
     var nodeCount = 0
@@ -33,7 +35,13 @@ class ActionModeCallback constructor(
 
         when (item.itemId) {
             R.id.cab_menu_download -> {
-                mainActivity.saveNodesToDevice(selectedNodes, false, false, false, false)
+                viewModel.executeTransfer {
+                    mainActivity.saveNodesToDevice(selectedNodes,
+                        false,
+                        false,
+                        false,
+                        false)
+                }
             }
             R.id.cab_menu_copy -> {
                 NodeController(mainActivity).chooseLocationToCopyNodes(nodesHandles)
@@ -78,7 +86,6 @@ class ActionModeCallback constructor(
             inflater.inflate(R.menu.cloud_storage_action, menu)
         }
         mainActivity.changeAppBarElevation(true)
-
         return true
     }
 
@@ -118,7 +125,7 @@ class ActionModeCallback constructor(
             control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
         }
 
-        if(areAllNotTakenDown) {
+        if (areAllNotTakenDown) {
             control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
             control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
             control.copy().isVisible = true

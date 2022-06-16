@@ -41,7 +41,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     private var itemTouchHelper: ItemTouchHelper? = null
     private var actionMode: ActionMode? = null
-    private var playlistActionBarCallback: PlaylistActionBarCallback? = null
+    private var playlistActionModeCallback: PlaylistActionModeCallback? = null
     private var isActionMode = false
 
     private var isAudioPlayer = false
@@ -233,12 +233,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
      * Activated the action mode
      */
     private fun activateActionMode(){
-        if (playlistActionBarCallback == null) {
+        if (playlistActionModeCallback == null) {
             playerService?.viewModel?.run {
-                playlistActionBarCallback = PlaylistActionBarCallback(this)
+                playlistActionModeCallback = PlaylistActionModeCallback(this)
             }
         }
-        playlistActionBarCallback?.run {
+        playlistActionModeCallback?.run {
             actionMode = (context as AppCompatActivity).startSupportActionMode(this)
             actionMode?.title = resources.getString(R.string.title_select_tracks)
         }
