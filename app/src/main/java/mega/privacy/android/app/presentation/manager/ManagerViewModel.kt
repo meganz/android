@@ -99,10 +99,9 @@ class ManagerViewModel @Inject constructor(
     val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onRubbishNodesUpdate") }
-            .mapNotNull { getRubbishBinChildrenNode(rubbishBinParentHandle) }
+            .mapNotNull { getRubbishBinChildrenNode(_uiState.value.rubbishBinParentHandle) }
             .map { Event(it) }
             .asLiveData()
-
 
     /**
      * Update Browser Nodes when a node update callback happens
@@ -110,27 +109,27 @@ class ManagerViewModel @Inject constructor(
     val updateBrowserNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onBrowserNodesUpdate") }
-            .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
+            .mapNotNull { getBrowserChildrenNode(_uiState.value.browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
 
     /**
-     * Current rubbish bin parent handle
+     * Set the current browser parent handle to the UI state
+     *
+     * @param handle the id of the current browser parent handle to set
      */
-    var rubbishBinParentHandle: Long = -1L
-        set(value) {
-            Timber.d("setRubbishparentHandle")
-            field = value
-        }
+    fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
+        _uiState.update { it.copy(browserParentHandle = handle) }
+    }
 
     /**
-     * Current browser parent handle
+     * Set the current rubbish bin parent handle to the UI state
+     *
+     * @param handle the id of the current rubbish bin parent handle to set
      */
-    var browserParentHandle: Long = -1L
-        set(value) {
-            Timber.d("setBrowserParentHandle")
-            field = value
-        }
+    fun setRubbishBinParentHandle(handle: Long) = viewModelScope.launch {
+        _uiState.update { it.copy(rubbishBinParentHandle = handle) }
+    }
 
     /**
      * Reset the current search drawer item to initial value
@@ -171,6 +170,8 @@ class ManagerViewModel @Inject constructor(
      */
     private fun initializeState(): ManagerState =
         ManagerState(
+            browserParentHandle = -1L,
+            rubbishBinParentHandle = -1L,
             searchDrawerItem = null,
             searchSharedTab = -1,
             isFirstNavigationLevel = true

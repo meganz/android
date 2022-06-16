@@ -694,7 +694,7 @@ public class SearchFragment extends RotatableFragment {
 				}
 
 			case RUBBISH_BIN:
-				return managerViewModel.getRubbishBinParentHandle();
+				return managerViewModel.getUiState().getValue().getRubbishBinParentHandle();
 
 			case INBOX:
 				return ((ManagerActivity) context).getParentHandleInbox();
