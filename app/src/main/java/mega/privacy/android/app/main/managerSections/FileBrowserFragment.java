@@ -990,7 +990,7 @@ public class FileBrowserFragment extends RotatableFragment{
 
 	public void setFolderInfoNavigation(MegaNode n){
 	    mediaHandle = n.getHandle();
-        ((ManagerActivity)context).setParentHandleBrowser(n.getHandle());
+        managerViewModel.setBrowserParentHandle(n.getHandle());
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
         ((ManagerActivity)context).setToolbarTitle();
 
@@ -1162,7 +1162,7 @@ public class FileBrowserFragment extends RotatableFragment{
 				((ManagerActivity) context).comesFromNotifications = false;
 				((ManagerActivity) context).comesFromNotificationHandle = -1;
 				((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
-				((ManagerActivity)context).setParentHandleBrowser(((ManagerActivity)context).comesFromNotificationHandleSaved);
+				managerViewModel.setBrowserParentHandle(((ManagerActivity)context).comesFromNotificationHandleSaved);
 				((ManagerActivity)context).comesFromNotificationHandleSaved = -1;
 				((ManagerActivity) context).refreshCloudDrive();
 
@@ -1176,7 +1176,7 @@ public class FileBrowserFragment extends RotatableFragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 
-					((ManagerActivity)context).setParentHandleBrowser(parentNode.getHandle());
+					managerViewModel.setBrowserParentHandle(parentNode.getHandle());
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 
 					((ManagerActivity)context).setToolbarTitle();

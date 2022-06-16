@@ -744,7 +744,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean isList = true;
 
-    private long parentHandleIncoming;
     private long parentHandleLinks;
     private long parentHandleOutgoing;
     private long parentHandleInbox;
@@ -1312,7 +1311,6 @@ public class ManagerActivity extends TransfersManagementActivity
             logWarning("DrawerItem is null");
         }
         super.onSaveInstanceState(outState);
-        outState.putLong("parentHandleIncoming", parentHandleIncoming);
         logDebug("IN BUNDLE -> parentHandleOutgoing: " + parentHandleOutgoing);
         outState.putLong(PARENT_HANDLE_LINKS, parentHandleLinks);
         outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
@@ -1323,7 +1321,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
         outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 
-        if (parentHandleIncoming != INVALID_HANDLE) {
+        if (viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
             outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
         }
 
@@ -1496,8 +1494,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
-            parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
-            logDebug("savedInstanceState -> parentHandleIncoming: " + parentHandleIncoming);
             parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
             logDebug("savedInstanceState -> parentHandleOutgoing: " + parentHandleOutgoing);
             parentHandleLinks = savedInstanceState.getLong(PARENT_HANDLE_LINKS, INVALID_HANDLE);
@@ -1567,7 +1563,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else {
             logDebug("Bundle is NULL");
-            parentHandleIncoming = -1;
             parentHandleOutgoing = -1;
             parentHandleLinks = INVALID_HANDLE;
             parentHandleInbox = -1;
@@ -2283,7 +2278,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                                 if (fragmentHandle == megaApi.getRootNode().getHandle()) {
                                     drawerItem = DrawerItem.CLOUD_DRIVE;
-                                    setParentHandleBrowser(handleIntent);
+                                    viewModel.setBrowserParentHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 } else if (fragmentHandle == megaApi.getRubbishNode().getHandle()) {
@@ -2304,7 +2299,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     if (parentIntentN != null) {
                                         deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
                                     }
-                                    setParentHandleIncoming(handleIntent);
+                                    viewModel.setIncomingParentHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 }
@@ -3094,7 +3089,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaShare.ACCESS_READ:
             case MegaShare.ACCESS_READWRITE:
             case MegaShare.ACCESS_FULL:
-                parentHandleIncoming = handleIntent;
+                viewModel.setIncomingParentHandle(handleIntent);
                 deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 break;
@@ -3751,8 +3746,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 switch (indexShares) {
                     case INCOMING_TAB: {
                         if (isIncomingAdded()) {
-                            if (parentHandleIncoming != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+                            if (viewModel.getUiState().getValue().getIncomingParentHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getIncomingParentHandle());
                                 if (node == null) {
                                     aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
                                 } else {
@@ -4317,7 +4312,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case SHARED_ITEMS: {
                 int tabItemShares = getTabItemShares();
 
-                if ((tabItemShares == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE)
+                if ((tabItemShares == INCOMING_TAB && viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
                         || (tabItemShares == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
@@ -4366,7 +4361,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case SHARED_ITEMS:
                 switch (currentTab) {
                     case INCOMING_TAB:
-                        if (!isIncomingAdded() || (!hide && parentHandleIncoming != INVALID_HANDLE)) {
+                        if (!isIncomingAdded() || (!hide && viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -6168,8 +6163,8 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case R.id.bottom_navigation_item_shared_items: {
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    if (getTabItemShares() == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE) {
-                        parentHandleIncoming = INVALID_HANDLE;
+                    if (getTabItemShares() == INCOMING_TAB && viewModel.getUiState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
+                        viewModel.setIncomingParentHandle(INVALID_HANDLE);
                         refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
                     } else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE) {
                         parentHandleOutgoing = INVALID_HANDLE;
@@ -6438,7 +6433,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     switch (getTabItemShares()) {
                         case INCOMING_TAB:
                             decreaseDeepBrowserTreeIncoming();
-                            parentHandleIncoming = deepBrowserTreeIncoming == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+                            viewModel.setIncomingParentHandle(deepBrowserTreeIncoming == 0 ? INVALID_HANDLE : result.getOldParentHandle());
                             refreshIncomingShares();
                             break;
 
@@ -6836,7 +6831,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (viewPagerShares == null) break;
 
                 if (getTabItemShares() == INCOMING_TAB) {
-                    parentHandle = parentHandleIncoming;
+                    parentHandle = viewModel.getUiState().getValue().getIncomingParentHandle();
                 } else if (getTabItemShares() == OUTGOING_TAB) {
                     parentHandle = parentHandleOutgoing;
                 } else if (getTabItemShares() == LINKS_TAB) {
@@ -6857,7 +6852,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         case SHARED_ITEMS:
                             switch (viewModel.getUiState().getValue().getSearchSharedTab()) {
                                 case INCOMING_TAB:
-                                    parentHandle = parentHandleIncoming;
+                                    parentHandle = viewModel.getUiState().getValue().getIncomingParentHandle();
                                     break;
                                 case OUTGOING_TAB:
                                     parentHandle = parentHandleOutgoing;
@@ -7681,7 +7676,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setParentHandleIncoming(long parentHandleIncoming) {
         logDebug("setParentHandleIncoming: " + parentHandleIncoming);
-        this.parentHandleIncoming = parentHandleIncoming;
+        viewModel.setIncomingParentHandle(parentHandleIncoming);
     }
 
     public void setParentHandleInbox(long parentHandleInbox) {
@@ -9737,14 +9732,14 @@ public class ManagerActivity extends TransfersManagementActivity
             drawerItem = DrawerItem.CLOUD_DRIVE;
             openFolderRefresh = true;
             comesFromNotificationHandleSaved = viewModel.getUiState().getValue().getBrowserParentHandle();
-            setParentHandleBrowser(nodeHandle);
+            viewModel.setBrowserParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         } else if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
             //Rubbish
             drawerItem = DrawerItem.RUBBISH_BIN;
             openFolderRefresh = true;
             comesFromNotificationHandleSaved = viewModel.getUiState().getValue().getRubbishBinParentHandle();
-            setParentHandleRubbish(nodeHandle);
+            viewModel.setRubbishBinParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         } else if (parent.getHandle() == megaApi.getInboxNode().getHandle()) {
             //Inbox
@@ -9758,12 +9753,12 @@ public class ManagerActivity extends TransfersManagementActivity
             drawerItem = DrawerItem.SHARED_ITEMS;
             indexShares = 0;
             comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming;
-            comesFromNotificationHandleSaved = parentHandleIncoming;
+            comesFromNotificationHandleSaved = viewModel.getUiState().getValue().getIncomingParentHandle();
             if (parent != null) {
                 comesFromNotificationsLevel = deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(node, this);
             }
             openFolderRefresh = true;
-            setParentHandleIncoming(nodeHandle);
+            viewModel.setIncomingParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         }
     }
@@ -9890,14 +9885,14 @@ public class ManagerActivity extends TransfersManagementActivity
                     updateContacts = true;
 
                     if (drawerItem == DrawerItem.SHARED_ITEMS
-                            && getTabItemShares() == INCOMING_TAB && parentHandleIncoming == updatedNode.getHandle()) {
-                        getNodeUseCase.get(parentHandleIncoming)
+                            && getTabItemShares() == INCOMING_TAB && viewModel.getUiState().getValue().getIncomingParentHandle() == updatedNode.getHandle()) {
+                        getNodeUseCase.get(viewModel.getUiState().getValue().getIncomingParentHandle())
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe((result, throwable) -> {
                                     if (throwable != null) {
                                         decreaseDeepBrowserTreeIncoming();
-                                        parentHandleIncoming = INVALID_HANDLE;
+                                        viewModel.setIncomingParentHandle(INVALID_HANDLE);
                                         hideTabs(false, INCOMING_TAB);
                                         refreshIncomingShares();
                                     }
@@ -10343,7 +10338,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case INCOMING_TAB:
                         if (!isIncomingAdded()) break;
 
-                        MegaNode parentNodeInSF = megaApi.getNodeByHandle(parentHandleIncoming);
+                        MegaNode parentNodeInSF = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getIncomingParentHandle());
                         if (deepBrowserTreeIncoming <= 0 || parentNodeInSF == null) {
                             hideFabButton();
                             break;
@@ -10840,14 +10835,14 @@ public class ManagerActivity extends TransfersManagementActivity
                 // Redirect to Cloud drive.
                 selectDrawerItem(DrawerItem.CLOUD_DRIVE);
             case CLOUD_DRIVE:
-                setParentHandleBrowser(node.getHandle());
+                viewModel.setBrowserParentHandle(node.getHandle());
                 refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
                 break;
             case SHARED_ITEMS:
                 if (viewPagerShares == null || sharesPageAdapter == null) break;
 
                 if (getTabItemShares() == INCOMING_TAB) {
-                    setParentHandleIncoming(node.getHandle());
+                    viewModel.setIncomingParentHandle(node.getHandle());
                     increaseDeepBrowserTreeIncoming();
                 } else if (getTabItemShares() == OUTGOING_TAB) {
                     setParentHandleOutgoing(node.getHandle());
@@ -10958,7 +10953,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public long getParentHandleIncoming() {
-        return parentHandleIncoming;
+        return viewModel.getUiState().getValue().getIncomingParentHandle();
     }
 
     public long getParentHandleOutgoing() {
@@ -11076,7 +11071,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {
-            parentHandleIncoming = node.getParentHandle();
+            viewModel.setIncomingParentHandle(node.getParentHandle());
             deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node),
                     this);
             refreshFragment(FragmentTag.INCOMING_SHARES.getTag());

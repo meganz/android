@@ -590,7 +590,7 @@ public class RubbishBinFragment extends Fragment{
 				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivity)context).setParentHandleRubbish(n.getHandle());
+				managerViewModel.setRubbishBinParentHandle(n.getHandle());
 
 				((ManagerActivity)context).setToolbarTitle();
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -911,7 +911,7 @@ public class RubbishBinFragment extends Fragment{
 			((ManagerActivity) context).comesFromNotifications = false;
 			((ManagerActivity) context).comesFromNotificationHandle = -1;
 			((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
-			((ManagerActivity)context).setParentHandleRubbish(((ManagerActivity)context).comesFromNotificationHandleSaved);
+			managerViewModel.setRubbishBinParentHandle(((ManagerActivity)context).comesFromNotificationHandleSaved);
 			((ManagerActivity)context).comesFromNotificationHandleSaved = -1;
 
 			return 2;
@@ -924,7 +924,7 @@ public class RubbishBinFragment extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
-				((ManagerActivity)context).setParentHandleRubbish(parentNode.getHandle());
+				managerViewModel.setRubbishBinParentHandle(parentNode.getHandle());
 
 				((ManagerActivity)context).setToolbarTitle();
 				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());

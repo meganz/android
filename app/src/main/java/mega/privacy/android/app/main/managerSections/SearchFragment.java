@@ -690,7 +690,7 @@ public class SearchFragment extends RotatableFragment {
 						return ((ManagerActivity) context).getParentHandleLinks();
 					case INCOMING_TAB:
 					default:
-						return ((ManagerActivity) context).getParentHandleIncoming();
+						return managerViewModel.getUiState().getValue().getIncomingParentHandle();
 				}
 
 			case RUBBISH_BIN:
