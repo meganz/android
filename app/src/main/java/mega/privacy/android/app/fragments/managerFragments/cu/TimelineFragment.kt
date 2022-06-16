@@ -19,6 +19,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Adapter
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.ListView
@@ -44,7 +46,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
-import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -68,6 +69,7 @@ import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.main.ManagerActivity
@@ -89,6 +91,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import java.util.concurrent.atomic.AtomicReference
+
 
 /**
  * TimelineFragment is a sub fragment of PhotosFragment. Its sibling is AlbumsFragment
@@ -663,7 +666,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                     createFilterDialog(mManagerActivity)
                 }
                 R.id.action_photos_sortby -> {
-                    createSortByDialogue(mManagerActivity)
+                    createSortByDialog(mManagerActivity)
                 }
             }
             return super.onOptionsItemSelected(item)
@@ -1316,10 +1319,11 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
         dialogBuilder.setSingleChoiceItems(
             itemsAdapter,
-            Constants.INVALID_POSITION
-        ) { _: DialogInterface, item: Int ->
-            itemClicked.set(item)
-        }
+            Constants.INVALID_POSITION,
+            DialogInterface.OnClickListener { dialog, item ->
+                itemClicked.set(item)
+                dialog.dismiss()
+            })
 
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
                 dialog: DialogInterface,
@@ -1328,12 +1332,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             dialog.dismiss()
         }
 
+        dialogBuilder.setTitle(R.string.photos_action_filter)
         filterDialog = dialogBuilder.create()
-        filterDialog.setTitle(R.string.photos_action_filter)
         filterDialog.show()
     }
 
-    fun createSortByDialogue(
+    fun createSortByDialog(
         context: Activity,
     ) {
         val sortDialog: AlertDialog
@@ -1351,10 +1355,11 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
         dialogBuilder.setSingleChoiceItems(
             itemsAdapter,
-            Constants.INVALID_POSITION
-        ) { _: DialogInterface, item: Int ->
-            itemClicked.set(item)
-        }
+            Constants.INVALID_POSITION,
+            DialogInterface.OnClickListener { dialog, item ->
+                itemClicked.set(item)
+                dialog.dismiss()
+            })
 
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
                 dialog: DialogInterface,
