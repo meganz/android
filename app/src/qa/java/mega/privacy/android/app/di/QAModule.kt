@@ -7,8 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
-import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
-import mega.privacy.android.app.domain.usecase.DefaultSetFeatureFlag
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
@@ -18,18 +16,14 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 class QAModule {
     @Provides
     @IntoSet
-    fun bindPreferenceResource(): PreferenceResource =
+    fun providePreferenceResource(): PreferenceResource =
         PreferenceResource(R.xml.preferences_qa_entry)
 
     @Provides
-    @IntoSet
-    fun bindInsertFeatureFlag(featureFlagRepository: FeatureFlagRepository): SetFeatureFlag {
-        return DefaultSetFeatureFlag(featureFlagRepository)
-    }
+    fun provideSetFeatureFlag(repository: FeatureFlagRepository): SetFeatureFlag =
+        SetFeatureFlag(repository::setFeature)
 
     @Provides
-    @IntoSet
-    fun bindGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags {
-        return DefaultGetAllFeatureFlags(featureFlagRepository)
-    }
+    fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
+        GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
 }

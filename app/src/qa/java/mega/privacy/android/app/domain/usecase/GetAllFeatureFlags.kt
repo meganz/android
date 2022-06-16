@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.FeatureFlag
 /**
  * Use case to get all feature flags
  */
-interface GetAllFeatureFlags {
+fun interface GetAllFeatureFlags {
 
     /**
      * Gets a fow of list of all feature flags

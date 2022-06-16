@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Use case to set Feature Flag
  */
-interface SetFeatureFlag {
+fun interface SetFeatureFlag {
 
     /**
      * Sets value of feature flag

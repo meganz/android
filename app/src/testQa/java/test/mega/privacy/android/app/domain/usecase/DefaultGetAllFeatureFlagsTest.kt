@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.FeatureFlag
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
-import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import org.junit.Assert
 import org.junit.Before
@@ -24,7 +23,7 @@ class DefaultGetAllFeatureFlagsTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAllFeatureFlags(featureFlagRepository)
+        underTest = GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
     }
 
     @Test

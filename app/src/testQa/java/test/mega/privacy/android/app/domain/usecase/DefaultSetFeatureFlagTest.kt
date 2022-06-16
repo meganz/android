@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
-import mega.privacy.android.app.domain.usecase.DefaultSetFeatureFlag
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import org.junit.Before
 import org.junit.Test
@@ -19,7 +18,7 @@ class DefaultSetFeatureFlagTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultSetFeatureFlag(featureFlagRepository)
+        underTest = SetFeatureFlag(featureFlagRepository::setFeature)
     }
 
     @Test
