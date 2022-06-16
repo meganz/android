@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -23,8 +22,7 @@ class FilePrepareUseCase @Inject constructor() {
     fun prepareFile(data: Intent): Single<ShareInfo> =
             Single.fromCallable {
                 val shareInfo = ShareInfo.processIntent(data, MegaApplication.getInstance())
-                shareInfo.ifEmpty { error("Error preparing files") }
-                shareInfo[0]
+                shareInfo.firstOrNull() ?: error("Error preparing files")
             }
 
     /**
@@ -51,6 +49,5 @@ class FilePrepareUseCase @Inject constructor() {
             Single.fromCallable {
                 val shareInfo = ShareInfo.processUploadFile(MegaApplication.getInstance(), files)
                 shareInfo.ifEmpty { error("Error preparing files") }
-                shareInfo
             }
 }
