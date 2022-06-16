@@ -3853,17 +3853,11 @@ public class ChatActivity extends PasscodeActivity
     private void showOnlyMeInTheCallDialog() {
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
-        TextView title = dialogLayout.findViewById(R.id.title_call_dialog);
-        title.setText(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
-        TextView description = dialogLayout.findViewById(R.id.description_call_dialog);
-        description.setText(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
 
-        final Button firstButton = dialogLayout.findViewById(R.id.first_button);
-        final Button secondButton = dialogLayout.findViewById(R.id.second_button);
-        final Button thirdButton = dialogLayout.findViewById(R.id.cancel_button);
+        Button firstButton = dialogLayout.findViewById(R.id.first_button);
+        Button secondButton = dialogLayout.findViewById(R.id.second_button);
         firstButton.setVisibility(View.VISIBLE);
         secondButton.setVisibility(View.VISIBLE);
-        thirdButton.setVisibility(View.GONE);
 
         firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call).toUpperCase(Locale.ROOT));
         secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call).toUpperCase(Locale.ROOT));
@@ -3872,6 +3866,8 @@ public class ChatActivity extends PasscodeActivity
         builder.setView(dialogLayout);
         dialogCall = builder.create();
         isOnlyMeInCallDialogShown = true;
+        dialogCall.setTitle(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
+        dialogCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
         dialogCall.show();
 
         dialogCall.setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false);
@@ -3902,8 +3898,10 @@ public class ChatActivity extends PasscodeActivity
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
         TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.title_call_dialog);
         joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
+        joinCallDialogTitle.setVisibility(View.VISIBLE);
         TextView description = dialogLayout.findViewById(R.id.description_call_dialog);
         description.setText(StringResourcesUtils.getString(R.string.text_join_another_call));
+        description.setVisibility(View.VISIBLE);
 
         final Button holdJoinButton = dialogLayout.findViewById(R.id.first_button);
         final Button endJoinButton = dialogLayout.findViewById(R.id.second_button);
@@ -3912,6 +3910,8 @@ public class ChatActivity extends PasscodeActivity
         holdJoinButton.setText(chatRoom.isGroup() ? R.string.hold_and_join_call_incoming : R.string.hold_and_answer_call_incoming);
         endJoinButton.setText(chatRoom.isGroup() ? R.string.end_and_join_call_incoming : R.string.end_and_answer_call_incoming);
         holdJoinButton.setVisibility(existsMoreThanOneCall ? View.GONE : View.VISIBLE);
+        endJoinButton.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialogLayout);

@@ -9,24 +9,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.CountDownTimer;
 
-import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.listeners.ChatRoomListener;
-import mega.privacy.android.app.main.megachat.MegaChatParticipant;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
@@ -35,7 +31,6 @@ import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotificat
 import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.Constants.KEY_IS_SHOWED_WARNING_MESSAGE;
-import static mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
@@ -46,8 +41,8 @@ public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
     private final MegaApplication app;
-    private CustomCountDownTimer customCountDownTimer = null;
-    private CountDownTimer countDownTimer = null;
+    private CountDownTimer countDownTimerToEndCall = null;
+    public long millisecondsUntilEndCall = 0;
 
     // List of chat ids to control if a chat is already joining.
     private final List<Long> joiningChatIds = new ArrayList<>();
@@ -337,11 +332,12 @@ public class ChatManagement {
      */
     public void startCounterToFinishCall(long chatId, long timeToWait) {
         stopCounterToFinishCall();
-        if (countDownTimer == null) {
-            countDownTimer = new CountDownTimer(timeToWait * 1000, 1000) {
+        if (countDownTimerToEndCall == null) {
+            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), 1000) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
+                    millisecondsUntilEndCall = millisUntilFinished;
                 }
 
                 @Override
@@ -359,9 +355,10 @@ public class ChatManagement {
      * Method to stop the counter to end the call
      */
     public void stopCounterToFinishCall() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-            countDownTimer = null;
+        millisecondsUntilEndCall = 0;
+        if (countDownTimerToEndCall != null) {
+            countDownTimerToEndCall.cancel();
+            countDownTimerToEndCall = null;
         }
     }
 

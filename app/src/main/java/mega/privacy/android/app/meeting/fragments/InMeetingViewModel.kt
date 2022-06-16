@@ -1181,6 +1181,17 @@ class InMeetingViewModel @Inject constructor(
             logDebug("Adding participant... ${participantCreated.clientId}")
             participants.value = participants.value
             logDebug("Num of participants: " + participants.value?.size)
+
+            var currentSpeaker = getCurrentSpeakerParticipant()
+            if(currentSpeaker == null) {
+                getFirstParticipant(
+                    MEGACHAT_INVALID_HANDLE,
+                    MEGACHAT_INVALID_HANDLE
+                )?.let { (peerId, clientId) ->
+                    updatePeerSelected(peerId, clientId)
+                }
+            }
+
             return participants.value?.indexOf(participantCreated)
         }
 
@@ -2274,6 +2285,7 @@ class InMeetingViewModel @Inject constructor(
                     if (position != INVALID_POSITION) {
                         speakerParticipants.value?.removeAt(position)
                         logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+                        speakerParticipants.value = speakerParticipants.value
                     }
                 }
             }
