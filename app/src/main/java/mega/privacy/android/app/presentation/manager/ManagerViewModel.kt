@@ -3,9 +3,11 @@ package mega.privacy.android.app.presentation.manager
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,6 +17,9 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
+ * @param getRubbishBinChildrenNode
+ * @param getBrowserChildrenNode
+ * @param getNumUnreadUserAlerts
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -22,6 +27,7 @@ class ManagerViewModel @Inject constructor(
     monitorGlobalUpdates: MonitorGlobalUpdates,
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
+    private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts
 ) : ViewModel() {
 
     /**
@@ -110,4 +116,23 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
+
+    /**
+     * Notifies about the number of unread user alerts once.
+     *
+     * @return [SingleLiveEvent] with the number of unread user alerts.
+     */
+    fun onGetNumUnreadUserAlerts(): SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>> =
+        numUnreadUserAlerts
+
+    /**
+     * Checks the number of unread user alerts.
+     */
+    fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
+        viewModelScope.launch {
+            numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlerts())
+        }
+    }
 }

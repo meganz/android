@@ -39,4 +39,7 @@ abstract class ManagerUseCases {
     @Binds
     abstract fun bindGetNodeByHandle(useCase: DefaultGetNodeByHandle): GetNodeByHandle
 
+    @Binds
+    abstract fun bindGetNumUnreadUserAlerts(useCase: DefaultGetNumUnreadUserAlerts): GetNumUnreadUserAlerts
+
 }

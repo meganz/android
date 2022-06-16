@@ -215,4 +215,11 @@ interface MegaApiGateway {
      * @return Base64-encoded node handle
      */
     fun handleToBase64(handle: Long): String
+
+    /**
+     * Gets the number of unread user alerts for the logged in user.
+     *
+     * @return Number of unread user alerts.
+     */
+    suspend fun getNumUnreadUserAlerts(): Int
 }
