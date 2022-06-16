@@ -697,7 +697,7 @@ public class SearchFragment extends RotatableFragment {
 				return managerViewModel.getUiState().getValue().getRubbishBinParentHandle();
 
 			case INBOX:
-				return ((ManagerActivity) context).getParentHandleInbox();
+				return managerViewModel.getUiState().getValue().getInboxParentHandle();
 
 			default:
 				return megaApi.getRootNode().getHandle();

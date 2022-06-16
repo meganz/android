@@ -743,7 +743,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean isList = true;
 
-    private long parentHandleInbox;
     private String pathNavigationOffline;
     public int deepBrowserTreeIncoming = 0;
     public int deepBrowserTreeOutgoing = 0;
@@ -1308,7 +1307,6 @@ public class ManagerActivity extends TransfersManagementActivity
             logWarning("DrawerItem is null");
         }
         super.onSaveInstanceState(outState);
-        outState.putLong("parentHandleInbox", parentHandleInbox);
         outState.putSerializable("drawerItem", drawerItem);
         outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
                 bottomItemBeforeOpenFullscreenOffline);
@@ -1488,7 +1486,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
-            parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
             deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
             deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
             deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
@@ -1554,7 +1551,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else {
             logDebug("Bundle is NULL");
-            parentHandleInbox = -1;
             deepBrowserTreeIncoming = 0;
             deepBrowserTreeOutgoing = 0;
             deepBrowserTreeLinks = 0;
@@ -2277,7 +2273,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     selectDrawerItemPending = false;
                                 } else if (fragmentHandle == megaApi.getInboxNode().getHandle()) {
                                     drawerItem = DrawerItem.INBOX;
-                                    setParentHandleInbox(handleIntent);
+                                    viewModel.setInboxParentHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 } else {
@@ -3088,7 +3084,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     viewModel.setRubbishBinParentHandle(handleIntent);
                     drawerItem = DrawerItem.RUBBISH_BIN;
                 } else if (megaApi.isInInbox(parentIntentN)) {
-                    parentHandleInbox = handleIntent;
+                    viewModel.setInboxParentHandle(handleIntent);
                     drawerItem = DrawerItem.INBOX;
                 } else {
                     viewModel.setBrowserParentHandle(handleIntent);
@@ -3789,11 +3785,11 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case INBOX: {
                 aB.setSubtitle(null);
-                if (parentHandleInbox == megaApi.getInboxNode().getHandle() || parentHandleInbox == -1) {
+                if (viewModel.getUiState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getUiState().getValue().getInboxParentHandle() == -1) {
                     aB.setTitle(getResources().getString(R.string.section_inbox).toUpperCase());
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
-                    MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+                    MegaNode node = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getInboxParentHandle());
                     aB.setTitle(node.getName());
                     viewModel.setIsFirstNavigationLevel(false);
                 }
@@ -6414,7 +6410,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     break;
 
                 case INBOX:
-                    parentHandleInbox = result.getOldParentHandle();
+                    viewModel.setInboxParentHandle(result.getOldParentHandle());
                     refreshInboxList();
                     break;
 
@@ -6809,7 +6805,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case INBOX:
-                parentHandle = parentHandleInbox;
+                parentHandle = viewModel.getUiState().getValue().getInboxParentHandle();
                 break;
 
             case RUBBISH_BIN:
@@ -6852,7 +6848,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             }
                             break;
                         case INBOX:
-                            parentHandle = getParentHandleInbox();
+                            parentHandle = viewModel.getUiState().getValue().getInboxParentHandle();
                             break;
                     }
                 }
@@ -7670,7 +7666,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setParentHandleInbox(long parentHandleInbox) {
         logDebug("setParentHandleInbox: " + parentHandleInbox);
-        this.parentHandleInbox = parentHandleInbox;
+        viewModel.setInboxParentHandle(parentHandleInbox);
     }
 
     public void setParentHandleOutgoing(long parentHandleOutgoing) {
@@ -9734,8 +9730,8 @@ public class ManagerActivity extends TransfersManagementActivity
             //Inbox
             drawerItem = DrawerItem.INBOX;
             openFolderRefresh = true;
-            comesFromNotificationHandleSaved = parentHandleInbox;
-            setParentHandleInbox(nodeHandle);
+            comesFromNotificationHandleSaved = viewModel.getUiState().getValue().getInboxParentHandle();
+            viewModel.setInboxParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         } else {
             //Incoming Shares
@@ -10549,7 +10545,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public long getParentHandleInbox() {
-        return parentHandleInbox;
+        return viewModel.getUiState().getValue().getInboxParentHandle();
     }
 
     public void setContactTitleSection() {
@@ -10844,7 +10840,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 break;
             case INBOX:
-                setParentHandleInbox(node.getHandle());
+                viewModel.setInboxParentHandle(node.getHandle());
                 refreshFragment(FragmentTag.INBOX.getTag());
                 break;
         }

@@ -10,6 +10,7 @@ import mega.privacy.android.app.main.DrawerItem
  * @param incomingParentHandle current incoming parent handle
  * @param outgoingParentHandle current outgoing parent handle
  * @param linksParentHandle current links parent handle
+ * @param inboxParentHandle current inbox parent handle
  * @param searchDrawerItem current drawer item set for the search
  * @param searchSharedTab current shared tab set for the search
  * @param isFirstNavigationLevel true if the navigation level is the first level
@@ -20,6 +21,7 @@ data class ManagerState(
     val incomingParentHandle: Long,
     val outgoingParentHandle: Long,
     val linksParentHandle: Long,
+    val inboxParentHandle: Long,
     val searchDrawerItem: DrawerItem?,
     val searchSharedTab: Int,
     val isFirstNavigationLevel: Boolean

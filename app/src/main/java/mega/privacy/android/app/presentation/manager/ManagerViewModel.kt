@@ -196,6 +196,15 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
+     * Set the current inbox parent handle to the UI state
+     *
+     * @param handle the id of the current inbox parent handle to set
+     */
+    fun setInboxParentHandle(handle: Long) = viewModelScope.launch {
+        _uiState.update { it.copy(inboxParentHandle = handle) }
+    }
+
+    /**
      * Reset the current search drawer item to initial value
      */
     fun resetCurrentSearchDrawerItem() = viewModelScope.launch {
@@ -239,6 +248,7 @@ class ManagerViewModel @Inject constructor(
             incomingParentHandle = -1L,
             outgoingParentHandle = -1L,
             linksParentHandle = -1L,
+            inboxParentHandle = -1L,
             searchDrawerItem = null,
             searchSharedTab = -1,
             isFirstNavigationLevel = true,
