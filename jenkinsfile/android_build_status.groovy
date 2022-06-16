@@ -5,6 +5,9 @@ MEGACHAT_BRANCH = "develop"
 GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
 
+UNIT_TEST_SUMMARY = ""
+UNIT_TEST_REPORT_ARCHIVE = "unit_test_result_${BUILD_NUMBER}.zip"
+
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
  * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
@@ -144,6 +147,17 @@ pipeline {
                         final String respJenkinsLog = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
                         def jsonJenkinsLog = new groovy.json.JsonSlurperClassic().parseText(respJenkinsLog)
 
+                        // upload unit test report if unit test fails
+                        String unitTestResult = ""
+                        if (BUILD_STEP == "Unit Test") {
+                            archiveUnitTestReport()
+                            final String unitTestUploadReponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+                            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadReponse).markdown
+
+                            String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                            unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
+                        }
+
                         // upload SDK build log if SDK build fails
                         String sdkBuildMessage = ""
                         if (BUILD_STEP == "Build SDK") {
@@ -156,7 +170,10 @@ pipeline {
                                 "<br/>Failure Stage: ${BUILD_STEP}" +
                                 "<br/>Last Commit Message: <b>${getLastCommitMessage()}</b>" +
                                 "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
-                                "<br/>Build Log: ${jsonJenkinsLog.markdown}" + sdkBuildMessage
+                                "<br/>Build Log: ${jsonJenkinsLog.markdown}" +
+                                sdkBuildMessage +
+                                unitTestResult
+
                         env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                         sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                     }
@@ -191,7 +208,8 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                             env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
                                     "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})" +
-                                    "<br/>Build Warnings: ${readBuildWarnings()}"
+                                    "<br/>Build Warnings: ${readBuildWarnings()}" +
+                                    "<br/>${UNIT_TEST_SUMMARY}"
 
                             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
@@ -209,16 +227,19 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
-
-                    getSDKBranch()
-                    sh("echo SDK_BRANCH = ${SDK_BRANCH}")
-
-                    getMEGAChatBranch()
-                    sh("echo MEGACHAT_BRANCH = ${MEGACHAT_BRANCH}")
                 }
                 gitlabCommitStatus(name: 'Preparation') {
-                    sh("rm -fv ${CONSOLE_LOG_FILE}")
-                    sh("set")
+                    script {
+                        getSDKBranch()
+                        sh("echo SDK_BRANCH = ${SDK_BRANCH}")
+
+                        getMEGAChatBranch()
+                        sh("echo MEGACHAT_BRANCH = ${MEGACHAT_BRANCH}")
+
+                        sh("rm -fv ${CONSOLE_LOG_FILE}")
+                        sh("set")
+                        sh("rm -fv unit_test_result*.zip")
+                    }
                 }
             }
         }
@@ -350,8 +371,12 @@ pipeline {
                     // Compile and run the unit tests for the app and its dependencies
                     sh "./gradlew testGmsDebugUnitTest"
 
-                    // Analyse the test results and update the build result as appropriate
-                    //junit '**/TEST-*.xml'
+                    script {
+                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                        // If UnitTest is failed, summary is collected at post.failure{} phase
+                        UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                    }
+
                 }
             }
         }
@@ -365,44 +390,7 @@ pipeline {
         //     androidLint pattern: '**/lint-results-*.xml'
         //   }
         // }
-        stage('Deploy') {
-            when {
-                allOf {
-                    expression { (!shouldSkipBuild()) }
 
-                    // Only execute this stage when building from the `beta` branch
-                    branch 'beta'
-                }
-            }
-            environment {
-                // Assuming a file credential has been added to Jenkins, with the ID 'my-app-signing-keystore',
-                // this will export an environment variable during the build, pointing to the absolute path of
-                // the stored Android keystore file.  When the build ends, the temporarily file will be removed.
-                SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
-
-                // Similarly, the value of this variable will be a password stored by the Credentials Plugin
-                SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Deploy"
-                }
-                // Build the app in release mode, and sign the APK using the environment variables
-                sh './gradlew assembleRelease'
-
-                // Archive the APKs so that they can be downloaded from Jenkins
-                archiveArtifacts '**/*.apk'
-
-                // Upload the APK to Google Play
-                androidApkUpload googleCredentialsId: 'Google Play', apkFilesPattern: '**/*-release.apk', trackName: 'beta'
-            }
-            // post {
-            //   success {
-            //     // Notify if the upload succeeded
-            //     mail to: 'beta-testers@example.com', subject: 'New build available!', body: 'Check it out!'
-            //   }
-            // }
-        }
         stage('Clean up') {
             steps {
                 script {
@@ -461,4 +449,20 @@ String wrapBuildWarnings(String rawWarning) {
     } else {
         return rawWarning.split('\n').join("<br/>")
     }
+}
+
+/**
+ * Analyse unit test report and get the summary string
+ * @return summary string of unit test
+ */
+String unitTestSummary(String testReportRoot) {
+    return sh(script:  "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
+}
+
+def archiveUnitTestReport() {
+    sh """
+        cd app/build
+        zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
+        mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
+    """
 }

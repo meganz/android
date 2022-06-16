@@ -7,15 +7,17 @@ import kotlinx.coroutines.delay
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.fragments.homepage.TypedNodesFetcher
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_VIDEO
+import mega.privacy.android.app.gallery.data.MediaCardType
+import mega.privacy.android.app.gallery.extension.formatDateTitle
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.StringUtils.formatDateTitle
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.ZoomUtil
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -23,7 +25,9 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter.ofPattern
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 /**
  * Data fetcher for fetching typed files
@@ -32,7 +36,7 @@ abstract class GalleryBaseFetcher(
     protected val context: Context,
     protected val megaApi: MegaApiAndroid,
     protected val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-    protected val zoom: Int
+    protected val zoom: Int,
 ) : TypedNodesFetcher(context, megaApi, selectedNodesMap = selectedNodesMap) {
 
     private val getPreviewNodes = mutableMapOf<MegaNode, String>()
@@ -132,7 +136,8 @@ abstract class GalleryBaseFetcher(
                         addPhotoDateTitle(
                             dateString, Pair(
                                 SimpleDateFormat("LLLL", Locale.getDefault()).format(
-                                    Date.from(modifyDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                                    Date.from(modifyDate.atStartOfDay()
+                                        .atZone(ZoneId.systemDefault()).toInstant())
                                 ),
                                 if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
                             )
@@ -147,7 +152,7 @@ abstract class GalleryBaseFetcher(
                 INVALID_POSITION,
                 INVALID_POSITION,
                 thumbnail,
-                if (node.duration == -1) TYPE_IMAGE else TYPE_VIDEO,
+                if (node.duration == -1) MediaCardType.Image else MediaCardType.Video,
                 dateString,
                 null,
                 null,
@@ -173,9 +178,9 @@ abstract class GalleryBaseFetcher(
             INVALID_POSITION,
             INVALID_POSITION,
             null,
-            TYPE_HEADER,
+            MediaCardType.Header,
             dateString,
-            date.formatDateTitle(),
+            date.formatDateTitle(context),
             null,
             false,
             uiDirty = true
@@ -183,8 +188,8 @@ abstract class GalleryBaseFetcher(
     }
 
     suspend fun getPreviewsFromServer(
-        map: MutableMap<MegaNode, String>,
-        refreshCallback: () -> Unit
+        map: Map<MegaNode, String>,
+        refreshCallback: () -> Unit,
     ) {
         for (item in map) {
             megaApi.getPreview(

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetAlbums
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
-import mega.privacy.android.app.usecase.MegaException
+import mega.privacy.android.app.usecase.exception.MegaException
 import timber.log.Timber
 import javax.inject.Inject
 

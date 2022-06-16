@@ -12,16 +12,14 @@ import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import java.io.File
 import javax.inject.Inject
 
@@ -31,12 +29,14 @@ import javax.inject.Inject
  * @property context            Context needed to get offline node files.
  * @property megaApi            Mega API needed to call node information.
  * @property megaApiFolder      Mega API folder needed to authorize node.
+ * @property megaChatApi        Mega Chat API needed to get nodes from chat messages.
  * @property databaseHandler    Database Handler needed to retrieve offline nodes.
  */
 class GetNodeUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
+    private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: DatabaseHandler
 ) {
@@ -252,12 +252,10 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.setNodeFavourite(node, isFavorite, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onComplete()
-                    } else {
-                        emitter.onError(error.toMegaException())
+                    when {
+                        emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
+                        error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                        else -> emitter.onError(error.toMegaException())
                     }
                 }
             ))

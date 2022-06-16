@@ -40,15 +40,14 @@ class PlaylistAdapter(
         return getItem(position).type
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
-        return PlaylistViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder =
+        PlaylistViewHolder(
             ItemPlaylistBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
         )
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {

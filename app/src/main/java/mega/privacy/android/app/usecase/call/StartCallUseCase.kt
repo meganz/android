@@ -11,7 +11,7 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.usecase.toMegaException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
 import mega.privacy.android.app.utils.LogUtil

@@ -6,7 +6,12 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -25,6 +30,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -106,7 +112,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         binding = FragmentAlbumContentBinding.inflate(inflater, container, false)
         adapterType = ALBUM_CONTENT_ADAPTER
@@ -182,7 +188,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
             handleOptionsMenuUpdate(it.isNotEmpty())
         }
     }
@@ -496,17 +502,17 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     updateUiWhenAnimationEnd()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 
@@ -579,7 +585,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
             colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
-            menuItem.icon,
+            menuItem.icon ?: return,
             colorRes
         )
         menuItem.isEnabled = isEnable

@@ -25,12 +25,12 @@ object MenuUtils {
      */
     fun MenuItem.setupSearchView(queryCallback: (String?) -> Unit) {
         setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                 queryCallback.invoke(null)
                 return true
             }
 
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean = true
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
         })
         (actionView as SearchView?)?.apply {
             setOnCloseListener {

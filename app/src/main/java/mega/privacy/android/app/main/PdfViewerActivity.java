@@ -61,6 +61,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -68,6 +71,12 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
@@ -95,15 +104,11 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.main.FileInfoActivity.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
@@ -154,10 +159,20 @@ import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class PdfViewerActivity extends PasscodeActivity
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener, MegaRequestListenerInterface,
         MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
+
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    MoveNodeUseCase moveNodeUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -222,13 +237,13 @@ public class PdfViewerActivity extends PasscodeActivity
     ChatController chatC;
     private long msgId = -1;
     private long chatId = -1;
-    MegaNode nodeChat;
     MegaChatMessage msgChat;
 
     boolean notChangePage = false;
-    MegaNode currentDocument;
 
     private AlertDialog takenDownDialog;
+
+    private MegaNode node;
 
     private final BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
         @Override
@@ -310,8 +325,8 @@ public class PdfViewerActivity extends PasscodeActivity
         else if (type == FILE_LINK_ADAPTER) {
             String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
             if(serialize!=null) {
-                currentDocument = MegaNode.unserialize(serialize);
-                if (currentDocument != null) {
+                node = MegaNode.unserialize(serialize);
+                if (node != null) {
                     logDebug("currentDocument NOT NULL");
                 }
                 else {
@@ -332,6 +347,7 @@ public class PdfViewerActivity extends PasscodeActivity
             }
             else {
                 fromChat = false;
+                node = megaApi.getNodeByHandle(handle);
             }
         }
 
@@ -367,7 +383,7 @@ public class PdfViewerActivity extends PasscodeActivity
                         msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                     }
                     if (msgChat != null) {
-                        nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+                        node = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                         if (isDeleteDialogShow) {
                             showConfirmationDeleteNode(chatId, msgChat);
                         }
@@ -420,16 +436,6 @@ public class PdfViewerActivity extends PasscodeActivity
                 }
 
                 if (savedInstanceState != null && ! isFolderLink) {
-                    MegaNode node;
-
-                    if (fromChat) {
-                        node = nodeChat;
-                    } else if (type == FILE_LINK_ADAPTER) {
-                        node = currentDocument;
-                    } else {
-                        node = megaApi.getNodeByHandle(handle);
-                    }
-
                     String url = null;
 
                     if (node != null) {
@@ -448,8 +454,8 @@ public class PdfViewerActivity extends PasscodeActivity
 
             if (isFolderLink){
                 logDebug("Folder link node");
-                MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
-                if (currentDocumentAuth == null){
+                node = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
+                if (node == null){
                     logWarning("CurrentDocumentAuth is null");
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming)+ ": node not authorized", -1);
                 }
@@ -457,10 +463,10 @@ public class PdfViewerActivity extends PasscodeActivity
                     logDebug("CurrentDocumentAuth is not null");
                     String url;
                     if (dbH != null && dbH.getCredentials() != null) {
-                        url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                        url = megaApi.httpServerGetLocalLink(node);
                     }
                     else {
-                        url = megaApiFolder.httpServerGetLocalLink(currentDocumentAuth);
+                        url = megaApiFolder.httpServerGetLocalLink(node);
                     }
                     if (url != null) {
                         uri = Uri.parse(url);
@@ -468,7 +474,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 }
             }
 
-            if (isOnTransferOverQuota()) {
+            if (transfersManagement.isOnTransferOverQuota()) {
                 showGeneralTransferOverQuotaWarning();
             }
         }
@@ -582,8 +588,8 @@ public class PdfViewerActivity extends PasscodeActivity
             else if (type == FILE_LINK_ADAPTER) {
                 String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
                 if(serialize!=null) {
-                    currentDocument = MegaNode.unserialize(serialize);
-                    if (currentDocument != null) {
+                    node = MegaNode.unserialize(serialize);
+                    if (node != null) {
                         logDebug("currentDocument NOT NULL");
                     }
                     else {
@@ -604,6 +610,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 }
                 else {
                     fromChat = false;
+                    node = megaApi.getNodeByHandle(handle);
                 }
             }
             handle = getIntent().getLongExtra("HANDLE", -1);
@@ -636,7 +643,7 @@ public class PdfViewerActivity extends PasscodeActivity
                             msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                         }
                         if (msgChat != null) {
-                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            node = msgChat.getMegaNodeList().get(0);
                         }
                     } else {
                         logWarning("msgId or chatId null");
@@ -647,7 +654,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
-                if (isOnTransferOverQuota()) {
+                if (transfersManagement.isOnTransferOverQuota()) {
                     showGeneralTransferOverQuotaWarning();
                 }
             }
@@ -896,12 +903,8 @@ public class PdfViewerActivity extends PasscodeActivity
             if (node != null) {
                 nodeSaver.saveOfflineNode(node, true);
             }
-        } else if (type == FILE_LINK_ADAPTER) {
-            nodeSaver.saveNode(currentDocument, false, false, true, true);
-        } else if (fromChat) {
-            nodeSaver.saveNode(nodeChat, true, false, true, true);
         } else {
-            nodeSaver.saveHandle(handle, false, isFolderLink, true, false);
+            nodeSaver.saveNode(node, fromChat, isFolderLink, true, type == FILE_LINK_ADAPTER || fromChat);
         }
     }
 
@@ -1118,7 +1121,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     chatRemoveMenuItem.setVisible(msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
                             && msgChat.isDeletable());
                 }
-                else if (nodeChat != null){
+                else if (node != null){
                     downloadMenuItem.setVisible(true);
                     if (chatC.isInAnonymousMode()) {
                         importMenuItem.setVisible(false);
@@ -1398,7 +1401,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 break;
             }
             case R.id.chat_pdf_viewer_import:{
-                if (nodeChat != null){
+                if (node != null){
                     importNode();
                 }
                 break;
@@ -1648,6 +1651,79 @@ public class PdfViewerActivity extends PasscodeActivity
         }
     }
 
+    /**
+     * Checks if there is a name collision before moving or copying the node.
+     *
+     * @param parentHandle Parent handle of the node in which the node will be moved or copied.
+     * @param type         Type of name collision to check.
+     */
+    private void checkCollision(long parentHandle, NameCollisionType type) {
+        checkNameCollisionUseCase.check(node, parentHandle, type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(collision -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            ArrayList<NameCollision> list = new ArrayList<>();
+                            list.add(collision);
+                            nameCollisionActivityContract.launch(list);
+                        },
+                        throwable -> {
+                            if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                if (type == NameCollisionType.MOVE) {
+                                    move(parentHandle);
+                                } else {
+                                    copy(parentHandle);
+                                }
+                            }
+                        });
+    }
+
+    /**
+     * Moves the node.
+     *
+     * @param parentHandle Parent handle in which the node will be moved.
+     */
+    private void move(long parentHandle) {
+        moveNodeUseCase.move(node, parentHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), MEGACHAT_INVALID_HANDLE);
+                            finish();
+                        }, throwable -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            if (!manageCopyMoveException(throwable)) {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
+                );
+    }
+
+    /**
+     * Copies the node.
+     *
+     * @param parentHandle Parent handle in which the node will be copied.
+     */
+    private void copy(long parentHandle) {
+        copyNodeUseCase.copy(node, parentHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_copied), MEGACHAT_INVALID_HANDLE);
+                        }, throwable -> {
+                            dismissAlertDialogIfExists(statusDialog);
+
+                            if (!manageCopyMoveException(throwable)) {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_copied), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
+                );
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -1666,73 +1742,42 @@ public class PdfViewerActivity extends PasscodeActivity
         }
 
         if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
-            if(!isOnline(this)){
+            if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
             final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
-            MegaNode parent = megaApi.getNodeByHandle(toHandle);
-
             AlertDialog temp;
-            try{
+            try {
                 temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
                 temp.show();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 return;
             }
             statusDialog = temp;
 
-            if (moveHandles != null) {
-                for (long moveHandle : moveHandles) {
-                    megaApi.moveNode(megaApi.getNodeByHandle(moveHandle), parent, this);
-                }
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK){
-            if(!isOnline(this)){
+            checkCollision(toHandle, NameCollisionType.MOVE);
+        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
             AlertDialog temp;
-            try{
+            try {
                 temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
                 temp.show();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 return;
             }
             statusDialog = temp;
 
-            MegaNode parent = megaApi.getNodeByHandle(toHandle);
-            if (copyHandles != null) {
-                for(int i=0; i<copyHandles.length;i++){
-                    MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                    if (cN != null){
-                        logDebug("cN != null, i = " + i + " of " + copyHandles.length);
-                        megaApi.copyNode(cN, parent, this);
-                    }
-                    else{
-                        logWarning("cN == null, i = " + i + " of " + copyHandles.length);
-                        try {
-                            statusDialog.dismiss();
-                            showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-                        }
-                        catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+            checkCollision(toHandle, NameCollisionType.COPY);
+        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
             logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
             if(!isOnline(this)||megaApi==null) {
@@ -1746,20 +1791,7 @@ public class PdfViewerActivity extends PasscodeActivity
             }
 
             final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
-            MegaNode target;
-            target = megaApi.getNodeByHandle(toHandle);
-            if(target == null){
-                target = megaApi.getRootNode();
-            }
-            logDebug("TARGET: " + target.getName() + "and handle: " + target.getHandle());
-            if (nodeChat != null) {
-                logDebug("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
-                megaApi.copyNode(nodeChat, target, this);
-            }
-            else{
-                logError("DOCUMENT: null");
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-            }
+            checkCollision(toHandle, NameCollisionType.COPY);
         }
     }
 
@@ -1890,51 +1922,6 @@ public class PdfViewerActivity extends PasscodeActivity
                 MegaApplication.setLoggingIn(false);
                 download();
             }
-        } else if (request.getType() == MegaRequest.TYPE_MOVE) {
-            logDebug("Move nodes request finished");
-
-            if (e.getErrorCode() == MegaError.API_OK) {
-                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
-                finish();
-            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
-                showForeignStorageOverQuotaWarningDialog(this);
-            } else {
-                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
-            }
-        } else if (request.getType() == MegaRequest.TYPE_COPY) {
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-            }
-            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                if (api.isForeignNode(request.getParentHandle())) {
-                    showForeignStorageOverQuotaWarningDialog(this);
-                    return;
-                }
-
-                logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                Intent intent = new Intent(this, ManagerActivity.class);
-                intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                startActivity(intent);
-                finish();
-            }
-            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
-                Intent intent = new Intent(this, ManagerActivity.class);
-                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                startActivity(intent);
-                finish();
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-            }
-            logDebug("Copy nodes request finished");
         }
     }
 

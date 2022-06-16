@@ -39,6 +39,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -47,7 +48,6 @@ import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
@@ -278,7 +278,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
-            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked,
+            requireContext(),
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
@@ -430,7 +431,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 order = viewModel.getOrder()
             }
 
-            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
+            actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != MediaCardType.Header })
 
             updateOptionsButtons()
 
@@ -892,21 +893,21 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         }
     }
 
-    override fun onCardClicked(position: Int, card: GalleryCard) {
+    override fun onCardClicked(card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                val photoPosition = gridAdapter.getNodePosition(card.id)
                 layoutManager.scrollToPosition(photoPosition)
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(card))
             }
         }
 
@@ -930,26 +931,13 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
-                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
                 val childrenNodes = viewModel.getItemsHandle()
-                val intent = when (adapterType) {
-                    Constants.ALBUM_CONTENT_ADAPTER, Constants.PHOTOS_BROWSE_ADAPTER -> {
-                        ImageViewerActivity.getIntentForChildren(
-                            requireContext(),
-                            childrenNodes,
-                            nodeHandle
-                        )
-                    }
-                    else -> {
-                        ImageViewerActivity.getIntentForParentNode(
-                            requireContext(),
-                            parentNodeHandle,
-                            getOrder(),
-                            nodeHandle
-                        )
-                    }
-                }
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    childrenNodes,
+                    nodeHandle
+                )
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
@@ -1028,17 +1016,17 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     updateUiWhenAnimationEnd()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 
@@ -1117,7 +1105,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
-            menuItem.icon,
+            menuItem.icon ?: return,
             colorRes
         )
         menuItem.isEnabled = isEnable
