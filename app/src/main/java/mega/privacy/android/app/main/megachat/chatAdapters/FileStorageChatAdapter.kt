@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.databinding.ItemFileStorageBinding
+import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.databinding.ItemFileStorageCameraBinding
+import mega.privacy.android.app.databinding.ItemFileStorageImageBinding
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
@@ -18,8 +20,13 @@ class FileStorageChatAdapter(
     private val onTakePictureCallback: () -> Unit,
     private val onClickItemCallback: (FileGalleryItem) -> Unit,
     private val onLongClickItemCallback: (FileGalleryItem) -> Unit,
-    private val lifecycleOwner: LifecycleOwner,
-) : ListAdapter<FileGalleryItem, FileStorageChatHolder>(FileGalleryItem.DiffCallback()) {
+    private val customLifecycle: LifecycleOwner,
+) : ListAdapter<FileGalleryItem, RecyclerView.ViewHolder>(FileGalleryItem.DiffCallback()) {
+
+    companion object {
+        private const val VIEW_TYPE_CAMERA = 0
+        private const val VIEW_TYPE_IMAGE = 1
+    }
 
     init {
         setHasStableIds(true)
@@ -33,34 +40,51 @@ class FileStorageChatAdapter(
      *
      * @return Holder FileStorageChatHolder
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageChatHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemFileStorageBinding.inflate(layoutInflater, parent, false)
-        return FileStorageChatHolder(binding, lifecycleOwner).apply {
-            binding.root.setOnLongClickListener {
-                if (isValidPosition(bindingAdapterPosition) && bindingAdapterPosition != 0) {
-                    val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
-                    onLongClickItemCallback.invoke(file)
-                }
-                true
-            }
-            binding.root.setOnClickListener {
-                if (isValidPosition(bindingAdapterPosition)) {
-                    if (bindingAdapterPosition == 0) {
-                        onTakePictureCallback.invoke()
-                    } else {
-                        val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
-                        onClickItemCallback.invoke(file)
+        return when (viewType) {
+            VIEW_TYPE_CAMERA -> {
+                val binding = ItemFileStorageCameraBinding.inflate(layoutInflater, parent, false)
+                FileStorageChatCameraViewHolder(binding).apply {
+                    binding.lifecycleOwner = customLifecycle
+                    binding.root.setOnClickListener {
+                        if (isValidPosition(bindingAdapterPosition)) {
+                            onTakePictureCallback.invoke()
+                        }
+                    }
+                    binding.takePictureButton.setOnClickListener {
+                        if (isValidPosition(bindingAdapterPosition)) {
+                            onTakePictureCallback.invoke()
+                        }
                     }
                 }
             }
-            binding.takePictureButton.setOnClickListener {
-                if (isValidPosition(bindingAdapterPosition)) {
-                    onTakePictureCallback.invoke()
+            else -> {
+                val binding = ItemFileStorageImageBinding.inflate(layoutInflater, parent, false)
+                FileStorageChatImageViewHolder(binding).apply {
+                    binding.root.setOnLongClickListener {
+                        if (isValidPosition(bindingAdapterPosition)) {
+                            val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
+                            onLongClickItemCallback.invoke(file)
+                        }
+                        true
+                    }
+                    binding.root.setOnClickListener {
+                        if (isValidPosition(bindingAdapterPosition)) {
+                            val file = (getItem(bindingAdapterPosition) as FileGalleryItem)
+                            onClickItemCallback.invoke(file)
+                        }
+                    }
                 }
             }
         }
     }
+
+    override fun getItemViewType(position: Int): Int =
+        when (position) {
+            0 -> VIEW_TYPE_CAMERA
+            else -> VIEW_TYPE_IMAGE
+        }
 
     /**
      * Bind view for the File storage chat toolbar.
@@ -68,8 +92,12 @@ class FileStorageChatAdapter(
      * @param holder FileStorageChatHolder
      * @param position Item position
      */
-    override fun onBindViewHolder(holder: FileStorageChatHolder, position: Int) {
-        holder.bind(getItem(position), position)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = getItem(position)
+        when (getItemViewType(position)) {
+            VIEW_TYPE_CAMERA -> (holder as FileStorageChatCameraViewHolder).bind(item.hasCameraPermissions ?: false)
+            else -> (holder as FileStorageChatImageViewHolder).bind(item)
+        }
     }
 
     /**
@@ -80,5 +108,4 @@ class FileStorageChatAdapter(
      */
     override fun getItemId(position: Int): Long =
         getItem(position).id
-
 }

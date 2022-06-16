@@ -74,7 +74,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:choiceMode="multipleChoice"
+                android:orientation="horizontal"
                 android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:scrollbars="horizontal"
                 android:visibility="visible"
                 tools:listitem="@layout/item_file_storage" />

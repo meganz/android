@@ -10,8 +10,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -22,8 +20,9 @@ import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActio
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 
 /**
@@ -135,14 +134,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Setup recycler view
      */
     private fun setupView() {
-        val mLayoutManager: RecyclerView.LayoutManager =
-            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
-
         binding.list.apply {
             clipToPadding = false
             setHasFixedSize(true)
             itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-            layoutManager = mLayoutManager
             adapter = filesAdapter
         }
     }
