@@ -1,15 +1,35 @@
 package mega.privacy.android.app.presentation.manager
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.ManagerState
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaUser
+import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,6 +38,9 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
+ * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
+ * @param getBrowserChildrenNode Fetch the browser nodes
+ * @param getRootFolder Fetch the root node
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -25,6 +48,7 @@ class ManagerViewModel @Inject constructor(
     monitorGlobalUpdates: MonitorGlobalUpdates,
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
+    private val getRootFolder: GetRootFolder,
 ) : ViewModel() {
 
     /**
@@ -112,6 +136,19 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(_uiState.value.browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    /**
+     * Get the browser parent handle
+     * If not previously set, set the browser parent handle to root handle
+     *
+     * @return the handle of the browser section
+     */
+    fun getBrowserParentHandle(): Long = runBlocking {
+        if (_uiState.value.browserParentHandle == -1L) {
+            setBrowserParentHandle(getRootFolder()?.handle ?: INVALID_HANDLE)
+        }
+        return@runBlocking _uiState.value.browserParentHandle
+    }
 
     /**
      * Set the current browser parent handle to the UI state

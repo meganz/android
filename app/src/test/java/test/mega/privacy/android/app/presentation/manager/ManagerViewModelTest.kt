@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -32,6 +33,7 @@ class ManagerViewModelTest {
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
+    private val getRootFolder = mock<GetRootFolder>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -49,7 +51,8 @@ class ManagerViewModelTest {
             monitorNodeUpdates,
             monitorGlobalUpdates,
             getRubbishBinNodeByHandle,
-            getBrowserNodeByHandle
+            getBrowserNodeByHandle,
+            getRootFolder
         )
     }
 
@@ -89,7 +92,7 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() = runTest {
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
+        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle, getRootFolder)
 
         underTest.updateContactsRequests.test().assertNoValue()
     }

@@ -680,7 +680,7 @@ public class SearchFragment extends RotatableFragment {
 
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
-				return ((ManagerActivity) context).getParentHandleBrowser();
+				return managerViewModel.getBrowserParentHandle();
 
 			case SHARED_ITEMS:
 				switch (managerViewModel.getUiState().getValue().getSearchSharedTab()) {

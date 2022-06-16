@@ -6809,12 +6809,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public long getParentHandleBrowser() {
-        if (viewModel.getUiState().getValue().getBrowserParentHandle() == -1) {
-            MegaNode rootNode = megaApi.getRootNode();
-            viewModel.setBrowserParentHandle(rootNode != null ? rootNode.getParentHandle() : viewModel.getUiState().getValue().getBrowserParentHandle());
-        }
-
-        return viewModel.getUiState().getValue().getBrowserParentHandle();
+        return viewModel.getBrowserParentHandle();
     }
 
     private long getCurrentParentHandle() {
@@ -6826,7 +6821,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 parentHandle = megaApi.getRootNode().getHandle();
                 break;
             case CLOUD_DRIVE:
-                parentHandle = getParentHandleBrowser();
+                parentHandle = viewModel.getBrowserParentHandle();
                 break;
 
             case INBOX:
@@ -6857,7 +6852,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (viewModel.getUiState().getValue().getSearchDrawerItem() != null) {
                     switch (viewModel.getUiState().getValue().getSearchDrawerItem()) {
                         case CLOUD_DRIVE:
-                            parentHandle = getParentHandleBrowser();
+                            parentHandle = viewModel.getBrowserParentHandle();
                             break;
                         case SHARED_ITEMS:
                             switch (viewModel.getUiState().getValue().getSearchSharedTab()) {
