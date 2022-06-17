@@ -29,7 +29,8 @@ import javax.inject.Inject
 class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase
+    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
+    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase
 ) {
 
     companion object {
@@ -59,38 +60,66 @@ class GetCallSoundsUseCase @Inject constructor(
         Flowable.create({ emitter ->
             val disposable = CompositeDisposable()
 
+            getCallStatusChangesUseCase.getReconnectingStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        if (it) {
+                            emitter.onNext(CallSoundType.CALL_RECONNECTING)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                ).addTo(disposable)
+
+            getCallStatusChangesUseCase.callCannotBeRecovered()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        if (it) {
+                            emitter.onNext(CallSoundType.CALL_ENDED)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                ).addTo(disposable)
+
             getSessionStatusChangesUseCase.getSessionChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { result ->
+                    onNext = { (call1, sessionStatus, isRecoverable, peerId, clientId) ->
                         val participant =
-                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
+                            ParticipantInfo(peerId = peerId, clientId = clientId)
 
-                        when (result.sessionStatus) {
+                        when (sessionStatus) {
                             MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                                result.call?.let { call ->
+                                call1?.let { call ->
                                     stopCountDown(call.chatid, participant)
                                 }
                             }
 
                             MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                result.isRecoverable?.let { isRecoverableSession ->
-                                    if (result.call == null) {
+                                isRecoverable?.let { isRecoverableSession ->
+                                    if (call1 == null) {
                                         stopCountDown(INVALID_HANDLE, participant)
                                         emitter.onNext(CallSoundType.CALL_ENDED)
                                     } else if (isRecoverableSession) {
                                         emitter.startCountDown(
-                                            result.call, participant,
+                                            call1, participant,
                                             SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
                                         )
                                     } else {
                                         stopCountDown(
-                                            result.call.chatid,
+                                            call1.chatid,
                                             participant
                                         )
 
-                                        megaChatApi.getChatRoom(result.call.chatid)
+                                        megaChatApi.getChatRoom(call1.chatid)
                                             ?.let { chat ->
                                                 if (!chat.isGroup && !chat.isMeeting) {
                                                     emitter.onNext(CallSoundType.CALL_ENDED)

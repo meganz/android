@@ -24,7 +24,8 @@ class CallSoundsController {
      * @param type CallSoundType
      */
     fun playSound(type: CallSoundType) {
-        audioManager = MegaApplication.getInstance().baseContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager =
+            MegaApplication.getInstance().baseContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (mMediaPlayer == null)
             mMediaPlayer = MediaPlayer()
 
@@ -38,6 +39,7 @@ class CallSoundsController {
                 CallSoundType.CALL_ENDED -> playSpecificSound(res.openRawResourceFd(R.raw.end_call))
                 CallSoundType.PARTICIPANT_JOINED_CALL -> playSpecificSound(res.openRawResourceFd(R.raw.join_call))
                 CallSoundType.PARTICIPANT_LEFT_CALL -> playSpecificSound(res.openRawResourceFd(R.raw.left_call))
+                CallSoundType.CALL_RECONNECTING -> playSpecificSound(res.openRawResourceFd(R.raw.reconnecting))
             }
         }
     }
@@ -49,16 +51,18 @@ class CallSoundsController {
      */
     fun playSpecificSound(afd: AssetFileDescriptor) {
         audioManager?.apply {
-            setStreamVolume(AudioManager.STREAM_VOICE_CALL, getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0)
+            setStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                getStreamVolume(AudioManager.STREAM_VOICE_CALL),
+                0)
         }
 
         mMediaPlayer?.apply {
             isLooping = false
             setAudioAttributes(
-                    AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION_SIGNALLING)
-                            .build()
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION_SIGNALLING)
+                    .build()
             )
         }
 
@@ -70,9 +74,9 @@ class CallSoundsController {
             afd.let {
                 mMediaPlayer?.reset()
                 mMediaPlayer?.setDataSource(
-                        it.fileDescriptor,
-                        it.startOffset,
-                        it.length
+                    it.fileDescriptor,
+                    it.startOffset,
+                    it.length
                 )
 
                 mMediaPlayer?.prepareAsync()
