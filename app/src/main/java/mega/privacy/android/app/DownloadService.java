@@ -1173,6 +1173,8 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 			}
 
 			if (transfer.getType() == TYPE_DOWNLOAD) {
+				transfersManagement.checkScanningTransferOnFinish(transfer);
+
 				boolean isVoiceClip = isVoiceClipType(transfer);
 				boolean isBackgroundTransfer = isBackgroundTransfer(transfer);
 
