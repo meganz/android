@@ -113,11 +113,9 @@ class PhotosFragment : BaseFragment() {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
                         mManagerActivity.fromAlbumContent = false
-                        if (PhotosFilterAndSortToggle.enabled) {
-                            showHideABSubtitle(false)
-                        }
                         with(timelineFragment) {
                             if (PhotosFilterAndSortToggle.enabled) {
+                                showHideABSubtitle(isFilterAllPhotos())
                                 setActionBarSubtitleText(Util.adjustForLargeFont(getCurrentFilter()))
                                 actionBar.customView.findViewById<View>(R.id.ab_container)
                                     .setOnClickListener {
@@ -135,7 +133,7 @@ class PhotosFragment : BaseFragment() {
                     } else {
                         tabIndex = ALBUM_INDEX
                         if (PhotosFilterAndSortToggle.enabled) {
-                            showHideABSubtitle(false)
+                            showHideABSubtitle(true)
                         }
                         with(mManagerActivity) {
                             updateCUViewTypes(View.GONE)

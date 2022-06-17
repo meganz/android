@@ -56,6 +56,7 @@ import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_ALL_PHOTOS
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_LANDSCAPE
@@ -1342,9 +1343,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             DialogInterface.OnClickListener { dialog, item ->
                 itemsAdapter.getItem(item)?.let {
                     viewModel.setCurrentFilter(item)
-                    photosFragment.setActionBarSubtitleText(Util.adjustForLargeFont(
-                        it
-                    ))
+                    with(photosFragment) {
+                        setActionBarSubtitleText(Util.adjustForLargeFont(
+                            it
+                        ))
+                        showHideABSubtitle(isFilterAllPhotos())
+                    }
                 }
                 dialog.dismiss()
             })
@@ -1404,5 +1408,9 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      */
     fun getCurrentFilter(): String {
         return viewModel.getCurrentFilterAsString()
+    }
+
+    fun isFilterAllPhotos(): Boolean {
+        return viewModel.getCurrentFilter() == FILTER_ALL_PHOTOS
     }
 }
