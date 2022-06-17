@@ -2586,7 +2586,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             hideCallWillEndInBanner()
         }
 
-        onlyMeDialog = MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+        onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
             .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
             .setView(dialogLayout)

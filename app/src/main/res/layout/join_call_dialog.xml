@@ -16,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:textAppearance="@style/MaterialAlertDialog.MaterialComponents.Title.Text"
             android:visibility="gone"/>
         <TextView
             android:id="@+id/description_call_dialog"
@@ -24,6 +25,7 @@
             android:paddingTop="15dp"
             android:layout_gravity="start"
             android:layout_marginBottom="31dp"
+            android:textAppearance="@style/MaterialAlertDialog.MaterialComponents.Body.Text"
             android:visibility="gone"/>
 
         <LinearLayout
