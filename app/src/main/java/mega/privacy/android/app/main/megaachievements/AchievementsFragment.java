@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
+import static mega.privacy.android.app.data.extensions.SizeStringKt.getBigFormattedStorageString;
 import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.INVALID_TYPE;
 import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
@@ -64,7 +65,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	private ImageView addPhoneIcon;
 	private ImageView referralBonusIcon;
 
-	private TextView figureUnlockedRewardStorage, figureUnlockedRewardStorageUnit;
+	private TextView figureUnlockedRewardStorage;
 
 	private TextView figureReferralBonusesStorage;
 
@@ -179,10 +180,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		String storageSpaceString = getString(R.string.storage_space);
 		storageSpaceString = storageSpaceString.toLowerCase(Locale.getDefault());
 
-		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
-		figureUnlockedRewardStorageUnit = v.findViewById(R.id.unlocked_storage_unit);
-
-		figureUnlockedRewardStorage.setText(getSizeString(0));
+		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage);
+		figureUnlockedRewardStorage.setText(getBigFormattedStorageString(0));
 
 		figureReferralBonusesStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_referral);
 		figureReferralBonusesStorage.setText(getSizeString(0));
@@ -578,19 +577,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		long storageQuota = details.currentStorage();
 
 		logDebug("My calculated totalTransfer: " + totalStorage);
-		String sizeString = getSizeString(storageQuota);
-		figureUnlockedRewardStorage.setText(getNumberAndUnit(sizeString)[0]);
-		figureUnlockedRewardStorageUnit.setText(getNumberAndUnit(sizeString)[1]);
+		figureUnlockedRewardStorage.setText(getBigFormattedStorageString(storageQuota));
 
 		logDebug("My calculated totalTransfer: " + totalTransfer);
 	}
-
-    private String[] getNumberAndUnit(String sizeString) {
-        if (sizeString == null || !sizeString.contains(" ")) {
-            return new String[]{"", ""};
-        }
-        return sizeString.split(" ");
-    }
 
 	@Override
 	public void onAchievementsReceived() {
