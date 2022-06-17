@@ -5259,17 +5259,22 @@ public class ChatActivity extends PasscodeActivity
                             if (m.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if (nodeList.size() == 1) {
-                                    getNodeUseCase.get(nodeList.get(0).getHandle())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe((result, throwable) -> {
-                                                if (throwable == null) {
-                                                    MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
-                                                    nodeAttachmentClicked(node, m.getMessage().getMsgId(), screenPosition, positionInMessages);
-                                                } else {
-                                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_file_not_available), MEGACHAT_INVALID_HANDLE);
-                                                }
-                                            });
+                                    if (m.getMessage().getUserHandle() == myUserHandle) {
+                                        getNodeUseCase.get(nodeList.get(0).getHandle())
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe((result, throwable) -> {
+                                                    if (throwable == null) {
+                                                        MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
+                                                        nodeAttachmentClicked(node, m.getMessage().getMsgId(), screenPosition, positionInMessages);
+                                                    } else {
+                                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_file_not_available), MEGACHAT_INVALID_HANDLE);
+                                                    }
+                                                });
+                                    } else {
+                                        MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
+                                        nodeAttachmentClicked(node, m.getMessage().getMsgId(), screenPosition, positionInMessages);
+                                    }
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
