@@ -14,13 +14,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -37,6 +41,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     private val rootNodeExists: RootNodeExists,
+    private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
 ) : ViewModel() {
 
@@ -137,11 +142,9 @@ class SearchViewModel @Inject constructor(
      * Perform a search request
      *
      * @param managerState the manager UI state of the ManagerViewModel
-     * @param parentHandleForSearch
      */
     fun performSearch(
         managerState: ManagerState,
-        parentHandleForSearch: Long,
     ) = viewModelScope.launch {
         if (!rootNodeExists()) {
             Timber.e("Root node is null.")
@@ -154,6 +157,7 @@ class SearchViewModel @Inject constructor(
         val query = uiState.value.searchQuery
         val parentHandleSearch = uiState.value.searchParentHandle
         val drawerItem = managerState.searchDrawerItem
+        val parentHandle = getParentHandleForSearch(managerState)
         val sharesTab = managerState.searchSharedTab
         val isFirstNavigationLevel = managerState.isFirstNavigationLevel
 
@@ -163,7 +167,7 @@ class SearchViewModel @Inject constructor(
             searchNodesUseCase.get(
                 query,
                 parentHandleSearch,
-                parentHandleForSearch,
+                parentHandle,
                 TYPE_GENERAL,
                 token,
                 drawerItem,
@@ -175,6 +179,27 @@ class SearchViewModel @Inject constructor(
                 .subscribe { nodes, _ ->
                     finishSearch(nodes ?: emptyList())
                 }
+        }
+    }
+
+    /**
+     * Get the parent handle from where the search is performed
+     *
+     * @param managerState the UI manager state of the ManagerViewModel
+     */
+    private suspend fun getParentHandleForSearch(managerState: ManagerState): Long {
+        return when (managerState.searchDrawerItem) {
+            DrawerItem.CLOUD_DRIVE -> managerState.browserParentHandle
+            DrawerItem.SHARED_ITEMS ->
+                when (managerState.searchSharedTab) {
+                    ManagerActivity.OUTGOING_TAB -> managerState.outgoingParentHandle
+                    ManagerActivity.LINKS_TAB -> managerState.linksParentHandle
+                    ManagerActivity.INCOMING_TAB -> managerState.incomingParentHandle
+                    else -> managerState.incomingParentHandle
+                }
+            DrawerItem.RUBBISH_BIN -> managerState.rubbishBinParentHandle
+            DrawerItem.INBOX -> managerState.inboxParentHandle
+            else -> getRootFolder()?.handle ?: INVALID_HANDLE
         }
     }
 

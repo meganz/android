@@ -2,9 +2,6 @@ package mega.privacy.android.app.main.managerSections;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.utils.CloudStorageOptionControlUtil.MAX_ACTION_COUNT;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
@@ -93,7 +90,6 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
@@ -663,45 +659,11 @@ public class SearchFragment extends RotatableFragment {
 		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_SEARCH);
 	}
 
-	public void newSearchNodesTask() {
-		viewModel.performSearch(
-				managerViewModel.getUiState().getValue(),
-				getParentHandleForSearch(
-						managerViewModel.getUiState().getValue().getSearchDrawerItem()
-				)
-		);
-	}
-
-	private long getParentHandleForSearch(DrawerItem drawerItem) {
-		if (drawerItem == null) {
-			logWarning("DrawerItem is null.");
-			return megaApi.getRootNode().getHandle();
-		}
-
-		switch (drawerItem) {
-			case CLOUD_DRIVE:
-				return managerViewModel.getBrowserParentHandle();
-
-			case SHARED_ITEMS:
-				switch (managerViewModel.getUiState().getValue().getSearchSharedTab()) {
-					case OUTGOING_TAB:
-						return managerViewModel.getUiState().getValue().getOutgoingParentHandle();
-					case LINKS_TAB:
-						return managerViewModel.getUiState().getValue().getLinksParentHandle();
-					case INCOMING_TAB:
-					default:
-						return managerViewModel.getUiState().getValue().getIncomingParentHandle();
-				}
-
-			case RUBBISH_BIN:
-				return managerViewModel.getUiState().getValue().getRubbishBinParentHandle();
-
-			case INBOX:
-				return managerViewModel.getUiState().getValue().getInboxParentHandle();
-
-			default:
-				return megaApi.getRootNode().getHandle();
-		}
+	/**
+	 * Perform a new search
+	 */
+	private void newSearchNodesTask() {
+		viewModel.performSearch(managerViewModel.getUiState().getValue());
 	}
 
 	private void updateSearchProgressView(boolean inProgress) {

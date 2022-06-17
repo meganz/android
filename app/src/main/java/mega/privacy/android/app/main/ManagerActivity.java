@@ -5173,9 +5173,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         searchViewModel.setTextSubmitted(false);
                     } else {
                         searchViewModel.setSearchQuery(newText);
-                        if (getSearchFragment() != null) {
-                            searchFragment.newSearchNodesTask();
-                        }
+                        searchViewModel.performSearch(viewModel.getUiState().getValue());
                     }
                 }
                 return true;
@@ -5343,9 +5341,7 @@ public class ManagerActivity extends TransfersManagementActivity
         selectDrawerItem(drawerItem);
         resetActionBar(aB);
 
-        if (searchFragment != null) {
-            searchFragment.newSearchNodesTask();
-        }
+        searchViewModel.performSearch(viewModel.getUiState().getValue());
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {

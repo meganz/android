@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.presentation.search.SearchViewModel
@@ -26,6 +27,7 @@ class SearchViewModelTest {
 
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
     private val rootNodeExists = mock<RootNodeExists>()
+    private val getRootFolder = mock<GetRootFolder>()
     private val searchNodesUseCase = mock<SearchNodesUseCase>()
 
     @get:Rule
@@ -43,6 +45,7 @@ class SearchViewModelTest {
         underTest = SearchViewModel(
             monitorNodeUpdates,
             rootNodeExists,
+            getRootFolder,
             searchNodesUseCase
         )
     }
