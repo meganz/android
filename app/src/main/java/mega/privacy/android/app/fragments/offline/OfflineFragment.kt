@@ -17,7 +17,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +45,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.*
-import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
@@ -79,7 +77,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
-    private val managerViewModel by activityViewModels<ManagerViewModel>()
 
     private var recyclerView: RecyclerView? = null
     private var listDivider: PositionDividerItemDecoration? = null
