@@ -498,11 +498,11 @@ class TransfersManagement @Inject constructor(
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    if (isFolder) {
+                    if (!isFolder || megaApi.getTransferByTag(transfer.tag) == null) {
+                        removeProcessedScanningTransfer()
+                    } else {
                         transferTag = transfer.tag
                         transferStage = transfer.stage
-                    } else {
-                        removeProcessedScanningTransfer()
                     }
                 }
 
@@ -525,7 +525,9 @@ class TransfersManagement @Inject constructor(
 
         for (data in scanningTransfers) {
             if (data.isTheSameFolderTransfer(transfer)) {
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES) {
+                if (transfer.stage >= STAGE_TRANSFERRING_FILES
+                    || megaApi.getTransferByTag(transfer.tag) == null
+                ) {
                     data.removeProcessedScanningTransfer()
                 } else {
                     data.transferStage = transfer.stage
