@@ -7,8 +7,6 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
-import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -30,9 +28,7 @@ import org.mockito.kotlin.mock
 object TestManagerUseCases {
 
     @Provides
-    fun bindMonitorGlobalUpdates() = mock<MonitorGlobalUpdates>() {
-        on { run { invoke() } }.thenReturn(flowOf(any()))
-    }
+    fun bindMonitorGlobalUpdates() = mock<MonitorGlobalUpdates>()
 
     @Provides
     fun bindMonitorNodeUpdates() = mock<MonitorNodeUpdates> {
@@ -40,16 +36,14 @@ object TestManagerUseCases {
     }
 
     @Provides
-    fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode) =
-        mock<GetRubbishBinChildrenNode> {
-            on { runBlocking { invoke(0) } }.thenReturn(emptyList())
-        }
+    fun bindRubbishBinChildrenNode() = mock<GetRubbishBinChildrenNode> {
+        on { runBlocking { invoke(0) } }.thenReturn(emptyList())
+    }
 
     @Provides
-    fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode) =
-        mock<GetBrowserChildrenNode> {
-            on { runBlocking { invoke(0) } }.thenReturn(emptyList())
-        }
+    fun bindBrowserChildrenNode() = mock<GetBrowserChildrenNode> {
+        on { runBlocking { invoke(0) } }.thenReturn(emptyList())
+    }
 
     @Provides
     fun bindGetRootFolder() = mock<GetRootFolder> {
