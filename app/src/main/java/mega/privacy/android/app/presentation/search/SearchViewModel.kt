@@ -48,19 +48,19 @@ class SearchViewModel @Inject constructor(
     /**
      * private UI state
      */
-    private val _uiState = MutableStateFlow(initializeState())
+    private val _state = MutableStateFlow(initializeState())
 
     /**
      * public UI State
      */
-    val uiState: StateFlow<SearchState> = _uiState
+    val state: StateFlow<SearchState> = _state
 
     /**
      * Temporary live data that can be observed from the search fragment
      * Should be replace by directly observing uiState flow
      * after migrating SearchFragment to kotlin
      */
-    val uiStateLiveData = _uiState.map { Event(it) }.asLiveData()
+    val stateLiveData = _state.map { Event(it) }.asLiveData()
 
     /**
      * Monitor global node updates
@@ -82,7 +82,7 @@ class SearchViewModel @Inject constructor(
      * Set the current search parent handle
      */
     fun setSearchParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(searchParentHandle = handle) }
+        _state.update { it.copy(searchParentHandle = handle) }
     }
 
     /**
@@ -91,7 +91,7 @@ class SearchViewModel @Inject constructor(
      * @param submitted
      */
     fun setTextSubmitted(submitted: Boolean) = viewModelScope.launch {
-        _uiState.update { it.copy(textSubmitted = submitted) }
+        _state.update { it.copy(textSubmitted = submitted) }
     }
 
     /**
@@ -99,7 +99,7 @@ class SearchViewModel @Inject constructor(
      *
      * @return true if the query is not null and not empty
      */
-    fun isSearchQueryValid(): Boolean = !_uiState.value.searchQuery.isNullOrEmpty()
+    fun isSearchQueryValid(): Boolean = !_state.value.searchQuery.isNullOrEmpty()
 
     /**
      * Set the current search query
@@ -107,35 +107,35 @@ class SearchViewModel @Inject constructor(
      * @param query the query to set
      */
     fun setSearchQuery(query: String) = viewModelScope.launch {
-        _uiState.update { it.copy(searchQuery = query) }
+        _state.update { it.copy(searchQuery = query) }
     }
 
     /**
      * Reset the search query an empty string
      */
     fun resetSearchQuery() = viewModelScope.launch {
-        _uiState.update { it.copy(searchQuery = "") }
+        _state.update { it.copy(searchQuery = "") }
     }
 
     /**
      * Reset the search level to initial value
      */
     fun resetSearchDepth() = viewModelScope.launch {
-        _uiState.update { it.copy(searchDepth = -1) }
+        _state.update { it.copy(searchDepth = -1) }
     }
 
     /**
      * Decrease by 1 the search depth
      */
     fun decreaseSearchDepth() = viewModelScope.launch {
-        _uiState.update { it.copy(searchDepth = it.searchDepth - 1) }
+        _state.update { it.copy(searchDepth = it.searchDepth - 1) }
     }
 
     /**
      * Increase by 1 the search depth
      */
     fun increaseSearchDepth() = viewModelScope.launch {
-        _uiState.update { it.copy(searchDepth = it.searchDepth + 1) }
+        _state.update { it.copy(searchDepth = it.searchDepth + 1) }
     }
 
     /**
@@ -154,8 +154,8 @@ class SearchViewModel @Inject constructor(
         //stop from query for empty string.
         setTextSubmitted(true)
 
-        val query = uiState.value.searchQuery
-        val parentHandleSearch = uiState.value.searchParentHandle
+        val query = state.value.searchQuery
+        val parentHandleSearch = state.value.searchParentHandle
         val drawerItem = managerState.searchDrawerItem
         val parentHandle = getParentHandleForSearch(managerState)
         val sharesTab = managerState.searchSharesTab.ordinal
@@ -237,7 +237,7 @@ class SearchViewModel @Inject constructor(
      * @param nodes a list of nodes to set
      */
     private fun setNodes(nodes: List<MegaNode>?) = viewModelScope.launch {
-        _uiState.update { it.copy(nodes = nodes) }
+        _state.update { it.copy(nodes = nodes) }
     }
 
     /**
@@ -246,7 +246,7 @@ class SearchViewModel @Inject constructor(
      * @param isInProgress true if a search request is in progress
      */
     private fun setIsInSearchProgress(isInProgress: Boolean) = viewModelScope.launch {
-        _uiState.update { it.copy(isInProgress = isInProgress) }
+        _state.update { it.copy(isInProgress = isInProgress) }
     }
 
     /**

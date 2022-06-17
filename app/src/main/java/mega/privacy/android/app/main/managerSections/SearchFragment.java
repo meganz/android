@@ -537,7 +537,7 @@ public class SearchFragment extends RotatableFragment {
 					return null;
 				})
 		);
-		viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(),
+		viewModel.getStateLiveData().observe(getViewLifecycleOwner(),
 				new EventObserver<>(state -> {
 					updateSearchProgressView(state.isInProgress());
 					if (state.getNodes() != null) {
@@ -590,7 +590,7 @@ public class SearchFragment extends RotatableFragment {
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						viewModel.getUiState().getValue().getSearchParentHandle(), recyclerView,
+						viewModel.getState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
@@ -624,7 +624,7 @@ public class SearchFragment extends RotatableFragment {
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						viewModel.getUiState().getValue().getSearchParentHandle(), recyclerView,
+						viewModel.getState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
@@ -650,7 +650,7 @@ public class SearchFragment extends RotatableFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		String query = viewModel.getUiState().getValue().getSearchQuery();
+		String query = viewModel.getState().getValue().getSearchQuery();
 		if (isAdded() && query != null) {
 			newSearchNodesTask();
 			((ManagerActivity) context).showFabButton();
@@ -663,7 +663,7 @@ public class SearchFragment extends RotatableFragment {
 	 * Perform a new search
 	 */
 	private void newSearchNodesTask() {
-		viewModel.performSearch(managerViewModel.getUiState().getValue());
+		viewModel.performSearch(managerViewModel.getState().getValue());
 	}
 
 	private void updateSearchProgressView(boolean inProgress) {
@@ -778,9 +778,9 @@ public class SearchFragment extends RotatableFragment {
 					}
                     mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					mediaIntent.putExtra("position", position);
-					mediaIntent.putExtra("searchQuery", viewModel.getUiState().getValue().getSearchQuery());
+					mediaIntent.putExtra("searchQuery", viewModel.getState().getValue().getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (viewModel.getUiState().getValue().getSearchParentHandle() == -1L){
+					if (viewModel.getState().getValue().getSearchParentHandle() == -1L){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -1007,11 +1007,11 @@ public class SearchFragment extends RotatableFragment {
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 		viewModel.cancelSearch();
-		int levelSearch = viewModel.getUiState().getValue().getSearchDepth();
+		int levelSearch = viewModel.getState().getValue().getSearchDepth();
 
 		if (levelSearch >= 0) {
 			if (levelSearch > 0) {
-				MegaNode node = megaApi.getNodeByHandle(viewModel.getUiState().getValue().getSearchParentHandle());
+				MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getSearchParentHandle());
 
 				if (node == null) {
 					viewModel.setSearchParentHandle(-1L);
@@ -1103,14 +1103,14 @@ public class SearchFragment extends RotatableFragment {
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			if (viewModel.getUiState().getValue().getSearchParentHandle() == -1L) {
+			if (viewModel.getState().getValue().getSearchParentHandle() == -1L) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				emptyTextViewFirst.setText(R.string.no_results_found);
-			} else if (megaApi.getRootNode().getHandle() == viewModel.getUiState().getValue().getSearchParentHandle()) {
+			} else if (megaApi.getRootNode().getHandle() == viewModel.getState().getValue().getSearchParentHandle()) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
 				} else {

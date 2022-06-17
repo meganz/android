@@ -55,12 +55,12 @@ class ManagerViewModel @Inject constructor(
     /**
      * private UI state
      */
-    private val _uiState = MutableStateFlow(ManagerState())
+    private val _state = MutableStateFlow(ManagerState())
 
     /**
      * public UI State
      */
-    val uiState: StateFlow<ManagerState> = _uiState
+    val state: StateFlow<ManagerState> = _state
 
     /**
      * Monitor all global updates
@@ -124,7 +124,7 @@ class ManagerViewModel @Inject constructor(
     val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onRubbishNodesUpdate") }
-            .mapNotNull { getRubbishBinChildrenNode(_uiState.value.rubbishBinParentHandle) }
+            .mapNotNull { getRubbishBinChildrenNode(_state.value.rubbishBinParentHandle) }
             .map { Event(it) }
             .asLiveData()
 
@@ -134,7 +134,7 @@ class ManagerViewModel @Inject constructor(
     val updateBrowserNodes: LiveData<Event<List<MegaNode>>> =
         _updateNodes
             .also { Timber.d("onBrowserNodesUpdate") }
-            .mapNotNull { getBrowserChildrenNode(_uiState.value.browserParentHandle) }
+            .mapNotNull { getBrowserChildrenNode(_state.value.browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
 
@@ -145,10 +145,10 @@ class ManagerViewModel @Inject constructor(
      * @return the handle of the browser section
      */
     fun getBrowserParentHandle(): Long = runBlocking {
-        if (_uiState.value.browserParentHandle == -1L) {
+        if (_state.value.browserParentHandle == -1L) {
             setBrowserParentHandle(getRootFolder()?.handle ?: INVALID_HANDLE)
         }
-        return@runBlocking _uiState.value.browserParentHandle
+        return@runBlocking _state.value.browserParentHandle
     }
 
     /**
@@ -157,7 +157,7 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current browser parent handle to set
      */
     fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(browserParentHandle = handle) }
+        _state.update { it.copy(browserParentHandle = handle) }
     }
 
     /**
@@ -166,7 +166,7 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current rubbish bin parent handle to set
      */
     fun setRubbishBinParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(rubbishBinParentHandle = handle) }
+        _state.update { it.copy(rubbishBinParentHandle = handle) }
     }
 
     /**
@@ -175,7 +175,7 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current incoming parent handle to set
      */
     fun setIncomingParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(incomingParentHandle = handle) }
+        _state.update { it.copy(incomingParentHandle = handle) }
     }
 
     /**
@@ -184,7 +184,7 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current outgoing parent handle to set
      */
     fun setOutgoingParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(outgoingParentHandle = handle) }
+        _state.update { it.copy(outgoingParentHandle = handle) }
     }
 
     /**
@@ -193,7 +193,7 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current links parent handle to set
      */
     fun setLinksParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(linksParentHandle = handle) }
+        _state.update { it.copy(linksParentHandle = handle) }
     }
 
     /**
@@ -202,14 +202,14 @@ class ManagerViewModel @Inject constructor(
      * @param handle the id of the current inbox parent handle to set
      */
     fun setInboxParentHandle(handle: Long) = viewModelScope.launch {
-        _uiState.update { it.copy(inboxParentHandle = handle) }
+        _state.update { it.copy(inboxParentHandle = handle) }
     }
 
     /**
      * Reset the current search drawer item to initial value
      */
     fun resetSearchDrawerItem() = viewModelScope.launch {
-        _uiState.update { it.copy(searchDrawerItem = null) }
+        _state.update { it.copy(searchDrawerItem = null) }
     }
 
     /**
@@ -218,7 +218,7 @@ class ManagerViewModel @Inject constructor(
      * @param drawerItem
      */
     fun setSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
-        _uiState.update { it.copy(searchDrawerItem = drawerItem) }
+        _state.update { it.copy(searchDrawerItem = drawerItem) }
     }
 
     /**
@@ -227,7 +227,7 @@ class ManagerViewModel @Inject constructor(
      * @param sharesTab
      */
     fun setSearchSharedTab(sharesTab: SharesTab) = viewModelScope.launch {
-        _uiState.update { it.copy(searchSharesTab = sharesTab) }
+        _state.update { it.copy(searchSharesTab = sharesTab) }
     }
 
     /**
@@ -236,7 +236,7 @@ class ManagerViewModel @Inject constructor(
      * @param isFirstNavigationLevel true if the current navigation level corresponds to the first level
      */
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
-        _uiState.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
+        _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
     }
 
 }
