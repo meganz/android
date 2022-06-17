@@ -425,15 +425,15 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
         animatorSet = AnimatorSet().apply {
             addListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {}
+                override fun onAnimationStart(animation: Animator) {}
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     viewModel.checkSelection()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {}
+                override fun onAnimationCancel(animation: Animator) {}
 
-                override fun onAnimationRepeat(animation: Animator?) {}
+                override fun onAnimationRepeat(animation: Animator) {}
 
             })
 

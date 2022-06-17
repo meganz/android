@@ -61,6 +61,20 @@ class GetCallSoundsUseCase @Inject constructor(
         Flowable.create({ emitter ->
             val disposable = CompositeDisposable()
 
+            getCallStatusChangesUseCase.getReconnectingStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        if (it) {
+                            emitter.onNext(CallSoundType.CALL_RECONNECTING)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                ).addTo(disposable)
+
             getSessionStatusChangesUseCase.getSessionChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -239,4 +253,3 @@ class GetCallSoundsUseCase @Inject constructor(
         countDownTimer = null
     }
 }
-

@@ -99,23 +99,23 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @return Flowable containing True, if audio is enabled. False, if audio is disabled.
      */
     fun getChangesFromParticipants(): Flowable<ParticipantsChangesResult> =
-            Flowable.create({ emitter ->
-                val callCompositionObserver = Observer<MegaChatCall> { call ->
-                    emitter.checkParticipantsChanges(call)
-                }
+        Flowable.create({ emitter ->
+            val callCompositionObserver = Observer<MegaChatCall> { call ->
+                emitter.checkParticipantsChanges(call)
+            }
 
-                LiveEventBus.get(EventConstants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-                        .observeForever(callCompositionObserver)
+            LiveEventBus.get(EventConstants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
+                .observeForever(callCompositionObserver)
 
-                emitter.setCancellable {
-                    removeCountDown()
-                    LiveEventBus.get(
-                            EventConstants.EVENT_CALL_COMPOSITION_CHANGE,
-                            MegaChatCall::class.java
-                    )
-                            .removeObserver(callCompositionObserver)
-                }
-            }, BackpressureStrategy.LATEST)
+            emitter.setCancellable {
+                removeCountDown()
+                LiveEventBus.get(
+                    EventConstants.EVENT_CALL_COMPOSITION_CHANGE,
+                    MegaChatCall::class.java
+                )
+                    .removeObserver(callCompositionObserver)
+            }
+        }, BackpressureStrategy.LATEST)
 
     /**
      * Control when participants join or leave and the appropriate sound should be played.
@@ -148,9 +148,9 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         val listOfPeers = ArrayList<Long>()
                                         listOfPeers.addAll(peerIdsJoined)
                                         val result = ParticipantsChangesResult(
-                                                chatId = call.chatid,
-                                                typeChange = TYPE_JOIN,
-                                                listOfPeers
+                                            chatId = call.chatid,
+                                            typeChange = TYPE_JOIN,
+                                            listOfPeers
                                         )
                                         this.onNext(result)
                                         peerIdsJoined.clear()
@@ -181,9 +181,9 @@ class GetParticipantsChangesUseCase @Inject constructor(
                                         val listOfPeers = ArrayList<Long>()
                                         listOfPeers.addAll(peerIdsLeft)
                                         val result = ParticipantsChangesResult(
-                                                chatId = call.chatid,
-                                                typeChange = TYPE_LEFT,
-                                                listOfPeers
+                                            chatId = call.chatid,
+                                            typeChange = TYPE_LEFT,
+                                            listOfPeers
                                         )
 
                                         this.onNext(result)

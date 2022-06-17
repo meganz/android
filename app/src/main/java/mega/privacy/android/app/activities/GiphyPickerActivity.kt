@@ -415,11 +415,11 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 return true
             }
 
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                 requestTrendingData(false)
                 return true
             }
