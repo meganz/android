@@ -20,6 +20,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +28,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
-
 
 @ExperimentalCoroutinesApi
 class ManagerViewModelTest {
@@ -179,6 +179,24 @@ class ManagerViewModelTest {
             }
     }
 
+    @Test
+    fun `test that get safe browser handle returns INVALID_HANDLE if not set and root folder fails`() =
+        runTest {
+            setUnderTest()
+
+            whenever(getRootFolder()).thenReturn(null)
+            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(INVALID_HANDLE)
+        }
+
+    @Test
+    fun `test that get safe browser handle returns if set`() =
+        runTest {
+            setUnderTest()
+
+            val expectedHandle = 123456789L
+            underTest.setBrowserParentHandle(expectedHandle)
+            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
+        }
 
     @Test
     fun `test that user updates live data is not set when no updates triggered from use case`() =

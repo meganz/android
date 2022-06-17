@@ -142,7 +142,7 @@ class ManagerViewModel @Inject constructor(
      *
      * @return the handle of the browser section
      */
-    fun getBrowserParentHandle(): Long = runBlocking {
+    fun getSafeBrowserParentHandle(): Long = runBlocking {
         if (_state.value.browserParentHandle == -1L) {
             setBrowserParentHandle(getRootFolder()?.handle ?: INVALID_HANDLE)
         }
