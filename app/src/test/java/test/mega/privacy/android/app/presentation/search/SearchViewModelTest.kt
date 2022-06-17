@@ -20,6 +20,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
+/**
+ * This test class will be implemented when the searchNodeUseCase will be unit testable
+ */
 @ExperimentalCoroutinesApi
 class SearchViewModelTest {
 
