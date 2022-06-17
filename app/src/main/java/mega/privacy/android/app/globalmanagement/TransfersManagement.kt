@@ -537,6 +537,24 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
+     * If the transfer is a folder removes it from scanningTransfers as is already processed.
+     *
+     * @param transfer  Transfer to check.
+     */
+    fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
+        if (!transfer.isFolderTransfer) {
+            return
+        }
+
+        for (data in scanningTransfers) {
+            if (data.isTheSameFolderTransfer(transfer)) {
+                data.removeProcessedScanningTransfer()
+                break
+            }
+        }
+    }
+
+    /**
      * Removes the a scanningTransferData which has been already processed.
      */
     private fun ScanningTransferData.removeProcessedScanningTransfer() {
