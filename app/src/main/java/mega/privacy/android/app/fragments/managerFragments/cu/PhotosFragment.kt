@@ -65,7 +65,9 @@ class PhotosFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
-        actionBar = (context as AppCompatActivity).supportActionBar!!
+        if (PhotosFilterAndSortToggle.enabled) {
+            actionBar = (context as AppCompatActivity).supportActionBar!!
+        }
         tabIndex = if (mManagerActivity.fromAlbumContent) {
             ALBUM_INDEX
         } else {
