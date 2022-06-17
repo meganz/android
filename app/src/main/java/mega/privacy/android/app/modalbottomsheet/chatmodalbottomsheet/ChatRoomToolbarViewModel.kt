@@ -57,6 +57,14 @@ class ChatRoomToolbarViewModel @Inject constructor(
         _checkCameraPermissions.value = true
     }
 
+    /**
+     * Method to check if the camera permissions should be requested again
+     */
+    fun updateCheckCameraPermissions() {
+        _checkCameraPermissions.value = false
+        checkCameraPermission()
+    }
+
     fun checkStoragePermission() {
         _checkReadStoragePermissions.value = true
     }
@@ -64,7 +72,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
     /**
      * Update camera permissions
      *
-     * @param hasPermissions If permission is granted
+     * @param isGranted If permission is granted
      */
     private fun updateCameraPermissions(isGranted: Boolean) {
         if (_hasCameraPermissionsGranted.value == isGranted || !isGranted) {

@@ -235,6 +235,8 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         if (hasCameraPermission) {
             listener.onTakePictureOptionClicked()
             dismiss()
+        } else {
+            viewModel.updateCheckCameraPermissions()
         }
     }
 
