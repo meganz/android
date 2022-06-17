@@ -19,8 +19,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Adapter
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.ListView
@@ -46,6 +44,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -603,7 +602,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     /**
      * When zoom changes,handle zoom
      */
-    fun handleZoomChange(zoom: Int, needReload: Boolean) {
+    private fun handleZoomChange(zoom: Int, needReload: Boolean) {
         PHOTO_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
@@ -645,7 +644,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             return
         }
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_photos_toolbar, menu)
+        if (PhotosFilterAndSortToggle.enabled) {
+            inflater.inflate(R.menu.fragment_photos_toolbar, menu)
+        } else {
+            inflater.inflate(R.menu.fragment_images_toolbar, menu)
+
+        }
         this.menu = menu
         handleOnCreateOptionsMenu()
         handleZoomMenuItemStatus()
@@ -655,18 +659,32 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         return if (!isInPhotosPage()) {
             true
         } else {
-            when (item.itemId) {
-                R.id.action_zoom_in -> {
-                    zoomIn()
+            if (PhotosFilterAndSortToggle.enabled) {
+                when (item.itemId) {
+                    R.id.action_zoom_in -> {
+                        zoomIn()
+                    }
+                    R.id.action_zoom_out -> {
+                        zoomOut()
+                    }
+                    R.id.action_photos_filter -> {
+                        createFilterDialog(mManagerActivity)
+                    }
+                    R.id.action_photos_sortby -> {
+                        createSortByDialog(mManagerActivity)
+                    }
                 }
-                R.id.action_zoom_out -> {
-                    zoomOut()
-                }
-                R.id.action_photos_filter -> {
-                    createFilterDialog(mManagerActivity)
-                }
-                R.id.action_photos_sortby -> {
-                    createSortByDialog(mManagerActivity)
+            } else {
+                when (item.itemId) {
+                    R.id.action_zoom_in -> {
+                        zoomIn()
+                    }
+                    R.id.action_zoom_out -> {
+                        zoomOut()
+                    }
+                    R.id.action_menu_sort_by -> {
+                        mManagerActivity.showNewSortByPanel(Constants.ORDER_CAMERA)
+                    }
                 }
             }
             return super.onOptionsItemSelected(item)
@@ -1298,13 +1316,14 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      */
     fun isInActionMode() = actionMode != null
 
-
+    /**
+     * Create the filter dialog
+     */
     fun createFilterDialog(
         context: Activity,
     ) {
         val filterDialog: AlertDialog
         val dialogBuilder = MaterialAlertDialogBuilder(context)
-        val itemClicked = AtomicReference<Int>()
 
         val stringsArray: List<String> = listOf(
             getString(R.string.photos_filter_all_photos),
@@ -1319,11 +1338,10 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
         dialogBuilder.setSingleChoiceItems(
             itemsAdapter,
-            Constants.INVALID_POSITION,
+            viewModel.getCurrentFilter(),
             DialogInterface.OnClickListener { dialog, item ->
-                itemClicked.set(item)
                 itemsAdapter.getItem(item)?.let {
-                    viewModel.setCurrentFilter(it)
+                    viewModel.setCurrentFilter(item)
                     photosFragment.setActionBarSubtitleText(Util.adjustForLargeFont(
                         it
                     ))
@@ -1343,12 +1361,14 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         filterDialog.show()
     }
 
+    /**
+     * Create the sort by dialog
+     */
     fun createSortByDialog(
         context: Activity,
     ) {
         val sortDialog: AlertDialog
         val dialogBuilder = MaterialAlertDialogBuilder(context)
-        val itemClicked = AtomicReference<Int>()
 
         val stringsArray: List<String> = listOf(
             getString(R.string.sortby_date_newest),
@@ -1361,9 +1381,9 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
         dialogBuilder.setSingleChoiceItems(
             itemsAdapter,
-            Constants.INVALID_POSITION,
+            viewModel.getCurrentSort(),
             DialogInterface.OnClickListener { dialog, item ->
-                itemClicked.set(item)
+                viewModel.setCurrentSort(item)
                 dialog.dismiss()
             })
 
@@ -1379,7 +1399,10 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         sortDialog.show()
     }
 
+    /**
+     * Get the current selected filter
+     */
     fun getCurrentFilter(): String {
-        return viewModel.getCurrentFilter()
+        return viewModel.getCurrentFilterAsString()
     }
 }

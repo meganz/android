@@ -14,6 +14,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
+import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.ALBUM_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.TIMELINE_INDEX
@@ -70,7 +71,9 @@ class PhotosFragment : BaseFragment() {
         } else {
             savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
         }
-        setCustomisedActionBar()
+        if (PhotosFilterAndSortToggle.enabled) {
+            setCustomisedActionBar()
+        }
         setupPhotosViewPager()
         return binding.root
     }
@@ -108,15 +111,19 @@ class PhotosFragment : BaseFragment() {
 
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
-                        showHideABSubtitle(false)
                         val timelineFragment = currentTab
                         mManagerActivity.fromAlbumContent = false
+                        if (PhotosFilterAndSortToggle.enabled) {
+                            showHideABSubtitle(false)
+                        }
                         with(timelineFragment) {
-                            setActionBarSubtitleText(Util.adjustForLargeFont(getCurrentFilter()))
-                            actionBar.customView.findViewById<View>(R.id.ab_container)
-                                .setOnClickListener {
-                                    createFilterDialog(mManagerActivity)
-                                }
+                            if (PhotosFilterAndSortToggle.enabled) {
+                                setActionBarSubtitleText(Util.adjustForLargeFont(getCurrentFilter()))
+                                actionBar.customView.findViewById<View>(R.id.ab_container)
+                                    .setOnClickListener {
+                                        createFilterDialog(mManagerActivity)
+                                    }
+                            }
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()
                             if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
@@ -127,7 +134,9 @@ class PhotosFragment : BaseFragment() {
                         }
                     } else {
                         tabIndex = ALBUM_INDEX
-                        showHideABSubtitle(false)
+                        if (PhotosFilterAndSortToggle.enabled) {
+                            showHideABSubtitle(false)
+                        }
                         with(mManagerActivity) {
                             updateCUViewTypes(View.GONE)
                             enableHideBottomViewOnScroll(false)

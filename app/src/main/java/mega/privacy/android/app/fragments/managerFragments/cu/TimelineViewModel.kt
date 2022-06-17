@@ -66,6 +66,9 @@ class TimelineViewModel @Inject constructor(
         const val FILTER_CAMERA_UPLOADS = 2
         const val FILTER_VIDEOS_ONLY = 3
 
+        const val SORT_DESC = 0
+        const val SORT_ASC = 1
+
         const val SPAN_CARD_PORTRAIT = 1
         const val SPAN_CARD_LANDSCAPE = 2
 
@@ -80,7 +83,8 @@ class TimelineViewModel @Inject constructor(
 
     var mZoom = PHOTO_ZOOM_LEVEL
 
-    private var currentFilter: String = getString(R.string.photos_filter_all_photos)
+    private var currentFilter: Int = FILTER_ALL_PHOTOS
+    private var currentSort: Int = SORT_DESC
 
     /**
      * Get current sort rule from SortOrderManagement
@@ -483,12 +487,45 @@ class TimelineViewModel @Inject constructor(
         composite.clear()
     }
 
-    fun getCurrentFilter(): String {
+    /**
+     * Return the current filter set as string
+     */
+    fun getCurrentFilterAsString(): String {
+        return when (currentFilter) {
+            FILTER_ALL_PHOTOS -> getString(R.string.photos_filter_all_photos)
+            FILTER_CLOUD_DRIVE -> getString(R.string.photos_filter_cloud_drive)
+            FILTER_CAMERA_UPLOADS -> getString(R.string.photos_filter_camera_uploads)
+            FILTER_VIDEOS_ONLY -> getString(R.string.photos_filter_videos_only)
+            else -> ""
+        }
+    }
+
+    /**
+     * Return the current filter
+     */
+    fun getCurrentFilter(): Int {
         return currentFilter
     }
 
-    fun setCurrentFilter(filter: String) {
+    /**
+     * Set the current selected filter
+     */
+    fun setCurrentFilter(filter: Int) {
         currentFilter = filter
+    }
+
+    /**
+     * Get the current sort
+     */
+    fun getCurrentSort(): Int {
+        return currentSort
+    }
+
+    /**
+     * Set the current sort
+     */
+    fun setCurrentSort(sort: Int) {
+        currentSort = sort
     }
 }
 
