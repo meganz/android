@@ -333,7 +333,7 @@ public class ChatManagement {
     public void startCounterToFinishCall(long chatId, long timeToWait) {
         stopCounterToFinishCall();
         if (countDownTimerToEndCall == null) {
-            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), 1000) {
+            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
