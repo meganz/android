@@ -9,6 +9,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFileStorageCameraBinding
 
 /**
@@ -48,9 +49,13 @@ class FileStorageChatCameraViewHolder(
                     preview.setSurfaceProvider(previewView.surfaceProvider)
                 }, ContextCompat.getMainExecutor(root.context))
                 previewView.isVisible = true
+                cardLayout.setCardBackgroundColor(Color.TRANSPARENT)
+                layout.background = null
             } else {
                 previewView.isVisible = false
                 cardLayout.setCardBackgroundColor(Color.BLACK)
+                layout.background = ContextCompat.getDrawable(binding.root.context,
+                    R.drawable.self_feed_floating_window_background)
             }
         }
     }
