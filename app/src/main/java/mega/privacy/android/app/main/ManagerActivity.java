@@ -5041,9 +5041,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void closeSearchSection() {
         searchViewModel.resetSearchQuery();
-        drawerItem = viewModel.getState().getValue().getSearchDrawerItem();
+        drawerItem = searchViewModel.getState().getValue().getSearchDrawerItem();
         selectDrawerItem(drawerItem);
-        viewModel.resetSearchDrawerItem();
+        searchViewModel.resetSearchDrawerItem();
     }
 
     @Override
@@ -5185,7 +5185,15 @@ public class ManagerActivity extends TransfersManagementActivity
                         searchViewModel.setTextSubmitted(false);
                     } else {
                         searchViewModel.setSearchQuery(newText);
-                        searchViewModel.performSearch(viewModel.getState().getValue());
+                        searchViewModel.performSearch(
+                                viewModel.getState().getValue().getBrowserParentHandle(),
+                                viewModel.getState().getValue().getRubbishBinParentHandle(),
+                                viewModel.getState().getValue().getInboxParentHandle(),
+                                viewModel.getState().getValue().getIncomingParentHandle(),
+                                viewModel.getState().getValue().getOutgoingParentHandle(),
+                                viewModel.getState().getValue().getLinksParentHandle(),
+                                viewModel.getState().getValue().isFirstNavigationLevel()
+                        );
                     }
                 }
                 return true;
@@ -5353,7 +5361,15 @@ public class ManagerActivity extends TransfersManagementActivity
         selectDrawerItem(drawerItem);
         resetActionBar(aB);
 
-        searchViewModel.performSearch(viewModel.getState().getValue());
+        searchViewModel.performSearch(
+                viewModel.getState().getValue().getBrowserParentHandle(),
+                viewModel.getState().getValue().getRubbishBinParentHandle(),
+                viewModel.getState().getValue().getInboxParentHandle(),
+                viewModel.getState().getValue().getIncomingParentHandle(),
+                viewModel.getState().getValue().getOutgoingParentHandle(),
+                viewModel.getState().getValue().getLinksParentHandle(),
+                viewModel.getState().getValue().isFirstNavigationLevel()
+        );
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
@@ -6836,13 +6852,13 @@ public class ManagerActivity extends TransfersManagementActivity
                     parentHandle = searchViewModel.getState().getValue().getSearchParentHandle();
                     break;
                 }
-                if (viewModel.getState().getValue().getSearchDrawerItem() != null) {
-                    switch (viewModel.getState().getValue().getSearchDrawerItem()) {
+                if (searchViewModel.getState().getValue().getSearchDrawerItem() != null) {
+                    switch (searchViewModel.getState().getValue().getSearchDrawerItem()) {
                         case CLOUD_DRIVE:
                             parentHandle = viewModel.getBrowserParentHandle();
                             break;
                         case SHARED_ITEMS:
-                            switch (viewModel.getState().getValue().getSearchSharesTab()) {
+                            switch (searchViewModel.getState().getValue().getSearchSharesTab()) {
                                 case INCOMING_TAB:
                                     parentHandle = viewModel.getState().getValue().getIncomingParentHandle();
                                     break;
@@ -10909,8 +10925,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private void setSearchDrawerItem() {
         if (drawerItem == DrawerItem.SEARCH) return;
 
-        viewModel.setSearchDrawerItem(drawerItem);
-        viewModel.setSearchSharedTab(SharesTab.Companion.fromPosition(getTabItemShares()));
+        searchViewModel.setSearchDrawerItem(drawerItem);
+        searchViewModel.setSearchSharedTab(SharesTab.Companion.fromPosition(getTabItemShares()));
 
         drawerItem = DrawerItem.SEARCH;
     }

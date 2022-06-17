@@ -5,7 +5,7 @@ package mega.privacy.android.app.presentation.manager.model
  *
  * @param position the position of the tab in the adapter
  */
-enum class SharesTab(private val position: Int) {
+enum class SharesTab(val position: Int) {
     /**
      * Default value
      */

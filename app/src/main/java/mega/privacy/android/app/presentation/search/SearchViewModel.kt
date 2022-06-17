@@ -20,7 +20,6 @@ import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
@@ -141,10 +140,22 @@ class SearchViewModel @Inject constructor(
     /**
      * Perform a search request
      *
-     * @param managerState the manager UI state of the ManagerViewModel
+     * @param browserParentHandle
+     * @param rubbishBinParentHandle
+     * @param inboxParentHandle
+     * @param incomingParentHandle
+     * @param outgoingParentHandle
+     * @param linksParentHandle
+     * @param isFirstNavigationLevel
      */
     fun performSearch(
-        managerState: ManagerState,
+        browserParentHandle: Long,
+        rubbishBinParentHandle: Long,
+        inboxParentHandle: Long,
+        incomingParentHandle: Long,
+        outgoingParentHandle: Long,
+        linksParentHandle: Long,
+        isFirstNavigationLevel: Boolean,
     ) = viewModelScope.launch {
         if (!rootNodeExists()) {
             Timber.e("Root node is null.")
@@ -154,12 +165,19 @@ class SearchViewModel @Inject constructor(
         //stop from query for empty string.
         setTextSubmitted(true)
 
-        val query = state.value.searchQuery
-        val parentHandleSearch = state.value.searchParentHandle
-        val drawerItem = managerState.searchDrawerItem
-        val parentHandle = getParentHandleForSearch(managerState)
-        val sharesTab = managerState.searchSharesTab.ordinal
-        val isFirstNavigationLevel = managerState.isFirstNavigationLevel
+        val query = _state.value.searchQuery
+        val parentHandleSearch = _state.value.searchParentHandle
+        val drawerItem = _state.value.searchDrawerItem
+        val parentHandle =
+            getParentHandleForSearch(
+                browserParentHandle,
+                rubbishBinParentHandle,
+                inboxParentHandle,
+                incomingParentHandle,
+                outgoingParentHandle,
+                linksParentHandle
+            )
+        val sharesTab = _state.value.searchSharesTab.position
 
         cancelSearch()
         searchCancelToken = initNewSearch()
@@ -185,20 +203,34 @@ class SearchViewModel @Inject constructor(
     /**
      * Get the parent handle from where the search is performed
      *
-     * @param managerState the UI manager state of the ManagerViewModel
+     * @param browserParentHandle
+     * @param rubbishBinParentHandle
+     * @param inboxParentHandle
+     * @param incomingParentHandle
+     * @param outgoingParentHandle
+     * @param linksParentHandle
+     *
+     * @return the parent handle from where the search is performed
      */
-    private suspend fun getParentHandleForSearch(managerState: ManagerState): Long {
-        return when (managerState.searchDrawerItem) {
-            DrawerItem.CLOUD_DRIVE -> managerState.browserParentHandle
+    private suspend fun getParentHandleForSearch(
+        browserParentHandle: Long,
+        rubbishBinParentHandle: Long,
+        inboxParentHandle: Long,
+        incomingParentHandle: Long,
+        outgoingParentHandle: Long,
+        linksParentHandle: Long,
+    ): Long {
+        return when (_state.value.searchDrawerItem) {
+            DrawerItem.CLOUD_DRIVE -> browserParentHandle
             DrawerItem.SHARED_ITEMS ->
-                when (managerState.searchSharesTab) {
-                    SharesTab.INCOMING_TAB -> managerState.incomingParentHandle
-                    SharesTab.OUTGOING_TAB -> managerState.outgoingParentHandle
-                    SharesTab.LINKS_TAB -> managerState.linksParentHandle
-                    else -> managerState.incomingParentHandle
+                when (_state.value.searchSharesTab) {
+                    SharesTab.INCOMING_TAB -> incomingParentHandle
+                    SharesTab.OUTGOING_TAB -> outgoingParentHandle
+                    SharesTab.LINKS_TAB -> linksParentHandle
+                    else -> incomingParentHandle
                 }
-            DrawerItem.RUBBISH_BIN -> managerState.rubbishBinParentHandle
-            DrawerItem.INBOX -> managerState.inboxParentHandle
+            DrawerItem.RUBBISH_BIN -> rubbishBinParentHandle
+            DrawerItem.INBOX -> inboxParentHandle
             else -> getRootFolder()?.handle ?: INVALID_HANDLE
         }
     }
@@ -229,6 +261,31 @@ class SearchViewModel @Inject constructor(
     private fun finishSearch(nodes: List<MegaNode>) {
         setIsInSearchProgress(false)
         setNodes(nodes)
+    }
+
+    /**
+     * Reset the current search drawer item to initial value
+     */
+    fun resetSearchDrawerItem() = viewModelScope.launch {
+        _state.update { it.copy(searchDrawerItem = null) }
+    }
+
+    /**
+     * Set current search drawer item
+     *
+     * @param drawerItem
+     */
+    fun setSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
+        _state.update { it.copy(searchDrawerItem = drawerItem) }
+    }
+
+    /**
+     * Set the current search shares tab
+     *
+     * @param sharesTab
+     */
+    fun setSearchSharedTab(sharesTab: SharesTab) = viewModelScope.launch {
+        _state.update { it.copy(searchSharesTab = sharesTab) }
     }
 
     /**

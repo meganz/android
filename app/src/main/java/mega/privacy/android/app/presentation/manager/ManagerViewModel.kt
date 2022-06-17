@@ -23,9 +23,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.ManagerState
-import mega.privacy.android.app.presentation.manager.model.SharesTab
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaNode
@@ -203,31 +201,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setInboxParentHandle(handle: Long) = viewModelScope.launch {
         _state.update { it.copy(inboxParentHandle = handle) }
-    }
-
-    /**
-     * Reset the current search drawer item to initial value
-     */
-    fun resetSearchDrawerItem() = viewModelScope.launch {
-        _state.update { it.copy(searchDrawerItem = null) }
-    }
-
-    /**
-     * Set current search drawer item
-     *
-     * @param drawerItem
-     */
-    fun setSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
-        _state.update { it.copy(searchDrawerItem = drawerItem) }
-    }
-
-    /**
-     * Set the current search shares tab
-     *
-     * @param sharesTab
-     */
-    fun setSearchSharedTab(sharesTab: SharesTab) = viewModelScope.launch {
-        _state.update { it.copy(searchSharesTab = sharesTab) }
     }
 
     /**

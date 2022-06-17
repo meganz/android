@@ -663,7 +663,15 @@ public class SearchFragment extends RotatableFragment {
 	 * Perform a new search
 	 */
 	private void newSearchNodesTask() {
-		viewModel.performSearch(managerViewModel.getState().getValue());
+		viewModel.performSearch(
+				managerViewModel.getState().getValue().getBrowserParentHandle(),
+				managerViewModel.getState().getValue().getRubbishBinParentHandle(),
+				managerViewModel.getState().getValue().getInboxParentHandle(),
+				managerViewModel.getState().getValue().getIncomingParentHandle(),
+				managerViewModel.getState().getValue().getOutgoingParentHandle(),
+				managerViewModel.getState().getValue().getLinksParentHandle(),
+				managerViewModel.getState().getValue().isFirstNavigationLevel()
+		);
 	}
 
 	private void updateSearchProgressView(boolean inProgress) {

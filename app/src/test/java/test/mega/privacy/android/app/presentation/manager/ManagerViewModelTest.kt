@@ -19,9 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.app.presentation.manager.model.SharesTab
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -86,8 +84,6 @@ class ManagerViewModelTest {
             assertThat(initial.outgoingParentHandle).isEqualTo(-1L)
             assertThat(initial.linksParentHandle).isEqualTo(-1L)
             assertThat(initial.inboxParentHandle).isEqualTo(-1L)
-            assertThat(initial.searchDrawerItem).isNull()
-            assertThat(initial.searchSharesTab).isEqualTo(SharesTab.NONE)
             assertThat(initial.isFirstNavigationLevel).isTrue()
         }
     }
@@ -166,32 +162,6 @@ class ManagerViewModelTest {
                 val newValue = 123456789L
                 assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setInboxParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
-    fun `test that search drawer item is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.searchDrawerItem }.distinctUntilChanged()
-            .test {
-                val newValue = DrawerItem.CLOUD_DRIVE
-                assertThat(awaitItem()).isEqualTo(null)
-                underTest.setSearchDrawerItem(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
-    fun `test that search shared tab is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.searchSharesTab }.distinctUntilChanged()
-            .test {
-                val newValue = SharesTab.INCOMING_TAB
-                assertThat(awaitItem()).isEqualTo(SharesTab.NONE)
-                underTest.setSearchSharedTab(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
