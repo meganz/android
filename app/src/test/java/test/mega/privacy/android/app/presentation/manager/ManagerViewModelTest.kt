@@ -70,168 +70,183 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that user updates live data is not set when no updates triggered from use case`() = runTest {
-        setUnderTest()
+    fun `test that user updates live data is not set when no updates triggered from use case`() =
+        runTest {
+            setUnderTest()
 
-        underTest.updateUsers.test().assertNoValue()
-    }
-
-    @Test
-    fun `test that user alert updates live data is not set when no updates triggered from use case`() = runTest {
-        setUnderTest()
-
-        underTest.updateUserAlerts.test().assertNoValue()
-    }
-
-    @Test
-    fun `test that node updates live data is not set when no updates triggered from use case`() = runTest {
-        setUnderTest()
-
-        underTest.updateNodes.test().assertNoValue()
-    }
-
-    @Test
-    fun `test that contact request updates live data is not set when no updates triggered from use case`() = runTest {
-        underTest = ManagerViewModel(monitorNodeUpdates, monitorGlobalUpdates, getRubbishBinNodeByHandle, getBrowserNodeByHandle)
-
-        underTest.updateContactsRequests.test().assertNoValue()
-    }
-
-    @Test
-    fun `test that node updates live data is set when node updates triggered from use case`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-
-        setUnderTest()
-
-        runCatching {
-            underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-        }.onSuccess { result ->
-            result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-        }
-    }
-
-    @Test
-    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-        whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
-
-        setUnderTest()
-
-        runCatching {
-            underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-        }.onSuccess { result ->
-            result.assertValue { it.getContentIfNotHandled()?.size == 2 }
-        }
-    }
-
-    @Test
-    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-        whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
-
-        setUnderTest()
-
-        runCatching {
-            underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-        }.onSuccess { result ->
-            result.assertNoValue()
-        }
-    }
-
-    @Test
-    fun `test that browser node updates live data is set when node updates triggered from use case`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-        whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
-
-        setUnderTest()
-
-        runCatching {
-            underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-        }.onSuccess { result ->
-            result.assertValue { it.getContentIfNotHandled()?.size == 2 }
-        }
-    }
-
-    @Test
-    fun `test that browser node updates live data is not set when get browser node returns a null list`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-        whenever(getBrowserNodeByHandle(any())).thenReturn(null)
-
-        setUnderTest()
-
-        runCatching {
-            underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-        }.onSuccess { result ->
-            result.assertNoValue()
-        }
-    }
-
-    @Test
-    fun `test that user updates live data is set when user updates triggered from use case`() = runTest {
-        triggerRepositoryUpdate(listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))) {
-
-            runCatching {
-                underTest.updateUsers.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-            }
-        }
-    }
-
-    @Test
-    fun `test that user updates live data is not set when user updates triggered from use case with null`() = runTest {
-        triggerRepositoryUpdate(
-            listOf(
-                GlobalUpdate.OnUsersUpdate(null),
-            )
-        ) {
             underTest.updateUsers.test().assertNoValue()
         }
-    }
 
     @Test
-    fun `test that user alert updates live data is set when user alert updates triggered from use case`() = runTest {
-        triggerRepositoryUpdate(listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))) {
+    fun `test that user alert updates live data is not set when no updates triggered from use case`() =
+        runTest {
+            setUnderTest()
 
-            runCatching {
-                underTest.updateUserAlerts.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-            }
-        }
-    }
-
-    @Test
-    fun `test that user alert updates live data is not set when user alert updates triggered from use case with null`() = runTest {
-        triggerRepositoryUpdate(
-            listOf(
-                GlobalUpdate.OnUserAlertsUpdate(null),
-            )
-        ) {
             underTest.updateUserAlerts.test().assertNoValue()
         }
-    }
 
     @Test
-    fun `test that contact request updates live data is set when contact request updates triggered from use case`() = runTest {
-        triggerRepositoryUpdate(listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
+    fun `test that node updates live data is not set when no updates triggered from use case`() =
+        runTest {
+            setUnderTest()
+
+            underTest.updateNodes.test().assertNoValue()
+        }
+
+    @Test
+    fun `test that contact request updates live data is not set when no updates triggered from use case`() =
+        runTest {
+            setUnderTest()
+
+            underTest.updateContactsRequests.test().assertNoValue()
+        }
+
+    @Test
+    fun `test that node updates live data is set when node updates triggered from use case`() =
+        runTest {
+            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+
+            setUnderTest()
 
             runCatching {
-                underTest.updateContactsRequests.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
             }.onSuccess { result ->
                 result.assertValue { it.getContentIfNotHandled()?.size == 1 }
             }
         }
-    }
 
     @Test
-    fun `test that contact request updates live data is not set when contact request updates triggered from use case with null`() = runTest {
-        triggerRepositoryUpdate(
-            listOf(
-                GlobalUpdate.OnContactRequestsUpdate(null),
-            )
-        ) {
-            underTest.updateContactsRequests.test().assertNoValue()
+    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
+        runTest {
+            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+            whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+            setUnderTest()
+
+            runCatching {
+                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess { result ->
+                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
+            }
         }
-    }
+
+    @Test
+    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
+        runTest {
+            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+            whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
+
+            setUnderTest()
+
+            runCatching {
+                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess { result ->
+                result.assertNoValue()
+            }
+        }
+
+    @Test
+    fun `test that browser node updates live data is set when node updates triggered from use case`() =
+        runTest {
+            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+            whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+            setUnderTest()
+
+            runCatching {
+                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess { result ->
+                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
+            }
+        }
+
+    @Test
+    fun `test that browser node updates live data is not set when get browser node returns a null list`() =
+        runTest {
+            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+            whenever(getBrowserNodeByHandle(any())).thenReturn(null)
+
+            setUnderTest()
+
+            runCatching {
+                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess { result ->
+                result.assertNoValue()
+            }
+        }
+
+    @Test
+    fun `test that user updates live data is set when user updates triggered from use case`() =
+        runTest {
+            triggerRepositoryUpdate(listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))) {
+
+                runCatching {
+                    underTest.updateUsers.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                }.onSuccess { result ->
+                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
+                }
+            }
+        }
+
+    @Test
+    fun `test that user updates live data is not set when user updates triggered from use case with null`() =
+        runTest {
+            triggerRepositoryUpdate(
+                listOf(
+                    GlobalUpdate.OnUsersUpdate(null),
+                )
+            ) {
+                underTest.updateUsers.test().assertNoValue()
+            }
+        }
+
+    @Test
+    fun `test that user alert updates live data is set when user alert updates triggered from use case`() =
+        runTest {
+            triggerRepositoryUpdate(listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))) {
+
+                runCatching {
+                    underTest.updateUserAlerts.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                }.onSuccess { result ->
+                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
+                }
+            }
+        }
+
+    @Test
+    fun `test that user alert updates live data is not set when user alert updates triggered from use case with null`() =
+        runTest {
+            triggerRepositoryUpdate(
+                listOf(
+                    GlobalUpdate.OnUserAlertsUpdate(null),
+                )
+            ) {
+                underTest.updateUserAlerts.test().assertNoValue()
+            }
+        }
+
+    @Test
+    fun `test that contact request updates live data is set when contact request updates triggered from use case`() =
+        runTest {
+            triggerRepositoryUpdate(listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
+
+                runCatching {
+                    underTest.updateContactsRequests.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                }.onSuccess { result ->
+                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
+                }
+            }
+        }
+
+    @Test
+    fun `test that contact request updates live data is not set when contact request updates triggered from use case with null`() =
+        runTest {
+            triggerRepositoryUpdate(
+                listOf(
+                    GlobalUpdate.OnContactRequestsUpdate(null),
+                )
+            ) {
+                underTest.updateContactsRequests.test().assertNoValue()
+            }
+        }
 }
