@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
@@ -31,6 +32,7 @@ import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import nz.mega.sdk.MegaApiJava
@@ -59,6 +61,11 @@ class TimelineViewModel @Inject constructor(
         const val MONTHS_VIEW = 2
         const val YEARS_VIEW = 3
 
+        const val FILTER_ALL_PHOTOS = 0
+        const val FILTER_CLOUD_DRIVE = 1
+        const val FILTER_CAMERA_UPLOADS = 2
+        const val FILTER_VIDEOS_ONLY = 3
+
         const val SPAN_CARD_PORTRAIT = 1
         const val SPAN_CARD_LANDSCAPE = 2
 
@@ -72,6 +79,8 @@ class TimelineViewModel @Inject constructor(
     private val composite = CompositeDisposable()
 
     var mZoom = PHOTO_ZOOM_LEVEL
+
+    private var currentFilter: String = getString(R.string.photos_filter_all_photos)
 
     /**
      * Get current sort rule from SortOrderManagement
@@ -257,8 +266,6 @@ class TimelineViewModel @Inject constructor(
         //No month equal or behind the current found, then return the latest month.
         return monthCards.size - 1
     }
-
-
 
     /**
      * Checks the clicked month card and gets the day card to show after click on a month card.
@@ -468,16 +475,20 @@ class TimelineViewModel @Inject constructor(
         camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
     }
 
-    private fun add(disposable: Disposable) {
-        composite.add(disposable)
-    }
-
     override fun onCleared() {
         super.onCleared()
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
         composite.clear()
+    }
+
+    fun getCurrentFilter(): String {
+        return currentFilter
+    }
+
+    fun setCurrentFilter(filter: String) {
+        currentFilter = filter
     }
 }
 

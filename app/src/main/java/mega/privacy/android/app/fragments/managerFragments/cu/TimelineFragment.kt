@@ -1322,6 +1322,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             Constants.INVALID_POSITION,
             DialogInterface.OnClickListener { dialog, item ->
                 itemClicked.set(item)
+                itemsAdapter.getItem(item)?.let {
+                    viewModel.setCurrentFilter(it)
+                    photosFragment.setActionBarSubtitleText(Util.adjustForLargeFont(
+                        it
+                    ))
+                }
                 dialog.dismiss()
             })
 
@@ -1371,5 +1377,9 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         sortDialog = dialogBuilder.create()
         sortDialog.setTitle(R.string.action_sort_by)
         sortDialog.show()
+    }
+
+    fun getCurrentFilter(): String {
+        return viewModel.getCurrentFilter()
     }
 }
