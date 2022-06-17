@@ -374,6 +374,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
@@ -472,9 +473,20 @@ public class ManagerActivity extends TransfersManagementActivity
     private static final String OPEN_LINK_ERROR = "OPEN_LINK_ERROR";
 
     public static final int ERROR_TAB = -1;
+    /**
+     * @deprecated Should use SharedTab
+     */
     public static final int INCOMING_TAB = 0;
+    /**
+     * @deprecated Should use SharedTab
+     */
     public static final int OUTGOING_TAB = 1;
+
+    /**
+     * @deprecated Should use SharedTab
+     */
     public static final int LINKS_TAB = 2;
+
     public static final int PENDING_TAB = 0;
     public static final int COMPLETED_TAB = 1;
 
@@ -5031,7 +5043,7 @@ public class ManagerActivity extends TransfersManagementActivity
         searchViewModel.resetSearchQuery();
         drawerItem = viewModel.getUiState().getValue().getSearchDrawerItem();
         selectDrawerItem(drawerItem);
-        viewModel.resetCurrentSearchDrawerItem();
+        viewModel.resetSearchDrawerItem();
     }
 
     @Override
@@ -6830,7 +6842,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             parentHandle = viewModel.getBrowserParentHandle();
                             break;
                         case SHARED_ITEMS:
-                            switch (viewModel.getUiState().getValue().getSearchSharedTab()) {
+                            switch (viewModel.getUiState().getValue().getSearchSharesTab()) {
                                 case INCOMING_TAB:
                                     parentHandle = viewModel.getUiState().getValue().getIncomingParentHandle();
                                     break;
@@ -10897,8 +10909,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private void setSearchDrawerItem() {
         if (drawerItem == DrawerItem.SEARCH) return;
 
-        viewModel.setCurrentSearchDrawerItem(drawerItem);
-        viewModel.setCurrentSearchSharedTab(getTabItemShares());
+        viewModel.setSearchDrawerItem(drawerItem);
+        viewModel.setSearchSharedTab(SharesTab.Companion.fromPosition(getTabItemShares()));
 
         drawerItem = DrawerItem.SEARCH;
     }

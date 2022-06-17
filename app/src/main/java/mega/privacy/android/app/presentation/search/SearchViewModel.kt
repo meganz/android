@@ -19,7 +19,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.RootNodeExists
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
@@ -158,7 +158,7 @@ class SearchViewModel @Inject constructor(
         val parentHandleSearch = uiState.value.searchParentHandle
         val drawerItem = managerState.searchDrawerItem
         val parentHandle = getParentHandleForSearch(managerState)
-        val sharesTab = managerState.searchSharedTab
+        val sharesTab = managerState.searchSharesTab.ordinal
         val isFirstNavigationLevel = managerState.isFirstNavigationLevel
 
         cancelSearch()
@@ -191,10 +191,10 @@ class SearchViewModel @Inject constructor(
         return when (managerState.searchDrawerItem) {
             DrawerItem.CLOUD_DRIVE -> managerState.browserParentHandle
             DrawerItem.SHARED_ITEMS ->
-                when (managerState.searchSharedTab) {
-                    ManagerActivity.OUTGOING_TAB -> managerState.outgoingParentHandle
-                    ManagerActivity.LINKS_TAB -> managerState.linksParentHandle
-                    ManagerActivity.INCOMING_TAB -> managerState.incomingParentHandle
+                when (managerState.searchSharesTab) {
+                    SharesTab.INCOMING_TAB -> managerState.incomingParentHandle
+                    SharesTab.OUTGOING_TAB -> managerState.outgoingParentHandle
+                    SharesTab.LINKS_TAB -> managerState.linksParentHandle
                     else -> managerState.incomingParentHandle
                 }
             DrawerItem.RUBBISH_BIN -> managerState.rubbishBinParentHandle

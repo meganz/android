@@ -25,6 +25,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaNode
@@ -54,7 +55,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * private UI state
      */
-    private val _uiState = MutableStateFlow(initializeState())
+    private val _uiState = MutableStateFlow(ManagerState())
 
     /**
      * public UI State
@@ -207,7 +208,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Reset the current search drawer item to initial value
      */
-    fun resetCurrentSearchDrawerItem() = viewModelScope.launch {
+    fun resetSearchDrawerItem() = viewModelScope.launch {
         _uiState.update { it.copy(searchDrawerItem = null) }
     }
 
@@ -216,17 +217,17 @@ class ManagerViewModel @Inject constructor(
      *
      * @param drawerItem
      */
-    fun setCurrentSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
+    fun setSearchDrawerItem(drawerItem: DrawerItem) = viewModelScope.launch {
         _uiState.update { it.copy(searchDrawerItem = drawerItem) }
     }
 
     /**
-     * Set the current search shared tab
+     * Set the current search shares tab
      *
-     * @param sharedTab
+     * @param sharesTab
      */
-    fun setCurrentSearchSharedTab(sharedTab: Int) = viewModelScope.launch {
-        _uiState.update { it.copy(searchSharedTab = sharedTab) }
+    fun setSearchSharedTab(sharesTab: SharesTab) = viewModelScope.launch {
+        _uiState.update { it.copy(searchSharesTab = sharesTab) }
     }
 
     /**
@@ -237,21 +238,5 @@ class ManagerViewModel @Inject constructor(
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _uiState.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
     }
-
-    /**
-     * Initialize the UI State
-     */
-    private fun initializeState(): ManagerState =
-        ManagerState(
-            browserParentHandle = -1L,
-            rubbishBinParentHandle = -1L,
-            incomingParentHandle = -1L,
-            outgoingParentHandle = -1L,
-            linksParentHandle = -1L,
-            inboxParentHandle = -1L,
-            searchDrawerItem = null,
-            searchSharedTab = -1,
-            isFirstNavigationLevel = true,
-        )
 
 }
