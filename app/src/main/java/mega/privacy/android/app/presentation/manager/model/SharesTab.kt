@@ -30,7 +30,9 @@ enum class SharesTab(val position: Int) {
         private val map = values().associateBy(SharesTab::position)
 
         /**
+         * Retrieve the enum value based on the position value
          *
+         * @param position
          */
         fun fromPosition(position: Int) = map[position] ?: NONE
     }
