@@ -2178,7 +2178,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         containerAddedContactsRecyclerView.setVisibility(View.VISIBLE);
         setTitleAB();
         if (adapterMEGA != null){
-            if (adapterMEGA.getItemCount() == 1){
+            if (adapterMEGA.getItemCount() == 0){
                 showHeader(false);
                 setEmptyStateVisibility(true);
 

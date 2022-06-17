@@ -3825,8 +3825,6 @@
     <string name="calls_call_screen_poor_network_quality">Poor connection</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect.</string>
-    <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Please do not close the application.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
@@ -3913,4 +3911,20 @@
     <string name="calls_call_screen_button_to_end_call">End call now</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
     <string name="calls_call_screen_button_to_stay_alone_in_call">Stay on call</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
 </resources>
