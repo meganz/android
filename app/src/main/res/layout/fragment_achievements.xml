@@ -34,37 +34,19 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/unlocked_rewards_title"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp">
 
-                <RelativeLayout
+                <TextView
                     android:id="@+id/unlocked_storage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal">
-
-                    <TextView
-                        android:id="@+id/unlocked_storage_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:textColor="@color/dark_blue_500_200"
-                        android:textSize="28sp" />
-
-                    <TextView
-                        android:id="@+id/unlocked_storage_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBaseline="@+id/unlocked_storage_text"
-                        android:layout_marginStart="2dp"
-                        android:layout_toEndOf="@+id/unlocked_storage_text"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
-                        android:textColor="@color/dark_blue_500_200" />
-                </RelativeLayout>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
+                    android:textColor="@color/dark_blue_500_200" />
 
                 <TextView
                     android:id="@+id/unlocked_storage_title"
@@ -74,7 +56,9 @@
                     android:layout_centerHorizontal="true"
                     android:text="@string/unlocked_storage_title"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium" />
+
             </RelativeLayout>
+
         </RelativeLayout>
 
         <LinearLayout

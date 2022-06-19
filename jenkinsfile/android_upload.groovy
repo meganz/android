@@ -222,6 +222,14 @@ pipeline {
                 }
             }
         }
+        stage('Clean Android build') {
+            steps {
+                script {
+                    BUILD_STEP = 'Clean Android'
+                    sh './gradlew clean'
+                }
+            }
+        }
         stage('Build APK(GMS)') {
             steps {
                 script {
@@ -230,7 +238,7 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Build APK (GMS)') {
                     script {
-                        sh './gradlew clean app:assembleGmsRelease'
+                        sh './gradlew app:assembleGmsRelease'
                     }
                 }
             }
@@ -262,10 +270,6 @@ pipeline {
             }
         }
         stage('Upload APK(GMS) to Firebase') {
-            //            environment {
-            //SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
-            //SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
-            //            }
             steps {
                 script {
                     BUILD_STEP = 'Upload APK(GMS) to Firebase'
@@ -285,12 +289,6 @@ pipeline {
                         }
                     }
                 }
-
-                // Archive the APKs so that they can be downloaded from Jenkins
-                // archiveArtifacts '**/*.apk'
-
-                // Upload the APK to Google Play
-                //androidApkUpload googleCredentialsId: 'Google Play', apkFilesPattern: '**/*-release.apk', trackName: 'beta'
             }
         }
         stage('Build APK(HMS)') {
@@ -300,7 +298,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK(HMS)') {
                     script {
-                        sh './gradlew clean app:assembleHmsRelease'
+                        sh './gradlew app:assembleHmsRelease'
                     }
                 }
             }
@@ -332,10 +330,6 @@ pipeline {
             }
         }
         stage('Upload HMS APK to Firebase') {
-            //            environment {
-            //SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
-            //SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
-            //            }
             steps {
                 script {
                     BUILD_STEP = 'Upload HMS APK to Firebase'
@@ -353,45 +347,43 @@ pipeline {
                         }
                     }
                 }
-
-                // Archive the APKs so that they can be downloaded from Jenkins
-                // archiveArtifacts '**/*.apk'
-
-                // Upload the APK to Google Play
-                //androidApkUpload googleCredentialsId: 'Google Play', apkFilesPattern: '**/*-release.apk', trackName: 'beta'
+            }
+        }
+        stage('Build QA APK(GMS)') {
+            steps {
+                script {
+                    BUILD_STEP = 'Build QA APK(GMS)'
+                    withEnv([
+                            "APK_VERSION_NAME_FOR_CD=${APK_VERSION_NAME_FOR_CD}_QA"
+                    ]) {
+                        sh './gradlew app:assembleGmsQa'
+                    }
+                }
             }
         }
 
-//        stage('Deploy') {
-//            environment {
-//                // Assuming a file credential has been added to Jenkins, with the ID 'my-app-signing-keystore',
-//                // this will export an environment variable during the build, pointing to the absolute path of
-//                // the stored Android keystore file.  When the build ends, the temporarily file will be removed.
-//                SIGNING_KEYSTORE = credentials('my-app-signing-keystore')
-//
-//                // Similarly, the value of this variable will be a password stored by the Credentials Plugin
-//                SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
-//            }
-//            steps {
-//                script {
-//                    BUILD_STEP = 'Deploy'
-//                }
-//                // Build the app in release mode, and sign the APK using the environment variables
-//                sh './gradlew assembleRelease'
-//
-//                // Archive the APKs so that they can be downloaded from Jenkins
-//                archiveArtifacts '**/*.apk'
-//
-//                // Upload the APK to Google Play
-//                androidApkUpload googleCredentialsId: 'Google Play', apkFilesPattern: '**/*-release.apk', trackName: 'beta'
-//            }
-//        // post {
-//        //   success {
-//        //     // Notify if the upload succeeded
-//        //     mail to: 'beta-testers@example.com', subject: 'New build available!', body: 'Check it out!'
-//        //   }
-//        // }
-//        }
+        stage('Upload QA APK(GMS) to Firebase') {
+            steps {
+                script {
+                    BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
+                }
+                withCredentials([
+                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
+                ]) {
+                    script {
+                        withEnv([
+                                "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                        ]) {
+                            sh './gradlew appDistributionUploadGmsQa'
+                        }
+                    }
+                }
+            }
+        }
+
+
         stage('Clean up') {
             steps {
                 script {
@@ -415,12 +407,6 @@ pipeline {
             }
         }
     }
-// post {
-//   failure {
-//     // Notify developer team of the failure
-//     mail to: 'android-devs@example.com', subject: 'Oops!', body: "Build ${env.BUILD_NUMBER} failed; ${env.BUILD_URL}"
-//   }
-// }
 }
 
 private String failureMessage(String lineBreak) {
@@ -603,7 +589,6 @@ private String getTriggerReason() {
         return "Other reasons${env.gitlabActionType}"
     }
 }
-
 
 
 /**

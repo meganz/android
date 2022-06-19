@@ -73,6 +73,20 @@ String readTesters() {
     return testers
 }
 
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester group list from environment. Tester group list should be
+ * comma-separated list of group names.
+ * @return tester group list or default group list if there is no environment setting
+ */
+String readTesterGroupList() {
+    String groups = System.getenv("TESTER_GROUP_FOR_CD")
+    if (groups == null || groups.trim().isEmpty()) {
+        groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
+    }
+    return groups
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -207,7 +221,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
+                groups =  readTesterGroupList()
                 testers = readTesters()
             }
         }
@@ -223,7 +237,7 @@ android {
                 // This appId value comes from src/hms/google-services.json
                 appId = "1:268821755439:android:fdd31226b477cf614e78da"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                groups = readTesterGroupList()
                 testers = readTesters()
             }
         }
