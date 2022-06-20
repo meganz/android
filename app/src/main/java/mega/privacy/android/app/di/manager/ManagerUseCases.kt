@@ -43,11 +43,11 @@ abstract class ManagerUseCases {
 
     companion object {
         @Provides
-        fun bindGetInboxNode(filesRepository: FilesRepository): GetInboxNode =
+        fun provideGetInboxNode(filesRepository: FilesRepository): GetInboxNode =
             GetInboxNode(filesRepository::getInboxNode)
 
         @Provides
-        fun bindHasChildren(filesRepository: FilesRepository): HasChildren =
+        fun provideHasChildren(filesRepository: FilesRepository): HasChildren =
             HasChildren(filesRepository::hasChildren)
     }
 }
