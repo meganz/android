@@ -16,7 +16,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
 
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        if (preference.key == composeBrowserPreferenceKey){
+        if (preference.key == composeBrowserPreferenceKey) {
             startActivity(Showkase.getBrowserIntent(requireContext()))
         }
         return super.onPreferenceTreeClick(preference)

@@ -16,5 +16,6 @@ data class UserAccount(
     val email: String,
     val isBusinessAccount: Boolean,
     val isMasterBusinessAccount: Boolean,
-    val accountTypeIdentifier: Int
+    val accountTypeIdentifier: Int,
+    val accountTypeString: String,
 )
