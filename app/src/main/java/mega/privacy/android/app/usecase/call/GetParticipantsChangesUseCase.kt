@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
@@ -51,15 +52,31 @@ class GetParticipantsChangesUseCase @Inject constructor(
     )
 
     /**
-     * Method to check if I am alone in the call or not
+     * Num participants changes result
      *
-     * @param chatId Chat ID of a call
+     * @property chatId        Chat ID of the call
+     * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
      */
-    fun checkIfIAmAloneOnTheCall(chatId: Long): Flowable<Boolean> =
+    data class NumParticipantsChangesResult(
+        val chatId: Long?,
+        val onlyMeInTheCall: Boolean,
+    )
+
+    /**
+     * Method to check if I am alone in the meeting o group call
+     */
+    fun checkIfIAmAloneOnACall(): Flowable<NumParticipantsChangesResult> =
         Flowable.create({ emitter ->
             val callCompositionObserver = Observer<MegaChatCall> { call ->
-                if (call.chatid == chatId) {
-                    emitter.onNext(call.numParticipants == 1 && call.peeridParticipants.get(0) == megaChatApi.myUserHandle)
+                megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+                    val isRequestSent =
+                        MegaApplication.getChatManagement().isRequestSent(call.callId)
+                    val isOneToOneCall = !chat.isGroup && !chat.isMeeting
+                    if (!isRequestSent && !isOneToOneCall) {
+                        val onlyMeInTheCall =
+                            call.numParticipants == 1 && call.peeridParticipants.get(0) == megaChatApi.myUserHandle
+                        emitter.onNext(NumParticipantsChangesResult(call.chatid, onlyMeInTheCall))
+                    }
                 }
             }
 

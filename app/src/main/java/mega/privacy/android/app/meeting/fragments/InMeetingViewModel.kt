@@ -97,7 +97,6 @@ class InMeetingViewModel @Inject constructor(
     private var anotherCallInProgressDisposable: Disposable? = null
     private var networkQualityDisposable: Disposable? = null
     private var reconnectingDisposable: Disposable? = null
-    private var onlyMeDisposable: Disposable? = null
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -190,11 +189,26 @@ class InMeetingViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { result ->
-                    if (currentChatId == result.chatId) {
-                        result.peers?.let { list ->
-                            getParticipantChangesText(list, result.typeChange)
+                onNext = { (chatId, typeChange, peers) ->
+                    if (currentChatId == chatId) {
+                        peers?.let { list ->
+                            getParticipantChangesText(list, typeChange)
                         }
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+
+        getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { (chatId, onlyMeInTheCall) ->
+                    if (currentChatId == chatId) {
+                        _showOnlyMeBanner.value = onlyMeInTheCall
                     }
                 },
                 onError = { error ->
@@ -343,11 +357,6 @@ class InMeetingViewModel @Inject constructor(
      * Method to check if a info banner should be displayed
      */
     fun checkBannerInfo() {
-        if (_showOnlyMeBanner.value) {
-            _showOnlyMeBanner.value = false
-            _showOnlyMeBanner.value = true
-        }
-
         if (_showPoorConnectionBanner.value) {
             _showPoorConnectionBanner.value = false
             _showPoorConnectionBanner.value = true
@@ -377,30 +386,6 @@ class InMeetingViewModel @Inject constructor(
                 }
             ).addTo(composite)
     }
-
-    /**
-     * Method that controls whether to display the I am the only one in the call banner
-     */
-    private fun checkOnlyYouChanges() {
-        getChat()?.let { chat ->
-            if (chat.isMeeting || chat.isGroup) {
-                onlyMeDisposable?.dispose()
-                onlyMeDisposable =
-                    getParticipantsChangesUseCase.checkIfIAmAloneOnTheCall(currentChatId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                            onNext = {
-                                _showOnlyMeBanner.value = it
-                            },
-                            onError = { error ->
-                                LogUtil.logError(error.stackTraceToString())
-                            }
-                        ).addTo(composite)
-            }
-        }
-    }
-
 
     /**
      * Method that controls whether to display the reconnecting banner
@@ -463,7 +448,6 @@ class InMeetingViewModel @Inject constructor(
                     checkParticipantsList()
                     checkNetworkQualityChanges()
                     checkReconnectingChanges()
-                    checkOnlyYouChanges()
                 }
 
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
@@ -1120,6 +1104,17 @@ class InMeetingViewModel @Inject constructor(
             logDebug("Adding participant... ${participantCreated.clientId}")
             participants.value = participants.value
             logDebug("Num of participants: " + participants.value?.size)
+
+            val currentSpeaker = getCurrentSpeakerParticipant()
+            if(currentSpeaker == null) {
+                getFirstParticipant(
+                    MEGACHAT_INVALID_HANDLE,
+                    MEGACHAT_INVALID_HANDLE
+                )?.let { (peerId, clientId) ->
+                    updatePeerSelected(peerId, clientId)
+                }
+            }
+
             return participants.value?.indexOf(participantCreated)
         }
 
@@ -2213,6 +2208,7 @@ class InMeetingViewModel @Inject constructor(
                     if (position != INVALID_POSITION) {
                         speakerParticipants.value?.removeAt(position)
                         logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+                        speakerParticipants.value = speakerParticipants.value
                     }
                 }
             }

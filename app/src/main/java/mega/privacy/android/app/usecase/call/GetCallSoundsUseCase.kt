@@ -35,6 +35,7 @@ class GetCallSoundsUseCase @Inject constructor(
 
     companion object {
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
+        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 1 * SECONDS_IN_MINUTE
     }
 
     /**
@@ -74,57 +75,35 @@ class GetCallSoundsUseCase @Inject constructor(
                     }
                 ).addTo(disposable)
 
-            getCallStatusChangesUseCase.callCannotBeRecovered()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = {
-                        if (it) {
-                            emitter.onNext(CallSoundType.CALL_ENDED)
-                        }
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
-                    }
-                ).addTo(disposable)
-
             getSessionStatusChangesUseCase.getSessionChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { (call1, sessionStatus, isRecoverable, peerId, clientId) ->
+                    onNext = { result ->
                         val participant =
-                            ParticipantInfo(peerId = peerId, clientId = clientId)
+                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
 
-                        when (sessionStatus) {
+                        when (result.sessionStatus) {
                             MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                                call1?.let { call ->
+                                result.call?.let { call ->
                                     stopCountDown(call.chatid, participant)
                                 }
                             }
 
                             MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                isRecoverable?.let { isRecoverableSession ->
-                                    if (call1 == null) {
+                                result.isRecoverable?.let { isRecoverableSession ->
+                                    if (result.call == null) {
                                         stopCountDown(INVALID_HANDLE, participant)
-                                        emitter.onNext(CallSoundType.CALL_ENDED)
                                     } else if (isRecoverableSession) {
                                         emitter.startCountDown(
-                                            call1, participant,
+                                            result.call, participant,
                                             SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
                                         )
                                     } else {
                                         stopCountDown(
-                                            call1.chatid,
+                                            result.call.chatid,
                                             participant
                                         )
-
-                                        megaChatApi.getChatRoom(call1.chatid)
-                                            ?.let { chat ->
-                                                if (!chat.isGroup && !chat.isMeeting) {
-                                                    emitter.onNext(CallSoundType.CALL_ENDED)
-                                                }
-                                            }
                                     }
                                 }
                             }
@@ -136,6 +115,42 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
+            getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { (chatId, onlyMeInTheCall) ->
+                        if (onlyMeInTheCall) {
+                            chatId?.let {
+                                MegaApplication.getChatManagement().startCounterToFinishCall(it,
+                                    SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+                            }
+                        } else {
+                            MegaApplication.getChatManagement().stopCounterToFinishCall()
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            getCallStatusChangesUseCase.getCallStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { status ->
+                        if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                            MegaApplication.getInstance()
+                                .removeRTCAudioManager()
+                            emitter.onNext(CallSoundType.CALL_ENDED)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
             getParticipantsChangesUseCase.getChangesFromParticipants()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -185,9 +200,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                         onRequestFinish = { _, error ->
                                             if (error.errorCode == MegaError.API_OK) {
                                                 removeCountDownTimer()
-                                                MegaApplication.getInstance()
-                                                    .removeRTCAudioManager()
-                                                this.onNext(CallSoundType.CALL_ENDED)
                                             } else {
                                                 this.onError(error.toThrowable())
                                             }
@@ -241,4 +253,3 @@ class GetCallSoundsUseCase @Inject constructor(
         countDownTimer = null
     }
 }
-

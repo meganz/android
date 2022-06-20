@@ -22,7 +22,6 @@ class GetCallStatusChangesUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
 ) {
 
-
     /**
      * Enum defining the type of network quality.
      *
@@ -47,12 +46,16 @@ class GetCallStatusChangesUseCase @Inject constructor(
     private var reconnectingStatusList = hashMapOf<Long, ReconnectingStatusTypes>()
 
     /**
-     * Method to check if the call is reconnecting or not
+     * Method to know if the call has been destroyed because it could not be reconnected.
      */
-    fun getReconnectingStatus(): Flowable<Boolean> =
+    fun callCannotBeRecovered(): Flowable<Boolean> =
         Flowable.create({ emitter ->
             val callStatusObserver = Observer<MegaChatCall> { call ->
-                emitter.checkReconnectingStatus(call.chatid, call.status)
+                if (call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                    if(call.termCode == TERM_CODE_ERROR && !Util.isOnline(MegaApplication.getInstance().applicationContext)) {
+                        emitter.onNext(true)
+                    }
+                }
             }
 
             LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
@@ -65,16 +68,12 @@ class GetCallStatusChangesUseCase @Inject constructor(
         }, BackpressureStrategy.LATEST)
 
     /**
-     * Method to know if the call has been destroyed because it could not be reconnected.
+     * Method to check if the call is reconnecting or not
      */
-    fun callCannotBeRecovered(): Flowable<Boolean> =
+    fun getReconnectingStatus(): Flowable<Boolean> =
         Flowable.create({ emitter ->
             val callStatusObserver = Observer<MegaChatCall> { call ->
-                if (call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
-                    if(call.termCode == TERM_CODE_ERROR && !Util.isOnline(MegaApplication.getInstance().applicationContext)) {
-                        emitter.onNext(true)
-                    }
-                }
+                emitter.checkReconnectingStatus(call.chatid, call.status)
             }
 
             LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
@@ -140,4 +139,25 @@ class GetCallStatusChangesUseCase @Inject constructor(
             }
         }
     }
+
+    /**
+     * Method to get call status
+     */
+    fun getCallStatus(): Flowable<Int> =
+        Flowable.create({ emitter ->
+            val callStatusObserver = Observer<MegaChatCall> { call ->
+                emitter.onNext(call.status)
+            }
+
+            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                .observeForever(callStatusObserver)
+
+            emitter.setCancellable {
+                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                    .removeObserver(callStatusObserver)
+            }
+        }, BackpressureStrategy.LATEST)
+
+
+
 }
