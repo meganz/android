@@ -66,7 +66,7 @@ class InMeetingViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
-    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
+    getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -351,6 +351,15 @@ class InMeetingViewModel @Inject constructor(
                     }
                 ).addTo(composite)
         }
+    }
+
+    /**
+     * Start the counter to end the call after the previous banner has been hidden
+     */
+    fun startCounterTimerAfterBanner() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        MegaApplication.getChatManagement()
+            .startCounterToFinishCall(currentChatId, 2 * SECONDS_IN_MINUTE)
     }
 
     /**

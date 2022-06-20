@@ -176,6 +176,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
+    private var amIOnlyOneOnTheCall:Boolean = false
+
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
     private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
@@ -1080,11 +1082,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.getParticipantsChangesText.collect { title ->
                 if (title.trim().isNotEmpty()) {
-                    callWillEndBanner?.let {
-                        if (it.isShown)
-                            return@collect
-                    }
-
                     participantsChangesBanner?.apply {
                         clearAnimation()
                         text = title
@@ -1093,7 +1090,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
                             else 1f
 
-                        animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
+                        animate()
+                            .alpha(0f)
+                            .setDuration(INFO_ANIMATION.toLong())
+                            .withEndAction {
+                                isVisible = false
+                                if (amIOnlyOneOnTheCall) {
+                                    inMeetingViewModel.startCounterTimerAfterBanner()
+                                    showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
+                                    showOnlyMeInTheCallDialog()
+                                }
+                            }
+                    }
+                } else {
+                    participantsChangesBanner?.apply {
+                        clearAnimation()
                     }
                 }
             }
@@ -1102,16 +1113,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
                 checkMenuItemsVisibility()
-                if (shouldBeShown) {
-                    showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
-                    showOnlyMeInTheCallDialog()
-                } else {
+                amIOnlyOneOnTheCall = shouldBeShown
+
+                if (!amIOnlyOneOnTheCall) {
                     val currentTime = MegaApplication.getChatManagement().millisecondsUntilEndCall
                     if (currentTime > 0) {
                         showCallWillEndInBanner(currentTime)
                         showOnlyMeInTheCallDialog()
                     } else {
                         hideCallWillEndInBanner()
+                        dismissDialog(onlyMeDialog)
                     }
                 }
             }
@@ -1208,13 +1219,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun showCallWillEndInBanner(milliseconds: Long) {
         callWillEndBanner?.apply {
             hideCallWillEndInBanner()
-            participantsChangesBanner?.let {
-                if (it.isShown) {
-                    it.isVisible = false
-                }
-            }
-            logDebug("****************** callWillEndBanner:: SHOW")
-
             isVisible = true
             text = StringResourcesUtils.getString(
                 R.string.calls_call_screen_count_down_timer_to_end_call,
@@ -1242,7 +1246,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Hide Call will end banner and counter down timer
      */
     private fun hideCallWillEndInBanner() {
-        dismissDialog(onlyMeDialog)
         callWillEndBanner?.isVisible = false
         countDownTimerToEndCall?.cancel()
         countDownTimerToEndCall = null
@@ -2527,12 +2530,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         firstButton.setOnClickListener {
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
             leaveMeeting()
         }
 
         secondButton.setOnClickListener {
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
         }
 
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
@@ -2546,6 +2551,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         onlyMeDialog?.setOnDismissListener {
             MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+            it.dismiss()
         }
     }
 
@@ -2651,7 +2657,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     companion object {
 
-        const val INFO_ANIMATION = 4000
+        const val INFO_ANIMATION = 1000
 
         const val ANIMATION_DURATION: Long = 500
 
