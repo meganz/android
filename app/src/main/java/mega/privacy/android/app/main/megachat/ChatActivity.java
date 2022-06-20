@@ -653,7 +653,7 @@ public class ChatActivity extends PasscodeActivity
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     cancelRecording();
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED && dialogCall != null) {
-                    dialogCall.dismiss();
+                    hideDialogCall();
                 }
 
                 if(call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION&&
@@ -1166,7 +1166,7 @@ public class ChatActivity extends PasscodeActivity
                         if (result.component2()) {
                             showOnlyMeInTheCallDialog();
                         } else if (dialogCall != null) {
-                            dialogCall.dismiss();
+                            hideDialogCall();
                         }
                     }
                 });
@@ -3863,6 +3863,11 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
+        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0 || MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            hideDialogCall();
+            return;
+        }
+
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
 
@@ -3882,20 +3887,32 @@ public class ChatActivity extends PasscodeActivity
         dialogCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
         dialogCall.show();
 
-        dialogCall.setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false);
+        dialogCall.setOnDismissListener(dialog -> {
+            isOnlyMeInCallDialogShown = false;
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
+        });
+
         firstButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-            dialogCall.dismiss();
+            hideDialogCall();
         });
 
         secondButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
-            dialogCall.dismiss();
+            hideDialogCall();
         });
+    }
+
+    /**
+     * Hide dialog related to calls
+     */
+    private void hideDialogCall() {
+        isOnlyMeInCallDialogShown = false;
+        dialogCall.dismiss();
     }
 
     /**

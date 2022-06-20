@@ -17,9 +17,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Button
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
@@ -131,7 +131,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerMuteIcon: ImageView? = null
 
     private var participantsChangesBanner: EmojiTextView? = null
-    private var callWillEndBanner: EmojiTextView? = null
+    private var callWillEndBanner: TextView? = null
     private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
@@ -1080,6 +1080,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.getParticipantsChangesText.collect { title ->
                 if (title.trim().isNotEmpty()) {
+                    callWillEndBanner?.let {
+                        if (it.isShown)
+                            return@collect
+                    }
+
                     participantsChangesBanner?.apply {
                         clearAnimation()
                         text = title
@@ -1203,6 +1208,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun showCallWillEndInBanner(milliseconds: Long) {
         callWillEndBanner?.apply {
             hideCallWillEndInBanner()
+            participantsChangesBanner?.let {
+                if (it.isShown) {
+                    it.isVisible = false
+                }
+            }
+            logDebug("****************** callWillEndBanner:: SHOW")
 
             isVisible = true
             text = StringResourcesUtils.getString(
@@ -1231,7 +1242,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Hide Call will end banner and counter down timer
      */
     private fun hideCallWillEndInBanner() {
-        onlyMeDialog?.dismiss()
+        dismissDialog(onlyMeDialog)
         callWillEndBanner?.isVisible = false
         countDownTimerToEndCall?.cancel()
         countDownTimerToEndCall = null
@@ -2495,6 +2506,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
      */
     private fun showOnlyMeInTheCallDialog() {
+        if (MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            dismissDialog(onlyMeDialog)
+            return
+        }
+
         val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
         val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
         val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)
@@ -2527,6 +2543,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .create()
 
         onlyMeDialog?.show()
+
+        onlyMeDialog?.setOnDismissListener {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+        }
     }
 
     /**
