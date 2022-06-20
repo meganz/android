@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Use case for getting the number of unread user alerts for the logged in user.
  */
-interface GetNumUnreadUserAlerts {
+fun interface GetNumUnreadUserAlerts {
 
     /**
      * Invoke.

@@ -2,8 +2,10 @@ package mega.privacy.android.app.di.manager
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.*
 
 /**
@@ -39,7 +41,10 @@ abstract class ManagerUseCases {
     @Binds
     abstract fun bindGetNodeByHandle(useCase: DefaultGetNodeByHandle): GetNodeByHandle
 
-    @Binds
-    abstract fun bindGetNumUnreadUserAlerts(useCase: DefaultGetNumUnreadUserAlerts): GetNumUnreadUserAlerts
+    companion object {
+        @Provides
+        fun provideGetNumUnreadUserAlerts(accountRepository: AccountRepository): GetNumUnreadUserAlerts =
+            GetNumUnreadUserAlerts(accountRepository::getNumUnreadUserAlerts)
+    }
 
 }
