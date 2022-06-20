@@ -11,6 +11,8 @@ import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRAN
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
 import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
@@ -97,17 +99,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
+import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository;
 import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
+import mega.privacy.android.app.domain.repository.CameraUploadRepository;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -126,8 +130,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -175,9 +177,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean stopByNetworkStateChange;
 
     @Inject
-    DatabaseHandler dbH;
+    CameraUploadRepository cameraUploadRepository;
+
+    @Inject
+    ThreadPoolExecutor megaThreadPoolExecutor;
 
     private MegaPreferences prefs;
+
+    private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
+    private MegaApplication app;
+
     private String localPath = INVALID_NON_NULL_VALUE;
     private boolean removeGPS = true;
     private long cameraUploadHandle = INVALID_HANDLE;
@@ -187,10 +197,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private MegaNode secondaryUploadNode;
 
     private boolean isLoggingIn;
-
-    private MegaApiAndroid megaApi;
-    private MegaApiAndroid megaApiFolder;
-    private MegaApplication app;
 
     private static final int LOGIN_IN = 12;
     private static final int SETTING_USER_ATTRIBUTE = 7;
@@ -226,9 +232,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private PendingIntent mPendingIntent;
     private String tempRoot;
     private VideoCompressor mVideoCompressor;
-
-    @Inject
-    ThreadPoolExecutor megaThreadPoolExecutor;
 
     private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 
@@ -320,16 +323,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onTypeChanges(int type) {
         Timber.d("Network type change to: %s", type);
         megaThreadPoolExecutor.execute(() -> {
-            MegaPreferences prefs = dbH.getPreferences();
-            if (prefs != null) {
-                stopByNetworkStateChange = type == MOBILE && Boolean.parseBoolean(prefs.getCamSyncWifi());
-                if (stopByNetworkStateChange) {
-                    for (MegaTransfer transfer : cuTransfers) {
-                        megaApi.cancelTransfer(transfer, this);
-                    }
-                    stopped = true;
-                    finish();
+            stopByNetworkStateChange = type == MOBILE && cameraUploadRepository.isSyncByWifi();
+            if (stopByNetworkStateChange) {
+                for (MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer, this);
                 }
+                stopped = true;
+                finish();
             }
         });
     }
@@ -513,57 +513,43 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 MediaStore.MediaColumns.DATE_MODIFIED
         };
 
-        String selectionCamera = null;
-        String selectionCameraVideo = null;
+        String selectionCamera;
+        String selectionCameraVideo;
         String selectionSecondary = null;
         String selectionSecondaryVideo = null;
 
-        prefs = dbH.getPreferences();
+        currentTimeStamp = cameraUploadRepository.getSyncTimeStamp();
+        Timber.d("Primary photo timestamp is: %s", currentTimeStamp);
 
-        if (prefs != null) {
-            if (prefs.getCamSyncTimeStamp() != null) {
-                currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-            } else {
-                currentTimeStamp = 0;
+        selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+
+        currentVideoTimeStamp = cameraUploadRepository.getVideoSyncTimeStamp();
+        Timber.d("Primary video timestamp is: %s", currentVideoTimeStamp);
+
+        selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+
+        if (secondaryEnabled) {
+            Timber.d("Secondary upload is enabled.");
+            secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
+
+            String secondaryTime = cameraUploadRepository.getSecondarySyncTimeStamp();
+            if (secondaryTime != null) {
+                secondaryTimeStamp = Long.parseLong(secondaryTime);
+                Timber.d("Secondary photo timestamp is: %s", secondaryTimeStamp);
+                selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
             }
-            Timber.d("Primary photo timestamp is: %s", currentTimeStamp);
 
-            selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-
-            if (prefs.getCamVideoSyncTimeStamp() != null) {
-                currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
-            } else {
-                currentVideoTimeStamp = 0;
-            }
-            Timber.d("Primary video timestamp is: %s", currentVideoTimeStamp);
-
-            selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-
-            if (secondaryEnabled) {
-                Timber.d("Secondary upload is enabled.");
-                secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
-
-                if (prefs.getSecSyncTimeStamp() != null) {
-                    secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-                    Timber.d("Secondary photo timestamp is: %s", secondaryTimeStamp);
-                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-                }
-                if (prefs.getSecVideoSyncTimeStamp() != null) {
-                    secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
-                    Timber.d("Secondary video timestamp is: %s", secondaryVideoTimeStamp);
-                    selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-                }
+            String secondaryVideoTime = cameraUploadRepository.getSecondaryVideoSyncTimeStamp();
+            if (secondaryVideoTime != null) {
+                secondaryVideoTimeStamp = Long.parseLong(secondaryVideoTime);
+                Timber.d("Secondary video timestamp is: %s", secondaryVideoTimeStamp);
+                selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
             }
         }
 
         ArrayList<Uri> uris = new ArrayList<>();
-        if (prefs.getCamSyncFileUpload() == null) {
-            Timber.d("What to upload setting is null, only upload photo.");
-            dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-            uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        } else {
-            switch (Integer.parseInt(prefs.getCamSyncFileUpload())) {
+        cameraUploadRepository.manageSyncFileUpload(preference -> {
+            switch (preference) {
                 case MegaPreferences.ONLY_PHOTOS: {
                     Timber.d("Only upload photo.");
                     uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -585,7 +571,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     break;
                 }
             }
-        }
+            return Unit.INSTANCE;
+        }, () -> {
+            Timber.d("What to upload setting is NULL, only upload photo.");
+            uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            return Unit.INSTANCE;
+        });
 
         for (int i = 0; i < uris.size(); i++) {
             Uri uri = uris.get(i);
@@ -702,7 +694,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         // Need to maintain timestamp for better performance
         updateTimeStamp();
 
-        List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
+        List<SyncRecord> finalList = cameraUploadRepository.getPendingSyncRecords();
 
         // Reset backup state as active.
         CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE);
@@ -803,7 +795,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     MegaNode node = checkExsitBySize(parent, toUpload.length());
                     if (node != null && node.getOriginalFingerprint() == null) {
                         Timber.d("Node with handle: " + node.getHandle() + " already exists, delete record from database.");
-                        dbH.deleteSyncRecordByPath(path, isSec);
+                        cameraUploadRepository.deleteSyncRecord(path, isSec);
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
@@ -812,7 +804,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.");
-                    dbH.deleteSyncRecordByPath(path, isSec);
+                    cameraUploadRepository.deleteSyncRecord(path, isSec);
                 }
             }
         }
@@ -847,11 +839,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Timber.d("Handle with local file which timestamp is: %s", file.getTimestamp());
             if (stopped) return;
 
-            SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(), file.isSecondary(), file.isCopyOnly());
+            SyncRecord exist = cameraUploadRepository.getSyncRecordOrNull(file.getOriginFingerprint(), file.isSecondary(), file.isCopyOnly());
             if (exist != null) {
                 if (exist.getTimestamp() < file.getTimestamp()) {
                     Timber.d("Got newer time stamp.");
-                    dbH.deleteSyncRecordByLocalPath(exist.getLocalPath(), exist.isSecondary());
+                    cameraUploadRepository.deleteSyncRecordLocalPath(exist.getLocalPath(), exist.isSecondary());
                 } else {
                     Timber.w("Duplicate sync records.");
                     continue;
@@ -865,7 +857,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 File f = new File(file.getLocalPath());
                 if (!f.exists()) {
                     Timber.w("File does not exist, remove from database.");
-                    dbH.deleteSyncRecordByLocalPath(file.getLocalPath(), isSec);
+                    cameraUploadRepository.deleteSyncRecordLocalPath(file.getLocalPath(), isSec);
                     continue;
                 }
             }
@@ -887,7 +879,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
+                    inDatabase = cameraUploadRepository.doesFileNameExist(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
                 } while ((inCloud || inDatabase));
             } else {
                 do {
@@ -898,7 +890,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = dbH.fileNameExists(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
+                    inDatabase = cameraUploadRepository.doesFileNameExist(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
                 } while ((inCloud || inDatabase));
             }
 
@@ -912,7 +904,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             String newPath = tempRoot + System.nanoTime() + "." + extension;
             file.setNewPath(newPath);
             Timber.d("Save file to database, new path is: %s", newPath);
-            dbH.saveSyncRecord(file);
+            cameraUploadRepository.saveSyncRecord(file);
         }
     }
 
@@ -946,7 +938,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Media media = mediaList.poll();
             if (media == null) continue;
 
-            if (dbH.localPathExists(media.filePath, isSecondary, SyncRecordType.TYPE_ANY.getValue())) {
+            if (cameraUploadRepository.doesLocalPathExist(media.filePath, isSecondary, SyncRecordType.TYPE_ANY.getValue())) {
                 Timber.d("Skip media with timestamp: %s", media.timestamp);
                 continue;
             }
@@ -1005,24 +997,24 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                         if (isVideo) {
                             if (media.timestamp > currentVideoTimeStamp) {
                                 currentVideoTimeStamp = media.timestamp;
-                                dbH.setCamVideoSyncTimeStamp(media.timestamp);
+                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY_VIDEO);
                             }
                         } else {
                             if (media.timestamp > currentTimeStamp) {
                                 currentTimeStamp = media.timestamp;
-                                dbH.setCamSyncTimeStamp(media.timestamp);
+                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY);
                             }
                         }
                     } else {
                         if (isVideo) {
                             if (media.timestamp > secondaryVideoTimeStamp) {
                                 secondaryVideoTimeStamp = media.timestamp;
-                                dbH.setSecVideoSyncTimeStamp(media.timestamp);
+                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY_VIDEO);
                             }
                         } else {
                             if (media.timestamp > secondaryTimeStamp) {
                                 secondaryTimeStamp = media.timestamp;
-                                dbH.setSecSyncTimeStamp(media.timestamp);
+                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY);
                             }
                         }
                     }
@@ -1785,22 +1777,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void updateCurrentTimeStamp(long timeStamp) {
         currentTimeStamp = timeStamp;
-        dbH.setCamSyncTimeStamp(currentTimeStamp);
+        cameraUploadRepository.setSyncTimeStamp(currentTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY);
     }
 
     private void updateCurrentVideoTimeStamp(long timeStamp) {
         currentVideoTimeStamp = timeStamp;
-        dbH.setCamVideoSyncTimeStamp(currentVideoTimeStamp);
+        cameraUploadRepository.setSyncTimeStamp(currentVideoTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY_VIDEO);
     }
 
     private void updateSecondaryTimeStamp(long timeStamp) {
         secondaryTimeStamp = timeStamp;
-        dbH.setSecSyncTimeStamp(secondaryTimeStamp);
+        cameraUploadRepository.setSyncTimeStamp(secondaryTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY);
     }
 
     private void updateSecondaryVideoTimeStamp(long timeStamp) {
         secondaryVideoTimeStamp = timeStamp;
-        dbH.setSecVideoSyncTimeStamp(secondaryVideoTimeStamp);
+        cameraUploadRepository.setSyncTimeStamp(secondaryVideoTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY_VIDEO);
     }
 
     private boolean isCompressedVideoPending() {
