@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.FolderVersionInfo
  * Get folder version info
  *
  */
-interface GetFolderVersionInfo {
+fun interface GetFolderVersionInfo {
     /**
      * Invoke
      *
