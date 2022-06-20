@@ -476,18 +476,18 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * @deprecated Should use SharedTab
      */
-    @SuppressWarnings({"deprecation", "RedundantSuppression"})
+    @Deprecated
     public static final int INCOMING_TAB = 0;
     /**
      * @deprecated Should use SharedTab
      */
-    @SuppressWarnings({"deprecation", "RedundantSuppression"})
+    @Deprecated
     public static final int OUTGOING_TAB = 1;
 
     /**
      * @deprecated Should use SharedTab
      */
-    @SuppressWarnings({"deprecation", "RedundantSuppression"})
+    @Deprecated
     public static final int LINKS_TAB = 2;
 
     public static final int PENDING_TAB = 0;
