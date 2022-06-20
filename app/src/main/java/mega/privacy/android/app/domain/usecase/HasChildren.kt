@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Use case for checking if a node has children.
  */
-interface HasChildren {
+fun interface HasChildren {
 
     /**
      * Invoke.

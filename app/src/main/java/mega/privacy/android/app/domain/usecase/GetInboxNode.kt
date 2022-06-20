@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Use case for getting the Inbox node.
  */
-interface GetInboxNode {
+fun interface GetInboxNode {
 
     /**
      * Invoke.
