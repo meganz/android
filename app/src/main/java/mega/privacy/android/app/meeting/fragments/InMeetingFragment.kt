@@ -2072,13 +2072,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.alpha = 0f
             }
 
-            // Delay a bit to wait for 'bannerMuteLayout' finish layouting, otherwise, its bottom is 0.
-            RunOnUIThreadUtils.runDelay(10) {
-                adjustPositionOfFloatingWindow(
-                    bTop = true,
-                    bBottom = false
-                )
-            }
+            adjustPositionOfFloatingWindow(
+                bTop = true,
+                bBottom = false
+            )
         }
     }
 
