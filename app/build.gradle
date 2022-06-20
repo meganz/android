@@ -40,7 +40,7 @@ def readVersionName() {
     if (versionNameTag != null && !versionNameTag.isEmpty()) {
         return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
     } else {
-        return  "$rootProject.appVersion (${rootProject.versionCode})"
+        return "$rootProject.appVersion (${rootProject.versionCode})"
     }
 }
 
@@ -73,6 +73,20 @@ String readTesters() {
     return testers
 }
 
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester group list from environment. Tester group list should be
+ * comma-separated list of group names.
+ * @return tester group list or default group list if there is no environment setting
+ */
+String readTesterGroupList() {
+    String groups = System.getenv("TESTER_GROUP_FOR_CD")
+    if (groups == null || groups.trim().isEmpty()) {
+        groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
+    }
+    return groups
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -96,18 +110,18 @@ android {
         versionName readVersionName()
 
         multiDexEnabled true
-        ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
+        ndk.abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
 
-        buildConfigField ("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
-        resValue ("string", "app_version", "\"${versionName}\"")
-        resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
-        resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
+        buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
+        resValue("string", "app_version", "\"${versionName}\"")
+        resValue("string", "sdk_version", "\"${getSdkGitHash()}\"")
+        resValue("string", "karere_version", "\"${getKarereGitHash()}\"")
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
     }
 
     sourceSets {
-         main {
+        main {
             java {
                 srcDirs += 'src/main/jni/mega/sdk/bindings/java'
                 srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
@@ -118,7 +132,7 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
-        debug{
+        debug {
             res {
                 srcDirs 'src/main/res', 'src/sharedTest/res'
             }
@@ -207,7 +221,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
+                groups =  readTesterGroupList()
                 testers = readTesters()
             }
         }
@@ -223,7 +237,7 @@ android {
                 // This appId value comes from src/hms/google-services.json
                 appId = "1:268821755439:android:fdd31226b477cf614e78da"
                 releaseNotes = readReleaseNotes()
-                groups = "internal_qa, internal_dev, external_qa, external_dev"
+                groups = readTesterGroupList()
                 testers = readTesters()
             }
         }
@@ -383,6 +397,14 @@ dependencies {
     implementation "com.github.tony19:logback-android:$logbackVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
+    // Compose
+    implementation "androidx.compose.compiler:compiler:$composeVersion"
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$viewModelComposeVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
@@ -396,7 +418,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
-    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
@@ -404,7 +426,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
     testImplementation "app.cash.turbine:turbine:$turbineVersion"
-    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
@@ -419,7 +441,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
-    androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }

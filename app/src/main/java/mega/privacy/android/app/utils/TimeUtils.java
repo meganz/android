@@ -427,6 +427,16 @@ public class TimeUtils implements Comparator<Calendar> {
         return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
     }
 
+    /**
+     * Get minutes and seconds from milliseconds
+     *
+     * @param milliseconds Time in milliseconds
+     * @return Time in minutes and seconds
+     */
+    public static String getMinutesAndSecondsFromMilliseconds(long milliseconds) {
+        return (new SimpleDateFormat("mm:ss")).format(new Date(milliseconds));
+    }
+
     public static String getVideoDuration(int duration) {
         if (duration > 0) {
             int hours = duration / 3600;

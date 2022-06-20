@@ -495,9 +495,6 @@ public class Constants {
     public static int TYPE_NETWORK_QUALITY = 2;
     public static int TYPE_AUDIO = 3;
     public static int TYPE_VIDEO = 4;
-    public static int TYPE_RECONNECTING = 5;
-    public static int TYPE_SINGLE_PARTICIPANT = 6;
-    public static int TYPE_NO_CONNECTION = 7;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";

@@ -25,4 +25,15 @@ interface AccountInfoWrapper {
      * MegaAccountDetails.ACCOUNT_TYPE_BUSINESS = 100
      */
     val accountTypeId: Int
+
+    /**
+     * Account type string
+     */
+    val accountTypeString: String
+
+    /**
+     * Request account details
+     *
+     */
+    fun requestAccountDetails()
 }

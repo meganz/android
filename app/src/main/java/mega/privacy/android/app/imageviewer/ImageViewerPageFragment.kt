@@ -254,7 +254,7 @@ class ImageViewerPageFragment : Fragment() {
             setAllowTouchInterceptionWhileZoomed(true)
             setZoomingEnabled(false)
             setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
                     launchVideoScreen()
                     return true
                 }
@@ -264,7 +264,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun launchVideoScreen() {
-        val imageItem = viewModel.getImageItem(itemId!!) ?: return
+        val imageItem = itemId?.let { viewModel.getImageItem(it) } ?: return
         (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
     }
 
