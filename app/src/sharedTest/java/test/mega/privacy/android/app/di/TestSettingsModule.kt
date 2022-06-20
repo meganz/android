@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetAccountDetails
 import mega.privacy.android.app.domain.usecase.GetChatImageQuality
 import mega.privacy.android.app.domain.usecase.GetPreference
 import mega.privacy.android.app.domain.usecase.GetStartScreen
+import mega.privacy.android.app.domain.usecase.GetSupportEmail
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
 import mega.privacy.android.app.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
@@ -181,19 +182,22 @@ object TestSettingsModule {
 
     @Provides
     fun provideGetIntPreference(): GetPreference<Int> =
-        mock { on { invoke(anyOrNull(), any()) }.thenAnswer{ flowOf(it.arguments[1])} }
+        mock { on { invoke(anyOrNull(), any()) }.thenAnswer { flowOf(it.arguments[1]) } }
 
     @Provides
     fun provideGetLongPreference(): GetPreference<Long> =
-        mock { on { invoke(anyOrNull(), any()) }.thenAnswer{ flowOf(it.arguments[1])} }
+        mock { on { invoke(anyOrNull(), any()) }.thenAnswer { flowOf(it.arguments[1]) } }
 
     @Provides
     fun provideGetFloatPreference(): GetPreference<Float> =
-        mock { on { invoke(anyOrNull(), any()) }.thenAnswer{ flowOf(it.arguments[1])} }
+        mock { on { invoke(anyOrNull(), any()) }.thenAnswer { flowOf(it.arguments[1]) } }
 
     @Provides
     fun provideGetBooleanPreference(): GetPreference<Boolean> =
-        mock { on { invoke(anyOrNull(), any()) }.thenAnswer{ flowOf(it.arguments[1])} }
+        mock { on { invoke(anyOrNull(), any()) }.thenAnswer { flowOf(it.arguments[1]) } }
+
+    @Provides
+    fun provideGetSupportEmail(): GetSupportEmail = mock()
 
     @Provides
     @ElementsIntoSet
