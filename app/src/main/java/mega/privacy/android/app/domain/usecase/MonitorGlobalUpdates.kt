@@ -6,7 +6,7 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 /**
  * Monitor global updates for the current logged in user
  */
-interface MonitorGlobalUpdates {
+fun interface MonitorGlobalUpdates {
     /**
      * Invoke
      *

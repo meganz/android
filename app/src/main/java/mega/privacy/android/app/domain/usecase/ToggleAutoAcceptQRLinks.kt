@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Toggle auto accept q r links
  *
  */
-interface ToggleAutoAcceptQRLinks {
+fun interface ToggleAutoAcceptQRLinks {
     /**
      * Invoke
      *

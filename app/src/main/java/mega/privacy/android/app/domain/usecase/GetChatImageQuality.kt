@@ -7,7 +7,7 @@ import mega.privacy.android.app.domain.entity.ChatImageQuality
  * Gets chat image quality preference.
  *
  */
-interface GetChatImageQuality {
+fun interface GetChatImageQuality {
 
     /**
      * Invoke.
