@@ -27,8 +27,8 @@ class RecyclerViewAssertions {
                 }
                 Assert.assertTrue(view is RecyclerView)
                 val recyclerView = view as RecyclerView
-                val adapter = recyclerView.adapter
-                for (position in 0 until adapter!!.itemCount) {
+                val adapter = recyclerView.adapter ?: return@ViewAssertion
+                for (position in 0 until adapter.itemCount) {
                     val itemType = adapter.getItemViewType(position)
                     val viewHolder = adapter.createViewHolder(recyclerView, itemType)
                     adapter.bindViewHolder(viewHolder, position)
@@ -60,8 +60,8 @@ class RecyclerViewAssertions {
                 }
                 Assert.assertTrue(view is RecyclerView)
                 val recyclerView = view as RecyclerView
-                val adapter = recyclerView.adapter
-                for (position in 0 until adapter!!.itemCount) {
+                val adapter = recyclerView.adapter ?: return@ViewAssertion
+                for (position in 0 until adapter.itemCount) {
                     val itemType = adapter.getItemViewType(position)
                     val viewHolder = adapter.createViewHolder(recyclerView, itemType)
                     adapter.bindViewHolder(viewHolder, position)

@@ -34,7 +34,6 @@ class DefaultAccountRepositoryTest {
         underTest = DefaultAccountRepository(
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
-            context = mock(),
             monitorMultiFactorAuth = MonitorMultiFactorAuth(),
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) }
@@ -45,6 +44,7 @@ class DefaultAccountRepositoryTest {
     fun `test that get account does not throw exception if email is null`() = runTest {
         whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
         whenever(megaApiGateway.getLoggedInUser()).thenReturn(null)
+        whenever(accountInfoWrapper.accountTypeString).thenReturn("Free")
 
         assertThat(underTest.getUserAccount()).isNotNull()
     }
@@ -80,4 +80,3 @@ class DefaultAccountRepositoryTest {
         }
 
 }
-
