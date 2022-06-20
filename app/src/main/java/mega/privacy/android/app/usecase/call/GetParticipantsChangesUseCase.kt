@@ -127,10 +127,6 @@ class GetParticipantsChangesUseCase @Inject constructor(
             return
 
         megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-            if (!chat.isMeeting && !chat.isGroup) {
-                return
-            }
-
             when (call.callCompositionChange) {
                 TYPE_JOIN -> {
                     peerIdsJoined.add(call.peeridCallCompositionChange)

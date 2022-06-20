@@ -79,31 +79,37 @@ class GetCallSoundsUseCase @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { result ->
+                    onNext = { (call, sessionStatus, isRecoverable, peerId, clientId) ->
                         val participant =
-                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
+                            ParticipantInfo(peerId = peerId, clientId = clientId)
 
-                        when (result.sessionStatus) {
-                            MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                                result.call?.let { call ->
-                                    stopCountDown(call.chatid, participant)
-                                }
-                            }
+                        if (call == null) {
+                            stopCountDown(INVALID_HANDLE, participant)
+                        } else {
+                            megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+                                if (!chat.isGroup && !chat.isMeeting) {
+                                    when (sessionStatus) {
+                                        MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                            stopCountDown(call.chatid, participant)
+                                        }
+                                        MegaChatSession.SESSION_STATUS_DESTROYED -> {
 
-                            MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                result.isRecoverable?.let { isRecoverableSession ->
-                                    if (result.call == null) {
-                                        stopCountDown(INVALID_HANDLE, participant)
-                                    } else if (isRecoverableSession) {
-                                        emitter.startCountDown(
-                                            result.call, participant,
-                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
-                                        )
-                                    } else {
-                                        stopCountDown(
-                                            result.call.chatid,
-                                            participant
-                                        )
+                                            isRecoverable?.let { isRecoverableSession ->
+                                                if (isRecoverableSession) {
+                                                    emitter.startCountDown(
+                                                        call,
+                                                        participant,
+                                                        SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                                    )
+
+                                                } else {
+                                                    stopCountDown(
+                                                        call.chatid,
+                                                        participant
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -151,6 +157,7 @@ class GetCallSoundsUseCase @Inject constructor(
                     }
                 )
                 .addTo(disposable)
+
             getParticipantsChangesUseCase.getChangesFromParticipants()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

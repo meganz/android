@@ -191,8 +191,12 @@ class InMeetingViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { (chatId, typeChange, peers) ->
                     if (currentChatId == chatId) {
-                        peers?.let { list ->
-                            getParticipantChangesText(list, typeChange)
+                        getChat()?.let { chat ->
+                            if (chat.isMeeting || chat.isGroup) {
+                                peers?.let { list ->
+                                    getParticipantChanges(list, typeChange)
+                                }
+                            }
                         }
                     }
                 },
@@ -233,7 +237,7 @@ class InMeetingViewModel @Inject constructor(
      * @param list List of participants with changes
      * @param type Type of change
      */
-    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
+    private fun getParticipantChanges(list: ArrayList<Long>, type: Int) {
         val text = when (val numParticipants = list.size) {
             1 -> StringResourcesUtils.getString(
                 if (type == TYPE_JOIN)
