@@ -294,8 +294,6 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                listener.onChangePanelState()
-
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
                 if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED

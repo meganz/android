@@ -2030,20 +2030,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Change Bottom Floating Panel State
-     *
-     */
-    override fun onChangePanelState() {
-        /*if (isWaitingForMakeModerator) {
-            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                findNavController().navigate(
-                    InMeetingFragmentDirections.actionGlobalMakeModerator()
-                )
-            }
-        }*/
-    }
-
-    /**
      * Change Mic State
      *
      * @param micOn True, if the microphone is on. False, if the microphone is off
