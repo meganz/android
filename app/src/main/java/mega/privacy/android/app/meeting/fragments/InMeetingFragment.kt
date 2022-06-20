@@ -1080,10 +1080,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.getParticipantsChangesText.collect { title ->
+            inMeetingViewModel.getParticipantsChanges.collect { (type, title) ->
                 if (title.trim().isNotEmpty()) {
                     participantsChangesBanner?.apply {
                         clearAnimation()
+                        hideCallWillEndInBanner()
+
                         text = title
                         isVisible = true
                         alpha =
@@ -1095,7 +1097,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             .setDuration(INFO_ANIMATION.toLong())
                             .withEndAction {
                                 isVisible = false
-                                if (amIOnlyOneOnTheCall) {
+                                if (type == TYPE_LEFT && amIOnlyOneOnTheCall) {
                                     inMeetingViewModel.startCounterTimerAfterBanner()
                                     showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
                                     showOnlyMeInTheCallDialog()
@@ -1105,6 +1107,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 } else {
                     participantsChangesBanner?.apply {
                         clearAnimation()
+                        isVisible = false
                     }
                 }
             }
@@ -1114,7 +1117,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
                 checkMenuItemsVisibility()
                 amIOnlyOneOnTheCall = shouldBeShown
-
                 if (!amIOnlyOneOnTheCall) {
                     val currentTime = MegaApplication.getChatManagement().millisecondsUntilEndCall
                     if (currentTime > 0) {
@@ -1218,7 +1220,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun showCallWillEndInBanner(milliseconds: Long) {
         callWillEndBanner?.apply {
+            collapsePanel()
             hideCallWillEndInBanner()
+
             isVisible = true
             text = StringResourcesUtils.getString(
                 R.string.calls_call_screen_count_down_timer_to_end_call,
@@ -2030,13 +2034,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      *
      */
     override fun onChangePanelState() {
-        if (isWaitingForMakeModerator) {
+        /*if (isWaitingForMakeModerator) {
             if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                 findNavController().navigate(
                     InMeetingFragmentDirections.actionGlobalMakeModerator()
                 )
             }
-        }
+        }*/
     }
 
     /**
@@ -2475,21 +2479,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         leaveMeeting()
     }
 
-    /**
-     * Method to navigate to the Make moderator screen
-     */
-    private val showAssignModeratorFragment = fun() {
+    private fun collapsePanel() {
         val isPanelExpanded =
             bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded
 
-        if (isPanelExpanded) {
+        if (isPanelExpanded)
             bottomFloatingPanelViewHolder.collapse()
-        } else {
-            findNavController().navigate(
-                InMeetingFragmentDirections.actionGlobalMakeModerator()
-            )
-        }
+    }
+
+    /**
+     * Method to navigate to the Make moderator screen
+     */
+    private val showAssignModeratorFragment = fun() {
+        collapsePanel()
+        findNavController().navigate(
+            InMeetingFragmentDirections.actionGlobalMakeModerator()
+        )
+
     }
 
     /**
