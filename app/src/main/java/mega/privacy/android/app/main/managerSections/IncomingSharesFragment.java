@@ -16,7 +16,6 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
-import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -264,16 +263,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 		}
 
 		if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationsLevel == (managerActivity.deepBrowserTreeIncoming)) {
-			managerActivity.comesFromNotifications = false;
-			managerActivity.comesFromNotificationsLevel = 0;
-			managerActivity.comesFromNotificationHandle = -1;
-			managerActivity.selectDrawerItem(DrawerItem.NOTIFICATIONS);
-			managerActivity.setDeepBrowserTreeIncoming(managerActivity.comesFromNotificationDeepBrowserTreeIncoming);
-			managerActivity.comesFromNotificationDeepBrowserTreeIncoming = -1;
-			managerActivity.setParentHandleIncoming(managerActivity.comesFromNotificationHandleSaved);
-			managerActivity.comesFromNotificationHandleSaved = -1;
-			managerActivity.refreshIncomingShares();
-
+			managerActivity.restoreSharesAfterComingFromNotifications();
 			return 4;
 		} else {
 			managerActivity.decreaseDeepBrowserTreeIncoming();
