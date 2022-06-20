@@ -1,23 +1,22 @@
 package mega.privacy.android.app.di.settings
 
 import dagger.Binds
-import dagger.BindsOptionalOf
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntoSet
+import mega.privacy.android.app.domain.repository.SupportRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultAreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultAreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultSetChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultSetSdkLogsEnabled
+import mega.privacy.android.app.domain.usecase.GetSupportEmail
 import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
-import java.util.Optional
 
 /**
  * Settings module
@@ -40,7 +39,11 @@ abstract class SettingsModule {
     @Binds
     abstract fun bindAreSdkLogsEnabled(useCase: DefaultAreSdkLogsEnabled): AreSdkLogsEnabled
 
-    companion object{
+    companion object {
+        @Provides
+        fun provideGetSupportEmail(supportRepository: SupportRepository): GetSupportEmail =
+            GetSupportEmail(supportRepository::getSupportEmail)
+
         @Provides
         @ElementsIntoSet
         fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()

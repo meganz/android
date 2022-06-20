@@ -7,11 +7,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.CountDownTimer;
+
 import androidx.preference.PreferenceManager;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
@@ -38,6 +41,8 @@ public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
     private final MegaApplication app;
+    private CountDownTimer countDownTimerToEndCall = null;
+    public long millisecondsUntilEndCall = 0;
 
     // List of chat ids to control if a chat is already joining.
     private final List<Long> joiningChatIds = new ArrayList<>();
@@ -317,6 +322,44 @@ public class ChatManagement {
         removeStatusVideoAndSpeaker(chatId);
         setRequestSentCall(callId, false);
         unregisterScreenReceiver();
+    }
+
+    /**
+     * Method to start a timer to end the call
+     *
+     * @param chatId     Chat ID of the call
+     * @param timeToWait seconds to wait
+     */
+    public void startCounterToFinishCall(long chatId, long timeToWait) {
+        stopCounterToFinishCall();
+        if (countDownTimerToEndCall == null) {
+            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    millisecondsUntilEndCall = millisUntilFinished;
+                }
+
+                @Override
+                public void onFinish() {
+                    MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
+                    if (call != null) {
+                        app.getMegaChatApi().hangChatCall(call.getCallId(), null);
+                    }
+                }
+            }.start();
+        }
+    }
+
+    /**
+     * Method to stop the counter to end the call
+     */
+    public void stopCounterToFinishCall() {
+        millisecondsUntilEndCall = 0;
+        if (countDownTimerToEndCall != null) {
+            countDownTimerToEndCall.cancel();
+            countDownTimerToEndCall = null;
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.core.graphics.alpha
 import androidx.preference.R
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers
@@ -43,4 +44,4 @@ fun withTextColorAlpha(expectedAlpha: Double): Matcher<View?> {
  * Helper function to match views on a preference screen.
  *
  */
-fun onPreferences(): ViewInteraction = Espresso.onView(ViewMatchers.withId(R.id.recycler_view))
+fun onPreferences(): ViewInteraction = onView(ViewMatchers.withId(R.id.recycler_view))

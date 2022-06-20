@@ -15,7 +15,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 
-const val testFragmentTag = "underTest"
+internal const val testFragmentTag = "underTest"
 
 /**
  * launchFragmentInContainer from the androidx.fragment:fragment-testing library
@@ -26,7 +26,7 @@ const val testFragmentTag = "underTest"
  * [HiltTestActivity] in the debug folder and include it in the debug AndroidManifest.xml file
  * as can be found in this project.
  */
-inline fun <reified T : Fragment> launchFragmentInHiltContainer(
+internal inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme,
     crossinline action: Fragment.() -> Unit = {}
@@ -49,7 +49,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
         fragment.arguments = fragmentArgs
         activity.supportFragmentManager
             .beginTransaction()
-            .add(android.R.id.content, fragment, testFragmentTag)
+            .add(R.id.test_fragment, fragment, testFragmentTag)
             .commitNow()
 
         fragment.action()

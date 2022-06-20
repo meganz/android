@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
@@ -48,6 +49,20 @@ class MegaApiFacade @Inject constructor(
         megaApi.cancelAccount(listener)
     }
 
+    override fun createSupportTicket(
+        ticketContent: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.createSupportTicket(ticketContent, ANDROID_SUPPORT_ISSUE, listener)
+    }
+
+    override fun startUploadForSupport(
+        path: String,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startUploadForSupport(path, false, listener)
+    }
+
     override val accountEmail: String?
         get() = megaApi.myEmail
     override val isBusinessAccount: Boolean
@@ -62,6 +77,8 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
+
+    override suspend fun getSdkVersion(): String = megaApi.version
 
     override val globalUpdates: Flow<GlobalUpdate>
         get() = callbackFlow {
@@ -172,5 +189,13 @@ class MegaApiFacade @Inject constructor(
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
 
+    override fun cancelTransfer(transfer: MegaTransfer) {
+        megaApi.cancelTransfer(transfer)
+    }
+
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
+
+    companion object {
+        private const val ANDROID_SUPPORT_ISSUE = 10
+    }
 }

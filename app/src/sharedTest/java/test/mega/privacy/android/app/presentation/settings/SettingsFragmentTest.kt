@@ -4,9 +4,13 @@ import android.app.Activity
 import android.app.Instrumentation
 import android.content.*
 import android.os.Bundle
+import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -14,6 +18,7 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.filters.Suppress
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -25,9 +30,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants
+import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.entity.user.UserId
 import mega.privacy.android.app.presentation.settings.SettingsFragment
+import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
@@ -106,7 +113,8 @@ class SettingsFragmentTest {
             email = "refreshEmail",
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
-            accountTypeIdentifier = Constants.FREE
+            accountTypeIdentifier = Constants.FREE,
+            accountTypeString = "free",
         )
 
         runBlocking{
@@ -383,5 +391,43 @@ class SettingsFragmentTest {
             )
 
     }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = 29)
+    fun test_that_report_issue_is_visible_in_pre_30() {
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onPreferences()
+            .check(withRowContaining(withText(R.string.settings_help_report_issue)))
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 30)
+    fun test_that_report_issue_is_visible_in_30() {
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onPreferences()
+            .check(withRowContaining(withText(R.string.settings_help_report_issue)))
+    }
+
+    @Test
+    fun test_that_report_issue_result_displays_a_snackbar() {
+        var resultHandler: FragmentResultListener? = null
+
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>(){
+            resultHandler = this as FragmentResultListener
+        }
+        scenario?.moveToState(Lifecycle.State.CREATED)
+        scenario?.moveToState(Lifecycle.State.STARTED)
+        scenario?.moveToState(Lifecycle.State.RESUMED)
+
+        val resultMessage = "This is a success"
+        resultHandler?.onFragmentResult(REPORT_ISSUE, bundleOf(ReportIssueFragment::class.java.name to resultMessage))
+
+
+        onView(withText(resultMessage))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+    }
+
 }
 
