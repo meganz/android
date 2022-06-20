@@ -359,7 +359,7 @@ class InMeetingViewModel @Inject constructor(
     fun startCounterTimerAfterBanner() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         MegaApplication.getChatManagement()
-            .startCounterToFinishCall(currentChatId, 2 * SECONDS_IN_MINUTE)
+            .startCounterToFinishCall(currentChatId, SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
     }
 
     /**
@@ -2062,6 +2062,7 @@ class InMeetingViewModel @Inject constructor(
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
+        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
     }
 
     override fun onCallHungUp(callId: Long) {
