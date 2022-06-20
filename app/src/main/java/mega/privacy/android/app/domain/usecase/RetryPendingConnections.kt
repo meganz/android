@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Retry pending connections use case.
  */
-interface RetryPendingConnections {
+fun interface RetryPendingConnections {
 
     /**
      * Invoke.

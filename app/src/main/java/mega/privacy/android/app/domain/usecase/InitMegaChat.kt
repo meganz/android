@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Init megaChat API use case.
  */
-interface InitMegaChat {
+fun interface InitMegaChat {
 
     /**
      * Invoke.

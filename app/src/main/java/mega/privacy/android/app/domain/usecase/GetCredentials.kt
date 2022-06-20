@@ -5,7 +5,7 @@ import mega.privacy.android.app.UserCredentials
 /**
  * Checks if user credentials exists.
  */
-interface GetCredentials {
+fun interface GetCredentials {
     /**
      * Invoke
      *

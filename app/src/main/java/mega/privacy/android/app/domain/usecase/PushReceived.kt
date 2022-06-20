@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaChatRequest
 /**
  * Push received use case.
  */
-interface PushReceived {
+fun interface PushReceived {
 
     /**
      * Invoke

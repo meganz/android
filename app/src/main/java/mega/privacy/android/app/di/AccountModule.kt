@@ -1,12 +1,11 @@
 package mega.privacy.android.app.di
 
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.GetCredentials
-import mega.privacy.android.app.domain.usecase.DefaultGetCredentials
-import mega.privacy.android.app.domain.usecase.DefaultRetryPendingConnections
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 
 /**
@@ -19,9 +18,13 @@ import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 @InstallIn(SingletonComponent::class)
 abstract class AccountModule {
 
-    @Binds
-    abstract fun bindGetCredentials(useCase: DefaultGetCredentials): GetCredentials
+    companion object {
+        @Provides
+        fun provideGetCredentials(accountRepository: AccountRepository): GetCredentials =
+            GetCredentials(accountRepository::getCredentials)
 
-    @Binds
-    abstract fun bindRetryPendingConnections(useCase: DefaultRetryPendingConnections): RetryPendingConnections
+        @Provides
+        fun provideRetryPendingConnections(accountRepository: AccountRepository): RetryPendingConnections =
+            RetryPendingConnections(accountRepository::retryPendingConnections)
+    }
 }

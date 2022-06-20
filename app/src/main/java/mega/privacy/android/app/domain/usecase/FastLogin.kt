@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Fast login use case.
  */
-interface FastLogin {
+fun interface FastLogin {
 
     /**
      * Invoke.

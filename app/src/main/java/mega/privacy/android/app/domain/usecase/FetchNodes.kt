@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Fetch nodes use case.
  */
-interface FetchNodes {
+fun interface FetchNodes {
 
     /**
      * Invoke.

@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Register push notifications use case.
  */
-interface RegisterPushNotifications {
+fun interface RegisterPushNotifications {
 
     /**
      * Registers push notifications.

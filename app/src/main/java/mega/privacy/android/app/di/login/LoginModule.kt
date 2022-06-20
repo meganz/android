@@ -1,9 +1,10 @@
 package mega.privacy.android.app.di.login
 
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.domain.repository.LoginRepository
 import mega.privacy.android.app.domain.usecase.*
 
 /**
@@ -13,12 +14,17 @@ import mega.privacy.android.app.domain.usecase.*
 @InstallIn(SingletonComponent::class)
 internal abstract class LoginModule {
 
-    @Binds
-    abstract fun bindFastLogin(useCase: DefaultFastLogin): FastLogin
+    companion object {
+        @Provides
+        fun provideFastLogin(loginRepository: LoginRepository): FastLogin =
+            FastLogin(loginRepository::fastLogin)
 
-    @Binds
-    abstract fun bindFetchNodes(useCase: DefaultFetchNodes): FetchNodes
+        @Provides
+        fun provideFetchNodes(loginRepository: LoginRepository): FetchNodes =
+            FetchNodes(loginRepository::fetchNodes)
 
-    @Binds
-    abstract fun bindInitMegaChat(useCase: DefaultInitMegaChat): InitMegaChat
+        @Provides
+        fun provideInitMegaChat(loginRepository: LoginRepository): InitMegaChat =
+            InitMegaChat(loginRepository::initMegaChat)
+    }
 }
