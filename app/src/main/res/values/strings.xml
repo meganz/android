@@ -3927,4 +3927,26 @@
     <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Report issue</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Your feedback helps us improve MEGA. Please clearly describe the issue you’ve experienced. The more details you provide, the easier it will be for us to resolve it.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Describe the issue</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Send log file</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">No internet connectionPlease check your connection and try again.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Submit</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Something went wrong. Please try again later. If you still can’t submit the issue, contact %s for assistance.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">We have received your report. We’ll look into the issue and get back to you.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Uploading log file</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Discard report?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Discard</string>
 </resources>

@@ -40,7 +40,7 @@ def readVersionName() {
     if (versionNameTag != null && !versionNameTag.isEmpty()) {
         return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
     } else {
-        return  "$rootProject.appVersion (${rootProject.versionCode})"
+        return "$rootProject.appVersion (${rootProject.versionCode})"
     }
 }
 
@@ -110,18 +110,18 @@ android {
         versionName readVersionName()
 
         multiDexEnabled true
-        ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
+        ndk.abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
 
-        buildConfigField ("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
-        resValue ("string", "app_version", "\"${versionName}\"")
-        resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
-        resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
+        buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
+        resValue("string", "app_version", "\"${versionName}\"")
+        resValue("string", "sdk_version", "\"${getSdkGitHash()}\"")
+        resValue("string", "karere_version", "\"${getKarereGitHash()}\"")
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
     }
 
     sourceSets {
-         main {
+        main {
             java {
                 srcDirs += 'src/main/jni/mega/sdk/bindings/java'
                 srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
@@ -132,7 +132,7 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
-        debug{
+        debug {
             res {
                 srcDirs 'src/main/res', 'src/sharedTest/res'
             }
@@ -395,6 +395,14 @@ dependencies {
     implementation "com.github.tony19:logback-android:$logbackVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
+    // Compose
+    implementation "androidx.compose.compiler:compiler:$composeVersion"
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$viewModelComposeVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
@@ -408,7 +416,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
-    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
@@ -416,7 +424,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
     testImplementation "app.cash.turbine:turbine:$turbineVersion"
-    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
@@ -431,7 +439,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
-    androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
