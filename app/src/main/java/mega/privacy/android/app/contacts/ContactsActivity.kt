@@ -110,15 +110,16 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
         navController.apply {
             navController.setGraph(
-                    navController.navInflater.inflate(R.navigation.nav_contacts).apply {
-                        val startDestination = when {
+                navController.navInflater.inflate(R.navigation.nav_contacts).apply {
+                    setStartDestination(
+                        when {
                             showGroups -> R.id.contact_groups
                             showSentRequests || showReceivedRequests -> R.id.contact_requests
                             else -> R.id.contact_list
                         }
-                        setStartDestination(startDestination)
-                    },
-                    intent.extras
+                    )
+                },
+                intent.extras
             )
 
             addOnDestinationChangedListener { _, _, _ ->

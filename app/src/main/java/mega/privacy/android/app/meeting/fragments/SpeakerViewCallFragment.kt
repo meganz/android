@@ -79,11 +79,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private val speakerParticipantsObserver = Observer<MutableList<Participant>> {
         val newSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
         if (newSpeaker == null) {
-
-            inMeetingViewModel.getFirstParticipant(
+            val firstParticipant = inMeetingViewModel.getFirstParticipant(
                 MEGACHAT_INVALID_HANDLE,
                 MEGACHAT_INVALID_HANDLE
-            )?.let { firstParticipant ->
+            )
+
+            if (firstParticipant == null) {
+                speakerAvatar.isVisible = false
+            } else {
                 selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
             }
         } else {

@@ -4,7 +4,7 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_900">
+    android:background="@color/black">
 
     <RelativeLayout
         android:id="@+id/layer"
@@ -13,7 +13,7 @@
         app:layout_constraintHeight_percent=".7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/grey_800">
+        android:background="@color/black">
 
         <RelativeLayout
             android:id="@+id/parent_surface_view"
