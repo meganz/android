@@ -20,6 +20,8 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode
  * @param getBrowserChildrenNode
  * @param getNumUnreadUserAlerts
+ * @param getInboxNode
+ * @param hasChildren
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -27,7 +29,9 @@ class ManagerViewModel @Inject constructor(
     monitorGlobalUpdates: MonitorGlobalUpdates,
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
-    private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts
+    private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
+    private val getInboxNode: GetInboxNode,
+    private val hasChildren: HasChildren,
 ) : ViewModel() {
 
     /**
@@ -117,6 +121,7 @@ class ManagerViewModel @Inject constructor(
             .map { Event(it) }
             .asLiveData()
 
+
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 
     /**
@@ -133,6 +138,23 @@ class ManagerViewModel @Inject constructor(
     fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
         viewModelScope.launch {
             numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlerts())
+        }
+    }
+
+    private val inboxSectionVisible: MutableLiveData<Boolean> = MutableLiveData()
+
+    /**
+     * Notifies about updates on Inbox section visibility.
+     */
+    fun onInboxSectionUpdate(): LiveData<Boolean> = inboxSectionVisible
+
+    /**
+     * Checks the Inbox section visibility.
+     */
+    fun checkInboxSectionVisibility() {
+        viewModelScope.launch {
+            val inboxNode = getInboxNode()
+            inboxSectionVisible.value = if (inboxNode == null) false else hasChildren(inboxNode)
         }
     }
 }

@@ -195,6 +195,10 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
 
+    override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
+
+    override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
