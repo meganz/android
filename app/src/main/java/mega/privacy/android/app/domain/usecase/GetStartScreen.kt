@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Get start screen
  *
  */
-interface GetStartScreen {
+fun interface GetStartScreen {
     /**
      * Invoke
      *
