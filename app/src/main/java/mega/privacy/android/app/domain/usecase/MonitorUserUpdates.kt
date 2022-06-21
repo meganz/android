@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.user.UserChanges
 /**
  * Monitor global user updates for the current logged in user
  */
-interface MonitorUserUpdates {
+fun interface MonitorUserUpdates {
     /**
      * Invoke
      *

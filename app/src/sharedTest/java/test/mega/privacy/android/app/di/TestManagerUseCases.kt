@@ -28,45 +28,45 @@ import org.mockito.kotlin.mock
 object TestManagerUseCases {
 
     @Provides
-    fun bindMonitorGlobalUpdates() = mock<MonitorGlobalUpdates>()
+    fun provideMonitorGlobalUpdates() = mock<MonitorGlobalUpdates>()
 
     @Provides
-    fun bindMonitorNodeUpdates() = mock<MonitorNodeUpdates> {
+    fun provideMonitorNodeUpdates() = mock<MonitorNodeUpdates> {
         on { run { invoke() } }.thenReturn(flowOf(any()))
     }
 
     @Provides
-    fun bindRubbishBinChildrenNode() = mock<GetRubbishBinChildrenNode> {
+    fun provideRubbishBinChildrenNode() = mock<GetRubbishBinChildrenNode> {
         on { runBlocking { invoke(0) } }.thenReturn(emptyList())
     }
 
     @Provides
-    fun bindBrowserChildrenNode() = mock<GetBrowserChildrenNode> {
+    fun provideBrowserChildrenNode() = mock<GetBrowserChildrenNode> {
         on { runBlocking { invoke(0) } }.thenReturn(emptyList())
     }
 
     @Provides
-    fun bindGetRootFolder() = mock<GetRootFolder> {
+    fun provideGetRootFolder() = mock<GetRootFolder> {
         on { runBlocking { invoke() } }.thenReturn(MegaNode())
     }
 
     @Provides
-    fun bindGetRubbishBinFolder() = mock<GetRubbishBinFolder> {
+    fun provideGetRubbishBinFolder() = mock<GetRubbishBinFolder> {
         on { runBlocking { invoke() } }.thenReturn(MegaNode())
     }
 
     @Provides
-    fun bindGetChildrenNode() = mock<GetChildrenNode> {
-        on { runBlocking { invoke(any()) } }.thenReturn(emptyList())
+    fun provideGetChildrenNode() = mock<GetChildrenNode> {
+        on { runBlocking { invoke(any(), null) } }.thenReturn(emptyList())
     }
 
     @Provides
-    fun bindGetNodeByHandle() = mock<GetNodeByHandle> {
+    fun provideGetNodeByHandle() = mock<GetNodeByHandle> {
         on { runBlocking { invoke(any()) } }.thenReturn(MegaNode())
     }
 
     @Provides
-    fun bindGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlerts> {
+    fun provideGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlerts> {
         on { runBlocking { invoke() } }.thenReturn(0)
     }
 }

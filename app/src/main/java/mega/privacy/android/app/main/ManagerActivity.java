@@ -833,6 +833,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public long comesFromNotificationHandle = -1;
     public long comesFromNotificationHandleSaved = -1;
     public int comesFromNotificationDeepBrowserTreeIncoming = -1;
+    public long[] comesFromNotificationChildNodeHandleList;
 
     RelativeLayout myAccountHeader;
     ImageView contactStatus;
@@ -7649,7 +7650,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
             }
             logDebug("Nodes: " + nodes.size());
-            fileBrowserFragment.hideMultipleSelect();
+            if (comesFromNotificationChildNodeHandleList == null) {
+                fileBrowserFragment.hideMultipleSelect();
+            }
             fileBrowserFragment.setNodes(nodes);
             fileBrowserFragment.getRecyclerView().invalidate();
         }
@@ -9762,7 +9765,12 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void openLocation(long nodeHandle) {
+    /**
+     * Open location based on where parent node is located
+     * @param nodeHandle parent node handle
+     * @param childNodeHandleList list of child nodes handles if comes from notfication about new added nodes to shared folder
+     */
+    public void openLocation(long nodeHandle, long[] childNodeHandleList) {
         logDebug("Node handle: " + nodeHandle);
 
         MegaNode node = megaApi.getNodeByHandle(nodeHandle);
@@ -9771,6 +9779,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
         comesFromNotifications = true;
         comesFromNotificationHandle = nodeHandle;
+        comesFromNotificationChildNodeHandleList = childNodeHandleList;
         MegaNode parent = nC.getParent(node);
         if (parent.getHandle() == megaApi.getRootNode().getHandle()) {
             //Cloud Drive
@@ -11486,6 +11495,28 @@ public class ManagerActivity extends TransfersManagementActivity
                 }, (error) -> logError("Error " + error));
 
         composite.add(chatSubscription);
+    }
+
+    /**
+     * Create list of positions of each new node which was added to share folder
+     *
+     * @param nodes Share folder nodes' list
+     * @return positions list
+     */
+    public ArrayList<Integer> getPositionsList(List<MegaNode> nodes) {
+        ArrayList<Integer> positions = new ArrayList<>();
+        if (comesFromNotificationChildNodeHandleList != null) {
+            long[] childNodeHandleList = comesFromNotificationChildNodeHandleList;
+            for (long childNodeHandle : childNodeHandleList) {
+                for (int i = 1; i < nodes.size(); i++) {
+                    var shareNode = nodes.get(i);
+                    if (shareNode != null && shareNode.getHandle() == childNodeHandle) {
+                        positions.add(i);
+                    }
+                }
+            }
+        }
+        return positions;
     }
 
     /**

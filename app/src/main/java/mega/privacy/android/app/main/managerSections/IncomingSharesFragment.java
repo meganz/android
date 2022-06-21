@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
@@ -174,6 +175,8 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 		recyclerView.setAdapter(adapter);
 		visibilityFastScroller();
 		setEmptyView();
+
+		selectNewlyAddedNodes();
 
 		logDebug("Deep browser tree: " + managerActivity.deepBrowserTreeIncoming);
 
@@ -384,5 +387,26 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 	 */
 	public void updateContact(long contactHandle) {
 		adapter.updateItem(contactHandle);
+	}
+
+	/**
+	 * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
+	 */
+	private void selectNewlyAddedNodes() {
+		ArrayList<Integer> positions = managerActivity.getPositionsList(nodes);
+		if (!positions.isEmpty()) {
+			int firstPosition = Collections.min(positions);
+			activateActionMode();
+			for (int position : positions) {
+				if (adapter.isMultipleSelect()) {
+					adapter.toggleSelection(position);
+				}
+			}
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0) {
+				updateActionModeTitle();
+			}
+			recyclerView.scrollToPosition(firstPosition);
+		}
 	}
 }

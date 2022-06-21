@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Fetch auto accept q r links
  *
  */
-interface FetchAutoAcceptQRLinks {
+fun interface FetchAutoAcceptQRLinks {
     /**
      * Invoke
      *
