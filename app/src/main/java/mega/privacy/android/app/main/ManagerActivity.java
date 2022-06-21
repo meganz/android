@@ -8539,20 +8539,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
         }
 
-        if (inboxSection != null) {
-            if (inboxNode == null) {
-                inboxSection.setVisibility(View.GONE);
-            } else {
-                boolean hasChildren = megaApi.hasChildren(inboxNode);
-                if (hasChildren) {
-                    inboxSection.setEnabled(false);
-                    inboxSection.setVisibility(View.VISIBLE);
-                    ((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
-                } else {
-                    inboxSection.setVisibility(View.GONE);
-                }
-            }
-        }
+        viewModel.checkInboxSectionVisibility();
 
         if (contactsSection != null) {
             contactsSection.setEnabled(false);
@@ -8665,19 +8652,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void setInboxNavigationDrawer() {
         logDebug("setInboxNavigationDrawer");
         if (nV != null && inboxSection != null) {
-            if (inboxNode == null) {
-                inboxSection.setVisibility(View.GONE);
-                logDebug("Inbox Node is NULL");
-            } else {
-                boolean hasChildren = megaApi.hasChildren(inboxNode);
-                if (hasChildren) {
-                    inboxSection.setEnabled(true);
-                    inboxSection.setVisibility(View.VISIBLE);
-                } else {
-                    logDebug("Inbox Node NO children");
-                    inboxSection.setVisibility(View.GONE);
-                }
-            }
+            viewModel.checkInboxSectionVisibility();
         }
     }
 
