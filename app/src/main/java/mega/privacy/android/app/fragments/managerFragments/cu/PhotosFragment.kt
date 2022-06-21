@@ -117,12 +117,12 @@ class PhotosFragment : BaseFragment() {
                         mManagerActivity.fromAlbumContent = false
                         with(timelineFragment) {
                             if (PhotosFilterAndSortToggle.enabled) {
-                                showHideABSubtitle(isFilterAllPhotos())
-                                setActionBarSubtitleText(Util.adjustForLargeFont(getCurrentFilter()))
+                                setActionBarSubtitleText(Util.adjustForLargeFont(getCurrentFilterAsString()))
                                 actionBar.customView.findViewById<View>(R.id.ab_container)
                                     .setOnClickListener {
                                         createFilterDialog(mManagerActivity)
                                     }
+                                showHideABSubtitle(isFilterAllPhotos())
                             }
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()

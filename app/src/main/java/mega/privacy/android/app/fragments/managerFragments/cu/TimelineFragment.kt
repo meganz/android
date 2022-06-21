@@ -57,6 +57,9 @@ import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_ALL_PHOTOS
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_CAMERA_UPLOADS
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_CLOUD_DRIVE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_VIDEOS_ONLY
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_LANDSCAPE
@@ -90,7 +93,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import java.util.concurrent.atomic.AtomicReference
 
 
 /**
@@ -400,12 +402,30 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun setupOtherViews() {
         binding.emptyEnableCuButton.setOnClickListener { enableCameraUploadClick() }
         setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
+        setEmptyState()
+    }
+
+    private fun setEmptyState() {
         binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
                 context,
-                StringResourcesUtils.getString(R.string.photos_empty)
+                StringResourcesUtils.getString(when (getCurrentFilter()) {
+                    FILTER_CAMERA_UPLOADS -> R.string.photos_empty
+                    FILTER_CLOUD_DRIVE -> R.string.homepage_empty_hint_photos
+                    FILTER_VIDEOS_ONLY -> R.string.homepage_empty_hint_video
+                    else -> R.string.photos_empty
+                })
             ),
             HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        binding.emptyHintImage.setImageResource(
+            when (getCurrentFilter()) {
+                FILTER_CAMERA_UPLOADS -> R.drawable.ic_zero_data_cu
+                FILTER_CLOUD_DRIVE -> R.drawable.ic_zero_no_images
+                FILTER_VIDEOS_ONLY -> R.drawable.ic_no_videos
+                else -> R.drawable.ic_zero_data_cu
+            }
         )
     }
 
@@ -1146,8 +1166,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (this::menu.isInitialized) {
             menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
             menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-            menu.findItem(R.id.action_photos_filter)?.isVisible = shouldShow
-            menu.findItem(R.id.action_photos_sortby)?.isVisible = shouldShow
+            menu.findItem(R.id.action_photos_filter)?.isVisible = true
+            menu.findItem(R.id.action_photos_sortby)?.isVisible = true
         }
     }
 
@@ -1348,6 +1368,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                             it
                         ))
                         showHideABSubtitle(isFilterAllPhotos())
+                        setEmptyState()
                     }
                 }
                 dialog.dismiss()
@@ -1406,8 +1427,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     /**
      * Get the current selected filter
      */
-    fun getCurrentFilter(): String {
+    fun getCurrentFilterAsString(): String {
         return viewModel.getCurrentFilterAsString()
+    }
+
+    fun getCurrentFilter(): Int {
+        return viewModel.getCurrentFilter()
     }
 
     fun isFilterAllPhotos(): Boolean {
