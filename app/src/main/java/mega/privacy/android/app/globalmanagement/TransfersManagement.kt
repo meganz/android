@@ -498,7 +498,10 @@ class TransfersManagement @Inject constructor(
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    if (!isFolder || megaApi.getTransferByTag(transfer.tag) == null) {
+                    val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
+                    if (!isFolder || updatedTransfer == null
+                        || updatedTransfer.state == STATE_COMPLETED
+                    ) {
                         removeProcessedScanningTransfer()
                     } else {
                         transferTag = transfer.tag
@@ -519,14 +522,11 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
-        if (!transfer.isFolderTransfer) {
-            return
-        }
-
         for (data in scanningTransfers) {
-            if (data.isTheSameFolderTransfer(transfer)) {
+            if (data.isTheSameTransfer(transfer)) {
+                val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
                 if (transfer.stage >= STAGE_TRANSFERRING_FILES
-                    || megaApi.getTransferByTag(transfer.tag) == null
+                    || updatedTransfer == null || updatedTransfer.state == STATE_COMPLETED
                 ) {
                     data.removeProcessedScanningTransfer()
                 } else {
@@ -544,12 +544,8 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
-        if (!transfer.isFolderTransfer) {
-            return
-        }
-
         for (data in scanningTransfers) {
-            if (data.isTheSameFolderTransfer(transfer)) {
+            if (data.isTheSameTransfer(transfer)) {
                 data.removeProcessedScanningTransfer()
                 break
             }

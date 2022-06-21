@@ -551,7 +551,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 					localPath, currentDocument, currentDocument.isFolder());
 
 			if (token != null) {
-				megaApi.startDownload(currentDocument, localPath, appData, null, highPriority, token);
+				megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, highPriority, token);
 			}
 		} else {
 			Timber.w("currentDir is not a directory");
@@ -1544,7 +1544,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 						localPath, currentDocument, currentDocument.isFolder());
 
 				if (token != null) {
-					megaApi.startDownload(currentDocument, localPath, appData, null, false, token);
+					megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, false, token);
 				}
 			}
 		}
