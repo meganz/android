@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatSession
+import timber.log.Timber
 
 class MeetingListener : MegaChatCallListenerInterface {
 
@@ -76,7 +77,7 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
             logDebug("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
-            checkLastParticipant(api, call)
+            stopCountDown()
         }
 
         // Call is set onHold
@@ -198,44 +199,26 @@ class MeetingListener : MegaChatCallListenerInterface {
     }
 
     /**
-     * Control when I am the last participant in the call and the microphone should be muted
-     *
-     * @param call MegaChatCall
-     * @param api MegaChatApiJava
-     */
-    private fun checkLastParticipant(api: MegaChatApiJava, call: MegaChatCall) {
-        if (call.hasLocalAudio() && call.callCompositionChange == TYPE_LEFT &&
-            call.numParticipants == 1 &&
-            call.peeridParticipants.get(0) == api.myUserHandle
-        ) {
-            api.getChatRoom(call.chatid)?.let { chat ->
-                if (chat.isMeeting || chat.isGroup) {
-                    api.disableAudio(call.chatid, null)
-                }
-            }
-        }
-    }
-
-    /**
      * Control when I am the only one on the call, no one has joined and more than 1 minute has expired
      *
      * @param call MegaChatCall
      * @param api MegaChatApiJava
      */
     private fun checkFirstParticipant(api: MegaChatApiJava, call: MegaChatCall) {
-        if (call.hasLocalAudio() && call.status == CALL_STATUS_IN_PROGRESS &&
-                MegaApplication.getChatManagement().isRequestSent(call.callId)
-        ) {
-            api.getChatRoom(call.chatid)?.let { chat ->
-                if (chat.isMeeting || chat.isGroup) {
-                    if(customCountDownTimer == null) {
+        api.getChatRoom(call.chatid)?.let { chat ->
+            if (chat.isMeeting || chat.isGroup) {
+                if (call.hasLocalAudio() && call.status == CALL_STATUS_IN_PROGRESS &&
+                    MegaApplication.getChatManagement().isRequestSent(call.callId)
+                ) {
+                    if (customCountDownTimer == null) {
                         val timerLiveData: MutableLiveData<Boolean> = MutableLiveData()
                         customCountDownTimer = CustomCountDownTimer(timerLiveData)
 
                         timerLiveData.observeOnce { counterState ->
                             counterState?.let { isFinished ->
                                 if (isFinished) {
-                                    stopCountDown()
+                                    Timber.d("Nobody has joined the group call/meeting, muted micro")
+                                    customCountDownTimer = null
                                     api.disableAudio(call.chatid, null)
                                 }
                             }
@@ -252,10 +235,7 @@ class MeetingListener : MegaChatCallListenerInterface {
      * Stop count down timer
      */
     private fun stopCountDown() {
-        customCountDownTimer?.apply {
-            stop()
-        }
-
+        customCountDownTimer?.stop()
         customCountDownTimer = null
     }
 }
