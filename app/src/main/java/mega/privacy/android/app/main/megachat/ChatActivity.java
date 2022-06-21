@@ -374,6 +374,7 @@ public class ChatActivity extends PasscodeActivity
     private boolean errorReactionsDialogIsShown;
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private AlertDialog dialogCall;
+    private AlertDialog dialogOnlyMeInCall;
 
     AlertDialog dialog;
     AlertDialog statusDialog;
@@ -652,8 +653,12 @@ public class ChatActivity extends PasscodeActivity
                 updateCallBanner();
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     cancelRecording();
-                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED && dialogCall != null) {
-                    dialogCall.dismiss();
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
+                    hideDialogCall();
+
+                    if (dialogCall != null) {
+                        dialogCall.dismiss();
+                    }
                 }
 
                 if(call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION&&
@@ -1165,8 +1170,8 @@ public class ChatActivity extends PasscodeActivity
                     if (chatId == chatRoom.getChatId()) {
                         if (result.component2()) {
                             showOnlyMeInTheCallDialog();
-                        } else if (dialogCall != null) {
-                            dialogCall.dismiss();
+                        } else {
+                            hideDialogCall();
                         }
                     }
                 });
@@ -3863,6 +3868,11 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
+        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0 || MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            hideDialogCall();
+            return;
+        }
+
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
 
@@ -3876,26 +3886,37 @@ public class ChatActivity extends PasscodeActivity
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialogLayout);
-        dialogCall = builder.create();
-        isOnlyMeInCallDialogShown = true;
-        dialogCall.setTitle(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
-        dialogCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
-        dialogCall.show();
+        dialogOnlyMeInCall = builder.create();
+        dialogOnlyMeInCall.setTitle(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
+        dialogOnlyMeInCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
+        dialogOnlyMeInCall.show();
 
-        dialogCall.setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false);
+        dialogOnlyMeInCall.setOnDismissListener(dialog -> {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
+        });
+
         firstButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-            dialogCall.dismiss();
+            hideDialogCall();
         });
 
         secondButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
-            dialogCall.dismiss();
+            hideDialogCall();
         });
+    }
+
+    /**
+     * Hide dialog related to calls
+     */
+    private void hideDialogCall() {
+        if(dialogOnlyMeInCall != null) {
+            dialogOnlyMeInCall.dismiss();
+        }
     }
 
     /**
@@ -8354,6 +8375,9 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
+        if(dialogOnlyMeInCall != null) {
+            outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, dialogOnlyMeInCall.isShowing());
+        }
     }
 
     /**
