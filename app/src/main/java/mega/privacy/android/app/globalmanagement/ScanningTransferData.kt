@@ -35,12 +35,10 @@ data class ScanningTransferData(
      * @param transfer  MegaTransfer to check.
      * @return True if the transfer data is the same as this ScanningFolderData, false otherwise.
      */
-    fun isTheSameTransfer(transfer: MegaTransfer): Boolean {
-        val isTheSame = transferType == transfer.type && isFolder == transfer.isFolderTransfer
+    fun isTheSameTransfer(transfer: MegaTransfer): Boolean =
+        if (transferTag != INVALID_VALUE) transferTag == transfer.tag
+        else transferType == transfer.type && isFolder == transfer.isFolderTransfer
                 && (isTheSameUpload(transfer) || isTheSameDownload(transfer))
-
-        return if (isFolder) isTheSame && transferTag == transfer.tag else isTheSame
-    }
 
     /**
      * Checks if this is an upload and its data is the same as the received MegaTransfer.
