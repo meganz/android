@@ -5,7 +5,7 @@ import java.io.File
 /**
  * The use case interface to get thumbnail
  */
-interface GetThumbnail {
+fun interface GetThumbnail {
     /**
      * get thumbnail from local if exist, from server otherwise
      * @return File

@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
 /**
  * The use case interface to get children nodes by node
  */
-interface GetFavouriteFolderInfo {
+fun interface GetFavouriteFolderInfo {
     /**
      * Get children nodes by node
      * @param parentHandle parent node handle

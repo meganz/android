@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Is camera sync enabled
  *
  */
-interface IsCameraSyncEnabled {
+fun interface IsCameraSyncEnabled {
     /**
      * Invoke
      *

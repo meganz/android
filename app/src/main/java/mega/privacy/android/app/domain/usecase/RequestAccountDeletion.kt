@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Request account deletion
  *
  */
-interface RequestAccountDeletion {
+fun interface RequestAccountDeletion {
     /**
      * Invoke
      *

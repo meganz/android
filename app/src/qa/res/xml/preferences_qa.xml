@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <androidx.preference.Preference
         android:key="settings_qa_compose_browser"
-        android:title="@string/settings_qa_compose_ui_browser_title"
-        android:summary="@string/settings_qa_compose_ui_browser_summary" />
+        android:summary="@string/settings_qa_compose_ui_browser_summary"
+        android:title="@string/settings_qa_compose_ui_browser_title" />
+
+    <androidx.preference.Preference
+        android:key="settings_qa_check_update"
+        android:title="@string/settings_qa_compose_check_for_updates" />
 </PreferenceScreen>

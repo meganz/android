@@ -6,7 +6,19 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
+import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.app.domain.usecase.HasChildren
+import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 
 /**
  * Manager module
@@ -21,27 +33,32 @@ abstract class ManagerUseCases {
     abstract fun bindMonitorGlobalUpdates(useCase: DefaultMonitorGlobalUpdates): MonitorGlobalUpdates
 
     @Binds
-    abstract fun bindMonitorNodeUpdates(useCase: DefaultMonitorNodeUpdates): MonitorNodeUpdates
-
-    @Binds
     abstract fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode): GetRubbishBinChildrenNode
 
     @Binds
     abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
-    @Binds
-    abstract fun bindGetRootFolder(useCase: DefaultGetRootFolder): GetRootFolder
-
-    @Binds
-    abstract fun bindGetRubbishBinFolder(useCase: DefaultGetRubbishBinFolder): GetRubbishBinFolder
-
-    @Binds
-    abstract fun bindGetChildrenNode(useCase: DefaultGetChildrenNode): GetChildrenNode
-
-    @Binds
-    abstract fun bindGetNodeByHandle(useCase: DefaultGetNodeByHandle): GetNodeByHandle
-
     companion object {
+        @Provides
+        fun provideMonitorNodeUpdates(filesRepository: FilesRepository): MonitorNodeUpdates =
+            MonitorNodeUpdates(filesRepository::monitorNodeUpdates)
+
+        @Provides
+        fun provideGetRootFolder(filesRepository: FilesRepository): GetRootFolder =
+            GetRootFolder(filesRepository::getRootNode)
+
+        @Provides
+        fun provideGetRubbishBinFolder(filesRepository: FilesRepository): GetRubbishBinFolder =
+            GetRubbishBinFolder(filesRepository::getRubbishBinNode)
+
+        @Provides
+        fun provideGetChildrenNode(filesRepository: FilesRepository): GetChildrenNode =
+            GetChildrenNode(filesRepository::getChildrenNode)
+
+        @Provides
+        fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
+            GetNodeByHandle(filesRepository::getNodeByHandle)
+
         @Provides
         fun provideGetInboxNode(filesRepository: FilesRepository): GetInboxNode =
             GetInboxNode(filesRepository::getInboxNode)
