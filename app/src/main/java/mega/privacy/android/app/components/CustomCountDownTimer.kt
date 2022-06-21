@@ -9,8 +9,14 @@ import androidx.lifecycle.MutableLiveData
  * @param mutableLiveData MutableLiveData<Boolean> which shall be False while the countdown is in progress and True when the countdown is finished.
  */
 class CustomCountDownTimer(var mutableLiveData: MutableLiveData<Boolean>) {
+    /**
+     * Count down timer
+     */
     lateinit var timer: CountDownTimer
 
+    /**
+     * Method to stop the counter
+     */
     fun stop() {
         if (this::timer.isInitialized) {
             timer.cancel()
@@ -18,6 +24,9 @@ class CustomCountDownTimer(var mutableLiveData: MutableLiveData<Boolean>) {
         }
     }
 
+    /**
+     * Method to start the counter
+     */
     fun start(seconds: Long) {
         timer = object : CountDownTimer(seconds * 1000, 1000) {
 
