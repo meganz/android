@@ -66,7 +66,7 @@ class InMeetingViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
-    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
+    getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -157,8 +157,8 @@ class InMeetingViewModel @Inject constructor(
     private val _anotherChatTitle = MutableStateFlow(" ")
     val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
-    private val _getParticipantsChangesText = MutableStateFlow(" ")
-    val getParticipantsChangesText: StateFlow<String> get() = _getParticipantsChangesText
+    private val _getParticipantsChanges = MutableStateFlow(Pair(TYPE_JOIN, ""))
+    val getParticipantsChanges: StateFlow<Pair<Int, String>> get() = _getParticipantsChanges
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -191,8 +191,12 @@ class InMeetingViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { (chatId, typeChange, peers) ->
                     if (currentChatId == chatId) {
-                        peers?.let { list ->
-                            getParticipantChangesText(list, typeChange)
+                        getChat()?.let { chat ->
+                            if (chat.isMeeting || chat.isGroup) {
+                                peers?.let { list ->
+                                    getParticipantChanges(list, typeChange)
+                                }
+                            }
                         }
                     }
                 },
@@ -233,10 +237,8 @@ class InMeetingViewModel @Inject constructor(
      * @param list List of participants with changes
      * @param type Type of change
      */
-    private fun getParticipantChangesText(list: ArrayList<Long>, type: Int) {
-        val numParticipants = list.size
-
-        _getParticipantsChangesText.value = when (numParticipants) {
+    private fun getParticipantChanges(list: ArrayList<Long>, type: Int) {
+        val text = when (val numParticipants = list.size) {
             1 -> StringResourcesUtils.getString(
                 if (type == TYPE_JOIN)
                     R.string.meeting_call_screen_one_participant_joined_call
@@ -259,6 +261,8 @@ class InMeetingViewModel @Inject constructor(
                 getParticipantFullName(list[0]),
                 (numParticipants - 1))
         }
+
+        _getParticipantsChanges.value = Pair(type, text)
     }
 
     /**
@@ -351,6 +355,15 @@ class InMeetingViewModel @Inject constructor(
                     }
                 ).addTo(composite)
         }
+    }
+
+    /**
+     * Start the counter to end the call after the previous banner has been hidden
+     */
+    fun startCounterTimerAfterBanner() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        MegaApplication.getChatManagement()
+            .startCounterToFinishCall(currentChatId, SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
     }
 
     /**
@@ -2053,6 +2066,7 @@ class InMeetingViewModel @Inject constructor(
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
+        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
     }
 
     override fun onCallHungUp(callId: Long) {

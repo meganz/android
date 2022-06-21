@@ -300,6 +300,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -1498,6 +1499,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return null;
                 }));
 
+        viewModel.onGetNumUnreadUserAlerts().observe(this, this::updateNumUnreadUserAlerts);
+
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
         // and then switch the app to foreground, causing the app to create a new instantiation.
@@ -2496,7 +2499,7 @@ public class ManagerActivity extends TransfersManagementActivity
             logDebug("Check if there any INCOMING pendingRequest contacts");
             setContactTitleSection();
 
-            setNotificationsTitleSection();
+            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
 
             if (drawerItem == null) {
                 drawerItem = getStartDrawerItem(this);
@@ -3938,7 +3941,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        updateNavigationToolbarIcon();
+        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON);
     }
 
     public void setToolbarTitleFromFullscreenOfflineFragment(String title,
@@ -3946,22 +3949,21 @@ public class ManagerActivity extends TransfersManagementActivity
         aB.setSubtitle(null);
         aB.setTitle(title);
         this.firstNavigationLevel = firstNavigationLevel;
-        updateNavigationToolbarIcon();
+        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON);
         textSubmitted = true;
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(showSearch);
         }
     }
 
-    public void updateNavigationToolbarIcon() {
-        int totalHistoric = megaApi.getNumUnreadUserAlerts();
+    public void updateNavigationToolbarIcon(int numUnreadUserAlerts) {
         int totalIpc = 0;
         ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
         if (requests != null) {
             totalIpc = requests.size();
         }
 
-        int totalNotifications = totalHistoric + totalIpc;
+        int totalNotifications = numUnreadUserAlerts + totalIpc;
 
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel()) {
@@ -8564,7 +8566,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             notificationsSectionText.setAlpha(0.38F);
-            setNotificationsTitleSection();
+            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
         }
 
         if (rubbishBinSection != null) {
@@ -8654,7 +8656,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             notificationsSectionText.setAlpha(1F);
-            setNotificationsTitleSection();
+            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
         }
 
         if (rubbishBinSection != null) {
@@ -9804,13 +9806,11 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
-        setNotificationsTitleSection();
+        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON);
         notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
         if (notificationsFragment != null && userAlerts != null) {
             notificationsFragment.updateNotifications(userAlerts);
         }
-
-        updateNavigationToolbarIcon();
     }
 
     public void updateMyEmail(String email) {
@@ -9991,7 +9991,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        updateNavigationToolbarIcon();
+        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON);
     }
 
     /**
@@ -10486,7 +10486,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
             logDebug("Change unread count: " + item.getUnreadCount());
             setChatBadge();
-            updateNavigationToolbarIcon();
+            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON);
         }
     }
 
@@ -10642,9 +10642,7 @@ public class ManagerActivity extends TransfersManagementActivity
         contactsSectionText.setText(result);
     }
 
-    public void setNotificationsTitleSection() {
-        int unread = megaApi.getNumUnreadUserAlerts();
-
+    public void setNotificationsTitleSection(int unread) {
         if (unread == 0) {
             notificationsSectionText.setText(getString(R.string.title_properties_chat_contact_notifications));
         } else {
@@ -11507,6 +11505,25 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
         return positions;
+    }
+
+    /**
+     * Updates the UI related to unread user alerts as per the [UnreadUserAlertsCheckType] received.
+     *
+     * @param result Pair containing the type of the request and the number of unread user alerts.
+     */
+    private void updateNumUnreadUserAlerts(kotlin.Pair<UnreadUserAlertsCheckType, Integer> result) {
+        UnreadUserAlertsCheckType type = result.getFirst();
+        int numUnreadUserAlerts = result.getSecond();
+
+        if (type == UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON) {
+            updateNavigationToolbarIcon(numUnreadUserAlerts);
+        } else if (type == UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE) {
+            setNotificationsTitleSection(numUnreadUserAlerts);
+        } else {
+            updateNavigationToolbarIcon(numUnreadUserAlerts);
+            setNotificationsTitleSection(numUnreadUserAlerts);
+        }
     }
 
     /**

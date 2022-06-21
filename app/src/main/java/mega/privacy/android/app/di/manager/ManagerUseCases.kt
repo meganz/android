@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
@@ -12,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
@@ -57,5 +59,8 @@ abstract class ManagerUseCases {
         fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
             GetNodeByHandle(filesRepository::getNodeByHandle)
 
+        @Provides
+        fun provideGetNumUnreadUserAlerts(accountRepository: AccountRepository): GetNumUnreadUserAlerts =
+            GetNumUnreadUserAlerts(accountRepository::getNumUnreadUserAlerts)
     }
 }

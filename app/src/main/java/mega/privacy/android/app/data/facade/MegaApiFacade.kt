@@ -193,6 +193,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.cancelTransfer(transfer)
     }
 
+    override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
