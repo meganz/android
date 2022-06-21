@@ -252,5 +252,10 @@ interface MegaApiGateway {
      */
     fun cancelTransfer(transfer: MegaTransfer)
 
-
+    /**
+     * Gets the number of unread user alerts for the logged in user.
+     *
+     * @return Number of unread user alerts.
+     */
+    suspend fun getNumUnreadUserAlerts(): Int
 }

@@ -138,4 +138,8 @@ class DefaultAccountRepository @Inject constructor(
             .mapNotNull { it.users }
             .map { userUpdateMapper(it) }
 
+    override suspend fun getNumUnreadUserAlerts(): Int = withContext(ioDispatcher) {
+        megaApiGateway.getNumUnreadUserAlerts()
+    }
+
 }
