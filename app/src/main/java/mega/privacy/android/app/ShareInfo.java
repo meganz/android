@@ -29,6 +29,7 @@ import java.util.List;
 
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
 
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -165,6 +166,41 @@ public class ShareInfo implements Serializable {
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
+		return result;
+	}
+
+	/**
+	 * Process files to upload to chat from gallery
+	 *
+	 * @param context Context
+	 * @param files   List of FileGalleryItem
+	 * @return List of ShareInfo
+	 */
+	public static List<ShareInfo> processUploadFile(Context context, ArrayList<FileGalleryItem> files) {
+		List<ShareInfo> result = new ArrayList<>();
+
+		if (files.isEmpty())
+			return result;
+
+		// Get File info from Data URI
+		for (int i = 0; i < files.size(); i++) {
+			ShareInfo shareInfo = new ShareInfo();
+			FileGalleryItem file = files.get(i);
+			Uri dataUri = file.getFileUri();
+			if (dataUri == null) {
+				logWarning("Data uri is null");
+				continue;
+			}
+
+			if (isPathInsecure(dataUri.getPath())) {
+				logWarning("Data uri is insecure");
+				continue;
+			}
+
+			shareInfo.processUri(dataUri, context);
+			result.add(shareInfo);
+		}
+
 		return result;
 	}
 
