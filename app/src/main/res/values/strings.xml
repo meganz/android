@@ -3959,10 +3959,4 @@
     <string name="photos_filter_camera_uploads">Camera uploads</string>
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">Videos only</string>
-    <!-- Empty state text for no images in Cloud Drive -->
-    <string name="photos_empty_cloud_drive">NO [B]IMAGES[/B] FOUND</string>
-    <!-- Empty state text for no node in Camera Uploads -->
-    <string name="photos_empty_camera_uploads">NO [B]PHOTOS[/B] FOUND</string>
-    <!-- Empty state text for no video in Camera Uploads -->
-    <string name="photos_empty_videos">NO [B]VIDEOS[/B] FOUND</string>
 </resources>
