@@ -253,7 +253,7 @@
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Kích cỡ</string>
     <!-- When the file/folder was last modified -->
-    <string name="file_properties_info_last_modified">Thay đổi lần cuối</string>
+    <string name="file_properties_info_last_modified">Lần sửa cuối</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">Ngày Tạo</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
@@ -307,7 +307,7 @@
         <item quantity="other">Các thư mục trống.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_cancel">Chạm để hủy tải xuống</string>
+    <string name="download_touch_to_cancel">Chạm để hủy</string>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Xem các truyền tải</string>
     <!-- Warning message -->
@@ -325,7 +325,7 @@
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Từ bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_clean_shares_menu">Chấm dứt chia sẻ</string>
+    <string name="context_clean_shares_menu">Loại bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Xóa đường dẫn liên kết</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
@@ -2676,7 +2676,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Phiên bản đã được hồi phục thành công.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Chạm và giữ để thu âm, thả ra để gửi đi.</string>
+    <string name="recording_less_than_second">Chạm và giữ để ghi âm</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Trượt để hủy bỏ</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3805,4 +3805,68 @@
     <string name="skip_folder">Bỏ qua thư mục này</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Đã có một thư mục mang tên [B]%1$s[/B] ở tại vị trí này rồi.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">Đường truyền kém</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Không thể kết nối lại</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Cuộc gọi sẽ kết thúc trong %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">Bạn là người duy nhất ở đây</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Bạn vẫn đang ở trong cuộc gọi</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Cuộc gọi sẽ tự động kết thúc trong 2 phút trừ khi bạn muốn ở lại duy trì cuộc gọi.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">Gác cuộc gọi ngay</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Duy trì cuộc gọi</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Báo cáo lỗi</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Phản hồi của bạn sẽ giúp chúng tôi cải thiện MEGA. Xin vui lòng mô tả rõ ràng vấn đề bạn gặp phải. Bạn cung cấp càng nhiều chi tiết thì chúng tôi càng dễ dàng giải quyết vấn đề đó.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Mô tả vấn đề</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Gửi tệp nhật ký</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">Không có kết nối internet. Kiểm tra đường truyền kết nối mạng và thử lại.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Gửi đi</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Có vấn đề đã xảy ra. Xin thử lại sau. Nếu vấn đề vẫn tái diễn làm bạn không gửi được báo cáo, liên hệ %s để được hỗ trợ.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">Báo cáo của bạn đã được nhận. Chúng tôi sẽ xem xét vấn đề và hồi âm cho bạn.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Đang tải lên tệp nhật ký</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Hủy báo cáo?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Hủy bỏ</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Sửa tin nhắn</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Thư viện</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Gọi điện</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Quét</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Tin nhắn thoại</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
 </resources>

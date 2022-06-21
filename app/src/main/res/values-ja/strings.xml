@@ -2676,7 +2676,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">バージョンは正常に復元されました。</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">長押しすると録音し、離すと送信します。</string>
+    <string name="recording_less_than_second">長押しで録音</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">スライドしてキャンセル</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3805,4 +3805,68 @@
     <string name="skip_folder">このフォルダをスキップ</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">[B]%1$s[/B]という名前のフォルダは、この場所にすでに存在しています。</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">接続不良です</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">再接続できません</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">通話は%sに終了します</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">ここにいるのはあなただけです</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">まだ通話中です</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">通話は2分後に自動的に終了します（通話を継続したい場合は除きます）。</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">今すぐ通話を終了</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">通話に留まる</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">問題を報告</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">お客様のご意見は、MEGAをより良くするための参考となります。ご経験された問題を明確に記述してください。より詳細な情報をご提供いただくことで、より簡単に解決できます。</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">問題を記述</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">ログファイル送信</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">インターネットに接続できません。接続を確認し、再度お試しください。</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">送信</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">何かがうまくいきませんでした。後でもう一度お試しください。それでも問題が送信できない場合は、%sに連絡してサポートをお受けください。</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">ご報告をいただきました。問題を調査し、ご連絡いたします。</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">ログファイルのアップロード中</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">ご報告を破棄しますか？</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">破棄する</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">メッセージの編集</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">ギャラリー</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">ボイス</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">スキャン</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">ボイスクリップ</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
 </resources>

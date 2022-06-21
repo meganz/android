@@ -256,7 +256,7 @@
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Grootte</string>
     <!-- When the file/folder was last modified -->
-    <string name="file_properties_info_last_modified">Laatst aangepast</string>
+    <string name="file_properties_info_last_modified">Laatst gewijzigd</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">Toegevoegd</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
@@ -2741,7 +2741,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versie succesvol hersteld.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Tik en houd vast om op te nemen,dan loslaten om te verzenden.</string>
+    <string name="recording_less_than_second">Tik en vasthouden om op te nemen</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Slepen om te annuleren</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3899,4 +3899,68 @@
     <string name="skip_folder">Deze map overslaan</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Een map genoemd [B]%1$s[/B] bestaat al in deze locatie.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">Slechte verbinding</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Kan niet opnieuw verbinden</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">%1$s[/A][A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Oproep eindigt over %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">U bent de enige hier</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">U bent nog steeds in de oproep</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">De oproep wordt over 2 minuten automatisch beëindigd, tenzij wilt blijven.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">Beëindig oproep nu</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Blijf in oproep</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Rapporteer probleem</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Uw feedback helpt ons MEGA te verbeteren. Beschrijf duidelijk het probleem dat u heeft ondervonden. Hoe meer details u verstrekt, hoe gemakkelijker het voor ons zal zijn om het op te lossen.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Omschrijf het probleem</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Logbestand versturen</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Indienen</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Er is iets fout gegaan. Probeer later nogmaals. Als u nog steeds het probleem niet kan indienen, neem dan contact op met %s voor assistentie.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">We hebben uw melding ontvangen. We zullen het probleem onderzoeken en contact met u opnemen.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Logbestand uploaden</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Melding weggooien?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Weggooien</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Bericht wijzigen</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Gallerij</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Spraak</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Scannen</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Spraakclip</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
 </resources>

@@ -3001,7 +3001,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">تم استعادة النسخة بنجاح.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">انقر مطولاً للتسجيل، ثم حرر للإرسال.</string>
+    <string name="recording_less_than_second">انقر مع الاستمرار للتسجيل</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">اسحب  للإلغاء</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -4275,4 +4275,68 @@
     <string name="skip_folder">تخطي هذا المجلد</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">يوجد مجلد اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">اتصال سيء</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] بايت</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] كيلوبايت</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] ميغابايت</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] غيغابايت</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] تيرابايت</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] بيتابايت</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] إكسابايت</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">انت الوحيد هنا</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">ستنتهي المكالمة تلقائيًا في غضون 2 دقيقتين ما لم ترغب في الاستمرار فيها.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">انهاء الاتصال</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">البقاء في اتصال</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">بلغ عن مشكلة</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">تساعدنا ملاحظاتك على تحسين ميغا MEGA. يرجى وصف المشكلة التي واجهتها بوضوح. كلما زادت التفاصيل التي تقدمها ، كان من الأسهل علينا حلها.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">اشرح المشكلة</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">إرسال ملف السجل</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">إرسال</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">هناك خطأ ما. الرجاء المحاولة في وقت لاحق. إذا كنت لا تزال غير قادر على إرسال المشكلة، فتواصل مع %s للحصول على المساعدة.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">لقد تلقينا تقريرك. سننظر في المشكلة ونعود إليك.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">تحميل ملف السجل</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">تجاهل التقرير؟</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">تجاهل</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">تعديل الرسالة</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">المعرض</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">صوت</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">مسح ضوئي</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">مقطع صوتي</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
 </resources>

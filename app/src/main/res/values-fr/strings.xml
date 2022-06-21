@@ -2806,7 +2806,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">La version a été restaurée avec succès.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Touchez et maintenez pour enregistrer, relâchez pour envoyer.</string>
+    <string name="recording_less_than_second">Toucher et maintenir pour enregistrer</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Faire glisser pour annuler</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3993,4 +3993,68 @@
     <string name="skip_folder">Ignorer ce dossier</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Un dossier nommé [B]%1$s[/B] existe déjà dans cet emplacement.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">La connexion est mauvaise</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Impossible de se reconnecter</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;o</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;Ko</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;Mo</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;Go</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;To</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;Po</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;Eo</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">L’appel se terminera dans %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">Vous êtes la seule personne ici</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Vous êtes encore dans l’appel</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">L’appel cessera dans 2 minutes à moins que vous ne vouliez rester sur l’appel.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">Mettre fin à l’appel maintenant</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Rester sur l’appel</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Signaler un problème</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Votre rétroaction nous aide à améliorer MEGA. Veuillez décrire clairement le problème que vous avez rencontré. Plus vous fournirez de détails, plus facile sera la résolution.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Décrivez le problème</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Envoyer le fichier journal</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">Internet n’est pas connecté. Veuillez vérifier votre connexion et réessayer.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Envoyer</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Un problème est survenu. Veuillez réessayer plus tard. Si vous n’arrivez toujours pas envoyer le problème, contactez %s pour de l’assistance.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">Nous avons reçu votre signalement. Nous examinerons la situation et vous contacterons.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Téléversement du fichier journal</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Abandonner le signalement ?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Abandonner</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Modifier le message</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Galerie</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Voix</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Numériser</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Insert parlé</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
 </resources>
