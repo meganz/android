@@ -11,12 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
-import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -175,6 +175,8 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 		visibilityFastScroller();
 		setEmptyView();
 
+		selectNewlyAddedNodes();
+
 		logDebug("Deep browser tree: " + managerActivity.deepBrowserTreeIncoming);
 
 		return v;
@@ -264,16 +266,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 		}
 
 		if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationsLevel == (managerActivity.deepBrowserTreeIncoming)) {
-			managerActivity.comesFromNotifications = false;
-			managerActivity.comesFromNotificationsLevel = 0;
-			managerActivity.comesFromNotificationHandle = -1;
-			managerActivity.selectDrawerItem(DrawerItem.NOTIFICATIONS);
-			managerActivity.setDeepBrowserTreeIncoming(managerActivity.comesFromNotificationDeepBrowserTreeIncoming);
-			managerActivity.comesFromNotificationDeepBrowserTreeIncoming = -1;
-			managerActivity.setParentHandleIncoming(managerActivity.comesFromNotificationHandleSaved);
-			managerActivity.comesFromNotificationHandleSaved = -1;
-			managerActivity.refreshIncomingShares();
-
+			managerActivity.restoreSharesAfterComingFromNotifications();
 			return 4;
 		} else {
 			managerActivity.decreaseDeepBrowserTreeIncoming();
@@ -384,5 +377,26 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 	 */
 	public void updateContact(long contactHandle) {
 		adapter.updateItem(contactHandle);
+	}
+
+	/**
+	 * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
+	 */
+	private void selectNewlyAddedNodes() {
+		ArrayList<Integer> positions = managerActivity.getPositionsList(nodes);
+		if (!positions.isEmpty()) {
+			int firstPosition = Collections.min(positions);
+			activateActionMode();
+			for (int position : positions) {
+				if (adapter.isMultipleSelect()) {
+					adapter.toggleSelection(position);
+				}
+			}
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0) {
+				updateActionModeTitle();
+			}
+			recyclerView.scrollToPosition(firstPosition);
+		}
 	}
 }

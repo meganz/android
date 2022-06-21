@@ -45,7 +45,6 @@ public class Constants {
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
-    public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
     public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
@@ -165,6 +164,7 @@ public class Constants {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_BT_CONNECT = 16;
+    public static final int REQUEST_CAMERA_SHOW_PREVIEW = 17;
     public static final int REQUEST_ACCESS_MEDIA_LOCATION = 17;
 
     public static final int TYPE_START_RECORD = 1;
@@ -495,9 +495,6 @@ public class Constants {
     public static int TYPE_NETWORK_QUALITY = 2;
     public static int TYPE_AUDIO = 3;
     public static int TYPE_VIDEO = 4;
-    public static int TYPE_RECONNECTING = 5;
-    public static int TYPE_SINGLE_PARTICIPANT = 6;
-    public static int TYPE_NO_CONNECTION = 7;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";

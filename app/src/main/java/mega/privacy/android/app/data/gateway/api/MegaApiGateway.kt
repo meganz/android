@@ -5,6 +5,8 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 
 /**
@@ -35,6 +37,28 @@ interface MegaApiGateway {
      * @param listener
      */
     fun cancelAccount(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Create support ticket
+     *
+     * @param ticketContent
+     * @param listener
+     */
+    fun createSupportTicket(
+        ticketContent: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Start upload for support
+     *
+     * @param path of file to upload
+     * @param listener
+     */
+    fun startUploadForSupport(
+        path: String,
+        listener: MegaTransferListenerInterface,
+    )
 
     /**
      * Registered email address for the account
@@ -73,6 +97,11 @@ interface MegaApiGateway {
      *
      */
     suspend fun getRubbishBinNode(): MegaNode?
+
+    /**
+     * Sdk version
+     */
+    suspend fun getSdkVersion(): String
 
     /**
      * Global updates
@@ -215,4 +244,33 @@ interface MegaApiGateway {
      * @return Base64-encoded node handle
      */
     fun handleToBase64(handle: Long): String
+
+    /**
+     * Cancel transfer
+     *
+     * @param transfer to be cancelled
+     */
+    fun cancelTransfer(transfer: MegaTransfer)
+
+    /**
+     * Gets the number of unread user alerts for the logged in user.
+     *
+     * @return Number of unread user alerts.
+     */
+    suspend fun getNumUnreadUserAlerts(): Int
+
+    /**
+     * Inbox node of the account
+     *
+     * @return The Inbox node if exists, null otherwise.
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
+     * Checks if the provided node has children.
+     *
+     * @param node  The MegaNode to check.
+     * @return True if the node has children, false otherwise.
+     */
+    suspend fun hasChildren(node: MegaNode): Boolean
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="-1dp"
+    android:fadeScrollbars="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/linear_empty_layout_chat_recent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/empty_description_text_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="start"
+            android:maxWidth="272dp"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/empty_image_view_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="52dp" />
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:maxWidth="300dp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
+            android:fontFamily="sans-serif"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
+
+        <Button
+            android:id="@+id/invite_button"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:minWidth="96dp"
+            android:text="@string/new_chat_link_label"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+</ScrollView>

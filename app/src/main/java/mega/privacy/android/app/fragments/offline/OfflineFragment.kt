@@ -472,19 +472,19 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     viewModel.nodes.value?.let { newList ->
                         rvAdapter.submitList(ArrayList(newList.first))
                     }
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 

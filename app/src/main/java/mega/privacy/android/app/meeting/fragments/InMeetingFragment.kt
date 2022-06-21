@@ -4,13 +4,22 @@ import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Pair
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
@@ -39,7 +48,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
@@ -75,14 +83,26 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -96,6 +116,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Views
     lateinit var toolbar: MaterialToolbar
+    lateinit var blink: Animation
 
     private var toolbarTitle: EmojiTextView? = null
     private var toolbarSubtitle: TextView? = null
@@ -109,7 +130,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerMuteText: EmojiTextView? = null
     private var bannerMuteIcon: ImageView? = null
 
-    private var meetingChangesBanner: EmojiTextView? = null
+    private var participantsChangesBanner: EmojiTextView? = null
+    private var callWillEndBanner: TextView? = null
     private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
@@ -148,6 +170,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
+
+    // Only me in the call Dialog
+    private var onlyMeDialog: Dialog? = null
+
+    private var countDownTimerToEndCall: CountDownTimer? = null
+
+    private var amIOnlyOneOnTheCall:Boolean = false
 
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
@@ -208,7 +237,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) && !inMeetingViewModel.isFromReconnectingStatus) {
+                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
                         logDebug("Change in my privileges")
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                             showSnackbar(
@@ -234,7 +263,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private val callStatusObserver = Observer<MegaChatCall> {
-         if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId)) {
             updatePanel()
 
             when (it.status) {
@@ -245,7 +274,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED -> {
+                MegaChatCall.CALL_STATUS_DESTROYED,
+                -> {
                     disableCamera()
                     removeUI()
                     if (inMeetingViewModel.amIAGuest()) {
@@ -257,13 +287,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         false,
                         inMeetingViewModel.isCallOnHold()
                     )
-
-                    if (inMeetingViewModel.isReconnectingStatus) {
-                        reconnecting()
-                    } else {
-                        binding.reconnecting.isVisible = false
-                        checkInfoBanner(TYPE_RECONNECTING)
-                    }
 
                     checkMenuItemsVisibility()
                 }
@@ -293,7 +316,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.status != INVALID_CALL_STATUS &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
-            if (inMeetingViewModel.isFromReconnectingStatus || inMeetingViewModel.isReconnectingStatus || !isOnline(
+            if (inMeetingViewModel.showReconnectingBanner.value || !isOnline(
                     requireContext()
                 )
             ) {
@@ -316,13 +339,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             logDebug("Change in call on hold status")
             isCallOnHold(it.isOnHold)
             checkSwapCameraMenuItemVisibility()
-        }
-    }
-
-    private val localNetworkQualityObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
-            logDebug("Change in the network quality")
-            checkInfoBanner(TYPE_NETWORK_QUALITY)
         }
     }
 
@@ -517,7 +533,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = InMeetingFragmentBinding.inflate(inflater)
 
@@ -531,6 +547,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onViewCreated(view, savedInstanceState)
 
         logDebug("In the meeting fragment")
+
+        blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
         initViewModel()
         MegaApplication.getInstance().startProximitySensor()
@@ -758,9 +776,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observe(this, callOnHoldObserver)
 
-        LiveEventBus.get(EVENT_LOCAL_NETWORK_QUALITY_CHANGE, MegaChatCall::class.java)
-            .observe(this, localNetworkQualityObserver)
-
         //Sessions Level
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE)
@@ -794,11 +809,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         toolbar.apply {
-            background = ContextCompat.getDrawable(
-                requireContext(), R.drawable.gradient_shape_callschat
-            )
-            setBackgroundColor(Color.TRANSPARENT)
+            setBackgroundColor(ContextCompat.getColor(requireContext(),
+                R.color.dark_grey_alpha_070))
         }
+
+        meetingActivity.window.statusBarColor =
+            ContextCompat.getColor(requireContext(), R.color.dark_grey_alpha_070)
+
 
         toolbarTitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         toolbarSubtitle?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -806,7 +823,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallLayout = meetingActivity.binding.bannerAnotherCall
         bannerAnotherCallTitle = meetingActivity.binding.bannerAnotherCallTitle
         bannerAnotherCallSubtitle = meetingActivity.binding.bannerAnotherCallSubtitle
-        meetingChangesBanner = meetingActivity.binding.meetingBanner
+        participantsChangesBanner = meetingActivity.binding.participantsChangesBanner
+        callWillEndBanner = meetingActivity.binding.callWillEndBanner
 
         bannerInfo = meetingActivity.binding.bannerInfo
         bannerMuteLayout = meetingActivity.binding.bannerMute
@@ -929,23 +947,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.CAMERA)
+                    arrayOf(Manifest.permission.CAMERA)
                 )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresPermission(l)
+                    .setOnRequiresPermission { l ->
+                        run {
+                            onRequiresPermission(l)
 
-                                // Continue expected action after granted
-                                sharedModel.clickCamera(true)
-                            }
+                            // Continue expected action after granted
+                            sharedModel.clickCamera(true)
                         }
-                        .setOnShowRationale { l ->
-                            onShowRationale(l)
+                    }
+                    .setOnShowRationale { l ->
+                        onShowRationale(l)
 
-                        }
-                        .setOnNeverAskAgain { l ->
-                            onPermNeverAskAgain(l) }
-                        .build()
+                    }
+                    .setOnNeverAskAgain { l ->
+                        onPermNeverAskAgain(l)
+                    }
+                    .build()
                 permissionsRequester.launch(false)
             }
         }
@@ -955,21 +974,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.RECORD_AUDIO)
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickMic(true)
-                            }
+                    .setOnRequiresPermission { l ->
+                        run {
+                            onRequiresPermission(l)
+                            // Continue expected action after granted
+                            sharedModel.clickMic(true)
                         }
-                        .setOnShowRationale { l ->
-                            onShowRationale(l)
-                        }
-                        .setOnNeverAskAgain { l ->
-                            onPermNeverAskAgain(l) }
-                        .build()
+                    }
+                    .setOnShowRationale { l ->
+                        onShowRationale(l)
+                    }
+                    .setOnNeverAskAgain { l ->
+                        onPermNeverAskAgain(l)
+                    }
+                    .build()
                 permissionsRequester.launch(false)
             }
         }
@@ -984,7 +1004,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
-            checkInfoBanner(TYPE_NO_CONNECTION)
         }
 
         lifecycleScope.launchWhenStarted {
@@ -992,7 +1011,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (it != MEGACHAT_INVALID_HANDLE) {
                     checkButtonsStatus()
                     showMuteBanner()
-                    inMeetingViewModel.getCall()?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
+                    inMeetingViewModel.getCall()
+                        ?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
                 }
             }
         }
@@ -1060,16 +1080,51 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.getParticipantsChangesText.collect { title ->
+            inMeetingViewModel.getParticipantsChanges.collect { (type, title) ->
                 if (title.trim().isNotEmpty()) {
-                    meetingChangesBanner?.apply {
+                    participantsChangesBanner?.apply {
+                        clearAnimation()
+                        hideCallWillEndInBanner()
+
                         text = title
                         isVisible = true
                         alpha =
-                                if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
-                                else 1f
+                            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
+                            else 1f
 
-                        animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
+                        animate()
+                            .alpha(0f)
+                            .setDuration(INFO_ANIMATION.toLong())
+                            .withEndAction {
+                                isVisible = false
+                                if (type == TYPE_LEFT && amIOnlyOneOnTheCall) {
+                                    inMeetingViewModel.startCounterTimerAfterBanner()
+                                    showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
+                                    showOnlyMeInTheCallDialog()
+                                }
+                            }
+                    }
+                } else {
+                    participantsChangesBanner?.apply {
+                        clearAnimation()
+                        isVisible = false
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
+                checkMenuItemsVisibility()
+                amIOnlyOneOnTheCall = shouldBeShown
+                if (!amIOnlyOneOnTheCall) {
+                    val currentTime = MegaApplication.getChatManagement().millisecondsUntilEndCall
+                    if (currentTime > 0) {
+                        showCallWillEndInBanner(currentTime)
+                        showOnlyMeInTheCallDialog()
+                    } else {
+                        hideCallWillEndInBanner()
+                        dismissDialog(onlyMeDialog)
                     }
                 }
             }
@@ -1115,6 +1170,89 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showPoorConnectionBanner.collect { shouldBeShown ->
+                bannerInfo?.apply {
+                    alpha = 1f
+                    isVisible = shouldBeShown
+                    if (shouldBeShown) {
+                        setBackgroundColor(ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            R.color.dark_grey_alpha_070
+                        ))
+                        text =
+                            StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
+
+                        reconnecting()
+                    } else {
+                        inMeetingViewModel.checkBannerInfo()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showReconnectingBanner.collect { shouldBeShown ->
+                bannerInfo?.apply {
+                    alpha = 1f
+                    isVisible = shouldBeShown
+                    if (shouldBeShown) {
+                        setBackgroundColor(ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            android.R.color.transparent))
+                        text =
+                            StringResourcesUtils.getString(R.string.reconnecting_message)
+                        startAnimation(blink)
+                    } else {
+                        clearAnimation()
+                        inMeetingViewModel.checkBannerInfo()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Show Call will end banner
+     *
+     * @param milliseconds Time remaining until the end of the call
+     */
+    private fun showCallWillEndInBanner(milliseconds: Long) {
+        callWillEndBanner?.apply {
+            collapsePanel()
+            hideCallWillEndInBanner()
+
+            isVisible = true
+            text = StringResourcesUtils.getString(
+                R.string.calls_call_screen_count_down_timer_to_end_call,
+                TimeUtils.getMinutesAndSecondsFromMilliseconds(milliseconds)
+            )
+
+            countDownTimerToEndCall = object :
+                CountDownTimer(milliseconds, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    text = StringResourcesUtils.getString(
+                        R.string.calls_call_screen_count_down_timer_to_end_call,
+                        TimeUtils.getMinutesAndSecondsFromMilliseconds(millisUntilFinished)
+                    )
+                }
+
+                override fun onFinish() {
+                    countDownTimerToEndCall = null
+                    callWillEndBanner?.isVisible = false
+                }
+            }.start()
+        }
+    }
+
+    /**
+     * Hide Call will end banner and counter down timer
+     */
+    private fun hideCallWillEndInBanner() {
+        callWillEndBanner?.isVisible = false
+        countDownTimerToEndCall?.cancel()
+        countDownTimerToEndCall = null
     }
 
     /**
@@ -1125,7 +1263,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun onPermNeverAskAgain(permissions: java.util.ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
             onAudioNeverAskAgain(permissions)
-        } else  if (permissions.contains(Manifest.permission.CAMERA)) {
+        } else if (permissions.contains(Manifest.permission.CAMERA)) {
             onCameraNeverAskAgain(permissions)
         }
     }
@@ -1269,7 +1407,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun adjustPositionOfFloatingWindow(
         bTop: Boolean = false,
-        bBottom: Boolean = true
+        bBottom: Boolean = true,
     ) {
         var isIntersect: Boolean
         var isIntersectPreviously: Boolean
@@ -1337,7 +1475,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateGroupUI() {
         inMeetingViewModel.getCall()?.let { call ->
-            if (inMeetingViewModel.amIAloneOnTheCall(call.chatid)) {
+            if (inMeetingViewModel.isRequestSent()) {
                 waitingForConnection(call.chatid)
             } else {
                 initGroupCall(call.chatid)
@@ -1433,7 +1571,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         removeListenersAndFragments()
         binding.reconnecting.isVisible = true
-        checkInfoBanner(TYPE_RECONNECTING)
     }
 
     /**
@@ -1491,7 +1628,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             session?.let { userSession ->
                 logDebug("Show one to one call UI")
                 inMeetingViewModel.status = TYPE_IN_ONE_TO_ONE
-                checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
                 logDebug("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
@@ -1523,7 +1659,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show waiting for connection call UI")
         inMeetingViewModel.status = TYPE_WAITING_CONNECTION
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         removeListenersAndFragments()
 
@@ -1592,7 +1727,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show group call - Speaker View UI")
         inMeetingViewModel.status = TYPE_IN_SPEAKER_VIEW
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
         inMeetingViewModel.removeAllParticipantVisible()
 
         gridViewCallFragment?.let {
@@ -1632,7 +1766,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         logDebug("Show group call - Grid View UI")
         inMeetingViewModel.status = TYPE_IN_GRID_VIEW
-        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         inMeetingViewModel.removeAllParticipantVisible()
 
@@ -1768,12 +1901,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkGridSpeakerViewMenuItemVisibility() {
         inMeetingViewModel.getCall()?.let { call ->
-            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING) {
-                gridViewMenuItem?.let {
-                    it.isVisible = false
+            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING || inMeetingViewModel.showOnlyMeBanner.value) {
+                gridViewMenuItem?.apply {
+                    isVisible = false
                 }
-                speakerViewMenuItem?.let {
-                    it.isVisible = false
+                speakerViewMenuItem?.apply {
+                    isVisible = false
                 }
                 return
             }
@@ -1897,20 +2030,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Change Bottom Floating Panel State
-     *
-     */
-    override fun onChangePanelState() {
-        if(isWaitingForMakeModerator){
-            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                findNavController().navigate(
-                    InMeetingFragmentDirections.actionGlobalMakeModerator()
-                )
-            }
-        }
-    }
-
-    /**
      * Change Mic State
      *
      * @param micOn True, if the microphone is on. False, if the microphone is off
@@ -1932,85 +2051,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Method that controls whether the fixed banner should be displayed.
-     * This banner is displayed when my network quality is low,
-     * I am in a state of reconnection or I am alone on the call
-     *
-     * @param type Type of banner
-     */
-    private fun checkInfoBanner(type: Int) {
-        bannerInfo?.let {
-            val shouldShow = inMeetingViewModel.shouldShowFixedBanner(
-                type
-            )
-            if (shouldShow) {
-                showFixedBanner(it, type)
-                return
-            }
-
-            if (type != TYPE_RECONNECTING) {
-                val shouldShowReconnectingBanner = inMeetingViewModel.shouldShowFixedBanner(
-                    TYPE_RECONNECTING,
-                )
-                if (shouldShowReconnectingBanner) {
-                    showFixedBanner(it, TYPE_RECONNECTING)
-                    return
-                }
-            }
-
-            if (type != TYPE_NETWORK_QUALITY) {
-                val shouldShowNetworkQualityBanner = inMeetingViewModel.shouldShowFixedBanner(
-                    TYPE_NETWORK_QUALITY
-                )
-                if (shouldShowNetworkQualityBanner) {
-                    showFixedBanner(it, TYPE_NETWORK_QUALITY)
-                    return
-                }
-            }
-
-            if (type != TYPE_SINGLE_PARTICIPANT) {
-                val shouldShowSingleParticipantBanner =
-                    inMeetingViewModel.shouldShowFixedBanner(
-                        TYPE_SINGLE_PARTICIPANT
-                    )
-                if (shouldShowSingleParticipantBanner) {
-                    showFixedBanner(it, TYPE_SINGLE_PARTICIPANT)
-                    return
-                }
-            }
-
-            hideFixedBanner(it)
-        }
-    }
-
-    /**
-     * Method of displaying the banner
-     *
-     * @param textView The text in the banner
-     * @param type The type of banner
-     */
-    private fun showFixedBanner(textView: TextView, type: Int) {
-        logDebug("Show fixed banner: type = $type")
-        inMeetingViewModel.updateFixedBanner(textView,type)
-        textView.apply {
-            isVisible = true
-            alpha =
-                if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
-                else 1f
-
-            if (type == TYPE_JOIN || type == TYPE_LEFT) {
-                animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
-            }
-        }
-    }
-
-    private fun hideFixedBanner(textView: TextView) {
-        logDebug("Hide fixed banner")
-        textView.alpha = 1f
-        textView.isVisible = false
-    }
-
-    /**
      * Method that controls whether the banner should be displayed.
      * This banner is displayed when the call is muted
      * or if the session or call is on hold.
@@ -2023,10 +2063,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
 
             if (bannerShouldBeShown) {
-                it.background = ContextCompat.getDrawable(
-                    context,
-                    R.drawable.gradient_shape_callschat
-                )
+                it.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.dark_grey_alpha_070))
                 logDebug("Show banner info")
                 it.isVisible = true
             } else {
@@ -2038,13 +2076,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.alpha = 0f
             }
 
-            // Delay a bit to wait for 'bannerMuteLayout' finish layouting, otherwise, its bottom is 0.
-            RunOnUIThreadUtils.runDelay(10) {
-                adjustPositionOfFloatingWindow(
-                    bTop = true,
-                    bBottom = false
-                )
-            }
+            adjustPositionOfFloatingWindow(
+                bTop = true,
+                bBottom = false
+            )
         }
     }
 
@@ -2205,7 +2240,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun checkVideoListener(
         participant: Participant,
         shouldAddListener: Boolean,
-        isHiRes: Boolean
+        isHiRes: Boolean,
     ) {
         gridViewCallFragment?.let {
             if (it.isAdded) {
@@ -2243,7 +2278,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateRemoteAVFlags(
         session: MegaChatSession,
         isAudioChange: Boolean,
-        isVideoChange: Boolean
+        isVideoChange: Boolean,
     ) {
         logDebug("Remote changes detected")
         gridViewCallFragment?.let {
@@ -2427,21 +2462,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         leaveMeeting()
     }
 
-    /**
-     * Method to navigate to the Make moderator screen
-     */
-    private val showAssignModeratorFragment = fun() {
+    private fun collapsePanel() {
         val isPanelExpanded =
             bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded
 
-        if (isPanelExpanded) {
+        if (isPanelExpanded)
             bottomFloatingPanelViewHolder.collapse()
-        } else {
-            findNavController().navigate(
-                InMeetingFragmentDirections.actionGlobalMakeModerator()
-            )
-        }
+    }
+
+    /**
+     * Method to navigate to the Make moderator screen
+     */
+    private val showAssignModeratorFragment = fun() {
+        collapsePanel()
+        findNavController().navigate(
+            InMeetingFragmentDirections.actionGlobalMakeModerator()
+        )
+
     }
 
     /**
@@ -2455,6 +2493,56 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
             .setNegativeButton(R.string.general_cancel, null)
             .show()
+    }
+
+    /**
+     * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
+     */
+    private fun showOnlyMeInTheCallDialog() {
+        if (MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            dismissDialog(onlyMeDialog)
+            return
+        }
+
+        val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
+        val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
+        val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)
+        firstButton.isVisible = true
+        secondButton.isVisible = true
+
+        firstButton.text =
+            StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call)
+                .uppercase()
+        secondButton.text =
+            StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call)
+                .uppercase()
+
+        firstButton.setOnClickListener {
+            MegaApplication.getChatManagement().stopCounterToFinishCall()
+            hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
+            leaveMeeting()
+        }
+
+        secondButton.setOnClickListener {
+            MegaApplication.getChatManagement().stopCounterToFinishCall()
+            hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
+        }
+
+        onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
+            .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
+            .setView(dialogLayout)
+            .setCancelable(true)
+            .create()
+
+        onlyMeDialog?.show()
+
+        onlyMeDialog?.setOnDismissListener {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+            it.dismiss()
+        }
     }
 
     /**
@@ -2559,7 +2647,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     companion object {
 
-        const val INFO_ANIMATION = 4000
+        const val INFO_ANIMATION = 1000
 
         const val ANIMATION_DURATION: Long = 500
 
@@ -2576,6 +2664,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
+
+        const val MILLISECONDS_TO_END_CALL = 2 * SECONDS_IN_MINUTE * 1000
     }
 
     /**
@@ -2594,6 +2684,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         sharedModel.hideSnackBar()
+        countDownTimerToEndCall?.cancel()
 
         removeUI()
         logDebug("Fragment destroyed")
@@ -2618,6 +2709,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onStop()
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
+        dismissDialog(onlyMeDialog)
     }
 
     /**
@@ -2677,25 +2769,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to answer the call
      */
     private fun answerCall() {
-        sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable).observe(viewLifecycleOwner) {
-                result ->
-                MegaApplication.getChatManagement().setSpeakerStatus(result.chatHandle,
-                    result.enableVideo
+        sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable)
+            .observe(viewLifecycleOwner) { (chatHandle, enableVideo) ->
+                MegaApplication.getChatManagement().setSpeakerStatus(chatHandle,
+                    enableVideo
                 )
-                checkCallStarted(result.chatHandle)
-        }
+                checkCallStarted(chatHandle)
+            }
     }
 
     /**
      * Method to start the call
      */
     private fun startCall() {
-        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable).observe(viewLifecycleOwner) {
-                result ->
-           result?.let {
-               checkCallStarted(result.chatHandle)
-           }
-        }
+        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable)
+            .observe(viewLifecycleOwner) { result ->
+                result?.let {
+                    checkCallStarted(result.chatHandle)
+                }
+            }
     }
 
     override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {

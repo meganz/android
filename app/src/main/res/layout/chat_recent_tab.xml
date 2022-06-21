@@ -133,57 +133,10 @@
             </LinearLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <ScrollView
-            android:id="@+id/scroller"
+        <include layout="@layout/empty_screen_recents_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="10dp"
-            android:elevation="-1dp"
-            android:fadeScrollbars="false"
-            android:fillViewport="true">
-
-            <RelativeLayout
-                android:id="@+id/linear_empty_layout_chat_recent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="100dp">
-
-                <ImageView
-                    android:id="@+id/empty_image_view_recent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/empty_text_chat_recent_invite"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true" />
-
-                <TextView
-                    android:id="@+id/empty_text_chat_recent_invite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/empty_text_chat_recent"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:maxWidth="300dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
-
-                <TextView
-                    android:id="@+id/empty_text_chat_recent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
-
-                <Button
-                    android:id="@+id/invite_button"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_below="@id/empty_text_chat_recent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal" />
-            </RelativeLayout>
-        </ScrollView>
+            android:layout_below="@+id/linear_layout_add"/>
 
         <LinearLayout
             android:id="@+id/linear_layout_recycler"

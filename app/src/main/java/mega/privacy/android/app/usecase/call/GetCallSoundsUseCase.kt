@@ -29,11 +29,13 @@ import javax.inject.Inject
 class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase
+    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
+    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase
 ) {
 
     companion object {
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
+        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
     }
 
     /**
@@ -59,46 +61,95 @@ class GetCallSoundsUseCase @Inject constructor(
         Flowable.create({ emitter ->
             val disposable = CompositeDisposable()
 
+            getCallStatusChangesUseCase.getReconnectingStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        if (it) {
+                            emitter.onNext(CallSoundType.CALL_RECONNECTING)
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                ).addTo(disposable)
+
             getSessionStatusChangesUseCase.getSessionChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { result ->
+                    onNext = { (call, sessionStatus, isRecoverable, peerId, clientId) ->
                         val participant =
-                            ParticipantInfo(peerId = result.peerId, clientId = result.clientId)
+                            ParticipantInfo(peerId = peerId, clientId = clientId)
 
-                        when (result.sessionStatus) {
-                            MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                                result.call?.let { call ->
-                                    stopCountDown(call.chatid, participant)
-                                }
-                            }
+                        if (call == null) {
+                            stopCountDown(INVALID_HANDLE, participant)
+                        } else {
+                            megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+                                if (!chat.isGroup && !chat.isMeeting) {
+                                    when (sessionStatus) {
+                                        MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                            stopCountDown(call.chatid, participant)
+                                        }
+                                        MegaChatSession.SESSION_STATUS_DESTROYED -> {
 
-                            MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                result.isRecoverable?.let { isRecoverableSession ->
-                                    if (result.call == null) {
-                                        stopCountDown(INVALID_HANDLE, participant)
-                                        emitter.onNext(CallSoundType.CALL_ENDED)
-                                    } else if (isRecoverableSession) {
-                                        emitter.startCountDown(
-                                            result.call, participant,
-                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
-                                        )
-                                    } else {
-                                        stopCountDown(
-                                            result.call.chatid,
-                                            participant
-                                        )
+                                            isRecoverable?.let { isRecoverableSession ->
+                                                if (isRecoverableSession) {
+                                                    emitter.startCountDown(
+                                                        call,
+                                                        participant,
+                                                        SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                                    )
 
-                                        megaChatApi.getChatRoom(result.call.chatid)
-                                            ?.let { chat ->
-                                                if (!chat.isGroup && !chat.isMeeting) {
-                                                    emitter.onNext(CallSoundType.CALL_ENDED)
+                                                } else {
+                                                    stopCountDown(
+                                                        call.chatid,
+                                                        participant
+                                                    )
                                                 }
                                             }
+                                        }
                                     }
                                 }
                             }
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { (chatId, onlyMeInTheCall) ->
+                        if (onlyMeInTheCall) {
+                            chatId?.let {
+                                MegaApplication.getChatManagement().startCounterToFinishCall(it,
+                                    SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+                            }
+                        } else {
+                            MegaApplication.getChatManagement().stopCounterToFinishCall()
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                )
+                .addTo(disposable)
+
+            getCallStatusChangesUseCase.getCallStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { status ->
+                        if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                            MegaApplication.getInstance()
+                                .removeRTCAudioManager()
+                            emitter.onNext(CallSoundType.CALL_ENDED)
                         }
                     },
                     onError = { error ->
@@ -156,9 +207,6 @@ class GetCallSoundsUseCase @Inject constructor(
                                         onRequestFinish = { _, error ->
                                             if (error.errorCode == MegaError.API_OK) {
                                                 removeCountDownTimer()
-                                                MegaApplication.getInstance()
-                                                    .removeRTCAudioManager()
-                                                this.onNext(CallSoundType.CALL_ENDED)
                                             } else {
                                                 this.onError(error.toThrowable())
                                             }
@@ -212,4 +260,3 @@ class GetCallSoundsUseCase @Inject constructor(
         countDownTimer = null
     }
 }
-

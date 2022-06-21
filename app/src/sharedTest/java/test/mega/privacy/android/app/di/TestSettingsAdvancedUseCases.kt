@@ -10,14 +10,14 @@ import mega.privacy.android.app.domain.usecase.IsUseHttpsEnabled
 import mega.privacy.android.app.domain.usecase.SetUseHttps
 import org.mockito.kotlin.mock
 
+@Module
 @TestInstallIn(
     replaces = [SettingsAdvancedUseCases::class],
     components = [ViewModelComponent::class]
 )
-@Module
 object TestSettingsAdvancedUseCases {
 
-    val isUseHttpsEnabled = mock<IsUseHttpsEnabled>()
+    val isUseHttpsEnabled = mock<IsUseHttpsEnabled> { onBlocking { invoke() }.thenReturn(true)}
     val setUseHttps = mock<SetUseHttps>()
 
     @Provides
