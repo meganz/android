@@ -445,6 +445,7 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 @SuppressWarnings("deprecation")
@@ -474,6 +475,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private static final String OPEN_LINK_DIALOG_SHOWN = "OPEN_LINK_DIALOG_SHOWN";
     private static final String OPEN_LINK_TEXT = "OPEN_LINK_TEXT";
     private static final String OPEN_LINK_ERROR = "OPEN_LINK_ERROR";
+    private static final String COMES_FROM_NOTIFICATIONS_SHARED_INDEX = "COMES_FROM_NOTIFICATIONS_SHARED_INDEX";
 
     public static final int ERROR_TAB = -1;
     public static final int INCOMING_TAB = 0;
@@ -830,10 +832,11 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean comesFromNotifications = false;
     public int comesFromNotificationsLevel = 0;
-    public long comesFromNotificationHandle = -1;
-    public long comesFromNotificationHandleSaved = -1;
-    public int comesFromNotificationDeepBrowserTreeIncoming = -1;
+    public long comesFromNotificationHandle = INVALID_VALUE;
+    public long comesFromNotificationHandleSaved = INVALID_VALUE;
+    public int comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
     public long[] comesFromNotificationChildNodeHandleList;
+    public int comesFromNotificationSharedIndex = INVALID_VALUE;
 
     RelativeLayout myAccountHeader;
     ImageView contactStatus;
@@ -1376,6 +1379,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putInt("comesFromNotificationsLevel", comesFromNotificationsLevel);
         outState.putLong("comesFromNotificationHandle", comesFromNotificationHandle);
         outState.putLong("comesFromNotificationHandleSaved", comesFromNotificationHandleSaved);
+        outState.putInt(COMES_FROM_NOTIFICATIONS_SHARED_INDEX, comesFromNotificationSharedIndex);
         outState.putBoolean("onAskingPermissionsFragment", onAskingPermissionsFragment);
         permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
         if (onAskingPermissionsFragment && permissionsFragment != null) {
@@ -1551,8 +1555,9 @@ public class ManagerActivity extends TransfersManagementActivity
             searchExpand = savedInstanceState.getBoolean("searchExpand", false);
             comesFromNotifications = savedInstanceState.getBoolean("comesFromNotifications", false);
             comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
-            comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", -1);
-            comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", -1);
+            comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", INVALID_VALUE);
+            comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", INVALID_VALUE);
+            comesFromNotificationSharedIndex = savedInstanceState.getInt(COMES_FROM_NOTIFICATIONS_SHARED_INDEX, INVALID_VALUE);
             onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
             if (onAskingPermissionsFragment) {
                 permissionsFragment = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
@@ -1564,7 +1569,7 @@ public class ManagerActivity extends TransfersManagementActivity
             mElevationCause = savedInstanceState.getInt("elevation", 0);
             storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
-            comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
+            comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
             isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
             isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false);
@@ -4170,27 +4175,9 @@ public class ManagerActivity extends TransfersManagementActivity
             viewPagerShares.setAdapter(sharesPageAdapter);
             tabLayoutShares.setupWithViewPager(viewPagerShares);
             setSharesTabIcons(indexShares);
-
-            //Force on CreateView, addTab do not execute onCreateView
-            if (indexShares != ERROR_TAB) {
-                logDebug("The index of the TAB Shares is: " + indexShares);
-                if (viewPagerShares != null) {
-                    switch (indexShares) {
-                        case INCOMING_TAB:
-                        case OUTGOING_TAB:
-                        case LINKS_TAB:
-                            viewPagerShares.setCurrentItem(indexShares);
-                            break;
-                    }
-                }
-                indexShares = ERROR_TAB;
-            } else {
-                //No bundle, no change of orientation
-                logDebug("indexShares is NOT -1");
-            }
-
         }
 
+        updateSharesTab();
         setToolbarTitle();
 
         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -9805,7 +9792,8 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             //Incoming Shares
             drawerItem = DrawerItem.SHARED_ITEMS;
-            indexShares = 0;
+            comesFromNotificationSharedIndex = viewPagerShares.getCurrentItem();
+            indexShares = INCOMING_TAB;
             comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming;
             comesFromNotificationHandleSaved = parentHandleIncoming;
             if (parent != null) {
@@ -11536,5 +11524,47 @@ public class ManagerActivity extends TransfersManagementActivity
             updateNavigationToolbarIcon(numUnreadUserAlerts);
             setNotificationsTitleSection(numUnreadUserAlerts);
         }
+    }
+
+    /**
+     * Updates the Shares section tab as per the indexShares.
+     */
+    public void updateSharesTab() {
+        if (indexShares == ERROR_TAB) {
+            Timber.d("indexShares is -1");
+            return;
+        }
+
+        Timber.d("The index of the TAB Shares is: %s", indexShares);
+
+        if (viewPagerShares != null) {
+            switch (indexShares) {
+                case INCOMING_TAB:
+                case OUTGOING_TAB:
+                case LINKS_TAB:
+                    viewPagerShares.setCurrentItem(indexShares);
+                    break;
+            }
+        }
+
+        indexShares = ERROR_TAB;
+    }
+
+    /**
+     * Restores the Shares section after opening it from a notification in the Notifications section.
+     */
+    public void restoreSharesAfterComingFromNotifications() {
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        comesFromNotifications = false;
+        comesFromNotificationsLevel = 0;
+        comesFromNotificationHandle = INVALID_VALUE;
+        indexShares = comesFromNotificationSharedIndex;
+        updateSharesTab();
+        comesFromNotificationSharedIndex = INVALID_VALUE;
+        setDeepBrowserTreeIncoming(comesFromNotificationDeepBrowserTreeIncoming);
+        comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
+        setParentHandleIncoming(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = INVALID_VALUE;
+        refreshIncomingShares();
     }
 }
