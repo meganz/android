@@ -334,6 +334,19 @@ public class RecordView extends RelativeLayout {
         }
     }
 
+    /**
+     * Method to start and lock recording
+     */
+    public void startAndLockRecordingTime() {
+        isSwiped = false;
+
+        startStopCounterTime(true);
+        removeHandlers();
+        isLockShown = false;
+        isPadlockShouldBeShown = false;
+        lockRecord();
+    }
+
     public void startRecordingTime() {
         slideToCancelLayout.setVisibility(VISIBLE);
         cancelRecordLayout.setVisibility(GONE);
@@ -405,9 +418,6 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionDown(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
-        animationHelper.setStartRecorded(true);
-        animationHelper.resetBasketAnimation();
-        animationHelper.resetSmallMic();
         startStopCounterTime(false);
 
         initialButtonX = recordBtnLayout.getX();
@@ -415,6 +425,18 @@ public class RecordView extends RelativeLayout {
         lastX = firstX;
         firstY = motionEvent.getRawY();
         lastY = firstY;
+
+        startRecord();
+    }
+
+    /**
+     * Method to start recording
+     */
+    public void startRecord() {
+        animationHelper.setStartRecorded(true);
+        animationHelper.resetBasketAnimation();
+        animationHelper.resetSmallMic();
+
         startTime = 0;
         isSwiped = false;
 
@@ -475,7 +497,6 @@ public class RecordView extends RelativeLayout {
 
             } else if (recordBtnLayout.getX() + 100 > previewX && !isLockShown) {
                 showLock(true);
-
             }
 
             float valueToTranslation = -(firstX - motionEvent.getRawX());
@@ -500,6 +521,16 @@ public class RecordView extends RelativeLayout {
         }
         lastX = motionEvent.getRawX();
         lastY = motionEvent.getRawY();
+    }
+
+    /**
+     * Method to lock the recording
+     */
+    private void lockRecord() {
+        userBehaviour = UserBehaviour.LOCKING;
+        recordListenerOptions(LOCK_RECORD, 0);
+        slideToCancelTranslation(0);
+        cancelRecordLayout.setVisibility(VISIBLE);
     }
 
     private void resetAnimationHelper() {
