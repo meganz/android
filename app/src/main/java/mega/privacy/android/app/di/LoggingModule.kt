@@ -5,10 +5,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.repository.TimberLoggingRepository
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
-import mega.privacy.android.app.domain.usecase.DefaultResetSdkLogger
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
 import mega.privacy.android.app.domain.usecase.ResetSdkLogger
 import mega.privacy.android.app.logging.ChatLogger
@@ -33,9 +31,6 @@ abstract class LoggingModule {
     @Binds
     abstract fun bindInitialiseLogging(useCase: DefaultInitialiseLogging): InitialiseLogging
 
-    @Binds
-    abstract fun bindResetSdkLogger(useCase: DefaultResetSdkLogger): ResetSdkLogger
-
     companion object {
 
         @Singleton
@@ -49,5 +44,10 @@ abstract class LoggingModule {
         @Provides
         fun provideChatFileLogger(): FileLogger =
             FileLogger(LoggerFactory.getLogger(TimberChatLogger::class.java))
+
+        @Provides
+        fun provideResetSdkLogger(loggingRepository: LoggingRepository): ResetSdkLogger =
+            ResetSdkLogger(loggingRepository::resetSdkLogging)
+
     }
 }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Is chat logged in
  *
  */
-interface IsChatLoggedIn {
+fun interface IsChatLoggedIn {
     /**
      * Invoke
      *

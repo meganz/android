@@ -5,27 +5,23 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.domain.usecase.CanDeleteAccount
 import mega.privacy.android.app.domain.usecase.DefaultCanDeleteAccount
-import mega.privacy.android.app.domain.usecase.DefaultFetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.DefaultFetchMultiFactorAuthSetting
 import mega.privacy.android.app.domain.usecase.DefaultGetAccountDetails
-import mega.privacy.android.app.domain.usecase.DefaultGetChatImageQuality
 import mega.privacy.android.app.domain.usecase.DefaultGetStartScreen
-import mega.privacy.android.app.domain.usecase.DefaultIsCameraSyncEnabled
 import mega.privacy.android.app.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.app.domain.usecase.DefaultIsHideRecentActivityEnabled
-import mega.privacy.android.app.domain.usecase.DefaultIsMultiFactorAuthAvailable
 import mega.privacy.android.app.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.DefaultRefreshPasscodeLockPreference
-import mega.privacy.android.app.domain.usecase.DefaultRequestAccountDeletion
-import mega.privacy.android.app.domain.usecase.DefaultSetChatImageQuality
 import mega.privacy.android.app.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.app.domain.usecase.GetAccountDetails
 import mega.privacy.android.app.domain.usecase.GetChatImageQuality
+import mega.privacy.android.app.domain.usecase.GetPreference
 import mega.privacy.android.app.domain.usecase.GetStartScreen
 import mega.privacy.android.app.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
@@ -37,7 +33,6 @@ import mega.privacy.android.app.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.app.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.app.domain.usecase.SetChatImageQuality
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.app.domain.usecase.GetPreference
 
 /**
  * Settings use cases module
@@ -58,15 +53,6 @@ abstract class SettingsUseCases {
     abstract fun bindRefreshPasscodeLockPreference(useCase: DefaultRefreshPasscodeLockPreference): RefreshPasscodeLockPreference
 
     @Binds
-    abstract fun bindIsCameraSyncEnabled(useCase: DefaultIsCameraSyncEnabled): IsCameraSyncEnabled
-
-    @Binds
-    abstract fun bindIsMultiFactorAuthAvailable(useCase: DefaultIsMultiFactorAuthAvailable): IsMultiFactorAuthAvailable
-
-    @Binds
-    abstract fun bindFetchAutoAcceptQRLinks(useCase: DefaultFetchAutoAcceptQRLinks): FetchAutoAcceptQRLinks
-
-    @Binds
     abstract fun bindStartScreen(useCase: DefaultGetStartScreen): GetStartScreen
 
     @Binds
@@ -76,9 +62,6 @@ abstract class SettingsUseCases {
     abstract fun bindToggleAutoAcceptQRLinks(useCase: DefaultToggleAutoAcceptQRLinks): ToggleAutoAcceptQRLinks
 
     @Binds
-    abstract fun bindRequestAccountDeletion(useCase: DefaultRequestAccountDeletion): RequestAccountDeletion
-
-    @Binds
     abstract fun bindIsChatLoggedIn(useCase: DefaultIsChatLoggedIn): IsChatLoggedIn
 
     @Binds
@@ -86,12 +69,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
-
-    @Binds
-    abstract fun bindGetChatImageQuality(useCase: DefaultGetChatImageQuality): GetChatImageQuality
-
-    @Binds
-    abstract fun bindSetChatImageQuality(useCaseSetChatImageQuality: DefaultSetChatImageQuality): SetChatImageQuality
 
     companion object {
         @Provides
@@ -141,5 +118,30 @@ abstract class SettingsUseCases {
         @Provides
         fun provideGetBooleanPreference(settingsRepository: SettingsRepository): GetPreference<Boolean> =
             GetPreference(settingsRepository::monitorBooleanPreference)
+
+        @Provides
+        fun provideFetchAutoAcceptQRLinks(settingsRepository: SettingsRepository): FetchAutoAcceptQRLinks =
+            FetchAutoAcceptQRLinks(settingsRepository::fetchContactLinksOption)
+
+        @Provides
+        fun provideIsCameraSyncEnabled(settingsRepository: SettingsRepository): IsCameraSyncEnabled =
+            IsCameraSyncEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
+
+        @Provides
+        fun provideIsMultiFactorAuthAvailable(accountRepository: AccountRepository): IsMultiFactorAuthAvailable =
+            IsMultiFactorAuthAvailable(accountRepository::isMultiFactorAuthAvailable)
+
+        @Provides
+        fun provideRequestAccountDeletion(accountRepository: AccountRepository): RequestAccountDeletion =
+            RequestAccountDeletion(accountRepository::requestDeleteAccountLink)
+
+        @Provides
+        fun provideGetChatImageQuality(settingsRepository: SettingsRepository): GetChatImageQuality =
+            GetChatImageQuality(settingsRepository::getChatImageQuality)
+
+        @Provides
+        fun provideSetChatImageQuality(settingsRepository: SettingsRepository): SetChatImageQuality =
+            SetChatImageQuality(settingsRepository::setChatImageQuality)
+
     }
 }
