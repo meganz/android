@@ -43,6 +43,8 @@ public class ChatManagement {
     private final MegaApplication app;
     private CountDownTimer countDownTimerToEndCall = null;
     public long millisecondsUntilEndCall = 0;
+    // Boolean indicating whether the end call dialog was ignored.
+    public Boolean hasEndCallDialogBeenIgnored = false;
 
     // List of chat ids to control if a chat is already joining.
     private final List<Long> joiningChatIds = new ArrayList<>();
@@ -332,6 +334,9 @@ public class ChatManagement {
      */
     public void startCounterToFinishCall(long chatId, long timeToWait) {
         stopCounterToFinishCall();
+        hasEndCallDialogBeenIgnored = false;
+        millisecondsUntilEndCall = TimeUnit.SECONDS.toMillis(timeToWait);
+
         if (countDownTimerToEndCall == null) {
             countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
 

@@ -193,6 +193,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.cancelTransfer(transfer)
     }
 
+    override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
+
     override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)

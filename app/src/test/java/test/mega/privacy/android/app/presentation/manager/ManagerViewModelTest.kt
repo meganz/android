@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
@@ -34,6 +35,7 @@ class ManagerViewModelTest {
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
+    private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val getInboxNode = mock<GetInboxNode>()
     private val hasChildren = mock<HasChildren>()
 
@@ -54,6 +56,7 @@ class ManagerViewModelTest {
             monitorGlobalUpdates,
             getRubbishBinNodeByHandle,
             getBrowserNodeByHandle,
+            getNumUnreadUserAlerts,
             getInboxNode,
             hasChildren
         )
