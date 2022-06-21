@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Set chat logs enabled
  *
  */
-interface SetChatLogsEnabled {
+fun interface SetChatLogsEnabled {
     /**
      * Invoke
      *

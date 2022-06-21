@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.Album
 /**
  * The use case interface to get albums
  */
-interface GetAlbums {
+fun interface GetAlbums {
     /**
      * get albums
      * @return Flow<List<Album>>

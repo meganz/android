@@ -312,22 +312,36 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
                     MegaNode node =  megaApi.getNodeByHandle(notif.getNodeHandle());
                     if(node!=null){
                         if(node.isFile()){
-                            ((ManagerActivity)context).openLocation(node.getParentHandle());
+                            ((ManagerActivity)context).openLocation(node.getParentHandle(), null);
                         }
                         else{
-                            ((ManagerActivity)context).openLocation(notif.getNodeHandle());
+                            ((ManagerActivity)context).openLocation(notif.getNodeHandle(), null);
                         }
                     }
                 }
                 break;
             }
             case MegaUserAlert.TYPE_NEWSHARE:
-            case MegaUserAlert.TYPE_NEWSHAREDNODES:
             case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
             case MegaUserAlert.TYPE_DELETEDSHARE:{
                 logDebug("Go to open corresponding location");
                 if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
-                    ((ManagerActivity)context).openLocation(notif.getNodeHandle());
+                    ((ManagerActivity)context).openLocation(notif.getNodeHandle(), null);
+                }
+                break;
+            }
+            case MegaUserAlert.TYPE_NEWSHAREDNODES:{
+                logDebug("Go to open corresponding location");
+                int numOfFolders = (int)notif.getNumber(0);
+                int numOfFiles = (int)notif.getNumber(1);
+                int childNodeHandleCount = numOfFolders + numOfFiles;
+
+                long[] childNodeHandleList = new long[childNodeHandleCount];
+                for (int i = 0; i < childNodeHandleCount; i++) {
+                    childNodeHandleList[i] = notif.getHandle(i);
+                }
+                if (notif.getNodeHandle() != -1 && megaApi.getNodeByHandle(notif.getNodeHandle()) != null) {
+                    ((ManagerActivity) context).openLocation(notif.getNodeHandle(), childNodeHandleList);
                 }
                 break;
             }

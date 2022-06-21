@@ -6,7 +6,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Monitor global node updates for the current logged in user
  */
-interface MonitorNodeUpdates {
+fun interface MonitorNodeUpdates {
     /**
      * Invoke
      *

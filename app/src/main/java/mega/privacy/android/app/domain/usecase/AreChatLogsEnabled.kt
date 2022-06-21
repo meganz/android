@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Are chat logs enabled
  *
  */
-interface AreChatLogsEnabled {
+fun interface AreChatLogsEnabled {
     /**
      * Invoke
      *

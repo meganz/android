@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Monitor auto accept QR links setting use case
  */
-interface MonitorAutoAcceptQRLinks {
+fun interface MonitorAutoAcceptQRLinks {
     /**
      * Invoke
      *

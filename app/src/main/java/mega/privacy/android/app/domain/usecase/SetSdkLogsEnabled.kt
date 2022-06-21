@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Set sdk logs enabled
  *
  */
-interface SetSdkLogsEnabled {
+fun interface SetSdkLogsEnabled {
     /**
      * Invoke
      *
