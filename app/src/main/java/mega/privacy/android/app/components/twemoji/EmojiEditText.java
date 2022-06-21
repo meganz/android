@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.os.Build;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -19,10 +20,14 @@ import androidx.core.view.inputmethod.InputConnectionCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 
 import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
+
+import java.util.Objects;
 
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
@@ -79,6 +84,13 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
 
     @Override
     @CallSuper
+    public boolean isTextEmpty() {
+        Editable text = getText();
+        return text != null && TextUtil.isTextEmpty(text.toString());
+    }
+
+    @Override
+    @CallSuper
     public void input(final Emoji emoji) {
         if (emoji != null) {
             final int start = getSelectionStart();
@@ -87,7 +99,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
             if (start < 0) {
                 append(emoji.getUnicode());
             } else {
-                getText().replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
+                Objects.requireNonNull(getText()).replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
             }
         }
     }

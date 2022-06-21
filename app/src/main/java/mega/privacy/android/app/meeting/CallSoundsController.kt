@@ -35,6 +35,7 @@ class CallSoundsController {
             }
 
             val res = MegaApplication.getInstance().baseContext.resources
+            Timber.d("Play sound: $type")
             when (type) {
                 CallSoundType.CALL_ENDED -> playSpecificSound(res.openRawResourceFd(R.raw.end_call))
                 CallSoundType.PARTICIPANT_JOINED_CALL -> playSpecificSound(res.openRawResourceFd(R.raw.join_call))

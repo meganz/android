@@ -2,14 +2,18 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
@@ -19,23 +23,21 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListene
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiSelectedListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
+import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.ViewUtils;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class EmojiKeyboard extends LinearLayout {
 
-    private View rootView;
     private String type;
     private int keyboardHeight;
-
     private VariantEmoji variantEmoji;
     private EmojiVariantPopup variantPopup;
     private RecentEmoji recentEmoji;
 
     private boolean isListenerActivated = true;
-    private Activity activity;
     private EmojiEditTextInterface editInterface;
     private ImageButton emojiIcon;
     private OnPlaceButtonListener buttonListener;
@@ -61,7 +63,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     private void initializeCommonVariables(String type, int height) {
         this.type = type;
-        this.rootView = getRootView();
+        View rootView = getRootView();
         this.variantEmoji = new VariantEmojiManager(getContext(), type);
         this.recentEmoji = new RecentEmojiManager(getContext(), type);
         this.variantPopup = new EmojiVariantPopup(rootView, clickListener);
@@ -75,8 +77,7 @@ public class EmojiKeyboard extends LinearLayout {
         requestLayout();
     }
 
-    public void initEmoji(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon) {
-        this.activity = context;
+    public void initEmoji(Activity activity, EmojiEditTextInterface editText, ImageButton emojiIcon) {
         this.editInterface = editText;
         this.emojiIcon = emojiIcon;
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -137,74 +138,96 @@ public class EmojiKeyboard extends LinearLayout {
     //KEYBOARDS:
     public void showLetterKeyboard() {
         if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
-        logDebug("showLetterKeyboard()");
+
         hideEmojiKeyboard();
         View view = (View) editInterface;
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm == null) return;
-        imm.showSoftInput(view, 0, null);
-        isLetterKeyboardShown = true;
-        changeKeyboardIcon(false);
+        ViewUtils.showSoftKeyboardDelayed(view);
+    }
+
+    /**
+     * Method that controls when the text keyboard changes state, visible or hidden.
+     *
+     * @param isShown True, if visible. False, if hidden.
+     */
+    public void updateStatusLetterKeyboard(boolean isShown) {
+        isLetterKeyboardShown = isShown;
+        changeKeyboardIcon();
         needToReplace();
     }
 
     public void showEmojiKeyboard() {
-        if (isEmojiKeyboardShown) return;
-        logDebug("showEmojiKeyboard");
+        if (isEmojiKeyboardShown || !(editInterface instanceof View)) return;
+
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
-        changeKeyboardIcon(true);
-        if (editInterface instanceof View) {
-            View view = (View) editInterface;
-            view.setFocusableInTouchMode(true);
-            view.requestFocus();
-        }
-
+        changeKeyboardIcon();
+        View view = (View) editInterface;
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
         needToReplace();
     }
 
     public void hideBothKeyboard(Activity activity) {
         if (activity == null) return;
-        logDebug("hideBothKeyboard()");
+
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        changeKeyboardIcon(false);
+        changeKeyboardIcon();
     }
 
     public void hideLetterKeyboard() {
         if (!isLetterKeyboardShown || !(editInterface instanceof View)) return;
-        logDebug("hideLetterKeyboard() ");
+
         View view = (View) editInterface;
         view.clearFocus();
-        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm == null) return;
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
-        isLetterKeyboardShown = false;
-        needToReplace();
+        ViewUtils.hideKeyboard(view);
     }
 
     public void hideKeyboardFromFileStorage(){
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        changeKeyboardIcon(true);
+        changeKeyboardIcon();
     }
 
-    public void changeKeyboardIcon(boolean isKeyboard){
+    /**
+     * Method to check if the icon is different than emojiIcon
+     *
+     * @param newIcon The new icon
+     * @return True if it's the same, false otherwise
+     */
+    private boolean isDifferentIcon(Drawable newIcon) {
+        Drawable currentDrawable = emojiIcon.getDrawable();
+        return !areDrawablesIdentical(currentDrawable, newIcon);
+    }
+
+    /**
+     * Method controlling the change in the keyboard icon
+     */
+    public void changeKeyboardIcon() {
         Drawable drawable;
-        if(isKeyboard){
-            drawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
-        }else {
-            drawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        if (!isLetterKeyboardShown && isEmojiKeyboardShown) {
+            drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_keyboard_white);
+            if (isDifferentIcon(drawable)) {
+                emojiIcon.setImageDrawable(drawable);
+            }
+            ImageViewCompat.setImageTintList(emojiIcon, ColorStateList.valueOf(ContextCompat.getColor(getContext(), editInterface.isTextEmpty() ? R.color.grey_020_white_020 : R.color.grey_060_white_060)));
+        } else {
+            drawable = ContextCompat.getDrawable(getContext(), editInterface.isTextEmpty() ?
+                    R.drawable.ic_emoji_unchecked :
+                    R.drawable.ic_emoji_checked);
+            if (isDifferentIcon(drawable)) {
+                ImageViewCompat.setImageTintList(emojiIcon, null);
+                emojiIcon.setImageDrawable(drawable);
+            }
         }
-        emojiIcon.setImageDrawable(drawable);
     }
 
     public void hideEmojiKeyboard() {
         if (!isEmojiKeyboardShown) return;
-        logDebug("hideEmojiKeyboard() ");
+
         recentEmoji.persist();
         variantEmoji.persist();
         setVisibility(GONE);

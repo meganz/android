@@ -91,4 +91,12 @@ class DefaultFilesRepository @Inject constructor(
     override suspend fun getCameraSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getCameraSortOrder()
     }
+
+    override suspend fun getInboxNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getInboxNode()
+    }
+
+    override suspend fun hasChildren(node: MegaNode): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.hasChildren(node)
+    }
 }

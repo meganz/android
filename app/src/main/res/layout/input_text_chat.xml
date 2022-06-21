@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/input_text_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/input_text_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RelativeLayout
+                android:id="@+id/more_options_rl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/write_msg_and_expand_rl"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_add"
+                    tools:ignore="ContentDescription" />
+            </RelativeLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/write_msg_and_expand_rl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/more_options_rl"
+                app:layout_constraintWidth_default="spread">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/write_msg_rl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/expand_input_text_layout"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <LinearLayout
+                        android:id="@+id/edit_msg_rl"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingStart="12dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/cancel_edit_rl"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="NestedWeights,RtlSymmetry">
+
+                        <RelativeLayout
+                            android:id="@+id/edit_msg_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:gravity="center_vertical"
+                            android:paddingStart="0dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="14dp"
+                            android:visibility="visible">
+
+                            <View
+                                android:id="@+id/edit_icon"
+                                android:layout_width="2dp"
+                                android:layout_height="31dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="@color/teal_200"
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
+
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_toEndOf="@id/edit_icon">
+
+                                <TextView
+                                    android:id="@+id/edit_msg_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="@string/edit_chat_message"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Teal200"
+                                    android:textColor="@color/teal_200"
+                                    tools:ignore="TextContrastCheck" />
+
+                                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                                    android:id="@+id/edit_msg_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/edit_msg_title"
+                                    android:ellipsize="end"
+                                    android:fontFamily="sans-serif"
+                                    android:singleLine="true"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp" />
+                            </RelativeLayout>
+                        </RelativeLayout>
+
+                        <mega.privacy.android.app.components.twemoji.EmojiEditText
+                            android:id="@+id/input_text_chat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|top"
+                            android:background="@null"
+                            android:gravity="start"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:maxLines="5"
+                            android:minHeight="38dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="8dp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2"
+                            app:emojiSize="18sp"
+                            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/cancel_edit_rl"
+                        android:layout_width="40dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <RelativeLayout
+                            android:id="@+id/cancel_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerInParent="true"
+                            android:layout_centerHorizontal="true">
+
+                            <ImageButton
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_centerInParent="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_remove_chat_toolbar"
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/emoji_rl"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_alignParentBottom="true">
+
+                            <ImageButton
+                                android:id="@+id/emoji_icon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerInParent="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_emoji_unchecked"
+                                tools:ignore="ContentDescription, SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <RelativeLayout
+                    android:id="@+id/expand_input_text_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RelativeLayout
+                        android:id="@+id/expand_input_text_rl"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:gravity="center_horizontal"
+                        android:paddingTop="18dp"
+                        android:paddingBottom="10dp"
+                        android:visibility="visible">
+
+                        <ImageButton
+                            android:id="@+id/expand_input_text_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:background="@null"
+                            android:src="@drawable/ic_expand_text_input"
+                            android:visibility="visible"
+                            tools:ignore="ContentDescription, SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:gravity="center_horizontal"
+                        android:paddingBottom="12dp"
+                        android:visibility="visible">
+
+                        <ImageButton
+                            android:id="@+id/send_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:src="@drawable/ic_send_white"
+                            android:visibility="visible"
+                            tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
