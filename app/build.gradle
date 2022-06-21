@@ -457,8 +457,13 @@ dependencies {
 
     //Showkase
     implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+
+
+
+    //QA
     qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
     kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
+    qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
