@@ -144,6 +144,10 @@ class DefaultAccountRepository @Inject constructor(
         .mapNotNull { it.users }
         .map { userUpdateMapper(it) }
 
+    override suspend fun getNumUnreadUserAlerts(): Int = withContext(ioDispatcher) {
+        megaApiGateway.getNumUnreadUserAlerts()
+    }
+
     override suspend fun getCredentials(): UserCredentials? = dbH.credentials
 
     override fun retryPendingConnections(disconnect: Boolean) {

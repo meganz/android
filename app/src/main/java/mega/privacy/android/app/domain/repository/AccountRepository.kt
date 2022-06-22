@@ -68,6 +68,12 @@ interface AccountRepository {
      */
     fun monitorUserUpdates(): Flow<UserUpdate>
 
+    /**
+     * Gets the number of unread user alerts for the logged in user.
+     *
+     * @return Number of unread user alerts.
+     */
+    suspend fun getNumUnreadUserAlerts(): Int
 
     /**
      * Gets user account credentials.
