@@ -7,4 +7,4 @@ import mega.privacy.android.app.domain.entity.FeatureFlag
  *
  * @param featureFlagList = List of @FeatureFlag
  */
-data class FeatureFlagState(val featureFlagList: MutableList<FeatureFlag> = emptyList())
+data class FeatureFlagState(val featureFlagList: List<FeatureFlag> = emptyList())

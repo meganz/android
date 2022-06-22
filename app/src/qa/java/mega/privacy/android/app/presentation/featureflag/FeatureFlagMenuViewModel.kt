@@ -25,6 +25,10 @@ class FeatureFlagMenuViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FeatureFlagState())
+
+    /**
+     * UI State for feature flag list
+     */
     val state: StateFlow<FeatureFlagState> = _state
 
     init {
@@ -51,7 +55,7 @@ class FeatureFlagMenuViewModel @Inject constructor(
      *
      * @return flow of list of @FeatureFlag
      */
-    suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
+    suspend fun getAllFeatures(): Flow<List<FeatureFlag>> {
         return getAllFeatureFlags()
     }
 }
