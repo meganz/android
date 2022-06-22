@@ -1957,8 +1957,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         int minutes = (message.getDuration() % 3600) / 60;
                         int seconds = message.getDuration() % 60;
 
-                        Timber.d("**************************** TIEMPO:: duration "+message.getDuration());
-
                         textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
                                 StringResourcesUtils.getString(R.string.call_ended_message);
 
@@ -2115,8 +2113,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         int hours = message.getDuration() / 3600;
                         int minutes = (message.getDuration() % 3600) / 60;
                         int seconds = message.getDuration() % 60;
-
-                        Timber.d("**************************** TIEMPO:: duration "+message.getDuration());
 
                         textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
                                 StringResourcesUtils.getString(R.string.call_ended_message);
