@@ -1,9 +1,10 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.presentation.transfers
 
 import android.content.*
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -12,8 +13,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
+import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
@@ -47,6 +50,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
+
+    val transfersViewModel: TransfersManagementViewModel by viewModels()
 
     /**
      * Broadcast to update the transfers widget.
@@ -114,6 +119,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     }
                 }
             }
+
+        transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
+            transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
+        }
     }
 
     /**
@@ -134,7 +143,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     protected fun setTransfersWidgetLayout(
         transfersWidgetLayout: RelativeLayout,
-        context: Context?
+        context: Context?,
     ) {
         transfersWidget =
             TransfersWidget(context ?: this, megaApi, transfersWidgetLayout, transfersManagement)
@@ -187,11 +196,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         val transferType = intent.getIntExtra(TRANSFER_TYPE, EXTRA_BROADCAST_INVALID_VALUE)
 
-        if (transferType == EXTRA_BROADCAST_INVALID_VALUE) {
-            transfersWidget?.update()
-        } else {
-            transfersWidget?.update(transferType)
-        }
+        transfersViewModel.checkTransfersInfo(
+            if (transferType == EXTRA_BROADCAST_INVALID_VALUE) NO_TYPE
+            else transferType
+        )
     }
 
     /**
@@ -254,7 +262,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             showScanningTransfersDialog()
         }
 
-        transfersWidget?.update()
+        updateTransfersWidget()
     }
 
     override fun onDestroy() {
@@ -270,7 +278,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the transfers widget.
      */
     fun updateTransfersWidget() {
-        transfersWidget?.update()
+        transfersViewModel.checkTransfersInfo(NO_TYPE)
     }
 
     /**
@@ -286,11 +294,4 @@ open class TransfersManagementActivity : PasscodeActivity() {
     fun hideTransfersWidget() {
         transfersWidget?.hide()
     }
-
-    /**
-     * Gets the pending transfers.
-     *
-     * @return Pending transfers.
-     */
-    fun getPendingTransfers(): Int = transfersWidget?.pendingTransfers ?: 0
 }

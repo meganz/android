@@ -10,8 +10,8 @@ import org.mockito.kotlin.mock
 
 @Module
 @TestInstallIn(
-        replaces = [RepositoryModule::class],
-        components = [SingletonComponent::class]
+    replaces = [RepositoryModule::class],
+    components = [SingletonComponent::class]
 )
 object TestRepositoryModule {
 
@@ -47,4 +47,7 @@ object TestRepositoryModule {
 
     @Provides
     fun bindDeviceRepository(): EnvironmentRepository = mock()
+
+    @Provides
+    fun provideTransfersRepository(): TransfersRepository = mock()
 }

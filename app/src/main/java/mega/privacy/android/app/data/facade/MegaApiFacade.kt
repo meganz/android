@@ -199,6 +199,8 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
 
+    override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }

@@ -74,6 +74,8 @@ import timber.log.Timber;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
+import static mega.privacy.android.app.data.extensions.MegaTransferKt.isVoiceClipTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
@@ -82,8 +84,6 @@ import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
-import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
-import static mega.privacy.android.app.utils.MegaTransferUtils.isVoiceClipType;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
@@ -375,7 +375,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 					continue;
 				}
 
-				if (!isVoiceClipType(transfer) && !isBackgroundTransfer(transfer)) {
+				if (!isVoiceClipTransfer(transfer) && !isBackgroundTransfer(transfer)) {
 					transfersManagement.checkIfTransferIsPaused(transfer);
 					transfersCount++;
 				}
@@ -1132,7 +1132,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 		return Completable.fromCallable(() -> {
 			Timber.d("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
-			if (transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return null;
+			if (transfer.isStreamingTransfer() || isVoiceClipTransfer(transfer)) return null;
 			if (isBackgroundTransfer(transfer)) {
 				backgroundTransfers.add(transfer.getTag());
 				return null;
@@ -1173,7 +1173,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 			}
 
 			if (transfer.getType() == TYPE_DOWNLOAD) {
-				boolean isVoiceClip = isVoiceClipType(transfer);
+				boolean isVoiceClip = isVoiceClipTransfer(transfer);
 				boolean isBackgroundTransfer = isBackgroundTransfer(transfer);
 
 				if (!isVoiceClip && !isBackgroundTransfer) transfersCount--;
@@ -1392,7 +1392,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 					return null;
 				}
 
-				if (transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return null;
+				if (transfer.isStreamingTransfer() || isVoiceClipTransfer(transfer)) return null;
 
 				if (isBackgroundTransfer(transfer)) {
 					backgroundTransfers.add(transfer.getTag());
