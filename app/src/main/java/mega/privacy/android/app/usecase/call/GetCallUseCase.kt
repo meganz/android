@@ -4,22 +4,29 @@ import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.FlowableEmitter
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.constants.EventConstants
-
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatListItemUpdate
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
-import java.util.ArrayList
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Main use case to get a Mega Chat Call and get information about existing calls
  *
+ * @property getChatChangesUseCase      Use case required to get chat request updates
  * @property megaChatApi   Mega Chat API needed to get call information.
  */
 class GetCallUseCase @Inject constructor(
-    private val megaChatApi: MegaChatApiAndroid
+    private val getChatChangesUseCase: GetChatChangesUseCase,
+    private val megaChatApi: MegaChatApiAndroid,
 ) {
 
     /**
@@ -190,5 +197,76 @@ class GetCallUseCase @Inject constructor(
         }
 
         return listCalls
+    }
+
+    /**
+     * Method to get if the call associated a chat ID exists and I'm the moderator of the call
+     *
+     * @return Flowable containing True, if there call exists and I'm moderator. False, otherwise
+     */
+    fun isThereACallCallInChatAndIAmTheModerator(chatId: Long): Flowable<Boolean> =
+        Flowable.create({ emitter ->
+            val disposable = CompositeDisposable()
+            megaChatApi.getChatCall(chatId)?.let { call ->
+                megaChatApi.getChatRoom(chatId)?.let { chat ->
+                    emitter.checkCallAndPrivileges(call, chat)
+                }
+            }
+
+            val callStatusObserver = Observer<MegaChatCall> { call ->
+                if (chatId == call.chatid) {
+                    megaChatApi.getChatRoom(chatId)?.let { chat ->
+                        emitter.checkCallAndPrivileges(call, chat)
+                    }
+
+                    emitter.onNext(false)
+                }
+            }
+
+            getChatChangesUseCase.get()
+                .filter { it is OnChatListItemUpdate }
+                .subscribeBy(
+                    onNext = { change ->
+                        if (emitter.isCancelled) return@subscribeBy
+                        (change as OnChatListItemUpdate).item?.let { item ->
+                            if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
+                                if (chatId == item.chatId) {
+                                    megaChatApi.getChatCall(chatId)?.let { call ->
+                                        megaChatApi.getChatRoom(chatId)?.let { chat ->
+                                            emitter.checkCallAndPrivileges(call, chat)
+                                        }
+                                    }
+
+                                    emitter.onNext(false)
+                                }
+                            }
+                        }
+                    },
+                    onError = { error ->
+                        Timber.e(error.stackTraceToString())
+                    }
+                ).addTo(disposable)
+
+            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                .observeForever(callStatusObserver)
+
+            emitter.setCancellable {
+                disposable.clear()
+                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+                    .removeObserver(callStatusObserver)
+            }
+
+        }, BackpressureStrategy.LATEST)
+
+    /**
+     * Check call status and own privileges
+     *
+     * @return True, if the status of the call is other than:CALL_STATUS_DESTROYED, CALL_STATUS_INITIAL, CALL_STATUS_JOINING and own privilege is PRIV_MODERATOR. False, otherwise.
+     */
+    private fun FlowableEmitter<Boolean>.checkCallAndPrivileges(
+        call: MegaChatCall,
+        chat: MegaChatRoom,
+    ) {
+        this.onNext(call.status != CALL_STATUS_DESTROYED && call.status != CALL_STATUS_INITIAL && call.status != CALL_STATUS_JOINING && chat.ownPrivilege == MegaChatRoom.PRIV_MODERATOR)
     }
 }

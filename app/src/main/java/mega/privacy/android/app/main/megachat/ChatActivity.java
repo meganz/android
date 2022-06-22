@@ -120,10 +120,13 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
+import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -358,6 +361,8 @@ public class ChatActivity extends PasscodeActivity
     @Inject
     StartCallUseCase startCallUseCase;
     @Inject
+    EndCallUseCase endCallUseCase;
+    @Inject
     GetCallStatusChangesUseCase getCallStatusChangesUseCase;
     @Inject
     GetNodeUseCase getNodeUseCase;
@@ -367,6 +372,8 @@ public class ChatActivity extends PasscodeActivity
     CopyNodeUseCase copyNodeUseCase;
     @Inject
     GetParticipantsChangesUseCase getParticipantsChangesUseCase;
+    @Inject
+    GetCallUseCase getCallUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -383,6 +390,7 @@ public class ChatActivity extends PasscodeActivity
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private AlertDialog dialogCall;
     private AlertDialog dialogOnlyMeInCall;
+    private AlertDialog endCallForAllDialog;
 
     private RelativeLayout editMsgLayout;
     private RelativeLayout cancelEdit;
@@ -2743,6 +2751,8 @@ public class ChatActivity extends PasscodeActivity
         muteMenuItem = menu.findItem(R.id.cab_menu_mute_chat);
         unMuteMenuItem = menu.findItem(R.id.cab_menu_unmute_chat);
 
+        checkEndCallForAllMenuItem();
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -2776,7 +2786,6 @@ public class ChatActivity extends PasscodeActivity
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
                 leaveMenuItem.setVisible(false);
-                endCallForAllMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
@@ -2828,11 +2837,9 @@ public class ChatActivity extends PasscodeActivity
                         else {
                             clearHistoryMenuItem.setVisible(false);
                         }
-                        endCallForAllMenuItem.setVisible(true);
                         leaveMenuItem.setVisible(true);
                     } else if (permission == MegaChatRoom.PRIV_RM) {
                         logDebug("Group chat PRIV_RM");
-                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2840,7 +2847,6 @@ public class ChatActivity extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else if (permission == MegaChatRoom.PRIV_RO) {
                         logDebug("Group chat PRIV_RO");
-                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2848,13 +2854,11 @@ public class ChatActivity extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else if(permission == MegaChatRoom.PRIV_STANDARD){
                         logDebug("Group chat PRIV_STANDARD");
-                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }else{
                         logDebug("Permission: " + permission);
-                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2875,14 +2879,12 @@ public class ChatActivity extends PasscodeActivity
                         contactInfoMenuItem.setTitle(getString(R.string.general_info));
                         contactInfoMenuItem.setVisible(true);
                     }
-                    endCallForAllMenuItem.setVisible(false);
                     leaveMenuItem.setVisible(false);
                 }
             }
 
         }else{
             logWarning("Chatroom NULL on create menu");
-            endCallForAllMenuItem.setVisible(false);
             muteMenuItem.setVisible(false);
             unMuteMenuItem.setVisible(false);
             leaveMenuItem.setVisible(false);
@@ -3005,6 +3007,12 @@ public class ChatActivity extends PasscodeActivity
                 showConfirmationLeaveChat(chatActivity, chatRoom.getChatId(), chatActivity);
                 break;
             }
+
+            case R.id.cab_menu_end_call_for_all:
+                Timber.d("End call for all selected");
+                showEndCallForAllDialog();
+                break;
+
             case R.id.cab_menu_archive_chat:{
                 if(recordView.isRecordingNow()) break;
 
@@ -3462,6 +3470,63 @@ public class ChatActivity extends PasscodeActivity
     private void enableCallMenuItems(Boolean enable) {
         callMenuItem.setEnabled(enable);
         videoMenuItem.setEnabled(enable);
+    }
+
+    /**
+     * Method to control the visibility of the menu item: End call for all
+     */
+    private void checkEndCallForAllMenuItem() {
+        endCallForAllMenuItem.setVisible(false);
+        if (chatRoom == null || joiningOrLeaving || (!chatRoom.isGroup() && !chatRoom.isMeeting()))
+            return;
+
+        Disposable callSubscription = getCallUseCase.isThereACallCallInChatAndIAmTheModerator(chatRoom.getChatId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((shouldBeVisible) -> {
+                    if (endCallForAllMenuItem.isVisible() != shouldBeVisible) {
+                        endCallForAllMenuItem.setVisible(shouldBeVisible);
+                    }
+
+                    if (!shouldBeVisible && endCallForAllDialog != null) {
+                        endCallForAllDialog.dismiss();
+                    }
+
+                }, (error) -> logError("Error " + error));
+
+        composite.add(callSubscription);
+    }
+
+    /**
+     * Method to show the End call for all dialog
+     */
+    private void showEndCallForAllDialog() {
+        if (AlertDialogUtil.isAlertDialogShown(endCallForAllDialog))
+            return;
+
+        endCallForAllDialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+                .setMessage(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+                .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all, (dialogInterface, i) -> AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog))
+                .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all, (dialogInterface, i) -> {
+                    AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog);
+                    endCallForAll();
+                })
+                .show();
+    }
+
+    /**
+     * Method to end call for all
+     */
+    private void endCallForAll() {
+        if (chatRoom == null)
+            return;
+
+        endCallUseCase.endCallForAllWithChatId(chatRoom.getChatId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                }, (error) -> Timber.e("Error " + error));
     }
 
     private boolean checkPermissions(String permission, int requestCode) {

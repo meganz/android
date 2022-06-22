@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
@@ -746,6 +747,8 @@ public class CallUtil {
                 return "END_CALL_REASON_FAILED";
             case MegaChatCall.END_CALL_REASON_CANCELLED:
                 return "END_CALL_REASON_CANCELLED";
+            case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
+                return "END_CALL_REASON_BY_MODERATOR";
             default:
                 return String.valueOf(endCallReason);
         }

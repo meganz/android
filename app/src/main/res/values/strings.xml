@@ -1686,8 +1686,6 @@
     <string name="external_play">Open with</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Share using</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -3965,12 +3963,16 @@
     <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security[/B]</string>
     <!-- Option in the chat menu to end call for all participants -->
     <string name="meetings_chat_screen_menu_option_end_call_for_all">End call for all</string>
-    <!-- Title of the dialog indicating that it asks you if you want to end the call at all, displayed on the chat room screen -->
+    <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">End call for all?</string>
-    <!-- Description of the dialog indicating that it asks you if you want to end the call at all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">You’re a moderator on this call. If you end the call, it will end for all participants.</string>
-    <!-- Button of the dialog indicating that it asks you if you want to end the call at all, displayed on the chat room screen -->
-    <string name="meetings_chat_screen_dialog_button_end_call_for_all">End call</string>
+    <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">This will end the call for all participants.</string>
+    <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Yes</string>
+    <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">No</string>
 </resources>
