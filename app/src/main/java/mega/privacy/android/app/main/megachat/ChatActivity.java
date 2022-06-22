@@ -513,6 +513,7 @@ public class ChatActivity extends PasscodeActivity
     private MenuItem clearHistoryMenuItem;
     private MenuItem contactInfoMenuItem;
     private MenuItem leaveMenuItem;
+    private MenuItem endCallForAllMenuItem;
     private MenuItem archiveMenuItem;
     private MenuItem muteMenuItem;
     private MenuItem unMuteMenuItem;
@@ -2737,6 +2738,7 @@ public class ChatActivity extends PasscodeActivity
         clearHistoryMenuItem = menu.findItem(R.id.cab_menu_clear_history_chat);
         contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
         leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
+        endCallForAllMenuItem = menu.findItem(R.id.cab_menu_end_call_for_all);
         archiveMenuItem = menu.findItem(R.id.cab_menu_archive_chat);
         muteMenuItem = menu.findItem(R.id.cab_menu_mute_chat);
         unMuteMenuItem = menu.findItem(R.id.cab_menu_unmute_chat);
@@ -2774,6 +2776,7 @@ public class ChatActivity extends PasscodeActivity
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
                 leaveMenuItem.setVisible(false);
+                endCallForAllMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
@@ -2825,10 +2828,11 @@ public class ChatActivity extends PasscodeActivity
                         else {
                             clearHistoryMenuItem.setVisible(false);
                         }
-
+                        endCallForAllMenuItem.setVisible(true);
                         leaveMenuItem.setVisible(true);
                     } else if (permission == MegaChatRoom.PRIV_RM) {
                         logDebug("Group chat PRIV_RM");
+                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2836,6 +2840,7 @@ public class ChatActivity extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else if (permission == MegaChatRoom.PRIV_RO) {
                         logDebug("Group chat PRIV_RO");
+                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2843,11 +2848,13 @@ public class ChatActivity extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else if(permission == MegaChatRoom.PRIV_STANDARD){
                         logDebug("Group chat PRIV_STANDARD");
+                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }else{
                         logDebug("Permission: " + permission);
+                        endCallForAllMenuItem.setVisible(false);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
@@ -2868,12 +2875,14 @@ public class ChatActivity extends PasscodeActivity
                         contactInfoMenuItem.setTitle(getString(R.string.general_info));
                         contactInfoMenuItem.setVisible(true);
                     }
+                    endCallForAllMenuItem.setVisible(false);
                     leaveMenuItem.setVisible(false);
                 }
             }
 
         }else{
             logWarning("Chatroom NULL on create menu");
+            endCallForAllMenuItem.setVisible(false);
             muteMenuItem.setVisible(false);
             unMuteMenuItem.setVisible(false);
             leaveMenuItem.setVisible(false);
