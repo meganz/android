@@ -28,6 +28,8 @@ class CustomCountDownTimer(var mutableLiveData: MutableLiveData<Boolean>) {
      * Method to start the counter
      */
     fun start(seconds: Long) {
+        stop()
+
         timer = object : CountDownTimer(seconds * 1000, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {}
