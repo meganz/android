@@ -4,5 +4,7 @@ import mega.privacy.android.app.domain.entity.FeatureFlag
 
 /**
  * Data class for Feature flag menu UI state
+ *
+ * @param featureFlagList = List of @FeatureFlag
  */
-data class FeatureFlagState(val featureFlagList: MutableList<FeatureFlag>? = null)
+data class FeatureFlagState(val featureFlagList: MutableList<FeatureFlag> = emptyList())

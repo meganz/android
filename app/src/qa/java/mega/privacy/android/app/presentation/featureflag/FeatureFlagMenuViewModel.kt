@@ -51,7 +51,7 @@ class FeatureFlagMenuViewModel @Inject constructor(
      *
      * @return flow of list of @FeatureFlag
      */
-    suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
+    private suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
         return getAllFeatureFlags()
     }
 }
