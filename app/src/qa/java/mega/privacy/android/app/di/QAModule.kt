@@ -32,13 +32,20 @@ class QAModule {
     fun bindPreferenceResource(): PreferenceResource =
         PreferenceResource(R.xml.preferences_qa_entry)
 
+    /**
+     * Provide SetFeatureFlag use case
+     */
     @Provides
     fun provideSetFeatureFlag(repository: FeatureFlagRepository): SetFeatureFlag =
         SetFeatureFlag(repository::setFeature)
 
+    /**
+     * Provide GetAllFeatureFlags use case
+     */
     @Provides
     fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
         GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
+
     /**
      * Provide distribution gateway for QA builds
      *

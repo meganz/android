@@ -28,7 +28,7 @@ class DefaultFeatureFlagRepository @Inject constructor(
      * Gets a fow of list of all feature flags
      * @return: Flow of List of @FeatureFlag
      */
-    override suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>> {
+    override suspend fun getAllFeatures(): Flow<List<FeatureFlag>> {
         return flow {
             val list = mutableListOf<FeatureFlag>()
             preferencesGateway.getAllFeatures().collect { map ->

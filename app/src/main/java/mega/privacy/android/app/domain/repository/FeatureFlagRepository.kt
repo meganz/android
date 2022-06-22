@@ -20,5 +20,5 @@ interface FeatureFlagRepository {
      * Gets a fow of list of all feature flags
      * @return: Flow of List of @FeatureFlag
      */
-    suspend fun getAllFeatures(): Flow<MutableList<FeatureFlag>>
+    suspend fun getAllFeatures(): Flow<List<FeatureFlag>>
 }
