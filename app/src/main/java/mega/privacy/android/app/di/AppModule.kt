@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Process
+import android.os.Vibrator
 import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.utils.ShakeDetector
 import mega.privacy.android.app.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
@@ -93,4 +95,8 @@ class AppModule {
     @Provides
     fun provideGetThemeModePreference(useCase: DefaultGetThemeMode): GetThemeMode =
         useCase
+
+    @Singleton
+    @Provides
+    fun provideShakeDetector(): ShakeDetector = ShakeDetector()
 }

@@ -3829,6 +3829,7 @@
     <string name="account_info_renews_on">[A]Renews on[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_expires_on">[A]Expires on[/A] [B]%s[/B]</string>
+    <string name="title_activity_feature_flag">FeatureFlagActivity</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">Favourites</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
