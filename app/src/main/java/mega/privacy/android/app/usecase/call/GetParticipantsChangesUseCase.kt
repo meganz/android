@@ -46,7 +46,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @property peers        List of user IDs
      */
     data class ParticipantsChangesResult(
-        val chatId: Long?,
+        val chatId: Long,
         val typeChange: Int,
         val peers: ArrayList<Long>?,
     )
@@ -58,7 +58,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
      */
     data class NumParticipantsChangesResult(
-        val chatId: Long?,
+        val chatId: Long,
         val onlyMeInTheCall: Boolean,
     )
 
@@ -73,9 +73,12 @@ class GetParticipantsChangesUseCase @Inject constructor(
                         MegaApplication.getChatManagement().isRequestSent(call.callId)
                     val isOneToOneCall = !chat.isGroup && !chat.isMeeting
                     if (!isRequestSent && !isOneToOneCall) {
-                        val onlyMeInTheCall =
-                            call.numParticipants == 1 && call.peeridParticipants.get(0) == megaChatApi.myUserHandle
-                        emitter.onNext(NumParticipantsChangesResult(call.chatid, onlyMeInTheCall))
+                        call.peeridParticipants?.let { list ->
+                            val onlyMeInTheCall =
+                                list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
+                            emitter.onNext(NumParticipantsChangesResult(call.chatid,
+                                onlyMeInTheCall))
+                        }
                     }
                 }
             }
