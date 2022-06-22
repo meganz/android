@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.setImageRequestFromUri
  * @property binding    Item's view binding
  */
 class ContactListDataViewHolder(
-    private val binding: ItemContactDataBinding
+    private val binding: ItemContactDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactItem.Data) {
@@ -22,7 +22,16 @@ class ContactListDataViewHolder(
         binding.txtLastSeen.isVisible = !item.lastSeen.isNullOrBlank()
         binding.chipNew.isVisible = item.isNew
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
-        binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)
-        item.statusColor?.let { binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, it)) }
+        if (item.avatarUri != null) {
+            binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)
+        } else {
+            binding.imgThumbnail.setImageRequest(null)
+        }
+        if (item.statusColor != null) {
+            val color = ContextCompat.getColor(itemView.context, item.statusColor)
+            binding.imgState.setColorFilter(color)
+        } else {
+            binding.imgState.clearColorFilter()
+        }
     }
 }
