@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.gradleVersion = '7.2.0'
-    ext.kotlinVersion = '1.6.21'
+    ext.kotlinVersion = '1.6.10'
     ext.navigationVersion = '2.4.2'
     ext.googleServicesVersion = '4.3.10'
     ext.hiltVersion = "2.42"
@@ -69,7 +69,7 @@ ext {
     bannerViewPagerVersion = '3.4.0'
     biometricVersion = '1.1.0'
     cardViewVersion = '1.0.0'
-    composeVersion = '1.2.0-beta02'
+    composeVersion = '1.1.1'
     constraintLayoutVersion = '2.1.1'
     coroutinesVersion = "1.6.0"
     coroutineTestVersion = '1.6.0'
