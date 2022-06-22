@@ -1166,8 +1166,8 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (this::menu.isInitialized) {
             menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
             menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-            menu.findItem(R.id.action_photos_filter)?.isVisible = true
-            menu.findItem(R.id.action_photos_sortby)?.isVisible = true
+            menu.findItem(R.id.action_photos_filter)?.isVisible = shouldShow
+            menu.findItem(R.id.action_photos_sortby)?.isVisible = shouldShow
         }
     }
 

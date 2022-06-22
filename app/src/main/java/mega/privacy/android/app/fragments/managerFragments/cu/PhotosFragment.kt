@@ -114,7 +114,6 @@ class PhotosFragment : BaseFragment() {
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
-                        mManagerActivity.fromAlbumContent = false
                         with(timelineFragment) {
                             if (PhotosFilterAndSortToggle.enabled) {
                                 setActionBarSubtitleText(Util.adjustForLargeFont(
@@ -126,6 +125,7 @@ class PhotosFragment : BaseFragment() {
                                     }
                                 showHideABSubtitle(isFilterAllPhotos())
                             }
+                            mManagerActivity.fromAlbumContent = false
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()
                             if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
@@ -134,6 +134,7 @@ class PhotosFragment : BaseFragment() {
                                 mManagerActivity.updateCUViewTypes(View.VISIBLE)
                             }
                         }
+
                     } else {
                         tabIndex = ALBUM_INDEX
                         if (PhotosFilterAndSortToggle.enabled) {
@@ -288,13 +289,13 @@ class PhotosFragment : BaseFragment() {
     }
 
     fun showHideABSubtitle(hide: Boolean) {
-        actionBarSubtitle.visibility = if (hide) {
+        actionBarSubtitle.visibility = if (hide || mManagerActivity.fromAlbumContent) {
             View.GONE
         } else {
             View.VISIBLE
         }
 
-        actionBarSubtitleArrow.visibility = if (hide) {
+        actionBarSubtitleArrow.visibility = if (hide || mManagerActivity.fromAlbumContent) {
             View.GONE
         } else {
             View.VISIBLE
