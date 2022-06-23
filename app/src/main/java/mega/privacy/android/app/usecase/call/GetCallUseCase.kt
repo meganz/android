@@ -98,7 +98,8 @@ class GetCallUseCase @Inject constructor(
             val callStatusObserver = Observer<MegaChatCall> { call ->
                 when (call.status) {
                     CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                    CALL_STATUS_DESTROYED -> {
+                    CALL_STATUS_DESTROYED,
+                    -> {
                         emitter.onNext(call.chatid)
                     }
                 }
@@ -204,7 +205,7 @@ class GetCallUseCase @Inject constructor(
      *
      * @return Flowable containing True, if there call exists and I'm moderator. False, otherwise
      */
-    fun isThereACallCallInChatAndIAmTheModerator(chatId: Long): Flowable<Boolean> =
+    fun isThereACallAndIAmModerator(chatId: Long): Flowable<Boolean> =
         Flowable.create({ emitter ->
             val disposable = CompositeDisposable()
             megaChatApi.getChatCall(chatId)?.let { call ->
@@ -262,7 +263,7 @@ class GetCallUseCase @Inject constructor(
     /**
      * Check call status and own privileges
      *
-     * @return True, if the status of the call is other than:CALL_STATUS_DESTROYED, CALL_STATUS_INITIAL, CALL_STATUS_JOINING and own privilege is PRIV_MODERATOR. False, otherwise.
+     * @return True, if the status of the call is other than:CALL_STATUS_DESTROYED, CALL_STATUS_INITIAL, CALL_STATUS_JOINING and own privilege is moderator. False, otherwise.
      */
     private fun FlowableEmitter<Boolean>.checkCallAndPrivileges(
         call: MegaChatCall,

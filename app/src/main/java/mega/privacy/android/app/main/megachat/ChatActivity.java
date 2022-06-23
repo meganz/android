@@ -3486,7 +3486,7 @@ public class ChatActivity extends PasscodeActivity
         if (chatRoom == null || joiningOrLeaving || (!chatRoom.isGroup() && !chatRoom.isMeeting()))
             return;
 
-        Disposable callSubscription = getCallUseCase.isThereACallCallInChatAndIAmTheModerator(chatRoom.getChatId())
+        Disposable callSubscription = getCallUseCase.isThereACallAndIAmModerator(chatRoom.getChatId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((shouldBeVisible) -> {

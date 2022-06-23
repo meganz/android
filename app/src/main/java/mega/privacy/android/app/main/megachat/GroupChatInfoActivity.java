@@ -320,7 +320,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             if (chat.isPreview() || !chat.isActive()) {
                 endCallForAllShouldBeVisible = false;
             } else {
-                Disposable callSubscription = getCallUseCase.isThereACallCallInChatAndIAmTheModerator(chat.getChatId())
+                Disposable callSubscription = getCallUseCase.isThereACallAndIAmModerator(chat.getChatId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((shouldBeVisible) -> {
