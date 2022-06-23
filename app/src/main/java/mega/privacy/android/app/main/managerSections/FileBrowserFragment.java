@@ -594,7 +594,7 @@ public class FileBrowserFragment extends RotatableFragment{
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						((ManagerActivity) context).getParentHandleBrowser(), recyclerView,
+						managerViewModel.getSafeBrowserParentHandle(), recyclerView,
 						FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
@@ -648,7 +648,7 @@ public class FileBrowserFragment extends RotatableFragment{
 
             if (adapter == null) {
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						((ManagerActivity) context).getParentHandleBrowser(), recyclerView,
+						managerViewModel.getSafeBrowserParentHandle(), recyclerView,
 						FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
             } else {
                 adapter.setParentHandle(((ManagerActivity)context).getParentHandleBrowser());
@@ -685,6 +685,8 @@ public class FileBrowserFragment extends RotatableFragment{
 
 		setTransferOverQuotaBannerVisibility();
 
+		selectNewlyAddedNodes();
+
 		return v;
     }
 
@@ -718,7 +720,7 @@ public class FileBrowserFragment extends RotatableFragment{
 	}
 
 	private void getNodes() {
-		long parentHandleBrowser = ((ManagerActivity) context).getParentHandleBrowser();
+		long parentHandleBrowser = managerViewModel.getSafeBrowserParentHandle();
 		if (parentHandleBrowser == -1 || parentHandleBrowser == megaApi.getRootNode().getHandle()) {
 			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + parentHandleBrowser);
 
@@ -990,11 +992,11 @@ public class FileBrowserFragment extends RotatableFragment{
 
 	public void setFolderInfoNavigation(MegaNode n){
 	    mediaHandle = n.getHandle();
-        ((ManagerActivity)context).setParentHandleBrowser(n.getHandle());
+        managerViewModel.setBrowserParentHandle(n.getHandle());
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
         ((ManagerActivity)context).setToolbarTitle();
 
-        adapter.setParentHandle(((ManagerActivity)context).getParentHandleBrowser());
+        adapter.setParentHandle(managerViewModel.getSafeBrowserParentHandle());
         nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
         adapter.setNodes(nodes);
         recyclerView.scrollToPosition(0);
@@ -1156,27 +1158,27 @@ public class FileBrowserFragment extends RotatableFragment{
 		logDebug("onBackPressed");
 
         if (adapter != null) {
-			logDebug("Parent Handle is: " + ((ManagerActivity)context).getParentHandleBrowser());
+			logDebug("Parent Handle is: " + managerViewModel.getSafeBrowserParentHandle());
 
-			if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == (((ManagerActivity)context).getParentHandleBrowser())) {
+			if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == (managerViewModel.getSafeBrowserParentHandle())) {
 				((ManagerActivity) context).comesFromNotifications = false;
 				((ManagerActivity) context).comesFromNotificationHandle = -1;
 				((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
-				((ManagerActivity)context).setParentHandleBrowser(((ManagerActivity)context).comesFromNotificationHandleSaved);
+				managerViewModel.setBrowserParentHandle(((ManagerActivity)context).comesFromNotificationHandleSaved);
 				((ManagerActivity)context).comesFromNotificationHandleSaved = -1;
 				((ManagerActivity) context).refreshCloudDrive();
 
 				return 2;
 			}
 			else {
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivity)context).getParentHandleBrowser()));
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.getSafeBrowserParentHandle()));
 				if (parentNode != null) {
 				    mediaHandle = parentNode.getHandle();
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 
-					((ManagerActivity)context).setParentHandleBrowser(parentNode.getHandle());
+					managerViewModel.setBrowserParentHandle(parentNode.getHandle());
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 
 					((ManagerActivity)context).setToolbarTitle();
@@ -1240,7 +1242,7 @@ public class FileBrowserFragment extends RotatableFragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == ((ManagerActivity)context).getParentHandleBrowser() || ((ManagerActivity)context).getParentHandleBrowser() == -1) {
+				if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == managerViewModel.getSafeBrowserParentHandle() || managerViewModel.getSafeBrowserParentHandle() == -1) {
 
 					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 						emptyImageView.setImageResource(R.drawable.empty_cloud_drive_landscape);
@@ -1433,5 +1435,26 @@ public class FileBrowserFragment extends RotatableFragment{
 		MediaDiscoveryFragment f = MediaDiscoveryFragment.getInstance(mediaHandle);
 		((ManagerActivity) context).skipToMediaDiscoveryFragment(f);
 		return f;
+	}
+
+	/**
+	 * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
+	 */
+	private void selectNewlyAddedNodes() {
+		ArrayList<Integer> positions = ((ManagerActivity) context).getPositionsList(nodes);
+		if (!positions.isEmpty()) {
+			int firstPosition = Collections.min(positions);
+			activateActionMode();
+			for (int position : positions) {
+				if (adapter.isMultipleSelect()) {
+					adapter.toggleSelection(position);
+				}
+			}
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0) {
+				updateActionModeTitle();
+			}
+			recyclerView.scrollToPosition(firstPosition);
+		}
 	}
 }

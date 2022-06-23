@@ -13,6 +13,8 @@ import nz.mega.sdk.MegaError;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
+import androidx.annotation.NonNull;
+
 public class TruncateHistoryListener extends ChatBaseListener {
 
     public TruncateHistoryListener(Context context) {
@@ -20,13 +22,13 @@ public class TruncateHistoryListener extends ChatBaseListener {
     }
 
     @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    public void onRequestFinish(@NonNull MegaChatApiJava api, MegaChatRequest request, @NonNull MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_TRUNCATE_HISTORY) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
             Util.showSnackbar(context, getString(R.string.clear_history_success));
             if (context instanceof ChatActivity) {
-                ((ChatActivity) context).hideMessageJump();
+                ((ChatActivity) context).hideScrollToLastMsgButton();
             }
         } else {
             Util.showSnackbar(context, getString(R.string.clear_history_error));

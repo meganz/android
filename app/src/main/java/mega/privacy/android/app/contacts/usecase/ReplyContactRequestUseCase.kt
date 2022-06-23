@@ -23,7 +23,7 @@ class ReplyContactRequestUseCase @Inject constructor(
         handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
 
     fun ignoreReceivedRequest(requestHandle: Long): Completable =
-        handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
+        handleReceivedRequest(requestHandle, REPLY_ACTION_IGNORE)
 
     fun denyReceivedRequest(requestHandle: Long): Completable =
         handleReceivedRequest(requestHandle, REPLY_ACTION_DENY)

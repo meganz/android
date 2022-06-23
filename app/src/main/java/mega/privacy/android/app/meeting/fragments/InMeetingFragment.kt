@@ -17,9 +17,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Button
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
@@ -131,7 +131,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerMuteIcon: ImageView? = null
 
     private var participantsChangesBanner: EmojiTextView? = null
-    private var callWillEndBanner: EmojiTextView? = null
+    private var callWillEndBanner: TextView? = null
     private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
@@ -175,6 +175,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var onlyMeDialog: Dialog? = null
 
     private var countDownTimerToEndCall: CountDownTimer? = null
+
+    private var amIOnlyOneOnTheCall:Boolean = false
 
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
@@ -1078,17 +1080,34 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.getParticipantsChangesText.collect { title ->
+            inMeetingViewModel.getParticipantsChanges.collect { (type, title) ->
                 if (title.trim().isNotEmpty()) {
                     participantsChangesBanner?.apply {
                         clearAnimation()
+                        hideCallWillEndInBanner()
+
                         text = title
                         isVisible = true
                         alpha =
                             if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
                             else 1f
 
-                        animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
+                        animate()
+                            .alpha(0f)
+                            .setDuration(INFO_ANIMATION.toLong())
+                            .withEndAction {
+                                isVisible = false
+                                if (type == TYPE_LEFT && amIOnlyOneOnTheCall) {
+                                    inMeetingViewModel.startCounterTimerAfterBanner()
+                                    showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
+                                    showOnlyMeInTheCallDialog()
+                                }
+                            }
+                    }
+                } else {
+                    participantsChangesBanner?.apply {
+                        clearAnimation()
+                        isVisible = false
                     }
                 }
             }
@@ -1097,16 +1116,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
                 checkMenuItemsVisibility()
-                if (shouldBeShown) {
-                    showCallWillEndInBanner(MILLISECONDS_TO_END_CALL)
-                    showOnlyMeInTheCallDialog()
-                } else {
+                amIOnlyOneOnTheCall = shouldBeShown
+                if (!amIOnlyOneOnTheCall) {
                     val currentTime = MegaApplication.getChatManagement().millisecondsUntilEndCall
                     if (currentTime > 0) {
                         showCallWillEndInBanner(currentTime)
                         showOnlyMeInTheCallDialog()
                     } else {
                         hideCallWillEndInBanner()
+                        dismissDialog(onlyMeDialog)
                     }
                 }
             }
@@ -1202,6 +1220,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun showCallWillEndInBanner(milliseconds: Long) {
         callWillEndBanner?.apply {
+            collapsePanel()
             hideCallWillEndInBanner()
 
             isVisible = true
@@ -1231,7 +1250,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Hide Call will end banner and counter down timer
      */
     private fun hideCallWillEndInBanner() {
-        onlyMeDialog?.dismiss()
         callWillEndBanner?.isVisible = false
         countDownTimerToEndCall?.cancel()
         countDownTimerToEndCall = null
@@ -2012,20 +2030,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Change Bottom Floating Panel State
-     *
-     */
-    override fun onChangePanelState() {
-        if (isWaitingForMakeModerator) {
-            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                findNavController().navigate(
-                    InMeetingFragmentDirections.actionGlobalMakeModerator()
-                )
-            }
-        }
-    }
-
-    /**
      * Change Mic State
      *
      * @param micOn True, if the microphone is on. False, if the microphone is off
@@ -2072,13 +2076,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.alpha = 0f
             }
 
-            // Delay a bit to wait for 'bannerMuteLayout' finish layouting, otherwise, its bottom is 0.
-            RunOnUIThreadUtils.runDelay(10) {
-                adjustPositionOfFloatingWindow(
-                    bTop = true,
-                    bBottom = false
-                )
-            }
+            adjustPositionOfFloatingWindow(
+                bTop = true,
+                bBottom = false
+            )
         }
     }
 
@@ -2461,21 +2462,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         leaveMeeting()
     }
 
-    /**
-     * Method to navigate to the Make moderator screen
-     */
-    private val showAssignModeratorFragment = fun() {
+    private fun collapsePanel() {
         val isPanelExpanded =
             bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
         isWaitingForMakeModerator = isPanelExpanded
 
-        if (isPanelExpanded) {
+        if (isPanelExpanded)
             bottomFloatingPanelViewHolder.collapse()
-        } else {
-            findNavController().navigate(
-                InMeetingFragmentDirections.actionGlobalMakeModerator()
-            )
-        }
+    }
+
+    /**
+     * Method to navigate to the Make moderator screen
+     */
+    private val showAssignModeratorFragment = fun() {
+        collapsePanel()
+        findNavController().navigate(
+            InMeetingFragmentDirections.actionGlobalMakeModerator()
+        )
+
     }
 
     /**
@@ -2495,6 +2499,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
      */
     private fun showOnlyMeInTheCallDialog() {
+        if (MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            dismissDialog(onlyMeDialog)
+            return
+        }
+
         val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
         val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
         val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)
@@ -2509,14 +2518,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 .uppercase()
 
         firstButton.setOnClickListener {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
             leaveMeeting()
         }
 
         secondButton.setOnClickListener {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
+            dismissDialog(onlyMeDialog)
         }
 
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
@@ -2527,6 +2540,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .create()
 
         onlyMeDialog?.show()
+
+        onlyMeDialog?.setOnDismissListener {
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+            it.dismiss()
+        }
     }
 
     /**
@@ -2631,7 +2649,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     companion object {
 
-        const val INFO_ANIMATION = 4000
+        const val INFO_ANIMATION = 1000
 
         const val ANIMATION_DURATION: Long = 500
 

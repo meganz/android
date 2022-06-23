@@ -1686,6 +1686,8 @@
     <string name="external_play">Open with</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Share using</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -1888,6 +1890,8 @@
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Save on File System</string>
+    <!-- Message shown when something has been copied to clipboard -->
+    <string name="message_copied_to_clipboard">Copied to clipboard</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">Jump to latest</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
@@ -2730,8 +2734,6 @@
     <string name="alert_enter_group_name">To create a chat link you must name the group.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Start chatting securely with your contacts using end-to-end encryption</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20&#160;GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2741,7 +2743,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Version restored successfully.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Tap and hold to record, release to send.</string>
+    <string name="recording_less_than_second">Tap and hold to record</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Slide to cancel</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3596,6 +3598,18 @@
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Edit message</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Gallery</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Voice</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Scan</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">Gif</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
@@ -3949,6 +3963,16 @@
     <string name="settings_help_report_issue_discard_dialog_title">Discard report?</string>
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Discard</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos">All photos</string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">From Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Camera uploads</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Videos only</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Cannot open file</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->

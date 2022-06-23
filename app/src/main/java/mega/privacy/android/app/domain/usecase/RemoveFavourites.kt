@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Use case interface for removing favourites
  */
-interface RemoveFavourites {
+fun interface RemoveFavourites {
 
     /**
      * Removing favourites

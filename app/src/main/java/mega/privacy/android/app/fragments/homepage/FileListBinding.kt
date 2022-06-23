@@ -119,6 +119,20 @@ fun showHide(view: View, show: Boolean) {
 
 private var roundingParams: RoundingParams? = null
 
+fun getRoundingParamsWithoutBorder(context: Context): RoundingParams? {
+    roundingParams?.let {
+        return it
+    }
+
+    roundingParams = RoundingParams.fromCornersRadius(
+            Util.dp2px(
+                    context.resources.getDimension(R.dimen.chat_gallery_files_round_corner_radius),
+            ).toFloat()
+    )
+
+    return roundingParams
+}
+
 fun getRoundingParams(context: Context): RoundingParams? {
     roundingParams?.let {
         return it

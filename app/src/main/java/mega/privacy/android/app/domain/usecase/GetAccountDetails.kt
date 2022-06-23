@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.entity.UserAccount
  * Get account details
  *
  */
-interface GetAccountDetails {
+fun interface GetAccountDetails {
     /**
      * Invoke
      *

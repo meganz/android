@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get the node corresponding to a handle
  */
-interface GetNodeByHandle {
+fun interface GetNodeByHandle {
     /**
      * Get the node corresponding to a handle
      *

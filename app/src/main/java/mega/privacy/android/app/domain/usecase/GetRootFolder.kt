@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get the root node
  */
-interface GetRootFolder {
+fun interface GetRootFolder {
     /**
      * Get the root node
      *

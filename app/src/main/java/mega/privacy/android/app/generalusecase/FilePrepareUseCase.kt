@@ -4,7 +4,7 @@ import android.content.Intent
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.utils.StringUtils.toThrowable
+import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import javax.inject.Inject
 
 /**
@@ -20,15 +20,10 @@ class FilePrepareUseCase @Inject constructor() {
      * onError if not.
      */
     fun prepareFile(data: Intent): Single<ShareInfo> =
-        Single.create { emitter ->
-            val shareInfo = ShareInfo.processIntent(data, MegaApplication.getInstance())
-
-            if (shareInfo.isNotEmpty()) {
-                emitter.onSuccess(shareInfo[0])
-            } else {
-                emitter.onError("Error preparing file".toThrowable())
+            Single.fromCallable {
+                val shareInfo = ShareInfo.processIntent(data, MegaApplication.getInstance())
+                shareInfo.firstOrNull() ?: error("Error preparing files")
             }
-        }
 
     /**
      * Prepares files to be managed in the app and gets all their info.
@@ -38,13 +33,21 @@ class FilePrepareUseCase @Inject constructor() {
      * onError if not.
      */
     fun prepareFiles(data: Intent): Single<List<ShareInfo>> =
-        Single.create { emitter ->
-            val shareInfo = ShareInfo.processIntent(data, MegaApplication.getInstance())
-
-            if (shareInfo.isNotEmpty()) {
-                emitter.onSuccess(shareInfo)
-            } else {
-                emitter.onError("Error preparing files".toThrowable())
+            Single.fromCallable {
+                val shareInfo = ShareInfo.processIntent(data, MegaApplication.getInstance())
+                shareInfo.ifEmpty { error("Error preparing files") }
             }
-        }
+
+    /**
+     * Prepares files to be managed in the app and gets all their info.
+     *
+     * @param files list of FileGalleryItem
+     * @return Single<List<ShareInfo>> List<ShareInfo> with all the file info if everything goes well,
+     * onError if not.
+     */
+    fun prepareFilesFromGallery(files: ArrayList<FileGalleryItem>): Single<List<ShareInfo>> =
+            Single.fromCallable {
+                val shareInfo = ShareInfo.processUploadFile(MegaApplication.getInstance(), files)
+                shareInfo.ifEmpty { error("Error preparing files") }
+            }
 }

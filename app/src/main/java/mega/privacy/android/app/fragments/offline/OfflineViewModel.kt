@@ -152,14 +152,6 @@ class OfflineViewModel @Inject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
-
-        viewModelScope.launch {
-            updateNodes =
-                monitorNodeUpdates()
-                    .also { Timber.d("onNodesUpdate") }
-                    .filterNot { it.isEmpty() }
-                    .stateIn(viewModelScope)
-        }
     }
 
     fun getSelectedNodes(): List<MegaOffline> {

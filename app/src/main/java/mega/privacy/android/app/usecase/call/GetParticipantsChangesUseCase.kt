@@ -46,7 +46,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @property peers        List of user IDs
      */
     data class ParticipantsChangesResult(
-        val chatId: Long?,
+        val chatId: Long,
         val typeChange: Int,
         val peers: ArrayList<Long>?,
     )
@@ -58,7 +58,7 @@ class GetParticipantsChangesUseCase @Inject constructor(
      * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
      */
     data class NumParticipantsChangesResult(
-        val chatId: Long?,
+        val chatId: Long,
         val onlyMeInTheCall: Boolean,
     )
 
@@ -73,9 +73,12 @@ class GetParticipantsChangesUseCase @Inject constructor(
                         MegaApplication.getChatManagement().isRequestSent(call.callId)
                     val isOneToOneCall = !chat.isGroup && !chat.isMeeting
                     if (!isRequestSent && !isOneToOneCall) {
-                        val onlyMeInTheCall =
-                            call.numParticipants == 1 && call.peeridParticipants.get(0) == megaChatApi.myUserHandle
-                        emitter.onNext(NumParticipantsChangesResult(call.chatid, onlyMeInTheCall))
+                        call.peeridParticipants?.let { list ->
+                            val onlyMeInTheCall =
+                                list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
+                            emitter.onNext(NumParticipantsChangesResult(call.chatid,
+                                onlyMeInTheCall))
+                        }
                     }
                 }
             }
@@ -126,77 +129,71 @@ class GetParticipantsChangesUseCase @Inject constructor(
         if (call.status != MegaChatCall.CALL_STATUS_IN_PROGRESS || call.peeridCallCompositionChange == megaChatApi.myUserHandle || call.callCompositionChange == 0)
             return
 
-        megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-            if (!chat.isMeeting && !chat.isGroup) {
-                return
-            }
+        when (call.callCompositionChange) {
+            TYPE_JOIN -> {
+                peerIdsJoined.add(call.peeridCallCompositionChange)
+                if (numberOfShiftsToWaitToJoin > 0) {
+                    numberOfShiftsToWaitToJoin--
 
-            when (call.callCompositionChange) {
-                TYPE_JOIN -> {
-                    peerIdsJoined.add(call.peeridCallCompositionChange)
-                    if (numberOfShiftsToWaitToJoin > 0) {
-                        numberOfShiftsToWaitToJoin--
+                    if (joinedCountDownTimer == null) {
+                        joinedCountDownTimer = CustomCountDownTimer(joinedParticipantLiveData)
+                        joinedCountDownTimer?.mutableLiveData?.observeForever { counterState ->
+                            counterState?.let { isFinished ->
+                                if (isFinished) {
+                                    joinedCountDownTimer?.stop()
+                                    numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
 
-                        if (joinedCountDownTimer == null) {
-                            joinedCountDownTimer = CustomCountDownTimer(joinedParticipantLiveData)
-                            joinedCountDownTimer?.mutableLiveData?.observeForever { counterState ->
-                                counterState?.let { isFinished ->
-                                    if (isFinished) {
-                                        joinedCountDownTimer?.stop()
-                                        numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
-
-                                        val listOfPeers = ArrayList<Long>()
-                                        listOfPeers.addAll(peerIdsJoined)
-                                        val result = ParticipantsChangesResult(
-                                            chatId = call.chatid,
-                                            typeChange = TYPE_JOIN,
-                                            listOfPeers
-                                        )
-                                        this.onNext(result)
-                                        peerIdsJoined.clear()
-                                    }
+                                    val listOfPeers = ArrayList<Long>()
+                                    listOfPeers.addAll(peerIdsJoined)
+                                    val result = ParticipantsChangesResult(
+                                        chatId = call.chatid,
+                                        typeChange = TYPE_JOIN,
+                                        listOfPeers
+                                    )
+                                    this.onNext(result)
+                                    peerIdsJoined.clear()
                                 }
                             }
-
-                        } else {
-                            joinedCountDownTimer?.stop()
                         }
 
-                        joinedCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
+                    } else {
+                        joinedCountDownTimer?.stop()
                     }
+
+                    joinedCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                 }
-                TYPE_LEFT -> {
-                    peerIdsLeft.add(call.peeridCallCompositionChange)
-                    if (numberOfShiftsToWaitToLeft > 0) {
-                        numberOfShiftsToWaitToLeft--
+            }
+            TYPE_LEFT -> {
+                peerIdsLeft.add(call.peeridCallCompositionChange)
+                if (numberOfShiftsToWaitToLeft > 0) {
+                    numberOfShiftsToWaitToLeft--
 
-                        if (leftCountDownTimer == null) {
-                            leftCountDownTimer = CustomCountDownTimer(leftParticipantLiveData)
-                            leftCountDownTimer?.mutableLiveData?.observeForever { counterState ->
-                                counterState?.let { isFinished ->
-                                    if (isFinished) {
-                                        leftCountDownTimer?.stop()
-                                        numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
+                    if (leftCountDownTimer == null) {
+                        leftCountDownTimer = CustomCountDownTimer(leftParticipantLiveData)
+                        leftCountDownTimer?.mutableLiveData?.observeForever { counterState ->
+                            counterState?.let { isFinished ->
+                                if (isFinished) {
+                                    leftCountDownTimer?.stop()
+                                    numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
 
-                                        val listOfPeers = ArrayList<Long>()
-                                        listOfPeers.addAll(peerIdsLeft)
-                                        val result = ParticipantsChangesResult(
-                                            chatId = call.chatid,
-                                            typeChange = TYPE_LEFT,
-                                            listOfPeers
-                                        )
+                                    val listOfPeers = ArrayList<Long>()
+                                    listOfPeers.addAll(peerIdsLeft)
+                                    val result = ParticipantsChangesResult(
+                                        chatId = call.chatid,
+                                        typeChange = TYPE_LEFT,
+                                        listOfPeers
+                                    )
 
-                                        this.onNext(result)
-                                        peerIdsLeft.clear()
-                                    }
+                                    this.onNext(result)
+                                    peerIdsLeft.clear()
                                 }
                             }
-                        } else {
-                            leftCountDownTimer?.stop()
                         }
-
-                        leftCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
+                    } else {
+                        leftCountDownTimer?.stop()
                     }
+
+                    leftCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                 }
             }
         }
