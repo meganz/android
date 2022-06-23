@@ -3963,4 +3963,14 @@
     <string name="settings_help_report_issue_discard_dialog_title">Discard report?</string>
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Discard</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos">All photos</string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">From Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Camera uploads</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Videos only</string>
 </resources>

@@ -1,18 +1,26 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.os.Bundle
+import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
+import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.ALBUM_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.TIMELINE_INDEX
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.utils.Util
+import java.util.Locale
 
 /**
  * PhotosFragment is a parent fragment for both TimelineFragment and AlbumsFragment
@@ -26,6 +34,12 @@ class PhotosFragment : BaseFragment() {
     private lateinit var tabLayout: TabLayout
 
     private lateinit var viewPager: ViewPager2
+
+    private lateinit var actionBar: ActionBar
+
+    private lateinit var actionBarSubtitle: TextView
+
+    private lateinit var actionBarSubtitleArrow: ImageView
 
     var currentTab: PhotosTabCallback? = null
 
@@ -51,10 +65,16 @@ class PhotosFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
+        if (PhotosFilterAndSortToggle.enabled) {
+            actionBar = (context as AppCompatActivity).supportActionBar!!
+        }
         tabIndex = if (mManagerActivity.fromAlbumContent) {
             ALBUM_INDEX
         } else {
             savedInstanceState?.getInt(KEY_TAB_INDEX) ?: TIMELINE_INDEX
+        }
+        if (PhotosFilterAndSortToggle.enabled) {
+            setCustomisedActionBar()
         }
         setupPhotosViewPager()
         return binding.root
@@ -94,8 +114,18 @@ class PhotosFragment : BaseFragment() {
                     if (currentTab is TimelineFragment) {
                         tabIndex = TIMELINE_INDEX
                         val timelineFragment = currentTab
-                        mManagerActivity.fromAlbumContent = false
                         with(timelineFragment) {
+                            if (PhotosFilterAndSortToggle.enabled) {
+                                setActionBarSubtitleText(Util.adjustForLargeFont(
+                                    getCurrentFilterAsString())
+                                )
+                                actionBar.customView.findViewById<View>(R.id.ab_subtitle_container)
+                                    .setOnClickListener {
+                                        createFilterDialog(mManagerActivity)
+                                    }
+                                showHideABSubtitle(isFilterAllPhotos())
+                            }
+                            mManagerActivity.fromAlbumContent = false
                             setHideBottomViewScrollBehaviour()
                             updateOptionsButtons()
                             if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
@@ -104,8 +134,12 @@ class PhotosFragment : BaseFragment() {
                                 mManagerActivity.updateCUViewTypes(View.VISIBLE)
                             }
                         }
+
                     } else {
                         tabIndex = ALBUM_INDEX
+                        if (PhotosFilterAndSortToggle.enabled) {
+                            showHideABSubtitle(true)
+                        }
                         with(mManagerActivity) {
                             updateCUViewTypes(View.GONE)
                             enableHideBottomViewOnScroll(false)
@@ -235,5 +269,36 @@ class PhotosFragment : BaseFragment() {
      */
     fun shouldEnableViewPager(isEnabled: Boolean) {
         binding.viewPager.isUserInputEnabled = isEnabled
+    }
+
+    fun setCustomisedActionBar() {
+        actionBar.setDisplayShowCustomEnabled(true)
+        actionBar.setDisplayShowTitleEnabled(false)
+        actionBar.setCustomView(R.layout.fragment_timeline_action_bar)
+        val v: View = actionBar.customView
+        val actionBarTitle = v.findViewById<TextView>(R.id.ab_title)
+        actionBarTitle?.text = Util.adjustForLargeFont(
+            getString(R.string.settings_start_screen_photos_option).uppercase(Locale.getDefault())
+        )
+        actionBarSubtitle = v.findViewById(R.id.ab_subtitle)
+        actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow)
+    }
+
+    fun setActionBarSubtitleText(text: SpannableString) {
+        actionBarSubtitle.text = text
+    }
+
+    fun showHideABSubtitle(hide: Boolean) {
+        actionBarSubtitle.visibility = if (hide || mManagerActivity.fromAlbumContent) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+
+        actionBarSubtitleArrow.visibility = if (hide || mManagerActivity.fromAlbumContent) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
     }
 }
