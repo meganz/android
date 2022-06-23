@@ -308,14 +308,14 @@ public class RubbishBinFragment extends Fragment{
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		if (managerViewModel.getRubbishBinParentHandle() == -1L || managerViewModel.getRubbishBinParentHandle() == megaApi.getRubbishNode().getHandle()) {
-			logDebug("Parent is the Rubbish: " + managerViewModel.getRubbishBinParentHandle());
+		if (managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1L || managerViewModel.getState().getValue().getRubbishBinParentHandle() == megaApi.getRubbishNode().getHandle()) {
+			logDebug("Parent is the Rubbish: " + managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
 
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(managerViewModel.getRubbishBinParentHandle());
+			MegaNode parentNode = megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
 			if (parentNode != null){
 				logDebug("The parent node is: " + parentNode.getHandle());
@@ -356,11 +356,11 @@ public class RubbishBinFragment extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getRubbishBinParentHandle(), recyclerView,
+						managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
 						RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
-				adapter.setParentHandle(managerViewModel.getRubbishBinParentHandle());
+				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -377,7 +377,7 @@ public class RubbishBinFragment extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getRubbishBinParentHandle() || managerViewModel.getRubbishBinParentHandle() ==-1) {
+				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() ==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
@@ -461,11 +461,11 @@ public class RubbishBinFragment extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getRubbishBinParentHandle(), recyclerView,
+						managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
 						RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
-				adapter.setParentHandle(managerViewModel.getRubbishBinParentHandle());
+				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -484,7 +484,7 @@ public class RubbishBinFragment extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getRubbishBinParentHandle() || managerViewModel.getRubbishBinParentHandle() == -1) {
+				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
@@ -590,12 +590,12 @@ public class RubbishBinFragment extends Fragment{
 				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivity)context).setParentHandleRubbish(n.getHandle());
+				managerViewModel.setRubbishBinParentHandle(n.getHandle());
 
 				((ManagerActivity)context).setToolbarTitle();
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 
-				adapter.setParentHandle(managerViewModel.getRubbishBinParentHandle());
+				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
@@ -606,7 +606,7 @@ public class RubbishBinFragment extends Fragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRubbishNode().getHandle() == managerViewModel.getRubbishBinParentHandle() || managerViewModel.getRubbishBinParentHandle() == -1) {
+					if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 						}else{
@@ -907,24 +907,24 @@ public class RubbishBinFragment extends Fragment{
 			return 0;
 		}
 
-		if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == managerViewModel.getRubbishBinParentHandle()) {
+		if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == managerViewModel.getState().getValue().getRubbishBinParentHandle()) {
 			((ManagerActivity) context).comesFromNotifications = false;
 			((ManagerActivity) context).comesFromNotificationHandle = -1;
 			((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
-			((ManagerActivity)context).setParentHandleRubbish(((ManagerActivity)context).comesFromNotificationHandleSaved);
+			managerViewModel.setRubbishBinParentHandle(((ManagerActivity)context).comesFromNotificationHandleSaved);
 			((ManagerActivity)context).comesFromNotificationHandleSaved = -1;
 
 			return 2;
 		}
 		else {
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.getRubbishBinParentHandle()));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle()));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
-				((ManagerActivity)context).setParentHandleRubbish(parentNode.getHandle());
+				managerViewModel.setRubbishBinParentHandle(parentNode.getHandle());
 
 				((ManagerActivity)context).setToolbarTitle();
 				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
@@ -978,7 +978,7 @@ public class RubbishBinFragment extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getRubbishBinParentHandle() || managerViewModel.getRubbishBinParentHandle() == -1) {
+				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
