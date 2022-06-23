@@ -4057,4 +4057,16 @@
     <string name="chat_room_toolbar_voice_clip_option">Clipe de áudio</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filtro</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">Da Nuvem de arquivos</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Uploads da câmera</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Somente vídeos</string>
 </resources>

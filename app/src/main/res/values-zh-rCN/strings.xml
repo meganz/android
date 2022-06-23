@@ -3844,7 +3844,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">发送日志文件</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">无网络连接。请检查您的连接后重试。</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">提交</string>
     <!-- Error message when submit issue failed-->
@@ -3869,4 +3869,16 @@
     <string name="chat_room_toolbar_voice_clip_option">语音剪辑</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF图片</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]邀请好友加入[/B][A]聊天[/A][B]并享受我们私密和安全的加密服务[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">过滤</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">从云盘</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">相机上传</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">仅视频</string>
 </resources>

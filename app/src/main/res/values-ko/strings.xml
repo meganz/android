@@ -3869,4 +3869,16 @@
     <string name="chat_room_toolbar_voice_clip_option">음성 클립</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[A]대화[/A]에 [B]친구들을 초대하여[/B] [B]보안과 프라이버시를 갖춘 우리의 암호화된 플랫폼을 즐기세요[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">필터</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive"></string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads"></string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only"></string>
 </resources>

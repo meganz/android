@@ -3806,11 +3806,11 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">โฟลเดอร์ที่ชื่อ [B]%1$s[/B] มีอยู่แล้วในตำแหน่งนี้</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Bad connection</string>
+    <string name="calls_call_screen_poor_network_quality">การเชื่อมต่อไม่ดี</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">ไม่สามารถเชื่อมต่อใหม่ได้</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] ไบต์</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3844,7 +3844,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">ส่งไฟล์บันทึก</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">ไม่พบการเชื่อมต่ออินเทอร์เน็ต ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">ส่ง</string>
     <!-- Error message when submit issue failed-->
@@ -3869,4 +3869,16 @@
     <string name="chat_room_toolbar_voice_clip_option">คลิปเสียง</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]เชิญเพื่อนเพื่อร่วม[/B][A]แชท[/A][B]และเพลิดเพลินไปกับแพลตฟอร์มที่เข้ารหัส มาพร้อมความเป็นส่วนตัวและความปลอดภัยมากยิ่งขึ้น[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">ตัวกรอง</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">จากคลาวด์ไดรฟ์</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">อัปโหลดจากกล้อง</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">วิดีโอเท่านั้น</string>
 </resources>

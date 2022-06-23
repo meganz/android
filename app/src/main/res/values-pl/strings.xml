@@ -3976,22 +3976,26 @@
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality_text">Zawsze wysyłaj zoptymalizowane obrazy.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s dołączył</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
-    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s i %2$s dołączyli</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s opuścił</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s i %2$s opuścili</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
-        <item quantity="other">%1$s and %2$d others joined</item>
+        <item quantity="one">%1$s i 1 inny dołączył</item>
+        <item quantity="few">%1$s i %2$d inny dołączyli</item>
+        <item quantity="many">%1$s i %2$d inny dołączyli</item>
+        <item quantity="other">%1$s i %2$d inny dołączyli</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s i 1 inny opuścili</item>
+        <item quantity="few">%1$s i %2$d inni opuścili</item>
+        <item quantity="many">%1$s i %2$d inni opuścili</item>
+        <item quantity="other">%1$s i %2$d inni opuścili</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Usuń trwale</string>
@@ -4122,7 +4126,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">Wyślij plik dziennika</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">Brak połączenia z Internetem. Sprawdź połączenie i spróbuj ponownie.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Wyślij</string>
     <!-- Error message when submit issue failed-->
@@ -4147,4 +4151,16 @@
     <string name="chat_room_toolbar_voice_clip_option">Klip głosowy</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Zaproś przyjaciół do [/B][A]Czatu[/A][B] i ciesz się naszą zaszyfrowaną platformą z prywatnością i bezpieczeństwem[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filtr</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive"></string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Przesyłanie zdjęć z kamery</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Tylko filmy</string>
 </resources>

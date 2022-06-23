@@ -3282,7 +3282,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B], %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="one">Upload läuft, noch eine Datei</item>
@@ -3820,7 +3820,7 @@
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">Favoriten</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <string name="settings_passcode_forgot_passcode_button">Passcode vergessen?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Passwort</string>
     <!-- Resume to paused transfers snack bar description text -->
@@ -3900,35 +3900,35 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Ein Ordner des Namens [B]%1$s[/B] ist bereits vorhanden.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Bad connection</string>
+    <string name="calls_call_screen_poor_network_quality">Schlechte Verbindung</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Verbindung kann nicht wiederhergestellt werden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Die Konferenz wird nach %s beendet</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
-    <string name="calls_call_screen_dialog_title_only_you_in_the_call">You’re the only one here</string>
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">Sie sind der einzige Teilnehmer</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Sie befinden sich noch in einem Anruf</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
-    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Call will automatically end in 2 mins unless you want to stay on it.</string>
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Der Anruf wird nach 2 Minuten automatisch beendet, es sei denn, Sie möchten ihn fortsetzen.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
-    <string name="calls_call_screen_button_to_end_call">End call now</string>
+    <string name="calls_call_screen_button_to_end_call">Anruf jetzt beenden</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
-    <string name="calls_call_screen_button_to_stay_alone_in_call">Stay on call</string>
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Anruf fortsetzen</string>
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Fehlfunktion melden</string>
     <!-- Report issue fragment instructions-->
@@ -3938,7 +3938,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">Protokolldatei senden</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Abschicken</string>
     <!-- Error message when submit issue failed-->
@@ -3963,4 +3963,16 @@
     <string name="chat_room_toolbar_voice_clip_option">Sprachnachricht</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Laden Sie Ihre Freunde in den [/B][A]Chat[/A][B] ein[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">Aus dem Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Kamera Uploads</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Nur Videos</string>
 </resources>

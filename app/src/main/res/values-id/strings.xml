@@ -3869,4 +3869,16 @@
     <string name="chat_room_toolbar_voice_clip_option">Klip suara</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Undang teman ke [/B][A]Obrolan[/A][B] dan nikmati platform terenkripsi kami dengan privasi dan keamanan[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">Dari Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Unggahan kamera</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Hanya video</string>
 </resources>
