@@ -632,9 +632,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isSMSDialogShowing;
     private final static String STATE_KEY_SMS_DIALOG = "isSMSDialogShowing";
 
-    // Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
-    private boolean isFromMeeting = false;
-
     private static final String STATE_KEY_IS_IN_MD_MODE = "isInMDMode";
     // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
     private boolean isInMDMode = false;
@@ -2433,10 +2430,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         selectDrawerItemPending = false;
                     } else if (getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)) {
                         logDebug("Intent from chat - show my account");
-
-                        if (getIntent().hasExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING)) {
-                            isFromMeeting = getIntent().getBooleanExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING, false);
-                        }
 
                         showMyAccount();
                         selectDrawerItemPending = false;
