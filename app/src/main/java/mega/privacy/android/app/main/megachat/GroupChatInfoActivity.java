@@ -59,14 +59,17 @@ import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -86,6 +89,7 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -114,10 +118,13 @@ public class GroupChatInfoActivity extends PasscodeActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     StartCallUseCase startCallUseCase;
+    @Inject
+    EndCallUseCase endCallUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
     private static final int MAX_LENGTH_CHAT_TITLE = 60;
+    private final static String END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown";
 
     private ChatController chatC;
     private long chatHandle;
@@ -131,6 +138,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     private AlertDialog permissionsDialog;
     private AlertDialog changeTitleDialog;
     private AlertDialog chatLinkDialog;
+    private AlertDialog endCallForAllDialog;
 
     private LinearLayout containerLayout;
     private Toolbar toolbar;
@@ -298,6 +306,13 @@ public class GroupChatInfoActivity extends PasscodeActivity
             updateAdapterHeader();
             if(adapter != null){
                 adapter.checkNotifications(chatHandle);
+            }
+
+            if (savedInstanceState != null) {
+                boolean isEndCallForAllDialogShown = savedInstanceState.getBoolean(END_CALL_FOR_ALL_DIALOG, false);
+                if (isEndCallForAllDialogShown) {
+                    showEndCallForAllDialog();
+                }
             }
         }
     }
@@ -719,6 +734,40 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 .setPositiveButton(R.string.general_leave, (dialog, which) -> notifyShouldLeaveChat())
                 .setNegativeButton(R.string.general_cancel, null)
                 .show();
+    }
+
+
+    /**
+     * Method to show the End call for all dialog
+     */
+    private void showEndCallForAllDialog() {
+
+        if (AlertDialogUtil.isAlertDialogShown(endCallForAllDialog))
+            return;
+
+        endCallForAllDialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+                .setMessage(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+                .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all, (dialogInterface, i) -> AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog))
+                .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all, (dialogInterface, i) -> {
+                    AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog);
+                    endCallForAll();
+                })
+                .show();
+    }
+
+    /**
+     * Method to end call for all
+     */
+    private void endCallForAll() {
+        if (chat == null)
+            return;
+
+        endCallUseCase.endCallForAllWithChatId(chat.getChatId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                }, (error) -> Timber.e("Error " + error));
     }
 
     /**
@@ -1475,5 +1524,12 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 }, (error) -> logError("Error " + error));
 
         composite.add(chatSubscription);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putLong(CHAT_ID, chat.getChatId());
+        outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
     }
 }

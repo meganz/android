@@ -283,6 +283,7 @@ public class ChatActivity extends PasscodeActivity
     private static final String USER_HANDLE_PLAYING = "userHandleVoicePlaying";
     private final static String JOIN_CALL_DIALOG = "isJoinCallDialogShown";
     private final static String ONLY_ME_IN_CALL_DIALOG = "isOnlyMeInCallDialogShown";
+    private final static String END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown";
 
     private static final String LAST_MESSAGE_SEEN = "LAST_MESSAGE_SEEN";
     private static final String GENERAL_UNREAD_COUNT = "GENERAL_UNREAD_COUNT";
@@ -565,6 +566,8 @@ public class ChatActivity extends PasscodeActivity
     private boolean isLocationDialogShown = false;
     private boolean isJoinCallDialogShown = false;
     private boolean isOnlyMeInCallDialogShown = false;
+    private boolean isEndCallForAllDialogShown = false;
+
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -1874,6 +1877,7 @@ public class ChatActivity extends PasscodeActivity
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
                         isJoinCallDialogShown = savedInstanceState.getBoolean(JOIN_CALL_DIALOG, false);
                         isOnlyMeInCallDialogShown = savedInstanceState.getBoolean(ONLY_ME_IN_CALL_DIALOG, false);
+                        isEndCallForAllDialogShown = savedInstanceState.getBoolean(END_CALL_FOR_ALL_DIALOG, false);
                         recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
                         lastIdMsgSeen = savedInstanceState.getLong(LAST_MESSAGE_SEEN, MEGACHAT_INVALID_HANDLE);
                         isTurn = lastIdMsgSeen != MEGACHAT_INVALID_HANDLE;
@@ -2138,9 +2142,11 @@ public class ChatActivity extends PasscodeActivity
         if (isLocationDialogShown) {
             showSendLocationDialog();
         }
-
         if (isOnlyMeInCallDialogShown) {
             showOnlyMeInTheCallDialog();
+        }
+        if (isEndCallForAllDialogShown) {
+            showEndCallForAllDialog();
         }
 
         if (isJoinCallDialogShown) {
@@ -3501,6 +3507,7 @@ public class ChatActivity extends PasscodeActivity
      * Method to show the End call for all dialog
      */
     private void showEndCallForAllDialog() {
+
         if (AlertDialogUtil.isAlertDialogShown(endCallForAllDialog))
             return;
 
@@ -8564,9 +8571,8 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-        if(dialogOnlyMeInCall != null) {
-            outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, dialogOnlyMeInCall.isShowing());
-        }
+        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall));
+        outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
     }
 
     /**

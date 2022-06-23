@@ -21,6 +21,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
@@ -39,6 +42,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -154,6 +158,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
         private View dividerLeaveLayout;
+        private RelativeLayout endCallForAllLayout;
+        private View dividerEndCallForAllLayout;
         private RelativeLayout archiveChatLayout;
         private TextView archiveChatTitle;
         private ImageView archiveChatIcon;
@@ -230,6 +236,11 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderHeader.leaveChatLayout.setOnClickListener(this);
                 holderHeader.dividerLeaveLayout = v.findViewById(R.id.divider_leave_layout);
 
+                //Leave chat Layout
+                holderHeader.endCallForAllLayout = v.findViewById(R.id.chat_group_contact_properties_end_call_layout);
+                holderHeader.endCallForAllLayout.setOnClickListener(this);
+                holderHeader.dividerEndCallForAllLayout = v.findViewById(R.id.divider_end_call_layout);
+
                 //Observers layout
                 holderHeader.observersLayout = v.findViewById(R.id.chat_group_observers_layout);
                 holderHeader.observersNumberText = v.findViewById(R.id.chat_group_observers_number_text);
@@ -280,6 +291,13 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         return getChat().getPeerCount() == 0 && !getChat().isActive();
     }
 
+    /**
+     * Method to control the visibility of the menu item: End call for all
+     */
+    private void checkEndCallForAllOption() {
+
+    }
+
     @Override
     public void onBindViewHolder(ViewHolderParticipants holder, int position) {
         switch (getItemViewType(position)) {
@@ -314,9 +332,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                     holderHeader.archiveChatLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatSeparator.setVisibility(View.GONE);
                     holderHeader.leaveChatLayout.setVisibility(View.GONE);
+                    holderHeader.endCallForAllLayout.setVisibility(View.GONE);
                     holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
                     holderHeader.editImageView.setVisibility(View.GONE);
                 } else {
+                    checkEndCallForAllOption();
+
                     participantsCount++;
 
                     if (getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
