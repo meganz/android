@@ -9,6 +9,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRE
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
@@ -127,7 +128,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -1582,7 +1583,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
         cuTransfers.add(transfer);
-        launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
     }
 
     @Override
@@ -1624,7 +1625,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         Timber.d("Image sync finished, error code: " + e.getErrorCode() + ", handle: " + transfer.getNodeHandle() + ", size: " + transfer.getTransferredBytes());
 
         try {
-            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
             transferFinished(transfer, e);
         } catch (Throwable th) {
             Timber.e(th);

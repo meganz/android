@@ -14,9 +14,9 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
-import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.PENDING_TAB
@@ -47,15 +47,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
-
-    /**
-     * Broadcast to update the transfers widget.
-     */
-    private var transfersUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            updateTransfersWidget(intent)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,10 +89,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
             )
             .addTo(composite)
 
-        registerReceiver(
-            transfersUpdateReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
-        )
+        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
+            .observe(this, ::updateTransfersWidget)
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
             .observe(this) { show ->
@@ -134,7 +123,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     protected fun setTransfersWidgetLayout(
         transfersWidgetLayout: RelativeLayout,
-        context: Context?
+        context: Context?,
     ) {
         transfersWidget =
             TransfersWidget(context ?: this, megaApi, transfersWidgetLayout, transfersManagement)
@@ -176,22 +165,12 @@ open class TransfersManagementActivity : PasscodeActivity() {
     }
 
     /**
-     * Updates the state of the transfers widget when the correspondent LocalBroadcast has been received.
+     * Updates the state of the transfers widget.
      *
-     * @param intent    Intent received in the LocalBroadcast
+     * @param transferType  Type of the transfer.
      */
-    protected fun updateTransfersWidget(intent: Intent?) {
-        if (intent == null || transfersWidget == null) {
-            return
-        }
-
-        val transferType = intent.getIntExtra(TRANSFER_TYPE, EXTRA_BROADCAST_INVALID_VALUE)
-
-        if (transferType == EXTRA_BROADCAST_INVALID_VALUE) {
-            transfersWidget?.update()
-        } else {
-            transfersWidget?.update(transferType)
-        }
+    protected fun updateTransfersWidget(transferType: Int) {
+        transfersWidget?.update(transferType)
     }
 
     /**
@@ -259,8 +238,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        unregisterReceiver(transfersUpdateReceiver)
 
         scanningTransfersDialog?.dismiss()
         cancelTransfersDialog?.dismiss()

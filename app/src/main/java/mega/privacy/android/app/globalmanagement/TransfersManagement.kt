@@ -22,8 +22,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.*
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
@@ -78,19 +80,6 @@ class TransfersManagement @Inject constructor(
             }
 
             return false
-        }
-
-        /**
-         * Sends a broadcast to update the transfer widget where needed.
-         *
-         * @param transferType  the transfer type.
-         */
-        @JvmStatic
-        fun launchTransferUpdateIntent(transferType: Int) {
-            MegaApplication.getInstance().sendBroadcast(
-                Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
-                    .putExtra(TRANSFER_TYPE, transferType)
-            )
         }
 
         /**
@@ -179,7 +168,7 @@ class TransfersManagement @Inject constructor(
     private var hasNotToBeShowDueToTransferOverQuota = false
     var isCurrentTransferOverQuota = false
     var isOnTransfersSection = false
-    var areFailedTransfers = false
+    private var areFailedTransfers = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
     var hasResumeTransfersWarningAlreadyBeenShown = false
@@ -361,7 +350,7 @@ class TransfersManagement @Inject constructor(
                 }
 
                 shouldShowNetworkWarning = true
-                launchTransferUpdateIntent(NO_TYPE)
+                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
             }
         }.start()
     }
@@ -373,7 +362,7 @@ class TransfersManagement @Inject constructor(
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false
-            launchTransferUpdateIntent(NO_TYPE)
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
         }
     }
 
@@ -641,4 +630,11 @@ class TransfersManagement @Inject constructor(
         } else {
             false
         }
+
+    fun setAreFailedTransfers(failed: Boolean) {
+        areFailedTransfers = failed
+        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean::class.java).post(false)
+    }
+
+    fun getAreFailedTransfers(): Boolean = areFailedTransfers
 }

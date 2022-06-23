@@ -74,10 +74,11 @@ import timber.log.Timber;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -387,7 +388,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 				stopForeground();
 			}
 
-			launchTransferUpdateIntent(TYPE_DOWNLOAD);
+			LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(TYPE_DOWNLOAD);
 			return;
 		}
 
@@ -620,8 +621,8 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 				}
 				sendBroadcast(intent);
 			}
-			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
+			LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(INVALID_VALUE);
 			megaApi.resetTotalDownloads();
 			backgroundTransfers.clear();
 			errorEBloqued = 0;
@@ -1152,7 +1153,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 				}
 
 				transfersManagement.checkScanningTransferOnStart(transfer);
-				launchTransferUpdateIntent(TYPE_DOWNLOAD);
+				LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(TYPE_DOWNLOAD);
 				transfersCount++;
 				updateProgressNotification();
 			}
@@ -1193,10 +1194,11 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 						addCompletedTransfer(completedTransfer, dbH);
 					}
 
-					launchTransferUpdateIntent(TYPE_DOWNLOAD);
 					if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 						transfersManagement.setAreFailedTransfers(true);
 					}
+
+					LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(TYPE_DOWNLOAD);
 
 					if (!isVoiceClip && !isBackgroundTransfer) {
 						updateProgressNotification();
@@ -1374,7 +1376,6 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 	private Completable doOnTransferUpdate(@Nullable MegaTransfer transfer) {
 		return Completable.fromCallable(() -> {
 			if (transfer.getType() == TYPE_DOWNLOAD) {
-				launchTransferUpdateIntent(TYPE_DOWNLOAD);
 				if (canceled) {
 					Timber.d("Transfer cancel: %s", transfer.getNodeHandle());
 
@@ -1401,10 +1402,11 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 					return null;
 				}
 
+				LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(TYPE_DOWNLOAD);
+
 				transfersManagement.checkScanningTransferOnUpdate(transfer);
 
 				if (!transfer.isFolderTransfer()) {
-					sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 					updateProgressNotification();
 				}
 
@@ -1451,7 +1453,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 			if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
 				transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
 				transfersManagement.setTransferOverQuotaTimestamp();
-				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).setAction(ACTION_TRANSFER_OVER_QUOTA));
+				LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class).post(true);
 			}
 		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
 			transfersManagement.setTransferOverQuotaNotificationShown(true);
