@@ -103,6 +103,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -2504,6 +2505,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
+
         val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
         val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
         val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)
@@ -2518,7 +2521,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 .uppercase()
 
         firstButton.setOnClickListener {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
@@ -2526,7 +2528,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         secondButton.setOnClickListener {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)

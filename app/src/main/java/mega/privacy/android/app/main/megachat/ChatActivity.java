@@ -124,6 +124,7 @@ import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -1866,6 +1867,7 @@ public class ChatActivity extends PasscodeActivity
                         isJoinCallDialogShown = savedInstanceState.getBoolean(JOIN_CALL_DIALOG, false);
                         isOnlyMeInCallDialogShown = savedInstanceState.getBoolean(ONLY_ME_IN_CALL_DIALOG, false);
                         recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
+
                         lastIdMsgSeen = savedInstanceState.getLong(LAST_MESSAGE_SEEN, MEGACHAT_INVALID_HANDLE);
                         isTurn = lastIdMsgSeen != MEGACHAT_INVALID_HANDLE;
 
@@ -4014,11 +4016,16 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
-        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0 || MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0) {
             hideDialogCall();
             return;
         }
 
+        if(MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+            hideDialogCall();
+            return;
+        }
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false;
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
 
@@ -4043,11 +4050,12 @@ public class ChatActivity extends PasscodeActivity
 
         firstButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
+            hideDialogCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-            hideDialogCall();
+
         });
 
         secondButton.setOnClickListener(v13 -> {
@@ -8144,6 +8152,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
+
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
@@ -8260,7 +8269,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onNewIntent(Intent intent){
-        logDebug("onNewIntent");
         hideKeyboard();
         if (intent != null){
             if (intent.getAction() != null){
@@ -8490,9 +8498,7 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-        if(dialogOnlyMeInCall != null) {
-            outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, dialogOnlyMeInCall.isShowing());
-        }
+        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall));
     }
 
     /**
@@ -8588,6 +8594,7 @@ public class ChatActivity extends PasscodeActivity
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();
+
 
             passcodeManagement.setShowPasscodeScreen(true);
             MegaApplication.setOpenChatId(idChat);
@@ -8686,6 +8693,10 @@ public class ChatActivity extends PasscodeActivity
                 titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
+
+            if (isOnlyMeInCallDialogShown) {
+                showOnlyMeInTheCallDialog();
+            } else {hideDialogCall();}
         }
     }
 
@@ -8765,6 +8776,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause(){
         super.onPause();
+
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 

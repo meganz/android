@@ -334,8 +334,8 @@ public class ChatManagement {
      */
     public void startCounterToFinishCall(long chatId, long timeToWait) {
         stopCounterToFinishCall();
-        hasEndCallDialogBeenIgnored = false;
         millisecondsUntilEndCall = TimeUnit.SECONDS.toMillis(timeToWait);
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false;
 
         if (countDownTimerToEndCall == null) {
             countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
