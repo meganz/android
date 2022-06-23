@@ -67,6 +67,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 .subscribeBy(
                     onNext = {
                         if (it) {
+                            Timber.d("Call reconnecting")
                             emitter.onNext(CallSoundType.CALL_RECONNECTING)
                         }
                     },
@@ -90,12 +91,13 @@ class GetCallSoundsUseCase @Inject constructor(
                                 if (!chat.isGroup && !chat.isMeeting) {
                                     when (sessionStatus) {
                                         MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                            Timber.d("Session in progress")
                                             stopCountDown(call.chatid, participant)
                                         }
                                         MegaChatSession.SESSION_STATUS_DESTROYED -> {
-
                                             isRecoverable?.let { isRecoverableSession ->
                                                 if (isRecoverableSession) {
+                                                    Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
                                                     emitter.startCountDown(
                                                         call,
                                                         participant,
@@ -103,6 +105,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                                     )
 
                                                 } else {
+                                                    Timber.d("Session destroyed, unrecoverable session.")
                                                     stopCountDown(
                                                         call.chatid,
                                                         participant
@@ -127,10 +130,17 @@ class GetCallSoundsUseCase @Inject constructor(
                 .subscribeBy(
                     onNext = { (chatId, onlyMeInTheCall) ->
                         if (onlyMeInTheCall) {
-                            chatId?.let {
-                                MegaApplication.getChatManagement().startCounterToFinishCall(it,
-                                    SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+                            megaChatApi.getChatCall(chatId)?.let { call ->
+                                if (call.hasLocalAudio()) {
+                                    Timber.d("I am the only participant in the group call/meeting, muted micro")
+                                    megaChatApi.disableAudio(call.chatid, null)
+                                }
                             }
+
+                            Timber.d("I am the only participant in the group call/meeting, wait 2 minutes to hang up")
+                            MegaApplication.getChatManagement().startCounterToFinishCall(chatId,
+                                SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+
                         } else {
                             MegaApplication.getChatManagement().stopCounterToFinishCall()
                         }
@@ -147,6 +157,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 .subscribeBy(
                     onNext = { status ->
                         if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                            Timber.d("Call destroyed")
                             MegaApplication.getInstance()
                                 .removeRTCAudioManager()
                             emitter.onNext(CallSoundType.CALL_ENDED)

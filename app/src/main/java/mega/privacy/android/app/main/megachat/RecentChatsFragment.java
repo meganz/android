@@ -74,6 +74,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -111,6 +112,7 @@ import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.HighLightHintHelper;
@@ -144,6 +146,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Inject
     SearchChatsUseCase searchChatsUseCase;
+
+    private SearchViewModel searchViewModel;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -399,6 +403,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
+
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
         appBarLayout = v.findViewById(R.id.linear_layout_add);
@@ -893,7 +899,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             intent.putExtra(CHAT_ID, adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivity) {
-                if (((ManagerActivity) context).getSearchQuery() != null && !((ManagerActivity) context).getSearchQuery().isEmpty()) {
+                if (searchViewModel.isSearchQueryValid()) {
                     closeSearch();
                     ((ManagerActivity) context).closeSearchView();
                 }
@@ -1430,7 +1436,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         if (context instanceof ManagerActivity) {
             if (((ManagerActivity) context).isSearchOpen()) {
-                filterChats(((ManagerActivity) context).getSearchQuery(), false);
+                filterChats(searchViewModel.getState().getValue().getSearchQuery(), false);
             }
             ((ManagerActivity) context).invalidateOptionsMenu();
         }
