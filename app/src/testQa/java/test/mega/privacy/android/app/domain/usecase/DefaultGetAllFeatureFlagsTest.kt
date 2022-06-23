@@ -4,11 +4,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.FeatureFlag
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -33,9 +33,9 @@ class DefaultGetAllFeatureFlagsTest {
             list.add(FeatureFlag("featureName",
                 false))
             whenever(featureFlagRepository.getAllFeatures()).thenReturn(flowOf(list))
-            underTest().collect {
+            underTest().map {
                 assertEquals(it[0].featureName, "featureName")
-                Assert.assertEquals(it[0].isEnabled, false)
+                assertEquals(it[0].isEnabled, false)
             }
         }
     }

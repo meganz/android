@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import javax.inject.Inject
 
@@ -38,15 +37,7 @@ class FeatureFlagPreferencesDataStore
     /**
      * Gets all features
      *
-     * @return Flow of Map of feature name & boolean value
+     * @return Flow of Preferences data
      */
-    override suspend fun getAllFeatures(): Flow<Map<String, Boolean>> {
-        return flow {
-            context.featureFlagDataStore.data.collect {
-                it.asMap().keys.forEach { key ->
-                    emit(mutableMapOf(Pair(key.toString(), it[key] as Boolean)))
-                }
-            }
-        }
-    }
+    override fun getAllFeatures(): Flow<Preferences> = context.featureFlagDataStore.data
 }

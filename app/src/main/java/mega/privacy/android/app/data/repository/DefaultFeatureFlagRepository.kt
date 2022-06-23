@@ -1,7 +1,9 @@
 package mega.privacy.android.app.data.repository
 
+import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.domain.entity.FeatureFlag
 import mega.privacy.android.app.domain.repository.FeatureFlagRepository
@@ -25,18 +27,32 @@ class DefaultFeatureFlagRepository @Inject constructor(
         preferencesGateway.setFeature(featureName, isEnabled)
 
     /**
-     * Gets a fow of list of all feature flags
+     * Gets a map of Preferences from gateway and returns flow
+     *
      * @return: Flow of List of @FeatureFlag
      */
-    override suspend fun getAllFeatures(): Flow<List<FeatureFlag>> {
-        return flow {
-            val list = mutableListOf<FeatureFlag>()
-            preferencesGateway.getAllFeatures().collect { map ->
-                map.keys.forEach { key ->
-                    list.add(FeatureFlag(key, map[key] ?: false))
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getAllFeatures(): Flow<List<FeatureFlag>> {
+        return preferencesGateway.getAllFeatures().mapLatest { map ->
+            map.asMap().mapNotNull { entry: Map.Entry<Preferences.Key<*>, Any> ->
+                entry.takeIf { it.value is Boolean }?.let {
+                    toFeatureFlag(it.key, it.value as Boolean)
                 }
-                emit(list)
             }
         }
     }
 }
+
+/**
+ * Type alias to make map output readable
+ */
+typealias FeatureFlagMapper = (
+    @JvmSuppressWildcards Preferences.Key<*>,
+    @JvmSuppressWildcards Boolean,
+) ->
+@JvmSuppressWildcards FeatureFlag
+
+internal fun toFeatureFlag(
+    key: Preferences.Key<*>,
+    value: Boolean,
+) = FeatureFlag(key.toString(), value)

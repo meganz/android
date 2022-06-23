@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.preferences
 
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -20,5 +21,5 @@ interface FeatureFlagPreferencesGateway {
      *
      * @return Flow of Map of feature name & boolean value
      */
-    suspend fun getAllFeatures(): Flow<Map<String, Boolean>>
+    fun getAllFeatures(): Flow<Preferences>
 }

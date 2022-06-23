@@ -12,5 +12,5 @@ fun interface GetAllFeatureFlags {
      * Gets a fow of list of all feature flags
      * @return: Flow of List of @FeatureFlag
      */
-    suspend operator fun invoke(): Flow<List<FeatureFlag>>
+    operator fun invoke(): Flow<List<FeatureFlag>>
 }
