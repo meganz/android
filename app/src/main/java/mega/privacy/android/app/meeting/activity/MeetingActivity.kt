@@ -23,7 +23,6 @@ import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint

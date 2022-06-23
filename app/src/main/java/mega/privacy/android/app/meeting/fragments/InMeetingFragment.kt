@@ -2505,8 +2505,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
-
         val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
         val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
         val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)

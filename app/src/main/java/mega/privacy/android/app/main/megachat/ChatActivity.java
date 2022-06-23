@@ -4016,16 +4016,11 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
-        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0) {
+        if (MegaApplication.getChatManagement().millisecondsUntilEndCall <= 0 || MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
             hideDialogCall();
             return;
         }
 
-        if(MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
-            hideDialogCall();
-            return;
-        }
-        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false;
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
 
@@ -4055,7 +4050,6 @@ public class ChatActivity extends PasscodeActivity
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-
         });
 
         secondButton.setOnClickListener(v13 -> {
@@ -8152,7 +8146,6 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
-
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
@@ -8595,7 +8588,6 @@ public class ChatActivity extends PasscodeActivity
 
             setNodeAttachmentVisible();
 
-
             passcodeManagement.setShowPasscodeScreen(true);
             MegaApplication.setOpenChatId(idChat);
             supportInvalidateOptionsMenu();
@@ -8696,7 +8688,9 @@ public class ChatActivity extends PasscodeActivity
 
             if (isOnlyMeInCallDialogShown) {
                 showOnlyMeInTheCallDialog();
-            } else {hideDialogCall();}
+            } else {
+                hideDialogCall();
+            }
         }
     }
 
@@ -8776,7 +8770,6 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause(){
         super.onPause();
-
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 
