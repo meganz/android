@@ -61,6 +61,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -114,18 +115,21 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.TextUtil;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
-import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
+
+import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
 public class RecentChatsFragment extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
@@ -197,8 +201,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     //Empty screen
     private TextView emptyTextView;
-    private RelativeLayout emptyLayout;
+    private LinearLayout emptyLayout;
     private TextView emptyTextViewInvite;
+    private TextView emptyDescriptionText;
     private ImageView emptyImageView;
 
     Button inviteButton;
@@ -427,8 +432,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         });
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
+        emptyDescriptionText.setText(TextUtil.formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.context_empty_chat_recent)));
+
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
@@ -638,7 +645,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     private void showFab() {
-        if (adapterList == null || adapterList.isMultipleSelect()) {
+        if (adapterList != null && adapterList.isMultipleSelect()) {
             return;
         }
 
@@ -665,50 +672,28 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         listView.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
+        Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
 
         if (context instanceof ArchivedChatsActivity) {
-            CharSequence result = getSpannedMessageForEmptyChat(
-                    context.getString(R.string.recent_chat_empty).toUpperCase());
-
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyTextView.setVisibility(View.GONE);
-            } else {
-                emptyTextView.setVisibility(View.VISIBLE);
-            }
+            emptyTextView.setVisibility(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
+                    View.GONE : View.VISIBLE);
 
             emptyTextViewInvite.setVisibility(View.GONE);
+            emptyDescriptionText.setVisibility(View.GONE);
             inviteButton.setVisibility(View.GONE);
             emptyTextView.setText(result);
         } else {
-            emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
+            emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
-            inviteButton.setText(getString(R.string.new_chat_link_label));
+            emptyDescriptionText.setVisibility(View.VISIBLE);
             inviteButton.setVisibility(View.VISIBLE);
         }
     }
 
-    private Spanned getSpannedMessageForEmptyChat(String originalMessage) {
-        String textToShow = originalMessage;
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
-                    + ">");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
-                    + ">");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            logError(Arrays.toString(e.getStackTrace()));
-        }
-
-        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
-    }
-
     private void addMarginTop() {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, scaleHeightPx(60, outMetrics), 0, 0);
-        emptyLayoutContainer.setLayoutParams(layoutParams);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(dp2px(108, outMetrics), dp2px(52, outMetrics), dp2px(108, outMetrics), dp2px(12, outMetrics));
+        emptyImageView.setLayoutParams(lp);
     }
 
     public void showConnectingChatScreen(){
@@ -719,14 +704,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             ((ManagerActivity) context).hideFabButton();
         }
 
-        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
         emptyTextViewInvite.setVisibility(View.INVISIBLE);
+        emptyDescriptionText.setVisibility(View.INVISIBLE);
 
         inviteButton.setVisibility(View.GONE);
 
-        CharSequence result = getSpannedMessageForEmptyChat(
-                context.getString(R.string.recent_chat_loading_conversations));
-        emptyTextView.setText(result);
+        String textToShow = context.getString(R.string.recent_chat_loading_conversations).toUpperCase();
+        emptyTextView.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
         emptyTextView.setVisibility(View.VISIBLE);
     }
 
@@ -740,6 +724,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
+        emptyDescriptionText.setVisibility(View.GONE);
         inviteButton.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
     }
@@ -1526,8 +1511,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                             listView.setVisibility(View.GONE);
                             emptyLayout.setVisibility(View.VISIBLE);
                             inviteButton.setVisibility(View.GONE);
-
-                            CharSequence result = getSpannedMessageForEmptyChat(context.getString(R.string.recent_chat_empty).toUpperCase());
+                            Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
                             emptyTextViewInvite.setText(result);
                             emptyTextViewInvite.setVisibility(View.VISIBLE);
                         } else {

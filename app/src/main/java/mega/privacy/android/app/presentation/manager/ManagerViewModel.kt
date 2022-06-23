@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.manager
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -18,12 +19,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaNode
@@ -40,6 +45,11 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param getRootFolder Fetch the root node
+ * @param getRubbishBinChildrenNode
+ * @param getBrowserChildrenNode
+ * @param getNumUnreadUserAlerts
+ * @param getInboxNode
+ * @param hasChildren
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -48,6 +58,9 @@ class ManagerViewModel @Inject constructor(
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
     private val getRootFolder: GetRootFolder,
+    private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
+    private val getInboxNode: GetInboxNode,
+    private val hasChildren: HasChildren,
 ) : ViewModel() {
 
     /**
@@ -210,6 +223,42 @@ class ManagerViewModel @Inject constructor(
      */
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
+    }
+
+    private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
+
+    /**
+     * Notifies about the number of unread user alerts once.
+     *
+     * @return [SingleLiveEvent] with the number of unread user alerts.
+     */
+    fun onGetNumUnreadUserAlerts(): SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>> =
+        numUnreadUserAlerts
+
+    /**
+     * Checks the number of unread user alerts.
+     */
+    fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
+        viewModelScope.launch {
+            numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlerts())
+        }
+    }
+
+    private val inboxSectionVisible: MutableLiveData<Boolean> = MutableLiveData()
+
+    /**
+     * Notifies about updates on Inbox section visibility.
+     */
+    fun onInboxSectionUpdate(): LiveData<Boolean> = inboxSectionVisible
+
+    /**
+     * Checks the Inbox section visibility.
+     */
+    fun checkInboxSectionVisibility() {
+        viewModelScope.launch {
+            val inboxNode = getInboxNode()
+            inboxSectionVisible.value = if (inboxNode == null) false else hasChildren(inboxNode)
+        }
     }
 
 }

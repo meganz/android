@@ -685,6 +685,8 @@ public class FileBrowserFragment extends RotatableFragment{
 
 		setTransferOverQuotaBannerVisibility();
 
+		selectNewlyAddedNodes();
+
 		return v;
     }
 
@@ -1433,5 +1435,26 @@ public class FileBrowserFragment extends RotatableFragment{
 		MediaDiscoveryFragment f = MediaDiscoveryFragment.getInstance(mediaHandle);
 		((ManagerActivity) context).skipToMediaDiscoveryFragment(f);
 		return f;
+	}
+
+	/**
+	 * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
+	 */
+	private void selectNewlyAddedNodes() {
+		ArrayList<Integer> positions = ((ManagerActivity) context).getPositionsList(nodes);
+		if (!positions.isEmpty()) {
+			int firstPosition = Collections.min(positions);
+			activateActionMode();
+			for (int position : positions) {
+				if (adapter.isMultipleSelect()) {
+					adapter.toggleSelection(position);
+				}
+			}
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0) {
+				updateActionModeTitle();
+			}
+			recyclerView.scrollToPosition(firstPosition);
+		}
 	}
 }

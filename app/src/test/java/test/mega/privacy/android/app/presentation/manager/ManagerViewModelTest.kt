@@ -16,7 +16,10 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
@@ -38,6 +41,9 @@ class ManagerViewModelTest {
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
     private val getRootFolder = mock<GetRootFolder>()
+    private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
+    private val getInboxNode = mock<GetInboxNode>()
+    private val hasChildren = mock<HasChildren>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -56,7 +62,10 @@ class ManagerViewModelTest {
             monitorGlobalUpdates,
             getRubbishBinNodeByHandle,
             getBrowserNodeByHandle,
-            getRootFolder
+            getRootFolder,
+            getNumUnreadUserAlerts,
+            getInboxNode,
+            hasChildren,
         )
     }
 
@@ -225,11 +234,16 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
-            underTest = ManagerViewModel(monitorNodeUpdates,
+            underTest = ManagerViewModel(
+                monitorNodeUpdates,
                 monitorGlobalUpdates,
                 getRubbishBinNodeByHandle,
                 getBrowserNodeByHandle,
-                getRootFolder)
+                getRootFolder,
+                getNumUnreadUserAlerts,
+                getInboxNode,
+                hasChildren,
+            )
 
             underTest.updateContactsRequests.test().assertNoValue()
         }

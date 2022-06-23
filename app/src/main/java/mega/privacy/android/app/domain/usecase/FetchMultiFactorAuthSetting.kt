@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Fetch multi factor auth setting
  *
  */
-interface FetchMultiFactorAuthSetting {
+fun interface FetchMultiFactorAuthSetting {
     /**
      * Invoke
      *
