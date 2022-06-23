@@ -21,9 +21,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
@@ -42,7 +39,6 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -291,13 +287,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         return getChat().getPeerCount() == 0 && !getChat().isActive();
     }
 
-    /**
-     * Method to control the visibility of the menu item: End call for all
-     */
-    private void checkEndCallForAllOption() {
-
-    }
-
     @Override
     public void onBindViewHolder(ViewHolderParticipants holder, int position) {
         switch (getItemViewType(position)) {
@@ -308,6 +297,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
                 holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
+
+                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
@@ -332,11 +323,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                     holderHeader.archiveChatLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatSeparator.setVisibility(View.GONE);
                     holderHeader.leaveChatLayout.setVisibility(View.GONE);
-                    holderHeader.endCallForAllLayout.setVisibility(View.GONE);
                     holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
+                    holderHeader.dividerEndCallForAllLayout.setVisibility(View.GONE);
                     holderHeader.editImageView.setVisibility(View.GONE);
                 } else {
-                    checkEndCallForAllOption();
 
                     participantsCount++;
 
@@ -344,8 +334,9 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
-                        holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
                         holderHeader.privateLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerEndCallForAllLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);
 
                         if (!getChat().isPublic()) {
@@ -383,6 +374,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         if (getChat().getOwnPrivilege() < MegaChatRoom.PRIV_RO) {
                             holderHeader.leaveChatLayout.setVisibility(View.GONE);
                             holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
+                            holderHeader.dividerEndCallForAllLayout.setVisibility(View.GONE);
                         }
                     }
 
@@ -612,6 +604,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 groupChatInfoActivity.showConfirmationLeaveChat();
                 break;
 
+            case R.id.chat_group_contact_properties_end_call_layout:
+                groupChatInfoActivity.showEndCallForAllDialog();
+                break;
+
             case R.id.manage_chat_history_group_info_layout:
                 Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
                 intentManageChat.putExtra(CHAT_ID, chatId);
@@ -700,6 +696,22 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         if (holderHeader != null) {
             updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds);
+        }
+    }
+
+    /**
+     * Update the visibility of end call for all option
+     *
+     * @param isVisible True, if it should be visible. False, if it should be gone.
+     */
+    public void updateEndCallOption(boolean isVisible) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            if(holderHeader.endCallForAllLayout.isShown() != isVisible) {
+                holderHeader.endCallForAllLayout.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+            }
+
+            holderHeader.dividerLeaveLayout.setVisibility(isVisible? View.VISIBLE : View.GONE);
         }
     }
 

@@ -59,7 +59,6 @@ import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
@@ -67,6 +66,7 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatA
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.usecase.call.EndCallUseCase;
+import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -120,6 +120,8 @@ public class GroupChatInfoActivity extends PasscodeActivity
     StartCallUseCase startCallUseCase;
     @Inject
     EndCallUseCase endCallUseCase;
+    @Inject
+    GetCallUseCase getCallUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
@@ -131,6 +133,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     private long selectedHandleParticipant;
     private long participantsCount;
     private boolean isChatOpen;
+    private boolean endCallForAllShouldBeVisible = false;
 
     private GroupChatInfoActivity groupChatInfoActivity;
     private MegaChatRoom chat;
@@ -210,6 +213,12 @@ public class GroupChatInfoActivity extends PasscodeActivity
             adapter.updateRetentionTimeUI(seconds);
         }
     };
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,6 +317,28 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 adapter.checkNotifications(chatHandle);
             }
 
+            if (chat.isPreview() || !chat.isActive()) {
+                endCallForAllShouldBeVisible = false;
+            } else {
+                Disposable callSubscription = getCallUseCase.isThereACallCallInChatAndIAmTheModerator(chat.getChatId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((shouldBeVisible) -> {
+                            endCallForAllShouldBeVisible = shouldBeVisible;
+
+                            if (adapter != null) {
+                                adapter.updateEndCallOption(shouldBeVisible);
+                            }
+
+                            if (!shouldBeVisible && endCallForAllDialog != null) {
+                                endCallForAllDialog.dismiss();
+                            }
+
+                        }, (error) -> logError("Error " + error));
+
+                composite.add(callSubscription);
+            }
+
             if (savedInstanceState != null) {
                 boolean isEndCallForAllDialogShown = savedInstanceState.getBoolean(END_CALL_FOR_ALL_DIALOG, false);
                 if (isEndCallForAllDialogShown) {
@@ -324,6 +355,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
+        composite.clear();
     }
 
     private void setParticipants() {
@@ -740,8 +772,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     /**
      * Method to show the End call for all dialog
      */
-    private void showEndCallForAllDialog() {
-
+    public void showEndCallForAllDialog() {
         if (AlertDialogUtil.isAlertDialogShown(endCallForAllDialog))
             return;
 
@@ -1480,6 +1511,10 @@ public class GroupChatInfoActivity extends PasscodeActivity
      */
     public boolean isChatOpen() {
         return isChatOpen;
+    }
+
+    public boolean endCallForAllShouldBeVisible(){
+        return endCallForAllShouldBeVisible;
     }
 
     @Override

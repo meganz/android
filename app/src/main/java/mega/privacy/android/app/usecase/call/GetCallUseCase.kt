@@ -215,11 +215,12 @@ class GetCallUseCase @Inject constructor(
 
             val callStatusObserver = Observer<MegaChatCall> { call ->
                 if (chatId == call.chatid) {
-                    megaChatApi.getChatRoom(chatId)?.let { chat ->
+                    val chat = megaChatApi.getChatRoom(chatId)
+                    if (chat == null) {
+                        emitter.onNext(false)
+                    } else {
                         emitter.checkCallAndPrivileges(call, chat)
                     }
-
-                    emitter.onNext(false)
                 }
             }
 
@@ -231,13 +232,13 @@ class GetCallUseCase @Inject constructor(
                         (change as OnChatListItemUpdate).item?.let { item ->
                             if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
                                 if (chatId == item.chatId) {
-                                    megaChatApi.getChatCall(chatId)?.let { call ->
-                                        megaChatApi.getChatRoom(chatId)?.let { chat ->
-                                            emitter.checkCallAndPrivileges(call, chat)
-                                        }
+                                    val call = megaChatApi.getChatCall(chatId)
+                                    val chat = megaChatApi.getChatRoom(chatId)
+                                    if (call == null || chat == null) {
+                                        emitter.onNext(false)
+                                    } else {
+                                        emitter.checkCallAndPrivileges(call, chat)
                                     }
-
-                                    emitter.onNext(false)
                                 }
                             }
                         }
@@ -267,6 +268,9 @@ class GetCallUseCase @Inject constructor(
         call: MegaChatCall,
         chat: MegaChatRoom,
     ) {
-        this.onNext(call.status != CALL_STATUS_DESTROYED && call.status != CALL_STATUS_INITIAL && call.status != CALL_STATUS_JOINING && chat.ownPrivilege == MegaChatRoom.PRIV_MODERATOR)
+        val result: Boolean =
+            call.status != CALL_STATUS_INITIAL && call.status != CALL_STATUS_TERMINATING_USER_PARTICIPATION && call.status != CALL_STATUS_DESTROYED && chat.ownPrivilege == MegaChatRoom.PRIV_MODERATOR
+
+        this.onNext(result)
     }
 }
