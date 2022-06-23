@@ -116,7 +116,6 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     /** the receiver and manager for the broadcast to listen to the pause event  */
     private var pauseBroadcastReceiver: BroadcastReceiver? = null
 
-    @SuppressLint("NewApi")
     override fun onCreate() {
         super.onCreate()
         app = application as MegaApplication
@@ -132,10 +131,8 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock")
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock")
-        mBuilder = Notification.Builder(
-            this@ChatUploadService,
-            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
-        )
+        @Suppress("DEPRECATION")
+        mBuilder = Notification.Builder(this@ChatUploadService)
         mBuilderCompat = NotificationCompat.Builder(
             this@ChatUploadService,
             Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
