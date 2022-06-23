@@ -5,6 +5,7 @@ import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
 import static mega.privacy.android.app.utils.Constants.DISPUTE_URL;
 import static mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE;
 import static mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER;
