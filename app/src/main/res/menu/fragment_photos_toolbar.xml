@@ -1,0 +1,37 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_zoom_out"
+        android:icon="@drawable/ic_zoom_out"
+        android:orderInCategory="85"
+        android:title="@string/action_grid"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_zoom_in"
+        android:icon="@drawable/ic_zoom_in"
+        android:orderInCategory="90"
+        android:title="@string/action_grid"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_photos_filter"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="105"
+        android:title="@string/photos_action_filter"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_photos_sortby"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="110"
+        android:title="@string/action_sort_by"
+        android:visible="false"
+        app:showAsAction="never" />
+</menu>

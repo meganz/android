@@ -1,21 +1,29 @@
 package test.mega.privacy.android.app.presentation.manager
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,7 +31,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
-
 
 @ExperimentalCoroutinesApi
 class ManagerViewModelTest {
@@ -33,7 +40,10 @@ class ManagerViewModelTest {
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
+    private val getRootFolder = mock<GetRootFolder>()
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
+    private val getInboxNode = mock<GetInboxNode>()
+    private val hasChildren = mock<HasChildren>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -52,7 +62,10 @@ class ManagerViewModelTest {
             monitorGlobalUpdates,
             getRubbishBinNodeByHandle,
             getBrowserNodeByHandle,
-            getNumUnreadUserAlerts
+            getRootFolder,
+            getNumUnreadUserAlerts,
+            getInboxNode,
+            hasChildren,
         )
     }
 
@@ -68,6 +81,131 @@ class ManagerViewModelTest {
         setUnderTest()
         after()
     }
+
+    @Test
+    fun `test that initial state is returned`() = runTest {
+        setUnderTest()
+        underTest.state.test {
+            val initial = awaitItem()
+            assertThat(initial.browserParentHandle).isEqualTo(-1L)
+            assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
+            assertThat(initial.incomingParentHandle).isEqualTo(-1L)
+            assertThat(initial.outgoingParentHandle).isEqualTo(-1L)
+            assertThat(initial.linksParentHandle).isEqualTo(-1L)
+            assertThat(initial.inboxParentHandle).isEqualTo(-1L)
+            assertThat(initial.isFirstNavigationLevel).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that browser parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.browserParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setBrowserParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that rubbish bin parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.rubbishBinParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setRubbishBinParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that incoming parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setIncomingParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that outgoing parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setOutgoingParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that links parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setLinksParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that inbox parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.inboxParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setInboxParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that is first navigation level is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.isFirstNavigationLevel }.distinctUntilChanged()
+            .test {
+                val newValue = false
+                assertThat(awaitItem()).isEqualTo(true)
+                underTest.setIsFirstNavigationLevel(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that get safe browser handle returns INVALID_HANDLE if not set and root folder fails`() =
+        runTest {
+            setUnderTest()
+
+            whenever(getRootFolder()).thenReturn(null)
+            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(INVALID_HANDLE)
+        }
+
+    @Test
+    fun `test that get safe browser handle returns if set`() =
+        runTest {
+            setUnderTest()
+
+            val expectedHandle = 123456789L
+            underTest.setBrowserParentHandle(expectedHandle)
+            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
+        }
 
     @Test
     fun `test that user updates live data is not set when no updates triggered from use case`() =
@@ -96,7 +234,16 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
-            setUnderTest()
+            underTest = ManagerViewModel(
+                monitorNodeUpdates,
+                monitorGlobalUpdates,
+                getRubbishBinNodeByHandle,
+                getBrowserNodeByHandle,
+                getRootFolder,
+                getNumUnreadUserAlerts,
+                getInboxNode,
+                hasChildren,
+            )
 
             underTest.updateContactsRequests.test().assertNoValue()
         }

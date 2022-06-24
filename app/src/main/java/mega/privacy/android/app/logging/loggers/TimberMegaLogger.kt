@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     override fun log(time: String?, loglevel: Int, source: String?, message: String?) {
-        Timber.tag("[ $time ][ ${getLogLevelString(loglevel)} ]")
+        Timber.tag("[$time][sdk][ ${getLogLevelString(loglevel)} ]")
         Timber.log(
             priority = getPriority(loglevel),
             message = "$message ${getSource(source)}",
@@ -25,7 +25,7 @@ class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     private fun getPriority(logLevel: Int): Int {
         return when (logLevel) {
             MegaApiAndroid.LOG_LEVEL_DEBUG -> Log.DEBUG
-            MegaApiAndroid.LOG_LEVEL_ERROR,
+            MegaApiAndroid.LOG_LEVEL_ERROR -> Log.ERROR
             MegaApiAndroid.LOG_LEVEL_FATAL -> Log.ERROR
             MegaApiAndroid.LOG_LEVEL_INFO -> Log.INFO
             MegaApiAndroid.LOG_LEVEL_MAX -> Log.VERBOSE

@@ -3975,4 +3975,14 @@
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Yes</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">No</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos">All photos</string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">From Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Camera uploads</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Videos only</string>
 </resources>

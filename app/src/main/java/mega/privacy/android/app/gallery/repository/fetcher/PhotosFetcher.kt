@@ -314,7 +314,9 @@ class PhotosFetcher(
      * Get Videos that are only from CU/MU
      */
     private fun getVideosFromCUMU(): List<MegaNode> {
-        return getCuChildren().filter { MimeTypeList.typeForName(it.name).isVideoReproducible }
+        return getFilteredChildren(
+            getCuChildren().filter { MimeTypeList.typeForName(it.name).isVideoReproducible }
+        )
     }
 
     val result = MutableLiveData<List<NodeItem>>()

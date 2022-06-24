@@ -258,4 +258,19 @@ interface MegaApiGateway {
      * @return Number of unread user alerts.
      */
     suspend fun getNumUnreadUserAlerts(): Int
+
+    /**
+     * Inbox node of the account
+     *
+     * @return The Inbox node if exists, null otherwise.
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
+     * Checks if the provided node has children.
+     *
+     * @param node  The MegaNode to check.
+     * @return True if the node has children, false otherwise.
+     */
+    suspend fun hasChildren(node: MegaNode): Boolean
 }

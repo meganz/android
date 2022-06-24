@@ -599,10 +599,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApiFolder();
                 break;
             }
-            case SEARCH_ADAPTER: {
-                ((ManagerActivity)context).setParentHandleSearch(parentHandle);
-                break;
-            }
             case INBOX_ADAPTER: {
                 logDebug("onCreate INBOX_ADAPTER");
                 ((ManagerActivity)context).setParentHandleInbox(parentHandle);

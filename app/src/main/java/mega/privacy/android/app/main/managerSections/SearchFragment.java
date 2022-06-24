@@ -2,10 +2,6 @@ package mega.privacy.android.app.main.managerSections;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_GENERAL;
 import static mega.privacy.android.app.utils.CloudStorageOptionControlUtil.MAX_ACTION_COUNT;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
@@ -76,15 +72,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -97,32 +90,30 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
-import mega.privacy.android.app.search.callback.SearchCallback;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 @AndroidEntryPoint
-public class SearchFragment extends RotatableFragment implements SearchCallback.View,
-		SearchCallback.Data {
+public class SearchFragment extends RotatableFragment {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	private ManagerViewModel managerViewModel;
+	private SearchViewModel viewModel;
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -155,7 +146,6 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 	private String downloadLocationDefaultPath;
 
-	private MegaCancelToken searchCancelToken;
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
 
@@ -540,6 +530,22 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				new EventObserver<>(this::showSortByPanel));
 
 		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
+		viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
+				new EventObserver<>(nodes -> {
+					refresh();
+					return null;
+				})
+		);
+		viewModel.getStateLiveData().observe(getViewLifecycleOwner(),
+				new EventObserver<>(state -> {
+					updateSearchProgressView(state.isInProgress());
+					if (state.getNodes() != null) {
+						setNodes(new ArrayList(state.getNodes()));
+					}
+					return null;
+				})
+		);
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -584,7 +590,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						((ManagerActivity)context).getParentHandleSearch(), recyclerView,
+						viewModel.getState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
@@ -618,7 +624,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes,
-						((ManagerActivity)context).getParentHandleSearch(), recyclerView,
+						viewModel.getState().getValue().getSearchParentHandle(), recyclerView,
 						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
@@ -644,7 +650,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		String query = ((ManagerActivity) context).getSearchQuery();
+		String query = viewModel.getState().getValue().getSearchQuery();
 		if (isAdded() && query != null) {
 			newSearchNodesTask();
 			((ManagerActivity) context).showFabButton();
@@ -653,72 +659,22 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_SEARCH);
 	}
 
-	public void newSearchNodesTask() {
-		if (megaApi.getRootNode() == null) {
-			logError("Root node is null.");
-			return;
-		}
-
-		String query = ((ManagerActivity) context).getSearchQuery();
-		long parentHandleSearch = ((ManagerActivity) context).getParentHandleSearch();
-		DrawerItem drawerItem = ((ManagerActivity) context).getSearchDrawerItem();
-		int sharesTab = ((ManagerActivity) context).getSearchSharedTab();
-		boolean isFirstNavigationLevel = ((ManagerActivity) context).isFirstNavigationLevel();
-
-		searchCancelToken = initNewSearch();
-		searchNodesUseCase.get(query, parentHandleSearch, getParentHandleForSearch(drawerItem),
-				TYPE_GENERAL, searchCancelToken, drawerItem, sharesTab, isFirstNavigationLevel)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe((searchedNodes, throwable) -> {
-					if (throwable == null) {
-						finishSearch(searchedNodes);
-					}
-				});
+	/**
+	 * Perform a new search
+	 */
+	private void newSearchNodesTask() {
+		viewModel.performSearch(
+				managerViewModel.getState().getValue().getBrowserParentHandle(),
+				managerViewModel.getState().getValue().getRubbishBinParentHandle(),
+				managerViewModel.getState().getValue().getInboxParentHandle(),
+				managerViewModel.getState().getValue().getIncomingParentHandle(),
+				managerViewModel.getState().getValue().getOutgoingParentHandle(),
+				managerViewModel.getState().getValue().getLinksParentHandle(),
+				managerViewModel.getState().getValue().isFirstNavigationLevel()
+		);
 	}
 
-	private long getParentHandleForSearch(DrawerItem drawerItem) {
-		if (drawerItem == null) {
-			logWarning("DrawerItem is null.");
-			return megaApi.getRootNode().getHandle();
-		}
-
-		switch (drawerItem) {
-			case CLOUD_DRIVE:
-				return ((ManagerActivity) context).getParentHandleBrowser();
-
-			case SHARED_ITEMS:
-				switch (((ManagerActivity) context).getSearchSharedTab()) {
-					case OUTGOING_TAB:
-						return ((ManagerActivity) context).getParentHandleOutgoing();
-					case LINKS_TAB:
-						return ((ManagerActivity) context).getParentHandleLinks();
-					case INCOMING_TAB:
-					default:
-						return ((ManagerActivity) context).getParentHandleIncoming();
-				}
-
-			case RUBBISH_BIN:
-				return managerViewModel.getRubbishBinParentHandle();
-
-			case INBOX:
-				return ((ManagerActivity) context).getParentHandleInbox();
-
-			default:
-				return megaApi.getRootNode().getHandle();
-		}
-	}
-
-	@NonNull
-	@Override
-	public MegaCancelToken initNewSearch() {
-		updateSearchProgressView(true);
-		cancelSearch();
-		return Objects.requireNonNull(MegaCancelToken.createInstance());
-	}
-
-	@Override
-	public void updateSearchProgressView(boolean inProgress) {
+	private void updateSearchProgressView(boolean inProgress) {
 		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
 			logWarning("Cannot set search progress view, one or more parameters are NULL.");
 			return;
@@ -728,19 +684,6 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
 		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
 		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
-	}
-
-	@Override
-	public void cancelSearch() {
-		if (searchCancelToken != null) {
-			searchCancelToken.cancel();
-		}
-	}
-
-	@Override
-	public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
-		updateSearchProgressView(false);
-		setNodes(searchedNodes);
 	}
 
 	@Override
@@ -777,7 +720,7 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			((ManagerActivity) context).setTextSubmitted();
 
 			// If search text is empty and try to open a folder in search fragment.
-			if (!((ManagerActivity) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
+			if (!viewModel.isSearchQueryValid() && nodes.get(position).isFolder()) {
 				((ManagerActivity) context).closeSearchView();
 				((ManagerActivity) context).openSearchFolder(nodes.get(position));
 				return;
@@ -785,8 +728,8 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 
 			if (nodes.get(position).isFolder()){
 				logDebug("is a folder");
-				((ManagerActivity)context).setParentHandleSearch(nodes.get(position).getHandle());
-				((ManagerActivity)context).levelsSearch ++;
+				viewModel.setSearchParentHandle(nodes.get(position).getHandle());
+				viewModel.increaseSearchDepth();
 
 				int lastFirstVisiblePosition;
 				if(((ManagerActivity)context).isList){
@@ -843,9 +786,9 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 					}
                     mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					mediaIntent.putExtra("position", position);
-					mediaIntent.putExtra("searchQuery", ((ManagerActivity)context).getSearchQuery());
+					mediaIntent.putExtra("searchQuery", viewModel.getState().getValue().getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (((ManagerActivity)context).getParentHandleSearch() == -1){
+					if (viewModel.getState().getValue().getSearchParentHandle() == -1L){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -1071,28 +1014,28 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 	
 	public int onBackPressed(){
 		logDebug("onBackPressed");
-		cancelSearch();
-		int levelSearch = ((ManagerActivity)context).levelsSearch;
+		viewModel.cancelSearch();
+		int levelSearch = viewModel.getState().getValue().getSearchDepth();
 
 		if (levelSearch >= 0) {
 			if (levelSearch > 0) {
-				MegaNode node = megaApi.getNodeByHandle(((ManagerActivity) context).getParentHandleSearch());
+				MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getSearchParentHandle());
 
 				if (node == null) {
-					((ManagerActivity) context).setParentHandleSearch(-1);
+					viewModel.setSearchParentHandle(-1L);
 				} else {
 					MegaNode parentNode = megaApi.getParentNode(node);
 					if (parentNode == null) {
-						((ManagerActivity) context).setParentHandleSearch(-1);
+						viewModel.setSearchParentHandle(-1L);
 					} else {
-						((ManagerActivity) context).setParentHandleSearch(parentNode.getHandle());
+						viewModel.setSearchParentHandle(parentNode.getHandle());
 					}
 				}
 			} else {
-				((ManagerActivity) context).setParentHandleSearch(-1);
+				viewModel.setSearchParentHandle(-1L);
 			}
 
-			((ManagerActivity)context).levelsSearch--;
+			viewModel.decreaseSearchDepth();
 			clickAction();
 
 			int lastVisiblePosition = 0;
@@ -1126,20 +1069,10 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		((ManagerActivity) context).showFabButton();
 	}
-	
-	public long getParentHandle(){
-		return ((ManagerActivity)context).getParentHandleSearch();
-
-	}
 
 	public void refresh(){
 		logDebug("refresh ");
 		newSearchNodesTask();
-
-		if(adapter != null){
-			adapter.notifyDataSetChanged();
-		}
-
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		visibilityFastScroller();
 
@@ -1178,14 +1111,14 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			if (((ManagerActivity) context).getParentHandleSearch() == -1) {
+			if (viewModel.getState().getValue().getSearchParentHandle() == -1L) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				emptyTextViewFirst.setText(R.string.no_results_found);
-			} else if (megaApi.getRootNode().getHandle() == ((ManagerActivity) context).getParentHandleSearch()) {
+			} else if (megaApi.getRootNode().getHandle() == viewModel.getState().getValue().getSearchParentHandle()) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
 				} else {
@@ -1248,6 +1181,8 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			reDoTheSelectionAfterRotation();
 			reSelectUnhandledItem();
 		}
+
+		notifyDataSetChanged();
 	}
 
 	public static SearchFragment newInstance() {
