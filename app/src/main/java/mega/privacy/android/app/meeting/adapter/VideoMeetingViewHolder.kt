@@ -680,9 +680,9 @@ class VideoMeetingViewHolder(
                     }
                 }
                 SLOT_NUM_3 -> {
-                    w = (screenWidth * 0.8).toInt()
+                    w = screenWidth
                     h = screenHeight / THREE_FILES
-                    marginLeft = (screenWidth - w) / 2
+                    marginLeft = 0
                     marginRight = marginLeft
 
                     when (bindingAdapterPosition) {

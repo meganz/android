@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_marginTop="2dp"
     android:layout_marginEnd="2dp"
-    android:background="@color/grey_800">
+    android:background="@color/purple_200">
 
     <RelativeLayout
         android:id="@+id/parent_texture_view"
