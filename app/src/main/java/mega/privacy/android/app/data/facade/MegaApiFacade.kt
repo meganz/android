@@ -12,6 +12,7 @@ import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
@@ -198,6 +199,16 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
+
+    override fun startDownload(
+        node: MegaNode,
+        localPath: String,
+        fileName: String?,
+        appData: String?,
+        startFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface?,
+    ) = megaApi.startDownload(node, localPath, fileName, appData, startFirst, cancelToken, listener)
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

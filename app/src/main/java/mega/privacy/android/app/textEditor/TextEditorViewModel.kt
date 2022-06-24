@@ -15,7 +15,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,8 +24,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.domain.usecase.DownloadBackgroundFile
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -48,6 +51,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import java.io.*
 import java.lang.Exception
 import java.net.HttpURLConnection
@@ -58,10 +62,13 @@ import javax.inject.Inject
  * Main ViewModel to handle all logic related to the [TextEditorActivity].
  *
  * @property megaApi                    Needed to manage nodes.
+ * @property megaApiFolder              Needed to manage folder link nodes.
  * @property megaChatApi                Needed to get text file info from chats.
  * @property checkNameCollisionUseCase  UseCase required to check name collisions.
  * @property moveNodeUseCase            UseCase required to move nodes.
  * @property copyNodeUseCase            UseCase required to copy nodes.
+ * @property downloadBackgroundFile     Use case for downloading the file in background if required.
+ * @property ioDispatcher
  */
 @HiltViewModel
 class TextEditorViewModel @Inject constructor(
@@ -70,7 +77,9 @@ class TextEditorViewModel @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase
+    private val copyNodeUseCase: CopyNodeUseCase,
+    private val downloadBackgroundFile: DownloadBackgroundFile,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -89,6 +98,7 @@ class TextEditorViewModel @Inject constructor(
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
     private val snackbarMessage = SingleLiveEvent<String>()
+    private val fatalError = SingleLiveEvent<Unit>()
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
 
@@ -101,6 +111,8 @@ class TextEditorViewModel @Inject constructor(
 
     private lateinit var preferences: SharedPreferences
 
+    private var downloadBackgroundFileJob: Job? = null
+
     fun onTextFileEditorDataUpdate(): LiveData<TextEditorData> = textEditorData
 
     fun getFileName(): LiveData<String> = fileName
@@ -112,6 +124,11 @@ class TextEditorViewModel @Inject constructor(
     fun getCollision(): LiveData<NameCollision> = collision
 
     fun onExceptionThrown(): LiveData<Throwable> = throwable
+
+    /**
+     * Notifies about a fatal error not recoverable.
+     */
+    fun onFatalError(): LiveData<Unit> = fatalError
 
     fun getPagination(): Pagination? = pagination.value
 
@@ -216,7 +233,7 @@ class TextEditorViewModel @Inject constructor(
     fun setInitialValues(
         intent: Intent,
         mi: ActivityManager.MemoryInfo,
-        preferences: SharedPreferences
+        preferences: SharedPreferences,
     ) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         textEditorData.value?.adapterType = adapterType
@@ -342,21 +359,17 @@ class TextEditorViewModel @Inject constructor(
      * Checks if the file is available to read locally. If not, it's read by streaming.
      */
     private suspend fun readFile() {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             isReadingContent = true
             needsReadContent = false
 
-            if (!isTextEmpty(localFileUri)) {
-                val localFile = File(localFileUri!!)
-
-                if (isFileAvailable(localFile)) {
-                    readFile(BufferedReader(FileReader(localFile)))
-                    return@withContext
-                }
+            if (readLocalFile()) {
+                return@withContext
             }
 
             if (streamingFileURL == null) {
-                logError("Error getting the file URL.")
+                Timber.e("Error getting the file URL.")
+                downloadFileForReading()
                 return@withContext
             }
 
@@ -365,16 +378,54 @@ class TextEditorViewModel @Inject constructor(
             try {
                 deferred.await()
             } catch (e: Exception) {
-                logError("Creating connection for reading by streaming.", e)
+                Timber.e("Creating connection for reading by streaming.", e)
+                downloadFileForReading()
             }
         }
+    }
+
+    /**
+     * Reads the file from local storage.
+     *
+     * @return True if the read from local file started successfully, false otherwise.
+     */
+    private suspend fun readLocalFile(): Boolean {
+        val localFile: File = localFileUri?.let { File(it) } ?: return false
+
+        return if (localFile.exists()) {
+            readFile(BufferedReader(FileReader(localFile)))
+            true
+        } else {
+            false
+        }
+    }
+
+    /**
+     * Downloads the file in background in case some error happened trying to read it with streaming,
+     * and tries to read it from local if the download finishes with success.
+     */
+    private suspend fun downloadFileForReading() {
+        downloadBackgroundFileJob = viewModelScope.launch(ioDispatcher) {
+            localFileUri = downloadBackgroundFile(getNode() ?: return@launch)
+
+            if (!readLocalFile()) {
+                fatalError.value = Unit
+            }
+        }
+    }
+
+    /**
+     * Cancels the download in background.
+     */
+    private fun cancelDownload() {
+        downloadBackgroundFileJob?.cancel()
     }
 
     /**
      * Creates a connection for reading the file by streaming.
      */
     private suspend fun createConnectionAndRead() {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val connection: HttpURLConnection =
                 streamingFileURL?.openConnection() as HttpURLConnection
 
@@ -388,7 +439,7 @@ class TextEditorViewModel @Inject constructor(
      * @param br Necessary BufferReader to read the file.
      */
     private suspend fun readFile(br: BufferedReader) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val sb = StringBuilder()
 
             try {
@@ -400,7 +451,7 @@ class TextEditorViewModel @Inject constructor(
 
                 br.close()
             } catch (e: IOException) {
-                logError("Exception while reading text file.", e)
+                Timber.e("Exception while reading text file.", e)
             }
 
             checkIfNeedsStopHttpServer()
@@ -433,7 +484,7 @@ class TextEditorViewModel @Inject constructor(
 
         val tempFile = CacheFolderManager.buildTempFile(activity, fileName.value)
         if (tempFile == null) {
-            logError("Cannot get temporal file.")
+            Timber.e("Cannot get temporal file.")
             return
         }
 
@@ -443,7 +494,7 @@ class TextEditorViewModel @Inject constructor(
         out.close()
 
         if (!isFileAvailable(tempFile)) {
-            logError("Cannot manage temporal file.")
+            Timber.e("Cannot manage temporal file.")
             return
         }
 
@@ -499,7 +550,7 @@ class TextEditorViewModel @Inject constructor(
         activity: Activity,
         fromHome: Boolean,
         tempFile: File,
-        parentHandle: Long
+        parentHandle: Long,
     ) {
         activity.startService(
             Intent(activity, UploadService::class.java)
@@ -513,9 +564,17 @@ class TextEditorViewModel @Inject constructor(
     }
 
     /**
+     * Finishes all pending works before closing the activity.
+     */
+    fun finishBeforeClosing() {
+        checkIfNeedsStopHttpServer()
+        cancelDownload()
+    }
+
+    /**
      * Stops the http server if has been started before.
      */
-    fun checkIfNeedsStopHttpServer() {
+    private fun checkIfNeedsStopHttpServer() {
         if (textEditorData.value?.needStopHttpServer == true) {
             textEditorData.value?.api?.httpServerStop()
             textEditorData.value?.needStopHttpServer = false
@@ -590,7 +649,7 @@ class TextEditorViewModel @Inject constructor(
     private fun checkNameCollision(
         newParentHandle: Long,
         type: NameCollisionType,
-        completeAction: (() -> Unit)
+        completeAction: (() -> Unit),
     ) {
         checkNameCollisionUseCase.check(
             handle = getNode()?.handle ?: return,
