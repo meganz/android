@@ -214,12 +214,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
         }
     };
 
-
-    @Override
-    public void onResume(){
-        super.onResume();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
