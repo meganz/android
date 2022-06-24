@@ -4124,11 +4124,11 @@ public class ChatActivity extends PasscodeActivity
 
         firstButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
+            hideDialogCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-            hideDialogCall();
         });
 
         secondButton.setOnClickListener(v13 -> {
@@ -8341,7 +8341,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onNewIntent(Intent intent){
-        logDebug("onNewIntent");
         hideKeyboard();
         if (intent != null){
             if (intent.getAction() != null){
@@ -8766,6 +8765,12 @@ public class ChatActivity extends PasscodeActivity
                 titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
+
+            if (isOnlyMeInCallDialogShown) {
+                showOnlyMeInTheCallDialog();
+            } else {
+                hideDialogCall();
+            }
         }
     }
 

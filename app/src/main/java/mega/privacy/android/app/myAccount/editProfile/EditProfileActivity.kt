@@ -208,7 +208,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding.changeName.setOnClickListener { showChangeNameDialog(null, null) }
 
         binding.addPhoto.setOnClickListener {
-            if (isBottomSheetDialogShown(photoBottomSheet))
+            if (photoBottomSheet.isBottomSheetDialogShown())
                 return@setOnClickListener
 
             photoBottomSheet = PhotoBottomSheetDialogFragment()
@@ -470,7 +470,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             SMSVerificationActivity::class.java
                         )
                     )
-                } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
+                } else if (!phoneNumberBottomSheetOld.isBottomSheetDialogShown()) {
                     phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
                     phoneNumberBottomSheetOld!!.show(
                         supportFragmentManager,

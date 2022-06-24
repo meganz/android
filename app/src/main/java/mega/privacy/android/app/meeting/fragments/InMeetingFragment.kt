@@ -2518,18 +2518,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 .uppercase()
 
         firstButton.setOnClickListener {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
-            hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
+            hideCallWillEndInBanner()
             leaveMeeting()
         }
 
         secondButton.setOnClickListener {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             MegaApplication.getChatManagement().stopCounterToFinishCall()
-            hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
+            hideCallWillEndInBanner()
         }
 
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
