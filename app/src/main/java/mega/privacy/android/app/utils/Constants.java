@@ -942,4 +942,6 @@ public class Constants {
     public static final int FIRST_NAVIGATION_LEVEL = 0;
     
     public static final long LONG_SNACKBAR_DURATION = 2750;
+
+    public static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
 }

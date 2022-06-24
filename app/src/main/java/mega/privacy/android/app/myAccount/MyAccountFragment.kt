@@ -28,7 +28,7 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
@@ -479,7 +479,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             setOnClickListener {
                 if (Util.canVoluntaryVerifyPhoneNumber()) {
                     findNavController().navigate(R.id.action_my_account_to_add_phone_number)
-                } else if (!ModalBottomSheetUtil.isBottomSheetDialogShown(phoneNumberBottomSheet)) {
+                } else if (!phoneNumberBottomSheet.isBottomSheetDialogShown()) {
                     phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
                     activity?.supportFragmentManager?.let { fragmentManager ->
                         phoneNumberBottomSheet!!.show(
