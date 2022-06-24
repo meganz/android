@@ -103,7 +103,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaRequest
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -2520,15 +2519,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         firstButton.setOnClickListener {
             MegaApplication.getChatManagement().stopCounterToFinishCall()
-            hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
+            hideCallWillEndInBanner()
             leaveMeeting()
         }
 
         secondButton.setOnClickListener {
             MegaApplication.getChatManagement().stopCounterToFinishCall()
-            hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
+            hideCallWillEndInBanner()
         }
 
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
