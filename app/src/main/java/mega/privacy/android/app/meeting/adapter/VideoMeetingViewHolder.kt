@@ -548,21 +548,11 @@ class VideoMeetingViewHolder(
                     w = screenWidth / TWO_COLUMNS
                     h = screenHeight
 
-                    when (bindingAdapterPosition) {
-                        POSITION_0 -> {
-                            w -= borderWidth
-                        }
-                    }
                 }
                 SLOT_NUM_3 -> {
-                    w = (screenWidth / THREE_COLUMNS)
-                    h = (screenHeight * 0.6).toInt()
-                    marginBottom = screenHeight - h
-                    when (bindingAdapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            w -= borderWidth
-                        }
-                    }
+                    w = screenWidth / THREE_COLUMNS
+                    h = screenHeight
+
                 }
                 SLOT_NUM_4 -> {
                     w = (screenWidth / FOUR_COLUMNS)
@@ -674,20 +664,10 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_2 -> {
                     w = screenWidth
                     h = screenHeight / TWO_FILES
-
-                    when (bindingAdapterPosition) {
-                        POSITION_1 -> marginTop = borderWidth
-                    }
                 }
                 SLOT_NUM_3 -> {
                     w = screenWidth
                     h = screenHeight / THREE_FILES
-                    marginLeft = 0
-                    marginRight = marginLeft
-
-                    when (bindingAdapterPosition) {
-                        POSITION_1, POSITION_2 -> marginTop = borderWidth
-                    }
                 }
                 SLOT_NUM_4 -> {
                     w = screenWidth / TWO_COLUMNS
