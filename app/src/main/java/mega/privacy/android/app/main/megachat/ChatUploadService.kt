@@ -688,7 +688,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             var inProgress: Long = 0
 
             for (currentTransfer in transfers) {
-                if (currentTransfer.isVoiceClipType()) {
+                if (!currentTransfer.isVoiceClipType()) {
                     if (currentTransfer.state == MegaTransfer.STATE_COMPLETED) {
                         total += currentTransfer.totalBytes
                         inProgress += currentTransfer.totalBytes
@@ -704,7 +704,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             }
         } else if (totalVideos > 0) {
             for (currentTransfer in transfers) {
-                if (currentTransfer.isVoiceClipType()) {
+                if (!currentTransfer.isVoiceClipType()) {
                     val individualInProgress = currentTransfer.transferredBytes
                     val individualTotalBytes = currentTransfer.totalBytes
                     var individualProgressPercent: Long = 0
@@ -740,7 +740,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             var inProgress: Long = 0
 
             for (currentTransfer in transfers) {
-                if (currentTransfer.isVoiceClipType()) {
+                if (!currentTransfer.isVoiceClipType()) {
                     total += currentTransfer.totalBytes
                     inProgress += currentTransfer.transferredBytes
                 }
@@ -865,7 +865,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
                 Timber.d("This is a chat upload: $appData")
 
-                if (transfer.isVoiceClipType()) {
+                if (!transfer.isVoiceClipType()) {
                     transfersCount++
                 }
 
@@ -883,7 +883,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 dbH.updatePendingMessageOnTransferStart(id, transfer.tag)
                 mapProgressTransfers!![transfer.tag] = transfer
 
-                if (!transfer.isFolderTransfer && transfer.isVoiceClipType()) {
+                if (!transfer.isFolderTransfer && !transfer.isVoiceClipType()) {
                     updateProgressNotification()
                 }
             }
@@ -928,7 +928,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
             mapProgressTransfers!![transfer.tag] = transfer
 
-            if (transfer.isVoiceClipType()) {
+            if (!transfer.isVoiceClipType()) {
                 updateProgressNotification()
             }
         }
@@ -951,7 +951,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     } else {
                         Timber.w("STORAGE OVERQUOTA ERROR: " + e.errorCode)
 
-                        if (transfer.isVoiceClipType()) {
+                        if (!transfer.isVoiceClipType()) {
                             updateProgressNotification()
                         }
                     }
@@ -974,7 +974,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     return
                 }
 
-                if (transfer.isVoiceClipType()) {
+                if (!transfer.isVoiceClipType()) {
                     transfersCount--
                     totalUploadsCompleted++
                 }
@@ -1184,7 +1184,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
                 if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
                     onQueueComplete()
-                } else if (transfer.isVoiceClipType()) {
+                } else if (!transfer.isVoiceClipType()) {
                     updateProgressNotification()
                 }
             }
