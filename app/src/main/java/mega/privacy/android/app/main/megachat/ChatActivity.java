@@ -124,6 +124,7 @@ import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -4043,11 +4044,11 @@ public class ChatActivity extends PasscodeActivity
 
         firstButton.setOnClickListener(v13 -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
+            hideDialogCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
             if (call != null) {
                 megaChatApi.hangChatCall(call.getCallId(), null);
             }
-            hideDialogCall();
         });
 
         secondButton.setOnClickListener(v13 -> {
@@ -8260,7 +8261,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onNewIntent(Intent intent){
-        logDebug("onNewIntent");
         hideKeyboard();
         if (intent != null){
             if (intent.getAction() != null){
@@ -8490,9 +8490,7 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-        if(dialogOnlyMeInCall != null) {
-            outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, dialogOnlyMeInCall.isShowing());
-        }
+        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall));
     }
 
     /**
@@ -8686,6 +8684,12 @@ public class ChatActivity extends PasscodeActivity
                 titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
+
+            if (isOnlyMeInCallDialogShown) {
+                showOnlyMeInTheCallDialog();
+            } else {
+                hideDialogCall();
+            }
         }
     }
 
