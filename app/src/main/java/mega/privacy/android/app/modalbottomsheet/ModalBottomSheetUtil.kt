@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import nz.mega.sdk.MegaNode
 import mega.privacy.android.app.MegaApplication
@@ -22,8 +21,10 @@ import androidx.core.content.FileProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -56,7 +57,7 @@ object ModalBottomSheetUtil {
         nodeDownloader: ((node: MegaNode) -> Unit)? = null,
     ): AlertDialog? {
         if (node == null) {
-            logWarning("Node is null")
+            Timber.w("Node is null")
             return null
         }
         val app = MegaApplication.getInstance()
@@ -80,17 +81,7 @@ object ModalBottomSheetUtil {
             }
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
-            if (megaApi.httpServerIsRunning() == 0) {
-                megaApi.httpServerStart()
-            }
-            val mi = ActivityManager.MemoryInfo()
-            val activityManager = app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.getMemoryInfo(mi)
-            if (mi.totalMem > Constants.BUFFER_COMP) {
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-            } else {
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-            }
+            setupStreamingServer(megaApi, context)
             val url = megaApi.httpServerGetLocalLink(node)
             if (url == null) {
                 Util.showSnackbar(context,

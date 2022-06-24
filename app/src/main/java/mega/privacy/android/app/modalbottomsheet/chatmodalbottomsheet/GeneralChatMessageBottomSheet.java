@@ -55,8 +55,6 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
-
     private MegaNode node = null;
     private AndroidMegaChatMessage message = null;
     private long chatId;
