@@ -1,16 +1,23 @@
 package mega.privacy.android.app.data.repository
 
 import android.content.Context
+import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.SyncRecord
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.FileUtil
-import timber.log.Timber
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
 import java.util.concurrent.ThreadPoolExecutor
 import javax.inject.Inject
 
@@ -31,22 +38,8 @@ class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
-    init {
-        initPreferencesIfNull()
-    }
-
-    private fun initPreferencesIfNull() {
-        if (databaseHandler.preferences == null) {
-            Timber.w("databaseHandler.preferences is NULL")
-            databaseHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation = FileUtil.buildDefaultDownloadDir(context)
-            defaultDownloadLocation.mkdirs()
-            databaseHandler.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
-        }
-    }
-
     /**
-     * All different sync timestamps
+     * All different synchronization timestamps
      */
     enum class SyncTimeStamp {
         /**
@@ -72,6 +65,9 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     override fun isSyncByWifi() =
         databaseHandler.preferences.camSyncWifi.toBoolean()
+
+    override fun isSyncByWifiDefault(): Boolean =
+        databaseHandler.preferences.camSyncWifi?.toBoolean() ?: true
 
     override fun getSyncTimeStamp() =
         databaseHandler.preferences.camSyncTimeStamp?.toLongOrNull() ?: 0
@@ -101,17 +97,38 @@ class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
+    override fun getVideoQuality(): String = databaseHandler.preferences.uploadVideoQuality
+
+    override fun deleteAllSyncRecords(syncRecordType: Int) =
+        databaseHandler.deleteAllSyncRecords(syncRecordType)
+
     override fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
         databaseHandler.deleteSyncRecordByPath(path, isSecondary)
 
-    override fun deleteSyncRecordLocalPath(localPath: String?, isSecondary: Boolean) =
+    override fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
         databaseHandler.deleteSyncRecordByLocalPath(localPath, isSecondary)
 
-    override fun getSyncRecordOrNull(
+    override fun deleteSyncRecordByFingerprint(
+        originalPrint: String,
+        newPrint: String,
+        isSecondary: Boolean,
+    ) =
+        databaseHandler.deleteSyncRecordByFingerprint(originalPrint, newPrint, isSecondary)
+
+    override fun getSyncRecordByFingerprint(
         fingerprint: String?,
         isSecondary: Boolean,
         isCopy: Boolean,
     ): SyncRecord? = databaseHandler.recordExists(fingerprint, isSecondary, isCopy)
+
+    override fun getSyncRecordByNewPath(path: String): SyncRecord? =
+        databaseHandler.findSyncRecordByNewPath(path)
+
+    override fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
+        databaseHandler.findSyncRecordByLocalPath(path, isSecondary)
+
+    override fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
+        databaseHandler.saveShouldClearCamsyncRecords(clearSyncRecords)
 
     override fun doesFileNameExist(
         fileName: String,
@@ -134,5 +151,87 @@ class DefaultCameraUploadRepository @Inject constructor(
             SyncTimeStamp.SECONDARY -> databaseHandler.setSecSyncTimeStamp(timestamp)
             SyncTimeStamp.SECONDARY_VIDEO -> databaseHandler.setSecVideoSyncTimeStamp(timestamp)
         }
+    }
+
+    override fun doCredentialsExist(): Boolean = databaseHandler.credentials != null
+
+    override fun doPreferencesExist(): Boolean = databaseHandler.preferences != null
+
+    override fun isSyncEnabled() =
+        databaseHandler.preferences.camSyncEnabled.toBoolean()
+
+    override fun getCameraUploadLocalPath(): String? =
+        if (databaseHandler.preferences.cameraFolderExternalSDCard.toBoolean()) {
+            val sdUri = Uri.parse(databaseHandler.preferences.uriExternalSDCard)
+            FileUtil.getFullPathFromTreeUri(sdUri, context)
+        } else {
+            databaseHandler.preferences.camSyncLocalPath
+        }
+
+    override fun setSyncLocalPath(localPath: String) =
+        databaseHandler.setCamSyncLocalPath(localPath)
+
+    override fun setSecondaryFolderPath(secondaryFolderPath: String) =
+        databaseHandler.setSecondaryFolderPath(secondaryFolderPath)
+
+    override fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
+        databaseHandler.setSecondaryUploadEnabled(secondaryCameraUpload)
+
+    override fun getSecondaryFolderPath(): String? =
+        databaseHandler.preferences.localPathSecondaryFolder
+
+    override fun getRemoveGpsDefault() =
+        databaseHandler.preferences.removeGPS?.toBoolean() ?: true
+
+    override fun initializeMegaChat() =
+        ChatUtil.initMegaChatApi(databaseHandler.credentials.session)
+
+    override fun shouldCompressVideo(): Boolean {
+        val qualitySetting = databaseHandler.preferences.uploadVideoQuality
+        return qualitySetting != null && qualitySetting.toInt() != SettingsConstants.VIDEO_QUALITY_ORIGINAL
+    }
+
+    override fun getKeepFileNames() = databaseHandler.preferences.keepFileNames.toBoolean()
+
+    override fun isFolderExternalSd() =
+        databaseHandler.preferences.cameraFolderExternalSDCard.toBoolean()
+
+    override fun getUriExternalSd(): String = databaseHandler.preferences.uriExternalSDCard
+
+    override fun isSecondaryMediaFolderEnabled() =
+        databaseHandler.preferences.keepFileNames.toBoolean()
+
+    override fun isMediaFolderExternalSd() = databaseHandler.mediaFolderExternalSdCard
+
+    override fun getUriMediaFolderExternalSd(): String = databaseHandler.uriMediaExternalSdCard
+
+    override fun shouldClearSyncRecords() = databaseHandler.shouldClearCamsyncRecords()
+
+    override fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError) =
+        TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error),
+            databaseHandler)
+
+    override fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long? =
+        databaseHandler.findMaxTimestamp(isSecondary, syncRecordType)
+
+    override fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
+        databaseHandler.findVideoSyncRecordsByState(syncStatusType)
+
+    override fun getChargingOnSizeString(): String = databaseHandler.preferences.chargingOnSize
+
+    override fun getChargingOnSize() = databaseHandler.preferences.chargingOnSize.toInt()
+
+    override fun convertOnCharging() =
+        doPreferencesExist() && databaseHandler.preferences.conversionOnCharging.toBoolean()
+
+    override fun updateSyncRecordStatusByLocalPath(
+        syncStatusType: Int,
+        localPath: String?,
+        isSecondary: Boolean,
+    ) = databaseHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
+
+    // TODO SUSPEND AND CONTINUATION INSTEAD OF CALLBACK LISTENER
+    override fun fastLogin(listener: MegaRequestListenerInterface) {
+        megaApiGateway.fastLogin(databaseHandler.credentials.session, listener)
     }
 }

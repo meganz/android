@@ -215,4 +215,12 @@ interface MegaApiGateway {
      * @return Base64-encoded node handle
      */
     fun handleToBase64(handle: Long): String
+
+    /**
+     * Execute a fast login
+     *
+     * @param session  Session key
+     * @param listener MegaRequestListener to handle callback
+     */
+    fun fastLogin(session: String, listener: MegaRequestListenerInterface)
 }

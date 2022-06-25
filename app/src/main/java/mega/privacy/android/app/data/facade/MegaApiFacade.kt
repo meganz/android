@@ -123,6 +123,10 @@ class MegaApiFacade @Inject constructor(
         megaApi.getFavourites(node, count, listener)
     }
 
+    override fun fastLogin(session: String, listener: MegaRequestListenerInterface) {
+        megaApi.fastLogin(session, listener)
+    }
+
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
