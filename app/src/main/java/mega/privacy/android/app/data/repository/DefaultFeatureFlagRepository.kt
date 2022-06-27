@@ -32,15 +32,14 @@ class DefaultFeatureFlagRepository @Inject constructor(
      * @return: Flow of List of @FeatureFlag
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getAllFeatures(): Flow<List<FeatureFlag>> {
-        return preferencesGateway.getAllFeatures().mapLatest { map ->
+    override fun getAllFeatures(): Flow<List<FeatureFlag>> =
+        preferencesGateway.getAllFeatures().mapLatest { map ->
             map.asMap().mapNotNull { entry: Map.Entry<Preferences.Key<*>, Any> ->
                 entry.takeIf { it.value is Boolean }?.let {
                     toFeatureFlag(it.key, it.value as Boolean)
                 }
             }
         }
-    }
 }
 
 /**
