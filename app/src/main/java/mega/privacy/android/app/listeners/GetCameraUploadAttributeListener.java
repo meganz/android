@@ -3,9 +3,6 @@ package mega.privacy.android.app.listeners;
 import static mega.privacy.android.app.utils.CameraUploadUtil.compareAndUpdateLocalFolderAttribute;
 import static mega.privacy.android.app.utils.CameraUploadUtil.forceUpdateCameraUploadFolderIcon;
 import static mega.privacy.android.app.utils.CameraUploadUtil.initCUFolderFromScratch;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
@@ -19,6 +16,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
+import timber.log.Timber;
 
 public class GetCameraUploadAttributeListener extends BaseListener {
 
@@ -34,7 +32,7 @@ public class GetCameraUploadAttributeListener extends BaseListener {
 
         if (e.getErrorCode() == MegaError.API_OK) {
             long[] handles = getCUHandles(request);
-            logDebug("Get CU folders successfully primary: " + handles[0] + ", secondary: " + handles[1]);
+            Timber.d("Get CU folders successfully primary: %d, secondary: %d", handles[0], handles[1]);
 
             synchronized (this) {
                 handle(handles[0], false, e);
@@ -42,14 +40,14 @@ public class GetCameraUploadAttributeListener extends BaseListener {
             }
         } else if (e.getErrorCode() == MegaError.API_ENOENT) {
             // only when both CU and MU are not set, will return API_ENOENT
-            logDebug("First time set CU attribute.");
+            Timber.d("First time set CU attribute.");
             initCUFolderFromScratch(context, false);
 
             if (context instanceof CameraUploadsService) {
                 ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e.getErrorCode(), true);
             }
         } else {
-            logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+            Timber.w("Get CU attributes failed, error code: %d, %s", e.getErrorCode(), e.getErrorString());
             JobUtil.fireStopCameraUploadJob(context);
         }
     }
@@ -75,7 +73,7 @@ public class GetCameraUploadAttributeListener extends BaseListener {
                 secondaryHandle = MegaApiJava.base64ToHandle(sh);
             }
         } else {
-            logError("MegaStringMap is null.");
+            Timber.e("MegaStringMap is null.");
         }
 
         return new long[]{primaryHandle, secondaryHandle};
@@ -92,7 +90,7 @@ public class GetCameraUploadAttributeListener extends BaseListener {
         boolean shouldStopCameraUpload = false;
 
         if (isNodeInRubbishOrDeleted(handle)) {
-            logDebug("Folder in rubbish bin, is secondary: " + isSecondary);
+            Timber.d("Folder in rubbish bin, is secondary: %s", isSecondary);
             initCUFolderFromScratch(context, isSecondary);
         } else {
             shouldStopCameraUpload = compareAndUpdateLocalFolderAttribute(handle, isSecondary);

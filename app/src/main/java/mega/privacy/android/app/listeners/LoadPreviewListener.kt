@@ -1,10 +1,13 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_CHAT_LINK
+import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
     private var callback: OnPreviewLoadedCallback? = null
@@ -15,7 +18,7 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
         context: Context?,
         callback: OnPreviewLoadedCallback,
         callbackChatLink: OnChatPreviewLoadedCallback,
-        type: Int
+        type: Int,
     ) : this(context) {
         this.callbackChatLink = callbackChatLink
         this.callback = callback
@@ -25,7 +28,7 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
     constructor(
         context: Context?,
         callback: OnPreviewLoadedCallback,
-        type: Int
+        type: Int,
     ) : this(context) {
         this.callback = callback
         this.callbackChatLink = null
@@ -43,10 +46,10 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
             }
             else -> {
                 if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_EEXIST) {
-                    logDebug("Preview loaded")
+                    Timber.d("Preview loaded")
                     callback?.onPreviewLoaded(request, e.errorCode == MegaError.API_EEXIST)
                 } else {
-                    LogUtil.logError("Error loading preview. Error code " + e.errorCode)
+                    Timber.e("Error loading preview. Error code ${e.errorCode}")
                     callback?.onErrorLoadingPreview(e.errorCode)
                 }
             }

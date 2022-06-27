@@ -1,8 +1,15 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_ASK_ME_ALWAYS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD_LOCATION;
+import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;
+import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.preference.Preference;
 
 import java.io.File;
@@ -10,12 +17,7 @@ import java.io.File;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.main.FileStorageActivity;
-
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
+import timber.log.Timber;
 
 public class DownloadSettingsFragment extends SettingsBaseFragment {
 
@@ -43,7 +45,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
         }
 
         storageAskMeAlways.setChecked(askMe);
-        if(askMe) {
+        if (askMe) {
             getPreferenceScreen().removePreference(downloadLocation);
         }
 
@@ -67,7 +69,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
         switch (preference.getKey()) {
             case KEY_STORAGE_ASK_ME_ALWAYS:
                 dbH.setStorageAskAlways(askMe = storageAskMeAlways.isChecked());
-                if(askMe) {
+                if (askMe) {
                     getPreferenceScreen().removePreference(downloadLocation);
                 } else {
                     resetDefaultDownloadLocation();
@@ -100,7 +102,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
                 downloadLocationPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
                 setDownloadLocation();
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
+                Timber.d("REQUEST_DOWNLOAD_FOLDER - canceled");
             }
         }
     }

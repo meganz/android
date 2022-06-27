@@ -16,7 +16,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiAndroid
@@ -29,6 +28,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -277,7 +277,7 @@ class PhotosFetcher(
                 val cuHandle = pref.camSyncHandle.toLong()
                 cuNode = megaApi.getNodeByHandle(cuHandle)
             } catch (e: NumberFormatException) {
-                LogUtil.logError("parse getCamSyncHandle error $e")
+                Timber.e(e, "parse getCamSyncHandle error")
             }
         }
 
@@ -286,7 +286,7 @@ class PhotosFetcher(
                 val muHandle = pref.megaHandleSecondaryFolder.toLong()
                 muNode = megaApi.getNodeByHandle(muHandle)
             } catch (e: NumberFormatException) {
-                LogUtil.logError("parse MegaHandleSecondaryFolder error $e")
+                Timber.e(e, "parse MegaHandleSecondaryFolder error")
             }
         }
 
@@ -314,7 +314,9 @@ class PhotosFetcher(
      * Get Videos that are only from CU/MU
      */
     private fun getVideosFromCUMU(): List<MegaNode> {
-        return getCuChildren().filter { MimeTypeList.typeForName(it.name).isVideoReproducible }
+        return getFilteredChildren(
+            getCuChildren().filter { MimeTypeList.typeForName(it.name).isVideoReproducible }
+        )
     }
 
     val result = MutableLiveData<List<NodeItem>>()

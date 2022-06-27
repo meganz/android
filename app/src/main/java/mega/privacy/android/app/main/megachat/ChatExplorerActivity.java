@@ -1,14 +1,21 @@
 package mega.privacy.android.app.main.megachat;
 
 
+import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
+import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT;
+import static mega.privacy.android.app.utils.Constants.SELECTED_CHATS;
+import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
+import static mega.privacy.android.app.utils.Constants.USER_HANDLES;
+import static mega.privacy.android.app.utils.TimeUtils.lastGreenDate;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+import static mega.privacy.android.app.utils.Util.showAlert;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -18,15 +25,25 @@ import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import nz.mega.sdk.MegaChatApi;
@@ -38,13 +55,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ChatExplorerActivity extends PasscodeActivity implements View.OnClickListener, MegaChatRequestListenerInterface {
@@ -57,7 +68,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     FrameLayout fragmentContainer;
     ChatExplorerFragment chatExplorerFragment;
     FloatingActionButton fab;
-    public long chatIdFrom=-1;
+    public long chatIdFrom = -1;
 
     private long[] nodeHandles;
     private long[] messagesIds;
@@ -80,17 +91,17 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        logDebug("onCreate first");
+        Timber.d("onCreate first");
         super.onCreate(savedInstanceState);
 
-        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
         chatExplorerActivity = this;
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_chat_explorer);
@@ -103,36 +114,34 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        if(aB!=null){
+        if (aB != null) {
             aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-        }
-        else{
-            logWarning("aB is null");
+        } else {
+            Timber.w("aB is null");
         }
 
         showFabButton(false);
 
         Intent intent = getIntent();
 
-        if(intent!=null){
-            logDebug("Intent received");
-            if(intent.getAction()!=null){
-                if(intent.getAction()== ACTION_FORWARD_MESSAGES){
+        if (intent != null) {
+            Timber.d("Intent received");
+            if (intent.getAction() != null) {
+                if (intent.getAction() == ACTION_FORWARD_MESSAGES) {
                     messagesIds = intent.getLongArrayExtra(ID_MESSAGES);
-                    logDebug("Number of messages to forward: " + messagesIds.length);
+                    Timber.d("Number of messages to forward: %s", messagesIds.length);
                     chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
                 }
-            }
-            else{
+            } else {
                 nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-                if(nodeHandles!=null){
-                    logDebug("Node handle is: " + nodeHandles[0]);
+                if (nodeHandles != null) {
+                    Timber.d("Node handle is: %s", nodeHandles[0]);
                 }
                 userHandles = intent.getLongArrayExtra(USER_HANDLES);
-                if(userHandles!=null){
-                    logDebug("User handles size: " + userHandles.length);
+                if (userHandles != null) {
+                    Timber.d("User handles size: %s", userHandles.length);
                 }
             }
         }
@@ -145,8 +154,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
             if (isSearchExpanded) {
                 pendingToOpenSearchView = true;
             }
-        }
-        else if (chatExplorerFragment == null) {
+        } else if (chatExplorerFragment == null) {
             chatExplorerFragment = new ChatExplorerFragment().newInstance();
         }
 
@@ -170,7 +178,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        logDebug("onCreateOptionsMenu");
+        Timber.d("onCreateOptionsMenu");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
@@ -189,7 +197,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
-        if (searchView != null){
+        if (searchView != null) {
             searchView.setIconifiedByDefault(true);
         }
 
@@ -213,7 +221,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                logDebug("Query: " + query);
+                Timber.d("Query: %s", query);
                 hideKeyboard(chatExplorerActivity, 0);
                 return true;
             }
@@ -229,7 +237,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void isPendingToOpenSearchView () {
+    public void isPendingToOpenSearchView() {
         if (pendingToOpenSearchView && searchMenuItem != null && searchView != null) {
             String query = querySearch;
             searchMenuItem.expandActionView();
@@ -240,32 +248,29 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+        Timber.d("onOptionsItemSelected");
 
         switch (item.getItemId()) {
             case android.R.id.home: {
                 finish();
                 break;
             }
-            case R.id.cab_menu_new_chat:{
-                if(megaApi!=null && megaApi.getRootNode()!=null){
+            case R.id.cab_menu_new_chat: {
+                if (megaApi != null && megaApi.getRootNode() != null) {
                     ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if(contacts==null){
+                    if (contacts == null) {
                         showSnackbar(getString(R.string.no_contacts_invite));
-                    }
-                    else {
-                        if(contacts.isEmpty()){
+                    } else {
+                        if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite));
-                        }
-                        else{
+                        } else {
                             Intent in = new Intent(this, AddContactActivity.class);
                             in.putExtra("contactType", CONTACT_TYPE_MEGA);
                             startActivityForResult(in, REQUEST_CREATE_CHAT);
                         }
                     }
-                }
-                else{
-                    logWarning("Online but not megaApi");
+                } else {
+                    Timber.w("Online but not megaApi");
                     showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }
             }
@@ -276,55 +281,51 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        logDebug("onActivityResult " + requestCode + "____" + resultCode);
+        Timber.d("onActivityResult %d____%d", requestCode, resultCode);
 
         if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
-            logDebug("REQUEST_CREATE_CHAT OK");
+            Timber.d("REQUEST_CREATE_CHAT OK");
 
             if (intent == null) {
-                logWarning("Return.....");
+                Timber.w("Return.....");
                 return;
             }
 
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
 
-            if (contactsData != null){
-                if(contactsData.size()==1){
+            if (contactsData != null) {
+                if (contactsData.size() == 1) {
                     MegaUser user = megaApi.getContact(contactsData.get(0));
-                    if(user!=null){
-                        logDebug("Chat with contact: " + contactsData.size());
+                    if (user != null) {
+                        Timber.d("Chat with contact: %s", contactsData.size());
                         startOneToOneChat(user);
                     }
-                }
-                else{
-                    logDebug("Create GROUP chat");
+                } else {
+                    Timber.d("Create GROUP chat");
                     MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                    for (int i=0; i<contactsData.size(); i++){
+                    for (int i = 0; i < contactsData.size(); i++) {
                         MegaUser user = megaApi.getContact(contactsData.get(i));
-                        if(user!=null){
+                        if (user != null) {
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
                         }
                     }
-                    logDebug("Create group chat with participants: " + peers.size());
+                    Timber.d("Create group chat with participants: %s", peers.size());
 
                     final String chatTitle = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE);
                     final boolean isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false);
                     if (isEKR) {
                         megaChatApi.createChat(true, peers, chatTitle, this);
-                    }
-                    else {
+                    } else {
                         final boolean chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
 
-                        if(chatLink){
-                            if(chatTitle!=null && !chatTitle.isEmpty()){
+                        if (chatLink) {
+                            if (chatTitle != null && !chatTitle.isEmpty()) {
                                 CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
                                 megaChatApi.createPublicChat(peers, chatTitle, listener);
-                            }
-                            else{
+                            } else {
                                 showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                             }
-                        }
-                        else{
+                        } else {
                             megaChatApi.createPublicChat(peers, chatTitle, this);
                         }
                     }
@@ -333,39 +334,38 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         }
     }
 
-    public void startOneToOneChat(MegaUser user){
-        logDebug("User Handle: " + user.getHandle());
+    public void startOneToOneChat(MegaUser user) {
+        Timber.d("User Handle: %s", user.getHandle());
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
-        if(chat==null){
-            logDebug("No chat, create it!");
+        if (chat == null) {
+            Timber.d("No chat, create it!");
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, this);
-        }
-        else{
-            logDebug("There is already a chat, open it!");
+        } else {
+            Timber.d("There is already a chat, open it!");
             showSnackbar(getString(R.string.chat_already_exists));
         }
     }
 
-    public void showSnackbar(String s){
+    public void showSnackbar(String s) {
         showSnackbar(fragmentContainer, s);
     }
 
     public void chooseChats(ArrayList<ChatExplorerListItem> listItems) {
-        logDebug("chooseChats");
+        Timber.d("chooseChats");
 
         Intent intent = new Intent();
 
-        if(nodeHandles!=null){
+        if (nodeHandles != null) {
             intent.putExtra(NODE_HANDLES, nodeHandles);
         }
 
-        if(userHandles!=null){
+        if (userHandles != null) {
             intent.putExtra(USER_HANDLES, userHandles);
         }
 
-        if(messagesIds!=null){
+        if (messagesIds != null) {
             intent.putExtra(ID_MESSAGES, messagesIds);
         }
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
@@ -374,15 +374,14 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         for (ChatExplorerListItem item : listItems) {
             if (item.getChat() != null) {
                 chats.add(item.getChat());
-             }
-            else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+            } else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 users.add(item.getContact().getMegaUser());
             }
         }
 
         if (chats != null && !chats.isEmpty()) {
             long[] chatHandles = new long[chats.size()];
-            for (int i=0; i<chats.size(); i++) {
+            for (int i = 0; i < chats.size(); i++) {
                 chatHandles[i] = chats.get(i).getChatId();
             }
 
@@ -391,7 +390,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
         if (users != null && !users.isEmpty()) {
             long[] userHandles = new long[users.size()];
-            for (int i=0; i<users.size(); i++) {
+            for (int i = 0; i < users.size(); i++) {
                 userHandles[i] = users.get(i).getHandle();
             }
 
@@ -399,20 +398,19 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         }
 
         setResult(RESULT_OK, intent);
-        logDebug("finish!");
+        Timber.d("finish!");
         finish();
     }
 
-    public void showFabButton(boolean show){
-        if(show){
+    public void showFabButton(boolean show) {
+        if (show) {
             fab.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             fab.setVisibility(View.GONE);
         }
     }
 
-    public void collapseSearchView () {
+    public void collapseSearchView() {
         if (searchMenuItem == null) {
             return;
         }
@@ -422,12 +420,12 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.fab_chat_explorer: {
-                if(chatExplorerFragment!=null){
-                    if(chatExplorerFragment.getAddedChats()!=null){
+                if (chatExplorerFragment != null) {
+                    if (chatExplorerFragment.getAddedChats() != null) {
                         chooseChats(chatExplorerFragment.getAddedChats());
                     }
                 }
@@ -446,7 +444,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                     intent.putExtra("onlyCreateGroup", true);
                     startActivityForResult(intent, REQUEST_CREATE_CHAT);
                 } else {
-                    logWarning("Online but not megaApi");
+                    Timber.w("Online but not megaApi");
                     showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }
                 break;
@@ -466,28 +464,27 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish(CHAT)");
+        Timber.d("onRequestFinish(CHAT)");
 
-       if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-           logDebug("Create chat request finish.");
-           onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+        if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
+            Timber.d("Create chat request finish.");
+            onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
         }
     }
 
-    public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
-        logDebug("onRequestFinishCreateChat");
+    public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink) {
+        Timber.d("onRequestFinishCreateChat");
 
-        if(errorCode==MegaChatError.ERROR_OK){
-            logDebug("Chat CREATED.");
+        if (errorCode == MegaChatError.ERROR_OK) {
+            Timber.d("Chat CREATED.");
 
             //Update chat view
-            if(chatExplorerFragment!=null && chatExplorerFragment.isAdded()){
+            if (chatExplorerFragment != null && chatExplorerFragment.isAdded()) {
                 chatExplorerFragment.setChats();
             }
             showSnackbar(getString(R.string.new_group_chat_created));
-        }
-        else{
-            logError("ERROR WHEN CREATING CHAT " + errorCode);
+        } else {
+            Timber.e("ERROR WHEN CREATING CHAT %s", errorCode);
             showSnackbar(getString(R.string.create_chat_error));
         }
     }
@@ -499,7 +496,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
         int state = megaChatApi.getUserOnlineStatus(userhandle);
-        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
+        if (state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
             String formattedDate = lastGreenDate(this, lastGreen);
             if (userhandle != megaChatApi.getMyUserHandle()) {
                 chatExplorerFragment = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorerFragment");
@@ -523,7 +520,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                     long userHandle = next.component1();
                     int lastGreen = next.component2();
                     onChatPresenceLastGreen(userHandle, lastGreen);
-                }, (error) -> logError("Error " + error));
+                }, Timber::e);
 
         composite.add(chatSubscription);
     }

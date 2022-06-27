@@ -1,6 +1,10 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.ChatActivity;
@@ -9,11 +13,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-
-import androidx.annotation.NonNull;
+import timber.log.Timber;
 
 public class TruncateHistoryListener extends ChatBaseListener {
 
@@ -32,7 +32,7 @@ public class TruncateHistoryListener extends ChatBaseListener {
             }
         } else {
             Util.showSnackbar(context, getString(R.string.clear_history_error));
-            logError("Error clearing history: " + e.getErrorString());
+            Timber.e("Error clearing history: %s", e.getErrorString());
         }
     }
 }

@@ -20,7 +20,6 @@ import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_ACCESS_MEDIA_LOCATION;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.BroadcastReceiver;
@@ -38,6 +37,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment;
 import mega.privacy.android.app.utils.Util;
+import timber.log.Timber;
 
 public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
@@ -47,7 +47,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            logDebug("Network broadcast received!");
+            Timber.d("Network broadcast received!");
             if (intent == null || intent.getAction() == null || settingsFragment == null)
                 return;
 

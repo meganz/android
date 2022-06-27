@@ -3,13 +3,19 @@ package mega.privacy.android.app.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.LogbackLogConfigurationGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.logging.ChatLogger
@@ -32,7 +38,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
- * [LoggingRepository] implementation
+ * Timber logging repository
  *
  * @property timberMegaLogger
  * @property timberChatLogger
@@ -43,6 +49,10 @@ import javax.inject.Inject
  * @property chatLogger
  * @property context
  * @property fileCompressionGateway
+ * @property megaApiGateway
+ * @property ioDispatcher
+ * @property loggingPreferencesGateway
+ * @property appScope
  */
 class TimberLoggingRepository @Inject constructor(
     private val timberMegaLogger: TimberMegaLogger,
@@ -56,6 +66,8 @@ class TimberLoggingRepository @Inject constructor(
     private val fileCompressionGateway: FileCompressionGateway,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val loggingPreferencesGateway: LoggingPreferencesGateway,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : LoggingRepository {
 
     init {
@@ -122,4 +134,19 @@ class TimberLoggingRepository @Inject constructor(
     private fun getFormattedDate() = DateTimeFormatter.ofPattern("dd_MM_yyyy__HH_mm_ss")
         .withZone(ZoneId.from(ZoneOffset.UTC))
         .format(Instant.now())
+
+    override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
+        loggingPreferencesGateway.isLoggingPreferenceEnabled()
+            .shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
+        loggingPreferencesGateway.setLoggingEnabledPreference(enabled)
+    }
+
+    override fun isChatLoggingEnabled(): Flow<Boolean> =
+        loggingPreferencesGateway.isChatLoggingPreferenceEnabled()
+
+    override suspend fun setChatLoggingEnabled(enabled: Boolean) {
+        loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
+    }
 }

@@ -2,10 +2,10 @@ package mega.privacy.android.app.sync.camerauploads.callback
 
 import mega.privacy.android.app.sync.SyncEventCallback
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 
 /**
  * Update backup event callback.
@@ -17,7 +17,7 @@ class UpdateBackupCallback : SyncEventCallback {
     override fun onSuccess(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     ) {
         // Update local cache.
         request.apply {
@@ -31,7 +31,7 @@ class UpdateBackupCallback : SyncEventCallback {
                     if (name != null) backupName = name
                 }
                 getDatabase().updateBackup(backup)
-                logDebug("Successful callback: update $backup.")
+                Timber.d("Successful callback: update $backup.")
             }
         }
     }

@@ -12,9 +12,9 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.usecase.CreateGroupChatUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactGroupsUseCase
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -40,9 +40,7 @@ class ContactGroupsViewModel @Inject constructor(
                 onNext = { items ->
                     groups.value = items.toList()
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -81,7 +79,7 @@ class ContactGroupsViewModel @Inject constructor(
                     result.value = chatId
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     result.value = MEGACHAT_INVALID_HANDLE
                 }
             )

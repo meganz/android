@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.displayMetrics
+import timber.log.Timber
 
 /**
  * A helper class for showing highlight hint on certain UI elements.
@@ -143,7 +144,7 @@ class HighLightHintHelper(private val activity: Activity) {
         // Find out the target view.
         val target = activity.findViewById<View>(targetViewId)
         if (target == null) {
-            LogUtil.logError("TargetView is null. Can't view with id $targetViewId in $activity")
+            Timber.e("TargetView is null. Can't view with id $targetViewId in $activity")
             return
         }
 
@@ -324,7 +325,7 @@ class HighLightHintHelper(private val activity: Activity) {
         val target = activity.findViewById<View>(targetViewId)
         // Can't find target view or it is invisible.
         if (target == null || (target.width == 0 && target.height == 0)) {
-            LogUtil.logError("TargetView is null. Can't view with id $targetViewId in $activity")
+            Timber.e("TargetView is null. Can't view with id $targetViewId in $activity")
             return
         }
 

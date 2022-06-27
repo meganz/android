@@ -28,12 +28,12 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -62,7 +62,7 @@ class WebViewActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         if (intent == null || intent.dataString == null) {
-            logError("Unable to open web. Intent is null")
+            Timber.e("Unable to open web. Intent is null")
             finish()
         }
 
@@ -347,7 +347,7 @@ class WebViewActivity : BaseActivity() {
 
                 file = CacheFolderManager.buildTempFile(this, fileName + getContentExtension(contentType))
             } catch (e: IOException) {
-                logError("Error creating temp file.", e)
+                Timber.e(e, "Error creating temp file.")
             }
 
             if (file != null) {

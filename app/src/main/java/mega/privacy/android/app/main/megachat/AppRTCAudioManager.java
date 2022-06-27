@@ -10,6 +10,21 @@
 
 package mega.privacy.android.app.main.megachat;
 
+import static android.media.AudioManager.RINGER_MODE_NORMAL;
+import static android.media.AudioManager.RINGER_MODE_SILENT;
+import static android.media.AudioManager.RINGER_MODE_VIBRATE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
+import static mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT;
+import static mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT;
+import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
+import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
+import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
+import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING;
+import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP;
+import static mega.privacy.android.app.utils.Constants.INVALID_CALL_STATUS;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +42,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 
+import androidx.annotation.RequiresApi;
+
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ThreadUtils;
@@ -35,22 +52,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
-
-import static android.media.AudioManager.RINGER_MODE_NORMAL;
-import static android.media.AudioManager.RINGER_MODE_SILENT;
-import static android.media.AudioManager.RINGER_MODE_VIBRATE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-
-import androidx.annotation.RequiresApi;
+import timber.log.Timber;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
@@ -113,13 +120,13 @@ public class AppRTCAudioManager {
             registerProximitySensor();
         }
 
-        logDebug("Default audio device is " + defaultAudioDevice);
+        Timber.d("Default audio device is %s", defaultAudioDevice);
         AppRTCUtils.logDeviceInfo(TAG);
     }
 
     public void startBluetooth() {
-        if (bluetoothManager == null){
-            logDebug("Starting bluetooth");
+        if (bluetoothManager == null) {
+            Timber.d("Starting bluetooth");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (hasPermissions(apprtcContext, Manifest.permission.BLUETOOTH_CONNECT)) {
                     bluetoothManager = AppRTCBluetoothManager.create(apprtcContext, this);
@@ -129,11 +136,12 @@ public class AppRTCAudioManager {
             }
         }
     }
+
     public void stopBluetooth() {
         if (bluetoothManager == null)
             return;
 
-        logDebug("Stopping bluetooth");
+        Timber.d("Stopping bluetooth");
         bluetoothManager.stop();
         bluetoothManager = null;
     }
@@ -148,14 +156,14 @@ public class AppRTCAudioManager {
         //This method will be called each time a state change is detected.
         if (proximitySensor != null) return false;
 
-        logDebug("Registering proximity sensor");
+        Timber.d("Registering proximity sensor");
         proximitySensor = AppRTCProximitySensor.create(apprtcContext, this::onProximitySensorChangedState);
         return true;
     }
 
     public boolean startProximitySensor() {
         if (registerProximitySensor()) {
-            logDebug("Starting proximity sensor");
+            Timber.d("Starting proximity sensor");
             proximitySensor.start();
             return true;
         }
@@ -173,24 +181,24 @@ public class AppRTCAudioManager {
             if (VideoCaptureUtils.isFrontCameraInUse()) {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                logDebug("Screen off");
+                Timber.d("Screen off");
 
                 if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                         (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
                         apprtcContext instanceof ChatActivity) {
-                    logDebug("Disabling the speakerphone:");
+                    Timber.d("Disabling the speakerphone:");
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
             }
         } else {
             // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
             proximitySensor.turnOnScreen();
-            logDebug("Screen on");
+            Timber.d("Screen on");
 
             if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                     (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
                     apprtcContext instanceof ChatActivity) {
-                logDebug("Enabling the speakerphone: ");
+                Timber.d("Enabling the speakerphone: ");
                 selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
             }
         }
@@ -222,13 +230,13 @@ public class AppRTCAudioManager {
     }
 
     private void setAudioManagerValues() {
-        logDebug("Updating values of Chat Audio Manager...");
+        Timber.d("Updating values of Chat Audio Manager...");
         if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING) {
-            logDebug("If there was also an incoming call (stop incoming call sound)");
+            Timber.d("If there was also an incoming call (stop incoming call sound)");
             stopAudioSignals();
             outgoingCallSound();
         } else if (typeAudioManager == AUDIO_MANAGER_CALL_RINGING) {
-            logDebug("If there is another incoming call (stop the sound of the previous incoming call)");
+            Timber.d("If there is another incoming call (stop the sound of the previous incoming call)");
             stopAudioSignals();
             incomingCallSound();
             checkVibration();
@@ -253,15 +261,15 @@ public class AppRTCAudioManager {
 
         try {
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            logDebug("Preparing mediaPlayer");
+            Timber.d("Preparing mediaPlayer");
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-            logError("Error preparing mediaPlayer", e);
+            Timber.e(e, "Error preparing mediaPlayer");
             return;
         }
 
-        logDebug("Start outgoing call sound");
+        Timber.d("Start outgoing call sound");
         mediaPlayer.start();
         isIncomingSound = false;
     }
@@ -279,7 +287,7 @@ public class AppRTCAudioManager {
         }
 
         mediaPlayer = new MediaPlayer();
-        if(audioManager.getRingerMode() != RINGER_MODE_SILENT) {
+        if (audioManager.getRingerMode() != RINGER_MODE_SILENT) {
             audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
         }
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
@@ -288,14 +296,14 @@ public class AppRTCAudioManager {
 
         try {
             mediaPlayer.setDataSource(MegaApplication.getInstance().getBaseContext(), ringtoneUri);
-            logDebug("Preparing mediaPlayer");
+            Timber.d("Preparing mediaPlayer");
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-            logError("Error preparing mediaPlayer", e);
+            Timber.e(e, "Error preparing mediaPlayer");
             return;
         }
-        logDebug("Start incoming call sound");
+        Timber.d("Start incoming call sound");
         mediaPlayer.start();
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING);
         isIncomingSound = true;
@@ -305,7 +313,7 @@ public class AppRTCAudioManager {
         if (audioManager == null)
             return;
 
-        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING) + ", Voice call volume: " + audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+        Timber.d("Ringer mode: %d, Stream volume: %d, Voice call volume: %d", audioManager.getRingerMode(), audioManager.getStreamVolume(AudioManager.STREAM_RING), audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
         if (participatingInACall()) {
             if (vibrator == null || !vibrator.hasVibrator())
                 return;
@@ -348,7 +356,7 @@ public class AppRTCAudioManager {
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build();
 
-        logDebug("Vibration begins");
+        Timber.d("Vibration begins");
         vibrator.vibrate(pattern, 0, audioAttributes);
     }
 
@@ -422,7 +430,7 @@ public class AppRTCAudioManager {
     private void stopSound() {
         try {
             if (mediaPlayer != null) {
-                logDebug("Stopping sound...");
+                Timber.d("Stopping sound...");
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.release();
@@ -430,26 +438,26 @@ public class AppRTCAudioManager {
                 muteOrUnmuteIncomingCall(false);
             }
         } catch (Exception e) {
-            logWarning("Exception stopping player", e);
+            Timber.w(e, "Exception stopping player");
         }
     }
 
     private void stopVibration() {
         try {
             if (vibrator != null && vibrator.hasVibrator()) {
-                logDebug("Canceling vibration...");
+                Timber.d("Canceling vibration...");
                 vibrator.cancel();
                 vibrator = null;
             }
         } catch (Exception e) {
-            logWarning("Exception canceling vibrator", e);
+            Timber.w(e, "Exception canceling vibrator");
         }
     }
 
     public void unregisterProximitySensor() {
         if (proximitySensor == null) return;
 
-        logDebug("Stopping proximity sensor");
+        Timber.d("Stopping proximity sensor");
         proximitySensor.stop();
         proximitySensor = null;
     }
@@ -462,25 +470,25 @@ public class AppRTCAudioManager {
     /**
      * Construction.
      */
-   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int type) {
-       return new AppRTCAudioManager(context, isSpeakerOn, type);
+    public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int type) {
+        return new AppRTCAudioManager(context, isSpeakerOn, type);
     }
 
     public void updateSpeakerStatus(boolean speakerStatus, int type) {
         typeAudioManager = type;
 
-        logDebug("Speaker status is " + speakerStatus);
+        Timber.d("Speaker status is %s", speakerStatus);
         selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE, false);
     }
 
     private void start(boolean statusSpeaker) {
         ThreadUtils.checkIsOnMainThread();
         if (amState == AudioManagerState.RUNNING) {
-            logError("AudioManager is already active");
+            Timber.e("AudioManager is already active");
             return;
         }
 
-        logDebug("AudioManager starts... ");
+        Timber.d("AudioManager starts... ");
         amState = AudioManagerState.RUNNING;
 
         // Store current audio state so we can restore it when stop() is called.
@@ -521,7 +529,7 @@ public class AppRTCAudioManager {
                     typeOfChange = "AUDIOFOCUS_INVALID";
                     break;
             }
-            logDebug("Audio focus change " + typeOfChange);
+            Timber.d("Audio focus change %s", typeOfChange);
         };
 
         int typeStream;
@@ -545,19 +553,19 @@ public class AppRTCAudioManager {
 
         int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            logDebug("Audio focus request granted for VOICE_CALL streams");
+            Timber.d("Audio focus request granted for VOICE_CALL streams");
         } else {
-            logError("Audio focus request failed");
+            Timber.e("Audio focus request failed");
         }
 
         if (typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP &&
                 typeAudioManager != AUDIO_MANAGER_CALL_RINGING &&
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
-            logDebug("Mode communication");
+            Timber.d("Mode communication");
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         } else {
-            logDebug("Mode normal");
+            Timber.d("Mode normal");
             audioManager.setMode(AudioManager.MODE_NORMAL);
         }
 
@@ -584,14 +592,14 @@ public class AppRTCAudioManager {
         // Register receiver for broadcast intents related to adding/removing a
         // wired headset.
         registerReceiver(wiredHeadsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-        logDebug("AudioManager started");
+        Timber.d("AudioManager started");
     }
 
     public void stop() {
-        logDebug("Stopping audio manager");
+        Timber.d("Stopping audio manager");
         ThreadUtils.checkIsOnMainThread();
         if (amState != AudioManagerState.RUNNING) {
-            logError("Trying to stop AudioManager in incorrect state: " + amState);
+            Timber.e("Trying to stop AudioManager in incorrect state: %s", amState);
             return;
         }
 
@@ -608,27 +616,28 @@ public class AppRTCAudioManager {
         audioManager.setMode(AudioManager.MODE_NORMAL);
 
         // Abandon audio focus. Gives the previous focus owner, if any, focus.
-        if(audioFocusChangeListener != null) audioManager.abandonAudioFocus(audioFocusChangeListener);
+        if (audioFocusChangeListener != null)
+            audioManager.abandonAudioFocus(audioFocusChangeListener);
         audioFocusChangeListener = null;
-        logDebug("Abandoned audio focus for VOICE_CALL streams");
+        Timber.d("Abandoned audio focus for VOICE_CALL streams");
         unregisterProximitySensor();
-        logDebug("AudioManager stopped");
+        Timber.d("AudioManager stopped");
     }
 
     /**
      * Changes selection of the currently active audio device.
      */
     private void setAudioDeviceInternal(AudioDevice device) {
-        logDebug("Selected audio device internal is " + device);
+        Timber.d("Selected audio device internal is %s", device);
         device = getDeviceAvailable(device);
         if (device == null)
             return;
 
-        logDebug("Audio device internal finally selected is " + device);
+        Timber.d("Audio device internal finally selected is %s", device);
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
         switch (device) {
             case SPEAKER_PHONE:
-                if(typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP){
+                if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP) {
                     audioManager.setMode(AudioManager.MODE_NORMAL);
                 }
 
@@ -637,11 +646,11 @@ public class AppRTCAudioManager {
                 break;
 
             case EARPIECE:
-                if(!isTemporary) {
+                if (!isTemporary) {
                     MegaApplication.isSpeakerOn = false;
                 }
 
-                if(typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP){
+                if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP) {
                     audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 }
 
@@ -655,13 +664,13 @@ public class AppRTCAudioManager {
                 break;
 
             default:
-                logError("Invalid audio device selection: " + device);
+                Timber.e("Invalid audio device selection: %s", device);
                 return;
         }
 
         if (selectedAudioDevice != device) {
             selectedAudioDevice = device;
-            logDebug("New audio device selected is " + selectedAudioDevice);
+            Timber.d("New audio device selected is %s", selectedAudioDevice);
             LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AudioDevice.class).post(selectedAudioDevice);
             setValues();
         }
@@ -687,11 +696,11 @@ public class AppRTCAudioManager {
                 break;
 
             default:
-                logError("Invalid default audio device selection: " + defaultDevice);
+                Timber.e("Invalid default audio device selection: %s", defaultDevice);
                 break;
         }
 
-        logDebug("Set default audio device is " + defaultAudioDevice);
+        Timber.d("Set default audio device is %s", defaultAudioDevice);
         updateAudioDeviceState();
     }
 
@@ -721,7 +730,7 @@ public class AppRTCAudioManager {
         if (isDeviceAvailable(device))
             return device;
 
-        logError("Can not select " + device + ", from available " + audioDevices);
+        Timber.e("Can not select %s, from available %s", device, audioDevices);
         return null;
     }
 
@@ -730,12 +739,12 @@ public class AppRTCAudioManager {
      */
     public void selectAudioDevice(AudioDevice device, boolean temporary) {
         ThreadUtils.checkIsOnMainThread();
-        logDebug("Selected audio device is " + device);
+        Timber.d("Selected audio device is %s", device);
         device = getDeviceAvailable(device);
         if (device == null)
             return;
 
-        logDebug("Audio device finally selected is " + device);
+        Timber.d("Audio device finally selected is %s", device);
 
         isTemporary = temporary;
         userSelectedAudioDevice = device;
@@ -776,7 +785,7 @@ public class AppRTCAudioManager {
      * Sets the speaker phone mode.
      */
     private void setSpeakerphoneOn(boolean on) {
-        if(audioManager == null)
+        if (audioManager == null)
             return;
 
         boolean wasOn = audioManager.isSpeakerphoneOn();
@@ -791,7 +800,7 @@ public class AppRTCAudioManager {
      * Sets the microphone mute state.
      */
     private void setMicrophoneMute(boolean on) {
-        if(audioManager == null)
+        if (audioManager == null)
             return;
 
         boolean wasMuted = audioManager.isMicrophoneMute();
@@ -821,12 +830,12 @@ public class AppRTCAudioManager {
         for (AudioDeviceInfo device : devices) {
             final int type = device.getType();
             if (type == AudioDeviceInfo.TYPE_WIRED_HEADSET) {
-                logDebug("Found wired headset");
+                Timber.d("Found wired headset");
                 return true;
             }
 
             if (type == AudioDeviceInfo.TYPE_USB_DEVICE) {
-                logDebug("Found USB audio device");
+                Timber.d("Found USB audio device");
                 return true;
             }
         }
@@ -834,7 +843,7 @@ public class AppRTCAudioManager {
         return false;
     }
 
-    public void changeUserSelectedAudioDeviceForHeadphone(AudioDevice device){
+    public void changeUserSelectedAudioDeviceForHeadphone(AudioDevice device) {
         userSelectedAudioDevice = device;
     }
 
@@ -846,9 +855,9 @@ public class AppRTCAudioManager {
         startBluetooth();
         ThreadUtils.checkIsOnMainThread();
         if (bluetoothManager != null) {
-            logDebug("Update audio device state. Wired headset " + hasWiredHeadset + ", Bluetooth " + bluetoothManager.getState());
+            Timber.d("Update audio device state. Wired headset %s, Bluetooth %s", hasWiredHeadset, bluetoothManager.getState());
         }
-        logDebug("Device status:. available " + audioDevices + ", selected " + selectedAudioDevice + ", user selected " + userSelectedAudioDevice);
+        Timber.d("Device status:. available %s, selected %s, user selected %s", audioDevices, selectedAudioDevice, userSelectedAudioDevice);
         // Check if any Bluetooth headset is connected. The internal BT state will
         // change accordingly.
         if (bluetoothManager != null) {
@@ -883,10 +892,10 @@ public class AppRTCAudioManager {
 
         boolean audioDeviceSetUpdated;
         // Store state which is set to true if the device list has changed.
-        if(audioDevices.equals(newAudioDevices)){
+        if (audioDevices.equals(newAudioDevices)) {
             //Equals
             audioDeviceSetUpdated = false;
-        }else{
+        } else {
             audioDevices.clear();
             // Update the existing audio device set.
             audioDevices = newAudioDevices;
@@ -895,7 +904,7 @@ public class AppRTCAudioManager {
 
         if (bluetoothManager != null) {
             if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
-                logWarning("Bluetooth is not available");
+                Timber.w("Bluetooth is not available");
                 userSelectedAudioDevice = AudioDevice.EARPIECE;
             }
         }
@@ -929,14 +938,14 @@ public class AppRTCAudioManager {
         // Bluetooth SCO connection is established or in the process.
         boolean needBluetoothAudioStop = bluetoothManager != null
                 && (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
-                        || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)
-                        && (userSelectedAudioDevice != AudioDevice.EARPIECE
-                        && userSelectedAudioDevice != AudioDevice.BLUETOOTH);
+                || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)
+                && (userSelectedAudioDevice != AudioDevice.EARPIECE
+                && userSelectedAudioDevice != AudioDevice.BLUETOOTH);
 
         if (bluetoothManager != null && (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED)) {
-            logDebug("Need Bluetooth audio. Start " + needBluetoothAudioStart + ". Stop " + needBluetoothAudioStop + ". Bluetooth state " + bluetoothManager.getState());
+            Timber.d("Need Bluetooth audio. Start %s. Stop %s. Bluetooth state %s", needBluetoothAudioStart, needBluetoothAudioStop, bluetoothManager.getState());
         }
 
         // Start or stop Bluetooth SCO connection given states set earlier.
@@ -955,10 +964,10 @@ public class AppRTCAudioManager {
         }
 
         updateAudioDevice(audioDeviceSetUpdated);
-        logDebug("Updated audio device state");
+        Timber.d("Updated audio device state");
     }
 
-    private void updateAudioDevice(boolean audioDeviceSetUpdated){
+    private void updateAudioDevice(boolean audioDeviceSetUpdated) {
         // Update selected audio device.
         AudioDevice newAudioDevice;
 
@@ -994,10 +1003,10 @@ public class AppRTCAudioManager {
         if (newAudioDevice != selectedAudioDevice || audioDeviceSetUpdated) {
             // Do the required device switch.
             setAudioDeviceInternal(newAudioDevice);
-            logDebug("New device status: available " + audioDevices + ", selected " + newAudioDevice);
+            Timber.d("New device status: available %s, selected %s", audioDevices, newAudioDevice);
         }
 
-        logDebug("Updated audio device state");
+        Timber.d("Updated audio device state");
     }
 
     /**
@@ -1029,11 +1038,7 @@ public class AppRTCAudioManager {
             int state = intent.getIntExtra("state", STATE_UNPLUGGED);
             int microphone = intent.getIntExtra("microphone", HAS_NO_MIC);
             String name = intent.getStringExtra("name");
-            logDebug("WiredHeadsetReceiver.onReceive" + AppRTCUtils.getThreadInfo() + ": "
-                    + "a=" + intent.getAction() + ", s="
-                    + (state == STATE_UNPLUGGED ? "unplugged" : "plugged") + ", m="
-                    + (microphone == HAS_MIC ? "mic" : "no mic") + ", n=" + name + ", sb="
-                    + isInitialStickyBroadcast());
+            Timber.d("WiredHeadsetReceiver.onReceive%s: a=%s, s=%s, m=%s, n=%s, sb=%s", AppRTCUtils.getThreadInfo(), intent.getAction(), state == STATE_UNPLUGGED ? "unplugged" : "plugged", microphone == HAS_MIC ? "mic" : "no mic", name, isInitialStickyBroadcast());
             hasWiredHeadset = (state == STATE_PLUGGED);
             if (state == STATE_PLUGGED) {
                 changeUserSelectedAudioDeviceForHeadphone(AudioDevice.WIRED_HEADSET);

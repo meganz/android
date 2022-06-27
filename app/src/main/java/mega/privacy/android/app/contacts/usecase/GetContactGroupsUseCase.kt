@@ -14,13 +14,13 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
 import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest.TYPE_GET_USER_EMAIL
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -98,11 +98,11 @@ class GetContactGroupsUseCase @Inject constructor(
                             emitter.onNext(groups.sortedAlphabetically())
                         }
                     } else {
-                        logError(error.toThrowable().stackTraceToString())
+                        Timber.e(error.toThrowable())
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    logError(error.toThrowable().stackTraceToString())
+                    Timber.e(error.toThrowable())
                 }
             )
 

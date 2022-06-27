@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.adapters;
 
 import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -10,8 +11,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
 import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
@@ -25,7 +25,7 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         switch (position) {
             case 0:
                 IncomingSharesFragment isF = (IncomingSharesFragment) ((ManagerActivity) context).getSupportFragmentManager().findFragmentByTag(ManagerActivity.FragmentTag.INCOMING_SHARES.getTag());

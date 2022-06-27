@@ -3,8 +3,7 @@ package mega.privacy.android.app;
 import java.io.Serializable;
 
 import nz.mega.sdk.MegaRecentActionBucket;
-
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import timber.log.Timber;
 
 public class BucketSaved implements Serializable {
 
@@ -17,7 +16,7 @@ public class BucketSaved implements Serializable {
 
     public BucketSaved(MegaRecentActionBucket bucket) {
         if (bucket == null) {
-            logError("Error: recent bucket is null");
+            Timber.e("Error: recent bucket is null");
             return;
         }
 

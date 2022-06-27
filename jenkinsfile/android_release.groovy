@@ -191,45 +191,36 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build SDK'
 
-                    if (REBUILD_SDK != null && REBUILD_SDK.toLowerCase() == "yes") {
-                        sh """
-                                cd ${WORKSPACE}/app/src/main/jni
-                                echo CLEANING SDK
-                                bash build.sh clean
-                            """
-                    }
-
                     sh """
-                            cd ${WORKSPACE}/app/src/main/jni
-                            echo "=== START SDK BUILD===="
-                            bash build.sh all
-                        """
+                        cd ${WORKSPACE}/app/src/main/jni
+                        echo "=== CLEAN SDK ===="
+                        bash build.sh clean
+                        echo "=== START SDK BUILD===="
+                        bash build.sh all
+                    """
                 }
 
             }
         }
-        stage('Build APK+AAB(GMS+HMS)') {
+        stage('Build GMS APK') {
             when {
                 expression { (!shouldSkip()) }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Build APK+AAB(GMS+HMS)'
-
-                    if (DO_CLEANUP) {
-                        sh("./gradlew clean")
-                    }
-
-                    sh './gradlew app:assembleRelease app:bundleRelease'
+                    BUILD_STEP = 'Build GMS APK'
+                    sh './gradlew clean app:assembleGmsRelease'
                 }
             }
         }
-
-        stage('Sign APK(GMS+HMS)') {
+        stage('Sign GMS APK') {
             when {
                 expression { (!shouldSkip()) }
             }
             steps {
+                script {
+                    BUILD_STEP = 'Sign GMS APK'
+                }
                 withCredentials([
                         file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
                         file(credentialsId: 'ANDROID_PRD_GMS_APK_KEYSTORE', variable: 'ANDROID_PRD_GMS_APK_KEYSTORE')
@@ -250,7 +241,29 @@ pipeline {
                         println("Finish signing APK. ($gmsApkOutput) generated!")
                     }
                 }
+            }
+        }
 
+        stage('Build HMS APK') {
+            when {
+                expression { (!shouldSkip()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Build HMS APK'
+                    sh './gradlew clean app:assembleHmsRelease'
+                }
+            }
+        }
+
+        stage('Sign HMS APK') {
+            when {
+                expression { (!shouldSkip()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Sign HMS APK'
+                }
                 withCredentials([
                         file(credentialsId: 'ANDROID_PRD_HMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_HMS_APK_PASSWORD_FILE'),
                         file(credentialsId: 'ANDROID_PRD_HMS_APK_KEYSTORE', variable: 'ANDROID_PRD_HMS_APK_KEYSTORE')
@@ -274,11 +287,26 @@ pipeline {
             }
         }
 
-        stage('Sign AAB(GMS+HMS)') {
+        stage('Build GMS AAB') {
             when {
                 expression { (!shouldSkip()) }
             }
             steps {
+                script {
+                    BUILD_STEP = 'Build GMS AAB'
+                    sh './gradlew clean app:bundleGmsRelease'
+                }
+            }
+        }
+
+        stage('Sign GMS AAB') {
+            when {
+                expression { (!shouldSkip()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Sign GMS AAB'
+                }
                 withCredentials([
                         string(credentialsId: 'ANDROID_PRD_GMS_AAB_PASSWORD', variable: 'ANDROID_PRD_GMS_AAB_PASSWORD'),
                         file(credentialsId: 'ANDROID_PRD_GMS_AAB_KEYSTORE', variable: 'ANDROID_PRD_GMS_AAB_KEYSTORE')
@@ -296,6 +324,27 @@ pipeline {
                         }
                         println("Finish signing GMS AAB. ($gmsAabOutput) generated!")
                     }
+                }
+            }
+        }
+        stage('Build HMS AAB') {
+            when {
+                expression { (!shouldSkip()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Build HMS AAB'
+                    sh './gradlew clean app:bundleHmsRelease'
+                }
+            }
+        }
+        stage('Sign HMS AAB') {
+            when {
+                expression { (!shouldSkip()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Sign HMS AAB'
                 }
 
                 withCredentials([
@@ -318,7 +367,6 @@ pipeline {
                 }
             }
         }
-
         stage('Collect native symbol files') {
             when {
                 expression { (!shouldSkip()) }
@@ -350,7 +398,6 @@ pipeline {
                 }
             }
         }
-
         stage('Archive files') {
             when {
                 expression { (!shouldSkip()) }

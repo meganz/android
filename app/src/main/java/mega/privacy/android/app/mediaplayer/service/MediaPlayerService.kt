@@ -16,8 +16,20 @@ import android.os.Looper
 import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.*
-import com.google.android.exoplayer2.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ProcessLifecycleOwner
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.util.EventLogger
@@ -32,12 +44,18 @@ import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
+import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
+import mega.privacy.android.app.utils.ChatUtil.abandonAudioFocus
+import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
+import mega.privacy.android.app.utils.ChatUtil.getRequest
+import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiAndroid
+import timber.log.Timber
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -232,11 +250,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                 addAnalyticsListener(object :
                     EventLogger(this@MediaPlayerService.trackSelector, "MediaPlayer") {
                     override fun logd(msg: String) {
-                        logDebug(msg)
+                        Timber.d(msg)
                     }
 
                     override fun loge(msg: String) {
-                        logError(msg)
+                        Timber.e(msg)
                     }
                 })
 
@@ -406,9 +424,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     private fun playSource(
         mediaItems: List<MediaItem>,
         newIndexForCurrentItem: Int,
-        nameToDisplay: String?
+        nameToDisplay: String?,
     ) {
-        logDebug("playSource ${mediaItems.size} items")
+        Timber.d("playSource ${mediaItems.size} items")
 
         if (!audioFocusRequested) {
             audioFocusRequested = true

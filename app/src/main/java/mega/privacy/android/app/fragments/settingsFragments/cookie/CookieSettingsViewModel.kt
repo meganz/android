@@ -12,8 +12,8 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,7 +83,7 @@ class CookieSettingsViewModel @Inject constructor(
                     MegaApplication.getInstance().checkEnabledCookies()
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     updateResult.value = false
                     getCookieSettings()
                 }
@@ -107,7 +107,7 @@ class CookieSettingsViewModel @Inject constructor(
                     updateResult.value = true
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     updateResult.value = false
                     resetCookies()
                 }
