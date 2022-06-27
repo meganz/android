@@ -26,7 +26,6 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
@@ -42,14 +41,13 @@ import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -89,7 +87,7 @@ class ImageViewerViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -195,7 +193,7 @@ class ImageViewerViewModel @Inject constructor(
      */
     fun loadSingleNode(itemId: Long) {
         val imageItem = images.value?.find { it.id == itemId } ?: run {
-            logWarning("Null item id: $itemId")
+            Timber.w("Null item id: $itemId")
             return
         }
 
@@ -223,7 +221,7 @@ class ImageViewerViewModel @Inject constructor(
                     updateItemIfNeeded(itemId, nodeItem = nodeItem)
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     if (itemId == getCurrentImageItem()?.id && error is MegaException) {
                         snackBarMessage.value = error.getTranslatedErrorString()
                     }
@@ -242,7 +240,7 @@ class ImageViewerViewModel @Inject constructor(
      */
     fun loadSingleImage(itemId: Long, fullSize: Boolean) {
         val imageItem = images.value?.find { it.id == itemId } ?: run {
-            logWarning("Null item id: $itemId")
+            Timber.w("Null item id: $itemId")
             return
         }
 
@@ -281,7 +279,7 @@ class ImageViewerViewModel @Inject constructor(
                     updateItemIfNeeded(itemId, imageResult = imageResult)
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     if (itemId == getCurrentImageItem()?.id
                         && error is MegaException && error !is ResourceAlreadyExistsMegaException
                     ) {
@@ -328,10 +326,10 @@ class ImageViewerViewModel @Inject constructor(
                     updateCurrentPosition(index, true)
                 }
             } else {
-                logWarning("Node $itemId not found")
+                Timber.w("Node $itemId not found")
             }
         } else {
-            logWarning("Images are null or empty")
+            Timber.w("Images are null or empty")
             images.value = null
         }
     }
@@ -348,7 +346,7 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { change ->
                     val items = images.value?.toMutableList() ?: run {
-                        logWarning("Images are null or empty")
+                        Timber.w("Images are null or empty")
                         return@subscribeBy
                     }
 
@@ -401,9 +399,7 @@ class ImageViewerViewModel @Inject constructor(
                         calculateNewPosition(items)
                     }
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -515,7 +511,7 @@ class ImageViewerViewModel @Inject constructor(
                     result.value = link
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     result.value = null
                 }
             )
@@ -581,7 +577,7 @@ class ImageViewerViewModel @Inject constructor(
         node: MegaNode,
         newParentHandle: Long,
         type: NameCollisionType,
-        completeAction: (() -> Unit)
+        completeAction: (() -> Unit),
     ) {
         checkNameCollisionUseCase.check(
             node = node,
@@ -593,7 +589,7 @@ class ImageViewerViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> logError(error.stackTraceToString())
+                        else -> Timber.e(error)
                     }
                 }
             )
@@ -621,9 +617,7 @@ class ImageViewerViewModel @Inject constructor(
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
-                        onError = { error ->
-                            logError(error.stackTraceToString())
-                        }
+                        onError = Timber::e
                     )
             }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
@@ -677,9 +671,7 @@ class ImageViewerViewModel @Inject constructor(
                 onSuccess = { isLoggedIn ->
                     isUserLoggedIn = isLoggedIn
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -705,7 +697,7 @@ class ImageViewerViewModel @Inject constructor(
                     }
                 },
                 onError = { error ->
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                     images.value = null
                 }
             )
@@ -715,7 +707,7 @@ class ImageViewerViewModel @Inject constructor(
     private fun Completable.subscribeAndComplete(
         addToComposite: Boolean = false,
         completeAction: (() -> Unit)? = null,
-        errorAction: ((Throwable) -> Unit)? = null
+        errorAction: ((Throwable) -> Unit)? = null,
     ) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -725,7 +717,7 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     errorAction?.invoke(error)
-                    logError(error.stackTraceToString())
+                    Timber.e(error)
                 }
             ).also {
                 if (addToComposite) it.addTo(composite)

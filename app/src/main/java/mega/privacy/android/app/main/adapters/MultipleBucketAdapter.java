@@ -1,5 +1,21 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnailList;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromMegaList;
+import static mega.privacy.android.app.utils.TimeUtils.formatTime;
+import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -29,15 +45,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
 
@@ -137,7 +145,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public ViewHolderMultipleBucket onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
+        Timber.d("onCreateViewHolder");
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_multiple_bucket, parent, false);
         ViewHolderMultipleBucket holder = new ViewHolderMultipleBucket(v);
 
@@ -164,7 +172,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public void onBindViewHolder(ViewHolderMultipleBucket holder, int position) {
-        logDebug("onBindViewHolder");
+        Timber.d("onBindViewHolder");
         MegaNode node = getItemAtPosition(position);
         if (node == null) return;
 
@@ -181,8 +189,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                         createThumbnailList(context, node, holder, megaApi, this);
                     }
                 } catch (Exception e) {
-                    logError("Error getting or creating node thumbnail", e);
-                    e.printStackTrace();
+                    Timber.e(e, "Error getting or creating node thumbnail");
                 }
             }
         }
@@ -269,7 +276,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
         MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 

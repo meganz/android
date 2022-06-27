@@ -1,5 +1,23 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.MY_CHAT_FILES;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.updateDBNickname;
+import static mega.privacy.android.app.utils.ContactUtil.updateFirstName;
+import static mega.privacy.android.app.utils.ContactUtil.updateLastName;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ED25519_PUBLIC_KEY;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
+
 import android.content.Context;
 import android.content.Intent;
 
@@ -16,13 +34,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.MY_CHAT_FILES;
-import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import timber.log.Timber;
 
 public class GetAttrUserListener extends BaseListener {
 
@@ -58,8 +70,8 @@ public class GetAttrUserListener extends BaseListener {
      * Constructor to init a request for check the USER_ATTR_AVATAR user's attribute
      * and updates the holder of the adapter.
      *
-     * @param context           current application context
-     * @param holderPosition    position of the holder to update
+     * @param context        current application context
+     * @param holderPosition position of the holder to update
      */
     public GetAttrUserListener(Context context, int holderPosition) {
         super(context);
@@ -105,7 +117,7 @@ public class GetAttrUserListener extends BaseListener {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateDBNickname(api, context, request.getMegaStringMap());
                 } else {
-                    logError("Error recovering the alias" + e.getErrorCode());
+                    Timber.e("Error recovering the alias%s", e.getErrorCode());
                 }
                 break;
 
@@ -142,7 +154,7 @@ public class GetAttrUserListener extends BaseListener {
 
             case MegaApiJava.USER_ATTR_RICH_PREVIEWS:
                 if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
+                    Timber.w("Attribute USER_ATTR_RICH_PREVIEWS not set");
                 }
 
                 if (request.getNumDetails() == 1) {
@@ -160,12 +172,12 @@ public class GetAttrUserListener extends BaseListener {
      * Checks if the USER_ATTR_MY_CHAT_FILES_FOLDER user's attribute exists when the request finished:
      * - If not exists but exists a file with the old "My chat files" name, it renames it with the old one.
      * - If the old one neither exists, it launches a request to create it.
-     *
+     * <p>
      * Updates the DB with the result and, if necessary updates the data in the current Context.
      *
-     * @param api       MegaApiJava object
-     * @param request   result of the request
-     * @param e         MegaError received when the request finished
+     * @param api     MegaApiJava object
+     * @param request result of the request
+     * @param e       MegaError received when the request finished
      */
     private void checkMyChatFilesFolderRequest(MegaApiJava api, MegaRequest request, MegaError e) {
         MegaNode myChatFolderNode = null;
@@ -188,7 +200,7 @@ public class GetAttrUserListener extends BaseListener {
                 api.setMyChatFilesFolder(myChatFolderNode.getHandle(), new SetAttrUserListener(context));
             }
         } else {
-            logError("Error getting \"My chat files\" folder: " + e.getErrorString());
+            Timber.e("Error getting \"My chat files\" folder: %s", e.getErrorString());
         }
         if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
             dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
@@ -230,7 +242,7 @@ public class GetAttrUserListener extends BaseListener {
     /**
      * If the avatar was correctly obtained in the request, updates the holder in the adapter with it.
      *
-     * @param request   result of the request
+     * @param request result of the request
      */
     private void updateAvatar(MegaRequest request) {
         if (context instanceof GroupChatInfoActivity) {

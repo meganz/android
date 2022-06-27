@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import mega.privacy.android.app.domain.repository.SettingsRepository
+import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.repository.SupportRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
@@ -33,20 +33,20 @@ abstract class SettingsModule {
         fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
 
         @Provides
-        fun provideAreChatLogsEnabled(settingsRepository: SettingsRepository): AreChatLogsEnabled =
-            AreChatLogsEnabled(settingsRepository::isChatLoggingEnabled)
+        fun provideAreChatLogsEnabled(repository: LoggingRepository): AreChatLogsEnabled =
+            AreChatLogsEnabled(repository::isChatLoggingEnabled)
 
         @Provides
-        fun provideAreSdkLogsEnabled(settingsRepository: SettingsRepository): AreSdkLogsEnabled =
-            AreSdkLogsEnabled(settingsRepository::isSdkLoggingEnabled)
+        fun provideAreSdkLogsEnabled(repository: LoggingRepository): AreSdkLogsEnabled =
+            AreSdkLogsEnabled(repository::isSdkLoggingEnabled)
 
         @Provides
-        fun provideSetSdkLogsEnabled(settingsRepository: SettingsRepository): SetSdkLogsEnabled =
-            SetSdkLogsEnabled(settingsRepository::setSdkLoggingEnabled)
+        fun provideSetSdkLogsEnabled(repository: LoggingRepository): SetSdkLogsEnabled =
+            SetSdkLogsEnabled(repository::setSdkLoggingEnabled)
 
         @Provides
-        fun provideSetChatLogsEnabled(settingsRepository: SettingsRepository): SetChatLogsEnabled =
-            SetChatLogsEnabled(settingsRepository::setChatLoggingEnabled)
+        fun provideSetChatLogsEnabled(repository: LoggingRepository): SetChatLogsEnabled =
+            SetChatLogsEnabled(repository::setChatLoggingEnabled)
     }
 
 }

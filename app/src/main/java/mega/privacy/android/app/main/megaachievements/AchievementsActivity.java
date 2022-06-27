@@ -1,5 +1,12 @@
 package mega.privacy.android.app.main.megaachievements;
 
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,22 +25,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.Locale;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
-
-import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.hideKeyboard;
-
-import java.util.Locale;
+import timber.log.Timber;
 
 public class AchievementsActivity extends PasscodeActivity {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -48,7 +48,7 @@ public class AchievementsActivity extends PasscodeActivity {
     private androidx.appcompat.app.AlertDialog successDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -62,7 +62,7 @@ public class AchievementsActivity extends PasscodeActivity {
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        logDebug("aB.setHomeAsUpIndicator_1");
+        Timber.d("aB.setHomeAsUpIndicator_1");
         aB.setHomeAsUpIndicator(Util.isDarkMode(this) ? R.drawable.ic_arrow_back_white : R.drawable.ic_arrow_back_black);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -90,7 +90,7 @@ public class AchievementsActivity extends PasscodeActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+        Timber.d("onOptionsItemSelected");
 
         int id = item.getItemId();
         switch (id) {
@@ -109,8 +109,8 @@ public class AchievementsActivity extends PasscodeActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showFragment(int fragmentName, int type){
-        logDebug("showFragment: " + fragmentName + " type: " + type);
+    public void showFragment(int fragmentName, int type) {
+        Timber.d("showFragment: %d type: %d", fragmentName, type);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = null;
@@ -155,9 +155,9 @@ public class AchievementsActivity extends PasscodeActivity {
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
-        if(getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment){
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment) {
             // GC the fetcher as user manually leave the activity
             sFetcher.setDataCallback(null);
             sFetcher = null;
@@ -166,8 +166,8 @@ public class AchievementsActivity extends PasscodeActivity {
         super.onBackPressed();
     }
 
-    public void showInviteConfirmationDialog(String contentText){
-        logDebug("showInviteConfirmationDialog");
+    public void showInviteConfirmationDialog(String contentText) {
+        Timber.d("showInviteConfirmationDialog");
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -186,7 +186,7 @@ public class AchievementsActivity extends PasscodeActivity {
         successDialog.show();
     }
 
-    public void showSnackbar(String s){
+    public void showSnackbar(String s) {
         showSnackbar(fragmentContainer, s);
     }
 

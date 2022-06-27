@@ -1,5 +1,8 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
@@ -11,6 +14,8 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.view.Surface;
 
+import androidx.annotation.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -19,12 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.main.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
-
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.utils.LogUtil.*;
-
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class VideoDownsampling {
 
@@ -57,12 +57,13 @@ public class VideoDownsampling {
 
     private boolean isRunning = true;
 
-    protected class VideoUpload{
+    protected class VideoUpload {
         String original;
         String outFile;
         long idPendingMessage;
         int percentage;
         long sizeInputFile, sizeRead;
+
         public VideoUpload(String original, String outFile, long sizeInputFile, long idMessage) {
             this.original = original;
             this.outFile = outFile;
@@ -87,7 +88,7 @@ public class VideoDownsampling {
     }
 
     public void changeResolution(File f, String inputFile, long idMessage, int quality) throws Throwable {
-        logDebug("changeResolution");
+        Timber.d("changeResolution");
 
         this.quality = quality;
 
@@ -112,22 +113,22 @@ public class VideoDownsampling {
             String out = video.outFile;
 
             try {
-                while(!queue.isEmpty()){
+                while (!queue.isEmpty()) {
                     VideoUpload toProcess = queue.poll();
                     mChanger.prepareAndChangeResolution(toProcess);
                 }
             } catch (Throwable th) {
                 mThrowable = th;
-                if(out!=null){
-                    if(context instanceof ChatUploadService) {
-                        ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
+                if (out != null) {
+                    if (context instanceof ChatUploadService) {
+                        ((ChatUploadService) context).finishDownsampling(out, false, video.idPendingMessage);
                     }
                 }
             }
         }
 
         public static void changeResolutionInSeparatedThread(VideoDownsampling changer) throws Throwable {
-            logDebug("changeResolutionInSeparatedThread");
+            Timber.d("changeResolutionInSeparatedThread");
             ChangerWrapper wrapper = new ChangerWrapper(changer);
             Thread th = new Thread(wrapper, ChangerWrapper.class.getSimpleName());
             th.start();
@@ -139,26 +140,26 @@ public class VideoDownsampling {
 
     /**
      * Creates the decoders and encoders to compress a video given a quality.
-     *
+     * <p>
      * Depending on quality these are the params the video encoder receives to perform the compression:
-     *  - VIDEO_QUALITY_HIGH:
-     *      * Original resolution.
-     *      * Original frame rate.
-     *      * Average bitrate reduced by 2%.
-     *  - VIDEO_QUALITY_MEDIUM:
-     *      * 1080p resolution if supported, the closest one if not.
-     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
-     *      * Half of average bitrate.
-     *  - VIDEO_QUALITY_LOW:
-     *      * 720p resolution if supported, the closest one if not.
-     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
-     *      * A third of average bitrate.
+     * - VIDEO_QUALITY_HIGH:
+     * * Original resolution.
+     * * Original frame rate.
+     * * Average bitrate reduced by 2%.
+     * - VIDEO_QUALITY_MEDIUM:
+     * * 1080p resolution if supported, the closest one if not.
+     * * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     * * Half of average bitrate.
+     * - VIDEO_QUALITY_LOW:
+     * * 720p resolution if supported, the closest one if not.
+     * * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     * * A third of average bitrate.
      *
      * @param video VideoUpload object containing the required info to compress a video.
      * @throws Exception If something wrong happens.
      */
     protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
-        logDebug("prepareAndChangeResolution");
+        Timber.d("prepareAndChangeResolution");
         Exception exception = null;
         String mInputFile = video.original;
 
@@ -202,7 +203,7 @@ public class VideoDownsampling {
                     ? inputFormat.getInteger(MediaFormat.KEY_FRAME_RATE)
                     : OUTPUT_VIDEO_FRAME_RATE;
 
-            logDebug("Video original width: " + mWidth + ", original height: " + mHeight
+            Timber.d("Video original width: " + mWidth + ", original height: " + mHeight
                     + ", average bitrate: " + bitrate + ", frame rate: " + frameRate);
 
             if (quality != VIDEO_QUALITY_HIGH) {
@@ -222,7 +223,7 @@ public class VideoDownsampling {
                 bitrate *= 0.98;
             }
 
-            logDebug("Video result width: " + resultWidth + ", result height: " + resultHeight
+            Timber.d("Video result width: " + resultWidth + ", result height: " + resultHeight
                     + ", encode bitrate: " + bitrate + ", encode frame rate: " + frameRate);
 
             MediaCodecInfo.VideoCapabilities capabilities = videoCodecInfo
@@ -231,9 +232,9 @@ public class VideoDownsampling {
             boolean supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
 
             if (!supported) {
-                logWarning("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
+                Timber.w("Sizes width: %d height: %d not supported.", resultWidth, resultHeight);
 
-                for (int i = shortSideByQuality; i< shortSide; i++) {
+                for (int i = shortSideByQuality; i < shortSide; i++) {
                     getCodecResolution(i);
                     supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
 
@@ -244,7 +245,7 @@ public class VideoDownsampling {
             }
 
             if (!supported && quality == VIDEO_QUALITY_MEDIUM) {
-                logWarning("Sizes still not supported. Second try.");
+                Timber.w("Sizes still not supported. Second try.");
                 shortSideByQuality--;
 
                 for (int i = shortSideByQuality; i > SHORT_SIDE_SIZE_LOW; i--) {
@@ -260,7 +261,7 @@ public class VideoDownsampling {
             if (!supported) {
                 String error = "Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported. " +
                         "Video not compressed, uploading original video.";
-                logError(error);
+                Timber.e(error);
                 throw exception = new Exception(error);
             }
 
@@ -300,14 +301,14 @@ public class VideoDownsampling {
             try {
                 if (videoExtractor != null)
                     videoExtractor.release();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
             try {
                 if (audioExtractor != null)
                     audioExtractor.release();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -316,7 +317,7 @@ public class VideoDownsampling {
                     videoDecoder.stop();
                     videoDecoder.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -324,7 +325,7 @@ public class VideoDownsampling {
                 if (outputSurface != null) {
                     outputSurface.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -333,7 +334,7 @@ public class VideoDownsampling {
                     videoEncoder.stop();
                     videoEncoder.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -342,7 +343,7 @@ public class VideoDownsampling {
                     audioDecoder.stop();
                     audioDecoder.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -351,7 +352,7 @@ public class VideoDownsampling {
                     audioEncoder.stop();
                     audioEncoder.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
@@ -360,25 +361,24 @@ public class VideoDownsampling {
                     muxer.stop();
                     muxer.release();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
             try {
                 if (inputSurface != null)
                     inputSurface.release();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 if (exception == null)
                     exception = e;
             }
         }
-        if (exception != null){
-            logError("Exception. Video not compressed, uploading original video.", exception);
+        if (exception != null) {
+            Timber.e(exception, "Exception. Video not compressed, uploading original video.");
             throw exception;
-        }
-        else{
-            if(context instanceof ChatUploadService) {
-                ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
+        } else {
+            if (context instanceof ChatUploadService) {
+                ((ChatUploadService) context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
             }
         }
     }
@@ -450,6 +450,7 @@ public class VideoDownsampling {
         }
         return -1;
     }
+
     private int getAndSelectAudioTrackIndex(MediaExtractor extractor) {
         for (int index = 0; index < extractor.getTrackCount(); ++index) {
             if (isAudioFormat(extractor.getTrackFormat(index))) {
@@ -462,10 +463,10 @@ public class VideoDownsampling {
 
     private void changeResolution(MediaExtractor videoExtractor, MediaExtractor audioExtractor,
                                   MediaCodec videoDecoder, MediaCodec videoEncoder,
-                                  @Nullable MediaCodec audioDecoder,  @Nullable MediaCodec audioEncoder,
+                                  @Nullable MediaCodec audioDecoder, @Nullable MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
-        logDebug("changeResolution");
+        Timber.d("changeResolution");
         String mOutputFile = video.outFile;
 
         ByteBuffer[] videoDecoderInputBuffers = null;
@@ -531,7 +532,7 @@ public class VideoDownsampling {
                 video.sizeRead += size;
 
                 if (size >= 0) {
-                    videoDecoder.queueInputBuffer(decoderInputBufferIndex,0, size, presentationTime, videoExtractor.getSampleFlags());
+                    videoDecoder.queueInputBuffer(decoderInputBufferIndex, 0, size, presentationTime, videoExtractor.getSampleFlags());
                 }
                 videoExtractorDone = !videoExtractor.advance();
                 if (videoExtractorDone) {
@@ -645,7 +646,7 @@ public class VideoDownsampling {
                     decoderOutputBuffer.limit(audioDecoderOutputBufferInfo.offset + size);
                     encoderInputBuffer.position(0);
                     encoderInputBuffer.put(decoderOutputBuffer);
-                    audioEncoder.queueInputBuffer(encoderInputBufferIndex,0, size, presentationTime, audioDecoderOutputBufferInfo.flags);
+                    audioEncoder.queueInputBuffer(encoderInputBufferIndex, 0, size, presentationTime, audioDecoderOutputBufferInfo.flags);
                 }
                 audioDecoder.releaseOutputBuffer(pendingAudioDecoderOutputBufferIndex, false);
                 pendingAudioDecoderOutputBufferIndex = -1;
@@ -722,15 +723,15 @@ public class VideoDownsampling {
                 muxing = true;
             }
 
-            video.percentage = (int)((100 * video.sizeRead) / video.sizeInputFile);
+            video.percentage = (int) ((100 * video.sizeRead) / video.sizeInputFile);
 //            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
-            if(video.percentage%5==0){
+            if (video.percentage % 5 == 0) {
 //                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
-                if(context instanceof  ChatUploadService) {
-                    ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
+                if (context instanceof ChatUploadService) {
+                    ((ChatUploadService) context).updateProgressDownsampling(video.percentage, mOutputFile);
                 }
             }
-            if(context instanceof VideoCompressionCallback) {
+            if (context instanceof VideoCompressionCallback) {
                 ((VideoCompressionCallback) context).onCompressUpdateProgress(video.percentage);
             }
         }
@@ -740,9 +741,11 @@ public class VideoDownsampling {
     private static boolean isVideoFormat(MediaFormat format) {
         return getMimeTypeFor(format).startsWith("video/");
     }
+
     private static boolean isAudioFormat(MediaFormat format) {
         return getMimeTypeFor(format).startsWith("audio/");
     }
+
     private static String getMimeTypeFor(MediaFormat format) {
         return format.getString(MediaFormat.KEY_MIME);
     }

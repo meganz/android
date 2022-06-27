@@ -80,9 +80,9 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.PdfViewerActivity;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
 /**
@@ -713,7 +713,7 @@ public class PDFView extends RelativeLayout {
 
     void showErrorDialog(final Throwable t) {
         if (pdfViewer == null || t == null) {
-            logError("Cannot show error dialog, pdfViewer or t is null");
+            Timber.e("Cannot show error dialog, pdfViewer or t is null");
             return;
         }
 
@@ -807,7 +807,7 @@ public class PDFView extends RelativeLayout {
             onErrorListener.onError(t);
         } else {
             showErrorDialog(t);
-            logError("Load pdf error", t);
+            Timber.e(t, "Load pdf error");
         }
     }
 

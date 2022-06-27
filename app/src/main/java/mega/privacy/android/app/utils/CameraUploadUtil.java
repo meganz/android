@@ -8,8 +8,6 @@ import static mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -31,6 +29,7 @@ import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import timber.log.Timber;
 
 public class CameraUploadUtil {
 
@@ -75,7 +74,7 @@ public class CameraUploadUtil {
         SharedPreferences sharedPreferences = app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
         long backupedHandle = sharedPreferences.getLong(KEY_PRIMARY_HANDLE, -2);
         long detectedPrimaryKey = getPrimaryFolderHandle();
-        logDebug("Primary handle in local is: " + detectedPrimaryKey + ", backuped handle is: " + backupedHandle);
+        Timber.d("Primary handle in local is: %d, backuped handle is: %d", detectedPrimaryKey, backupedHandle);
         if (detectedPrimaryKey == backupedHandle) {
             // if the primary handle matches to previous deleted primary folder's handle, restore the time stamp
             String camSyncStamp = sharedPreferences.getString(KEY_CAM_SYNC_TIMESTAMP, "");
@@ -83,7 +82,7 @@ public class CameraUploadUtil {
                 try {
                     dbH.setCamSyncTimeStamp(Long.parseLong(camSyncStamp));
                 } catch (Exception ex) {
-                    logError("Exception happens: " + ex.toString());
+                    Timber.e(ex);
                 }
             }
 
@@ -92,7 +91,7 @@ public class CameraUploadUtil {
                 try {
                     dbH.setCamVideoSyncTimeStamp(Long.parseLong(camVideoSyncStamp));
                 } catch (Exception ex) {
-                    logError("Exception happens: " + ex.toString());
+                    Timber.e(ex);
                 }
             }
         } else {
@@ -110,7 +109,7 @@ public class CameraUploadUtil {
         SharedPreferences sharedPreferences = app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
         long backupedHanlde = sharedPreferences.getLong(KEY_SECONDARY_HANDLE, -2);
         long detectedSecondaryKey = getSecondaryFolderHandle();
-        logDebug("Secondary handle in local is: " + detectedSecondaryKey + ", backuped handle is: " + backupedHanlde);
+        Timber.d("Secondary handle in local is: %d, backuped handle is: %d", detectedSecondaryKey, backupedHanlde);
         if (backupedHanlde == detectedSecondaryKey) {
             // if the secondary handle matches to previous deleted secondary folder's handle, restore the time stamp
             String secSyncStamp = sharedPreferences.getString(KEY_SEC_SYNC_TIMESTAMP, "");
@@ -118,7 +117,7 @@ public class CameraUploadUtil {
                 try {
                     dbH.setSecSyncTimeStamp(Long.parseLong(secSyncStamp));
                 } catch (Exception ex) {
-                    logError("Exception happens: " + ex.toString());
+                    Timber.e(ex);
                 }
             }
 
@@ -127,7 +126,7 @@ public class CameraUploadUtil {
                 try {
                     dbH.setSecVideoSyncTimeStamp(Long.parseLong(secVideoSyncStamp));
                 } catch (Exception ex) {
-                    logError("Exception happens: " + ex.toString());
+                    Timber.e(ex);
                 }
             }
         } else {
@@ -144,7 +143,7 @@ public class CameraUploadUtil {
     public static void backupTimestampsAndFolderHandle() {
         MegaPreferences prefs = dbH.getPreferences();
         if (prefs == null) {
-            logError("Preference is null, while backup.");
+            Timber.e("Preference is null, while backup.");
             return;
         }
         app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
@@ -181,14 +180,14 @@ public class CameraUploadUtil {
     }
 
     public static void resetPrimaryTimeline() {
-        logDebug("Reset primary timeline");
+        Timber.d("Reset primary timeline");
         dbH.setCamSyncTimeStamp(0);
         dbH.setCamVideoSyncTimeStamp(0);
         dbH.deleteAllPrimarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
     }
 
     public static void resetSecondaryTimeline() {
-        logDebug("Reset secondary timeline");
+        Timber.d("Reset secondary timeline");
         dbH.setSecSyncTimeStamp(0);
         dbH.setSecVideoSyncTimeStamp(0);
         dbH.deleteAllSecondarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
@@ -299,7 +298,7 @@ public class CameraUploadUtil {
         // Find previous camera upload folder, whose name is "Camera Uploads" in English
         long primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
         if (primaryHandle != INVALID_HANDLE) {
-            logDebug("Set CU primary attribute: " + primaryHandle);
+            Timber.d("Set CU primary attribute: %s", primaryHandle);
             api.setCameraUploadsFolders(primaryHandle, INVALID_HANDLE, new SetAttrUserListener(context));
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
@@ -315,7 +314,7 @@ public class CameraUploadUtil {
         long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
         if (secondaryHandle != INVALID_HANDLE) {
             // if current device language is not English, rename this folder as "Media Uploads" in other language
-            logDebug("Set CU secondary attribute: " + secondaryHandle);
+            Timber.d("Set CU secondary attribute: %s", secondaryHandle);
             api.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, new SetAttrUserListener(context));
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle),

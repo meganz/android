@@ -1,5 +1,10 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_SD_CARD;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 import android.content.Context;
 import android.net.Uri;
 
@@ -14,14 +19,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.objects.SDTransfer;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
-
-import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_SD_CARD;
-import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import timber.log.Timber;
 
 public class SDCardUtils {
 
@@ -36,7 +34,7 @@ public class SDCardUtils {
      * And:
      * 1. ":" is INVALID character for folder name in both local file system and cloud drive.
      * So there will never be a non-root uri like "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%3A"
-     *
+     * <p>
      * 2. "%" in ASCII is "%25",
      * so the uri for a folder with name "X%3A" is alright,
      * the uri will be "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%253A"
@@ -65,7 +63,7 @@ public class SDCardUtils {
 
     public static boolean isLocalFolderOnSDCard(Context context, String localPath) {
         File[] fs = context.getExternalFilesDirs(null);
-        if(fs.length > 1 && fs[1] != null) {
+        if (fs.length > 1 && fs[1] != null) {
             String sdRoot = getSDCardRoot(fs[1].getAbsolutePath());
             return localPath.startsWith(sdRoot);
         }
@@ -75,7 +73,7 @@ public class SDCardUtils {
     /**
      * Gets the name of a SD card folder from an Uri.
      *
-     * @param treeUri   the Uri to get the name of the folder
+     * @param treeUri the Uri to get the name of the folder
      * @return The name of the SD card folder.
      */
     public static String getSDCardDirName(Uri treeUri) {
@@ -110,7 +108,7 @@ public class SDCardUtils {
     public static String getSDCardTargetUri(String appData) {
         String[] appDataParts = getSDCardAppDataParts(appData);
         if (appDataParts == null || appDataParts.length <= APP_DATA_SD_CARD_PARTS) {
-            logDebug("App data doesn't contain SD card uri.");
+            Timber.d("App data doesn't contain SD card uri.");
             return null;
         }
 
@@ -175,14 +173,14 @@ public class SDCardUtils {
                     continue;
                 }
 
-                logWarning("Movement incomplete");
+                Timber.w("Movement incomplete");
 
                 try {
                     SDCardOperator sdCardOperator = new SDCardOperator(MegaApplication.getInstance());
                     sdCardOperator.moveDownloadedFileToDestinationPath(originalDownload, targetPath,
                             getSDCardTargetUri(appData), sdtransfer.getTag());
                 } catch (Exception e) {
-                    logError("Error moving file to the sd card path", e);
+                    Timber.e(e, "Error moving file to the sd card path");
                 }
 
                 dbH.setCompletedTransferWithCheck(new AndroidCompletedTransfer(sdtransfer));

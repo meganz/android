@@ -16,12 +16,13 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.LogUtil.logWarning
+
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -38,7 +39,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getNodeUseCase: GetNodeUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
-    private val getChatMessageUseCase: GetChatMessageUseCase
+    private val getChatMessageUseCase: GetChatMessageUseCase,
 ) {
 
     /**
@@ -101,7 +102,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 if (handle != null) {
                     getThumbnailUseCase.get(handle).blockingSubscribeBy(
                         onError = { error ->
-                            logWarning("No thumbnail", error)
+                            Timber.w(error, "No thumbnail")
                             thumbnailRequests--
 
                             if (thumbnailRequests == 0) {
@@ -124,7 +125,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                             if (node.handle == collision.nodeHandle) {
                                 getThumbnailUseCase.get(node).blockingSubscribeBy(
                                     onError = { error ->
-                                        logWarning("No thumbnail", error)
+                                        Timber.w(error, "No thumbnail")
                                         thumbnailRequests--
 
                                         if (thumbnailRequests == 0) {
@@ -150,7 +151,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 if (collision.isFile) {
                     getThumbnailUseCase.get(this).blockingSubscribeBy(
                         onError = { error ->
-                            logWarning("No thumbnail", error)
+                            Timber.w(error, "No thumbnail")
                             thumbnailRequests--
 
                             if (thumbnailRequests == 0) {
@@ -193,7 +194,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                             nameCollisionResult
                         )
                     },
-                    onError = { error -> logWarning("NameCollisionResult error", error) },
+                    onError = { error -> Timber.w(error, "NameCollisionResult error") },
                     onComplete = { emitter.onNext(collisionsResult) }
                 )
             }
@@ -262,7 +263,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
     fun updateRenameNames(
         pendingCollisions: MutableList<NameCollisionResult>,
         renameNames: MutableList<String>,
-        applyOnNext: Boolean
+        applyOnNext: Boolean,
     ): Completable =
         Completable.create { emitter ->
             pendingCollisions.forEach { collision ->

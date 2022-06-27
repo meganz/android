@@ -8,7 +8,8 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Bundle
 import android.os.IBinder
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -16,7 +17,10 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -47,16 +51,51 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.FROM_INBOX
+import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
+import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
+import mega.privacy.android.app.utils.Constants.NAME
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.shareUri
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -68,9 +107,20 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.getFragmentFromNavHost
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.util.*
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaShare
+import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -372,19 +422,19 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     private fun refreshMenuOptionsVisibility() {
         val menu = optionsMenu
         if (menu == null) {
-            logDebug("refreshMenuOptionsVisibility menu is null")
+            Timber.d("refreshMenuOptionsVisibility menu is null")
             return
         }
 
         val currentFragment = navController.currentDestination?.id
         if (currentFragment == null) {
-            logDebug("refreshMenuOptionsVisibility currentFragment is null")
+            Timber.d("refreshMenuOptionsVisibility currentFragment is null")
             return
         }
 
         val service = playerService
         if (service == null) {
-            logDebug("refreshMenuOptionsVisibility null service")
+            Timber.d("refreshMenuOptionsVisibility null service")
 
             menu.toggleAllMenuItemsVisibility(false)
             return
@@ -394,7 +444,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         if (adapterType == null) {
-            logDebug("refreshMenuOptionsVisibility null adapterType")
+            Timber.d("refreshMenuOptionsVisibility null adapterType")
 
             menu.toggleAllMenuItemsVisibility(false)
             return
@@ -483,7 +533,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
                 if (node == null) {
-                    logDebug("refreshMenuOptionsVisibility node is null")
+                    Timber.d("refreshMenuOptionsVisibility node is null")
 
                     menu.toggleAllMenuItemsVisibility(false)
                     return
@@ -575,7 +625,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
                             val currentDocument = MegaNode.unserialize(serialize)
                             if (currentDocument != null) {
-                                logDebug("currentDocument NOT NULL")
+                                Timber.d("currentDocument NOT NULL")
                                 nodeSaver.saveNode(
                                     currentDocument,
                                     isFolderLink = isFolderLink,
@@ -583,7 +633,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                                     needSerialize = true
                                 )
                             } else {
-                                LogUtil.logWarning("currentDocument is NULL")
+                                Timber.w("currentDocument is NULL")
                             }
                         }
                     }
@@ -614,14 +664,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         intent = Intent(this, OfflineFileInfoActivity::class.java)
                         intent.putExtra(HANDLE, playingHandle.toString())
 
-                        logDebug("onOptionsItemSelected properties offline handle $playingHandle")
+                        Timber.d("onOptionsItemSelected properties offline handle $playingHandle")
                     } else {
                         intent = Intent(this, FileInfoActivity::class.java)
                         intent.putExtra(HANDLE, playingHandle)
 
                         val node = megaApi.getNodeByHandle(playingHandle)
                         if (node == null) {
-                            logError("onOptionsItemSelected properties non-offline null node")
+                            Timber.e("onOptionsItemSelected properties non-offline null node")
 
                             return false
                         }
@@ -699,7 +749,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
                     megaApi.disableExport(node, object : BaseListener(this) {
                         override fun onRequestFinish(
-                            api: MegaApiJava, request: MegaRequest, e: MegaError
+                            api: MegaApiJava, request: MegaRequest, e: MegaError,
                         ) {
                             if (e.errorCode == MegaError.API_OK) {
                                 // Some times checking node.isExported immediately will still
@@ -814,7 +864,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 

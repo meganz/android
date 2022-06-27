@@ -16,8 +16,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import timber.log.Timber;
 
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
@@ -45,7 +44,7 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments == null) {
-            logError("Arguments is null, cannot get node.");
+            Timber.e("Arguments is null, cannot get node.");
             return;
         }
 

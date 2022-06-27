@@ -1,5 +1,15 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.Constants.AVATAR_PHONE_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_PRIMARY_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PORT;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
@@ -7,9 +17,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
-
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +24,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,259 +39,252 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.main.PhoneContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import timber.log.Timber;
 
 /*
  * Adapter for FilestorageActivity list
  */
 public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdapter.ViewHolderPhoneContacts> implements OnClickListener, SectionTitleProvider {
 
-	DatabaseHandler dbH = null;
+    DatabaseHandler dbH = null;
 
-	@Override
-	public String getSectionTitle(int position) {
-		return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
-	}
+    @Override
+    public String getSectionTitle(int position) {
+        return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
+    }
 
-	private class ContactPicture extends AsyncTask<Void, Void, Long> {
+    private class ContactPicture extends AsyncTask<Void, Void, Long> {
 
-		Context context;
-		ViewHolderPhoneContacts holder;
-		PhoneContactsAdapter adapter;
-		Bitmap photo = null;
-
-
-		public ContactPicture(Context context, ViewHolderPhoneContacts holder, PhoneContactsAdapter adapter) {
-			this.context = context;
-			this.holder = holder;
-			this.adapter = adapter;
-		}
-
-		@Override
-		protected Long doInBackground(Void... args) {
-			logDebug("doInBackGround");
-
-			try {
-				InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
-						ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
-
-				if (inputStream != null) {
-					photo = BitmapFactory.decodeStream(inputStream);
-				}
-
-				assert inputStream != null;
-				inputStream.close();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return new Long(holder.contactId);
-		}
+        Context context;
+        ViewHolderPhoneContacts holder;
+        PhoneContactsAdapter adapter;
+        Bitmap photo = null;
 
 
-		@Override
-		protected void onPostExecute(Long id) {
-			if (photo != null){
-				if (holder.contactId == id){
-					holder.imageView.setImageBitmap(photo);
-					adapter.notifyDataSetChanged();
-				}
-			}
-		}
-	}
+        public ContactPicture(Context context, ViewHolderPhoneContacts holder, PhoneContactsAdapter adapter) {
+            this.context = context;
+            this.holder = holder;
+            this.adapter = adapter;
+        }
 
-	// Listener for item check
-	public interface OnItemCheckClickListener {
-		public void onItemCheckClick(int position);
-	}
+        @Override
+        protected Long doInBackground(Void... args) {
+            Timber.d("doInBackGround");
 
-	private Context mContext;
-	MegaApiAndroid megaApi;
-	OnItemClickListener mItemClickListener;
-	private List<PhoneContactInfo> phoneContacts;
-	SparseBooleanArray selectedContacts;
+            try {
+                InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
+                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
 
-	private OnItemCheckClickListener checkClickListener;
+                if (inputStream != null) {
+                    photo = BitmapFactory.decodeStream(inputStream);
+                }
 
-	public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts, SparseBooleanArray selectedContacts) {
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		setContext(context);
-		this.phoneContacts = phoneContacts;
-		this.selectedContacts = selectedContacts;
-	}
+                assert inputStream != null;
+                inputStream.close();
 
-	public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		setContext(context);
-		this.phoneContacts = phoneContacts;
-		this.selectedContacts = null;
-	}
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return new Long(holder.contactId);
+        }
 
-	public void setContext(Context context) {
-		mContext = context;
-	}
 
-	public void setOnItemCheckClickListener(OnItemCheckClickListener listener) {
-		this.checkClickListener = listener;
-	}
+        @Override
+        protected void onPostExecute(Long id) {
+            if (photo != null) {
+                if (holder.contactId == id) {
+                    holder.imageView.setImageBitmap(photo);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
+    }
 
-	// Set new contacts
-	public void setContacts(List<PhoneContactInfo> phoneContacts){
-		this.phoneContacts = phoneContacts;
-		notifyDataSetChanged();
+    // Listener for item check
+    public interface OnItemCheckClickListener {
+        public void onItemCheckClick(int position);
+    }
 
-	}
+    private Context mContext;
+    MegaApiAndroid megaApi;
+    OnItemClickListener mItemClickListener;
+    private List<PhoneContactInfo> phoneContacts;
+    SparseBooleanArray selectedContacts;
 
-	@Override
-	public int getItemCount() {
+    private OnItemCheckClickListener checkClickListener;
 
-		if (phoneContacts == null) {
-			return 0;
-		}
+    public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts, SparseBooleanArray selectedContacts) {
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        }
+        setContext(context);
+        this.phoneContacts = phoneContacts;
+        this.selectedContacts = selectedContacts;
+    }
 
-		return phoneContacts.size();
+    public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        }
+        setContext(context);
+        this.phoneContacts = phoneContacts;
+        this.selectedContacts = null;
+    }
 
-	}
+    public void setContext(Context context) {
+        mContext = context;
+    }
+
+    public void setOnItemCheckClickListener(OnItemCheckClickListener listener) {
+        this.checkClickListener = listener;
+    }
+
+    // Set new contacts
+    public void setContacts(List<PhoneContactInfo> phoneContacts) {
+        this.phoneContacts = phoneContacts;
+        notifyDataSetChanged();
+
+    }
+
+    @Override
+    public int getItemCount() {
+
+        if (phoneContacts == null) {
+            return 0;
+        }
+
+        return phoneContacts.size();
+
+    }
 
     public PhoneContactInfo getItem(int position) {
 
-		if(position < phoneContacts.size())
-		{
-			return phoneContacts.get(position);
-		}
+        if (position < phoneContacts.size()) {
+            return phoneContacts.get(position);
+        }
 
-		return null;
+        return null;
     }
 
-	@Override
+    @Override
     public long getItemId(int position) {
         return position;
     }
 
-	public class ViewHolderPhoneContacts extends RecyclerView.ViewHolder implements OnClickListener{
-		RelativeLayout contactLayout;
-		TextView contactNameTextView;
-		TextView phoneEmailTextView;
-		RoundedImageView imageView;
-		RelativeLayout contactImageLayout;
-		long contactId;
-		String contactName;
-		String contactMail;
-		String phoneNumber;
-		int currentPosition;
-		
-		public ViewHolderPhoneContacts(View itemView) {
-			super(itemView);
+    public class ViewHolderPhoneContacts extends RecyclerView.ViewHolder implements OnClickListener {
+        RelativeLayout contactLayout;
+        TextView contactNameTextView;
+        TextView phoneEmailTextView;
+        RoundedImageView imageView;
+        RelativeLayout contactImageLayout;
+        long contactId;
+        String contactName;
+        String contactMail;
+        String phoneNumber;
+        int currentPosition;
+
+        public ViewHolderPhoneContacts(View itemView) {
+            super(itemView);
             itemView.setOnClickListener(this);
-		}
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			if(mItemClickListener != null){
-				mItemClickListener.onItemClick(v, getPosition());
-			}			
-		}
-	}
-	
-	public interface OnItemClickListener {
-		   public void onItemClick(View view, int position);
-	}
-	
-	public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
-		this.mItemClickListener = mItemClickListener;
-	}
-	
-	public ViewHolderPhoneContacts onCreateViewHolder(ViewGroup parentView, int viewType) {
-		
-	    dbH = DatabaseHandler.getDbHandler(mContext);
-		
-		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);		
-		
-		View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
-		ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
+        }
 
-		holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
-		holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
-		if(!isScreenInPortrait(mContext)){
-			holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
-		}
-		else{
-			holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
-		}
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(v, getPosition());
+            }
+        }
+    }
 
-		holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
-		holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
-		holder.contactImageLayout = rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position);
+    }
 
-		return holder;
-		
-	}
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
 
-	@Override
-	public void onBindViewHolder(ViewHolderPhoneContacts holder, int position) {
+    public ViewHolderPhoneContacts onCreateViewHolder(ViewGroup parentView, int viewType) {
 
-		boolean isCheckable = false;
-		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        dbH = DatabaseHandler.getDbHandler(mContext);
 
-		PhoneContactInfo contact = getItem(position);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		holder.currentPosition = position;
-		holder.contactMail = contact.getEmail();
-		holder.contactName = contact.getName();
-		holder.contactId = contact.getId();
+        View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
+        ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
 
-		holder.contactNameTextView.setText(contact.getName());
-		holder.phoneEmailTextView.setText(contact.getEmail());
+        holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
+        holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
+        if (!isScreenInPortrait(mContext)) {
+            holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
+        } else {
+            holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
+        }
 
-		createDefaultAvatar(holder, false);
+        holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
+        holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
+        holder.contactImageLayout = rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
 
-		try {
-			InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
-					ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
+        return holder;
 
-			if (inputStream != null) {
-				Bitmap photo = BitmapFactory.decodeStream(inputStream);
-				holder.imageView.setImageBitmap(photo);
-				inputStream.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void createDefaultAvatar(ViewHolderPhoneContacts holder, boolean isMegaContact){
-		logDebug("isMegaContact: " + isMegaContact);
+    }
 
-		int color;
-		if (isMegaContact){
-			color = getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
-		}
-		else{
-			color = getSpecificAvatarColor(AVATAR_PHONE_COLOR);
-		}
+    @Override
+    public void onBindViewHolder(ViewHolderPhoneContacts holder, int position) {
 
-		String name = null;
-		if (isMegaContact && holder.contactMail != null && holder.contactMail.length() > 0){
-			name = holder.contactMail;
-		}else if (!isMegaContact && holder.contactName != null && holder.contactName.length() > 0){
-			name = holder.contactName;
-		}
+        boolean isCheckable = false;
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		Bitmap bitmap = getDefaultAvatar(color, name, AVATAR_SIZE, true);
-		holder.imageView.setImageBitmap(bitmap);
-	}
-	
-	@Override
-	public void onClick(View v) {
-		logDebug("click!");
-	}
+        PhoneContactInfo contact = getItem(position);
+
+        holder.currentPosition = position;
+        holder.contactMail = contact.getEmail();
+        holder.contactName = contact.getName();
+        holder.contactId = contact.getId();
+
+        holder.contactNameTextView.setText(contact.getName());
+        holder.phoneEmailTextView.setText(contact.getEmail());
+
+        createDefaultAvatar(holder, false);
+
+        try {
+            InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
+                    ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
+
+            if (inputStream != null) {
+                Bitmap photo = BitmapFactory.decodeStream(inputStream);
+                holder.imageView.setImageBitmap(photo);
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createDefaultAvatar(ViewHolderPhoneContacts holder, boolean isMegaContact) {
+        Timber.d("isMegaContact: %s", isMegaContact);
+
+        int color;
+        if (isMegaContact) {
+            color = getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
+        } else {
+            color = getSpecificAvatarColor(AVATAR_PHONE_COLOR);
+        }
+
+        String name = null;
+        if (isMegaContact && holder.contactMail != null && holder.contactMail.length() > 0) {
+            name = holder.contactMail;
+        } else if (!isMegaContact && holder.contactName != null && holder.contactName.length() > 0) {
+            name = holder.contactName;
+        }
+
+        Bitmap bitmap = getDefaultAvatar(color, name, AVATAR_SIZE, true);
+        holder.imageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Timber.d("click!");
+    }
 }

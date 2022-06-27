@@ -1,6 +1,14 @@
 package mega.privacy.android.app.main.megachat;
 
 
+import static mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Util.decodeURL;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.net.Uri;
 import android.util.Patterns;
 
@@ -11,11 +19,7 @@ import java.util.regex.Matcher;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -30,7 +34,7 @@ public class AndroidMegaRichLinkMessage {
     private String title;
     private long numParticipants;
 
-    public AndroidMegaRichLinkMessage (String url, String folderContent, String folderName){
+    public AndroidMegaRichLinkMessage(String url, String folderContent, String folderName) {
         this.url = url;
 
         Uri uri = Uri.parse(url);
@@ -39,7 +43,7 @@ public class AndroidMegaRichLinkMessage {
         this.folderName = folderName;
     }
 
-    public AndroidMegaRichLinkMessage (String url, MegaNode node){
+    public AndroidMegaRichLinkMessage(String url, MegaNode node) {
         this.node = node;
         this.url = url;
         this.isFile = true;
@@ -48,7 +52,7 @@ public class AndroidMegaRichLinkMessage {
         this.server = uri.getAuthority();
     }
 
-    public AndroidMegaRichLinkMessage (String url, String title, long participants){
+    public AndroidMegaRichLinkMessage(String url, String title, long participants) {
 
         this.url = url;
         this.title = title;
@@ -105,7 +109,7 @@ public class AndroidMegaRichLinkMessage {
         Matcher m = Patterns.WEB_URL.matcher(text);
         while (m.find()) {
             String url = m.group();
-            logDebug("URL extracted: " + url);
+            Timber.d("URL extracted: %s", url);
             if (isFileLink(url)) {
                 return links.toArray(new String[links.size()]);
             }
@@ -147,7 +151,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isChatLink(String url) {
-       return matchRegexs(url, CHAT_LINK_REGEXS);
+        return matchRegexs(url, CHAT_LINK_REGEXS);
     }
 
     public static boolean isContactLink(String url) {

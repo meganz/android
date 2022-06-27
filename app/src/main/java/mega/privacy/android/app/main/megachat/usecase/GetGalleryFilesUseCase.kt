@@ -9,8 +9,8 @@ import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TimeUtils
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -91,7 +91,7 @@ class GetGalleryFilesUseCase @Inject constructor(
             }
 
         } ?: kotlin.run {
-            logError("Cursor is null")
+            Timber.e("Cursor is null")
         }
 
         return imageList
@@ -169,7 +169,7 @@ class GetGalleryFilesUseCase @Inject constructor(
             }
 
         } ?: kotlin.run {
-            logError("Cursor is null")
+            Timber.e("Cursor is null")
         }
 
         return videoList

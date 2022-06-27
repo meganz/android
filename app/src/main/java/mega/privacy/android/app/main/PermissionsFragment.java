@@ -1,14 +1,13 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -19,10 +18,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import mega.privacy.android.app.R;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
+import mega.privacy.android.app.R;
+import timber.log.Timber;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
@@ -210,7 +211,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
         // access contacts
-        if(permission == 4) {
+        if (permission == 4) {
             explanationDisplay.setVisibility(View.VISIBLE);
         } else {
             explanationDisplay.setVisibility(View.GONE);
@@ -241,17 +242,17 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForMediaPermissions() {
         if (!readGranted && !writeGranted) {
-            logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
+            Timber.d("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
             requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
         } else if (!writeGranted) {
-            logDebug("WRITE_EXTERNAL_STORAGE");
+            Timber.d("WRITE_EXTERNAL_STORAGE");
             requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
         } else if (!readGranted) {
-            logDebug("READ_EXTERNAL_STORAGE");
+            Timber.d("READ_EXTERNAL_STORAGE");
             requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -260,7 +261,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForCameraPermission() {
         if (!cameraGranted) {
-            logDebug("CAMERA");
+            Timber.d("CAMERA");
             requestPermission((ManagerActivity) context, PERMISSIONS_FRAGMENT, Manifest.permission.CAMERA);
         }
     }
@@ -268,25 +269,25 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForCallsPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!microphoneGranted && !bluetoothConnectGranted) {
-                logDebug("RECORD_AUDIO && BLUETOOTH_CONNECT");
+                Timber.d("RECORD_AUDIO && BLUETOOTH_CONNECT");
                 requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.BLUETOOTH_CONNECT);
-            } else if(!microphoneGranted) {
-                logDebug("RECORD_AUDIO");
+            } else if (!microphoneGranted) {
+                Timber.d("RECORD_AUDIO");
                 requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO);
-            } else if(!bluetoothConnectGranted) {
-                logDebug("BLUETOOTH_CONNECT");
+            } else if (!bluetoothConnectGranted) {
+                Timber.d("BLUETOOTH_CONNECT");
                 requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.BLUETOOTH_CONNECT);
             }
         } else {
             if (!microphoneGranted) {
-                logDebug("RECORD_AUDIO");
+                Timber.d("RECORD_AUDIO");
                 requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO);
@@ -296,7 +297,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     void askForContactsPermissions() {
         if (!contactsGranted) {
-            logDebug("Ask for CONTACT permission");
+            Timber.d("Ask for CONTACT permission");
             requestPermission((ManagerActivity) context, PERMISSIONS_FRAGMENT, Manifest.permission.READ_CONTACTS);
         }
     }

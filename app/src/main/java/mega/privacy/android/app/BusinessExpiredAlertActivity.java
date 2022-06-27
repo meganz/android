@@ -1,5 +1,8 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,13 +17,11 @@ import androidx.core.text.HtmlCompat;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class BusinessExpiredAlertActivity extends PasscodeActivity implements View.OnClickListener {
@@ -88,7 +89,7 @@ public class BusinessExpiredAlertActivity extends PasscodeActivity implements Vi
                 expiredString = expiredString.replace("[B]", "<b><font color=\'" + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
-                logWarning("Exception formatting string", e);
+                Timber.w(e, "Exception formatting string");
             }
             expiredText.setText(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY));
             expiredSubtext.setVisibility(View.VISIBLE);
@@ -103,7 +104,7 @@ public class BusinessExpiredAlertActivity extends PasscodeActivity implements Vi
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.expired_dismiss_button:{
+            case R.id.expired_dismiss_button: {
                 finish();
                 break;
             }

@@ -1,5 +1,9 @@
 package mega.privacy.android.app.service.iab;
 
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+
+import timber.log.Timber;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -39,11 +43,8 @@ import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class BillingManagerImpl implements BillingManager {
 
@@ -140,7 +141,7 @@ public class BillingManagerImpl implements BillingManager {
         iapClient = Iap.getIapClient(mActivity);
         Task<IsEnvReadyResult> task = iapClient.isEnvReady();
         task.addOnSuccessListener(result -> {
-            logDebug("HMS IAP env is ready.");
+            Timber.d("HMS IAP env is ready.");
             mBillingUpdatesListener.onBillingClientSetupFinished();
             queryPurchases();
         }).addOnFailureListener(result -> {
@@ -173,7 +174,7 @@ public class BillingManagerImpl implements BillingManager {
         Task<OwnedPurchasesResult> task = iapClient.obtainOwnedPurchases(req);
         task.addOnSuccessListener(result -> {
             mPurchases.clear();
-            logDebug("Obtain owned purchases, success");
+            Timber.d("Obtain owned purchases, success");
             List<String> inAppPurchaseDataList = result.getInAppPurchaseDataList();
             List<String> signatureList = result.getInAppSignature();
 
@@ -204,11 +205,11 @@ public class BillingManagerImpl implements BillingManager {
         try {
             InAppPurchaseData data = new InAppPurchaseData(originalJson);
             if (data.getPurchaseState() == InAppPurchaseData.PurchaseState.PURCHASED && data.isSubValid()) {
-                logDebug("New purchase added, payload is: " + data.getDeveloperPayload());
+                Timber.d("New purchase added, payload is: %s", data.getDeveloperPayload());
                 mPurchases.add(Converter.convert(originalJson));
             }
         } catch (JSONException e) {
-            logError(e.getMessage(), e);
+            Timber.e(e);
         }
     }
 
@@ -218,7 +219,7 @@ public class BillingManagerImpl implements BillingManager {
         try {
             return Security.verifyPurchase(signedData, signature, PUBLIC_KEY);
         } catch (IOException e) {
-            logWarning("Purchase failed to valid signature.", e);
+            Timber.w(e, "Purchase failed to valid signature.");
             return false;
         }
     }
@@ -231,7 +232,7 @@ public class BillingManagerImpl implements BillingManager {
     @Override
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
         String newSku = skuDetails.getSku();
-        logDebug("OldSku is:" + oldSku + ", new sku is:" + newSku);
+        Timber.d("OldSku is:%s, new sku is:%s", oldSku, newSku);
 
         PurchaseIntentReq req = new PurchaseIntentReq();
         req.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
@@ -240,7 +241,7 @@ public class BillingManagerImpl implements BillingManager {
         Task<PurchaseIntentResult> task = iapClient.createPurchaseIntent(req);
         task.addOnSuccessListener(result -> {
             if (result == null) {
-                logError("GetBuyIntentResult is null");
+                Timber.e("GetBuyIntentResult is null");
                 return;
             }
             startResolutionForResult(result.getStatus(), REQ_CODE_BUY);
@@ -290,7 +291,7 @@ public class BillingManagerImpl implements BillingManager {
         Task<ProductInfoResult> task = iapClient.obtainProductInfo(req);
         task.addOnSuccessListener(result -> {
             if (result == null) {
-                logError("ProductInfoResult is null");
+                Timber.e("ProductInfoResult is null");
                 return;
             }
             List<ProductInfo> productInfos = result.getProductInfoList();
@@ -309,7 +310,7 @@ public class BillingManagerImpl implements BillingManager {
         String message;
         if (e instanceof IapApiException) {
             IapApiException iapApiException = (IapApiException) e;
-            logWarning("returnCode: " + iapApiException.getStatusCode());
+            Timber.w("returnCode: %s", iapApiException.getStatusCode());
             code = iapApiException.getStatusCode();
             switch (iapApiException.getStatusCode()) {
                 case OrderStatusCode.ORDER_STATE_CANCEL:
@@ -348,9 +349,9 @@ public class BillingManagerImpl implements BillingManager {
                     // handle other error scenarios
                     message = code + " : Order unknown error!";
             }
-            logError(message, e);
+            Timber.e(e, message);
         } else {
-            logError(e.getMessage(), e);
+            Timber.e(e);
         }
     }
 
@@ -362,17 +363,17 @@ public class BillingManagerImpl implements BillingManager {
      */
     private void startResolutionForResult(Status status, int reqCode) {
         if (status == null) {
-            logWarning("status is null");
+            Timber.w("status is null");
             return;
         }
         if (status.hasResolution()) {
             try {
                 status.startResolutionForResult(mActivity, reqCode);
             } catch (IntentSender.SendIntentException exp) {
-                logError(exp.getMessage(), exp);
+                Timber.e(exp);
             }
         } else {
-            logWarning("intent is null");
+            Timber.w("intent is null");
         }
     }
 
