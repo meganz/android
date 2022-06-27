@@ -1,8 +1,7 @@
 package mega.privacy.android.app;
 
 import nz.mega.sdk.MegaApiJava;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class MegaAttributes {
 
@@ -211,12 +210,12 @@ public class MegaAttributes {
             try {
                 value = Long.parseLong(attribute);
             } catch (Exception e) {
-                logWarning("Exception getting " + attrName + ".", e);
+                Timber.w(e, "Exception getting %s.", attrName);
                 value = defaultValue;
             }
         }
 
-        logDebug(attrName + ": " + value);
+        Timber.d("%s: %d", attrName, value);
         return value;
     }
 }

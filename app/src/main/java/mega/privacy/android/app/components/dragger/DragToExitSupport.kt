@@ -4,7 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.WindowManager
+import android.view.WindowMetrics
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -15,11 +20,20 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_SCROLL
+import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION
+import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIEWER_FROM
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_HEIGHT
+import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT
+import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP
+import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_WIDTH
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.util.*
+import timber.log.Timber
 
 
 /**
@@ -35,7 +49,7 @@ import java.util.*
 class DragToExitSupport(
     private val context: Context,
     private val dragActivated: ((Boolean) -> Unit)?,
-    private val fadeOutFinishCallback: (() -> Unit)?
+    private val fadeOutFinishCallback: (() -> Unit)?,
 ) : DraggableView.DraggableListener, ViewAnimator.Listener, DraggableView.DraggableViewListener {
     private var draggableView: DraggableView? = null
     private var ivShadow: ImageView? = null
@@ -95,12 +109,13 @@ class DragToExitSupport(
      * @param intent         Intent which contains ViewerFrom key
      */
     fun observeThumbnailLocation(lifecycleOwner: LifecycleOwner, intent: Intent?) {
-        viewerFrom = intent?.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE) ?: INVALID_VALUE
+        viewerFrom =
+            intent?.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE) ?: INVALID_VALUE
 
         LiveEventBus.get(
             EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION, ThumbnailLocationEvent::class.java
         ).observe(lifecycleOwner) {
-            logDebug("EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION ${it.viewerFrom} ${it.location.contentToString()}")
+            Timber.d("EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION ${it.viewerFrom} ${it.location.contentToString()}")
 
             if (it.viewerFrom != viewerFrom) {
                 return@observe
@@ -124,7 +139,7 @@ class DragToExitSupport(
     fun runEnterAnimation(
         launchIntent: Intent,
         mainView: View,
-        animationCallback: ((Boolean) -> Unit)?
+        animationCallback: ((Boolean) -> Unit)?,
     ) {
         mainView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
@@ -220,7 +235,7 @@ class DragToExitSupport(
      * @param handle new node handle
      */
     fun nodeChanged(handle: Long) {
-        logDebug("nodeChanged $handle, currentHandle $currentHandle")
+        Timber.d("nodeChanged $handle, currentHandle $currentHandle")
 
         if (handle == currentHandle) {
             return
@@ -314,7 +329,7 @@ class DragToExitSupport(
             rv: RecyclerView,
             position: Int,
             viewerFrom: Int,
-            thumbnailGetter: DragThumbnailGetter
+            thumbnailGetter: DragThumbnailGetter,
         ) {
             launchIntent.putExtra(INTENT_EXTRA_KEY_VIEWER_FROM, viewerFrom)
 
@@ -356,12 +371,12 @@ class DragToExitSupport(
         fun observeDragSupportEvents(
             lifecycleOwner: LifecycleOwner,
             rv: RecyclerView,
-            viewerFrom: Int
+            viewerFrom: Int,
         ) {
             LiveEventBus.get(
                 EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
             ).observe(lifecycleOwner) {
-                logDebug("EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY $it")
+                Timber.d("EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY $it")
 
                 if (it.viewerFrom != viewerFrom) {
                     return@observe
@@ -371,7 +386,7 @@ class DragToExitSupport(
 
                 if (it.previousHiddenHandle != INVALID_HANDLE) {
                     val thumbnail = getThumbnail(rv, thumbnailGetter, it.previousHiddenHandle)
-                    logDebug("previous thumbnail $thumbnail")
+                    Timber.d("previous thumbnail $thumbnail")
 
                     if (thumbnail != null) {
                         thumbnail.visibility = View.VISIBLE
@@ -386,7 +401,7 @@ class DragToExitSupport(
                 }
 
                 val thumbnail = getThumbnail(rv, thumbnailGetter, it.handle)
-                logDebug("current thumbnail $thumbnail")
+                Timber.d("current thumbnail $thumbnail")
 
                 if (thumbnail != null) {
                     thumbnail.visibility = if (it.visible) View.VISIBLE else View.INVISIBLE
@@ -404,7 +419,7 @@ class DragToExitSupport(
             LiveEventBus.get(
                 EVENT_DRAG_TO_EXIT_SCROLL, ScrollEvent::class.java
             ).observe(lifecycleOwner) {
-                logDebug("EVENT_DRAG_TO_EXIT_SCROLL $it")
+                Timber.d("EVENT_DRAG_TO_EXIT_SCROLL $it")
 
                 if (it.viewerFrom != viewerFrom) {
                     return@observe
@@ -413,7 +428,7 @@ class DragToExitSupport(
                 val thumbnailGetter = rv.adapter as? DragThumbnailGetter ?: return@observe
 
                 val position = thumbnailGetter.getNodePosition(it.handle)
-                logDebug("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")
+                Timber.d("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")
 
                 if (position != INVALID_POSITION) {
                     rv.scrollToPosition(position)
@@ -424,7 +439,7 @@ class DragToExitSupport(
         private fun getThumbnail(
             rv: RecyclerView,
             thumbnailGetter: DragThumbnailGetter,
-            handle: Long
+            handle: Long,
         ): View? {
             val position = thumbnailGetter.getNodePosition(handle)
             val viewHolder = rv.findViewHolderForLayoutPosition(position) ?: return null

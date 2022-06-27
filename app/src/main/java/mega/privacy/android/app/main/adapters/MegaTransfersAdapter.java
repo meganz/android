@@ -1,12 +1,27 @@
 package mega.privacy.android.app.main.adapters;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.getSpeedString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaTransfer.STATE_ACTIVE;
+import static nz.mega.sdk.MegaTransfer.STATE_COMPLETING;
+import static nz.mega.sdk.MegaTransfer.STATE_PAUSED;
+import static nz.mega.sdk.MegaTransfer.STATE_QUEUED;
+import static nz.mega.sdk.MegaTransfer.STATE_RETRYING;
+import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
+import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -19,6 +34,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +51,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaTransfer.*;
+import timber.log.Timber;
 
 public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdapter.ViewHolderTransfer> implements OnClickListener, RotatableAdapter {
 
@@ -131,7 +140,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
         MegaTransfer transfer = (MegaTransfer) getItem(position);
 
         if (transfer == null) {
-            logWarning("The recovered transfer is NULL - do not update");
+            Timber.w("The recovered transfer is NULL - do not update");
             return;
         }
 
@@ -167,7 +176,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
                             try {
                                 thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
                             } catch (Exception e) {
-                                logError("Exception getting thumbnail", e);
+                                Timber.e(e, "Exception getting thumbnail");
                             }
                         }
                     }
@@ -246,11 +255,11 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
                     holder.progressText.setText(getProgress(transfer));
                     holder.speedText.setText(context.getResources().getString(R.string.transfer_paused));
 
-					if (!isMultipleSelect()) {
-						holder.optionPause.setImageResource(R.drawable.ic_play_grey);
-					}
+                    if (!isMultipleSelect()) {
+                        holder.optionPause.setImageResource(R.drawable.ic_play_grey);
+                    }
 
-					break;
+                    break;
 
                 case STATE_ACTIVE:
                     holder.progressText.setText(getProgress(transfer));
@@ -291,7 +300,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
                     break;
 
                 default:
-                    logDebug("Default status");
+                    Timber.d("Default status");
                     holder.progressText.setVisibility(GONE);
                     holder.speedText.setVisibility(GONE);
                     holder.imageViewCompleted.setVisibility(VISIBLE);
@@ -329,7 +338,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
         if (position >= 0) {
             return tL.get(position);
         }
-        logError("Error: position NOT valid: " + position);
+        Timber.e("Error: position NOT valid: %s", position);
         return null;
     }
 
@@ -340,18 +349,18 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
         if (holder == null) {
-            logWarning("Holder is NULL- not action performed");
+            Timber.w("Holder is NULL- not action performed");
             return;
         }
 
         int currentPosition = holder.getAdapterPosition();
         MegaTransfer t = (MegaTransfer) getItem(currentPosition);
         if (t == null) {
-            logWarning("MegaTransfer is NULL- not action performed");
+            Timber.w("MegaTransfer is NULL- not action performed");
             return;
         }
 
@@ -450,39 +459,39 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
         return multipleSelect;
     }
 
-	public void setMultipleSelect(boolean multipleSelect) {
-		if (this.multipleSelect != multipleSelect) {
-			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
-		}
+    public void setMultipleSelect(boolean multipleSelect) {
+        if (this.multipleSelect != multipleSelect) {
+            this.multipleSelect = multipleSelect;
+            notifyDataSetChanged();
+        }
 
-		if (this.multipleSelect) {
-			selectedItems = new SparseBooleanArray();
-		} else if (selectedItems != null) {
-			selectedItems.clear();
-		}
-	}
+        if (this.multipleSelect) {
+            selectedItems = new SparseBooleanArray();
+        } else if (selectedItems != null) {
+            selectedItems.clear();
+        }
+    }
 
     public void hideMultipleSelect() {
         setMultipleSelect(false);
         selectModeInterface.destroyActionMode();
     }
 
-	public void selectAll() {
-		for (int i = 0; i < getItemCount(); i++) {
-			if (!isItemChecked(i)) {
-				toggleSelection(i);
-			}
-		}
-	}
+    public void selectAll() {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (!isItemChecked(i)) {
+                toggleSelection(i);
+            }
+        }
+    }
 
-	public void clearSelections() {
-		for (int i = 0; i < getItemCount(); i++) {
-			if (isItemChecked(i)) {
-				toggleSelection(i);
-			}
-		}
-	}
+    public void clearSelections() {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (isItemChecked(i)) {
+                toggleSelection(i);
+            }
+        }
+    }
 
     /**
      * Checks if the current position is selected.
@@ -518,35 +527,35 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
      * @param delete True if the action is deselect, false if it is select.
      */
     private void startAnimation(final int pos, final boolean delete) {
-		MegaTransfersAdapter.ViewHolderTransfer view = (MegaTransfersAdapter.ViewHolderTransfer) listFragment.findViewHolderForLayoutPosition(pos);
-		if (view == null) {
-		    notifyItemChanged(pos);
-			return;
-		}
+        MegaTransfersAdapter.ViewHolderTransfer view = (MegaTransfersAdapter.ViewHolderTransfer) listFragment.findViewHolderForLayoutPosition(pos);
+        if (view == null) {
+            notifyItemChanged(pos);
+            return;
+        }
 
-		Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-		flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-				if (!delete) {
-					notifyItemChanged(pos);
-				}
-			}
+        Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+        flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if (!delete) {
+                    notifyItemChanged(pos);
+                }
+            }
 
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				if (delete) {
-					notifyItemChanged(pos);
-				}
-			}
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (delete) {
+                    notifyItemChanged(pos);
+                }
+            }
 
-			@Override
-			public void onAnimationRepeat(Animation animation) {
+            @Override
+            public void onAnimationRepeat(Animation animation) {
 
-			}
-		});
+            }
+        });
 
-		view.imageView.startAnimation(flipAnimation);
+        view.imageView.startAnimation(flipAnimation);
     }
 
     /**
@@ -555,11 +564,11 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
      * @param position Position to check.
      * @return True if the position is selected, false otherwise.
      */
-	private boolean isItemChecked(int position) {
-		return isMultipleSelect() && selectedItems != null
-				&& position >= 0
-				&& selectedItems.get(position);
-	}
+    private boolean isItemChecked(int position) {
+        return isMultipleSelect() && selectedItems != null
+                && position >= 0
+                && selectedItems.get(position);
+    }
 
     public List<MegaTransfer> getSelectedTransfers() {
         if (selectedItems == null) {
@@ -627,6 +636,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
 
     public interface SelectModeInterface {
         void destroyActionMode();
+
         void notifyItemChanged();
     }
 

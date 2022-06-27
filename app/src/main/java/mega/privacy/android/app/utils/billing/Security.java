@@ -16,8 +16,11 @@
 
 package mega.privacy.android.app.utils.billing;
 
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SIGNATURE_ALGORITHM;
+
 import android.text.TextUtils;
 import android.util.Base64;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -28,8 +31,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-import static mega.privacy.android.app.service.iab.BillingManagerImpl.SIGNATURE_ALGORITHM;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 /**
  * Security-related methods. For a secure implementation, all of this code should be implemented on
@@ -43,16 +45,17 @@ public class Security {
     /**
      * Verifies that the data was signed with the given signature, and returns the verified
      * purchase.
+     *
      * @param signedData the signed JSON string (signed, not encrypted)
-     * @param signature the signature for the data, signed with the private key
-     * @param publicKey Public key.
+     * @param signature  the signature for the data, signed with the private key
+     * @param publicKey  Public key.
      * @throws IOException if encoding algorithm is not supported or key specification
-     * is invalid
+     *                     is invalid
      */
     public static boolean verifyPurchase(String signedData, String signature, String publicKey) throws IOException {
         if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(publicKey)
                 || TextUtils.isEmpty(signature)) {
-            logWarning("Purchase verification failed: missing data.");
+            Timber.w("Purchase verification failed: missing data.");
             return false;
         }
 
@@ -65,7 +68,7 @@ public class Security {
      *
      * @param encodedPublicKey Base64-encoded public key
      * @throws IOException if encoding algorithm is not supported or key specification
-     * is invalid
+     *                     is invalid
      */
     public static PublicKey generatePublicKey(String encodedPublicKey) throws IOException {
         try {
@@ -74,14 +77,14 @@ public class Security {
             return keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
         } catch (NoSuchAlgorithmException e) {
             // "RSA" is guaranteed to be available.
-            logError("RSA is unavailable.", e);
+            Timber.e(e, "RSA is unavailable.");
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
             String msg = "Invalid key specification: " + e;
-            logWarning(msg, e);
+            Timber.w(e, msg);
             throw new IOException(msg);
         } catch (IllegalArgumentException e) {
-            logWarning(e.getMessage(), e);
+            Timber.w(e);
             throw new IOException(e.getMessage());
         }
     }
@@ -90,9 +93,9 @@ public class Security {
      * Verifies that the signature from the server matches the computed signature on the data.
      * Returns true if the data is correctly signed.
      *
-     * @param publicKey public key associated with the developer account
+     * @param publicKey  public key associated with the developer account
      * @param signedData signed data from server
-     * @param signature server signature
+     * @param signature  server signature
      * @return true if the data and signature match
      */
     public static boolean verify(PublicKey publicKey, String signedData, String signature) {
@@ -100,7 +103,7 @@ public class Security {
         try {
             signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         } catch (IllegalArgumentException e) {
-            logWarning("Base64 decoding failed.", e);
+            Timber.w(e, "Base64 decoding failed.");
             return false;
         }
         try {
@@ -108,18 +111,18 @@ public class Security {
             signatureAlgorithm.initVerify(publicKey);
             signatureAlgorithm.update(signedData.getBytes());
             if (!signatureAlgorithm.verify(signatureBytes)) {
-                logWarning("Signature verification failed.");
+                Timber.w("Signature verification failed.");
                 return false;
             }
             return true;
         } catch (NoSuchAlgorithmException e) {
             // "RSA" is guaranteed to be available.
-            logError("RSA is unavailable.", e);
+            Timber.e(e, "RSA is unavailable.");
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
-            logWarning("Invalid key specification.", e);
+            Timber.w(e, "Invalid key specification.");
         } catch (SignatureException e) {
-            logWarning("Signature exception.", e);
+            Timber.w(e, "Signature exception.");
         }
         return false;
     }

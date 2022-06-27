@@ -1,5 +1,53 @@
 package mega.privacy.android.app.fcm;
 
+import static android.view.View.GONE;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.CallUtil.existsAnotherCall;
+import static mega.privacy.android.app.utils.CallUtil.getCallNotificationId;
+import static mega.privacy.android.app.utils.CallUtil.getCallsParticipating;
+import static mega.privacy.android.app.utils.CallUtil.getImageAvatarCall;
+import static mega.privacy.android.app.utils.CallUtil.getPendingIntentMeetingRinging;
+import static mega.privacy.android.app.utils.CallUtil.isAnotherActiveCall;
+import static mega.privacy.android.app.utils.CallUtil.milliSecondsToTimer;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
+import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
+import static mega.privacy.android.app.utils.ChatUtil.getNameContactAttachment;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.ChatUtil.getVoiceClipDuration;
+import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
+import static mega.privacy.android.app.utils.ChatUtil.isEnableGeneralChatNotifications;
+import static mega.privacy.android.app.utils.ChatUtil.isVoiceClip;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SUMMARY;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_CURRENT_CALL;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_GENERAL_PUSH_CHAT;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_MISSED_CALL;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_SUMMARY_CHAT;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.getCircleBitmap;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatMessage.TYPE_CALL_ENDED;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,7 +70,6 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,17 +95,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
-
-import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatMessage.TYPE_CALL_ENDED;
+import timber.log.Timber;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -117,7 +154,7 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
         this.megaChatApi = megaChatApi;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChatSummaryChannel(context);
         }
 
@@ -128,13 +165,13 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
-        for(int i=0;i<unreadHandleList.size();i++){
+        for (int i = 0; i < unreadHandleList.size(); i++) {
             MegaChatMessage message = megaChatApi.getMessage(chatId, unreadHandleList.get(i));
-            logDebug("Chat: " + chat.getChatId() + " messagID: " + unreadHandleList.get(i));
-            if(message!=null) {
+            Timber.d("Chat: %d messagID: %d", chat.getChatId(), unreadHandleList.get(i));
+            if (message != null) {
                 unreadMessages.add(message);
             } else {
-                logWarning("Message cannot be recovered");
+                Timber.w("Message cannot be recovered");
             }
         }
 
@@ -167,7 +204,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void buildNotificationPreN(Uri uriParameter, String vibration, MegaChatRequest request) {
-        logDebug("buildNotificationPreN");
+        Timber.d("buildNotificationPreN");
 
         MegaHandleList chatHandleList = request.getMegaHandleList();
 
@@ -175,11 +212,11 @@ public final class ChatAdvancedNotificationBuilder {
         for (int i = 0; i < chatHandleList.size(); i++) {
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
             if (chat != null) {
-                if(isEnableChatNotifications(chat.getChatId())) {
+                if (isEnableChatNotifications(chat.getChatId())) {
                     chats.add(chat);
                 }
             } else {
-                logError("ERROR:chatNotRecovered:NULL");
+                Timber.e("ERROR:chatNotRecovered:NULL");
                 return;
             }
         }
@@ -211,7 +248,7 @@ public final class ChatAdvancedNotificationBuilder {
             intent.putExtra(CHAT_ID, chats.get(0).getChatId());
             pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         } else {
-            logError("ERROR:chatSIZE=0:return");
+            Timber.e("ERROR:chatSIZE=0:return");
             return;
         }
 
@@ -251,7 +288,7 @@ public final class ChatAdvancedNotificationBuilder {
                 MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
 
                 for (int j = 0; j < handleListUnread.size(); j++) {
-                    logDebug("Get message id: " + handleListUnread.get(j) + " from chatId: " + chats.get(i).getChatId());
+                    Timber.d("Get message id: %d from chatId: %d", handleListUnread.get(j), chats.get(i).getChatId());
                     MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
                     if (message != null) {
                         String messageContent = converterShortCodes(getMessageContent(message));
@@ -269,12 +306,12 @@ public final class ChatAdvancedNotificationBuilder {
 
                         inboxStyle.addLine(cs);
                     } else {
-                        logWarning("Message NULL cannot be recovered");
+                        Timber.w("Message NULL cannot be recovered");
                         break;
                     }
                 }
             } else {
-                logDebug("Do not show notification - opened chat");
+                Timber.d("Do not show notification - opened chat");
             }
         }
 
@@ -316,8 +353,8 @@ public final class ChatAdvancedNotificationBuilder {
      * Checks if it is updating the name of the chat notification message.
      * If so, it silentiates the notification.
      *
-     * @param uriParameter  Uri which contains the sound of the notification
-     * @param vibration     String which indicates if the notification should vibrate
+     * @param uriParameter Uri which contains the sound of the notification
+     * @param vibration    String which indicates if the notification should vibrate
      */
     private void setSilentNotificationIfUpdatingUserName(Uri uriParameter, String vibration) {
         if (isUpdatingUserName) {
@@ -330,7 +367,7 @@ public final class ChatAdvancedNotificationBuilder {
         if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             return checkMessageContentAttachmentOrVoiceClip(msg);
         } else if (msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-            logDebug("TYPE_CONTACT_ATTACHMENT");
+            Timber.d("TYPE_CONTACT_ATTACHMENT");
             long userCount = msg.getUsersCount();
             String messageContent;
 
@@ -347,14 +384,14 @@ public final class ChatAdvancedNotificationBuilder {
 
             return messageContent;
         } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-            logDebug("TYPE_TRUNCATE");
+            Timber.d("TYPE_TRUNCATE");
             return context.getString(R.string.history_cleared_message);
         } else if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-            logDebug("TYPE_CONTAINS_META");
+            Timber.d("TYPE_CONTAINS_META");
             return checkMessageContentMeta(msg);
 
         } else {
-            logDebug("OTHER");
+            Timber.d("OTHER");
             return msg.getContent();
         }
     }
@@ -367,10 +404,10 @@ public final class ChatAdvancedNotificationBuilder {
         return "\uD83C\uDF99 " + milliSecondsToTimer(duration);
     }
 
-    private String checkMessageContentMeta(MegaChatMessage message){
+    private String checkMessageContentMeta(MegaChatMessage message) {
         MegaChatContainsMeta meta = message.getContainsMeta();
-        if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-            return  "\uD83D\uDCCD " + context.getString(R.string.title_geolocation_message);
+        if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+            return "\uD83D\uDCCD " + context.getString(R.string.title_geolocation_message);
         }
         return message.getContent();
     }
@@ -384,12 +421,12 @@ public final class ChatAdvancedNotificationBuilder {
 
         String title;
         int unreadMessages = chat.getUnreadCount();
-        logDebug("Unread messages: " + unreadMessages + "  chatID: " + chat.getChatId());
+        Timber.d("Unread messages: %d  chatID: %d", unreadMessages, chat.getChatId());
         if (unreadMessages != 0) {
 
             if (unreadMessages < 0) {
                 unreadMessages = Math.abs(unreadMessages);
-                logDebug("Unread number: " + unreadMessages);
+                Timber.d("Unread number: %s", unreadMessages);
 
                 if (unreadMessages > 1) {
                     String numberString = "+" + unreadMessages;
@@ -446,7 +483,7 @@ public final class ChatAdvancedNotificationBuilder {
         int sizeFor = (int) unreadMessageList.size() - 1;
         for (int i = sizeFor; i >= 0; i--) {
             MegaChatMessage msg = unreadMessageList.get(i);
-            logDebug("getMessage: chatID: " + chat.getChatId() + " " + unreadMessageList.get(i));
+            Timber.d("getMessage: chatID: %d %s", chat.getChatId(), unreadMessageList.get(i));
             if (msg != null) {
                 String messageContent = msg.getType() == TYPE_CALL_ENDED ?
                         context.getString(R.string.missed_call_notification_title) : converterShortCodes(getMessageContent(msg));
@@ -458,7 +495,7 @@ public final class ChatAdvancedNotificationBuilder {
                     messagingStyleContent.addMessage(messageContent, msg.getTimestamp(), sender);
                 }
             } else {
-                logWarning("ERROR:buildIPCNotification:messageNULL");
+                Timber.w("ERROR:buildIPCNotification:messageNULL");
             }
         }
 
@@ -479,8 +516,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         MegaChatMessage lastMsg = unreadMessageList.get(0);
 
-        if(lastMsg!=null){
-            logDebug("Last message ts: " + lastMsg.getTimestamp());
+        if (lastMsg != null) {
+            Timber.d("Last message ts: %s", lastMsg.getTimestamp());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilderO.setWhen(lastMsg.getTimestamp() * 1000);
             } else {
@@ -514,26 +551,24 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         Bitmap largeIcon = setUserAvatar(chat);
-        if(largeIcon!=null){
+        if (largeIcon != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notificationBuilderO.setLargeIcon(largeIcon);
-            }
-            else{
+            } else {
                 notificationBuilder.setLargeIcon(largeIcon);
             }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return notificationBuilderO.build();
-        }
-        else{
+        } else {
             return notificationBuilder.build();
         }
     }
 
-    private Bitmap setUserAvatar(MegaChatRoom chat){
-        logDebug("Chat ID: " + chat.getChatId());
-        if(!chat.isGroup()) {
+    private Bitmap setUserAvatar(MegaChatRoom chat) {
+        Timber.d("Chat ID: %s", chat.getChatId());
+        if (!chat.isGroup()) {
             Bitmap bitmap = getImageAvatarCall(chat, chat.getPeerHandle(0));
             if (bitmap != null)
                 return getCircleBitmap(bitmap);
@@ -541,13 +576,13 @@ public final class ChatAdvancedNotificationBuilder {
         return createDefaultAvatar(chat);
     }
 
-    private Bitmap createDefaultAvatar(MegaChatRoom chat){
-        logDebug("Chat ID: " + chat.getChatId());
+    private Bitmap createDefaultAvatar(MegaChatRoom chat) {
+        Timber.d("Chat ID: %s", chat.getChatId());
 
         int color;
-        if(chat.isGroup()){
+        if (chat.isGroup()) {
             color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
-        }else{
+        } else {
             color = getColorAvatar(chat.getPeerHandle(0));
         }
 
@@ -561,16 +596,16 @@ public final class ChatAdvancedNotificationBuilder {
         String notificationChannelIdChatSummaryNoVibrate = NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
         String notificationChannelNameChatSummaryNoVibrate = NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
 
-        NotificationChannel channelWithVibration = new NotificationChannel(notificationChannelIdChatSummaryV2,notificationChannelNameChatSummary,NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel channelWithVibration = new NotificationChannel(notificationChannelIdChatSummaryV2, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
         channelWithVibration.setShowBadge(true);
-        channelWithVibration.setVibrationPattern(new long[] {0,500});
+        channelWithVibration.setVibrationPattern(new long[]{0, 500});
         //green light
         channelWithVibration.enableLights(true);
-        channelWithVibration.setLightColor(Color.rgb(0,255,0));
+        channelWithVibration.setLightColor(Color.rgb(0, 255, 0));
         //current ringtone for notification
-        channelWithVibration.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),Notification.AUDIO_ATTRIBUTES_DEFAULT);
+        channelWithVibration.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), Notification.AUDIO_ATTRIBUTES_DEFAULT);
 
-        NotificationChannel channelNoVibration = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate,notificationChannelNameChatSummaryNoVibrate,NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel channelNoVibration = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate, notificationChannelNameChatSummaryNoVibrate, NotificationManager.IMPORTANCE_HIGH);
         channelNoVibration.setShowBadge(true);
         channelNoVibration.enableVibration(false);
 
@@ -578,7 +613,7 @@ public final class ChatAdvancedNotificationBuilder {
         if (manager != null) {
             //delete old channel otherwise the new settings don't work.
             NotificationChannel oldChannel = manager.getNotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
-            if(oldChannel != null) {
+            if (oldChannel != null) {
                 manager.deleteNotificationChannel(NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
             }
             manager.createNotificationChannel(channelWithVibration);
@@ -586,12 +621,12 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public Notification buildSummary (String groupKey, boolean beep){
+    public Notification buildSummary(String groupKey, boolean beep) {
         Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_SUMMARY);
         intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!beep) {
@@ -617,9 +652,9 @@ public final class ChatAdvancedNotificationBuilder {
             } else {
                 boolean vibrationEnabled = true;
                 ChatSettings chatSettings = dbH.getChatSettings();
-                if (chatSettings != null){
-                    if (chatSettings.getVibrationEnabled()!=null && !chatSettings.getVibrationEnabled().isEmpty()){
-                        if (STRING_FALSE.equals(chatSettings.getVibrationEnabled())){
+                if (chatSettings != null) {
+                    if (chatSettings.getVibrationEnabled() != null && !chatSettings.getVibrationEnabled().isEmpty()) {
+                        if (STRING_FALSE.equals(chatSettings.getVibrationEnabled())) {
                             vibrationEnabled = false;
                         }
                     }
@@ -627,10 +662,9 @@ public final class ChatAdvancedNotificationBuilder {
 
                 NotificationCompat.Builder notificationBuilderO = null;
 
-                if (vibrationEnabled){
+                if (vibrationEnabled) {
                     notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryV2);
-                }
-                else{
+                } else {
                     notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryNoVibrate);
                 }
 
@@ -645,8 +679,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                 return notificationBuilderO.build();
             }
-        }
-        else {
+        } else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
 
             notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
@@ -662,10 +695,10 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void removeAllChatNotifications(){
+    public void removeAllChatNotifications() {
         notificationManager.cancel(NOTIFICATION_SUMMARY_CHAT);
         notificationManager.cancel(NOTIFICATION_GENERAL_PUSH_CHAT);
-        for(int id : notificationIds) {
+        for (int id : notificationIds) {
             notificationManager.cancel(id);
         }
         notificationIds.clear();
@@ -696,7 +729,7 @@ public final class ChatAdvancedNotificationBuilder {
                 return THREE_BUTTONS;
             }
 
-            if(!callsActive.isEmpty()){
+            if (!callsActive.isEmpty()) {
                 return VERTICAL_TWO_BUTTONS;
             }
         }
@@ -749,11 +782,11 @@ public final class ChatAdvancedNotificationBuilder {
     /**
      * Method for showing the incoming call notification, when exists another call in progress exists.
      *
-     * @param callToAnswer The call that is being received.
+     * @param callToAnswer   The call that is being received.
      * @param callInProgress The current call in progress.
      */
     private void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
-        logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
+        Timber.d("Call to answer ID: %d, Call in progress ID: %d", callToAnswer.getChatid(), callInProgress.getChatid());
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
@@ -902,7 +935,7 @@ public final class ChatAdvancedNotificationBuilder {
      * @param callToAnswer The call that is being received.
      */
     public void showOneCallNotification(MegaChatCall callToAnswer) {
-        logDebug("Call to answer ID: " + callToAnswer.getChatid());
+        Timber.d("Call to answer ID: %s", callToAnswer.getChatid());
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
@@ -953,7 +986,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         expandedView.setOnClickPendingIntent(R.id.answer_button_layout, intentAnswer);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create a channel for android Oreo or higher
             NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("");
@@ -1006,13 +1039,13 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
-            logWarning("Notify incoming call");
+            Timber.w("Notify incoming call");
             notifyCall(notificationId, notificationBuilder.build());
         }
     }
 
     public void checkQueuedCalls(long incomingCallChatId) {
-        logDebug("Check several calls");
+        Timber.d("Check several calls");
 
         MegaHandleList handleList = megaChatApi.getChatCalls();
         if (handleList == null || handleList.size() <= 1)
@@ -1020,11 +1053,11 @@ public final class ChatAdvancedNotificationBuilder {
 
         ArrayList<Long> callsInProgress = getCallsParticipating();
         if (callsInProgress == null || callsInProgress.isEmpty()) {
-            logWarning("No calls in progress");
+            Timber.w("No calls in progress");
             return;
         }
 
-        logDebug("Number of calls in progress: " + callsInProgress.size());
+        Timber.d("Number of calls in progress: %s", callsInProgress.size());
         MegaChatCall callInProgress = null;
         for (int i = 0; i < callsInProgress.size(); i++) {
             MegaChatCall call = megaChatApi.getChatCall(callsInProgress.get(i));
@@ -1049,7 +1082,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void showMissedCallNotification(long chatId, long chatCallId) {
-        logDebug("MISSED CALL Chat ID: " + chatId + ", Call ID: " + chatCallId);
+        Timber.d("MISSED CALL Chat ID: %d, Call ID: %d", chatId, chatCallId);
 
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         String notificationContent;
@@ -1066,13 +1099,13 @@ public final class ChatAdvancedNotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         long[] pattern = {0, 1000};
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdInProgressMissedCall, notificationChannelNameInProgressMissedCall, NotificationManager.IMPORTANCE_HIGH);
             channel.setShowBadge(true);
             if (notificationManager == null) {
@@ -1100,8 +1133,7 @@ public final class ChatAdvancedNotificationBuilder {
             }
 
             notify(notificationId, notificationBuilderO.build());
-        }
-        else {
+        } else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.missed_call_notification_title))
@@ -1137,39 +1169,36 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void generateChatNotification(MegaChatRequest request){
-        logDebug("generateChatNotification");
+    public void generateChatNotification(MegaChatRequest request) {
+        Timber.d("generateChatNotification");
         this.request = request;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             newGenerateChatNotification(request);
-        }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             String manufacturer = "xiaomi";
-            if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                logDebug("POST Android N");
+            if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
+                Timber.d("POST Android N");
                 newGenerateChatNotification(request);
-            }
-            else{
-                logDebug("XIAOMI POST Android N");
+            } else {
+                Timber.d("XIAOMI POST Android N");
                 generateChatNotificationPreN(request);
             }
-        }
-        else {
-            logDebug("PRE Android N");
+        } else {
+            Timber.d("PRE Android N");
             generateChatNotificationPreN(request);
         }
     }
 
-    public void newGenerateChatNotification(MegaChatRequest request){
-        logDebug("newGenerateChatNotification");
+    public void newGenerateChatNotification(MegaChatRequest request) {
+        Timber.d("newGenerateChatNotification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             boolean beep = request.getFlag();
-            logDebug("Should beep: " + beep);
+            Timber.d("Should beep: %s", beep);
 
             MegaHandleList chatHandleList = request.getMegaHandleList();
-            logDebug("chats size: " + chatHandleList.size());
+            Timber.d("chats size: %s", chatHandleList.size());
             ArrayList<MegaChatListItem> chats = new ArrayList<>();
             for (int i = 0; i < chatHandleList.size(); i++) {
                 MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
@@ -1193,16 +1222,15 @@ public final class ChatAdvancedNotificationBuilder {
             if (!(chats.isEmpty())) {
                 lastChatId = chats.get(0).getChatId();
             } else {
-                logError("Chats empty, remove all chat notifications");
+                Timber.e("Chats empty, remove all chat notifications");
                 removeAllChatNotifications();
                 return;
             }
 
             checkShowChatNotifications(lastChatId, beep, request, chats);
-        }
-        else{
+        } else {
             boolean beep = request.getFlag();
-            logDebug("Should beep: " + beep);
+            Timber.d("Should beep: %s", beep);
 
             MegaHandleList chatHandleList = request.getMegaHandleList();
             ArrayList<MegaChatListItem> chats = new ArrayList<>();
@@ -1231,11 +1259,11 @@ public final class ChatAdvancedNotificationBuilder {
                 if (!(chats.isEmpty())) {
                     lastChatId = chats.get(0).getChatId();
                 } else {
-                    logError("ERROR:chatsEMPTY:return");
+                    Timber.e("ERROR:chatsEMPTY:return");
                     return;
                 }
             } else {
-                logError("ERROR:chatsNULL:return");
+                Timber.e("ERROR:chatsNULL:return");
                 return;
             }
 
@@ -1245,9 +1273,9 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    private void checkShowChatNotifications(long lastChatId, boolean beep, MegaChatRequest request, ArrayList<MegaChatListItem> chats){
-        if(MegaApplication.getOpenChatId() != lastChatId){
-            logDebug("Generate chat notification for: " + chats.size() + " chats");
+    private void checkShowChatNotifications(long lastChatId, boolean beep, MegaChatRequest request, ArrayList<MegaChatListItem> chats) {
+        if (MegaApplication.getOpenChatId() != lastChatId) {
+            Timber.d("Generate chat notification for: %d chats", chats.size());
             for (int i = 0; i < chats.size(); i++) {
                 if (megaApi.isChatNotifiable(chats.get(i).getChatId()) && MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
                     MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
@@ -1255,48 +1283,48 @@ public final class ChatAdvancedNotificationBuilder {
                     beep = false;
                 }
             }
-        }else {
-            logDebug("Mute for the last chat");
+        } else {
+            Timber.d("Mute for the last chat");
         }
     }
 
-    public void generateChatNotificationPreN(MegaChatRequest request){
-        logDebug("generateChatNotificationPreN");
+    public void generateChatNotificationPreN(MegaChatRequest request) {
+        Timber.d("generateChatNotificationPreN");
         boolean beep = request.getFlag();
-        logDebug("Should beep: " + beep);
+        Timber.d("Should beep: %s", beep);
 
         MegaHandleList chatHandleList = request.getMegaHandleList();
-        logDebug("size chatHandleList: " + chatHandleList.size());
+        Timber.d("size chatHandleList: %s", chatHandleList.size());
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
-        for(int i=0; i<chatHandleList.size(); i++){
+        for (int i = 0; i < chatHandleList.size(); i++) {
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
             chats.add(chat);
         }
 
         //Order by last interaction
-        Collections.sort(chats, new Comparator<MegaChatListItem> (){
+        Collections.sort(chats, new Comparator<MegaChatListItem>() {
 
             public int compare(MegaChatListItem c1, MegaChatListItem c2) {
                 long timestamp1 = c1.getLastTimestamp();
                 long timestamp2 = c2.getLastTimestamp();
 
                 long result = timestamp2 - timestamp1;
-                return (int)result;
+                return (int) result;
             }
         });
 
-        logDebug("Generate chat notification for: " + chats.size() + " chats");
+        Timber.d("Generate chat notification for: %d chats", chats.size());
         if (!chats.isEmpty() && isEnableGeneralChatNotifications()) {
             showChatNotificationPreN(request, beep, chats.get(0).getChatId());
-        }else{
+        } else {
             removeAllChatNotifications();
         }
     }
 
-    public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId){
-        logDebug("Beep: " + beep + ", Last Chat ID: " + lastChatId);
+    public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId) {
+        Timber.d("Beep: %s, Last Chat ID: %d", beep, lastChatId);
 
-        if(beep){
+        if (beep) {
             ChatSettings chatSettings = dbH.getChatSettings();
             if (chatSettings != null) {
                 checkNotificationsSoundPreN(request, beep, lastChatId);
@@ -1308,40 +1336,40 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void checkNotificationsSoundPreN(MegaChatRequest request, boolean beep, long lastChatId) {
-        logDebug("Beep: " + beep + ", Last Chat ID: " + lastChatId);
+        Timber.d("Beep: %s, Last Chat ID: %d", beep, lastChatId);
 
         ChatSettings chatSettings = dbH.getChatSettings();
-            logDebug("Notifications OFF for this chat");
+        Timber.d("Notifications OFF for this chat");
 
-            if (chatSettings.getNotificationsSound() == null){
+        if (chatSettings.getNotificationsSound() == null) {
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+            buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
+        } else if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
+            buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
+        } else {
+            String soundString = chatSettings.getNotificationsSound();
+            Uri uri = Uri.parse(soundString);
+            Timber.d("Uri: %s", uri);
+
+            if (STRING_TRUE.equals(soundString) || isTextEmpty(soundString)) {
                 Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                 buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
-            } else if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
+            } else if (soundString.equals(INVALID_OPTION)) {
                 buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
             } else {
-                String soundString = chatSettings.getNotificationsSound();
-                Uri uri = Uri.parse(soundString);
-                logDebug("Uri: " + uri);
-
-                if (STRING_TRUE.equals(soundString) || isTextEmpty(soundString)) {
-                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-                    buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
-                } else if (soundString.equals(INVALID_OPTION)) {
+                Ringtone sound = RingtoneManager.getRingtone(context, uri);
+                if (sound == null) {
                     buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
                 } else {
-                    Ringtone sound = RingtoneManager.getRingtone(context, uri);
-                    if (sound == null) {
-                        buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
-                    } else {
-                        buildNotificationPreN(uri, chatSettings.getVibrationEnabled(), request);
-                    }
+                    buildNotificationPreN(uri, chatSettings.getVibrationEnabled(), request);
                 }
             }
+        }
     }
 
-    private boolean showChatNotification(long chatid, MegaHandleList handleListUnread, boolean beep){
-        logDebug("Beep: " + beep);
-        if(beep){
+    private boolean showChatNotification(long chatid, MegaHandleList handleListUnread, boolean beep) {
+        Timber.d("Beep: %s", beep);
+        if (beep) {
             ChatSettings chatSettings = dbH.getChatSettings();
             if (chatSettings != null) {
                 checkNotificationsSound(chatid, handleListUnread, beep);
@@ -1353,8 +1381,8 @@ public final class ChatAdvancedNotificationBuilder {
         return true;
     }
 
-    private void checkNotificationsSound(long chatid, MegaHandleList handleListUnread, boolean beep){
-        logDebug("Chat ID: " + chatid + ", Beep: " + beep);
+    private void checkNotificationsSound(long chatid, MegaHandleList handleListUnread, boolean beep) {
+        Timber.d("Chat ID: %d, Beep: %s", chatid, beep);
 
         ChatSettings chatSettings = dbH.getChatSettings();
         removeAllChatNotifications();

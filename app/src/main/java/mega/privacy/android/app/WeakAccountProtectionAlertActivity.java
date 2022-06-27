@@ -1,5 +1,10 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_AFTER_BLOCKED;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -15,19 +20,17 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.main.LoginActivity;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.controllers.AccountController;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class WeakAccountProtectionAlertActivity extends PasscodeActivity implements View.OnClickListener {
@@ -138,7 +141,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
                 try {
                     infoDialog.dismiss();
                 } catch (Exception e) {
-                    logWarning("Exception dismissing infoDialog");
+                    Timber.w("Exception dismissing infoDialog");
                 }
                 break;
 

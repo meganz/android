@@ -13,10 +13,10 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -84,7 +84,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         val handleList = intent.getLongArrayExtra(HANDLE_LIST)
 
         if (handle == INVALID_HANDLE && handleList == null) {
-            logError("No extras to manage.")
+            Timber.e("No extras to manage.")
             finish()
             return
         }

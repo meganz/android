@@ -35,7 +35,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
@@ -47,6 +46,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback,
     SnackbarShower {
@@ -229,7 +229,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 NOTIFICATION_STORAGE_OVERQUOTA
             )
         } catch (e: Exception) {
-            logError("Exception NotificationManager - remove all notifications", e)
+            Timber.e(e, "Exception NotificationManager - remove all notifications")
         }
     }
 

@@ -1,5 +1,20 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_NUMBER;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_TEXT;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+
 import android.content.Intent;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -18,18 +33,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE;
-import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -53,7 +56,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             String myUserHandle = api.getMyUserHandle();
             boolean isMyChange = myUserHandle != null && myUserHandle.equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
-            if(user.getChanges() == 0 && !isMyChange){
+            if (user.getChanges() == 0 && !isMyChange) {
                 LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(user.getHandle());
             }
 
@@ -89,13 +92,13 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             }
 
             // Receive the avatar change, send the event
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0){
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0) {
                 LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long.class).post(user.getHandle());
             }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
                 //user has change backup attribute, need to update local ones
-                logDebug("MyBackup + Get backup attribute when change on other client.");
+                Timber.d("MyBackup + Get backup attribute when change on other client.");
                 LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).post(true);
                 break;
             }
@@ -137,7 +140,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate");
+        Timber.d("onAccountUpdate");
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
@@ -168,19 +171,19 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     notificationBuilder.removeAllIncomingContactNotifications();
                     notificationBuilder.showIncomingContactRequestNotification();
 
-                    logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+                    Timber.d("IPC: %s cr.isOutgoing: %s cr.getStatus: %d", cr.getSourceEmail(), cr.isOutgoing(), cr.getStatus());
                 } else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
                     ContactsAdvancedNotificationBuilder notificationBuilder;
                     notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApplication.getMegaApi());
 
                     notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 
-                    logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+                    Timber.d("ACCEPT OPR: %s cr.isOutgoing: %s cr.getStatus: %d", cr.getSourceEmail(), cr.isOutgoing(), cr.getStatus());
 
                     new RatingHandlerImpl(megaApplication.getApplicationContext()).showRatingBaseOnContacts();
                 }
 
-                if(cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED){
+                if (cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
                     LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(cr.getHandle());
                 }
             }
@@ -189,7 +192,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
-        logDebug("Event received: " + event.getText());
+        Timber.d("Event received: %s", event.getText());
 
         if (megaApplication == null) {
             megaApplication = MegaApplication.getInstance();
@@ -197,7 +200,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         switch (event.getType()) {
             case MegaEvent.EVENT_STORAGE:
-                logDebug("EVENT_STORAGE: " + event.getNumber());
+                Timber.d("EVENT_STORAGE: %s", event.getNumber());
 
                 int state = (int) event.getNumber();
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
@@ -216,7 +219,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 break;
 
             case MegaEvent.EVENT_ACCOUNT_BLOCKED:
-                logDebug("EVENT_ACCOUNT_BLOCKED: " + event.getNumber());
+                Timber.d("EVENT_ACCOUNT_BLOCKED: %s", event.getNumber());
 
                 megaApplication.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
                         .putExtra(EVENT_NUMBER, event.getNumber())

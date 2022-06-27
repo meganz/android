@@ -1,5 +1,22 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import static mega.privacy.android.app.utils.AvatarUtil.setImageAvatar;
+import static mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContactOption;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_MY_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +25,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
@@ -24,20 +46,7 @@ import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -77,7 +86,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (selectedChat == null || participantHandle == INVALID_HANDLE) {
-            logWarning("Error. Selected chat is NULL or participant handle is -1");
+            Timber.w("Error. Selected chat is NULL or participant handle is -1");
             return;
         }
 

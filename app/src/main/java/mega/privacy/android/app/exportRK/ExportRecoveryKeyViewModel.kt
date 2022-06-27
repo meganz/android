@@ -10,18 +10,18 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity.Companion.WRITE_STORAGE_TO_SAVE_RK
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.FileUtil.saveTextOnContentUri
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaApiAndroid
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ExportRecoveryKeyViewModel @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -104,7 +104,7 @@ class ExportRecoveryKeyViewModel @Inject constructor(
      */
     fun manageActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode != REQUEST_DOWNLOAD_FOLDER || resultCode != RESULT_OK || data == null) {
-            logWarning("Wrong activity result.")
+            Timber.w("Wrong activity result.")
             return
         }
 

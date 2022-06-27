@@ -1,5 +1,37 @@
 package mega.privacy.android.app.fragments.recent;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
+import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS;
+import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
+import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
+import static mega.privacy.android.app.utils.FileUtil.isInternalIntent;
+import static mega.privacy.android.app.utils.FileUtil.isLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.isOpusFile;
+import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
+import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -54,22 +86,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
-import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
-import static mega.privacy.android.app.utils.Util.getMediaIntent;
+import timber.log.Timber;
 
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
@@ -454,7 +471,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
         } else {
-            logDebug("itemClick:isFile:otherOption");
+            Timber.d("itemClick:isFile:otherOption");
             onNodeTapped(context, node, ((ManagerActivity) requireActivity())::saveNodeByTap, (ManagerActivity) requireActivity(), (ManagerActivity) requireActivity());
         }
     }
@@ -462,12 +479,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     /**
      * Launch corresponding intent to open the file based on its type.
      *
-     * @param intent Intent to launch activity.
+     * @param intent                Intent to launch activity.
      * @param paramsSetSuccessfully true, if the param is set for the intent successfully; false, otherwise.
-     * @param node The node to open.
-     * @param position Thumbnail's position in the list.
+     * @param node                  The node to open.
+     * @param position              Thumbnail's position in the list.
      */
-    private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node ,int position) {
+    private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node, int position) {
         if (intent != null && !isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false;
             ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);

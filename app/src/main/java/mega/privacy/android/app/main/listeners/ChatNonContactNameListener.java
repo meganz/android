@@ -1,8 +1,11 @@
 package mega.privacy.android.app.main.listeners;
 
 
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 import android.app.Activity;
 import android.content.Context;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -15,9 +18,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
+import timber.log.Timber;
 
 public class ChatNonContactNameListener implements MegaChatRequestListenerInterface {
 
@@ -47,8 +48,8 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
         dbH = DatabaseHandler.getDbHandler(context);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
@@ -63,8 +64,8 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
         dbH = DatabaseHandler.getDbHandler(context);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
@@ -72,8 +73,8 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         this.context = context;
         dbH = DatabaseHandler.getDbHandler(context);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
@@ -89,61 +90,57 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish()");
+        Timber.d("onRequestFinish()");
 
-        if (e.getErrorCode() == MegaError.API_OK){
+        if (e.getErrorCode() == MegaError.API_OK) {
             if (adapter == null) {
                 return;
             }
 
-            if(adapter instanceof MegaChatAdapter && holder == null){
-                logWarning("holder is NULL");
-                holder = ((MegaChatAdapter)adapter).queryIfHolderNull(pos);
+            if (adapter instanceof MegaChatAdapter && holder == null) {
+                Timber.w("holder is NULL");
+                holder = ((MegaChatAdapter) adapter).queryIfHolderNull(pos);
                 if (holder == null) {
-                    logWarning("holder is NULL");
+                    Timber.w("holder is NULL");
                     return;
                 }
-            }
-            else {
-                logWarning("Other adapter holder is NULL");
+            } else {
+                Timber.w("Other adapter holder is NULL");
             }
 
-            if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
-                logDebug("First name received");
+            if (request.getType() == MegaChatRequest.TYPE_GET_FIRSTNAME) {
+                Timber.d("First name received");
                 firstName = request.getText();
                 receivedFirstName = true;
-                if(!isTextEmpty(firstName)){
-                    dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
+                if (!isTextEmpty(firstName)) {
+                    dbH.setNonContactFirstName(firstName, request.getUserHandle() + "");
                     updateAdapter();
                 }
-            }
-            else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
-                logDebug("Last name received");
+            } else if (request.getType() == MegaChatRequest.TYPE_GET_LASTNAME) {
+                Timber.d("Last name received");
                 lastName = request.getText();
                 receivedLastName = true;
-                if(!isTextEmpty(lastName)){
-                    dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
+                if (!isTextEmpty(lastName)) {
+                    dbH.setNonContactLastName(lastName, request.getUserHandle() + "");
                     updateAdapter();
                 }
-            }
-            else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
-                logDebug("Email received");
+            } else if (request.getType() == MegaChatRequest.TYPE_GET_EMAIL) {
+                Timber.d("Email received");
                 mail = request.getText();
                 receivedEmail = true;
-                if(!isTextEmpty(mail)){
-                    dbH.setNonContactEmail(mail, request.getUserHandle()+"");
+                if (!isTextEmpty(mail)) {
+                    dbH.setNonContactEmail(mail, request.getUserHandle() + "");
                     updateAdapter();
                 }
             }
-        }
-        else{
-            logError("ERROR: requesting: " + request.getRequestString());
+        } else {
+            Timber.e("ERROR: requesting: %s", request.getRequestString());
         }
     }
 
     private void updateAdapter() {
         if (receivedFirstName || receivedLastName || receivedEmail) {
-            logDebug("updateAdapter");
+            Timber.d("updateAdapter");
             if (adapter instanceof MegaChatAdapter) {
                 adapter.notifyItemChanged(holder.getAdapterPosition());
             } else if (adapter instanceof MegaListChatAdapter) {
@@ -154,7 +151,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
             receivedLastName = false;
             receivedEmail = false;
         } else {
-            logWarning("NOT updateAdapter: " + receivedFirstName + ":" + receivedLastName + ":" + receivedEmail);
+            Timber.w("NOT updateAdapter: %s:%s:%s", receivedFirstName, receivedLastName, receivedEmail);
         }
     }
 

@@ -1,11 +1,10 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import timber.log.Timber
 
 
 /**
@@ -23,25 +22,25 @@ class SimpleMegaRequestListener(
     private val onSuccess: (
         api: MegaApiJava,
         request: MegaRequest,
-        e: MegaError
+        e: MegaError,
     ) -> Unit,
     private val onFail: (
         api: MegaApiJava,
         request: MegaRequest,
-        e: MegaError
+        e: MegaError,
     ) -> Unit = { _, request, e ->
-        logError("[${request.requestString}] failed with error, result: ${e.errorCode} -> ${e.errorString}")
+        Timber.e("[${request.requestString}] failed with error, result: ${e.errorCode} -> ${e.errorString}")
     },
     private val isSuccess: (
         request: MegaRequest,
-        e: MegaError
+        e: MegaError,
     ) -> Boolean = { _, e ->
         e.errorCode == MegaError.API_OK
-    }
+    },
 ) : MegaRequestListenerInterface {
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        logDebug("Start [${request.requestString}]")
+        Timber.d("Start [${request.requestString}]")
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
@@ -50,7 +49,7 @@ class SimpleMegaRequestListener(
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (isSuccess(request, e)) {
-            logDebug("[${request.requestString}] finished successfully.")
+            Timber.d("[${request.requestString}] finished successfully.")
             onSuccess(api, request, e)
         } else {
             onFail(api, request, e)
@@ -60,7 +59,7 @@ class SimpleMegaRequestListener(
     override fun onRequestTemporaryError(
         api: MegaApiJava,
         request: MegaRequest,
-        e: MegaError?
+        e: MegaError?,
     ) {
 
     }

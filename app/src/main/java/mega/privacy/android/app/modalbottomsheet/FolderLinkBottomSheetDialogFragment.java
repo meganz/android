@@ -1,5 +1,13 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +16,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -82,7 +84,7 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
     @Override
     public void onClick(View v) {
         if (node == null) {
-            logWarning("The selected node is NULL");
+            Timber.w("The selected node is NULL");
             return;
         }
 
