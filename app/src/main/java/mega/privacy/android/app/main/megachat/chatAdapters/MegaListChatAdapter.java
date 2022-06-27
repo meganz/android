@@ -1774,7 +1774,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                             }
 
                             break;
-
                         case MegaChatMessage.END_CALL_REASON_REJECTED: {
 
                             textToShow = String.format(context.getString(R.string.call_rejected_messages));

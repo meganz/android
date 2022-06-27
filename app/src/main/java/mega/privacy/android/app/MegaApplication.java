@@ -88,13 +88,11 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StrictMode;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.Pair;
 
@@ -104,6 +102,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
+import androidx.core.text.HtmlCompat;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.hilt.work.HiltWorkerFactory;
@@ -143,8 +142,6 @@ import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.domain.usecase.InitialiseLogging;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
@@ -163,6 +160,7 @@ import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
+import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
@@ -284,7 +282,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static int disableFileVersions = -1;
 
     private static boolean recentChatVisible = false;
-    private static boolean chatNotificationReceived = false;
 
     private static String urlConfirmationLink = null;
 
@@ -640,8 +637,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
             return;
         }
 
-        stopService(new Intent(getInstance(), IncomingCallService.class));
         Timber.d("Call status is %s, chat id is %d, call id is %d", callStatusToString(callStatus), chatId, callId);
+
         switch (callStatus) {
             case MegaChatCall.CALL_STATUS_CONNECTING:
                 if ((isOutgoing && getChatManagement().isRequestSent(callId)))
@@ -699,7 +696,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
             if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
                 clearIncomingCallNotification(call.getCallId());
                 getChatManagement().removeValues(call.getChatid());
-                stopService(new Intent(getInstance(), IncomingCallService.class));
                 if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
                     LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
                 }
@@ -721,7 +717,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         } else {
             clearIncomingCallNotification(call.getCallId());
             getChatManagement().removeValues(call.getChatid());
-            stopService(new Intent(getInstance(), IncomingCallService.class));
         }
     };
 
@@ -1248,14 +1243,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         MegaApplication.recentChatVisible = recentChatVisible;
     }
 
-    public static boolean isChatNotificationReceived() {
-        return chatNotificationReceived;
-    }
-
-    public static void setChatNotificationReceived(boolean chatNotificationReceived) {
-        MegaApplication.chatNotificationReceived = chatNotificationReceived;
-    }
-
     public static long getOpenChatId() {
         return openChatId;
     }
@@ -1285,85 +1272,52 @@ public class MegaApplication extends MultiDexApplication implements Application.
             }
 
             String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + toCDATA(name);
-            Spanned notificationContent;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                notificationContent = Html.fromHtml(source);
-            }
+            Spanned notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-            int notificationId = NOTIFICATION_PUSH_CLOUD_DRIVE;
             String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
-            String notificationChannelName = NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 
-            Intent intent = new Intent(this, ManagerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+            Intent intent = new Intent(this, ManagerActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                     PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            String notificationTitle;
-            if (n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE) && !n.hasChanged(MegaNode.CHANGE_TYPE_NEW)) {
-                notificationTitle = getString(R.string.context_permissions_changed);
-            } else {
-                notificationTitle = getString(R.string.title_incoming_folder_notification);
-            }
+            String notificationTitle = getString(n.hasChanged(MegaNode.CHANGE_TYPE_NEW)
+                    ? R.string.title_incoming_folder_notification
+                    : R.string.context_permissions_changed);
+
+            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel channel = new NotificationChannel(notificationChannelId,
+                        NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME, NotificationManager.IMPORTANCE_HIGH);
+
                 channel.setShowBadge(true);
-                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.createNotificationChannel(channel);
-
-                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(this, notificationChannelId);
-                notificationBuilderO
-                        .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentTitle(notificationTitle)
-                        .setContentText(notificationContent)
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(notificationContent))
-                        .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
-                        .setContentIntent(pendingIntent)
-                        .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-
-                Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-                notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
-
-                notificationManager.notify(notificationId, notificationBuilderO.build());
-            } else {
-                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                        .setContentTitle(notificationTitle)
-                        .setContentText(notificationContent)
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(notificationContent))
-                        .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
-                        .setContentIntent(pendingIntent);
-
-                Drawable d;
-
-                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-
-                notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                    notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-                } else {
-                    // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                    notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-                }
-
-                NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                notificationManager.notify(notificationId, notificationBuilder.build());
             }
+
+            Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, notificationChannelId)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle(notificationTitle)
+                    .setContentText(notificationContent)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setContentIntent(pendingIntent)
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                    .setLargeIcon(((BitmapDrawable) d).getBitmap())
+                    .setPriority(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
+                            ? NotificationManager.IMPORTANCE_HIGH
+                            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                            : NotificationCompat.PRIORITY_HIGH);
+
+            notificationManager.notify(NOTIFICATION_PUSH_CLOUD_DRIVE, notificationBuilder.build());
         } catch (Exception e) {
-            Timber.e(e);
+            Timber.e("Exception", e);
         }
     }
 
@@ -1450,9 +1404,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     Timber.d("Disable chat finish logout");
                 }
             } else {
-
-                AccountController aC = new AccountController(this);
-                aC.logoutConfirmed(this, sharingScope);
+                AccountController.logoutConfirmed(this, sharingScope);
 
                 if (isActivityVisible()) {
                     Timber.d("Launch intent to login screen");
@@ -1461,27 +1413,29 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     this.startActivity(tourIntent);
                 }
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
+		} else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
             Timber.d("TYPE_PUSH_RECEIVED: %d__%s", e.getErrorCode(), e.getErrorString());
-            stopService(new Intent(this, KeepAliveService.class));
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                Timber.d("OK:TYPE_PUSH_RECEIVED");
-                chatNotificationReceived = true;
-                if (!getMegaApi().isEphemeralPlusPlus()) {
-                    ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-                    notificationBuilder.generateChatNotification(request);
+
+            //Temporary HMS code to show pushes until AND-13803 is resolved.
+            if (BuildFlavorHelper.INSTANCE.isHMS()) {
+                if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                    Timber.d("OK:TYPE_PUSH_RECEIVED");
+                    if (!getMegaApi().isEphemeralPlusPlus()) {
+                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
+                        notificationBuilder.generateChatNotification(request);
+                    }
+                } else {
+                    Timber.w("Error TYPE_PUSH_RECEIVED: %s", e.getErrorString());
                 }
-            } else {
-                Timber.e("Error TYPE_PUSH_RECEIVED: %s", e.getErrorString());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-            chatManagement.removeJoiningChatId(request.getChatHandle());
-            chatManagement.removeJoiningChatId(request.getUserHandle());
-        } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
-                && request.getUserHandle() == INVALID_HANDLE) {
-            chatManagement.removeLeavingChatId(request.getChatHandle());
-        }
-    }
+			chatManagement.removeJoiningChatId(request.getChatHandle());
+			chatManagement.removeJoiningChatId(request.getUserHandle());
+		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+				&& request.getUserHandle() == INVALID_HANDLE) {
+			chatManagement.removeLeavingChatId(request.getChatHandle());
+		}
+	}
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
@@ -1497,8 +1451,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         Timber.d("Show incoming call notification and start to sound. Chat ID is %s", incomingCall.getChatid());
         createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
         getChatManagement().addNotificationShown(incomingCall.getChatid());
-        stopService(new Intent(this, IncomingCallService.class));
-        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
         notificationBuilder.showOneCallNotification(incomingCall);
     }
 
@@ -1763,8 +1716,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
                     try {
                         Timber.d("Show missed call notification");
-                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-                        notificationBuilder.showMissedCallNotification(chatId, callId);
+                        ChatAdvancedNotificationBuilder.newInstance(this)
+                                .showMissedCallNotification(chatId, callId);
                     } catch (Exception e) {
                         Timber.e(e, "EXCEPTION when showing missed call notification");
                     }
@@ -1983,8 +1936,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public void checkQueuedCalls(long incomingCallChatId) {
         try {
-            stopService(new Intent(this, IncomingCallService.class));
-            ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+            ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
             notificationBuilder.checkQueuedCalls(incomingCallChatId);
         } catch (Exception e) {
             Timber.e(e);

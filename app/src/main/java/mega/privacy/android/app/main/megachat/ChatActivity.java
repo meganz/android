@@ -322,6 +322,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.domain.usecase.GetPushToken;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
@@ -370,7 +371,6 @@ import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
@@ -401,12 +401,14 @@ import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
@@ -582,6 +584,8 @@ public class ChatActivity extends PasscodeActivity
     GetParticipantsChangesUseCase getParticipantsChangesUseCase;
     @Inject
     GetCallUseCase getCallUseCase;
+    @Inject
+    GetPushToken getPushToken;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -1463,9 +1467,9 @@ public class ChatActivity extends PasscodeActivity
         if (position < messages.size()) {
             AndroidMegaChatMessage androidM = messages.get(position);
             StringBuilder messageToShow = new StringBuilder("");
-            String token = PushMessageHandler.getToken();
-            if (token != null) {
-                messageToShow.append("FCM TOKEN: " + token);
+            String token = getPushToken.invoke();
+            if(token!=null){
+                messageToShow.append("FCM TOKEN: " +token);
             }
             messageToShow.append("\nCHAT ID: " + MegaApiJava.userHandleToBase64(idChat));
             messageToShow.append("\nMY USER HANDLE: " + MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
@@ -8741,7 +8745,6 @@ public class ChatActivity extends PasscodeActivity
     @Override
     public void onResume() {
         super.onResume();
-        stopService(new Intent(this, KeepAliveService.class));
 
         setKeyboardVisibilityListener();
 
@@ -8770,7 +8773,7 @@ public class ChatActivity extends PasscodeActivity
 
             try {
                 ChatAdvancedNotificationBuilder notificationBuilder;
-                notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
                 notificationBuilder.removeAllChatNotifications();
             } catch (Exception e) {
                 Timber.e(e, "Exception NotificationManager - remove all notifications");
