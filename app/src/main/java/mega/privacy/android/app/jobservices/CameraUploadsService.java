@@ -62,7 +62,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -86,6 +85,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
+import androidx.lifecycle.LifecycleService;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +109,7 @@ import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
+import mega.privacy.android.app.domain.usecase.IsCameraUploadRunning;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -129,7 +130,16 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+public class CameraUploadsService extends LifecycleService implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+
+    @Inject
+    IsCameraUploadRunning isUploadRunning;
+
+    @Inject
+    CameraUploadRepository cameraUploadRepository;
+
+    @Inject
+    ThreadPoolExecutor megaThreadPoolExecutor;
 
     private static final int LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
     private static final int LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
@@ -162,7 +172,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private final String notificationChannelId = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
     private final String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
 
-    public static boolean running, ignoreAttr;
+    public static boolean ignoreAttr;
     private Handler handler;
 
     private WifiManager.WifiLock lock;
@@ -172,25 +182,16 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean canceled;
     private boolean stopByNetworkStateChange;
 
-    @Inject
-    CameraUploadRepository cameraUploadRepository;
-
-    @Inject
-    ThreadPoolExecutor megaThreadPoolExecutor;
-
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
     private MegaApplication app;
 
     private String localPath = INVALID_NON_NULL_VALUE;
-    private boolean removeGPS = true;
     private long cameraUploadHandle = INVALID_HANDLE;
     private boolean secondaryEnabled;
     private String localPathSecondary = INVALID_NON_NULL_VALUE;
     private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode;
-
-    private boolean isLoggingIn;
 
     private static final int LOGIN_IN = 12;
     private static final int SETTING_USER_ATTRIBUTE = 7;
@@ -311,6 +312,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        super.onBind(intent);
         return null;
     }
 
@@ -330,6 +332,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         Timber.d("Starting CameraUpload service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
         startForegroundNotification();
@@ -732,6 +735,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void startParallelUpload(List<SyncRecord> finalList, boolean isCompressedVideo) {
         CameraUploadSyncManager.INSTANCE.startActiveHeartbeat(finalList);
+        boolean removeGPS = cameraUploadRepository.getRemoveGpsDefault();
 
         for (SyncRecord file : finalList) {
             if (!running) break;
@@ -1082,8 +1086,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             localPath += SEPARATOR;
         }
 
-        removeGPS = cameraUploadRepository.getRemoveGpsDefault();
-
         if (cameraUploadRepository.isSyncByWifiDefault()) {
             if (!isOnWifi(this)) {
                 Timber.w("Not start, require WiFi.");
@@ -1091,11 +1093,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         }
 
-        isLoggingIn = MegaApplication.isLoggingIn();
-        if (megaApi.getRootNode() == null && !isLoggingIn) {
+        if (megaApi.getRootNode() == null && !MegaApplication.isLoggingIn()) {
             Timber.w("RootNode = null");
             running = true;
-            setLoginState(true);
+            MegaApplication.setLoggingIn(true);
             cameraUploadRepository.fastLogin(this);
             cameraUploadRepository.initializeMegaChat();
             return LOGIN_IN;
@@ -1356,7 +1357,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if (running) {
             handler.removeCallbacksAndMessages(null);
-            running = false;
         }
         releaseLocks();
 
@@ -1440,18 +1440,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 Timber.d("ERROR: %s", e.getErrorString());
-                setLoginState(false);
+                MegaApplication.setLoggingIn(false);
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 Timber.d("fetch nodes ok");
-                setLoginState(false);
+                MegaApplication.setLoggingIn(false);
                 Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES");
                 startWorkerThread();
             } else {
                 Timber.d("ERROR: %s", e.getErrorString());
-                setLoginState(false);
+                MegaApplication.setLoggingIn(false);
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
@@ -1534,11 +1534,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (!isSuccessful) {
             finish();
         }
-    }
-
-    private void setLoginState(boolean b) {
-        isLoggingIn = b;
-        MegaApplication.setLoggingIn(b);
     }
 
     @Override

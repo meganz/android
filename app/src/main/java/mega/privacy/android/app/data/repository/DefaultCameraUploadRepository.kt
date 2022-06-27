@@ -4,11 +4,13 @@ import android.content.Context
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.preferences.CameraUploadPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.SyncRecord
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
@@ -27,6 +29,7 @@ import javax.inject.Inject
  * @property databaseHandler DatabaseHandler
  * @property context Context
  * @property megaApiGateway MegaApiGateway
+ * @property cameraUploadPreferencesGateway CameraUploadPreferencesGateway
  * @property threadPoolExecutor ThreadPoolExecutor
  * @property ioDispatcher CoroutineDispatcher
  */
@@ -34,6 +37,7 @@ class DefaultCameraUploadRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
+    private val cameraUploadPreferencesGateway: CameraUploadPreferencesGateway,
     private val threadPoolExecutor: ThreadPoolExecutor,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
@@ -229,6 +233,13 @@ class DefaultCameraUploadRepository @Inject constructor(
         localPath: String?,
         isSecondary: Boolean,
     ) = databaseHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
+
+    override fun isCameraUploadRunning(): Flow<Boolean> =
+        cameraUploadPreferencesGateway.isCameraUploadRunning()
+
+    override suspend fun setIsCameraUploadRunning(isRunning: Boolean) {
+        cameraUploadPreferencesGateway.setIsCameraUploadRunning(isRunning)
+    }
 
     // TODO SUSPEND AND CONTINUATION INSTEAD OF CALLBACK LISTENER
     override fun fastLogin(listener: MegaRequestListenerInterface) {

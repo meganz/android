@@ -1,5 +1,6 @@
 package mega.privacy.android.app.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.app.domain.entity.SyncRecord
 import nz.mega.sdk.MegaError
@@ -352,4 +353,18 @@ interface CameraUploadRepository {
         localPath: String?,
         isSecondary: Boolean,
     )
+
+    /**
+     * Is camera upload service running
+     *
+     * @return flow emitting if camera upload is running
+     */
+    fun isCameraUploadRunning(): Flow<Boolean>
+
+    /**
+     * Set camera upload running flag
+     *
+     * @return
+     */
+    suspend fun setIsCameraUploadRunning(isRunning: Boolean)
 }
