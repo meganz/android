@@ -20,12 +20,11 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.isAllowedTitle
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatRoom
-import java.util.*
+import timber.log.Timber
 
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
@@ -49,7 +48,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             binding.typeMeetingEditText.setText(viewModel.initHintMeetingName())
         }
 
-        logDebug("Meeting Name: $meetingName")
+        Timber.d("Meeting Name: $meetingName")
         releaseVideoAndHideKeyboard()
 
         val action = InMeetingFragmentDirections.actionGlobalInMeeting(
@@ -67,7 +66,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         // Toolbar should be set to TRANSPARENT in "Create Meeting"
         toolbar = (activity as? MeetingActivity)?.binding?.toolbar
@@ -78,7 +77,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         // Reset the toolbar background to the default value
-        toolbar?.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_shape_callschat)
+        toolbar?.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.gradient_shape_callschat)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

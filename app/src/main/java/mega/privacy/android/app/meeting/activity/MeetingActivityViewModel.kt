@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -39,13 +42,15 @@ import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,7 +64,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
     private val answerCallUseCase: AnswerCallUseCase,
     getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
-    private val getCallUseCase: GetCallUseCase
+    private val getCallUseCase: GetCallUseCase,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -135,7 +140,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
             if (_speakerLiveData.value != it && it != AppRTCAudioManager.AudioDevice.NONE) {
-                logDebug("Updating speaker $it")
+                Timber.d("Updating speaker $it")
 
                 _speakerLiveData.value = it
                 tips.value = when (it) {
@@ -194,16 +199,14 @@ class MeetingActivityViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { chatIdOfCallEnded ->
                     currentChatId.value.let { currentChatId ->
-                        if(chatIdOfCallEnded == currentChatId) {
+                        if (chatIdOfCallEnded == currentChatId) {
                             _finishMeetingActivity.value = true
                         }
                     }
                 },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                onError = Timber::e
             )
-                .addTo(composite)
+            .addTo(composite)
 
         getLocalAudioChangesUseCase.get()
             .subscribeOn(Schedulers.io())
@@ -214,7 +217,7 @@ class MeetingActivityViewModel @Inject constructor(
                         if (call.chatid == it) {
                             val isEnable = call.hasLocalAudio()
                             _micLiveData.value = isEnable
-                            logDebug("open Mic: $isEnable")
+                            Timber.d("open Mic: $isEnable")
                             tips.value = when (isEnable) {
                                 true -> getString(
                                     R.string.general_mic_unmute
@@ -226,11 +229,9 @@ class MeetingActivityViewModel @Inject constructor(
                         }
                     }
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
-                .addTo(composite)
+            .addTo(composite)
 
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)
@@ -245,14 +246,14 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Control when calls are to be switched
      */
-    fun clickSwitchCall(){
+    fun clickSwitchCall() {
         checkAnotherCalls(false)
     }
 
     /**
      * Control when call should be finish
      */
-    fun clickEndCall(){
+    fun clickEndCall() {
         checkAnotherCalls(true)
     }
 
@@ -303,7 +304,7 @@ class MeetingActivityViewModel @Inject constructor(
                         override fun onRequestFinish(
                             api: MegaApiJava,
                             request: MegaRequest,
-                            e: MegaError
+                            e: MegaError,
                         ) {
                             if (request.type == MegaRequest.TYPE_GET_ATTR_USER
                                 && request.paramType == MegaApiJava.USER_ATTR_AVATAR
@@ -349,7 +350,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun updateChatRoomId(chatId: Long) {
-        if(_currentChatId.value != chatId){
+        if (_currentChatId.value != chatId) {
             _currentChatId.value = chatId
         }
     }
@@ -368,7 +369,7 @@ class MeetingActivityViewModel @Inject constructor(
      * Method to initiate the call with the microphone on
      */
     fun micInitiallyOn() {
-        logDebug("Call with audio activated initially")
+        Timber.d("Call with audio activated initially")
         _micLiveData.value = true
     }
 
@@ -376,7 +377,7 @@ class MeetingActivityViewModel @Inject constructor(
      * Method to initiate the call with the camera on
      */
     fun camInitiallyOn() {
-        logDebug("Call with video activated initially")
+        Timber.d("Call with video activated initially")
         _cameraLiveData.value = true
     }
 
@@ -411,7 +412,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
     fun clickMic(shouldAudioBeEnabled: Boolean) {
-        if(micLocked) {
+        if (micLocked) {
             return
         }
         // Check audio permission. If haven't been granted, ask for the permission and return
@@ -429,10 +430,10 @@ class MeetingActivityViewModel @Inject constructor(
         } else {
             //The chat is not yet created or the call is not yet established
             _micLiveData.value = shouldAudioBeEnabled
-            logDebug("open Mic: $shouldAudioBeEnabled")
+            Timber.d("open Mic: $shouldAudioBeEnabled")
             tips.value = if (shouldAudioBeEnabled) {
                 getString(R.string.general_mic_unmute)
-            } else{
+            } else {
                 getString(R.string.general_mic_mute)
             }
         }
@@ -451,14 +452,14 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
         if (isChatCreatedAndIParticipating()) {
-            logDebug("Clicked cam with chat")
+            Timber.d("Clicked cam with chat")
             meetingActivityRepository.switchCamera(
                 _currentChatId.value!!,
                 shouldVideoBeEnabled,
                 DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
             )
         } else {
-            logDebug("Clicked cam without chat")
+            Timber.d("Clicked cam without chat")
             //The chat is not yet created or the call is not yet established
             meetingActivityRepository.switchCameraBeforeStartMeeting(
                 shouldVideoBeEnabled,
@@ -492,11 +493,11 @@ class MeetingActivityViewModel @Inject constructor(
     fun clickSpeaker() {
         when (_speakerLiveData.value) {
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                logDebug("Trying to switch to EARPIECE")
+                Timber.d("Trying to switch to EARPIECE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
             }
             else -> {
-                logDebug("Trying to switch to SPEAKER_PHONE")
+                Timber.d("Trying to switch to SPEAKER_PHONE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
             }
         }
@@ -508,7 +509,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param cameraPermission true: the permission is granted
      */
     fun setCameraPermission(cameraPermission: Boolean) {
-        if(_cameraGranted.value == cameraPermission)
+        if (_cameraGranted.value == cameraPermission)
             return
 
         _cameraGranted.value = cameraPermission
@@ -520,7 +521,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param recordAudioPermission true: the permission is granted
      */
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
-        if(_recordAudioGranted.value == recordAudioPermission)
+        if (_recordAudioGranted.value == recordAudioPermission)
             return
 
         _recordAudioGranted.value = recordAudioPermission
@@ -536,7 +537,7 @@ class MeetingActivityViewModel @Inject constructor(
         if (listener == null)
             return
 
-        logDebug("Adding local video")
+        Timber.d("Adding local video")
         meetingActivityRepository.addLocalVideo(chatId, listener)
     }
 
@@ -548,11 +549,11 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun removeLocalVideo(chatId: Long, listener: IndividualCallVideoListener?) {
         if (listener == null) {
-            logError("Listener is null")
+            Timber.e("Listener is null")
             return
         }
 
-        logDebug("Removing local video")
+        Timber.d("Removing local video")
         meetingActivityRepository.removeLocalVideo(chatId, listener)
     }
 
@@ -576,7 +577,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun updateCameraValueAndTips(isVideoOn: Boolean) {
         _cameraLiveData.value = isVideoOn
-        logDebug("Open video: ${_cameraLiveData.value}")
+        Timber.d("Open video: ${_cameraLiveData.value}")
         tips.value = when (isVideoOn) {
             true -> getString(
                 R.string.general_camera_enable
@@ -622,13 +623,13 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
-        logDebug("Result Code: $resultCode")
+        Timber.d("Result Code: $resultCode")
         if (intent == null) {
-            LogUtil.logWarning("Intent is null")
+            Timber.w("Intent is null")
             return
         }
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
-            logDebug("Participants successfully added")
+            Timber.d("Participants successfully added")
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
             if (contactsData != null) {
@@ -638,7 +639,7 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         } else {
-            logError("Error adding participants")
+            Timber.e("Error adding participants")
         }
     }
 
@@ -654,7 +655,7 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Hide snack bar
      */
-    fun hideSnackBar(){
+    fun hideSnackBar() {
         _snackBarLiveData.value = ""
     }
 
@@ -678,10 +679,13 @@ class MeetingActivityViewModel @Inject constructor(
     fun changeParticipantPermissions(
         userHandle: Long,
         permission: Int,
-        listener: MegaChatRequestListenerInterface? = null
+        listener: MegaChatRequestListenerInterface? = null,
     ) {
         currentChatId.value?.let {
-            meetingActivityRepository.changeParticipantPermissions(it, userHandle, permission, listener)
+            meetingActivityRepository.changeParticipantPermissions(it,
+                userHandle,
+                permission,
+                listener)
         }
     }
 
@@ -696,7 +700,7 @@ class MeetingActivityViewModel @Inject constructor(
     fun answerCall(
         enableVideo: Boolean,
         enableAudio: Boolean,
-        speakerAudio: Boolean
+        speakerAudio: Boolean,
     ): LiveData<AnswerCallUseCase.AnswerCallResult> {
         val result = MutableLiveData<AnswerCallUseCase.AnswerCallResult>()
         _currentChatId.value?.let {

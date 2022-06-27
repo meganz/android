@@ -1,8 +1,11 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarShareContact;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_ADD_CONTACTS;
+import static mega.privacy.android.app.utils.Util.dp2px;
+
 import android.app.Activity;
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -10,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -19,32 +25,28 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import timber.log.Timber;
 
 
-public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdapter.ViewHolderChips> implements View.OnClickListener{
+public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdapter.ViewHolderChips> implements View.OnClickListener {
 
     private int positionClicked;
     ArrayList<ShareContactInfo> contacts;
     private MegaApiAndroid megaApi;
     private Context context;
 
-    public ShareContactsAdapter (Context _context, ArrayList<ShareContactInfo> _contacts){
+    public ShareContactsAdapter(Context _context, ArrayList<ShareContactInfo> _contacts) {
         this.contacts = _contacts;
         this.context = _context;
         this.positionClicked = -1;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
 
-    public static class ViewHolderChips extends RecyclerView.ViewHolder{
+    public static class ViewHolderChips extends RecyclerView.ViewHolder {
         public ViewHolderChips(View itemView) {
             super(itemView);
         }
@@ -60,10 +62,10 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public ShareContactsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
+        Timber.d("onCreateViewHolder");
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
@@ -85,58 +87,49 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public void onBindViewHolder(ShareContactsAdapter.ViewHolderChips holder, int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
 
         ShareContactInfo contact = (ShareContactInfo) getItem(position);
         String[] s;
-        if (contact.isPhoneContact()){
-            if (contact.getPhoneContactInfo().getName() != null){
+        if (contact.isPhoneContact()) {
+            if (contact.getPhoneContactInfo().getName() != null) {
                 s = contact.getPhoneContactInfo().getName().split(" ");
-                if (s != null && s.length > 0){
+                if (s != null && s.length > 0) {
                     holder.textViewName.setText(s[0]);
-                }
-                else {
+                } else {
                     holder.textViewName.setText(contact.getPhoneContactInfo().getName());
                 }
-            }
-            else {
+            } else {
                 s = contact.getPhoneContactInfo().getEmail().split("[@._]");
-                if (s != null && s.length > 0){
+                if (s != null && s.length > 0) {
                     holder.textViewName.setText(s[0]);
-                }
-                else {
+                } else {
                     holder.textViewName.setText(contact.getPhoneContactInfo().getEmail());
                 }
             }
-        }
-        else if (contact.isMegaContact()){
+        } else if (contact.isMegaContact()) {
             if (contact.getMegaContactAdapter().getFullName() != null) {
                 if (contact.getMegaContactAdapter().getMegaUser() == null && contact.getMegaContactAdapter().getMegaContactDB() == null) {
                     s = contact.getMegaContactAdapter().getFullName().split("[@._]");
                     if (s != null && s.length > 0) {
                         holder.textViewName.setText(s[0]);
-                    }
-                    else {
+                    } else {
                         holder.textViewName.setText(contact.getMegaContactAdapter().getFullName());
                     }
-                }
-                else {
+                } else {
                     s = contact.getMegaContactAdapter().getFullName().split(" ");
                     if (s != null && s.length > 0) {
                         holder.textViewName.setText(s[0]);
-                    }
-                    else {
+                    } else {
                         holder.textViewName.setText(contact.getMegaContactAdapter().getFullName());
                     }
                 }
             }
-        }
-        else {
+        } else {
             s = contact.getMail().split("[@._]");
             if (s != null && s.length > 0) {
                 holder.textViewName.setText(s[0]);
-            }
-            else {
+            } else {
                 holder.textViewName.setText(contact.getMail());
             }
         }
@@ -146,20 +139,20 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
     @Override
     public int getItemCount() {
-        return  contacts.size();
+        return contacts.size();
     }
 
     @Override
     public void onClick(View view) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         ShareContactsAdapter.ViewHolderChips holder = (ShareContactsAdapter.ViewHolderChips) view.getTag();
-        if(holder!=null){
+        if (holder != null) {
             int currentPosition = holder.getLayoutPosition();
-            logDebug("Current position: " + currentPosition);
+            Timber.d("Current position: %s", currentPosition);
 
-            if(currentPosition<0){
-                logError("Current position error - not valid value");
+            if (currentPosition < 0) {
+                Timber.e("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -168,9 +161,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
                     break;
                 }
             }
-        }
-        else{
-            logError("Error. Holder is Null");
+        } else {
+            Timber.e("Error. Holder is Null");
         }
     }
 
@@ -185,20 +177,20 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     }
 
     public void setPositionClicked(int p) {
-        logDebug("Position: " + p);
+        Timber.d("Position: %s", p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
-    public void setContacts (ArrayList<ShareContactInfo> contacts){
-        logDebug("setContacts");
+    public void setContacts(ArrayList<ShareContactInfo> contacts) {
+        Timber.d("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         return contacts.get(position);
     }
 }

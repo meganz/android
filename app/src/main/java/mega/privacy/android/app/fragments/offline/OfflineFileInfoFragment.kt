@@ -25,8 +25,8 @@ import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
+import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -60,7 +60,7 @@ class OfflineFileInfoFragment : Fragment() {
     private fun observeLiveData() {
         viewModel.node.observe(viewLifecycleOwner) {
             if (it == null) {
-                logError("OfflineFileInfoFragment observed null node")
+                Timber.e("OfflineFileInfoFragment observed null node")
 
                 requireActivity().finish()
             } else {

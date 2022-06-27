@@ -28,12 +28,12 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 
 /**
  * Fragment that represents the UI showing the list of contact groups for the current user.
@@ -55,7 +55,7 @@ class ContactGroupsFragment : Fragment() {
                 val intent = result.data
                 val resultCode = result.resultCode
                 if (resultCode != Activity.RESULT_OK || intent == null) {
-                    LogUtil.logWarning("Error creating chat")
+                    Timber.w("Error creating chat")
                     return@registerForActivityResult
                 }
 
@@ -65,7 +65,7 @@ class ContactGroupsFragment : Fragment() {
                     intent.getBooleanExtra(AddContactActivity.EXTRA_GROUP_CHAT, false)
 
                 if (contactsData == null || !isGroup) {
-                    LogUtil.logWarning("Is one to one chat or no contacts selected")
+                    Timber.w("Is one to one chat or no contacts selected")
                     return@registerForActivityResult
                 }
 
@@ -88,7 +88,7 @@ class ContactGroupsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentContactGroupsBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
@@ -117,7 +117,9 @@ class ContactGroupsFragment : Fragment() {
         binding.list.setHasFixedSize(true)
         binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
+                setDrawable(ResourcesCompat.getDrawable(resources,
+                    R.drawable.contact_list_divider,
+                    null)!!)
             }
         )
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {

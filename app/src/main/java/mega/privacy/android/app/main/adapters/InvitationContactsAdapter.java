@@ -1,22 +1,34 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+
 import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.ContactsContract;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.main.InvitationContactInfo;
@@ -25,12 +37,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import static mega.privacy.android.app.main.InvitationContactInfo.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
+import timber.log.Timber;
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContacts> implements MegaRequestListenerInterface {
 
@@ -86,12 +93,12 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
         @Override
         public void onClick(View v) {
-            logDebug("CI contact get clicked");
+            Timber.d("CI contact get clicked");
             int position = getAdapterPosition();
             if (callback != null && position >= 0 && position < contactData.size()) {
                 InvitationContactInfo invitationContactInfo = contactData.get(position);
                 if (invitationContactInfo.getType() == TYPE_MEGA_CONTACT || invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
-                    if(!invitationContactInfo.hasMultipleContactInfos()) {
+                    if (!invitationContactInfo.hasMultipleContactInfos()) {
                         boolean isSelected = !invitationContactInfo.isHighlighted();
                         invitationContactInfo.setHighlighted(isSelected);
                     }
@@ -113,7 +120,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     @Override
     public int getItemViewType(int position) {
         InvitationContactInfo item = getItem(position);
-        if(item != null) {
+        if (item != null) {
             return item.getType();
         }
         return -1;
@@ -171,7 +178,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private ViewHolderPhoneContacts createHeaderHolder(ViewGroup parentView) {
-        logDebug("create Header Holder");
+        Timber.d("create Header Holder");
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
         ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
@@ -181,7 +188,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private ViewHolderPhoneContacts createContactHolder(ViewGroup parentView) {
-        logDebug("create Contact Holder");
+        Timber.d("create Contact Holder");
         View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
         ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
         holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
@@ -215,7 +222,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
-                logDebug("create default avatar as unable to get user pre-set one");
+                Timber.d("create default avatar as unable to get user pre-set one");
                 bitmap = getDefaultAvatar(contact.getAvatarColor(), contact.getName(), AVATAR_SIZE, true, false);
             }
             contact.setBitmap(bitmap);
@@ -224,7 +231,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private Bitmap createPhoneContactBitmap(long id) {
-        logDebug("createPhoneContactBitmap");
+        Timber.d("createPhoneContactBitmap");
         InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
                 ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id));
         Bitmap photo = null;
@@ -234,14 +241,13 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
                 inputStream.close();
             }
         } catch (IOException e) {
-            logError("Create phone contact bitmap exception.", e);
-            e.printStackTrace();
+            Timber.e(e, "Create phone contact bitmap exception.");
         }
         return photo;
     }
 
     private void setItemHighlighted(View view) {
-        logDebug("setItemHighlighted");
+        Timber.d("setItemHighlighted");
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
         Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_chat_avatar_select);
         if (image != null) {
@@ -250,7 +256,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private void setItemNormal(View view, Bitmap bitmap) {
-        logDebug("setItemNormal");
+        Timber.d("setItemNormal");
         if (bitmap != null) {
             ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
             imageView.setImageBitmap(bitmap);
@@ -258,7 +264,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
-        logDebug("getMegaUserAvatar");
+        Timber.d("getMegaUserAvatar");
         String email = contact.getDisplayInfo();
         File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();

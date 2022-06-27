@@ -1,5 +1,55 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
+import static mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES;
+import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
+import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
+import static mega.privacy.android.app.main.ManagerActivity.COMPLETED_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS;
+import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_CHAT;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_CU;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_TXT_FILE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION;
+import static mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_UPLOAD_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_UPLOAD;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_UPLOAD_FINAL;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_UPLOAD_FOLDER;
+import static mega.privacy.android.app.utils.Constants.NOT_OVERQUOTA_STATE;
+import static mega.privacy.android.app.utils.Constants.OVERQUOTA_STORAGE_STATE;
+import static mega.privacy.android.app.utils.Constants.PRE_OVERQUOTA_STORAGE_STATE;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.resizeBitmapUpload;
+import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnailPdf;
+import static mega.privacy.android.app.utils.Util.getProgressSize;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -32,18 +82,20 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
-import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
@@ -61,38 +113,17 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
-import static mega.privacy.android.app.main.ManagerActivity.*;
-import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import javax.inject.Inject;
-
 /*
  * Service to Upload files
  */
 @AndroidEntryPoint
 public class UploadService extends Service {
 
-	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	public static String EXTRA_FILE_PATH = "MEGA_FILE_PATH";
-	public static String EXTRA_NAME = "MEGA_FILE_NAME";
-	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
-	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
+    public static String ACTION_CANCEL = "CANCEL_UPLOAD";
+    public static String EXTRA_FILE_PATH = "MEGA_FILE_PATH";
+    public static String EXTRA_NAME = "MEGA_FILE_NAME";
+    public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
+    public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
     public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
 
     @Inject
@@ -100,8 +131,8 @@ public class UploadService extends Service {
     @Inject
     TransfersManagement transfersManagement;
 
-	private boolean isForeground = false;
-	private boolean canceled;
+    private boolean isForeground = false;
+    private boolean canceled;
 
     private MegaApplication app;
     private MegaApiAndroid megaApi;
@@ -111,9 +142,9 @@ public class UploadService extends Service {
     private WakeLock wl;
     private DatabaseHandler dbH = null;
 
-	private Notification.Builder mBuilder;
-	private NotificationCompat.Builder mBuilderCompat;
-	private NotificationManager mNotificationManager;
+    private Notification.Builder mBuilder;
+    private NotificationCompat.Builder mBuilderCompat;
+    private NotificationManager mNotificationManager;
 
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
     private int pendingToAddInQueue = 0;
@@ -122,12 +153,14 @@ public class UploadService extends Service {
     private int alreadyUploaded = 0;
     private int uploadCount = 0;
 
-	//NOT_OVERQUOTA_STATE           = 0 - not overquota, not pre-overquota
-	//OVERQUOTA_STORAGE_STATE       = 1 - overquota
-	//PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-overquota
+    //NOT_OVERQUOTA_STATE           = 0 - not overquota, not pre-overquota
+    //OVERQUOTA_STORAGE_STATE       = 1 - overquota
+    //PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-overquota
     private int isOverquota = NOT_OVERQUOTA_STATE;
 
-    /** the receiver and manager for the broadcast to listen to the pause event */
+    /**
+     * the receiver and manager for the broadcast to listen to the pause event
+     */
     private BroadcastReceiver pauseBroadcastReceiver;
 
     private final CompositeDisposable rxSubscriptions = new CompositeDisposable();
@@ -142,37 +175,37 @@ public class UploadService extends Service {
     };
 
     @SuppressLint("NewApi")
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Timber.d("onCreate");
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Timber.d("onCreate");
 
-		app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
-		megaChatApi = app.getMegaChatApi();
-		mapProgressFileTransfers = new HashMap<>();
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		isForeground = false;
-		canceled = false;
-		isOverquota = NOT_OVERQUOTA_STATE;
+        app = (MegaApplication) getApplication();
+        megaApi = app.getMegaApi();
+        megaChatApi = app.getMegaChatApi();
+        mapProgressFileTransfers = new HashMap<>();
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        isForeground = false;
+        canceled = false;
+        isOverquota = NOT_OVERQUOTA_STATE;
 
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-		if (wifiManager != null) {
+        if (wifiManager != null) {
             lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock");
         }
 
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		if (pm != null) {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm != null) {
             wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock:");
         }
 
         mBuilder = new Notification.Builder(UploadService.this);
-		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
-		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		startForeground();
+        startForeground();
 
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = new BroadcastReceiver() {
@@ -198,32 +231,36 @@ public class UploadService extends Service {
                         doOnTransferStart(transfer)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (error) -> Timber.e("Error " + error));
+                                .subscribe(() -> {
+                                }, Timber::e);
                         ;
                     } else if (event instanceof Result.OnTransferUpdate) {
                         MegaTransfer transfer = ((Result.OnTransferUpdate) event).getTransfer();
                         doOnTransferUpdate(transfer)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (error) -> Timber.e("Error " + error));
+                                .subscribe(() -> {
+                                }, Timber::e);
                     } else if (event instanceof Result.OnTransferFinish) {
                         MegaTransfer transfer = ((Result.OnTransferFinish) event).getTransfer();
                         MegaError error = ((Result.OnTransferFinish) event).getError();
                         doOnTransferFinish(transfer, error)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (throwable) -> Timber.e("Error " + throwable));
+                                .subscribe(() -> {
+                                }, Timber::e);
                     } else if (event instanceof Result.OnTransferTemporaryError) {
                         MegaTransfer transfer = ((Result.OnTransferTemporaryError) event).getTransfer();
                         MegaError error = ((Result.OnTransferTemporaryError) event).getError();
                         doOnTransferTemporaryError(transfer, error)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> { }, (throwable) -> Timber.e("Error " + throwable));
+                                .subscribe(() -> {
+                                }, Timber::e);
                     }
-                }, (error) -> Timber.e("Error " + error));
+                }, Timber::e);
         rxSubscriptions.add(subscription);
-	}
+    }
 
     private void startForeground() {
         try {
@@ -249,12 +286,12 @@ public class UploadService extends Service {
         stopSelf();
     }
 
-	@Override
-	public void onDestroy(){
-		Timber.d("onDestroy");
+    @Override
+    public void onDestroy() {
+        Timber.d("onDestroy");
         releaseLocks();
 
-        if (megaChatApi != null){
+        if (megaChatApi != null) {
             megaChatApi.saveCurrentState();
         }
 
@@ -264,39 +301,39 @@ public class UploadService extends Service {
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
                 .removeObserver(stopServiceObserver);
 
-		super.onDestroy();
-	}
+        super.onDestroy();
+    }
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Timber.d("onStartCommand");
-		canceled = false;
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Timber.d("onStartCommand");
+        canceled = false;
 
-		if (intent == null) {
-		    canceled = true;
-		    stopForeground();
-			return START_NOT_STICKY;
-		}
+        if (intent == null) {
+            canceled = true;
+            stopForeground();
+            return START_NOT_STICKY;
+        }
 
-		if ((intent.getAction() != null)){
-			if (intent.getAction().equals(ACTION_CANCEL)) {
-				Timber.d("Cancel intent");
-				canceled = true;
-				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-				stopForeground();
-				return START_NOT_STICKY;
-			}
-		}
+        if ((intent.getAction() != null)) {
+            if (intent.getAction().equals(ACTION_CANCEL)) {
+                Timber.d("Cancel intent");
+                canceled = true;
+                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+                stopForeground();
+                return START_NOT_STICKY;
+            }
+        }
 
-		onHandleIntent(intent);
-		return START_NOT_STICKY;
-	}
+        onHandleIntent(intent);
+        return START_NOT_STICKY;
+    }
 
-	private synchronized void onHandleIntent(final Intent intent) {
-		Timber.d("onHandleIntent");
+    private synchronized void onHandleIntent(final Intent intent) {
+        Timber.d("onHandleIntent");
 
         String action = intent.getAction();
-        Timber.d("Action is " + action);
+        Timber.d("Action is %s", action);
         if (action != null) {
             switch (action) {
                 case ACTION_OVERQUOTA_STORAGE:
@@ -324,7 +361,7 @@ public class UploadService extends Service {
 
                         transfersManagement.checkIfTransferIsPaused(transfer);
 
-                        if (!transfer.isFolderTransfer() && transfer.getAppData() == null){
+                        if (!transfer.isFolderTransfer() && transfer.getAppData() == null) {
                             mapProgressFileTransfers.put(transfer.getTag(), transfer);
                         }
                     }
@@ -365,7 +402,7 @@ public class UploadService extends Service {
 
     private void doHandleIntent(Intent intent, String filePath) {
         final File file = new File(filePath);
-        Timber.d("File to manage: " + file.getAbsolutePath());
+        Timber.d("File to manage: %s", file.getAbsolutePath());
 
         String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, INVALID_HANDLE);
@@ -400,27 +437,27 @@ public class UploadService extends Service {
         }
     }
 
-	/*
-	 * Stop uploading service
-	 */
-	private void cancel() {
-		Timber.d("cancel");
-		canceled = true;
-		stopForeground();
-	}
+    /*
+     * Stop uploading service
+     */
+    private void cancel() {
+        Timber.d("cancel");
+        canceled = true;
+        stopForeground();
+    }
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-	/**
-	 * No more intents in the queue, reset and finish service.
+    /**
+     * No more intents in the queue, reset and finish service.
      *
      * @param showSnackbar True if should show finish snackbar, false otherwise.
-	 */
-	private void onQueueComplete(boolean showSnackbar) {
-		Timber.d("onQueueComplete");
+     */
+    private void onQueueComplete(boolean showSnackbar) {
+        Timber.d("onQueueComplete");
         releaseLocks();
         if (isOverquota != NOT_OVERQUOTA_STATE) {
             showStorageOverQuotaNotification();
@@ -433,63 +470,63 @@ public class UploadService extends Service {
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
-			Timber.d("Reset total uploads");
+            Timber.d("Reset total uploads");
             megaApi.resetTotalUploads();
         }
 
         resetUploadNumbers();
 
-		Timber.d("Stopping service!");
+        Timber.d("Stopping service!");
         stopForeground();
-		Timber.d("After stopSelf");
+        Timber.d("After stopSelf");
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
+            CacheFolderManager.deleteCacheFolderIfEmpty(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
         }
 
-	}
+    }
 
-    private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
+    private void notifyNotification(String notificationTitle, String size, int notificationId, String channelId, String channelName) {
         Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
-            channel.setSound(null,null);
+            channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(),channelId);
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), channelId);
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
 
-            mNotificationManager.notify(notificationId,mBuilderCompatO.build());
+            mNotificationManager.notify(notificationId, mBuilderCompatO.build());
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
 
-            mNotificationManager.notify(notificationId,mBuilderCompat.build());
+            mNotificationManager.notify(notificationId, mBuilderCompat.build());
         }
     }
 
     private long getTransferredByte(HashMap<Integer, MegaTransfer> map) {
         Collection<MegaTransfer> transfers = map.values();
         long transferredBytes = 0;
-        for (Iterator iterator = transfers.iterator();iterator.hasNext();) {
-            MegaTransfer currentTransfer = (MegaTransfer)iterator.next();
+        for (Iterator iterator = transfers.iterator(); iterator.hasNext(); ) {
+            MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
             transferredBytes = transferredBytes + currentTransfer.getTransferredBytes();
         }
         return transferredBytes;
@@ -536,7 +573,7 @@ public class UploadService extends Service {
         }
     }
 
-    private void notifyProgressNotification(int progressPercent, String message, String info, String actionString){
+    private void notifyProgressNotification(int progressPercent, String message, String info, String actionString) {
         Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         switch (isOverquota) {
             case OVERQUOTA_STORAGE_STATE:
@@ -574,11 +611,10 @@ public class UploadService extends Service {
                     .setOnlyAlertOnce(true);
 
             notification = mBuilderCompat.build();
-        }
-        else {
+        } else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setContentInfo(info)
@@ -589,13 +625,12 @@ public class UploadService extends Service {
         }
 
         if (!isForeground) {
-			Timber.d("Starting foreground");
+            Timber.d("Starting foreground");
             try {
                 startForeground(NOTIFICATION_UPLOAD, notification);
                 isForeground = true;
-            }
-            catch (Exception e){
-				Timber.e(e, "Start foreground exception");
+            } catch (Exception e) {
+                Timber.e(e, "Start foreground exception");
                 isForeground = false;
             }
         } else {
@@ -613,15 +648,15 @@ public class UploadService extends Service {
         long inProgressTemp;
         if (total > 0) {
             inProgressTemp = inProgress * 100;
-            progressPercent = (int)(inProgressTemp / total);
+            progressPercent = (int) (inProgressTemp / total);
 
             showRating(total, megaApi.getCurrentUploadSpeed());
         }
 
         String message = getMessageForProgressNotification(inProgress);
-        Timber.d("updateProgressNotification" + progressPercent + " " + message);
+        Timber.d("updateProgressNotification%d %s", progressPercent, message);
         String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
-        String info = getProgressSize(UploadService.this,inProgress,total);
+        String info = getProgressSize(UploadService.this, inProgress, total);
 
         notifyProgressNotification(progressPercent, message, info, actionString);
     }
@@ -629,7 +664,7 @@ public class UploadService extends Service {
     /**
      * Determine if should show the rating page to users
      *
-     * @param total the total size of uploading file
+     * @param total              the total size of uploading file
      * @param currentUploadSpeed current uploading speed
      */
     private void showRating(long total, int currentUploadSpeed) {
@@ -640,7 +675,7 @@ public class UploadService extends Service {
     }
 
     private String getMessageForProgressNotification(long inProgress) {
-        Timber.d("inProgress: " + inProgress);
+        Timber.d("inProgress: %s", inProgress);
         String message;
         if (isOverquota != NOT_OVERQUOTA_STATE) {
             message = getString(R.string.overquota_alert_title);
@@ -655,19 +690,18 @@ public class UploadService extends Service {
         return message;
     }
 
-    private UploadProgress getInProgressNotification(Collection<MegaTransfer> transfers){
-		Timber.d("getInProgressNotification");
+    private UploadProgress getInProgressNotification(Collection<MegaTransfer> transfers) {
+        Timber.d("getInProgressNotification");
         UploadProgress progress = new UploadProgress();
         long total = 0;
         long inProgress = 0;
 
-        for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = transfers.iterator(); iterator.hasNext(); ) {
             MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
-            if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+            if (currentTransfer.getState() == MegaTransfer.STATE_COMPLETED) {
                 total = total + currentTransfer.getTotalBytes();
                 inProgress = inProgress + currentTransfer.getTotalBytes();
-            }
-            else{
+            } else {
                 total = total + currentTransfer.getTotalBytes();
                 inProgress = inProgress + currentTransfer.getTransferredBytes();
             }
@@ -709,7 +743,7 @@ public class UploadService extends Service {
     private Completable doOnTransferFinish(@Nullable MegaTransfer transfer, MegaError error) {
         return Completable.fromCallable(() -> {
             if (transfer == null) return null;
-            Timber.d("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
+            Timber.d("Path: %s, Size: %d", transfer.getPath(), transfer.getTransferredBytes());
             if (isCUOrChatTransfer(transfer)) return null;
 
             launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
@@ -749,7 +783,7 @@ public class UploadService extends Service {
                 }
 
                 if (canceled) {
-                    Timber.d("Upload canceled: " + transfer.getFileName());
+                    Timber.d("Upload canceled: %s", transfer.getFileName());
 
                     releaseLocks();
                     UploadService.this.cancel();
@@ -789,7 +823,7 @@ public class UploadService extends Service {
                                 }
 
                                 if (location != null) {
-                                    Timber.d("Location: " + location);
+                                    Timber.d("Location: %s", location);
 
                                     boolean secondTry = false;
                                     try {
@@ -798,8 +832,8 @@ public class UploadService extends Service {
 
                                         Double lat = Double.parseDouble(parts[0]);
                                         Double lon = Double.parseDouble(parts[1]);
-                                        Timber.d("Lat: " + lat); //first part
-                                        Timber.d("Long: " + lon); //second part
+                                        Timber.d("Lat: %s", lat); //first part
+                                        Timber.d("Long: %s", lon); //second part
 
                                         megaApi.setNodeCoordinates(node, lat, lon, null);
                                     } catch (Exception e) {
@@ -814,8 +848,8 @@ public class UploadService extends Service {
 
                                             Double lat = Double.parseDouble(latString);
                                             Double lon = Double.parseDouble(lonString);
-                                            Timber.d("Lat: " + lat); //first part
-                                            Timber.d("Long: " + lon); //second part
+                                            Timber.d("Lat: %s", lat); //first part
+                                            Timber.d("Long: %s", lon); //second part
 
                                             megaApi.setNodeCoordinates(node, lat, lon, null);
                                         } catch (Exception e) {
@@ -845,7 +879,7 @@ public class UploadService extends Service {
                                         megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
                                     }
                                 } catch (Exception e) {
-                                    Timber.w("Couldn't read exif info: " + transfer.getPath(), e);
+                                    Timber.w(e, "Couldn't read exif info: %s", transfer.getPath());
                                 }
                             }
                         } else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
@@ -904,7 +938,7 @@ public class UploadService extends Service {
                             Timber.d("NOT video, image or pdf!");
                         }
                     } else {
-                        Timber.e("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+                        Timber.e("Upload Error: %s_%d___%s", transfer.getFileName(), error.getErrorCode(), error.getErrorString());
 
                         if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
                             isOverquota = OVERQUOTA_STORAGE_STATE;
@@ -917,12 +951,12 @@ public class UploadService extends Service {
 
                     File localFile = CacheFolderManager.buildQrFile(getApplicationContext(), transfer.getFileName());
                     if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
-                        Timber.d("Delete file!: " + localFile.getAbsolutePath());
+                        Timber.d("Delete file!: %s", localFile.getAbsolutePath());
                         localFile.delete();
                     }
 
                     File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
-                    Timber.d("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
+                    Timber.d("IN Finish: %spath? %s", transfer.getFileName(), transfer.getPath());
                     if (isFileAvailable(tempPic) && transfer.getPath() != null) {
                         if (transfer.getPath().startsWith(tempPic.getAbsolutePath())) {
                             File f = new File(transfer.getPath());
@@ -959,7 +993,7 @@ public class UploadService extends Service {
                 }
 
                 if (canceled) {
-                    Timber.d("Transfer cancel: " + transfer.getFileName());
+                    Timber.d("Transfer cancel: %s", transfer.getFileName());
                     releaseLocks();
                     megaApi.cancelTransfer(transfer);
                     UploadService.this.cancel();
@@ -981,7 +1015,7 @@ public class UploadService extends Service {
     private Completable doOnTransferTemporaryError(@Nullable MegaTransfer transfer, MegaError e) {
         return Completable.fromCallable(() -> {
             if (transfer == null) return null;
-            Timber.w("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
+            Timber.w("onTransferTemporaryError: %s__%d", e.getErrorString(), e.getErrorCode());
 
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
@@ -1000,9 +1034,9 @@ public class UploadService extends Service {
                         }
 
                         if (e.getValue() != 0) {
-                            Timber.w("TRANSFER OVER QUOTA ERROR: " + e.getErrorCode());
+                            Timber.w("TRANSFER OVER QUOTA ERROR: %s", e.getErrorCode());
                         } else {
-                            Timber.w("STORAGE OVER QUOTA ERROR: " + e.getErrorCode());
+                            Timber.w("STORAGE OVER QUOTA ERROR: %s", e.getErrorCode());
                             updateProgressNotification();
                         }
                         break;
@@ -1012,12 +1046,12 @@ public class UploadService extends Service {
         });
     }
 
-    private void showStorageOverQuotaNotification(){
-		Timber.d("showStorageOverQuotaNotification");
+    private void showStorageOverQuotaNotification() {
+        Timber.d("showStorageOverQuotaNotification");
         String contentText = getString(R.string.download_show_info);
-		String message = getString(R.string.overquota_alert_title);
+        String message = getString(R.string.overquota_alert_title);
 
-		Intent intent = new Intent(this, ManagerActivity.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (isOverquota == OVERQUOTA_STORAGE_STATE) {
             intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -1025,37 +1059,36 @@ public class UploadService extends Service {
             intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
         }
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-			channel.setShowBadge(true);
-			channel.setSound(null, null);
-			mNotificationManager.createNotificationChannel(channel);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
 
-			NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_UPLOAD_ID);
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_UPLOAD_ID);
 
-			mBuilderCompatO
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
-					.setAutoCancel(true).setTicker(contentText)
-					.setContentTitle(message).setContentText(contentText)
-					.setOngoing(false);
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
 
-			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
-		}
-		else {
-			mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
-					.setAutoCancel(true).setTicker(contentText)
-					.setContentTitle(message).setContentText(contentText)
-					.setOngoing(false);
+            mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
+        } else {
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
 
-			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
-		}
-	}
+            mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+        }
+    }
 
-	private void acquireLock(){
-		Timber.d("acquireLock");
+    private void acquireLock() {
+        Timber.d("acquireLock");
         if (wl != null && !wl.isHeld()) {
             wl.acquire();
         }
@@ -1064,34 +1097,34 @@ public class UploadService extends Service {
         }
     }
 
-	private void releaseLocks(){
-		Timber.d("releaseLocks");
+    private void releaseLocks() {
+        Timber.d("releaseLocks");
         if ((lock != null) && (lock.isHeld())) {
             try {
                 lock.release();
             } catch (Exception ex) {
-				Timber.e(ex, "EXCEPTION");
+                Timber.e(ex, "EXCEPTION");
             }
         }
         if ((wl != null) && (wl.isHeld())) {
             try {
                 wl.release();
             } catch (Exception ex) {
-				Timber.e(ex, "EXCEPTION");
+                Timber.e(ex, "EXCEPTION");
             }
         }
     }
 
-    private void resetUploadNumbers(){
-		Timber.d("resetUploadNumbers");
-		pendingToAddInQueue = 0;
+    private void resetUploadNumbers() {
+        Timber.d("resetUploadNumbers");
+        pendingToAddInQueue = 0;
         completed = 0;
         completedSuccessfully = 0;
         alreadyUploaded = 0;
         uploadCount = 0;
     }
 
-    class UploadProgress{
+    class UploadProgress {
         private long total;
         private long inProgress;
 
@@ -1103,7 +1136,7 @@ public class UploadService extends Service {
             this.inProgress = inProgress;
         }
 
-        public long getTotal(){
+        public long getTotal() {
             return this.total;
         }
 

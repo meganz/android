@@ -2,11 +2,10 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 
 class GetUserEmailListener(context: Context?) : BaseListener(context) {
 
@@ -32,11 +31,11 @@ class GetUserEmailListener(context: Context?) : BaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            logDebug("Email recovered")
+            Timber.d("Email recovered")
             dBH.setNonContactEmail(request.email, request.nodeHandle.toString())
             callback?.onUserEmailUpdate(request.email, request.nodeHandle, position)
         } else {
-            logError("Error getting user email: " + e.errorString)
+            Timber.e("Error getting user email: ${e.errorString}")
         }
     }
 

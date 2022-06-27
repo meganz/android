@@ -25,7 +25,7 @@ fun Pair<String?, String?>.formatDateTitle(context: Context): Spanned {
         dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
             .replace("[/B]", "</font>")
     } catch (e: Exception) {
-        Timber.w("Exception formatting text.", e)
+        Timber.w(e, "Exception formatting text.")
     }
 
     return dateText.toSpannedHtmlText()

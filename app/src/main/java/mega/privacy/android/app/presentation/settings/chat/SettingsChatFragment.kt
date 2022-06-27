@@ -70,7 +70,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         setOnlineOptions(Util.isOnline(context) && megaApi.rootNode != null)
@@ -136,7 +136,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         //Get chat status
         statusConfig = megaChatApi.presenceConfig
         if (statusConfig != null) {
-            Timber.d("ChatStatus pending: " + statusConfig!!.isPending + ", status: " + statusConfig!!.onlineStatus)
+            Timber.d("ChatStatus pending: ${statusConfig!!.isPending}, status: ${statusConfig!!.onlineStatus}")
             statusChatListPreference?.apply {
                 value = statusConfig!!.onlineStatus.toString()
                 summary =

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+
 import android.content.Context;
 
 import mega.privacy.android.app.R;
@@ -12,9 +14,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class CreateFolderListener extends BaseListener {
 
@@ -49,20 +49,20 @@ public class CreateFolderListener extends BaseListener {
                 CameraUploadsService.isCreatingPrimary = false;
                 //set primary only
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    logDebug("Set CU primary attribute on create folder: " + handle);
+                    Timber.d("Set CU primary attribute on create folder: %s", handle);
                     api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
                 } else {
-                    logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    Timber.w("Create CU folder failed, error code: %d, %s", e.getErrorCode(), e.getErrorString());
                     JobUtil.fireStopCameraUploadJob(context);
                 }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
                 CameraUploadsService.isCreatingSecondary = false;
                 //set secondary only
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    logDebug("Set CU secondary attribute on create folder: " + handle);
+                    Timber.d("Set CU secondary attribute on create folder: %s", handle);
                     api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
                 } else {
-                    logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    Timber.w("Create MU folder failed, error code: %d, %s", e.getErrorCode(), e.getErrorString());
                     JobUtil.fireStopCameraUploadJob(context);
                 }
             }
@@ -116,7 +116,7 @@ public class CreateFolderListener extends BaseListener {
         }
 
         if (e.getErrorCode() != MegaError.API_OK) {
-            logError("Error creating folder: " + e.getErrorString());
+            Timber.e("Error creating folder: %s", e.getErrorString());
         }
     }
 }

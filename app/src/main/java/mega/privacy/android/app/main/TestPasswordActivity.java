@@ -1,17 +1,17 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -24,7 +24,17 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.io.File;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
@@ -38,14 +48,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class TestPasswordActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
@@ -90,16 +93,15 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_test_password);
-        if (getIntent() == null){
-            logWarning("Intent NULL");
+        if (getIntent() == null) {
+            Timber.w("Intent NULL");
             return;
         }
 
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             counter = savedInstanceState.getInt("counter", 0);
             testingPassword = savedInstanceState.getBoolean("testingPassword", false);
-        }
-        else {
+        } else {
             counter = 0;
             testingPassword = false;
         }
@@ -143,8 +145,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             testPasswordDismissButton.setVisibility(View.GONE);
             proceedToLogout.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             passwordReminderCloseButton.setVisibility(View.GONE);
             dialogTest.setText(R.string.remember_pwd_dialog_text);
             passwordReminderDismissButton.setText(R.string.general_dismiss);
@@ -178,7 +179,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!passwordCorrect){
+                if (!passwordCorrect) {
                     quitError();
                 }
             }
@@ -190,8 +191,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
         if (testingPassword) {
             setTestPasswordLayout();
-        }
-        else {
+        } else {
             passwordReminderLayout.setVisibility(View.VISIBLE);
             testPasswordLayout.setVisibility(View.GONE);
         }
@@ -205,7 +205,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         outState.putBoolean("testingPassword", testingPassword);
     }
 
-    void setTestPasswordLayout () {
+    void setTestPasswordLayout() {
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
@@ -236,7 +236,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         return super.onOptionsItemSelected(item);
     }
 
-    void quitError(){
+    void quitError() {
         passwordLayout.setError(null);
         passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
         passwordErrorImage.setVisibility(View.GONE);
@@ -245,12 +245,12 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         confirmPasswordButton.setAlpha(1F);
     }
 
-    void showError (boolean correct) {
+    void showError(boolean correct) {
         hideKeyboard(this, 0);
 
         Drawable icon;
 
-        if (correct){
+        if (correct) {
             passwordLayout.setError(getString(R.string.test_pwd_accepted));
             passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
             passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium);
@@ -260,8 +260,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             testPasswordbackupRecoveryKeyButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             passwordText.setEnabled(false);
             passwordReminderSucceeded();
-        }
-        else {
+        } else {
             counter++;
             passwordLayout.setError(getString(R.string.test_pwd_wrong));
             passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
@@ -287,12 +286,12 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
-            logDebug("REQUEST_DOWNLOAD_FOLDER");
+        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+            Timber.d("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 
-            if (parentPath != null){
-                logDebug("parentPath no NULL");
+            if (parentPath != null) {
+                Timber.d("parentPath no NULL");
                 parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
                 ac.exportMK(parentPath);
@@ -303,13 +302,12 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.password_reminder_checkbox: {
                 if (blockCheckBox.isChecked()) {
-                    logDebug("Block CheckBox checked!");
-                }
-                else {
-                    logDebug("Block CheckBox does NOT checked!");
+                    Timber.d("Block CheckBox checked!");
+                } else {
+                    Timber.d("Block CheckBox does NOT checked!");
                 }
                 break;
             }
@@ -319,7 +317,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
                 setTestPasswordLayout();
                 break;
             }
-            case R.id.test_password_confirm_button:{
+            case R.id.test_password_confirm_button: {
                 String password = passwordText.getText().toString();
                 passwordCorrect = megaApi.checkPassword(password);
                 showError(passwordCorrect);
@@ -341,8 +339,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             case R.id.password_reminder_dismiss_button: {
                 if (isLogout()) {
                     dismissActivity(true);
-                }
-                else {
+                } else {
                     onBackPressed();
                 }
             }
@@ -353,12 +350,11 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         }
     }
 
-    void disableUI () {
+    void disableUI() {
         if (passwordReminderLayout.getVisibility() == View.VISIBLE) {
             passwordReminderLayout.setEnabled(false);
             passwordReminderLayout.setAlpha(0.3F);
-        }
-        else if (testPasswordLayout.getVisibility() == View.VISIBLE) {
+        } else if (testPasswordLayout.getVisibility() == View.VISIBLE) {
             testPasswordLayout.setEnabled(false);
             testPasswordLayout.setAlpha(0.3F);
         }
@@ -372,8 +368,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         megaApi.passwordReminderDialogSucceeded(this);
         if (isLogout()) {
             disableUI();
-        }
-        else {
+        } else {
             finish();
         }
     }
@@ -397,8 +392,8 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         }
     }
 
-    public void showSnackbar(String s){
-        logDebug("showSnackbar");
+    public void showSnackbar(String s) {
+        Timber.d("showSnackbar");
         showSnackbar(findViewById(R.id.container_layout), s);
     }
 
@@ -406,9 +401,9 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_WRITE_STORAGE:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    logDebug("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED");
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Timber.d("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED");
                 }
                 break;
             }
@@ -427,21 +422,20 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
+        if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
             if (request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
                 numRequests--;
                 if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                    logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
+Timber.d("New value of attribute USER_ATTR_PWD_REMINDER: %s",  request.getText());
                     if (dismissPasswordReminder && isLogout() && numRequests <= 0) {
                         AccountController.logout(this, megaApi, sharingScope);
                     }
-                }
-                else {
-                    logError("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER " + e.getErrorString());
+                } else {
+                    Timber.e("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER %s", e.getErrorString());
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_LOGOUT) {
-            logDebug("END logout sdk request - wait chat logout");
+            Timber.d("END logout sdk request - wait chat logout");
         }
     }
 

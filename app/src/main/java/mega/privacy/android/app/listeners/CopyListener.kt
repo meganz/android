@@ -13,18 +13,20 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 
 class CopyListener(
     private val action: Int,
     private val snackbarShower: SnackbarShower,
     private val activityLauncher: ActivityLauncher?,
-    context: Context
+    context: Context,
 ) : BaseListener(context) {
 
     private val messagesSelected = ArrayList<MegaChatMessage>()
@@ -43,7 +45,7 @@ class CopyListener(
         context: Context,
         snackbarShower: SnackbarShower,
         chatController: ChatController,
-        chatId: Long
+        chatId: Long,
     ) : this(action, snackbarShower, null, context) {
         initFields(messagesSelected, counter, chatController, chatId, null)
     }
@@ -56,7 +58,7 @@ class CopyListener(
         snackbarShower: SnackbarShower,
         chatController: ChatController,
         chatId: Long,
-        exportListener: ExportListener?
+        exportListener: ExportListener?,
     ) : this(action, snackbarShower, null, context) {
         initFields(messagesSelected, counter, chatController, chatId, exportListener)
     }
@@ -66,7 +68,7 @@ class CopyListener(
         counter: Int,
         chatController: ChatController,
         chatId: Long,
-        exportListener: ExportListener?
+        exportListener: ExportListener?,
     ) {
         this.messagesSelected.addAll(messagesSelected)
         this.counter = counter
@@ -83,7 +85,7 @@ class CopyListener(
         counter--
 
         if (e.errorCode != MegaError.API_OK) {
-            logError("Error copying")
+            Timber.e("Error copying")
             error++
         }
 
@@ -121,7 +123,7 @@ class CopyListener(
                         intent.putExtra(BroadcastConstants.ERROR_MESSAGE_TEXT, message)
                         context.sendBroadcast(intent)
                     } else {
-                        logDebug("Forward message")
+                        Timber.d("Forward message")
                         chatController?.forwardMessages(messagesSelected, chatId)
                     }
                 }
@@ -140,7 +142,7 @@ class CopyListener(
                         val node = api.getNodeByHandle(request.nodeHandle)
 
                         if (node == null) {
-                            logWarning("Node is NULL")
+                            Timber.w("Node is NULL")
                             return
                         }
 
@@ -150,10 +152,10 @@ class CopyListener(
                                 node.handle
                             )
 
-                            logDebug("Export Node")
+                            Timber.d("Export Node")
                             api.exportNode(node, exportListener)
                         } else {
-                            logDebug("Share Node")
+                            Timber.d("Share Node")
 
                             ChatUtil.shareNodeFromChat(
                                 context, node, chatId, messagesSelected[0].msgId

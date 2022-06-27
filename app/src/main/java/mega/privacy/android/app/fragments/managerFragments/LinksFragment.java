@@ -1,13 +1,27 @@
 package mega.privacy.android.app.fragments.managerFragments;
 
+import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_LINKS;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
+
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +33,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
-import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaError.API_OK;
-import static nz.mega.sdk.MegaShare.ACCESS_FULL;
+import timber.log.Timber;
 
 public class LinksFragment extends MegaNodeBaseFragment {
 
@@ -62,7 +68,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             super.onPrepareActionMode(mode, menu);
 
             CloudStorageOptionControlUtil.Control control =
-                new CloudStorageOptionControlUtil.Control();
+                    new CloudStorageOptionControlUtil.Control();
 
             boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
 
@@ -96,7 +102,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             }
 
             if (selected.size() == 1
-                && megaApi.checkAccessErrorExtended(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+                    && megaApi.checkAccessErrorExtended(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
                 control.rename().setVisible(true);
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
                     control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -133,13 +139,13 @@ public class LinksFragment extends MegaNodeBaseFragment {
         adapter.setListFragment(recyclerView);
 
         if (managerActivity.getParentHandleLinks() == INVALID_HANDLE) {
-            logWarning("ParentHandle -1");
+            Timber.w("ParentHandle -1");
             findNodes();
             adapter.setParentHandle(INVALID_HANDLE);
         } else {
             managerActivity.hideTabs(true, LINKS_TAB);
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
-            logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
+            Timber.d("ParentHandle to find children: %s", managerActivity.getParentHandleLinks());
 
             nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(
                     sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel()));
@@ -226,7 +232,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
     @Override
     public void itemClick(int position) {
         if (adapter.isMultipleSelect()) {
-            logDebug("multiselect ON");
+            Timber.d("multiselect ON");
             adapter.toggleSelection(position);
 
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();

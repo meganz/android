@@ -1,5 +1,17 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Base64;
@@ -9,6 +21,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
@@ -18,17 +31,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
-import mega.privacy.android.app.MegaApplication;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static mega.privacy.android.app.utils.Constants.NAME;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 public class ContactUtil {
 
@@ -201,7 +204,7 @@ public class ContactUtil {
 
     public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
         Intent intent = new Intent(action)
-            .putExtra(EXTRA_USER_HANDLE, userHandle);
+                .putExtra(EXTRA_USER_HANDLE, userHandle);
         context.sendBroadcast(intent);
     }
 
@@ -214,7 +217,7 @@ public class ContactUtil {
             byte[] data = Base64.decode(nicknameEncoded, Base64.URL_SAFE);
             return new String(data, StandardCharsets.UTF_8);
         } catch (java.lang.Exception e) {
-            logError("Error retrieving new nickname " + e);
+            Timber.e("Error retrieving new nickname %s", e);
             return null;
         }
     }
@@ -245,7 +248,7 @@ public class ContactUtil {
     /**
      * Checks if the user who their handle is received by parameter is a contact.
      *
-     * @param userHandle    handle of the user
+     * @param userHandle handle of the user
      * @return true if the user is a contact, false otherwise.
      */
     public static boolean isContact(long userHandle) {
@@ -259,7 +262,7 @@ public class ContactUtil {
     /**
      * Checks if the user who their email of handle in base64 is received by parameter is a contact.
      *
-     * @param emailOrUserHandleBase64   email or user's handle in base64
+     * @param emailOrUserHandleBase64 email or user's handle in base64
      * @return true if the user is a contact, false otherwise.
      */
     public static boolean isContact(String emailOrUserHandleBase64) {

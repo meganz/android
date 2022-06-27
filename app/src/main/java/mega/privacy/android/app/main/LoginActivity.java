@@ -18,11 +18,8 @@ import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
@@ -119,7 +116,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                 int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
                 if (actionType == UPDATE_PAYMENT_METHODS) {
-                    logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
+                    Timber.d("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
         }
@@ -155,7 +152,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     protected void onDestroy() {
-        logDebug("onDestroy");
+        Timber.d("onDestroy");
 
         app.setIsLoggingRunning(false);
 
@@ -168,7 +165,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
         loginActivity = this;
@@ -200,12 +197,12 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
         intentReceived = getIntent();
         if (savedInstanceState != null) {
-            logDebug("Bundle is NOT NULL");
+            Timber.d("Bundle is NOT NULL");
             visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
         } else {
             if (intentReceived != null) {
                 visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-                logDebug("There is an intent! VisibleFragment: " + visibleFragment);
+                Timber.d("There is an intent! VisibleFragment: %s", visibleFragment);
             } else {
                 visibleFragment = LOGIN_FRAGMENT;
             }
@@ -261,11 +258,11 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     }
 
     public void showFragment(int visibleFragment) {
-        logDebug("visibleFragment: " + visibleFragment);
+        Timber.d("visibleFragment: %s", visibleFragment);
         this.visibleFragment = visibleFragment;
         switch (visibleFragment) {
             case LOGIN_FRAGMENT: {
-                logDebug("Show LOGIN_FRAGMENT");
+                Timber.d("Show LOGIN_FRAGMENT");
                 if (loginFragment == null) {
                     loginFragment = new LoginFragment();
                 }
@@ -282,7 +279,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
-                logDebug("Show CREATE_ACCOUNT_FRAGMENT");
+                Timber.d("Show CREATE_ACCOUNT_FRAGMENT");
                 if (createAccountFragment == null || cancelledConfirmationProcess) {
                     createAccountFragment = new CreateAccountFragment();
                     cancelledConfirmationProcess = false;
@@ -297,7 +294,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
             }
             case TOUR_FRAGMENT: {
-                logDebug("Show TOUR_FRAGMENT");
+                Timber.d("Show TOUR_FRAGMENT");
 
                 if (ACTION_RESET_PASS.equals(intentReceived.getAction())) {
                     tourFragment = TourFragment.newInstance(intentReceived.getDataString(), null);
@@ -348,7 +345,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     }
 
     public void showAlertIncorrectRK() {
-        logDebug("showAlertIncorrectRK");
+        Timber.d("showAlertIncorrectRK");
         final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
         dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
@@ -368,7 +365,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     }
 
     public void showAlertLoggedOut() {
-        logDebug("showAlertLoggedOut");
+        Timber.d("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
         if (!isFinishing()) {
             final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
@@ -390,7 +387,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     }
 
     public void startCameraUploadService(boolean firstTimeCam, int time) {
-        logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
+        Timber.d("firstTimeCam: %stime: %d", firstNameTemp, time);
         if (firstTimeCam) {
             setStartScreenTimeStamp(this);
             Intent intent = new Intent(this, ManagerActivity.class);
@@ -407,7 +404,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     }
 
     public void showConfirmationCancelAllTransfers() {
-        logDebug("showConfirmationCancelAllTransfers");
+        Timber.d("showConfirmationCancelAllTransfers");
 
         setIntent(null);
         //Show confirmation message
@@ -416,11 +413,11 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        logDebug("Pressed button positive to cancel transfer");
+                        Timber.d("Pressed button positive to cancel transfer");
                         if (megaApi != null) {
                             megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
                         } else {
-                            logWarning("megaAPI is null");
+                            Timber.w("megaAPI is null");
                         }
                         if (megaApiFolder != null) {
                             megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
@@ -445,7 +442,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         retryConnectionsAndSignalPresence();
 
         int valueReturn = -1;
@@ -475,7 +472,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     public void onResume() {
-        logDebug("onResume");
+        Timber.d("onResume");
         super.onResume();
         setAppFontSize(this);
         Intent intent = getIntent();
@@ -483,7 +480,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
         if (intent != null) {
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                    logDebug("ACTION_CANCEL_CAM_SYNC");
+                    Timber.d("ACTION_CANCEL_CAM_SYNC");
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
                     MaterialAlertDialogBuilder builder = getCustomAlertBuilder(this, title, text, null);
@@ -501,7 +498,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                     try {
                         dialog.show();
                     } catch (Exception ex) {
-                        logError("Exception", ex);
+                        Timber.e(ex);
                     }
                 } else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
@@ -581,17 +578,17 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart - " + request.getRequestString());
+        Timber.d("onRequestStart - %s", request.getRequestString());
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestUpdate - " + request.getRequestString());
+        Timber.d("onRequestUpdate - %s", request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
+        Timber.d("onRequestFinish - %s_%d", request.getRequestString(), e.getErrorCode());
 
         if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 
@@ -620,13 +617,13 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                     }
                 }
             } catch (Exception exc) {
-                logError("Exception", exc);
+                Timber.e(exc);
             }
         }
     }
 
     public void cancelConfirmationAccount() {
-        logDebug("cancelConfirmationAccount");
+        Timber.d("cancelConfirmationAccount");
         dbH.clearEphemeral();
         dbH.clearCredentials();
         cancelledConfirmationProcess = true;
@@ -639,12 +636,12 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporaryError - " + request.getRequestString());
+        Timber.w("onRequestTemporaryError - %s", request.getRequestString());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
 
         super.onSaveInstanceState(outState);
 
@@ -653,7 +650,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Override
     protected void onPause() {
-        logDebug("onPause");
+        Timber.d("onPause");
         super.onPause();
     }
 
@@ -672,7 +669,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     public void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
         final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
         if (parentView == null) {
-            logWarning("Cannot set the keyboard visibility listener. Parent view is NULL.");
+            Timber.w("Cannot set the keyboard visibility listener. Parent view is NULL.");
             return;
         }
 

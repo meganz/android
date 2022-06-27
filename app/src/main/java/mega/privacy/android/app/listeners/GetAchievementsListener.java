@@ -1,5 +1,7 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,9 +12,7 @@ import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+import timber.log.Timber;
 
 public class GetAchievementsListener extends BaseListener {
     boolean mFetching;
@@ -34,7 +34,7 @@ public class GetAchievementsListener extends BaseListener {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish: " + request.getRequestString() + "__" + e.getErrorCode());
+        Timber.d("onRequestFinish: %s__%d", request.getRequestString(), e.getErrorCode());
         mFetching = false;
 
         if (request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
@@ -80,7 +80,7 @@ public class GetAchievementsListener extends BaseListener {
     }
 
     private void calculateReferralBonuses() {
-        logDebug("calculateReferralBonuses");
+        Timber.d("calculateReferralBonuses");
 
         long count = mMegaAchievements.getAwardsCount();
 
@@ -90,7 +90,7 @@ public class GetAchievementsListener extends BaseListener {
             int awardId = mMegaAchievements.getAwardId(i);
 
             int rewardId = mMegaAchievements.getRewardAwardId(awardId);
-            logDebug("AWARD ID: " + awardId + " REWARD id: " + rewardId);
+            Timber.d("AWARD ID: %d REWARD id: %d", awardId, rewardId);
 
             if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE) {
 
@@ -99,7 +99,7 @@ public class GetAchievementsListener extends BaseListener {
                 rBonus.setEmails(mMegaAchievements.getAwardEmails(i));
 
                 long daysLeft = mMegaAchievements.getAwardExpirationTs(i);
-                logDebug("Registration AwardExpirationTs: " + daysLeft);
+                Timber.d("Registration AwardExpirationTs: %s", daysLeft);
 
                 Calendar start = calculateDateFromTimestamp(daysLeft);
                 Calendar end = Calendar.getInstance();
@@ -117,7 +117,7 @@ public class GetAchievementsListener extends BaseListener {
 
                 mReferralBonuses.add(rBonus);
             } else {
-                logDebug("MEGA_ACHIEVEMENT: " + type);
+                Timber.d("MEGA_ACHIEVEMENT: %s", type);
             }
         }
     }

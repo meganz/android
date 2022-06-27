@@ -1,5 +1,8 @@
 package mega.privacy.android.app.service.map;
 
+import static mega.privacy.android.app.main.megachat.MapsActivity.REQUEST_INTERVAL;
+import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
+
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -42,10 +45,7 @@ import mega.privacy.android.app.main.megachat.MapAddress;
 import mega.privacy.android.app.main.megachat.MapsActivity;
 import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
-
-import static mega.privacy.android.app.main.megachat.MapsActivity.REQUEST_INTERVAL;
-import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 @SuppressLint("MissingPermission")
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
@@ -70,10 +70,10 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         MapsInitializer.initialize(activity.getApplicationContext(), MapsInitializer.Renderer.LATEST, renderer -> {
             switch (renderer) {
                 case LATEST:
-                    logDebug("The latest version of the renderer is used.");
+                    Timber.d("The latest version of the renderer is used.");
                     break;
                 case LEGACY:
-                    logDebug("The legacy version of the renderer is used.");
+                    Timber.d("The legacy version of the renderer is used.");
                     break;
             }
 
@@ -92,7 +92,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null || locationResult.getLastLocation() == null) {
-                    logWarning("locationResult is null");
+                    Timber.w("locationResult is null");
                     return;
                 }
 
@@ -139,7 +139,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        logDebug("onInfoWindowClick");
+        Timber.d("onInfoWindowClick");
         if (isFullScreen() && marker.equals(fullScreenMarker)) {
             setAddress(fullScreenAddress);
         }
@@ -176,18 +176,18 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public boolean onMyLocationButtonClick() {
-        logDebug("onMyLocationButtonClick");
+        Timber.d("onMyLocationButtonClick");
         return false;
     }
 
     @Override
     public void onMyLocationClick(Location location) {
-        logDebug("onMyLocationClick");
+        Timber.d("onMyLocationClick");
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        logDebug("onMapReady");
+        Timber.d("onMapReady");
 
         mMap = googleMap;
         enableLocationUpdates();
@@ -230,7 +230,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                 int quality = 100;
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                 byte[] byteArray = stream.toByteArray();
-                logDebug("The bitmaps has " + byteArray.length + " initial size");
+                Timber.d("The bitmaps has %d initial size", byteArray.length);
 
                 while (byteArray.length > MAX_SIZE) {
                     stream = new ByteArrayOutputStream();
@@ -239,7 +239,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                     byteArray = stream.toByteArray();
                 }
 
-                logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
+                Timber.d("The bitmaps has %d final size with quality: %d", byteArray.length, quality);
                 sendSnapshot(byteArray, latitude, longitude);
             });
         });
@@ -251,7 +251,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void initMap() {
         if (mMap == null) {
-            logWarning("mMap is null");
+            Timber.w("mMap is null");
             return;
         }
 
@@ -284,7 +284,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void setMyLocation(boolean animateCamera) {
         if (mMap == null || lastLocation == null) {
-            logWarning("mMap or lastLocation is null");
+            Timber.w("mMap or lastLocation is null");
             return;
         }
 
@@ -300,8 +300,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         try {
             fullScreenMarker.remove();
         } catch (Exception e) {
-            logError(e.getMessage(), e);
-            e.printStackTrace();
+            Timber.e(e);
         }
 
         fullScreenMarker = null;
@@ -314,7 +313,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void getMarkerInfo() {
         if (mMap == null) {
-            logWarning("mMap is null");
+            Timber.w("mMap is null");
             return;
         }
 

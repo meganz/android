@@ -1,60 +1,78 @@
 package mega.privacy.android.app.main.controllers
 
 import android.Manifest
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
-import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.stopAudioPlayer
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.clearSettings
-import mega.privacy.android.app.psa.PsaManager.stopChecking
-import mega.privacy.android.app.sync.removeBackupsBeforeLogout
-import nz.mega.sdk.MegaApiAndroid
-import android.graphics.Bitmap
-import androidx.print.PrintHelper
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.*
-import androidx.core.content.ContextCompat
-import mega.privacy.android.app.utils.contacts.MegaContactGetter
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler
-import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.fragments.offline.OfflineFragment
-import mega.privacy.android.app.constants.SettingsConstants
-import nz.mega.sdk.MegaApiJava
-import com.jeremyliao.liveeventbus.LiveEventBus
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
+import androidx.print.PrintHelper
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.*
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.DownloadService
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.OpenLinkActivity
+import mega.privacy.android.app.R
+import mega.privacy.android.app.UploadService
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.domain.entity.SyncRecordType
+import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.*
+import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.TestPasswordActivity
+import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.stopAudioPlayer
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.clearSettings
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.middlelayer.push.PushMessageHandler
+import mega.privacy.android.app.psa.PsaManager.stopChecking
+import mega.privacy.android.app.sync.removeBackupsBeforeLogout
+import mega.privacy.android.app.textEditor.TextEditorViewModel
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
 import mega.privacy.android.app.utils.ChatUtil.removeEmojisSharedPreferences
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.JobUtil.*
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders
+import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
+import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
+import mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob
+import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers
+import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
+import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.isOffline
+import mega.privacy.android.app.utils.Util.showAlert
+import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.ZoomUtil.resetZoomLevel
+import mega.privacy.android.app.utils.contacts.MegaContactGetter
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
-import java.lang.IllegalStateException
 
 class AccountController(private val context: Context) {
 
@@ -64,7 +82,7 @@ class AccountController(private val context: Context) {
         )
 
         if (avatar?.exists() == true) {
-            Timber.d("Avatar exists in: " + avatar.absolutePath)
+            Timber.d("Avatar exists in: ${avatar.absolutePath}")
             return true
         }
 
@@ -297,7 +315,7 @@ class AccountController(private val context: Context) {
                 ContextCompat.startForegroundService(context, cancelTransfersIntent)
             } catch (e: IllegalStateException) {
                 //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26
-                Timber.w("Cancelling services not allowed by the OS", e)
+                Timber.w(e, "Cancelling services not allowed by the OS")
             }
 
             val dbH = DatabaseHandler.getDbHandler(context)
@@ -378,8 +396,7 @@ class AccountController(private val context: Context) {
             try {
                 deleteFolderAndSubfolders(context, folder)
             } catch (e: IOException) {
-                Timber.e("Exception deleting" + folder!!.name + "directory", e)
-                e.printStackTrace()
+                Timber.e(e, "Exception deleting ${folder?.name} directory")
             }
         }
 

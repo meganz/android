@@ -1,6 +1,24 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.content.Intent;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
+import static mega.privacy.android.app.utils.ChatUtil.isGeolocation;
+import static mega.privacy.android.app.utils.ChatUtil.shareMsgFromChat;
+import static mega.privacy.android.app.utils.ChatUtil.shouldReactionBeClicked;
+import static mega.privacy.android.app.utils.Constants.CANNOT_OPEN_FILE_SHOWN;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.IMPORT_ONLY_OPTION;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.POSITION_SELECTED_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +27,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -36,21 +60,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
-import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-
-import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -84,7 +93,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private LinearLayout editSeparator;
     private LinearLayout copySeparator;
     private LinearLayout shareSeparator;
-    private  LinearLayout selectSeparator;
+    private LinearLayout selectSeparator;
     private LinearLayout infoSeparator;
     private LinearLayout inviteSeparator;
     private LinearLayout infoFileSeparator;
@@ -104,7 +113,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
-            logDebug("Bundle is NOT NULL");
+            Timber.d("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_ID);
             messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_ID);
             positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, INVALID_POSITION);
@@ -169,7 +178,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        if(message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
+        if (message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
             Timber.w("Message is null");
             closeDialog();
             return;
@@ -303,7 +312,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         super.onDestroyView();
     }
 
-    private void checkReactionsFragment(){
+    private void checkReactionsFragment() {
         boolean shouldReactionOptionBeVisible = shouldReactionBeClicked(chatRoom) && !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
@@ -315,7 +324,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         reactionSeparator.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
     }
 
-    private void hideAllOptions(){
+    private void hideAllOptions() {
         optionSaveOffline.setVisibility(View.GONE);
         optionOpenWith.setVisibility(View.GONE);
         optionForward.setVisibility(View.GONE);
@@ -336,7 +345,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     @Override
     public void onClick(View view) {
         if (message == null) {
-            logWarning("The message is NULL");
+            Timber.w("The message is NULL");
             return;
         }
 
@@ -345,7 +354,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         switch (view.getId()) {
             case R.id.open_with_layout:
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
                 cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
@@ -368,7 +377,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.share_layout:
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
 
@@ -380,7 +389,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.option_view_layout:
-                logDebug("View option");
+                Timber.d("View option");
                 ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
                 break;
 
@@ -408,7 +417,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 if (usersCount == 1) {
                     cC.inviteContact(message.getMessage().getUserEmail(0));
                 } else {
-                    logDebug("Num users to invite: " + usersCount);
+                    Timber.d("Num users to invite: %s", usersCount);
                     contactEmails = new ArrayList<>();
 
                     for (int j = 0; j < usersCount; j++) {
@@ -425,7 +434,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 if (numUsers == 1) {
                     ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                 } else {
-                    logDebug("Num users to invite: " + numUsers);
+                    Timber.d("Num users to invite: %s", numUsers);
                     ArrayList<Long> contactHandles = new ArrayList<>();
 
                     for (int j = 0; j < numUsers; j++) {
@@ -438,7 +447,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_download_layout:
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
 
@@ -450,7 +459,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_import_layout:
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
 
