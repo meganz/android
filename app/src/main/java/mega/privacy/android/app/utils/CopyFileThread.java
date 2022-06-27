@@ -1,9 +1,10 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.FileUtil.copyFile;
+
 import java.io.File;
 
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class CopyFileThread implements Runnable {
 
@@ -24,7 +25,7 @@ public class CopyFileThread implements Runnable {
 
     @Override
     public void run() {
-        logDebug("Call to copyFile");
+        Timber.d("Call to copyFile");
         try {
             if (operator.isSDCardDownload()) {
                 operator.moveFile(targetPath, new File(path));
@@ -33,7 +34,7 @@ public class CopyFileThread implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logError("Copy file error", e);
+            Timber.e(e, "Copy file error");
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.github.barteksc.pdfviewer.scroll;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.dp2px;
 
 import android.annotation.SuppressLint;
@@ -19,6 +18,7 @@ import com.github.barteksc.pdfviewer.util.Util;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.PdfViewerActivity;
+import timber.log.Timber;
 
 public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandle {
 
@@ -40,7 +40,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     public DefaultScrollHandle(Context context) {
         super(context);
-        logDebug("DefaultScrollHandle");
+        Timber.d("DefaultScrollHandle");
         this.context = context;
         textViewHandle = new TextView(context);
         textViewBubble = new TextView(context);
@@ -52,7 +52,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     @Override
     public void setupLayout(PDFView pdfView) {
-        logDebug("setupLayout");
+        Timber.d("setupLayout");
 
         ConstraintLayout.LayoutParams textViewHandleLp = new ConstraintLayout.LayoutParams(dp2px(45), dp2px(45));
         textViewHandleLp.endToEnd = LayoutParams.PARENT_ID;
@@ -85,13 +85,13 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     @Override
     public void destroyLayout() {
-        logDebug("destroyLayout");
+        Timber.d("destroyLayout");
         pdfView.removeView(this);
     }
 
     @Override
     public void setScroll(float position) {
-        logDebug("setScroll");
+        Timber.d("setScroll");
 
         if (!shown()) {
             show();
@@ -102,7 +102,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
     }
 
     private void setPosition(float pos) {
-        logDebug("setPosition");
+        Timber.d("setPosition");
         if (Float.isInfinite(pos) || Float.isNaN(pos)) {
             return;
         }
@@ -131,7 +131,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
     }
 
     private void calculateMiddle() {
-        logDebug("calculateMiddle");
+        Timber.d("calculateMiddle");
         float pos, viewSize, pdfViewSize;
         if (pdfView.isSwipeVertical()) {
             pos = getY();
@@ -147,13 +147,13 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     @Override
     public void hideDelayed() {
-        logDebug("hideDelayed");
+        Timber.d("hideDelayed");
         handler.postDelayed(hidePageScrollerRunnable, 1000);
     }
 
     @Override
     public void setPageNum(int pageNum) {
-        logDebug("setPageNum");
+        Timber.d("setPageNum");
 
         String strCurrentPages = String.valueOf(pageNum);
         String strTotalPages = String.valueOf(totalPages);
@@ -165,25 +165,25 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     @Override
     public boolean shown() {
-        logDebug("shown boolean");
+        Timber.d("shown boolean");
         return getVisibility() == VISIBLE;
     }
 
     @Override
     public void show() {
-        logDebug("shown");
+        Timber.d("shown");
         setVisibility(VISIBLE);
         animate().translationX(0).setDuration(200L).withEndAction(this::hideDelayed).start();
     }
 
     @Override
     public void hide() {
-        logDebug("hide");
+        Timber.d("hide");
         animate().translationX(200).setDuration(200L).withEndAction(() -> setVisibility(INVISIBLE)).start();
     }
 
     public void setTextColor(int color) {
-        logDebug("setTextColor");
+        Timber.d("setTextColor");
         textViewBubble.setTextColor(color);
     }
 
@@ -191,19 +191,19 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
      * @param size text size in sp
      */
     public void setTextSize(int size) {
-        logDebug("setTextSize");
+        Timber.d("setTextSize");
         textViewBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
     }
 
     private boolean isPDFViewReady() {
-        logDebug("isPDFViewReady");
+        Timber.d("isPDFViewReady");
         return pdfView != null && pdfView.getPageCount() > 0 && !pdfView.documentFitsView();
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        logDebug("onTouchEvent");
+        Timber.d("onTouchEvent");
 
         final int action = event.getActionMasked();
 

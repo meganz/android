@@ -34,15 +34,28 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
+import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
 import nz.mega.sdk.MegaApiJava
+import timber.log.Timber
 import java.io.File
-import java.util.*
+import java.util.Locale
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
@@ -155,7 +168,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        logDebug("OnOptionsItemSelected")
+        Timber.d("OnOptionsItemSelected")
         if (item.itemId == android.R.id.home) {
             onBackPressed()
             return true
@@ -258,7 +271,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      * @param file file
      */
     private fun imageFileOpen(position: Int, file: File) {
-        logDebug("isImage")
+        Timber.d("isImage")
 
         val intent = ImageViewerActivity.getIntentForFile(this, file.toUri(), true)
         DragToExitSupport.putThumbnailLocation(
@@ -278,7 +291,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      * @param file file
      */
     private fun MimeTypeList.mediaFileOpen(file: File, position: Int) {
-        logDebug("Video file")
+        Timber.d("Video file")
         val mediaIntent: Intent
         val internalIntent: Boolean
         var opusFile = false
@@ -349,7 +362,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                 }
                 intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, intentShare)) {
-                    logDebug("Call to startActivity(intentShare)")
+                    Timber.d("Call to startActivity(intentShare)")
                     startActivity(intentShare)
                 }
             }
@@ -363,7 +376,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      * @param file file
      */
     private fun MimeTypeList.pdfFileOpen(file: File, position: Int) {
-        logDebug("Pdf file")
+        Timber.d("Pdf file")
         val pdfIntent =
             Intent(this@ZipBrowserActivity, PdfViewerActivity::class.java)
         pdfIntent.apply {
@@ -402,7 +415,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      * @param file file
      */
     private fun MimeTypeList.otherFileOpen(file: File) {
-        logDebug("NOT Image, video, audio or pdf")
+        Timber.d("NOT Image, video, audio or pdf")
         val viewIntent = Intent(Intent.ACTION_VIEW)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             viewIntent.setDataAndType(
@@ -433,7 +446,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             }
             intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, intentShare)) {
-                logDebug("Call to startActivity(intentShare)")
+                Timber.d("Call to startActivity(intentShare)")
                 startActivity(intentShare)
             }
             val toastMessage =

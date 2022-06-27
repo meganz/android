@@ -4,7 +4,7 @@ import android.net.Uri
 import mega.privacy.android.app.services.GiphyService.BASE_URL
 import mega.privacy.android.app.services.GiphyService.GIPHY_URL
 import mega.privacy.android.app.services.GiphyService.TEST_URL
-import mega.privacy.android.app.utils.LogUtil.logError
+import timber.log.Timber
 
 class GiphyUtil {
 
@@ -21,7 +21,7 @@ class GiphyUtil {
                 return Uri.parse(giphyUri.replace(GIPHY_URL, BASE_URL))
             }
 
-            logError("Wrong giphyUri: $giphyUri")
+            Timber.e("Wrong giphyUri: $giphyUri")
             return if (TextUtil.isTextEmpty(giphyUri)) null else Uri.parse(giphyUri)
         }
 

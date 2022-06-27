@@ -39,9 +39,12 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -54,7 +57,9 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
+import java.util.Objects
 
 object MegaNodeDialogUtil {
     private const val TYPE_RENAME = 0
@@ -110,7 +115,7 @@ object MegaNodeDialogUtil {
         context: Context,
         node: MegaNode,
         snackbarShower: SnackbarShower?,
-        actionNodeCallback: ActionNodeCallback?
+        actionNodeCallback: ActionNodeCallback?,
     ): AlertDialog {
         val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -137,7 +142,7 @@ object MegaNodeDialogUtil {
     fun showNewFolderDialog(
         context: Context,
         actionNodeCallback: ActionNodeCallback?,
-        typedText: String? = null
+        typedText: String? = null,
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -194,7 +199,7 @@ object MegaNodeDialogUtil {
         context: Context,
         parent: MegaNode,
         data: String,
-        defaultURLName: String?
+        defaultURLName: String?,
     ): AlertDialog {
         val newURLFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -223,7 +228,7 @@ object MegaNodeDialogUtil {
         context: Context,
         parent: MegaNode,
         typedName: String?,
-        fromHome: Boolean
+        fromHome: Boolean,
     ): AlertDialog {
         val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -279,7 +284,7 @@ object MegaNodeDialogUtil {
         defaultURLName: String?,
         fromHome: Boolean,
         builder: AlertDialog.Builder,
-        dialogType: Int
+        dialogType: Int,
     ): AlertDialog {
         builder.setView(R.layout.dialog_create_rename_node)
 
@@ -385,7 +390,7 @@ object MegaNodeDialogUtil {
         errorText: TextView?,
         fromHome: Boolean,
         dialog: AlertDialog,
-        dialogType: Int
+        dialogType: Int,
     ) {
         val typedString = typeText?.text.toString().trim()
 
@@ -517,7 +522,7 @@ object MegaNodeDialogUtil {
         node: MegaNode,
         typedString: String,
         snackbarShower: SnackbarShower?,
-        actionNodeCallback: ActionNodeCallback?
+        actionNodeCallback: ActionNodeCallback?,
     ) {
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -569,7 +574,7 @@ object MegaNodeDialogUtil {
         node: MegaNode,
         typedString: String,
         snackbarShower: SnackbarShower?,
-        actionNodeCallback: ActionNodeCallback?
+        actionNodeCallback: ActionNodeCallback?,
     ) {
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(R.string.file_extension_change_title))
@@ -650,7 +655,7 @@ object MegaNodeDialogUtil {
     fun moveToRubbishOrRemove(
         handle: Long,
         activity: Activity,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -731,7 +736,7 @@ object MegaNodeDialogUtil {
     fun nameAlreadyExists(
         typedString: String,
         isRenameAction: Boolean,
-        node: MegaNode?
+        node: MegaNode?,
     ): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -779,13 +784,13 @@ object MegaNodeDialogUtil {
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         nodeType: Int,
-        actionType: Int
+        actionType: Int,
     ): AlertDialog {
 
-        logDebug("MyBackup + actWithBackupTips nodeType = $nodeType")
-        logDebug("MyBackup + actWithBackupTips actionType = $actionType")
+        Timber.d("MyBackup + actWithBackupTips nodeType = $nodeType")
+        Timber.d("MyBackup + actWithBackupTips actionType = $actionType")
         if (handleList != null) {
-            logDebug("MyBackup + handleList.size = " + handleList.size)
+            Timber.d("MyBackup + handleList.size = " + handleList.size)
         }
 
         val dialogClickListener =
@@ -799,7 +804,7 @@ object MegaNodeDialogUtil {
                             || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
                             || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)
                         ) {
-                            logDebug("MyBackup + showTipDialogWithBackup / actionExecute")
+                            Timber.d("MyBackup + showTipDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -807,7 +812,7 @@ object MegaNodeDialogUtil {
                                 actionType
                             )
                         } else {
-                            logDebug("MyBackup + showTipDialogWithBackup / actionConfirmed")
+                            Timber.d("MyBackup + showTipDialogWithBackup / actionConfirmed")
                             actionBackupNodeCallback.actionConfirmed(
                                 handleList,
                                 pNodeBackup,
@@ -817,7 +822,7 @@ object MegaNodeDialogUtil {
                         }
                     }
                     BUTTON_NEGATIVE -> {
-                        logDebug("MyBackup + showTipDialogWithBackup / actionCancel")
+                        Timber.d("MyBackup + showTipDialogWithBackup / actionCancel")
                         actionBackupNodeCallback.actionCancel(dialog, actionType)
                     }
                 }
@@ -867,7 +872,7 @@ object MegaNodeDialogUtil {
                     }
                     tvContent.setText(R.string.backup_move_sub_folder)
                 } else {
-                    logDebug("Not in the backup folder")
+                    Timber.d("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_REMOVE -> {
@@ -887,7 +892,7 @@ object MegaNodeDialogUtil {
                     }
                     tvContent.setText(R.string.backup_remove_sub_folder)
                 } else {
-                    logDebug("Not in the backup folder")
+                    Timber.d("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
@@ -982,7 +987,7 @@ object MegaNodeDialogUtil {
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         nodeType: Int,
-        actionType: Int
+        actionType: Int,
     ): AlertDialog {
         val layout: LayoutInflater = activity.layoutInflater
         val view = layout.inflate(R.layout.dialog_backup_action_confirm, null)
@@ -1029,7 +1034,7 @@ object MegaNodeDialogUtil {
                         }
                     }
                 } else {
-                    logDebug("Not in the backup folder")
+                    Timber.d("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_REMOVE -> {
@@ -1046,7 +1051,7 @@ object MegaNodeDialogUtil {
                         }
                     }
                 } else {
-                    logDebug("Not in the backup folder")
+                    Timber.d("Not in the backup folder")
                 }
             }
         }
@@ -1072,7 +1077,7 @@ object MegaNodeDialogUtil {
                 when (actionType) {
                     ACTION_BACKUP_MOVE -> {
                         if (nodeType == BACKUP_ROOT && getString(R.string.backup_move_confirm) == strEditText) {
-                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                            Timber.d("MyBackup + showConfirmDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -1083,7 +1088,7 @@ object MegaNodeDialogUtil {
                             dialog.dismiss()
                         } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                             if (getString(R.string.backup_disable_confirm) == strEditText) {
-                                logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                                Timber.d("MyBackup + showConfirmDialogWithBackup / actionExecute")
                                 actionBackupNodeCallback.actionExecute(
                                     handleList,
                                     pNodeBackup,
@@ -1101,7 +1106,7 @@ object MegaNodeDialogUtil {
                     }
                     else -> {
                         if (getString(R.string.backup_disable_confirm) == strEditText) {
-                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                            Timber.d("MyBackup + showConfirmDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -1120,7 +1125,7 @@ object MegaNodeDialogUtil {
             val buttonCancel =
                 dialog.getButton(BUTTON_NEGATIVE)
             buttonCancel.setOnClickListener {
-                logDebug("MyBackup + showConfirmDialogWithBackup / actionCancel")
+                Timber.d("MyBackup + showConfirmDialogWithBackup / actionCancel")
                 actionBackupNodeCallback.actionCancel(dialog, actionType)
                 dialog.dismiss()
             }
@@ -1134,7 +1139,7 @@ object MegaNodeDialogUtil {
 
     private fun showErrorInfo(
         editText: TextInputEditText,
-        editTextLayout: TextInputLayout
+        editTextLayout: TextInputLayout,
     ) {
         editText.requestFocus()
         editTextLayout.error =

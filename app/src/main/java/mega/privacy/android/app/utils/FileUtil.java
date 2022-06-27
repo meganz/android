@@ -1,6 +1,23 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -50,17 +67,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import timber.log.Timber;
 
 public class FileUtil {
 
@@ -117,13 +124,13 @@ public class FileUtil {
     }
 
     public static boolean setLocalIntentParams(Context context, MegaOffline offline, Intent intent,
-            String localPath, boolean isText, SnackbarShower snackbarShower) {
+                                               String localPath, boolean isText, SnackbarShower snackbarShower) {
         return setLocalIntentParams(context, getOfflineFile(context, offline).getName(), intent,
                 localPath, isText, snackbarShower);
     }
 
     public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent,
-            String localPath, boolean isText, SnackbarShower snackbarShower) {
+                                               String localPath, boolean isText, SnackbarShower snackbarShower) {
         return setLocalIntentParams(context, node.getName(), intent, localPath, isText,
                 snackbarShower);
     }
@@ -215,7 +222,7 @@ public class FileUtil {
                 paramsSetSuccessfully = true;
             }
         } catch (Exception ex) {
-            logError("EXCEPTION reading file", ex);
+            Timber.e(ex, "EXCEPTION reading file");
         } finally {
             // close the file.
             try {
@@ -223,20 +230,20 @@ public class FileUtil {
                     instream.close();
                 }
             } catch (IOException e) {
-                logError("EXCEPTION closing InputStream", e);
+                Timber.e(e, "EXCEPTION closing InputStream");
             }
         }
         if (paramsSetSuccessfully) {
             return true;
         }
-        logError("Not expected format: Exception on processing url file");
+        Timber.e("Not expected format: Exception on processing url file");
         return setLocalIntentParams(context, node, intent, localPath, true, snackbarShower);
     }
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
         if (f == null) return;
 
-        logDebug("deleteFolderAndSubfolders: " + f.getAbsolutePath());
+        Timber.d("deleteFolderAndSubfolders: %s", f.getAbsolutePath());
         if (f.isDirectory() && f.listFiles() != null) {
             for (File c : f.listFiles()) {
                 deleteFolderAndSubfolders(context, c);
@@ -259,7 +266,7 @@ public class FileUtil {
                 mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.sendBroadcast(mediaScanIntent);
             } catch (Exception e) {
-                logError("Exception while deleting media scanner file", e);
+                Timber.e(e, "Exception while deleting media scanner file");
             }
 
         }
@@ -292,7 +299,7 @@ public class FileUtil {
 
             return file;
         } catch (IOException e) {
-            logError("File write failed", e);
+            Timber.e(e, "File write failed");
             return null;
         }
     }
@@ -316,7 +323,7 @@ public class FileUtil {
             }
             return size;
         }
-        logDebug("Dir size: " + size);
+        Timber.d("Dir size: %s", size);
         return size;
     }
 
@@ -328,7 +335,7 @@ public class FileUtil {
      */
     public static String getLocalFile(MegaNode node) {
         if (node == null) {
-            logWarning("Node is null");
+            Timber.w("Node is null");
             return null;
         }
 
@@ -360,7 +367,7 @@ public class FileUtil {
             }
         } catch (SecurityException e) {
             // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
-            logError("Haven't granted the permission.", e);
+            Timber.e(e, "Haven't granted the permission.");
             return null;
         }
 
@@ -401,7 +408,7 @@ public class FileUtil {
      */
     public static String getTappedNodeLocalFile(MegaNode node) {
         if (node == null) {
-            logWarning("Node is null");
+            Timber.w("Node is null");
             return null;
         }
 
@@ -415,7 +422,7 @@ public class FileUtil {
         Context context = MegaApplication.getInstance();
 
         try {
-            Cursor cursor = context.getContentResolver().query( MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection, selectionArgs, null);
+            Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection, selectionArgs, null);
 
             List<String> candidates = getPotentialLocalPath(context, cursor, data, node.getName());
 
@@ -426,7 +433,7 @@ public class FileUtil {
             }
         } catch (SecurityException e) {
             // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
-            logError("Haven't granted the permission.", e);
+            Timber.e(e, "Haven't granted the permission.");
             return null;
         }
 
@@ -438,10 +445,10 @@ public class FileUtil {
      * If a file path is found both on internal storage and SD card,
      * put the path on internal storage before that on SD card.
      *
-     * @param context Context object.
-     * @param cursor Cursor which contains all the requirements to find the file
-     * @param columnName   Column name in which search
-     * @param fileName Name of the searching node.
+     * @param context    Context object.
+     * @param cursor     Cursor which contains all the requirements to find the file
+     * @param columnName Column name in which search
+     * @param fileName   Name of the searching node.
      * @return A list of file path that may be the path of the searching file.
      */
     private static List<String> getPotentialLocalPath(Context context, Cursor cursor, String columnName, String fileName) {
@@ -454,7 +461,7 @@ public class FileUtil {
 
             // Check file name.
             if (path.endsWith(fileName)) {
-                if(SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
                     sdCandidates.add(path);
                 } else {
                     candidates.add(path);
@@ -464,7 +471,7 @@ public class FileUtil {
 
         candidates.addAll(sdCandidates);
 
-        if(cursor != null) {
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -512,8 +519,8 @@ public class FileUtil {
     /**
      * Copy an Uri to file
      *
-     * @param uri Source Uri.
-     * @param dest   Final copied file.
+     * @param uri  Source Uri.
+     * @param dest Final copied file.
      * @throws IOException if some error happens while copying.
      */
     public static void copyUriToFile(Uri uri, File dest) throws IOException {
@@ -532,12 +539,12 @@ public class FileUtil {
     }
 
     public static boolean isVideoFile(String path) {
-        logDebug("isVideoFile: " + path);
+        Timber.d("isVideoFile: %s", path);
         try {
             String mimeType = URLConnection.guessContentTypeFromName(path);
             return mimeType != null && mimeType.indexOf("video") == 0;
         } catch (Exception e) {
-            logError("Exception", e);
+            Timber.e(e);
             return false;
         }
     }
@@ -660,7 +667,7 @@ public class FileUtil {
     }
 
     public static void purgeDirectory(File dir) {
-        logDebug("Removing cache files");
+        Timber.d("Removing cache files");
         if (!dir.exists()) {
             return;
         }
@@ -740,8 +747,8 @@ public class FileUtil {
      * Shares an uri.
      *
      * @param context current Context.
-     * @param name name of the uri.
-     * @param uri uri to share.
+     * @param name    name of the uri.
+     * @param uri     uri to share.
      */
     public static void shareUri(Context context, String name, Uri uri) {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -754,11 +761,11 @@ public class FileUtil {
 
     /**
      * Share multiple files to other apps.
-     *
+     * <p>
      * credit: https://stackoverflow.com/a/15577579/3077508
      *
      * @param context current Context
-     * @param files files to share
+     * @param files   files to share
      */
     public static void shareFiles(Context context, List<File> files) {
         String intentType = null;
@@ -787,9 +794,9 @@ public class FileUtil {
     /**
      * Share a file via its Uri.
      *
-     * @param context Current context.
+     * @param context   Current context.
      * @param extention The file's extention, for example, pdf, jpg. Use to infer the mimetype.
-     * @param uri The file's Uri.
+     * @param uri       The file's Uri.
      */
     public static void shareWithUri(Context context, String extention, Uri uri) {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -815,7 +822,7 @@ public class FileUtil {
      * 2. User selected specific folder path on the SD card, can get it from getDocumentPathFromTreeUri.
      *
      * @param treeUri The URI of the selected SD card location.
-     * @param con Context object.
+     * @param con     Context object.
      * @return Path of the selected SD card location.
      */
     @Nullable
@@ -823,13 +830,12 @@ public class FileUtil {
         if (treeUri == null) return null;
 
         String volumePath;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             SDCardOperator operator;
             try {
                 operator = new SDCardOperator(con);
             } catch (SDCardOperator.SDCardException e) {
-                e.printStackTrace();
-                logError(e.getMessage(), e);
+                Timber.e(e);
                 return null;
             }
 
@@ -1020,7 +1026,7 @@ public class FileUtil {
         try {
             copyFile(fileToCopy, copyFile);
         } catch (IOException e) {
-            logError("IOException copying file.", e);
+            Timber.e(e, "IOException copying file.");
             copyFile.delete();
         }
 
@@ -1050,14 +1056,14 @@ public class FileUtil {
 
             context.sendBroadcast(mediaScanIntent);
         } catch (Exception e) {
-            logWarning("Exception sending mediaScanIntent.", e);
+            Timber.w(e, "Exception sending mediaScanIntent.");
         }
 
         try {
             MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, (path1, uri)
-                    -> logDebug("File was scanned successfully"));
+                    -> Timber.d("File was scanned successfully"));
         } catch (Exception e) {
-            logWarning("Exception scanning file.", e);
+            Timber.w(e, "Exception scanning file.");
         }
     }
 
@@ -1084,9 +1090,9 @@ public class FileUtil {
     /**
      * Saves some text on a file.
      *
-     * @param context         Current context.
-     * @param content         The content to store.
-     * @param path            The selected location to save the file.
+     * @param context Current context.
+     * @param content The content to store.
+     * @param path    The selected location to save the file.
      * @return True if content was correctly saved, false otherwise.
      */
     public static boolean saveTextOnFile(Context context, String content, String path) {
@@ -1096,7 +1102,7 @@ public class FileUtil {
                 // Export to cache folder root first.
                 File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
 
-                if (!saveContentOnFile(content, new FileWriter(temp))){
+                if (!saveContentOnFile(content, new FileWriter(temp))) {
                     return false;
                 }
 
@@ -1112,7 +1118,7 @@ public class FileUtil {
                 return saveContentOnFile(content, new FileWriter(path));
             }
         } catch (SDCardOperator.SDCardException | IOException e) {
-            logError("IOException saving content.", e);
+            Timber.e(e, "IOException saving content.");
             return false;
         }
 
@@ -1132,7 +1138,7 @@ public class FileUtil {
             out.write(content);
             out.close();
         } catch (IOException e) {
-            logError("IOException saving content.", e);
+            Timber.e(e, "IOException saving content.");
             return false;
         }
 
@@ -1149,13 +1155,13 @@ public class FileUtil {
      */
     public static boolean saveTextOnContentUri(ContentResolver contentResolver, Uri contentUri, String content) {
         try {
-            ParcelFileDescriptor file =  contentResolver.openFileDescriptor(contentUri, "w");
+            ParcelFileDescriptor file = contentResolver.openFileDescriptor(contentUri, "w");
             FileOutputStream fileOutputStream = new FileOutputStream(file.getFileDescriptor());
             fileOutputStream.write(content.getBytes());
             fileOutputStream.close();
             file.close();
         } catch (IOException e) {
-            logError("IOException creating RK file", e);
+            Timber.e(e, "IOException creating RK file");
             return false;
         }
 
@@ -1165,8 +1171,8 @@ public class FileUtil {
     /**
      * Delete file without throwing exceptions.
      *
-     * @param file  File to be deleted
-     * @return      True if it was deleted successfully, false otherwise
+     * @param file File to be deleted
+     * @return True if it was deleted successfully, false otherwise
      */
     public static boolean deleteFileSafely(File file) {
         try {
@@ -1179,8 +1185,8 @@ public class FileUtil {
     /**
      * Check if a specific file is valid for Image Viewer
      *
-     * @param file  File to be checked
-     * @return      True if it's valid, false otherwise
+     * @param file File to be checked
+     * @return True if it's valid, false otherwise
      */
     public static boolean isValidForImageViewer(File file) {
         if (file.isFile() && file.exists() && file.canRead()) {

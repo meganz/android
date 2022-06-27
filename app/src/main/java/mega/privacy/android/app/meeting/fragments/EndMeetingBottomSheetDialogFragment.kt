@@ -10,8 +10,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
+import timber.log.Timber
 
 /**
  * The fragment shows two options for moderator when the moderator leave the meeting
@@ -30,14 +30,14 @@ class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
 
         if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            LogUtil.logError("Error. Chat doesn't exist")
+            Timber.e("Error. Chat doesn't exist")
             return
         }
 
         chatId?.let { sharedViewModel.setChatId(it) }
 
         if (sharedViewModel.getCall() == null) {
-            LogUtil.logError("Error. Call doesn't exist")
+            Timber.e("Error. Call doesn't exist")
             return
         }
     }

@@ -5,7 +5,9 @@ import android.content.Intent
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -19,9 +21,9 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.Check
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.ContextUtils.isValid
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -30,7 +32,7 @@ import javax.inject.Inject
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
-    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase
+    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase,
 ) : LifecycleEventObserver {
 
     private val disposable = CompositeDisposable()
@@ -71,9 +73,7 @@ class CookieDialogHandler @Inject constructor(
                 onSuccess = { showDialog ->
                     action.invoke(showDialog)
                 },
-                onError = { error ->
-                    LogUtil.logError(error.message)
-                }
+                onError = Timber::e
             )
             .addTo(disposable)
     }
@@ -93,10 +93,11 @@ class CookieDialogHandler @Inject constructor(
             .create()
             .apply {
                 setOnShowListener {
-                    val message = StringResourcesUtils.getString(R.string.dialog_cookie_alert_message)
-                        .replace("[A]", "<a href='https://mega.nz/cookie'>")
-                        .replace("[/A]", "</a>")
-                        .toSpannedHtmlText()
+                    val message =
+                        StringResourcesUtils.getString(R.string.dialog_cookie_alert_message)
+                            .replace("[A]", "<a href='https://mega.nz/cookie'>")
+                            .replace("[/A]", "</a>")
+                            .toSpannedHtmlText()
 
                     findViewById<TextView>(R.id.message)?.apply {
                         movementMethod = LinkMovementMethod.getInstance()
@@ -116,9 +117,7 @@ class CookieDialogHandler @Inject constructor(
                         (context.applicationContext as MegaApplication).checkEnabledCookies()
                     }
                 },
-                onError = { error ->
-                    LogUtil.logError(error.message)
-                }
+                onError = Timber::e
             )
     }
 
@@ -137,7 +136,7 @@ class CookieDialogHandler @Inject constructor(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when(event){
+        when (event) {
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
             else -> return

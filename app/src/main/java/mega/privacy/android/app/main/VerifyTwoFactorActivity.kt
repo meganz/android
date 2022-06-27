@@ -20,19 +20,31 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
+import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
+import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
+import mega.privacy.android.app.utils.Constants.DISABLE_2FA
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.*
+import nz.mega.sdk.MegaError.API_EACCESS
+import nz.mega.sdk.MegaError.API_EEXIST
+import nz.mega.sdk.MegaError.API_EEXPIRED
+import nz.mega.sdk.MegaError.API_EFAILED
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequest.*
+import nz.mega.sdk.MegaRequest.TYPE_CHANGE_PW
+import nz.mega.sdk.MegaRequest.TYPE_GET_CANCEL_LINK
+import nz.mega.sdk.MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK
+import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK
+import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET
+import timber.log.Timber
 
 @AndroidEntryPoint
 class VerifyTwoFactorActivity : PasscodeActivity() {
@@ -235,7 +247,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private fun showAlert(
         messageResId: Int,
         titleResId: Int,
-        callback: () -> Unit = this::finish
+        callback: () -> Unit = this::finish,
     ) {
         if (isActivityInBackground) return
 
@@ -328,7 +340,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * Showing 2fa verification error.
      */
     fun verifyShowError() {
-        logWarning("Pin not correct verifyShowError")
+        Timber.w("Pin not correct verifyShowError")
         isFirstTime2fa = false
         isErrorShown = true
 
@@ -344,7 +356,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * PIN code is from every single [EditTextPIN].
      */
     private fun permitVerify() {
-        logDebug("permitVerify")
+        Timber.d("permitVerify")
         var allInput = true
         val sb = StringBuilder(6)
 
@@ -388,10 +400,10 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         when (e.errorCode) {
             API_OK -> {
                 is2FAEnabled = request.flag
-                logDebug("2fa is enabled: $is2FAEnabled")
+                Timber.d("2fa is enabled: $is2FAEnabled")
             }
 
-            else -> logWarning("Check 2fa enable state error. error code: ${e.errorCode}")
+            else -> Timber.w("Check 2fa enable state error. error code: ${e.errorCode}")
         }
     }
 
@@ -401,7 +413,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private fun changeEmailFinish(e: MegaError) {
         when (e.errorCode) {
             API_OK -> {
-                logDebug("The change link has been sent")
+                Timber.d("The change link has been sent")
                 showAlert(
                     R.string.email_verification_text_change_mail,
                     R.string.email_verification_title
@@ -409,12 +421,12 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
             }
 
             API_EACCESS -> {
-                logWarning("The new mail already exists")
+                Timber.w("The new mail already exists")
                 showAlert(R.string.mail_already_used, R.string.email_verification_title)
             }
 
             API_EEXIST -> {
-                logWarning("Email change already requested (confirmation link already sent).")
+                Timber.w("Email change already requested (confirmation link already sent).")
                 showAlert(
                     R.string.mail_changed_confirm_requested,
                     R.string.email_verification_title
@@ -422,7 +434,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
             }
 
             else -> {
-                logError("Error when asking for change mail link: " + e.errorString + "___" + e.errorCode)
+                Timber.e("Error when asking for change mail link: ${e.errorString}___${e.errorCode}")
                 showAlert(R.string.general_text_error, R.string.general_error_word)
             }
         }
@@ -434,12 +446,12 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private fun cancelAccountFinish(e: MegaError) {
         when (e.errorCode) {
             API_OK -> {
-                logDebug("Cancellation link received!")
+                Timber.d("Cancellation link received!")
                 showAlert(R.string.email_verification_text, R.string.email_verification_title)
             }
 
             else -> {
-                logError("Error when asking for the cancellation link: " + e.errorString + "___" + e.errorCode)
+                Timber.e("Error when asking for the cancellation link: ${e.errorString}___${e.errorCode}")
                 showAlert(R.string.general_text_error, R.string.general_error_word)
             }
         }
@@ -453,16 +465,16 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
             API_OK -> {
                 if (!request.flag) {
                     // Send live event to notify.
-                    logDebug("Pin correct: Two-Factor Authentication disabled")
+                    Timber.d("Pin correct: Two-Factor Authentication disabled")
                     LiveEventBus.get(EVENT_2FA_UPDATED, Boolean::class.java).post(false)
                     showAlert(R.string.label_2fa_disabled, INVALID_VALUE)
                 } else {
-                    logWarning("Disable 2fa failed.")
+                    Timber.w("Disable 2fa failed.")
                 }
             }
 
             else -> {
-                logError("An error occurred trying to disable Two-Factor Authentication")
+                Timber.e("An error occurred trying to disable Two-Factor Authentication")
                 showAlert(R.string.general_text_error, R.string.error_disable_2fa)
             }
         }
@@ -474,7 +486,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private fun changePasswordFinish(e: MegaError) {
         when (e.errorCode) {
             API_OK -> {
-                logDebug("Pass changed OK")
+                Timber.d("Pass changed OK")
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
                 if (intent != null && intent.getBooleanExtra(
@@ -500,7 +512,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private val listener = object : BaseListener(this) {
 
         override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-            logDebug("Start ${request.type}: ${request.requestString} request.")
+            Timber.d("Start ${request.type}: ${request.requestString} request.")
 
             // Prevent to quit when the request starts.
             if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
@@ -509,7 +521,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         }
 
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-            logDebug("${request.type}: ${request.requestString} finished.")
+            Timber.d("${request.type}: ${request.requestString} finished.")
             isRequesting = false
 
             if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
@@ -520,7 +532,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
             // PIN code verification error.
             if (e.errorCode == API_EFAILED or API_EEXPIRED) {
-                logWarning("Pin not correct")
+                Timber.w("Pin not correct")
                 if (is2FAEnabled) {
                     verifyShowError()
                 }

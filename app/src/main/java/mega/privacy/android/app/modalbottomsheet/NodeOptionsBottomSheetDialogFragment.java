@@ -31,8 +31,6 @@ import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
@@ -104,28 +102,47 @@ import mega.privacy.android.app.utils.ViewUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
-    At the same time, compatible with old code. For which mode corresponds to which dialog style,
+     At the same time, compatible with old code. For which mode corresponds to which dialog style,
      please refer to the code */
-    /** No definite mode, map the drawerItem to a specific mode */
+    /**
+     * No definite mode, map the drawerItem to a specific mode
+     */
     public static final int DEFAULT_MODE = 0;
-    /** For Cloud Drive */
+    /**
+     * For Cloud Drive
+     */
     public static final int CLOUD_DRIVE_MODE = 1;
-    /** For Rubbish Bin */
+    /**
+     * For Rubbish Bin
+     */
     public static final int RUBBISH_BIN_MODE = 2;
-    /** For Inbox */
+    /**
+     * For Inbox
+     */
     public static final int INBOX_MODE = 3;
-    /** For Shared items */
+    /**
+     * For Shared items
+     */
     public static final int SHARED_ITEMS_MODE = 4;
-    /** For Search */
+    /**
+     * For Search
+     */
     public static final int SEARCH_MODE = 5;
-    /** For Recents */
+    /**
+     * For Recents
+     */
     public static final int RECENTS_MODE = 6;
-    /** For Favourites of HomePage tab */
+    /**
+     * For Favourites of HomePage tab
+     */
     public static final int FAVOURITES_IN_TAB_MODE = 7;
-    /** For Favourites */
+    /**
+     * For Favourites
+     */
     public static final int FAVOURITES_MODE = 8;
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";
@@ -280,7 +297,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout separatorModify = contentView.findViewById(R.id.separator_modify_options);
 
         if (!isScreenInPortrait(requireContext())) {
-            logDebug("Landscape configuration");
+            Timber.d("Landscape configuration");
             nodeName.setMaxWidth(scaleWidthPx(275, getResources().getDisplayMetrics()));
             nodeInfo.setMaxWidth(scaleWidthPx(275, getResources().getDisplayMetrics()));
         } else {
@@ -335,7 +352,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 setNodeThumbnail(requireContext(), node, nodeThumb);
 
-                if (isTakenDown)  {
+                if (isTakenDown) {
                     counterShares--;
                     optionSendChat.setVisibility(View.GONE);
                 } else {
@@ -426,7 +443,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case CLOUD_DRIVE_MODE:
             case INBOX_MODE:
             case SEARCH_MODE:
-                logDebug("show Cloud bottom sheet");
+                Timber.d("show Cloud bottom sheet");
 
                 // Check if sub folder of "My Backup"
                 ArrayList<Long> handleList = new ArrayList<>();
@@ -457,7 +474,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case RUBBISH_BIN_MODE:
-                logDebug("show Rubbish bottom sheet");
+                Timber.d("show Rubbish bottom sheet");
 
                 optionEdit.setVisibility(View.GONE);
 
@@ -526,7 +543,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case SHARED_ITEMS_MODE:
                 int tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
                 if (tabSelected == 0 || nC.nodeComesFromIncoming(node)) {
-                    logDebug("showOptionsPanelIncoming");
+                    Timber.d("showOptionsPanelIncoming");
 
                     optionRemove.setVisibility(View.GONE);
                     if (ViewUtils.isVisible(optionShareFolder)) {
@@ -540,7 +557,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     }
 
                     int dBT = nC.getIncomingLevel(node);
-                    logDebug("DeepTree value:" + dBT);
+                    Timber.d("DeepTree value:%s", dBT);
 
                     if (dBT > FIRST_NAVIGATION_LEVEL) {
                         optionLeaveShares.setVisibility(View.GONE);
@@ -552,17 +569,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                         switch (accessLevel) {
                             case MegaShare.ACCESS_FULL:
-                                logDebug("LEVEL 0 - access FULL");
+                                Timber.d("LEVEL 0 - access FULL");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                 break;
 
                             case MegaShare.ACCESS_READ:
-                                logDebug("LEVEL 0 - access read");
+                                Timber.d("LEVEL 0 - access read");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                                 break;
 
                             case MegaShare.ACCESS_READWRITE:
-                                logDebug("LEVEL 0 - readwrite");
+                                Timber.d("LEVEL 0 - readwrite");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
                                 break;
                         }
@@ -580,7 +597,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL:
-                            logDebug("access FULL");
+                            Timber.d("access FULL");
                             if (dBT <= FIRST_NAVIGATION_LEVEL) {
                                 optionRubbishBin.setVisibility(View.GONE);
                                 counterModify--;
@@ -590,7 +607,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             break;
 
                         case MegaShare.ACCESS_READ:
-                            logDebug("access read");
+                            Timber.d("access read");
                             optionLabel.setVisibility(View.GONE);
                             optionFavourite.setVisibility(View.GONE);
                             counterModify--;
@@ -601,7 +618,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             break;
 
                         case MegaShare.ACCESS_READWRITE:
-                            logDebug("readwrite");
+                            Timber.d("readwrite");
                             optionLabel.setVisibility(View.GONE);
                             optionFavourite.setVisibility(View.GONE);
                             counterModify--;
@@ -612,7 +629,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             break;
                     }
                 } else if (tabSelected == 1) {
-                    logDebug("showOptionsPanelOutgoing");
+                    Timber.d("showOptionsPanelOutgoing");
 
                     if (!isTakenDown && ((ManagerActivity) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL
                             && ViewUtils.isVisible(optionClearShares)) {
@@ -760,7 +777,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     @Override
     public void onClick(View v) {
         if (node == null) {
-            logWarning("The selected node is NULL");
+            Timber.w("The selected node is NULL");
             return;
         }
 

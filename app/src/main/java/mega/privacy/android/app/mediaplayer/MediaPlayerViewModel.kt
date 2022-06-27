@@ -17,10 +17,10 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class MediaPlayerViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase
+    private val moveNodeUseCase: MoveNodeUseCase,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -82,7 +82,7 @@ class MediaPlayerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     throwable.value = error
-                    LogUtil.logError("Error not copied.", error)
+                    Timber.e(error, "Error not copied.")
                 }
             )
             .addTo(composite)
@@ -111,7 +111,7 @@ class MediaPlayerViewModel @Inject constructor(
                     },
                     onError = { error ->
                         throwable.value = error
-                        LogUtil.logError("Error not moved.", error)
+                        Timber.e(error, "Error not moved.")
                     }
                 )
                 .addTo(composite)
@@ -132,7 +132,7 @@ class MediaPlayerViewModel @Inject constructor(
         nodeHandle: Long? = null,
         newParentHandle: Long,
         type: NameCollisionType,
-        completeAction: (() -> Unit)
+        completeAction: (() -> Unit),
     ) {
         if (node != null) {
             checkNameCollisionUseCase.check(
@@ -156,7 +156,7 @@ class MediaPlayerViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> LogUtil.logError(error.stackTraceToString())
+                        else -> Timber.e(error)
                     }
                 }
             )

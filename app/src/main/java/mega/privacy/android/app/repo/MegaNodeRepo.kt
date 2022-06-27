@@ -7,13 +7,13 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.SortUtil.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -40,7 +40,7 @@ class MegaNodeRepo @Inject constructor(
                 val cuHandle = pref.camSyncHandle.toLong()
                 cuNode = megaApi.getNodeByHandle(cuHandle)
             } catch (e: NumberFormatException) {
-                logError("parse getCamSyncHandle error $e")
+                Timber.e(e, "parse getCamSyncHandle error")
             }
         }
 
@@ -49,7 +49,7 @@ class MegaNodeRepo @Inject constructor(
                 val muHandle = pref.megaHandleSecondaryFolder.toLong()
                 muNode = megaApi.getNodeByHandle(muHandle)
             } catch (e: NumberFormatException) {
-                logError("parse MegaHandleSecondaryFolder error $e")
+                Timber.e(e, "parse MegaHandleSecondaryFolder error")
             }
         }
 

@@ -1,5 +1,8 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
+import static mega.privacy.android.app.utils.Constants.SELECT_NOTIFICATION_SOUND;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,11 +13,8 @@ import android.os.Bundle;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatNotificationsFragment;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
-import static mega.privacy.android.app.utils.Constants.SELECT_NOTIFICATION_SOUND;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivity {
 
@@ -45,20 +45,20 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
     }
 
     public void changeSound(String soundString) {
-        logDebug("Sound string: " + soundString);
+        Timber.d("Sound string: %s", soundString);
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
 
         if (soundString == null) {
-            logWarning("NULL sound");
+            Timber.w("NULL sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         } else if (soundString.equals("-1")) {
-            logWarning("Notification sound -1");
+            Timber.w("Notification sound -1");
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
         } else if (soundString.isEmpty()) {
-            logWarning("Empty sound");
+            Timber.w("Empty sound");
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
         } else {
@@ -70,10 +70,10 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        logDebug("Result code: " + resultCode);
+        Timber.d("Result code: %s", resultCode);
 
         if (resultCode == RESULT_OK && requestCode == SELECT_NOTIFICATION_SOUND) {
-            logDebug("Selected notification sound OK");
+            Timber.d("Selected notification sound OK");
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             if (sttChatNotifications != null && sttChatNotifications.isAdded()) {
                 sttChatNotifications.setNotificationSound(uri);

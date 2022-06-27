@@ -1,7 +1,16 @@
 package mega.privacy.android.app.meeting;
 
+import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
+import static mega.privacy.android.app.utils.CallUtil.openMeetingInProgress;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_CURRENT_CALL;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.IntentService;
 import android.content.Intent;
+
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -18,13 +27,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class CallNotificationIntentService extends IntentService implements HangChatCallListener.OnCallHungUpCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
@@ -68,25 +70,25 @@ public class CallNotificationIntentService extends IntentService implements Hang
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        logDebug("onHandleIntent");
+        Timber.d("onHandleIntent");
 
-        if(intent == null || intent.getExtras() == null)
+        if (intent == null || intent.getExtras() == null)
             return;
 
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
         MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
-        if(currentCall != null){
+        if (currentCall != null) {
             callIdCurrentCall = currentCall.getCallId();
         }
 
         chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
         MegaChatCall incomingCall = megaChatApi.getChatCall(chatIdIncomingCall);
 
-        if(incomingCall != null){
+        if (incomingCall != null) {
             callIdIncomingCall = incomingCall.getCallId();
             clearIncomingCallNotification(callIdIncomingCall);
             MegaChatRoom incomingCallChat = megaChatApi.getChatRoom(chatIdIncomingCall);
-            if(incomingCallChat != null && incomingCallChat.isMeeting()){
+            if (incomingCallChat != null && incomingCallChat.isMeeting()) {
                 isTraditionalCall = false;
             }
         }
@@ -95,7 +97,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
         if (action == null)
             return;
 
-        logDebug("The button clicked is : " + action+", currentChatId = "+chatIdCurrentCall+", incomingCall = "+chatIdIncomingCall);
+        Timber.d("The button clicked is : %s, currentChatId = %d, incomingCall = %d", action, chatIdCurrentCall, chatIdIncomingCall);
         switch (action) {
             case ANSWER:
             case END_ANSWER:
@@ -112,7 +114,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
                         Timber.d("Answering incoming call ...");
                         answerCall(chatIdIncomingCall);
                     } else {
-                        logDebug("Hanging up current call ... ");
+                        Timber.d("Hanging up current call ... ");
                         megaChatApi.hangChatCall(callIdCurrentCall, new HangChatCallListener(this, this));
                     }
 
@@ -120,12 +122,12 @@ public class CallNotificationIntentService extends IntentService implements Hang
                 break;
 
             case DECLINE:
-                logDebug("Hanging up incoming call ... ");
+                Timber.d("Hanging up incoming call ... ");
                 megaChatApi.hangChatCall(callIdIncomingCall, new HangChatCallListener(this, this));
                 break;
 
             case IGNORE:
-                logDebug("Ignore incoming call... ");
+                Timber.d("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
                 MegaApplication.getInstance().stopSounds();
                 clearIncomingCallNotification(callIdIncomingCall);
@@ -138,7 +140,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
                     Timber.d("Answering incoming call ...");
                     answerCall(chatIdIncomingCall);
                 } else {
-                    logDebug("Putting the current call on hold...");
+                    Timber.d("Putting the current call on hold...");
                     megaChatApi.setCallOnHold(chatIdCurrentCall, true, new SetCallOnHoldListener(this, this));
                 }
                 break;
@@ -151,7 +153,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
     @Override
     public void onCallHungUp(long callId) {
         if (callId == callIdIncomingCall) {
-            logDebug("Incoming call hung up. ");
+            Timber.d("Incoming call hung up. ");
             clearIncomingCallNotification(callIdIncomingCall);
             stopSelf();
         } else if (callId == callIdCurrentCall) {

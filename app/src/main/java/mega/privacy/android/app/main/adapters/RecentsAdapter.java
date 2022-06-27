@@ -1,13 +1,16 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVALID_VIEW_TYPE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isOutShare;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isOnline;
+
 import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.navigation.NavDestination;
-import androidx.navigation.NavOptions;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.Spanned;
@@ -19,6 +22,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.navigation.NavDestination;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,22 +41,16 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
-
-import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHolderBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
 
@@ -62,7 +65,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     private int mHeaderColor = -1;
 
     public RecentsAdapter(Context context, Object fragment, ArrayList<RecentsItem> items) {
-        logDebug("new RecentsAdapter");
+        Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
         setItems(items);
@@ -137,7 +140,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public RecentsAdapter.ViewHolderBucket onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
+        Timber.d("onCreateViewHolder");
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket, parent, false);
         ViewHolderBucket holder = new ViewHolderBucket(v);
@@ -164,18 +167,18 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(RecentsAdapter.ViewHolderBucket holder, int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         RecentsItem item = getItemtAtPosition(position);
         if (item == null) return;
 
         if (item.getViewType() == RecentsItem.TYPE_HEADER) {
-            logDebug("onBindViewHolder: TYPE_HEADER");
+            Timber.d("onBindViewHolder: TYPE_HEADER");
             holder.itemBucketLayout.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
             holder.headerLayout.setBackgroundColor(getHeaderColor());
             holder.headerText.setText(item.getDate());
         } else if (item.getViewType() == RecentsItem.TYPE_BUCKET) {
-            logDebug("onBindViewHolder: TYPE_BUCKET");
+            Timber.d("onBindViewHolder: TYPE_BUCKET");
             holder.itemBucketLayout.setVisibility(View.VISIBLE);
             holder.itemBucketLayout.setOnClickListener(this);
             holder.headerLayout.setVisibility(View.GONE);
@@ -282,7 +285,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "\'>");
             userAction = userAction.replace("[/A]", "</font>");
         } catch (Exception e) {
-            logError("Exception formatting string", e);
+            Timber.e(e, "Exception formatting string");
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -364,7 +367,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaRecentActionBucket bucket = item.getBucket();
                 if (bucket == null) break;
 
-                ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
+                ((RecentsFragment) fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
                 NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
                 if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
                     Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());
@@ -422,6 +425,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
      * The Homepage bottom sheet has a calculated background for elevation, while the
      * Recent fragment UI is transparent. This function is for calculating
      * the same background color as bottomSheet for the sticky "header"
+     *
      * @return the header's background color value
      */
     private int getHeaderColor() {

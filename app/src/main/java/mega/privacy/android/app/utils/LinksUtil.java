@@ -1,5 +1,12 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.HANDLE_LIST;
+import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
+import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,19 +18,12 @@ import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.getLink.GetLinkActivity;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
-
-import static mega.privacy.android.app.utils.Constants.HANDLE;
-import static mega.privacy.android.app.utils.Constants.HANDLE_LIST;
-import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
-import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.matchRegexs;
-
-import androidx.fragment.app.Fragment;
+import timber.log.Timber;
 
 public class LinksUtil {
 
@@ -34,7 +34,7 @@ public class LinksUtil {
     /**
      * Checks if the link received requires transfer session.
      *
-     * @param url   link to check
+     * @param url link to check
      * @return True if the link requires transfer session, false otherwise.
      */
     public static boolean requiresTransferSession(Context context, String url) {
@@ -55,8 +55,8 @@ public class LinksUtil {
     /**
      * Checks if the url is a MEGA link and if it requires transfer session.
      *
-     * @param context   current Context
-     * @param url       link to check
+     * @param context current Context
+     * @param url     link to check
      * @return True if the link is a MEGA link and requires transfer session, false otherwise.
      */
     public static boolean isMEGALinkAndRequiresTransferSession(Context context, String url) {
@@ -68,9 +68,9 @@ public class LinksUtil {
      * - If the link requires transfer session, requests it.
      * - If not, launches a general ACTION_VIEW intent.
      *
-     * @param context       current Context
-     * @param strBuilder    SpannableStringBuilder containing the text of the TextView
-     * @param span          URLSpan containing the links
+     * @param context    current Context
+     * @param strBuilder SpannableStringBuilder containing the text of the TextView
+     * @param span       URLSpan containing the links
      */
     public static void makeLinkClickable(Context context, SpannableStringBuilder strBuilder, final URLSpan span) {
         int start = strBuilder.getSpanStart(span);
@@ -87,7 +87,7 @@ public class LinksUtil {
                 if (!isMEGALinkAndRequiresTransferSession(context, url)) {
                     Uri uri = Uri.parse(url);
                     if (uri == null) {
-                        logWarning("Uri is null. Cannot open the link.");
+                        Timber.w("Uri is null. Cannot open the link.");
                         return;
                     }
 
@@ -105,8 +105,8 @@ public class LinksUtil {
      * Checks if the content of the TextView has links.
      * If so, sets a customized onClick listener to intercept the clicks on them.
      *
-     * @param context   current Context
-     * @param textView  TextView to check
+     * @param context  current Context
+     * @param textView TextView to check
      */
     public static void interceptLinkClicks(Context context, TextView textView) {
         CharSequence sequence = textView.getText();

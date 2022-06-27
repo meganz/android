@@ -13,7 +13,8 @@ import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.service.reporter.FirebaseCrashReporter
 import mega.privacy.android.app.service.reporter.FirebasePerformanceReporter
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import timber.log.Timber
+
 import javax.inject.Singleton
 
 @Module
@@ -50,7 +51,7 @@ class AnalyticsModule {
         try {
             FirebaseApp.getInstance()
         } catch (ignored: Exception) {
-            logWarning(ignored.stackTraceToString())
+            Timber.w(ignored)
             FirebaseApp.initializeApp(context)
         }
     }

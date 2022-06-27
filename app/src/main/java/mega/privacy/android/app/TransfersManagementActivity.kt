@@ -1,6 +1,9 @@
 package mega.privacy.android.app
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
@@ -14,7 +17,9 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
-import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE
+import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_BROADCAST_INVALID_VALUE
+import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.main.DrawerItem
@@ -23,11 +28,10 @@ import mega.privacy.android.app.main.ManagerActivity.PENDING_TAB
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
 import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -94,7 +98,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                         transfersManagement.startNetworkTimer()
                     }
                 },
-                onError = { error -> logError("Network update error", error) }
+                onError = { error -> Timber.e(error, "Network update error") }
             )
             .addTo(composite)
 
@@ -134,7 +138,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     protected fun setTransfersWidgetLayout(
         transfersWidgetLayout: RelativeLayout,
-        context: Context?
+        context: Context?,
     ) {
         transfersWidget =
             TransfersWidget(context ?: this, megaApi, transfersWidgetLayout, transfersManagement)
@@ -160,7 +164,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     protected fun openTransfersSection() {
         if (megaApi.isLoggedIn == 0 || dbH.credentials == null) {
-            LogUtil.logWarning("No logged in, no action.")
+            Timber.w("Not logged in, no action.")
             return
         }
 

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.logging.loggers
 
 import android.util.Log
-import mega.privacy.android.app.logging.TimberLegacyLog
-import mega.privacy.android.app.utils.LogUtil
 import timber.log.Timber
 
 /**
@@ -16,8 +14,6 @@ class LineNumberDebugTree : Timber.DebugTree() {
         Timber.Forest::class.java.name,
         Timber.Tree::class.java.name,
         Timber.DebugTree::class.java.name,
-        TimberLegacyLog::class.java.name,
-        LogUtil::class.java.name,
         SdkLogFlowTree::class.java.name,
         ChatFlowLogTree::class.java.name,
         LineNumberDebugTree::class.java.name,

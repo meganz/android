@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import timber.log.Timber;
 
 public class CustomizedGridCallRecyclerView extends RecyclerView {
 
@@ -60,22 +60,22 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        logDebug("onMeasure-> widthSpec: " + widthSpec + ", heightSpec: " + heightSpec);
+        Timber.d("onMeasure-> widthSpec: %d, heightSpec: %d", widthSpec, heightSpec);
         super.onMeasure(widthSpec, heightSpec);
         if (!isWrapContent) {
-            logDebug("columnWidth :" + columnWidth);
+            Timber.d("columnWidth :%s", columnWidth);
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-                logDebug("spanCount: " + spanCount);
+                Timber.d("spanCount: %s", spanCount);
                 manager.setSpanCount(spanCount);
             }
         } else {
 
             ViewGroup.LayoutParams params = getLayoutParams();
-            logDebug("columnWidth :" + columnWidth);
+            Timber.d("columnWidth :%s", columnWidth);
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-                logDebug("spanCount: " + spanCount);
+                Timber.d("spanCount: %s", spanCount);
                 manager.setSpanCount(spanCount);
                 params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 setLayoutParams(params);

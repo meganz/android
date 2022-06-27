@@ -6,7 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragmentArgs
 import mega.privacy.android.app.utils.Constants.HANDLE
-import mega.privacy.android.app.utils.LogUtil.logError
+import timber.log.Timber
 
 @AndroidEntryPoint
 class OfflineFileInfoActivity : PasscodeActivity() {
@@ -16,7 +16,7 @@ class OfflineFileInfoActivity : PasscodeActivity() {
 
         val handle = intent.getStringExtra(HANDLE)
         if (handle == null) {
-            logError("OfflineFileInfoActivity handle is null")
+            Timber.e("OfflineFileInfoActivity handle is null")
 
             finish()
             return

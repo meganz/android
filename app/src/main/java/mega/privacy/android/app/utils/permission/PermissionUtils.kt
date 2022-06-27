@@ -17,8 +17,8 @@ import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 
 /**
  * Declare singleton PermissionUtils
@@ -94,7 +94,7 @@ object PermissionUtils {
     @JvmStatic
     fun shouldShowRequestPermissionRationale(
         activity: Activity?,
-        permissions: List<String>
+        permissions: List<String>,
     ): Boolean {
         for (permission in permissions) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, permission)) {
@@ -114,7 +114,7 @@ object PermissionUtils {
     @JvmStatic
     fun shouldShowRequestPermissionRationale(
         fragment: Fragment,
-        permissions: List<String>
+        permissions: List<String>,
     ): Boolean {
         for (permission in permissions) {
             if (fragment.shouldShowRequestPermissionRationale(permission)) {
@@ -135,7 +135,7 @@ object PermissionUtils {
     @JvmStatic
     fun shouldShowRequestPermissionRationale(
         @NonNull activity: Activity,
-        @NonNull permission: String
+        @NonNull permission: String,
     ): Boolean {
         return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
     }
@@ -164,7 +164,7 @@ object PermissionUtils {
                         context.getString(R.string.on_permanently_denied)
                     )
                 } else {
-                    LogUtil.logError("Exception opening device settings", e)
+                    Timber.e(e, "Exception opening device settings")
                 }
             }
         }
@@ -204,7 +204,7 @@ object PermissionUtils {
     fun requestPermission(
         @NonNull activity: Activity,
         @NonNull requestCode: Int,
-        @NonNull vararg permissions: String?
+        @NonNull vararg permissions: String?,
     ) {
         ActivityCompat.requestPermissions(
             activity,
@@ -221,7 +221,7 @@ object PermissionUtils {
     @JvmStatic
     fun onRequiresPermission(
         permissions: ArrayList<String>,
-        permissionCallbacks: PermissionCallbacks
+        permissionCallbacks: PermissionCallbacks,
     ) {
         permissionCallbacks.onPermissionsCallback(TYPE_REQUIRE_PERMISSION, permissions)
     }
@@ -234,7 +234,7 @@ object PermissionUtils {
     @JvmStatic
     fun onPermissionDenied(
         permissions: ArrayList<String>,
-        permissionCallbacks: PermissionCallbacks
+        permissionCallbacks: PermissionCallbacks,
     ) {
         permissionCallbacks.onPermissionsCallback(TYPE_DENIED, permissions)
     }

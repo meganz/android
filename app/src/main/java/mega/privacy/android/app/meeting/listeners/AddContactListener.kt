@@ -1,10 +1,13 @@
 package mega.privacy.android.app.meeting.listeners
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
+import timber.log.Timber
 
 /**
  * Listener for adding contacts
@@ -18,8 +21,8 @@ class AddContactListener(private val callback: (String) -> Unit) : MegaRequestLi
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_INVITE_CONTACT) {
-            LogUtil.logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.number)
-            when{
+            Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: ${request.number}")
+            when {
                 e.errorCode == MegaError.API_OK -> {
                     if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong()) {
                         callback.invoke(
@@ -31,24 +34,25 @@ class AddContactListener(private val callback: (String) -> Unit) : MegaRequestLi
                     }
                     return
                 }
-                e.errorCode == MegaError.API_EEXIST ->{
+                e.errorCode == MegaError.API_EEXIST -> {
                     callback.invoke(
-                        StringResourcesUtils.getString(R.string.context_contact_already_invited, request.email)
+                        StringResourcesUtils.getString(R.string.context_contact_already_invited,
+                            request.email)
                     )
                 }
-                request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS ->{
+                request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS -> {
                     callback.invoke(
                         StringResourcesUtils.getString(R.string.error_own_email_as_contact)
                     )
                 }
-                else ->{
+                else -> {
                     callback.invoke(
                         StringResourcesUtils.getString(R.string.general_error).toString()
                     )
                 }
             }
 
-            logError("ERROR: " + e.errorCode + "___" + e.errorString)
+            Timber.e("ERROR: ${e.errorCode}___${e.errorString}")
         }
     }
 
