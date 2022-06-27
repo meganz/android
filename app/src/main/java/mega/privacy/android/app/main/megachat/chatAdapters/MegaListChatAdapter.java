@@ -86,6 +86,7 @@ import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -1732,15 +1733,16 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                     int termCode = Integer.parseInt(termCodeString);
 
                     switch (termCode) {
-                        case MegaChatMessage.END_CALL_REASON_ENDED: {
+                        case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
+                        case MegaChatMessage.END_CALL_REASON_ENDED:
 
-                            if (chat.isGroup()) {
-                                textToShow = context.getString(R.string.group_call_ended_no_duration_message);
+                            if (chat.isGroup() && termCode == MegaChatMessage.END_CALL_REASON_ENDED) {
+                                textToShow = StringResourcesUtils.getString(R.string.group_call_ended_no_duration_message);
                             } else {
                                 int hours = duration / 3600;
                                 int minutes = (duration % 3600) / 60;
                                 int seconds = duration % 60;
-                                textToShow = context.getString(R.string.call_ended_message);
+                                textToShow = StringResourcesUtils.getString(R.string.call_ended_message);
                                 if (hours != 0) {
                                     String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
                                     textToShow = textToShow + textHours;
@@ -1772,7 +1774,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                             }
 
                             break;
-                        }
+
                         case MegaChatMessage.END_CALL_REASON_REJECTED: {
 
                             textToShow = String.format(context.getString(R.string.call_rejected_messages));
