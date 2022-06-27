@@ -1,11 +1,10 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
+import timber.log.Timber
 
 /**
  * Simple implementation for MegaChatRequestListenerInterface.
@@ -22,25 +21,25 @@ class SimpleChatRequestListener(
     private val onSuccess: (
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        e: MegaChatError
+        e: MegaChatError,
     ) -> Unit,
     private val onFail: (
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        e: MegaChatError
+        e: MegaChatError,
     ) -> Unit = { _, request, e ->
-        logError("[${request.requestString}] failed with error, result: ${e.errorCode} -> ${e.errorString}")
+        Timber.e("[${request.requestString}] failed with error, result: ${e.errorCode} -> ${e.errorString}")
     },
     private val isSuccess: (
         request: MegaChatRequest,
-        e: MegaChatError
+        e: MegaChatError,
     ) -> Boolean = { _, e ->
         e.errorCode == MegaChatError.ERROR_OK
-    }
+    },
 ) : MegaChatRequestListenerInterface {
 
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
-        logDebug("Start [${request.requestString}]")
+        Timber.d("Start [${request.requestString}]")
     }
 
     override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest) {
@@ -50,12 +49,12 @@ class SimpleChatRequestListener(
     override fun onRequestFinish(
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        e: MegaChatError
+        e: MegaChatError,
     ) {
         if (requestType != request.type) return
 
         if (isSuccess(request, e)) {
-            logDebug("[${request.requestString}] finished successfully.")
+            Timber.d("[${request.requestString}] finished successfully.")
             onSuccess(api, request, e)
         } else {
             onFail(api, request, e)
@@ -65,7 +64,7 @@ class SimpleChatRequestListener(
     override fun onRequestTemporaryError(
         api: MegaChatApiJava?,
         request: MegaChatRequest?,
-        e: MegaChatError?
+        e: MegaChatError?,
     ) {
 
     }

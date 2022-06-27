@@ -1,13 +1,13 @@
 package mega.privacy.android.app.main.providers;
 
 import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class ProviderPageAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 2;
@@ -20,12 +20,12 @@ public class ProviderPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        logDebug("position: " + position);
-        switch (position){
+        Timber.d("position: %s", position);
+        switch (position) {
             case 0: {
                 return CloudDriveProviderFragment.newInstance();
             }
-            case 1:{
+            case 1: {
                 return IncomingSharesProviderFragment.newInstance();
             }
         }
@@ -35,11 +35,11 @@ public class ProviderPageAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
+        switch (position) {
             case 0: {
                 return context.getString(R.string.section_cloud_drive);
             }
-            case 1:{
+            case 1: {
                 return context.getString(R.string.tab_incoming_shares);
             }
         }

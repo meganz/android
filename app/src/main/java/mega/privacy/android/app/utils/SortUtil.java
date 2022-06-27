@@ -1,5 +1,14 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.FileUtil.getFileNameWithoutExtension;
+import static mega.privacy.android.app.utils.FileUtil.isFileNameNumeric;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC;
+import static nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC;
+
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -9,10 +18,8 @@ import java.util.Comparator;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import nz.mega.sdk.MegaNode;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
 public class SortUtil {
 
     public static void sortByNameDescending(ArrayList<MegaNode> nodes) {
@@ -107,8 +114,6 @@ public class SortUtil {
     }
 
 
-
-
     /**
      * sort the list of MegaOffline Node according to different order
      *
@@ -164,7 +169,7 @@ public class SortUtil {
                         int pureInteger2 = Integer.parseInt(getFileNameWithoutExtension(name2));
                         return pureInteger1 - pureInteger2;
                     } catch (Exception ex) {
-                        logError("Exception happens" + ex.toString());
+                        Timber.e("Exception happens%s", ex.toString());
                     }
                 }
 

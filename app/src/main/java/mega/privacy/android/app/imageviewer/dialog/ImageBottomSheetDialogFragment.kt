@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.net.toUri
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -30,16 +30,35 @@ import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.imageviewer.util.*
+import mega.privacy.android.app.imageviewer.util.shouldShowChatRemoveOption
+import mega.privacy.android.app.imageviewer.util.shouldShowCopyOption
+import mega.privacy.android.app.imageviewer.util.shouldShowDisputeOption
+import mega.privacy.android.app.imageviewer.util.shouldShowDownloadOption
+import mega.privacy.android.app.imageviewer.util.shouldShowFavoriteOption
+import mega.privacy.android.app.imageviewer.util.shouldShowForwardOption
+import mega.privacy.android.app.imageviewer.util.shouldShowInfoOption
+import mega.privacy.android.app.imageviewer.util.shouldShowLabelOption
+import mega.privacy.android.app.imageviewer.util.shouldShowManageLinkOption
+import mega.privacy.android.app.imageviewer.util.shouldShowMoveOption
+import mega.privacy.android.app.imageviewer.util.shouldShowOfflineOption
+import mega.privacy.android.app.imageviewer.util.shouldShowOpenWithOption
+import mega.privacy.android.app.imageviewer.util.shouldShowRemoveLinkOption
+import mega.privacy.android.app.imageviewer.util.shouldShowRenameOption
+import mega.privacy.android.app.imageviewer.util.shouldShowRestoreOption
+import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
+import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
 import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.DISPUTE_URL
+import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.NAME
 import mega.privacy.android.app.utils.ExtraUtils.extra
-import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
@@ -49,6 +68,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing image information.
@@ -94,7 +114,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = BottomSheetImageOptionsBinding.inflate(inflater, container, false)
         contentView = binding.root
@@ -112,7 +132,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         if (savedInstanceState?.containsKey(STATE_ALERT_DIALOG_TYPE) == true) {
-            val dialogType = AlertDialogType.values()[savedInstanceState.getInt(STATE_ALERT_DIALOG_TYPE)]
+            val dialogType =
+                AlertDialogType.values()[savedInstanceState.getInt(STATE_ALERT_DIALOG_TYPE)]
             binding.root.post { showAlertDialog(dialogType) }
         }
     }
@@ -132,7 +153,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n")
     private fun showNodeData(imageItem: ImageItem?) {
         if (imageItem?.nodeItem == null) {
-            logWarning("Image node is null")
+            Timber.w("Image node is null")
             dismissAllowingStateLoss()
             return
         }
@@ -191,8 +212,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Favorite
             optionFavorite.isVisible = imageItem.shouldShowFavoriteOption()
             if (node != null) {
-                val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
-                val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
+                val favoriteText =
+                    if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
+                val favoriteDrawable =
+                    if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
@@ -203,14 +226,19 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Label
             optionLabelLayout.isVisible = imageItem.shouldShowLabelOption()
             if (node != null) {
-                val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
+                val labelColor =
+                    ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
                 val labelDrawable = getNodeLabelDrawable(node.label, resources)
-                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, labelDrawable, null)
+                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                    null,
+                    labelDrawable,
+                    null)
                 optionLabelCurrent.setTextColor(labelColor)
                 optionLabelCurrent.text = getNodeLabelText(node.label)
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
                 optionLabelLayout.setOnClickListener {
-                    NodeLabelBottomSheetDialogFragment.newInstance(nodeHandle!!).show(childFragmentManager, TAG)
+                    NodeLabelBottomSheetDialogFragment.newInstance(nodeHandle!!)
+                        .show(childFragmentManager, TAG)
                 }
             }
 
@@ -261,7 +289,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 viewModel.switchNodeOfflineAvailability(nodeItem!!, requireActivity())
                 dismissAllowingStateLoss()
             }
-            optionOfflineRemove.setOnClickListener { viewModel.removeOfflineNode(nodeHandle!!, requireActivity()) }
+            optionOfflineRemove.setOnClickListener {
+                viewModel.removeOfflineNode(nodeHandle!!,
+                    requireActivity())
+            }
             switchOffline.post {
                 optionOfflineLayout.setOnClickListener { offlineAction.invoke() }
                 switchOffline.setOnCheckedChangeListener { _, _ -> offlineAction.invoke() }
@@ -327,8 +358,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     selectCopyFolderLauncher.launch(longArrayOf(nodeHandle!!))
                 }
             }
-            val copyAction = if (nodeItem?.isExternalNode == true) R.string.general_import else if (imageItem is ImageItem.ChatNode) R.string.add_to_cloud_node_chat else R.string.context_copy
-            val copyDrawable = if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
+            val copyAction =
+                if (nodeItem?.isExternalNode == true) R.string.general_import else if (imageItem is ImageItem.ChatNode) R.string.add_to_cloud_node_chat else R.string.context_copy
+            val copyDrawable =
+                if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
 
@@ -361,44 +394,49 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             separatorDispute.isVisible = optionDispute.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible || optionForward.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible || optionShare.isVisible
-            separatorShare.isVisible = optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible
+            separatorShare.isVisible =
+                optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible
             separatorRestore.isVisible = optionRestore.isVisible
-            separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
-                    && (optionRestore.isVisible || optionRubbishBin.isVisible || optionChatRemove.isVisible)
+            separatorCopy.isVisible =
+                (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
+                        && (optionRestore.isVisible || optionRubbishBin.isVisible || optionChatRemove.isVisible)
         }
     }
 
     private fun buildActivityLaunchers() {
-        selectMoveFolderLauncher = registerForActivityResult(SelectFolderToMoveActivityContract()) { result ->
-            if (result != null) {
-                val moveHandle = result.first.firstOrNull()
-                val toHandle = result.second
-                if (moveHandle != null && moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                    viewModel.moveNode(moveHandle, toHandle)
-                    dismissAllowingStateLoss()
+        selectMoveFolderLauncher =
+            registerForActivityResult(SelectFolderToMoveActivityContract()) { result ->
+                if (result != null) {
+                    val moveHandle = result.first.firstOrNull()
+                    val toHandle = result.second
+                    if (moveHandle != null && moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                        viewModel.moveNode(moveHandle, toHandle)
+                        dismissAllowingStateLoss()
+                    }
                 }
             }
-        }
-        selectCopyFolderLauncher = registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
-            if (result != null) {
-                val copyHandle = result.first.firstOrNull()
-                val toHandle = result.second
-                if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                    viewModel.copyNode(copyHandle, toHandle)
-                    dismissAllowingStateLoss()
+        selectCopyFolderLauncher =
+            registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
+                if (result != null) {
+                    val copyHandle = result.first.firstOrNull()
+                    val toHandle = result.second
+                    if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                        viewModel.copyNode(copyHandle, toHandle)
+                        dismissAllowingStateLoss()
+                    }
                 }
             }
-        }
-        selectImportFolderLauncher = registerForActivityResult(SelectFolderToImportActivityContract()) { result ->
-            if (result != null) {
-                val copyHandle = result.first.firstOrNull()
-                val toHandle = result.second
-                if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                    viewModel.copyNode(copyHandle, toHandle)
-                    dismissAllowingStateLoss()
+        selectImportFolderLauncher =
+            registerForActivityResult(SelectFolderToImportActivityContract()) { result ->
+                if (result != null) {
+                    val copyHandle = result.first.firstOrNull()
+                    val toHandle = result.second
+                    if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                        viewModel.copyNode(copyHandle, toHandle)
+                        dismissAllowingStateLoss()
+                    }
                 }
             }
-        }
     }
 
     /**
@@ -411,7 +449,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val nodeHandle = imageItem.getNodeHandle() ?: return
         alertDialog?.dismiss()
         alertDialogType = type
-        when(type) {
+        when (type) {
             AlertDialogType.TYPE_REMOVE_LINK -> {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
@@ -419,7 +457,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         viewModel.removeLink(nodeHandle)
                         dismissAllowingStateLoss()
                     }
-                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),
+                        null)
                     .show()
             }
             AlertDialogType.TYPE_RUBBISH_BIN -> {
@@ -445,7 +484,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         }
                         dismissAllowingStateLoss()
                     }
-                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),
+                        null)
                     .show()
             }
             AlertDialogType.TYPE_REMOVE_CHAT_NODE -> {

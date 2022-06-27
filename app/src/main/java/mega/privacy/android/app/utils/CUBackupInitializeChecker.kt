@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.USER_ATTR_DEVICE_NAMES
@@ -11,6 +10,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
+import timber.log.Timber
 
 /**
  * A checker class for CU backup.
@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
  * 2. Check if CU is enabled but hasn't created backup yet.
  */
 class CUBackupInitializeChecker(
-    private val megaApi: MegaApiAndroid
+    private val megaApi: MegaApiAndroid,
 ) {
 
     /**
@@ -58,7 +58,7 @@ class CUBackupInitializeChecker(
 
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 if (request.type != TYPE_GET_ATTR_USER || request.paramType != USER_ATTR_DEVICE_NAMES) return
-                logDebug("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+                Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
 
                 // Haven't set device name yet, should set a default name. Otherwise do nothing.
                 if (request.name == null || e.errorCode == API_ENOENT) {
@@ -67,13 +67,13 @@ class CUBackupInitializeChecker(
                         override fun onRequestFinish(
                             api: MegaApiJava,
                             request: MegaRequest,
-                            e: MegaError
+                            e: MegaError,
                         ) {
-                            logDebug("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+                            Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
                         }
                     })
                 } else {
-                    logDebug("Already set device name.")
+                    Timber.d("Already set device name.")
                 }
             }
         })

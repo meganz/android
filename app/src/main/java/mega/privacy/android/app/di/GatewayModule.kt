@@ -9,6 +9,8 @@ import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.app.data.facade.MegaApiFolderFacade
+import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
@@ -43,6 +45,9 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
+
+    @Binds
+    abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
 
     @Binds
     abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway

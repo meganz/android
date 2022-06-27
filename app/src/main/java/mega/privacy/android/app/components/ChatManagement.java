@@ -2,6 +2,16 @@ package mega.privacy.android.app.components;
 
 import static android.content.Intent.ACTION_SCREEN_OFF;
 import static android.content.Intent.ACTION_USER_PRESENT;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
+import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
+import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
+import static mega.privacy.android.app.utils.Constants.KEY_IS_SHOWED_WARNING_MESSAGE;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +20,9 @@ import android.content.IntentFilter;
 import android.os.CountDownTimer;
 
 import androidx.preference.PreferenceManager;
+
 import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,19 +35,7 @@ import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
-import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
-import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
-import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
-import static mega.privacy.android.app.utils.Constants.KEY_IS_SHOWED_WARNING_MESSAGE;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
+import timber.log.Timber;
 
 public class ChatManagement {
 
@@ -261,7 +261,7 @@ public class ChatManagement {
     }
 
     public void addNotificationShown(long chatId) {
-        if (isNotificationShown(chatId)){
+        if (isNotificationShown(chatId)) {
             return;
         }
 
@@ -310,8 +310,8 @@ public class ChatManagement {
     /**
      * Method to control when a call has ended
      *
-     * @param callId   Call ID
-     * @param chatId   Chat ID
+     * @param callId Call ID
+     * @param chatId Chat ID
      */
     public void controlCallFinished(long callId, long chatId) {
         ArrayList<Long> listCalls = CallUtil.getCallsParticipating();
@@ -392,11 +392,11 @@ public class ChatManagement {
         if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(chatId)) {
             MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
             if (call == null) {
-                logError("Call is null");
+                Timber.e("Call is null");
                 return;
             }
 
-            if(call.getStatus() == CALL_STATUS_USER_NO_PRESENT){
+            if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
                 addCurrentGroupChat(chatId);
                 checkToShowIncomingGroupCallNotification(call, chatId);
             }
@@ -410,33 +410,33 @@ public class ChatManagement {
      * @param chatId The chat ID
      */
     public void checkToShowIncomingGroupCallNotification(MegaChatCall call, long chatId) {
-        if(call.isRinging() || isNotificationShown(chatId)){
-            logDebug("Call is ringing or notification is shown");
+        if (call.isRinging() || isNotificationShown(chatId)) {
+            Timber.d("Call is ringing or notification is shown");
             return;
         }
 
         if (CallUtil.CheckIfIAmParticipatingWithAnotherClient(call)) {
-            logDebug("I am participating with another client");
+            Timber.d("I am participating with another client");
             return;
         }
 
         MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
         if (chatRoom == null) {
-            logError("Chat is null");
+            Timber.e("Chat is null");
             return;
         }
 
         if (isOpeningMeetingLink(chatId)) {
-            logDebug("Opening meeting link, don't show notification");
+            Timber.d("Opening meeting link, don't show notification");
             return;
         }
 
-        logDebug("Show incoming call notification");
+        Timber.d("Show incoming call notification");
         app.showOneCallNotification(call);
     }
 
-    public void registerScreenReceiver(){
-        if(isScreenBroadcastRegister)
+    public void registerScreenReceiver() {
+        if (isScreenBroadcastRegister)
             return;
 
         IntentFilter filterScreen = new IntentFilter();
@@ -446,8 +446,8 @@ public class ChatManagement {
         isScreenBroadcastRegister = true;
     }
 
-    public void unregisterScreenReceiver(){
-        if(!isScreenBroadcastRegister)
+    public void unregisterScreenReceiver() {
+        if (!isScreenBroadcastRegister)
             return;
 
         MegaApplication.getInstance().unregisterReceiver(screenOnOffReceiver);
@@ -480,7 +480,7 @@ public class ChatManagement {
                     setDisablingLocalVideo(false);
                     setInTemporaryState(true);
                     if (callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
-                        logDebug("Screen locked, local video is going to be disabled");
+                        Timber.d("Screen locked, local video is going to be disabled");
                         isScreenOn = false;
                         CallUtil.enableOrDisableLocalVideo(false, callInProgress.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
                     }
@@ -490,7 +490,7 @@ public class ChatManagement {
                     setDisablingLocalVideo(false);
                     setInTemporaryState(false);
                     if (!callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
-                        logDebug("Screen unlocked, local video is going to be enabled");
+                        Timber.d("Screen unlocked, local video is going to be enabled");
                         isScreenOn = true;
                         CallUtil.enableOrDisableLocalVideo(true, callInProgress.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
                     }
@@ -513,7 +513,7 @@ public class ChatManagement {
         if (!getVideoStatus(call.getChatid())) {
             setInTemporaryState(false);
         } else if (isNear) {
-            logDebug("Proximity sensor, video off");
+            Timber.d("Proximity sensor, video off");
             setDisablingLocalVideo(false);
             setInTemporaryState(true);
             LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean.class).post(false);
@@ -521,7 +521,7 @@ public class ChatManagement {
                 CallUtil.enableOrDisableLocalVideo(false, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
             }
         } else {
-            logDebug("Proximity sensor, video on");
+            Timber.d("Proximity sensor, video on");
             setDisablingLocalVideo(false);
             setInTemporaryState(false);
             LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean.class).post(true);

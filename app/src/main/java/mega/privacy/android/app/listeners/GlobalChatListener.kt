@@ -8,14 +8,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
+import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatListenerInterface
+import nz.mega.sdk.MegaChatPresenceConfig
+import nz.mega.sdk.MegaChatRoom
+import timber.log.Timber
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
@@ -62,7 +67,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         api: MegaChatApiJava?,
         userhandle: Long,
         status: Int,
-        inProgress: Boolean
+        inProgress: Boolean,
     ) {
         if (userhandle == api?.myUserHandle) {
             LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).post(status)
@@ -71,10 +76,10 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
 
     override fun onChatPresenceConfigUpdate(
         api: MegaChatApiJava?,
-        config: MegaChatPresenceConfig?
+        config: MegaChatPresenceConfig?,
     ) {
         if (config?.isPending == false) {
-            logDebug("Launch local broadcast")
+            Timber.d("Launch local broadcast")
             val intent = Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
             application.sendBroadcast(intent)
         }
@@ -95,7 +100,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     }
 
     override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
-        logError("MEGAChatSDK onDBError occurred. Error $error with message $msg")
+        Timber.e("MEGAChatSDK onDBError occurred. Error $error with message $msg")
         when (error) {
             MegaChatApi.DB_ERROR_IO -> application.currentActivity?.finishAndRemoveTask()
 

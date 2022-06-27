@@ -14,12 +14,20 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.MONTHLY_SUBSCRIBED
 import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.YEARLY_SUBSCRIBED
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
+import mega.privacy.android.app.utils.Constants.PRO_LITE
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import nz.mega.sdk.MegaApiJava
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
 
 class PaymentActivity : PasscodeActivity(), Scrollable {
 
@@ -114,7 +122,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
                         + "'>"
             ).replace("[/A]", "</font>")
         } catch (e: java.lang.Exception) {
-            LogUtil.logError("Exception formatting string", e)
+            Timber.e(e, "Exception formatting string")
         }
 
         binding.walletText.text = textWallet.toSpannedHtmlText()
@@ -147,14 +155,14 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         val paymentBitSet = viewModel.getPaymentBitSet()
 
         if (paymentBitSet == null) {
-            LogUtil.logWarning("Not payment bit set received!!!")
+            Timber.w("Not payment bit set received!!!")
             hideBilling()
             return
         }
 
         when {
             !viewModel.isInventoryFinished() -> {
-                LogUtil.logDebug("!isInventoryFinished()")
+                Timber.d("!isInventoryFinished()")
                 binding.walletIcon.isVisible = false
                 binding.walletText.isVisible = false
             }

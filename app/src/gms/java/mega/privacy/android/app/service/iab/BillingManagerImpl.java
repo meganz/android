@@ -15,6 +15,10 @@
  */
 package mega.privacy.android.app.service.iab;
 
+import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
+import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.getProductLevel;
+
 import android.app.Activity;
 import android.content.Intent;
 
@@ -52,13 +56,7 @@ import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.PaymentUtils;
 import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaApiJava;
-
-import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
-import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logInfo;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.getProductLevel;
+import timber.log.Timber;
 
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -66,28 +64,44 @@ import static mega.privacy.android.app.utils.billing.PaymentUtils.getProductLeve
  */
 public class BillingManagerImpl implements PurchasesUpdatedListener, BillingManager {
 
-    /** SKU for our subscription PRO_I monthly */
+    /**
+     * SKU for our subscription PRO_I monthly
+     */
     public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
 
-    /** SKU for our subscription PRO_I yearly */
+    /**
+     * SKU for our subscription PRO_I yearly
+     */
     public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
 
-    /** SKU for our subscription PRO_II monthly */
+    /**
+     * SKU for our subscription PRO_II monthly
+     */
     public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
 
-    /** SKU for our subscription PRO_II yearly */
+    /**
+     * SKU for our subscription PRO_II yearly
+     */
     public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
 
-    /** SKU for our subscription PRO_III monthly */
+    /**
+     * SKU for our subscription PRO_III monthly
+     */
     public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
 
-    /** SKU for our subscription PRO_III yearly */
+    /**
+     * SKU for our subscription PRO_III yearly
+     */
     public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
 
-    /** SKU for our subscription PRO_LITE monthly */
+    /**
+     * SKU for our subscription PRO_LITE monthly
+     */
     public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
 
-    /** SKU for our subscription PRO_LITE yearly */
+    /**
+     * SKU for our subscription PRO_LITE yearly
+     */
     public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
 
     private static final String BASE64_ENCODED_PUBLIC_KEY_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
@@ -96,7 +110,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private static final String BASE64_ENCODED_PUBLIC_KEY_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
     private static final String BASE64_ENCODED_PUBLIC_KEY_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
 
-    /** Public key for verify purchase. */
+    /**
+     * Public key for verify purchase.
+     */
     private static final String PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
     public static final int PAY_METHOD_RES_ID = R.string.payment_method_google_wallet;
     public static final int PAY_METHOD_ICON_RES_ID = R.drawable.ic_google_wallet;
@@ -125,7 +141,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        obfuscatedAccountId = ((MegaApplication)mActivity.getApplication()).getMyAccountInfo().generateObfuscatedAccountId();
+        obfuscatedAccountId = ((MegaApplication) mActivity.getApplication()).getMyAccountInfo().generateObfuscatedAccountId();
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -134,7 +150,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         // once setup completes.
         // It also starts to report all the new purchases through onPurchasesUpdated() callback.
         startServiceConnection(() -> {
-            logInfo("service connected, query purchases");
+            Timber.i("service connected, query purchases");
             // Notifying the listener that billing client is ready
             mBillingUpdatesListener.onBillingClientSetupFinished();
             // IAB is fully set up. Now, let's get an inventory of stuff we own.
@@ -145,7 +161,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
         int resultCode = billingResult.getResponseCode();
-        logDebug("Purchases updated, response code is " + resultCode);
+        Timber.d("Purchases updated, response code is %d", resultCode);
         if (resultCode == BillingResponseCode.OK) {
             mPurchases.clear();
             handlePurchaseList(purchases);
@@ -160,13 +176,13 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
     @Override
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
-        logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
+        Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails);
 
-        logDebug("Obfuscated account id is:" + obfuscatedAccountId);
+        Timber.d("Obfuscated account id is:%s", obfuscatedAccountId);
 
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
-        logDebug("prorationMode is " + prorationMode);
+        Timber.d("prorationMode is %d", prorationMode);
         Runnable purchaseFlowRequest = () -> {
             BillingFlowParams.Builder builder = BillingFlowParams
                     .newBuilder()
@@ -199,7 +215,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
     private SkuDetails getSkuDetails(MegaSku skuDetails) {
         if (mSkus == null || mSkus.isEmpty()) {
-            logWarning("Haven't init skus!");
+            Timber.w("Haven't init skus!");
             return null;
         }
         for (SkuDetails details : mSkus) {
@@ -207,13 +223,13 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
                 return details;
             }
         }
-        logWarning("Can't find sku with id: " + skuDetails.getSku());
+        Timber.w("Can't find sku with id: %s", skuDetails.getSku());
         return null;
     }
 
     @Override
     public void destroy() {
-        logInfo("on destroy");
+        Timber.i("on destroy");
         if (mBillingClient != null && mBillingClient.isReady()) {
             mBillingClient.endConnection();
             mBillingClient = null;
@@ -243,7 +259,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * @see PaymentUtils
      */
     private void querySkuDetailsAsync(@SkuType String itemType, List<String> skuList, SkuDetailsResponseListener listener) {
-        logDebug("querySkuDetailsAsync type is " + itemType);
+        Timber.d("querySkuDetailsAsync type is %s", itemType);
         // Creating a runnable from the request to use it inside our connection retry policy below
         Runnable queryRequest = () -> {
             // Query the purchase async
@@ -259,7 +275,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public void getInventory(QuerySkuListCallback callback) {
         SkuDetailsResponseListener listener = (result, skuList) -> {
             if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-                logWarning("Failed to get SkuDetails, error code is " + result.getResponseCode());
+                Timber.w("Failed to get SkuDetails, error code is %s", result.getResponseCode());
             }
             if (skuList != null && skuList.size() > 0) {
                 mSkus = skuList;
@@ -277,7 +293,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         for (Purchase purchase : purchases) {
             handlePurchase(purchase);
         }
-        logDebug("total purchased are: " + mPurchases.size());
+        Timber.d("total purchased are: %d", mPurchases.size());
     }
 
     /**
@@ -291,7 +307,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      */
     private void handlePurchase(Purchase purchase) {
         if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-            logWarning("Invalid purchase found");
+            Timber.w("Invalid purchase found");
             return;
         }
 
@@ -300,9 +316,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             if (!purchase.isAcknowledged()) {
                 AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = billingResult -> {
                     if (billingResult.getResponseCode() == BillingResponseCode.OK) {
-                        logInfo("purchase acknowledged");
+                        Timber.i("purchase acknowledged");
                     } else {
-                        logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
+                        Timber.w("purchase acknowledge failed, %s", billingResult.getDebugMessage());
                     }
                 };
                 AcknowledgePurchaseParams acknowledgePurchaseParams =
@@ -313,7 +329,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             }
         }
 
-        logDebug("new purchase added, " + purchase.getOriginalJson());
+        Timber.d("new purchase added, %s", purchase.getOriginalJson());
         mPurchases.add(purchase);
     }
 
@@ -323,7 +339,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * @param result PurchasesResult contains purchase result {@link BillingResult} and a list which includes all the purchased items.
      */
     private void onQueryPurchasesFinished(PurchasesResult result) {
-        logDebug("onQueryPurchasesFinished, succeed? " + (result.getResponseCode() == BillingResponseCode.OK));
+        Timber.d("onQueryPurchasesFinished, succeed? %s", (result.getResponseCode() == BillingResponseCode.OK));
         // Have we been disposed of in the meantime? If so, or bad result code, then quit
         if (mBillingClient == null || result.getResponseCode() != BillingResponseCode.OK) {
             return;
@@ -333,7 +349,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         mPurchases.clear();
 
         int resultCode = result.getResponseCode();
-        logDebug("Purchases updated, response code is " + resultCode);
+        Timber.d("Purchases updated, response code is %s", resultCode);
         if (resultCode == BillingResponseCode.OK) {
             handlePurchaseList(result.getPurchasesList());
         }
@@ -349,7 +365,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      */
     private boolean areSubscriptionsSupported() {
         int responseCode = mBillingClient.isFeatureSupported(FeatureType.SUBSCRIPTIONS).getResponseCode();
-        logDebug("areSubscriptionsSupported " + (responseCode == BillingResponseCode.OK));
+        Timber.d("areSubscriptionsSupported %s", (responseCode == BillingResponseCode.OK));
         return responseCode == BillingResponseCode.OK;
     }
 
@@ -357,13 +373,13 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener
      */
-        @Override
-        public void queryPurchases() {
+    @Override
+    public void queryPurchases() {
         Runnable queryToExecute = () -> {
             PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
             List<Purchase> purchasesList = purchasesResult.getPurchasesList();
             if (purchasesList == null) {
-                logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
+                Timber.w("getPurchasesList() for in-app products returned NULL, using an empty list.");
                 purchasesList = new ArrayList<>();
             }
 
@@ -383,12 +399,12 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
                         && purchase.getAccountIdentifiers().getObfuscatedAccountId() != null
                         && purchase.getAccountIdentifiers().getObfuscatedAccountId().equals(obfuscatedAccountId)) {
                     list.add(purchase);
-                    logDebug("Purchase added, " + purchase.getOriginalJson());
+                    Timber.d("Purchase added, %s", purchase.getOriginalJson());
                 }
             }
 
             PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-            logDebug("Final purchase result is " + finalResult.getBillingResult());
+            Timber.d("Final purchase result is %s", finalResult.getBillingResult());
             onQueryPurchasesFinished(finalResult);
         };
 
@@ -405,7 +421,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
-                logDebug("Response code is: " + billingResult.getResponseCode());
+                Timber.d("Response code is: %s", billingResult.getResponseCode());
                 mIsServiceConnected = billingResult.getResponseCode() == BillingResponseCode.OK;
 
                 if (!mIsServiceConnected) {
@@ -417,7 +433,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
             @Override
             public void onBillingServiceDisconnected() {
-                logInfo("billing service disconnected");
+                Timber.i("billing service disconnected");
                 mIsServiceConnected = false;
             }
         });
@@ -432,7 +448,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         if (mIsServiceConnected) {
             runnable.run();
         } else {
-            logInfo("billing service was disconnected, retry once");
+            Timber.i("billing service was disconnected, retry once");
             startServiceConnection(runnable);
         }
     }
@@ -449,7 +465,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         try {
             return Security.verifyPurchase(signedData, signature, PUBLIC_KEY);
         } catch (IOException e) {
-            logWarning("Purchase failed to valid signature", e);
+            Timber.w(e, "Purchase failed to valid signature");
             return false;
         }
     }

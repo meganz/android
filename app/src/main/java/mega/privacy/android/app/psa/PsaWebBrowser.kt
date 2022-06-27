@@ -18,8 +18,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.FragmentPsaWebBrowserBinding
 import mega.privacy.android.app.psa.PsaManager.dismissPsa
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 
 class PsaWebBrowser : Fragment() {
     private lateinit var binding: FragmentPsaWebBrowserBinding
@@ -82,7 +82,7 @@ class PsaWebBrowser : Fragment() {
             val finalUrl = "$url/$myUserHandle?$androidId"
             binding.webView.loadUrl(finalUrl)
         } catch (e: Exception) {
-            logError(e.message)
+            Timber.e(e)
         }
     }
 

@@ -1,5 +1,16 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
+import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
+import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,11 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ChatPreferencesActivity extends PreferencesBaseActivity {
@@ -35,7 +42,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            logDebug("Network broadcast received!");
+            Timber.d("Network broadcast received!");
             if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
@@ -168,7 +175,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
             return String.valueOf(timeout);
 
         } catch (Exception e) {
-            logWarning("Unable to parse user input, user entered: '" + value + "'");
+            Timber.w("Unable to parse user input, user entered: '%s'", value);
             return null;
         }
     }
@@ -180,7 +187,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
      * @param cancelled If it is cancelled.
      */
     private void setAutoAwayValue(String value, boolean cancelled) {
-        logDebug("Value: " + value);
+        Timber.d("Value: %s", value);
         if (cancelled) {
             needUpdatePresence(cancelled);
         } else {
@@ -208,7 +215,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
      * @param enable True to enable. False to disable.
      */
     public void enableLastGreen(boolean enable) {
-        logDebug("Enable Last Green: " + enable);
+        Timber.d("Enable Last Green: %s", enable);
 
         if (megaChatApi != null) {
             megaChatApi.setLastGreenVisible(enable, null);

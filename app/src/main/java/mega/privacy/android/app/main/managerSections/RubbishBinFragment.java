@@ -12,9 +12,6 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_RUBBISH_BIN;
 import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
@@ -91,965 +88,936 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import timber.log.Timber;
 
 @AndroidEntryPoint
-public class RubbishBinFragment extends Fragment{
+public class RubbishBinFragment extends Fragment {
 
-	@Inject
-	SortOrderManagement sortOrderManagement;
+    @Inject
+    SortOrderManagement sortOrderManagement;
 
-	private ManagerViewModel managerViewModel;
+    private ManagerViewModel managerViewModel;
 
-	Context context;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	MegaNodeAdapter adapter;
+    Context context;
+    RecyclerView recyclerView;
+    LinearLayoutManager mLayoutManager;
+    CustomizedGridLayoutManager gridLayoutManager;
+    MegaNodeAdapter adapter;
 
-	List<MegaNode> nodes;
-	
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+    List<MegaNode> nodes;
 
-	MegaApiAndroid megaApi;
-	
-	public ActionMode actionMode;
-	
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
+    ImageView emptyImageView;
+    LinearLayout emptyTextView;
+    TextView emptyTextViewFirst;
 
-	Stack<Integer> lastPositionStack;
+    MegaApiAndroid megaApi;
 
-	DatabaseHandler dbH;
-	MegaPreferences prefs;
-	String downloadLocationDefaultPath;
+    public ActionMode actionMode;
 
-	public void activateActionMode(){
-		logDebug("activateActionMode");
-		if (!adapter.isMultipleSelect()){
-			adapter.setMultipleSelect(true);
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-		}
-	}
+    float density;
+    DisplayMetrics outMetrics;
+    Display display;
 
-	public void checkScroll() {
-		if (recyclerView != null) {
-			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivity) context).changeAppBarElevation(true);
-			}
-			else {
-				((ManagerActivity) context).changeAppBarElevation(false);
-			}
-		}
-	}
+    Stack<Integer> lastPositionStack;
 
-	private class ActionBarCallBack implements ActionMode.Callback {
+    DatabaseHandler dbH;
+    MegaPreferences prefs;
+    String downloadLocationDefaultPath;
 
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = adapter.getSelectedNodes();
+    public void activateActionMode() {
+        Timber.d("activateActionMode");
+        if (!adapter.isMultipleSelect()) {
+            adapter.setMultipleSelect(true);
+            actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+        }
+    }
 
-			switch (item.getItemId()) {
-				case R.id.cab_menu_restore_from_rubbish:
+    public void checkScroll() {
+        if (recyclerView != null) {
+            if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
+                ((ManagerActivity) context).changeAppBarElevation(true);
+            } else {
+                ((ManagerActivity) context).changeAppBarElevation(false);
+            }
+        }
+    }
 
-					((ManagerActivity) context).restoreFromRubbish(documents);
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				case R.id.cab_menu_delete:
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i = 0; i < documents.size(); i++) {
-						handleList.add(documents.get(i).getHandle());
-					}
+    private class ActionBarCallBack implements ActionMode.Callback {
 
-					((ManagerActivity) context).askConfirmationMoveToRubbish(handleList);
-					break;
-				case R.id.cab_menu_select_all:
-					selectAll();
-					break;
-				case R.id.cab_menu_clear_selection:
-					clearSelections();
-					hideMultipleSelect();
-					break;
-			}
-			return true;
-		}
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            List<MegaNode> documents = adapter.getSelectedNodes();
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.rubbish_bin_action, menu);
-			checkScroll();
-			return true;
-		}
+            switch (item.getItemId()) {
+                case R.id.cab_menu_restore_from_rubbish:
 
-		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
-			logDebug("onDestroyActionMode");
-			clearSelections();
-			adapter.setMultipleSelect(false);
-			checkScroll();
-		}
+                    ((ManagerActivity) context).restoreFromRubbish(documents);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+                case R.id.cab_menu_delete:
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i = 0; i < documents.size(); i++) {
+                        handleList.add(documents.get(i).getHandle());
+                    }
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			menu.findItem(R.id.cab_menu_select_all)
-					.setVisible(adapter.getSelectedItemCount()
-							< adapter.getItemCount() - adapter.getPlaceholderCount());
+                    ((ManagerActivity) context).askConfirmationMoveToRubbish(handleList);
+                    break;
+                case R.id.cab_menu_select_all:
+                    selectAll();
+                    break;
+                case R.id.cab_menu_clear_selection:
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+            }
+            return true;
+        }
 
-			boolean isRestoreVisible = true;
-			List<MegaNode> documents = adapter.getSelectedNodes();
-			for (MegaNode node : documents) {
-				long restoreHandle = node.getRestoreHandle();
-				if (restoreHandle == INVALID_HANDLE) {
-					isRestoreVisible = false;
-					break;
-				}
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.rubbish_bin_action, menu);
+            checkScroll();
+            return true;
+        }
 
-				MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
-				if (restoreNode == null || megaApi.isInRubbish(restoreNode)) {
-					isRestoreVisible = false;
-					break;
-				}
-			}
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+            Timber.d("onDestroyActionMode");
+            clearSelections();
+            adapter.setMultipleSelect(false);
+            checkScroll();
+        }
 
-			menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(isRestoreVisible);
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            menu.findItem(R.id.cab_menu_select_all)
+                    .setVisible(adapter.getSelectedItemCount()
+                            < adapter.getItemCount() - adapter.getPlaceholderCount());
 
-			return true;
-		}
-	}
+            boolean isRestoreVisible = true;
+            List<MegaNode> documents = adapter.getSelectedNodes();
+            for (MegaNode node : documents) {
+                long restoreHandle = node.getRestoreHandle();
+                if (restoreHandle == INVALID_HANDLE) {
+                    isRestoreVisible = false;
+                    break;
+                }
 
-	public boolean showSelectMenuItem(){
-		if (adapter != null){
-			return adapter.isMultipleSelect();
-		}
-				
-		return false;
-	}
-	
-	public void selectAll(){
-		if (adapter != null){
-			if(adapter.isMultipleSelect()){
-				adapter.selectAll();
-			}
-			else{
-				adapter.setMultipleSelect(true);
-				adapter.selectAll();
-				
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
+                MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+                if (restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                    isRestoreVisible = false;
+                    break;
+                }
+            }
 
-			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
-		}
-	}
+            menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(isRestoreVisible);
 
-	/**
-	 * Shows the Sort by panel.
-	 *
-	 * @param unit Unit event.
-	 * @return Null.
-	 */
-	private Unit showSortByPanel(Unit unit) {
-		((ManagerActivity) context).showNewSortByPanel(ORDER_CLOUD);
-		return null;
-	}
+            return true;
+        }
+    }
 
-	public static RubbishBinFragment newInstance() {
-		logDebug("newInstance");
-		RubbishBinFragment fragment = new RubbishBinFragment();
-		return fragment;
-	}
-	
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		logDebug("onCreate");
+    public boolean showSelectMenuItem() {
+        if (adapter != null) {
+            return adapter.isMultipleSelect();
+        }
 
-		dbH = DatabaseHandler.getDbHandler(context);
-		prefs = dbH.getPreferences();
+        return false;
+    }
 
-		downloadLocationDefaultPath = getDownloadLocation();
+    public void selectAll() {
+        if (adapter != null) {
+            if (adapter.isMultipleSelect()) {
+                adapter.selectAll();
+            } else {
+                adapter.setMultipleSelect(true);
+                adapter.selectAll();
 
-		lastPositionStack = new Stack<>();
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		logDebug("onCreateView");
-		
-		if (megaApi.getRootNode() == null){
-			return null;
-		}
+                actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+            }
 
-		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
-				.get(SortByHeaderViewModel.class);
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
+        }
+    }
 
-		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
-				new EventObserver<>(this::showSortByPanel));
+    /**
+     * Shows the Sort by panel.
+     *
+     * @param unit Unit event.
+     * @return Null.
+     */
+    private Unit showSortByPanel(Unit unit) {
+        ((ManagerActivity) context).showNewSortByPanel(ORDER_CLOUD);
+        return null;
+    }
 
-		managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
-		managerViewModel.getUpdateRubbishBinNodes().observe(getViewLifecycleOwner(),
-				new EventObserver<>(nodes -> {
-					hideMultipleSelect();
-					setNodes(new ArrayList(nodes));
-					getRecyclerView().invalidate();
-					return null;
-				})
-		);
+    public static RubbishBinFragment newInstance() {
+        Timber.d("newInstance");
+        RubbishBinFragment fragment = new RubbishBinFragment();
+        return fragment;
+    }
 
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-		density  = getResources().getDisplayMetrics().density;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
 
-		if (managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1L || managerViewModel.getState().getValue().getRubbishBinParentHandle() == megaApi.getRubbishNode().getHandle()) {
-			logDebug("Parent is the Rubbish: " + managerViewModel.getState().getValue().getRubbishBinParentHandle());
+        dbH = DatabaseHandler.getDbHandler(context);
+        prefs = dbH.getPreferences();
 
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
+        downloadLocationDefaultPath = getDownloadLocation();
 
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
+        lastPositionStack = new Stack<>();
 
-			if (parentNode != null){
-				logDebug("The parent node is: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-			
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
-			}
-			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-		}
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        }
+        super.onCreate(savedInstanceState);
+    }
 
-		((ManagerActivity)context).setToolbarTitle();
-		((ManagerActivity)context).supportInvalidateOptionsMenu();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Timber.d("onCreateView");
 
-		if (((ManagerActivity)context).isList){
-			logDebug("List View");
-			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
-			
-			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
+        if (megaApi.getRootNode() == null) {
+            return null;
+        }
 
-			mLayoutManager = new LinearLayoutManager(context);
-			recyclerView.setLayoutManager(mLayoutManager);
-			//Add bottom padding for recyclerView like in other fragments.
-			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
-			recyclerView.setClipToPadding(false);
-			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
-			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-					super.onScrolled(recyclerView, dx, dy);
-					checkScroll();
-				}
-			});
-			
-			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
-			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_list_empty_text);
-			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_first);
+        SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
+                .get(SortByHeaderViewModel.class);
 
-			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
-						RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
-			}
-			else{
-				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
-				adapter.setListFragment(recyclerView);
-				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-			}
+        sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+                new EventObserver<>(this::showSortByPanel));
 
-			adapter.setMultipleSelect(false);
+        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+        managerViewModel.getUpdateRubbishBinNodes().observe(getViewLifecycleOwner(),
+                new EventObserver<>(nodes -> {
+                    hideMultipleSelect();
+                    setNodes(new ArrayList(nodes));
+                    getRecyclerView().invalidate();
+                    return null;
+                })
+        );
 
-			recyclerView.setAdapter(adapter);
+        display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        density = getResources().getDisplayMetrics().density;
 
-			setNodes(nodes);
+        if (managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1L || managerViewModel.getState().getValue().getRubbishBinParentHandle() == megaApi.getRubbishNode().getHandle()) {
+            Timber.d("Parent is the Rubbish: %s", managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
-			if (adapter.getItemCount() == 0){
-				
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+            nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() ==-1) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+        } else {
+            MegaNode parentNode = megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				} else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
-			
-			return v;
-		}
-		else{
-			logDebug("Grid View");
-			View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
+            if (parentNode != null) {
+                Timber.d("The parent node is: %s", parentNode.getHandle());
+                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 
-			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
-			recyclerView.setHasFixedSize(true);
-			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-			
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-					super.onScrolled(recyclerView, dx, dy);
-					checkScroll();
-				}
-			});
-			
-			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
-			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
-			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
+                ((ManagerActivity) context).supportInvalidateOptionsMenu();
+            }
+            nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+        }
 
-			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes,
-						managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
-						RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
-			}
-			else{
-				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
-				adapter.setListFragment(recyclerView);
-				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-			}
+        ((ManagerActivity) context).setToolbarTitle();
+        ((ManagerActivity) context).supportInvalidateOptionsMenu();
 
-			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
+        if (((ManagerActivity) context).isList) {
+            Timber.d("List View");
+            View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 
-			adapter.setMultipleSelect(false);
+            recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 
-			recyclerView.setAdapter(adapter);
-			
-			setNodes(nodes);
-			
-			if (adapter.getItemCount() == 0){
-				
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+            mLayoutManager = new LinearLayoutManager(context);
+            recyclerView.setLayoutManager(mLayoutManager);
+            //Add bottom padding for recyclerView like in other fragments.
+            recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
+            recyclerView.setClipToPadding(false);
+            recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    checkScroll();
+                }
+            });
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+            emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
+            emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_list_empty_text);
+            emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_first);
 
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				} else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}	
-			return v;
-		}
-	}
+            if (adapter == null) {
+                adapter = new MegaNodeAdapter(context, this, nodes,
+                        managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
+                        RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
+            } else {
+                adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
+                adapter.setListFragment(recyclerView);
+                adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+            }
 
-	@Override
-	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+            adapter.setMultipleSelect(false);
 
-		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_RUBBISH_BIN);
-	}
+            recyclerView.setAdapter(adapter);
 
-	@Override
+            setNodes(nodes);
+
+            if (adapter.getItemCount() == 0) {
+
+                recyclerView.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+                if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                } else {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                }
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyImageView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.GONE);
+            }
+
+            return v;
+        } else {
+            Timber.d("Grid View");
+            View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
+
+            recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
+            recyclerView.setHasFixedSize(true);
+            gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    checkScroll();
+                }
+            });
+
+            emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
+            emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
+            emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
+
+            if (adapter == null) {
+                adapter = new MegaNodeAdapter(context, this, nodes,
+                        managerViewModel.getState().getValue().getRubbishBinParentHandle(), recyclerView,
+                        RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
+            } else {
+                adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
+                adapter.setListFragment(recyclerView);
+                adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+            }
+
+            gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
+
+            adapter.setMultipleSelect(false);
+
+            recyclerView.setAdapter(adapter);
+
+            setNodes(nodes);
+
+            if (adapter.getItemCount() == 0) {
+
+                recyclerView.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+                if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                } else {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                }
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyImageView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.GONE);
+            }
+            return v;
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_RUBBISH_BIN);
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
     }
 
     public void itemClick(int position) {
-		logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
 
-		if (adapter.isMultipleSelect()){
-			logDebug("Multiselect ON");
-			adapter.toggleSelection(position);
+        if (adapter.isMultipleSelect()) {
+            Timber.d("Multiselect ON");
+            adapter.toggleSelection(position);
 
-			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
-			if (selectedNodes.size() > 0){
-				updateActionModeTitle();
+            List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+            if (selectedNodes.size() > 0) {
+                updateActionModeTitle();
 
-			}
-		}
-		else{
-			if (nodes.get(position).isFolder()){
-				MegaNode n = nodes.get(position);
+            }
+        } else {
+            if (nodes.get(position).isFolder()) {
+                MegaNode n = nodes.get(position);
 
-				int lastFirstVisiblePosition = 0;
-				if(((ManagerActivity)context).isList){
-					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-				}
-				else{
-					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
-					if(lastFirstVisiblePosition==-1){
-						logWarning("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
-					}
-				}
-				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-				lastPositionStack.push(lastFirstVisiblePosition);
+                int lastFirstVisiblePosition = 0;
+                if (((ManagerActivity) context).isList) {
+                    lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+                } else {
+                    lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+                    if (lastFirstVisiblePosition == -1) {
+                        Timber.w("Completely -1 then find just visible position");
+                        lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+                    }
+                }
+                Timber.d("Push to stack %d position", lastFirstVisiblePosition);
+                lastPositionStack.push(lastFirstVisiblePosition);
 
-				managerViewModel.setRubbishBinParentHandle(n.getHandle());
+                managerViewModel.setRubbishBinParentHandle(n.getHandle());
 
-				((ManagerActivity)context).setToolbarTitle();
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+                ((ManagerActivity) context).setToolbarTitle();
+                ((ManagerActivity) context).supportInvalidateOptionsMenu();
 
-				adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
-				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
-				adapter.setNodes(nodes);
-				recyclerView.scrollToPosition(0);
-				
-				//If folder has no files
-				if (adapter.getItemCount() == 0){
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
+                adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
+                nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
+                adapter.setNodes(nodes);
+                recyclerView.scrollToPosition(0);
 
-					if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
-						}
+                //If folder has no files
+                if (adapter.getItemCount() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    emptyImageView.setVisibility(View.VISIBLE);
+                    emptyTextView.setVisibility(View.VISIBLE);
 
-						String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+                    if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
+                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
+                        } else {
+                            emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
+                        }
 
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-									+ "\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-									+ "\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
+                        String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
 
-					} else {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-									+ "\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-									+ "\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					}
-				}
-				else{
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
-				checkScroll();
-			}
-			else{
-				//Is FILE
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = ImageViewerActivity.getIntentForParentNode(
-							requireContext(),
-							megaApi.getParentNode(nodes.get(position)).getHandle(),
-							sortOrderManagement.getOrderCloud(),
-							nodes.get(position).getHandle()
-					);
-					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
-					startActivity(intent);
-					((ManagerActivity) context).overridePendingTransition(0,0);
-				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
-					MegaNode file = nodes.get(position);
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                    + "\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                    + "\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                        } catch (Exception e) {
+                        }
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(textToShow);
+                        }
+                        emptyTextViewFirst.setText(result);
 
-					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					logDebug("FILE HANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
+                    } else {
+                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
+                        } else {
+                            emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
+                        }
+                        String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                    + "\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                    + "\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                        } catch (Exception e) {
+                        }
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(textToShow);
+                        }
+                        emptyTextViewFirst.setText(result);
+                    }
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyImageView.setVisibility(View.GONE);
+                    emptyTextView.setVisibility(View.GONE);
+                }
+                checkScroll();
+            } else {
+                //Is FILE
+                if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+                    Intent intent = ImageViewerActivity.getIntentForParentNode(
+                            requireContext(),
+                            megaApi.getParentNode(nodes.get(position)).getHandle(),
+                            sortOrderManagement.getOrderCloud(),
+                            nodes.get(position).getHandle()
+                    );
+                    putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
+                    startActivity(intent);
+                    ((ManagerActivity) context).overridePendingTransition(0, 0);
+                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
+                    MegaNode file = nodes.get(position);
 
-					Intent mediaIntent;
-					boolean internalIntent;
-					boolean opusFile = false;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
-						mediaIntent = new Intent(Intent.ACTION_VIEW);
-						internalIntent = false;
-						String[] s = file.getName().split("\\.");
-						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
-							opusFile = true;
-						}
-					}
-					else {
-						internalIntent = true;
-						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
-					}
+                    String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                    Timber.d("FILE HANDLE: %d, TYPE: %s", file.getHandle(), mimeType);
+
+                    Intent mediaIntent;
+                    boolean internalIntent;
+                    boolean opusFile = false;
+                    if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()) {
+                        mediaIntent = new Intent(Intent.ACTION_VIEW);
+                        internalIntent = false;
+                        String[] s = file.getName().split("\\.");
+                        if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+                            opusFile = true;
+                        }
+                    } else {
+                        internalIntent = true;
+                        mediaIntent = getMediaIntent(context, nodes.get(position).getName());
+                    }
                     mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
-					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
-					mediaIntent.putExtra("FILENAME", file.getName());
-					mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
+                    putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
+                    mediaIntent.putExtra("FILENAME", file.getName());
+                    mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
-						mediaIntent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
+                    if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH) {
+                        mediaIntent.putExtra("parentNodeHandle", -1L);
+                    } else {
+                        mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+                    }
 
-					String localPath = getLocalFile(file);
+                    String localPath = getLocalFile(file);
 
-					if (localPath != null){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
-							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					}
-					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-							mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-						}
+                    if (localPath != null) {
+                        File mediaFile = new File(localPath);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                        } else {
+                            mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                        }
+                        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                            mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
+                        }
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>BUFFER_COMP){
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-						}
-						else{
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-						}
+                        if (mi.totalMem > BUFFER_COMP) {
+                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+                        } else {
+                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+                        }
 
-						String url = megaApi.httpServerGetLocalLink(file);
-						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					}
-					mediaIntent.putExtra("HANDLE", file.getHandle());
-					if (opusFile){
-						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-					}
-					if (internalIntent) {
-						context.startActivity(mediaIntent);
-					}
-					else {
-						if (isIntentAvailable(context, mediaIntent)) {
-							context.startActivity(mediaIntent);
-						}
-						else {
-							((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
-							adapter.notifyDataSetChanged();
-							((ManagerActivity) context).saveNodesToDevice(
-									Collections.singletonList(nodes.get(position)),
-									true, false, false, false);
-						}
-					}
-					((ManagerActivity) context).overridePendingTransition(0,0);
-				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
-					MegaNode file = nodes.get(position);
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+                    }
+                    mediaIntent.putExtra("HANDLE", file.getHandle());
+                    if (opusFile) {
+                        mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                    }
+                    if (internalIntent) {
+                        context.startActivity(mediaIntent);
+                    } else {
+                        if (isIntentAvailable(context, mediaIntent)) {
+                            context.startActivity(mediaIntent);
+                        } else {
+                            ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
+                            adapter.notifyDataSetChanged();
+                            ((ManagerActivity) context).saveNodesToDevice(
+                                    Collections.singletonList(nodes.get(position)),
+                                    true, false, false, false);
+                        }
+                    }
+                    ((ManagerActivity) context).overridePendingTransition(0, 0);
+                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()) {
+                    MegaNode file = nodes.get(position);
 
-					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					logDebug("FILE HANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
+                    String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                    Timber.d("FILE HANDLE: %d, TYPE: %s", file.getHandle(), mimeType);
 
-					Intent pdfIntent = new Intent(context, PdfViewerActivity.class);
-					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    Intent pdfIntent = new Intent(context, PdfViewerActivity.class);
+                    pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-					pdfIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
-					pdfIntent.putExtra("inside", true);
-					pdfIntent.putExtra("APP", true);
+                    pdfIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
+                    pdfIntent.putExtra("inside", true);
+                    pdfIntent.putExtra("APP", true);
 
-					String localPath = getLocalFile(file);
+                    String localPath = getLocalFile(file);
 
-					if (localPath != null){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
-							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					}
-					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-							pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-						}
+                    if (localPath != null) {
+                        File mediaFile = new File(localPath);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                            pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                        } else {
+                            pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                        }
+                        pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                            pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
+                        }
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>BUFFER_COMP){
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-						}
-						else{
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-						}
+                        if (mi.totalMem > BUFFER_COMP) {
+                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+                        } else {
+                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
+                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+                        }
 
-						String url = megaApi.httpServerGetLocalLink(file);
-						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-					}
-					pdfIntent.putExtra("HANDLE", file.getHandle());
-					putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
-					if (isIntentAvailable(context, pdfIntent)){
-						startActivity(pdfIntent);
-					}
-					else{
-						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+                    }
+                    pdfIntent.putExtra("HANDLE", file.getHandle());
+                    putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
+                    if (isIntentAvailable(context, pdfIntent)) {
+                        startActivity(pdfIntent);
+                    } else {
+                        Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-						((ManagerActivity) context).saveNodesToDevice(
-								Collections.singletonList(nodes.get(position)),
-								true, false, false, false);
-					}
-					((ManagerActivity) context).overridePendingTransition(0,0);
-				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					manageURLNode(context, megaApi, nodes.get(position));
-				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
-					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
-				} else {
-					adapter.notifyDataSetChanged();
+                        ((ManagerActivity) context).saveNodesToDevice(
+                                Collections.singletonList(nodes.get(position)),
+                                true, false, false, false);
+                    }
+                    ((ManagerActivity) context).overridePendingTransition(0, 0);
+                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
+                    manageURLNode(context, megaApi, nodes.get(position));
+                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+                    manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
+                } else {
+                    adapter.notifyDataSetChanged();
                     onNodeTapped(context, nodes.get(position), ((ManagerActivity) context)::saveNodeByTap, (ManagerActivity) context, (ManagerActivity) context);
-				}
-			}
-		}
+                }
+            }
+        }
     }
-	
-	private void updateActionModeTitle() {
-		if (actionMode == null || getActivity() == null) {
-			return;
-		}
 
-		List<MegaNode> documents = adapter.getSelectedNodes();
-		int files = 0;
-		int folders = 0;
-		for (MegaNode document : documents) {
-			if (document.isFile()) {
-				files++;
-			} else if (document.isFolder()) {
-				folders++;
-			}
-		}
+    private void updateActionModeTitle() {
+        if (actionMode == null || getActivity() == null) {
+            return;
+        }
 
-		String title;
-		int sum=files+folders;
+        List<MegaNode> documents = adapter.getSelectedNodes();
+        int files = 0;
+        int folders = 0;
+        for (MegaNode document : documents) {
+            if (document.isFile()) {
+                files++;
+            } else if (document.isFolder()) {
+                folders++;
+            }
+        }
 
-		if (files == 0 && folders == 0) {
-			title = Integer.toString(sum);
-		} else if (files == 0) {
-			title = Integer.toString(folders);
-		} else if (folders == 0) {
-			title = Integer.toString(files);
-		} else {
-			title = Integer.toString(sum);
-		}
+        String title;
+        int sum = files + folders;
 
-		actionMode.setTitle(title);
-		try {
-			actionMode.invalidate();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			logError("Invalidate error", e);
-		}
-	}
-	
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-	}
+        if (files == 0 && folders == 0) {
+            title = Integer.toString(sum);
+        } else if (files == 0) {
+            title = Integer.toString(folders);
+        } else if (folders == 0) {
+            title = Integer.toString(files);
+        } else {
+            title = Integer.toString(sum);
+        }
 
-	/*
-	 * Disable selection
-	 */
-	public void hideMultipleSelect() {
-		adapter.setMultipleSelect(false);
+        actionMode.setTitle(title);
+        try {
+            actionMode.invalidate();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Timber.e(e, "Invalidate error");
+        }
+    }
 
-		if (actionMode != null) {
-			actionMode.finish();
-		}
-	}
-	
-	public int onBackPressed(){
+    /*
+     * Clear all selected items
+     */
+    private void clearSelections() {
+        if (adapter.isMultipleSelect()) {
+            adapter.clearSelections();
+        }
+    }
 
-		if (adapter == null){
-			return 0;
-		}
+    /*
+     * Disable selection
+     */
+    public void hideMultipleSelect() {
+        adapter.setMultipleSelect(false);
 
-		if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == managerViewModel.getState().getValue().getRubbishBinParentHandle()) {
-			((ManagerActivity) context).comesFromNotifications = false;
-			((ManagerActivity) context).comesFromNotificationHandle = -1;
-			((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
-			managerViewModel.setRubbishBinParentHandle(((ManagerActivity)context).comesFromNotificationHandleSaved);
-			((ManagerActivity)context).comesFromNotificationHandleSaved = -1;
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
 
-			return 2;
-		}
-		else {
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle()));
-			if (parentNode != null){
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+    public int onBackPressed() {
 
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
-				managerViewModel.setRubbishBinParentHandle(parentNode.getHandle());
+        if (adapter == null) {
+            return 0;
+        }
 
-				((ManagerActivity)context).setToolbarTitle();
-				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-				adapter.setNodes(nodes);
+        if (((ManagerActivity) context).comesFromNotifications && ((ManagerActivity) context).comesFromNotificationHandle == managerViewModel.getState().getValue().getRubbishBinParentHandle()) {
+            ((ManagerActivity) context).comesFromNotifications = false;
+            ((ManagerActivity) context).comesFromNotificationHandle = -1;
+            ((ManagerActivity) context).selectDrawerItem(DrawerItem.NOTIFICATIONS);
+            managerViewModel.setRubbishBinParentHandle(((ManagerActivity) context).comesFromNotificationHandleSaved);
+            ((ManagerActivity) context).comesFromNotificationHandleSaved = -1;
 
-				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
-					lastVisiblePosition = lastPositionStack.pop();
-					logDebug("Pop of the stack " + lastVisiblePosition + " position");
-				}
-				logDebug("Scroll to " + lastVisiblePosition + " position");
+            return 2;
+        } else {
+            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle()));
+            if (parentNode != null) {
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyImageView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.GONE);
 
-				if(lastVisiblePosition>=0){
-					if(((ManagerActivity)context).isList){
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else{
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
+                ((ManagerActivity) context).supportInvalidateOptionsMenu();
+                managerViewModel.setRubbishBinParentHandle(parentNode.getHandle());
 
-				return 2;
-			}
-			else{
-				return 0;
-			}
-		}
-	}
+                ((ManagerActivity) context).setToolbarTitle();
+                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                adapter.setNodes(nodes);
 
-	public RecyclerView getRecyclerView(){
-		return recyclerView;
-	}
-	
-	public void setNodes(List<MegaNode> nodes){
-		logDebug("setNodes");
-		this.nodes = nodes;
+                int lastVisiblePosition = 0;
+                if (!lastPositionStack.empty()) {
+                    lastVisiblePosition = lastPositionStack.pop();
+                    Timber.d("Pop of the stack %d position", lastVisiblePosition);
+                }
+                Timber.d("Scroll to %d position", lastVisiblePosition);
 
-		if(megaApi!=null){
-			if(megaApi.getRubbishNode()==null){
-				logError("megaApi.getRubbishNode() is NULL");
-				return;
-			}
-		}
+                if (lastVisiblePosition >= 0) {
+                    if (((ManagerActivity) context).isList) {
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    } else {
+                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    }
+                }
 
-		this.nodes = nodes;
+                return 2;
+            } else {
+                return 0;
+            }
+        }
+    }
 
-		if (adapter != null){
-			adapter.setNodes(this.nodes);
-			if (adapter.getItemCount() == 0){
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
 
-				if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+    public void setNodes(List<MegaNode> nodes) {
+        Timber.d("setNodes");
+        this.nodes = nodes;
 
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				} else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-								+ "\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-								+ "\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}			
-		}
-	}
+        if (megaApi != null) {
+            if (megaApi.getRubbishNode() == null) {
+                Timber.e("megaApi.getRubbishNode() is NULL");
+                return;
+            }
+        }
 
-	public void notifyDataSetChanged(){
-		if (adapter != null){
-			adapter.notifyDataSetChanged();
-		}
-	}
+        this.nodes = nodes;
 
-	public boolean isMultipleselect(){
-		return adapter.isMultipleSelect();
-	}
+        if (adapter != null) {
+            adapter.setNodes(this.nodes);
+            if (adapter.getItemCount() == 0) {
+                recyclerView.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
 
-	public int getItemCount(){
-		return adapter.getItemCount();
-	}
+                if (megaApi.getRubbishNode().getHandle() == managerViewModel.getState().getValue().getRubbishBinParentHandle() || managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                } else {
+                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
+                    } else {
+                        emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
+                    }
+                    String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                                + "\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextViewFirst.setText(result);
+                }
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyImageView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public void notifyDataSetChanged() {
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    public boolean isMultipleselect() {
+        return adapter.isMultipleSelect();
+    }
+
+    public int getItemCount() {
+        return adapter.getItemCount();
+    }
 }

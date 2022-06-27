@@ -27,20 +27,46 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
+import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.VIDEO_SEARCH_ADAPTER
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_VIDEOS
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -70,7 +96,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentVideoBinding.inflate(inflater, container, false).apply {
             viewModel = this@VideoFragment.viewModel
@@ -429,7 +455,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 requireActivity().overridePendingTransition(0, 0)
             }
         } else {
-            LogUtil.logWarning("itemClick:noAvailableIntent")
+            Timber.w("itemClick:noAvailableIntent")
             Util.showSnackbar(
                 context,
                 SNACKBAR_TYPE,

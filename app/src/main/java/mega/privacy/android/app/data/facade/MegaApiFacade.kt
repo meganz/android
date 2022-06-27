@@ -69,6 +69,10 @@ class MegaApiFacade @Inject constructor(
         get() = megaApi.isBusinessAccount
     override val isMasterBusinessAccount: Boolean
         get() = megaApi.isMasterBusinessAccount
+    override val isEphemeralPlusPlus: Boolean
+        get() = megaApi.isEphemeralPlusPlus
+    override val accountAuth: String
+        get() = megaApi.accountAuth
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
@@ -198,6 +202,20 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
 
     override suspend fun hasChildren(node: MegaNode): Boolean = megaApi.hasChildren(node)
+
+    override fun registerPushNotifications(
+        deviceType: Int,
+        newToken: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.registerPushNotifications(deviceType, newToken, listener)
+
+    override fun fastLogin(session: String, listener: MegaRequestListenerInterface) =
+        megaApi.fastLogin(session, listener)
+
+    override fun fetchNodes(listener: MegaRequestListenerInterface) =
+        megaApi.fetchNodes(listener)
+
+    override fun retryPendingConnections() = megaApi.retryPendingConnections()
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

@@ -7,8 +7,8 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.NumberPicker.OnValueChangeListener
 import android.widget.NumberPicker.OnScrollListener
+import android.widget.NumberPicker.OnValueChangeListener
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -17,15 +17,22 @@ import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
+import mega.privacy.android.app.utils.Constants.EMAIL
+import mega.privacy.android.app.utils.Constants.IS_FROM_CONTACTS
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
 
 class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     companion object {
@@ -67,7 +74,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
 
         if (intent == null || intent.extras == null) {
-            logError("Cannot init view, Intent is null")
+            Timber.e("Cannot init view, Intent is null")
             finish()
         }
 
@@ -80,13 +87,13 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             val email = intent.extras!!.getString(EMAIL)
 
             if (TextUtil.isTextEmpty(email)) {
-                logError("Cannot init view, contact' email is empty")
+                Timber.e("Cannot init view, contact' email is empty")
                 finish()
             }
 
             val contact = megaApi.getContact(email)
             if (contact == null) {
-                logError("Cannot init view, contact is null")
+                Timber.e("Cannot init view, contact is null")
                 finish()
             }
 
@@ -109,7 +116,8 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeButtonEnabled(true)
-        actionBar?.title = getString(R.string.title_properties_manage_chat).uppercase(Locale.getDefault())
+        actionBar?.title =
+            getString(R.string.title_properties_manage_chat).uppercase(Locale.getDefault())
 
         binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false
@@ -117,7 +125,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         binding.separator.visibility = View.GONE
 
         if (chat == null) {
-            logDebug("The chat does not exist")
+            Timber.d("The chat does not exist")
             binding.historyRetentionSwitchLayout.setOnClickListener(null)
             binding.clearChatHistoryLayout.setOnClickListener(null)
             binding.retentionTimeTextLayout.setOnClickListener(null)
@@ -125,7 +133,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
         } else {
-            logDebug("The chat exists")
+            Timber.d("The chat exists")
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
 
@@ -170,7 +178,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
      * @param seconds The time the retention time is enabled.
      */
     fun showPickers(seconds: Long) {
-        logDebug("Show the pickers")
+        Timber.d("Show the pickers")
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
 
@@ -217,7 +225,8 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 R.plurals.retention_time_picker_months,
                 value
             ).lowercase(Locale.getDefault()),
-            StringResourcesUtils.getString(R.string.retention_time_picker_year).lowercase(Locale.getDefault())
+            StringResourcesUtils.getString(R.string.retention_time_picker_year)
+                .lowercase(Locale.getDefault())
         )
         binding.textPicker.displayedValues = arrayString
     }
@@ -325,7 +334,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
      * - If the selected option is 4 weeks, it becomes 1 month.
      * - If the selected option is 12 months, it becomes 1 year.
      */
-    private fun updateOptionsAccordingly(){
+    private fun updateOptionsAccordingly() {
         if (binding.textPicker.value == OPTION_HOURS &&
             binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_HOURS
         ) {
