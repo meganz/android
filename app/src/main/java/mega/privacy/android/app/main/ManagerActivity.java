@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING;
@@ -12,19 +11,20 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH;
 import static mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER;
 import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
@@ -966,26 +966,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     };
 
-    /**
-     * Broadcast to show a "transfer over quota" warning if it is on Transfers section.
-     */
-    private BroadcastReceiver transferOverQuotaUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateTransfersWidget(intent);
-
-            if (intent == null) return;
-
-            if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
-                showTransfersTransferOverQuotaWarning();
-            }
-
-            if (transfersManagement.getAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
-                retryTransfers.setVisible(true);
-            }
-        }
-    };
-
     private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1612,9 +1592,16 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .observeForever(refreshAddPhoneNumberButtonObserver);
 
-        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
-        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-        registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
+        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class).observe(this, update -> {
+            updateTransfersWidget(INVALID_VALUE);
+            showTransfersTransferOverQuotaWarning();
+        });
+
+        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
+            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB) {
+                retryTransfers.setVisible(failed);
+            }
+        });
 
         registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
@@ -3518,7 +3505,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .removeObserver(refreshAddPhoneNumberButtonObserver);
         unregisterReceiver(receiverCUAttrChanged);
-        unregisterReceiver(transferOverQuotaUpdateReceiver);
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);

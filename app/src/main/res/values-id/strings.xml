@@ -12,18 +12,12 @@
     <string name="general_cancel">Batal</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">Pindahkan ke</string>
-    <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_copy_to">Salin ke</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select">Pilih</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="general_select_to_upload">Pilih file</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Pilih folder</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">Buat</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">Unduh</string>
     <!-- button -->
     <string name="general_add">Tambah</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -42,8 +36,6 @@
     <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">Lewati</string>
-    <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
-    <string name="general_stop">Berhenti</string>
     <!-- option shown when a message could not be sent -->
     <string name="general_retry">Ulangi</string>
     <!-- Button to open the default web browser -->
@@ -56,24 +48,12 @@
     <string name="general_forwarding">Meneruskan</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">Impor</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="general_storage">Penyimpanan</string>
-    <!-- Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer. -->
-    <string name="general_bandwidth">Kuota Transfer</string>
-    <!-- Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan -->
-    <string name="general_subscribe">Langganan</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Kesalahan</string>
-    <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">Belum di-implementasi</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Telah di download</string>
-    <!-- when trying to upload a file that is already uploaded in the folder -->
-    <string name="general_already_uploaded">telah di upload</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">Info file</string>
-    <!-- Label of the option menu. When clicking this button, the app shows the info of the folder -->
-    <string name="general_folder_info">Info folder</string>
     <!-- Hint how to cancel the download -->
     <string name="general_show_info">Tampilkan info</string>
     <!-- Error getting the root node -->
@@ -84,12 +64,6 @@
     <string name="secondary_media_service_error_local_folder">Folder media sekunder tidak ada, silahkan pilih folder  baru</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Tidak ada penyimpanan eksternal yang terdeteksi</string>
-    <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">Folder ini hanya-baca. Anda tidak memiliki izin untuk mengupload</string>
-    <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">Anda menghapus file Recovery Key yang telah diekspor sebelumnya</string>
-    <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">Apakah anda ingin mengirim undangan ke %s?</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Keluar</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,16 +90,12 @@
     <string name="action_help">Bantuan</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Upgrade akun</string>
-    <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">Meng-upgrade akun</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">Pilih semua</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Hapus pilihan</string>
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Tampilan thumbnail</string>
-    <!-- Menu item to change from grid view to list view -->
-    <string name="action_list">Tampilan daftar</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Cadangkan Recovery Key</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -198,24 +168,8 @@
     <string name="login_before_share">Silakan masuk untuk berbagi dengan MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tautan konfirmasi anda tidak lagi valid. Akun anda mungkin sudah diaktifkan atau anda mungkin telah membatalkan pendaftaran anda.</string>
-    <!--  -->
-    <string name="tour_space_title">Ruang MEGA</string>
-    <!--  -->
-    <string name="tour_speed_title">Kecepatan MEGA</string>
-    <!--  -->
-    <string name="tour_privacy_title">Privasi MEGA</string>
-    <!--  -->
-    <string name="tour_access_title">Akses MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
     <string name="tour_space_text">Daftar sekarang dan dapatkan 20&#160;GB penyimpanan gratis</string>
-    <!--  -->
-    <string name="tour_speed_text">Upload cepat. Bagikan file dengan siapapun</string>
-    <!--  -->
-    <string name="tour_privacy_text">Simpan seluruh file anda dengan aman dengan teknologi enkripsi menyeluruh MEGA</string>
-    <!--  -->
-    <string name="tour_access_text">Dapatkan akses terenkripsi penuh dimanapun, kapanpun</string>
-    <!-- button that allows the user to create an account -->
-    <string name="create_account_text">Buat akun</string>
     <!-- category in sort by action -->
     <string name="name_text">Nama</string>
     <!-- First Name of the user -->
@@ -226,8 +180,6 @@
     <string name="tos">Saya setuju dengan [A]Persyaratan Layanan[/A] MEGA</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Saya mengerti bahwa [B]jika saya kehilangan kata sandi, saya mungkin kehilangan data saya[/B].  Baca lebih lanjut tentang [A]enkripsi ujung-ke-ujung MEGA[/A].</string>
-    <!-- Does the user already have a MEGA account -->
-    <string name="already_account">Sudah punya akun?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Anda harus menyetujui Kebijakan Pelayanan</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -237,15 +189,11 @@
     <!-- Warning dialog -->
     <string name="error_enter_userlastname">Silakan masukkan nama belakang anda.</string>
     <!-- when creating the account -->
-    <string name="error_short_password">Kata sandi terlalu singkat</string>
-    <!-- when creating the account -->
     <string name="error_passwords_dont_match">Kata sandi berbeda</string>
     <!-- when creating the account -->
     <string name="error_email_registered">Alamat email ini telah memiliki akun terdaftar di MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Sedang menghubungi server: Membuat akun</string>
-    <!--  -->
-    <string name="cancel_transfer_confirmation">Batalkan pemindahan ini?</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Batalkan semua pemindahan?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -262,16 +210,12 @@
     <string name="section_secondary_media_uploads">Unggahan Media</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
     <string name="section_inbox">Kotak Masuk</string>
-    <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">Simpan untuk Offline</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Item berbagi</string>
-    <!-- title of the screen that shows all the shared items -->
-    <string name="section_shared_items">Folder berbagi</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">Tempat Sampah</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -312,8 +256,6 @@
     <string name="file_properties_info_last_modified">Terakhir dimodifikasi</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">Ditambahkan</string>
-    <!-- the label when a folder can be accesed by public users -->
-    <string name="file_properties_shared_folder_public_link">Tautan umum</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Izin</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -322,8 +264,6 @@
     <string name="file_properties_shared_folder_change_permissions">Ganti izin</string>
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">Berbagi dengan</string>
-    <!-- send a file to a MEGA user -->
-    <string name="file_properties_send_file_select_contact">Kirim ke</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">Pemilik</string>
     <!-- positive button on dialog to invite a contact -->
@@ -340,12 +280,8 @@
     <string name="contact_properties_activity">Info kontak</string>
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">Tambahkan kontak baru dengan menggunakan tombol di bawah ini</string>
-    <!-- Add new contacts before sharing. -->
-    <string name="contacts_explorer_list_empty_text">Tambahkan kontak baru untuk dibagikan</string>
     <!-- Error message -->
     <string name="error_not_enough_free_space">Tidak cukup ruang kosong di perangkat anda</string>
-    <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
-    <string name="option_link_without_key">Tautan tanpa kunci</string>
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Kunci dekripsi</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
@@ -382,14 +318,10 @@
     <string name="intent_not_available_location">Tidak ada aplikasi yang tersedia di perangkat anda untuk membuka lokasi ini</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Anda mungkin tidak memasang aplikasi apa pun yang mendukung jenis file ini</string>
-    <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">Bagikan gambar dengan</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">Bagikan tautan</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Hapus tautan</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">Tinggalkan</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Tinggalkan berbagi</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -404,14 +336,8 @@
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Ubah nama</string>
-    <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">Ubah nama %1$s</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="context_open_link_title">Buka tautan</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Buka</string>
-    <!-- while renaming a file or folder -->
-    <string name="context_renaming">Mengubah nama</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Mempersiapkan file</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -432,20 +358,14 @@
     <string name="context_delete_from_mega">Hapus dari MEGA</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">Nama Folder</string>
-    <!-- when adding a new contact. in the dialog -->
-    <string name="context_new_contact_name">Kontak email</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Membuat folder</string>
-    <!-- Menu item -->
-    <string name="context_download_to">Simpan ke</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Kosongkan Sampah</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Anda sedang akan menghapus semua benda ini secara permanen dari Sampah anda.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Kirim</string>
-    <!-- send the file to inbox -->
-    <string name="context_send_file_inbox">Kirim ke kontak</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">Hapus</string>
     <!-- Menu option to delete selected items of the offline state -->
@@ -456,8 +376,6 @@
     <string name="context_send_file">Kirim file ke obrolan</string>
     <!-- menu item -->
     <string name="context_send_contact">Bagikan kontak ke obrolan</string>
-    <!-- open a shared folder -->
-    <string name="context_view_shared_folders">Lihan folder berbagi</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">Berbagi</string>
     <!-- Menu option to manage a shared folder. -->
@@ -476,14 +394,10 @@
     <string name="context_contact_not_removed">Terjadi kesalahan. Kontak belum dihapus</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Izin telah diubah</string>
-    <!-- error message -->
-    <string name="context_permissions_not_changed">Terjadi kesalahan. Izin belum diubah</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">Folder sudah ada</string>
     <!-- message when trying to create a invite a contact already that is already added -->
     <string name="context_contact_already_exists">%s sudah menjadi kontak</string>
-    <!-- message when trying to send a file without full access -->
-    <string name="context_send_no_permission">Anda tidak memiliki izin untuk mengirim file ini</string>
     <!-- success message when creating a folder -->
     <string name="context_folder_created">Folder telah dibuat</string>
     <!-- error message when creating a folder -->
@@ -494,8 +408,6 @@
     <string name="context_no_renamed">Terjadi kesalahan. Belum ubah nama</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Berhasil disalin</string>
-    <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">Terkirim ke Kotak Masuk</string>
     <!-- error message when sending a node to Inbox -->
     <string name="context_no_sent_node">Terjadi kesalahan. Tidak terkirim ke Kotak Masuk</string>
     <!-- error message -->
@@ -516,18 +428,8 @@
     <string name="context_correctly_shared">Berhasil dibagikan</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Terjadi kesalahan. %d berbagi belum diselesaikan</string>
-    <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared_removed">Berhasil menghapus berbagi</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number_removed">Terjadi kesalahan. %d proses penghapusan berbagi tidak selesai</string>
-    <!-- error message -->
-    <string name="context_no_shared">Terjadi kesalahan. Belum dibagikan</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Terjadi kesalahan. Gagal menghilangkan berbagi</string>
-    <!-- success message when removing a sharing -->
-    <string name="context_remove_sharing">Folder berbagi dihapus</string>
-    <!-- error message -->
-    <string name="context_no_link">Gagal membuat tautan</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Berhasil dihapus</string>
     <!-- error message -->
@@ -558,20 +460,8 @@
     <string name="number_contact_removed">%d kontak berhasil dihapus</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d kontak tidak dihapus</string>
-    <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">Folder berhasil dibagikan dengan %d kontak</string>
-    <!-- success message when sharing multiple files -->
-    <string name="number_correctly_shared">%d folder berhasil dibagikan</string>
-    <!-- error message when sharing multiple files -->
-    <string name="number_no_shared">%d folder tidak dibagi</string>
     <!-- success message when sending a file to a contact -->
     <string name="context_correctly_copied_contact">Telah berhasil mengirimkan ke:</string>
-    <!-- success message when removing all the contacts of a shared folder -->
-    <string name="context_correctly_removed_sharing_contacts">Folder tidak lagi dibagikan</string>
-    <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Terjadi kesalahan. Folder masih dibagikan dengan kontak lain</string>
-    <!-- option available for just one file -->
-    <string name="context_select_one_file">Pilih hanya satu file</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Sampah telah berhasil dikosongkan</string>
     <!-- error message when emptying the RB -->
@@ -586,8 +476,6 @@
     <string name="confirmation_cancel_subscriptions">Terima kasih atas tanggapan anda. Apakah anda yakin ingin membatalkan langganan MEGA anda?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Langganan anda belum dibatalkan. Berikan alasan untuk pembatalan anda</string>
-    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">Terima kasih. Pembayaran anda sedang diproses. Silakan email kami di support&#64;mega.co.nz jika anda belum menerima peningkatan dalam waktu 24 jam.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Langganan baru anda akan mulai berlaku setelah yang sekarang berakhir, harga baru akan dibebankan pada saat itu.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -596,30 +484,22 @@
     <string name="subscription_type_monthly">Bulanan</string>
     <!--  -->
     <string name="subscription_type_yearly">Tahunan</string>
-    <!-- success message after removing the public link of a folder -->
-    <string name="context_node_private">Folder ini sekarang private</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Berbagi telah berhasil dihapus</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Folder baru</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Tambah kontak</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_add_contact_and_share">Tambah kontak dan bagikan</string>
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Kunci Dekripsi</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">Masukkan decryption key untuk link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Decryption key salah</string>
-    <!-- upload to. Then choose an Image file -->
-    <string name="upload_to_image">Gambar</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
-    <string name="upload_uploaded">berhasil diunggah</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">Memproses file</item>
@@ -634,10 +514,6 @@
     <string name="error_io_problem">Masalah file system</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">Terjadi error saat menjalankan aksi</string>
-    <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">Penampil gambar</string>
-    <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Ruang penyimpanan bekas</string>
     <!-- menu item -->
     <string name="my_account_change_password">Ganti password</string>
     <!-- Dialog text overquota error -->
@@ -646,34 +522,16 @@
     <string name="my_account_last_session">Sesi terakhir</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Mengganti password</string>
-    <!-- when changing the password, the first edittext is to enter the current password -->
-    <string name="my_account_change_password_oldPassword">Kata sandi terkini</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">Kata sandi baru</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Konfirmasi kata sandi baru</string>
-    <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Kata sandi berbeda</string>
-    <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Pilih paket</string>
-    <!-- the user has to decide the way of payment -->
-    <string name="select_membership_1">Langganan perbulan atau pertahun</string>
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Tidak ada metode pembayaran yang ditetapkan untuk paket ini saat ini. Silahkan pilih satu.</string>
-    <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">Perbulan*</string>
-    <!-- button to decide annually payment. The asterisk is needed -->
-    <string name="upgrade_per_year">Pertahun*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Link telah disalin ke clipboard</string>
-    <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">Pratinjau belum didownload. Mohon tunggu</string>
-    <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Memori kosong tidak cukup untuk menampilkan pratinjau. Silakan coba lagi nanti.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Tolong keluar sebelum membuat akun</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">Tidak ada transfer aktif</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Hentikan transfer</string>
     <!-- menu item -->
@@ -704,8 +562,6 @@
     <string name="camera_notif_primary_local_unavailable">Unggahan Kamera telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Unggahan Media telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
-    <!-- notification camera uploads complete -->
-    <string name="settings_camera_notif_complete">Unggahan kamera selesai</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Penampilan</string>
     <!-- settings of the Features section -->
@@ -736,16 +592,12 @@
     <string name="settings_storage_download_location">Lokasi unduhan default</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">Selalu tanya untuk lokasi unduhan</string>
-    <!-- Whether to enable the storage in advanced devices -->
-    <string name="settings_storage_advanced_devices">Tampilkan advanced devices (external SD)</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">Tambahkan nomor telepon</string>
     <!-- enter verification code page title -->
     <string name="verify_account_title">Verifikasi akun anda</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
     <string name="verify_account_helper_locked">Akun anda telah ditangguhkan sementara karena kemungkinan penyalahgunaan. Harap verifikasi nomor telepon anda untuk membuka akun anda.</string>
-    <!-- Hint text of the country edittext for billing purposes -->
-    <string name="general_country_label">Negara</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">Wilayah</string>
     <!-- place holder for enter mobile number field -->
@@ -789,10 +641,6 @@
         <item>Penyimpanan internal</item>
         <item>Penyimpanan luar</item>
     </string-array>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option -->
-    <string name="internal_storage_label">Penyimpanan internal</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string name="external_storage_label">Penyimpanan luar</string>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
         <item>Tulis email pengguna</item>
@@ -800,10 +648,6 @@
     </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Aktifkan Unggahan Kamera</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">Aktifkan Unggahan Kamera</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_off">Nonaktifkan Unggahan Kamera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Bagaimana cara mengunggah</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -825,8 +669,6 @@
         <item>Hanya video</item>
         <item>Foto dan video</item>
     </string-array>
-    <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">Hanya saat sedang mencas</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Sertakan tag lokasi</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -847,8 +689,6 @@
     <string name="settings_camera_upload_only_videos">Hanya Video</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Foto dan video</string>
-    <!-- status text when no custom photo sync folder has been set -->
-    <string name="settings_pin_lock_code_not_set">Belum diatur</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">Kunci Passcode</string>
     <!-- Settings option to change Passcode. -->
@@ -867,12 +707,6 @@
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">Anda akan keluar dan file offline anda akan dihapus setelah 10 upaya gagal</string>
-    <!-- error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_incorrect">Kode salah</string>
-    <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
-    <plurals name="pin_lock_incorrect_alert">
-        <item quantity="other">Passcode salah, silahkan coba lagi. Anda memiliki %2d upaya yang tersisa</item>
-    </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Passcode tidak sama. Coba lagi.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
@@ -883,8 +717,6 @@
     <string name="reset_pin_title">Masukkan passcode baru anda</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="reset_pin_title_2">Masukkan kembali passcode baru anda</string>
-    <!-- Text of the screen after 10 attemps with a wrong Passcode -->
-    <string name="incorrect_pin_activity">Semua data lokal anda akan dihapus dan anda akan keluar dalam %1d detik</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Tentang</string>
     <!-- Preference screen item action button -->
@@ -899,38 +731,10 @@
     <string name="settings_about_karere_version">Versi SDK MEGAchat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Lihat source code</string>
-    <!--  -->
-    <string name="january">Januari</string>
-    <!--  -->
-    <string name="february">Febuari</string>
-    <!--  -->
-    <string name="march">Maret</string>
-    <!--  -->
-    <string name="april">April</string>
-    <!--  -->
-    <string name="may">Mei</string>
-    <!--  -->
-    <string name="june">Juni</string>
-    <!--  -->
-    <string name="july">Juli</string>
-    <!--  -->
-    <string name="august">Agustus</string>
-    <!--  -->
-    <string name="september">September</string>
-    <!--  -->
-    <string name="october">Oktober</string>
-    <!--  -->
-    <string name="november">November</string>
-    <!--  -->
-    <string name="december">Desember</string>
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">Penjelajah ZIP</string>
-    <!-- title of the My Account screen -->
-    <string name="my_account_title">Jenis akun</string>
     <!--  -->
     <string name="free_account">Gratis</string>
-    <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Folder Upload Kamera telah dibuat</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nama</string>
     <!-- sort files alphabetically ascending -->
@@ -939,12 +743,6 @@
     <string name="sortby_name_descending">Menurun</string>
     <!-- category in sort by action -->
     <string name="sortby_date">Tanggal</string>
-    <!-- category in sort by action -->
-    <string name="sortby_creation_date">Tanggal Pembuatan</string>
-    <!-- category in sort by action -->
-    <string name="sortby_modification_date">Tanggal Modifikasi</string>
-    <!-- category in sort by action -->
-    <string name="sortby_link_creation_date">Tautkan tanggal pembuatan</string>
     <!-- sort files by date newest first -->
     <string name="sortby_date_newest">Terbaru</string>
     <!-- sort files by date oldest first -->
@@ -955,14 +753,10 @@
     <string name="sortby_size_largest_first">Terbesar</string>
     <!-- sort files by size smallest first -->
     <string name="sortby_size_smallest_first">Terkecil</string>
-    <!-- Title of sort by media type options -->
-    <string name="sortby_type">Tipe media</string>
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">Foto</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Video</string>
-    <!-- Title to choose the type of Passcode -->
-    <string name="pin_lock_type">Tipe Passcode</string>
     <!-- Passcode with 4 digits -->
     <string name="four_pin_lock">4 digit</string>
     <!-- Passcode with 6 digits -->
@@ -973,16 +767,12 @@
     <string name="settings_enable_logs">Logs sekarang diaktifkan</string>
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Logs sekarang dinonaktifkan</string>
-    <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Tidak dapat mengatur folder Unggah Kamera MEGA</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Buka lokasi</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Proses ini memakan waktu lebih lama dari yang diperkirakan. Mohon tunggu.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Akun Gratis</string>
-    <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Akun Pro Lite</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Akun Pro I</string>
     <!-- Label in My Account section to show user account type -->
@@ -1013,22 +803,8 @@
     <string name="general_positive_button">YA</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">TIDAK</string>
-    <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">Lupa password?</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Lupa password anda?</string>
-    <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">Jika anda memiliki cadangan Kunci Pemulihan, anda dapat mereset kata sandi anda dengan memilih YA. Tidak ada data yang akan hilang.</string>
-    <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">Anda masih dapat mengekspor Kunci Pemulihan sekarang jika anda memiliki sesi MEGA aktif di browser lain di komputer ini atau komputer lainnya. Jika tidak, anda tidak bisa lagi mendekripsi akun yang ada, tapi anda bisa memulai yang baru dengan alamat email yang sama dengan memilih TIDAK.</string>
-    <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">Apakah anda memiliki cadangan dari Kunci Pemulihan anda?</string>
-    <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">Bagus!</string>
-    <!-- Hint of the text where the user can write his e-mail -->
-    <string name="edit_text_insert_mail">email tulis disini</string>
-    <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">Harap masukan alamat email anda di bawah. Anda akan menerima tautan pemulihan yang membolehkan anda untuk memasukan Kunci Pemulihan anda dan mereset password anda.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">Kunci Pemulihan anda masuk ke sini</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1065,14 +841,6 @@
     <string name="park_account_dialog_title">Parkir akun</string>
     <!-- Button to park an account -->
     <string name="park_account_button">Parkir</string>
-    <!-- Title of the screen to park an account -->
-    <string name="park_account_title">Oops!</string>
-    <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">Karena paradigma enkripsi menyeluruh kami, anda tidak akan dapat mengakses data anda tanpa kata sandi atau cadangan Kunci Pemulihan anda.</string>
-    <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">Anda dapat memparkir akun anda dan memulai ulang dengan email yang  sama. Data anda akan kami simpan selama setidaknya 60 hari. Jika anda mengingat password dari akun yang sedang anda parkir, harap kontak support&#64;mega.nz</string>
-    <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">Harap masukan alamat email anda di bawah ini. Anda akan menerima tautan pemulihan yang akan membolehkan anda memparkir akun anda.</string>
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">Ini adalah langkah terakhir untuk memarkir akun anda, masukkan kata sandi baru anda. Data anda akan disimpan setidaknya selama 60 hari. Jika anda mengingat kata sandi akun yang diparkir, hubungi support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
@@ -1081,16 +849,12 @@
     <string name="recovery_link_expired">Recovery link ini telah kadaluarsa, harap coba kembali.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">Kunci Pemulihan anda akan digunakan untuk mengubah kata sandi anda. Tolong masukkan kata sandi baru anda</string>
-    <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
-    <string name="email_verification_text_change_pass">Anda akan menerima link pemulihan yang memungkinkan anda menyetel ulang kata sandi anda.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Tingkatkan</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Tingkatkan sekarang</string>
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Kembangkan cloud Anda.[A]Dapatkan peningkatan penyimpanan dan kuota transfer dengan akun Pro.</string>
-    <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Kunci Pemulihan akun MEGA telah disimpan ke: %1s. [A]Anda dapat menemukan file dengan Kunci Pemulihan anda di bagian Disimpan untuk Offline.[/A]Catatan: karena file dengan Kunci Pemulihan anda akan dihapus saat anda keluar, harap simpan di tempat yang aman di luar akun MEGA anda .</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Alamat e-mail ini telah digunakan. Silakan gunakan alamat email lain.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1101,12 +865,6 @@
     <string name="change_mail_text_last_step">Ini adalah langkah terakhir untuk mengganti email anda. Harap masukan password anda di bawah ini.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Ganti email</string>
-    <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Anda kehabisan ruang penyimpanan.</string>
-    <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">Ambil keuntungan penuh dari akun MEGA anda dengan meningkatkan ke Pro.</string>
-    <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">Ubah gambar profile</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Tangkap</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1117,8 +875,6 @@
     <string name="incorrect_MK">Kunci yang anda berikan tidak sesuai dengan akun ini. Pastikan anda menggunakan Kunci Pemulihan yang benar dan coba lagi.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">Kunci Pemulihan Salah</string>
-    <!-- Alert Dialog to get link -->
-    <string name="option_full_link">Tautan dengan kunci</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Mendapatkan info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1151,18 +907,10 @@
     <string name="number_correctly_delete_contact_request">%d permintaan berhasil dihapus.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d permintaan berhasil terhapus namun %2$d permintaan gagal dihapus.</string>
-    <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">Apakah anda ingin menghapus permintaan undangan ke %s?</string>
-    <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">Apakah anda ingin menghapus %d permintaan undangan ini?</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">%d balasan permintaan dikirim.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d balasan permintaan berhasil terkirim namun %2$d gagal terkirim.</string>
-    <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
-    <plurals name="general_num_request">
-        <item quantity="other">%1$d permintaan</item>
-    </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">Folder dibagikan dengan %1$d kontak. Hapus semua berbagi?</item>
@@ -1197,18 +945,12 @@
     <string name="file_link_unavaible_delete_account">Akun pengguna terkait telah dihentikan karena beberapa pelanggaran terhadap Kebijakan Layanan kami.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Kunci dekripsi yang disediakan untuk link folder tidak valid.</string>
-    <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
-    <string name="my_account_my_credentials">Kredential saya</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
     <string name="limited_bandwith">Terbatas</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Obrolan</string>
-    <!-- Item of the navigation title for the chat section when there is any unread message -->
-    <string name="section_chat_with_notification">Obrolan [A](%1$d)[/A]</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">Arsipkan</string>
-    <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">Undang teman anda untuk bergabung dengan anda di Obrolan dan nikmati platform terenkripsi kami dengan privasi dan keamanan.</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">h</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1221,12 +963,6 @@
     <string name="remove_contact_shared_folder">Kontak %s akan dihapus dari folder bersama.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <string name="remove_multiple_contacts_shared_folder">%d kontak akan dihapus dari folder bersama.</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_correctly_removed_from_shared">%d kontak berhasil dihapus dari folder bersama</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_incorrectly_removed_from_shared">%d kontak tidak berhasil dihapus</string>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_correctly_changed_from_shared">Izin berhasil diperbarui untuk %d kontak</string>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Gagal memperbarui izin untuk %d kontak</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
@@ -1239,8 +975,6 @@
     <string name="number_no_invite_contact_request">%1$d permintaan undangan berhasil dikirim namun %2$d permintaan tidak terkirim.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Saya)</string>
-    <!-- Hint shown in the field to write a message in the chat screen -->
-    <string name="type_message_hint">Ketik pesan</string>
     <!-- button -->
     <string name="general_mute">Matikan Suara</string>
     <!-- button -->
@@ -1283,12 +1017,8 @@
     <string name="title_properties_chat_contact_notifications">Notifikasi</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Suara pesan</string>
-    <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">Hapus obrolan</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">Bagikan kontak</string>
-    <!-- Title of the screen to select the ringtone of the calls -->
-    <string name="call_ringtone_title">Nada dering panggilan</string>
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">Suara notifikasi</string>
     <!-- Button to clear the chat history -->
@@ -1327,8 +1057,6 @@
     <string name="away_status">Sedang Pergi</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="busy_status">Sibuk</string>
-    <!-- Info label about the status of the user -->
-    <string name="invalid_status">Tidak ada koneksi</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Pesan ini telah dihapus</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1387,8 +1115,6 @@
     <string name="manual_resume_alert">Pemindahan diberhentikan. Klik untuk melanjutkan.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Kesalahan. Status anda belum berubah</string>
-    <!-- message shown when a user couldn’t leave chat -->
-    <string name="leave_chat_error">Terjadi kesalahan saat meninggalkan obrolan</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">Terjadi kesalahan saat membuat obrolan</string>
     <!-- settings of the chat to choose the status -->
@@ -1419,8 +1145,6 @@
     <string name="chat_error_open_title">Chat Error</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Obrolan tidak dapat dibuka dengan sukses</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">Pilih kontak</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d kontak</item>
@@ -1451,32 +1175,12 @@
     <string name="more_users_typing">%1$s [A]dan lainnya sedang mengetik&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Selebihnya</string>
-    <!-- Text button -->
-    <string name="label_close">Tutup</string>
-    <!-- Title of the general tab in My Account Section -->
-    <string name="tab_my_account_general">Umum</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="tab_my_account_storage">Penyimpanan</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="label_storage_upgrade_account">Penyimpanan</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
     <string name="label_transfer_quota_upgrade_account">Kuota transfer</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_achievements">Kuota transfer</string>
-    <!-- Title of the section about the plan in the storage tab in My Account Section -->
-    <string name="account_plan">Paket</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Tempat penyimpanan</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="transfer_quota">Kuota transfer</string>
-    <!-- Label in section the storage tab in My Account Section -->
-    <string name="available_space">Tersedia</string>
-    <!-- Label in section the storage tab in My Account Section when no info info is received -->
-    <string name="not_available">tidak tersedia</string>
-    <!-- Label in section the storage tab when the account is Free -->
-    <string name="no_bylling_cycle">Tidak ada siklus penagihan</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="my_account_of_string">%1$s [A] dari %2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Hapus dari Nonaktif?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1485,14 +1189,6 @@
     <string name="set_color_theme_label">Tema warna</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">Hilangkan</string>
-    <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="general_not_available">Tidak tersedia</string>
-    <!-- Accepted request invitacion alert -->
-    <string name="context_invitacion_reply_accepted">Undangan diterima</string>
-    <!-- Declined request invitacion alert -->
-    <string name="context_invitacion_reply_declined">Undangan ditolak</string>
-    <!-- Ignored request invitacion alert -->
-    <string name="context_invitacion_reply_ignored">Undangan diabaikan</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">Pesan tidak dikenali</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
@@ -1518,8 +1214,6 @@
         <item>Sibuk</item>
         <item>Offline</item>
     </string-array>
-    <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">Tidak ada file tersimpan untuk Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Nyalakan</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1528,30 +1222,12 @@
     <string name="enable_log_text_dialog">Log dapat berisi informasi yang terkait dengan akun anda</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">Sambungan jaringan terpulihkan. Hubungkan ke MEGA?</string>
-    <!-- Message shown meanwhile the app is waiting for a the chat status -->
-    <string name="loading_status">Memuat status &#8230;</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">Pesan ini tidak bisa diedit</string>
-    <!-- Label to show the number of transfers in progress, Plural -->
-    <plurals name="text_number_transfers">
-        <item quantity="other">%1$d dari %2$d file</item>
-    </plurals>
-    <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">Proses selesai &#8230;</string>
-    <!-- positive button on dialog to view a contact -->
-    <string name="option_to_transfer_manager">Lihat</string>
-    <!-- Label of the modal bottom sheet to pause all transfers -->
-    <string name="option_to_pause_transfers">Hentikan seluruh transfer</string>
-    <!-- Label of the modal bottom sheet to resume all transfers -->
-    <string name="option_to_resume_transfers">Lanjutkan seluruh transfer</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
     <string name="option_to_clear_transfers">Hapus semua pemindahan</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">Coba lagi semua pemindahan</string>
-    <!-- Dialog to confirm the action of pausing one transfer -->
-    <string name="menu_pause_individual_transfer">Hentikan transfer?</string>
-    <!-- Dialog to confirm the action of restarting one transfer -->
-    <string name="menu_resume_individual_transfer">Lanjutkan transfer?</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Lanjutkan</string>
     <!-- Dialog to confirm before removing completed transfers -->
@@ -1572,10 +1248,6 @@
     <string name="transfer_cancelled">Batal</string>
     <!-- Possible state of a transfer -->
     <string name="transfer_unknown">Tidak diketahui</string>
-    <!-- Title of the panel where the progress of the transfers is shown -->
-    <string name="paused_transfers_title">Transfer yang terhenti</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty">Tidak ada transfer selesai</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Mengunggah file: %1$d dari %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1593,10 +1265,6 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="other">%1$d file tidak terunggah</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
-    <plurals name="copied_service_upload">
-        <item quantity="other">%1$d file disalin</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
@@ -1678,12 +1346,6 @@
     <plurals name="context_link_removal_success">
         <item quantity="other">Tautan berhasil dihapus.</item>
     </plurals>
-    <!-- error message -->
-    <string name="context_link_action_error">Link aksi gagal. Coba kembali lagi nanti.</string>
-    <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">Tulis email pengguna</string>
-    <!-- title of the screen to see the details of several node attachments -->
-    <string name="activity_title_files_attached">File terlampir</string>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Kontak terlampir</string>
     <!--  -->
@@ -1748,28 +1410,16 @@
     <string name="attachment_uploading_state_compressing">Mengecilkan&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">Kesalahan. Tidak dikirim.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d file telah diunduh.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
-    <string name="pending_multiple">%d file pending.</string>
     <!--  -->
     <string name="contact_is_me">Tidak ada pilihan tersedia, anda telah memilih sendiri</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Hapus lampiran?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Melihat file (%1$d dihapus)</string>
-    <!-- Success message when the attachment has been sent to a chat -->
-    <string name="success_attaching_node_from_cloud">File dikirim ke %1$s</string>
-    <!-- Success message when the attachment has been sent to a many chats -->
-    <string name="success_attaching_node_from_cloud_chats">File dikirim ke %1$d obrolan</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">Kesalahan. File belum terkirim</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_attaching_node_from_cloud_chats">Kesalahan. File belum dikirim ke salah satu obrolan yang dipilih</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">Kesalahan. Lampiran belum terhapus</string>
-    <!-- settings option -->
-    <string name="settings_set_up_automatic_uploads">Atur unggahan otomatis</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Diam</string>
     <!-- messages string in chat notification -->
@@ -1788,8 +1438,6 @@
     <string name="title_properties_chat_notifications_contact">Notifikasi obrolan</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A] [B]menghapus riwayat obrolan [/B]</string>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <string name="number_messages_chat_notification">%1$d obrolan yang belum dibaca</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_permissions_changing_folder">Mengubah izin</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -1804,8 +1452,6 @@
     <string name="confirmation_move_to_rubbish_plural">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Hapus dari MEGA?</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state">Mengunggah&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Notifikasi obrolan</string>
     <!-- title of the section for achievements -->
@@ -1830,8 +1476,6 @@
     <string name="title_regitration">Bonus pendaftaran</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Dapatkan Aplikasi Desktop MEGA</string>
-    <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
-    <string name="camera_uploads_empty">Tidak ada file pada Upload Kamera</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d tersisa</string>
     <!-- State to indicate an achievement has expired -->
@@ -1846,14 +1490,8 @@
     <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk membuat akun MEGA Gratis dan menginstal Aplikasi Seluler MEGA. Anda akan menerima penyimpanan gratis sebagai bonus untuk setiap pendaftaran dan pemasangan aplikasi yang berhasil.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonus penyimpanan gratis hanya berlaku untuk undangan baru dan di mana Aplikasi Seluler MEGA atau Aplikasi Desktop MEGA diinstal.</string>
-    <!-- explanation of screen to invite friends and get an achievement -->
-    <string name="card_title_invite_friends">Pilih kontak dari daftar kontak telepon anda atau masukkan beberapa alamat email.</string>
-    <!-- title of the dialog to confirm the contact request -->
-    <string name="title_confirmation_invite_friends">Undang teman ke MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Undangan terkirim</string>
-    <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">Dorong teman-teman anda untuk mendaftar dan menginstal aplikasi MEGA. Selama teman anda menggunakan alamat email yang sama dengan yang anda masukkan, anda akan menerima hadiah  kuota transfer anda.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email salah</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1880,8 +1518,6 @@
     <plurals name="confirmation_leave_share_folder">
         <item quantity="other">Jika anda meninggalkan folder ini, anda tidak akan dapat melihatnya lagi.</item>
     </plurals>
-    <!-- Info of a contact if there is no folders shared with him -->
-    <string name="no_folders_shared">Tidak ada folder dibagikan</string>
     <!-- Menu item -->
     <string name="settings_help">Bantuan</string>
     <!-- Settings preference title for help centre -->
@@ -1898,8 +1534,6 @@
     <string name="settings_feedback_body_android_version">Versi Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">File teks baru</string>
-    <!-- Title of the dialog to create a new file by inserting the name -->
-    <string name="dialog_title_new_file">File baru</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nama File</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1908,32 +1542,12 @@
     <string name="context_new_link_name">URL link</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">SUBYEK</string>
-    <!-- Title of the field content when a new file is created to upload -->
-    <string name="new_file_content_when_uploading">KONTEN</string>
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">EMAIL</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Teruskan</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Lampirkan</string>
-    <!-- when add or share a file with a new contact, it can type by name or mail -->
-    <string name="type_contact">Nama kontak atau email</string>
-    <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">Tidak ada kontak lagi yang dapat ditambahkan saat ini</string>
-    <!-- when changing the password , the old password and new password are equals -->
-    <string name="old_and_new_passwords_equals">Kata sandi baru tidak bisa sama dengan kata sandi lama</string>
-    <!-- Menu item -->
-    <string name="action_search_by_date">Cari berdasarkan tanggal</string>
-    <!-- title of a button to apply search by date -->
-    <string name="general_apply">Terapkan</string>
-    <!-- title of a button to apply search by month -->
-    <string name="general_search_month">Bulan lalu</string>
-    <!-- title of a button to apply search by year -->
-    <string name="general_search_year">Tahun lalu</string>
-    <!-- title of a Search by date tag -->
-    <string name="label_set_day">Setel hari</string>
-    <!-- the user can’t choose this date -->
-    <string name="snackbar_search_by_date">Tanggal yang dibutuhkan tidak valid</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">Salah nama</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
@@ -1946,8 +1560,6 @@
     <plurals name="empty_names">
         <item quantity="other">Nama file tidak boleh kosong.</item>
     </plurals>
-    <!-- Label shown when audio file is playing -->
-    <string name="audio_play">File Audio</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Kesalahan. File pdf rusak atau tidak ada.</string>
     <!-- Label to include info of the user email in the feedback form -->
@@ -1956,10 +1568,6 @@
     <string name="save_to_mega">Simpan ke Drive Cloud \n saya</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">Obrolan sudah ada</string>
-    <!-- before sharing a file, has to be downloaded -->
-    <string name="not_download">File belum diunduh</string>
-    <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">Hanya kontak MEGA yang dapat ditambahkan</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Menghubungkan kembali ke obrolan</string>
     <!-- Message show when a call cannot be established -->
@@ -1970,14 +1578,10 @@
     <string name="rate_the_app_panel">Ya, beri nilai aplikasi</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">Tidak, kirim umpan balik</string>
-    <!-- title of the section advanced options on the get link screen -->
-    <string name="link_advanced_options">Opsi lanjutan</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">MEGA memerlukan izin baca dan tulis ke penyimpanan eksternal anda untuk mengunduh file di sana.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Kartu SD lama tidak tersedia, harap tetapkan lokasi pengunduhan baru.</string>
-    <!-- Dialog title to ask download to internal storage or external storage. -->
-    <string name="title_select_download_location">Pilih lokasi pengunduhan</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Tidak ada izin kontak yang diberikan</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1996,12 +1600,8 @@
     <string name="section_my_code">Kode saya</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">Pindai kode</string>
-    <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Terima otomatis</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Kontak yang memindai Kode QR anda akan secara otomatis ditambahkan ke daftar kontak anda.</string>
-    <!-- Subtitle of QR code settings that reset the code -->
-    <string name="setting_subtitle_qrcode_reset">Kode QR sebelumnya tidak lagi valid</string>
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Link disalin ke papan klip</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
@@ -2052,12 +1652,6 @@
     <string name="external_play">Buka dengan</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Bagikan menggunakan</string>
-    <!-- Message shown if the user choose enable button and he is not logged in -->
-    <string name="error_enable_chat_before_login">Silakan, masuk sebelum mengaktifkan obrolan</string>
-    <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
-    <string name="label_set_period">Setel periode</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Undang teman ke [/B][A]Obrolan[/A][B] dan nikmati platform terenkripsi kami dengan privasi dan keamanan[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Kosongkan [/B][A]Sampah[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2164,8 +1758,6 @@
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">Kembalikan</string>
-    <!-- option menu to clear all the previous versions -->
-    <string name="menu_item_clear_versions">Hapus versi sebelumnya</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="other">Hapus versi?</item>
@@ -2203,8 +1795,6 @@
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <string name="messages_forwarded_success">Pesan diteruskan</string>
-    <!-- Error message after forwarding one or several messages to several chats -->
-    <string name="messages_forwarded_error">Kesalahan. Tidak diteruskan dengan benar</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">Kesalahan. %1$d pesan tidak berhasil diteruskan</item>
@@ -2245,34 +1835,24 @@
     <string name="general_do_not_show">Jangan tampilkan lagi</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
     <string name="remember_pwd_dialog_button_test">Test password</string>
-    <!-- Title of the activity that permits user test his password -->
-    <string name="test_pwd_title">Test password anda</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password diterima</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
     <string name="test_pwd_wrong">Kata sandi salah.\nCadangkan Kunci Pemulihan anda sesegera mungkin!</string>
-    <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="recovery_key_exported_dialog_text_logout">Anda akan keluar, silakan uji kata sandi anda untuk memastikan anda mengingatnya. \nJika anda kehilangan kata sandi, anda akan kehilangan akses ke data MEGA anda.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Salin ke clipboard</string>
-    <!-- Option that permits user export his recovery key -->
-    <string name="option_export_recovery_key">Export Kunci Pemulihan</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Lanjutkan untuk keluar</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Kunci Pemulihan</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Simpan pada Sistem File</string>
-    <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">Tersalin ke papan klip</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">Lompat ke terbaru</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
     <string name="message_new_messages">Pesan baru</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Panggilan masuk</string>
-    <!-- Text for the notification action to launch the incoming call page -->
-    <string name="notification_incoming_action">Pergi ke telepon</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
     <string name="notification_enable_display">Pop-up latar belakang MEGA dinonaktifkan. \nKetuk untuk mengubah pengaturan.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
@@ -2285,10 +1865,6 @@
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Memuat[/A] [B]Pesan&#8230;[/B]</string>
-    <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">File atau folder tidak ditemukan. Apakah anda masuk dengan akun lain di peramban anda? Anda hanya dapat mengakses file atau folder dari akun yang saat ini anda gunakan untuk masuk ke dalam aplikasi</string>
-    <!-- menu option to loop video or audio file -->
-    <string name="context_loop_video">Loop</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Keamanan</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2305,16 +1881,8 @@
     <string name="login_API_rate">Terlalu banyak permintaan. Mohon tunggu.</string>
     <!-- Message when previous login is being cancelled -->
     <string name="login_in_progress">Membatalkan proses masuk. Tunggu sebentar&#8230;</string>
-    <!-- when open audio video player, the file that it try to open is not supported -->
-    <string name="unsupported_file_type">Tipe file tidak didukung.</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Kesalahan. File rusak atau tidak ada.</string>
-    <!-- Title of the screen Playlist -->
-    <string name="section_playlist">Playlist</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing -->
-    <string name="playlist_state_playing">Sedang memainkan&#8230;</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
-    <string name="playlist_state_paused">Berhenti sementara</string>
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Cetak</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
@@ -2333,8 +1901,6 @@
     <string name="title_enable_rich_links">Aktifkan pratinjau URL kaya</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Tingkatkan pengalaman MEGAchat. Isi URL akan diambil tanpa enkripsi menyeluruh.</string>
-    <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">Ketuk untuk memasukkan Kunci Dekripsi</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Harap masukkan kata sandi yang lebih kuat</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2345,8 +1911,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Permintaan kontak baru</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">Tulis pesan ke “%s”&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]Tidak ada yang aktif[/B][A] Transfer[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2377,8 +1941,6 @@
     <string name="general_verify">Verifikasi</string>
     <!-- Text button -->
     <string name="general_next">Berikutnya</string>
-    <!-- Text button -->
-    <string name="general_previous">Sebelumnya</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Terjadi kesalahan saat membuat benih atau kode QR, coba lagi.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2401,8 +1963,6 @@
     <string name="verify_2fa_subtitle_delete_account">Hapus akun</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Nonaktifkan</string>
-    <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">Kehilangan perangkat Authenticator anda?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">Terjadi kesalahan saat mencoba menonaktifkan otentikasi dua faktor. Silakan coba lagi.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2459,8 +2019,6 @@
     <string name="call_failed_messages">[A]Panggilan gagal[/A]</string>
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Panggilan tidak dijawab[/A]</string>
-    <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Kontak email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Anda telah menambahkan kontak ini.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2477,8 +2035,6 @@
     <string name="context_no_restored">Terjadi kesalahan. Barang tidak dipulihkan.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Kirim Pesan</string>
-    <!-- Error message on opening a MEGAdrop folder link -->
-    <string name="error_MEGAdrop_not_supported">Folder MEGAdrop belum didukung</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Tindakan ini tidak dapat diselesaikan karena akan membawa anda melebihi batas penyimpanan anda saat ini. Apakah anda ingin meningkatkan akun anda?</string>
     <!-- Title of the section Archived chats -->
@@ -2501,8 +2057,6 @@
     <string name="success_unarchive_chat">Obrolan %s tidak diarsipkan.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">Kesalahan. Obrolan %s tidak dapat dibatalkan pengarsipannya.</string>
-    <!-- Message shown when the user has no archived chats -->
-    <string name="archived_chats_empty">[A]Tidak ada[/A] [B]Obrolan yang Diarsipkan[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Obrolan tidak aktif</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2545,8 +2099,6 @@
     <string name="settings_enable_file_versioning_title">Versi file</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Aktifkan atau nonaktifkan versi file untuk seluruh akun anda.\nAnda masih dapat menerima versi file dari folder bersama jika kontak anda telah mengaktifkan ini.</string>
-    <!-- section title to select a chat to send a file -->
-    <string name="choose_chat">Pilih obrolan</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">Ketuk, masukkan nama atau email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2619,26 +2171,18 @@
     <string name="title_share_folder_explorer">Pilih folder</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">Semua pemindahan akan dibatalkan, apakah anda ingin masuk?</string>
-    <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="logout_warning_abort_transfers">Semua pemindahan akan dibatalkan, apakah anda ingin keluar?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">Hanya-baca</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]dari %2$s digunakan[/B]</string>
-    <!-- title of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_title">Ubah ke server uji?</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">Anda yakin ingin mengubah ke server pengujian? Akun anda mungkin mengalami  masalah yang tidak dapat dipulihkan.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Buka kamera?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">Jika anda membuka kamera, transmisi video anda akan dijeda dalam panggilan saat ini.</string>
-    <!-- Title of the notification when there is unknown activity on the Chat -->
-    <string name="notification_chat_undefined_title">Aktivitas obrolan</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Anda mungkin memiliki pesan baru</string>
-    <!-- When app is retrieving push message -->
-    <string name="retrieving_message_title">Mengambil pesan</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">Scheduler Pembersih Sampah</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
@@ -2663,8 +2207,6 @@
     <string name="hint_days">hari</string>
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Dapatkan tautan obrolan</string>
-    <!-- Title of the option to manage a public chat link -->
-    <string name="manage_chat_link_option">Atur tautan obrolan</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">Aktifkan Rotasi Kunci Enkripsi</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -2697,8 +2239,6 @@
     <string name="error_chat_link">Kesalahan memuat tautan obrolan.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Kesalahan saat memulai obrolan saat memuat tautan obrolan.</string>
-    <!-- Message on the alert to preview a chat link if the user is already a participant -->
-    <string name="alert_already_participant_chat_link">Anda sudah berpartisipasi dalam obrolan ini.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">Pratinjau obrolan ini tidak lagi tersedia. Jika anda meninggalkan pratinjau, anda tidak akan dapat membukanya kembali.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2715,8 +2255,6 @@
     <string name="invite_not_sent_already_sent">Undangan untuk menghubungi %s telah dikirim sebelumnya dan dapat dikonsultasikan di tab Permintaan Terkirim.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">Menyimpan %s di Drive Cloud&#8230;</string>
-    <!-- General label for folders -->
-    <string name="general_folders">Folder</string>
     <!-- General label for files -->
     <string name="general_files">File</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2805,10 +2343,6 @@
     <string name="payment_method">Cara pembayaran</string>
     <!-- title of billing period -->
     <string name="billing_period_title">Periode pembayaran</string>
-    <!-- Option of one-off (month) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_month">[A]Satu kali (bulan)[/A] %s</string>
-    <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_year">[A]Satu kali (tahun)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
     <string name="billed_monthly_text">[A]Ditagih setiap bulan[/A] %s/bulan</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
@@ -2943,8 +2477,6 @@
     <plurals name="plural_call_ended_messages_seconds">
         <item quantity="other">[B]%1$d detik[/B]</item>
     </plurals>
-    <!-- Message to indicate a call has ended without indicate the call duration. -->
-    <string name="call_ended_no_duration_message">[A]Panggilan berakhir[/A]</string>
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
     <string name="group_call_ended_no_duration_message">[A]Panggilan grup berakhir[/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
@@ -2961,24 +2493,12 @@
     <string name="label_tomorrow">Besok</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]Tidak ada [/B][A]File Bersama[/A]</string>
-    <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s bergabung dalam panggilan</string>
-    <!-- Text to indicate that a contact has left a group call -->
-    <string name="contact_left_the_call">%1$s meninggalkan panggilan</string>
-    <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Panggilan tidak dapat dimulai karena jumlah maksimum peserta telah terlampaui.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Panggilan tidak dapat disambungkan karena jumlah peserta telah terlampaui.</string>
-    <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Tidak dapat bergabung dengan panggilan grup karena jumlah maksimum peserta tercapai</string>
-    <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Video call tidak dapat diikuti karena jumlah peserta telah terlampaui.</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">Panggilan tidak dapat ditunda.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">Terjadi kesalahan dan file tidak dapat dibuka dengan aplikasi ini.</string>
-    <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">Panggilan masuk&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Memanggil&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -2995,8 +2515,6 @@
     <string name="explanation_send_location">Lokasi ini akan dibuka menggunakan penyedia peta pihak ketiga di luar platform MEGA terenkripsi menyeluruh.</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">Kirim Lokasi Ini</string>
-    <!-- Label shown when after a maps search and no places were found -->
-    <string name="no_places_found">Tidak ada tempat yang ditemukan</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">GPS dinonaktifkan</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -3045,8 +2563,6 @@
     <string name="preparing_chats">Mempersiapkan file</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Dikirim sebagai pesan.</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_sent_as_message">Kesalahan. File belum dikirim ke salah satu obrolan yang dipilih</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">Hapus versi sebelumnya</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
@@ -3089,12 +2605,8 @@
     <string name="title_pdf_password">Masukkan password anda</string>
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s adalah dokumen PDF yang dilindungi kata sandi. Silakan masukkan kata sandi untuk membuka PDF.</string>
-    <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
-    <string name="error_pdf_password">Anda telah memasukkan kata sandi yang salah, silakan coba lagi.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">Kata sandi yang anda masukkan tidak valid.</string>
-    <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
-    <string name="unknownn_file">Tidak mungkin untuk membuka file. Ini adalah tipe file yang tidak dikenal atau belum berhasil unzip file tersebut.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Memutar file media tidak dapat dilakukan saat ada panggilan yang sedang berlangsung.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -3103,8 +2615,6 @@
     <string name="join_call_layout_in_group_call">Ketuk untuk bergabung dengan panggilan grup saat ini.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Ketuk untuk kembali ke panggilan</string>
-    <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
-    <string name="not_allowed_to_start_call">Anda sedang menelepon</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] bergabung dengan obrolan grup.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -3115,8 +2625,6 @@
     <string name="context_create_chat_link_question_text">Apakah anda ingin membuat obrolan grup baru dan mendapatkan Tautan Obrolan?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">Rotasi kunci enkripsi sedikit lebih aman, tetapi tidak memungkinkan anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
-    <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">Anda berhasil bergabung dengan obrolan.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d dari %2$d</string>
     <!-- Hint of the Search view -->
@@ -3131,8 +2639,6 @@
     <string name="muted_own_micro">Diam</string>
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">Panggilan ditahan</string>
-    <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
-    <string name="session_on_hold">%s ditahan</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">Tahan dan Jawab</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
@@ -3167,22 +2673,10 @@
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">Tautan obrolan berhasil dihapus.</string>
-    <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
-    <string name="contact_request_status_accepted">%1$s (DITERIMA)</string>
-    <!-- The status of pending contact request (DELETED), placeholder is contact request creation time -->
-    <string name="contact_request_status_deleted">%1$s (DIHAPUS)</string>
-    <!-- The status of pending contact request (DENIED), placeholder is contact request creation time -->
-    <string name="contact_request_status_denied">%1$s (DITOLAK)</string>
-    <!-- The status of pending contact request (IGNORED), placeholder is contact request creation time -->
-    <string name="contact_request_status_ignored">%1$s (DIABAIKAN)</string>
-    <!-- The status of pending contact request (REMINDED), placeholder is contact request creation time -->
-    <string name="contact_request_status_reminded">%1$s (DIINGATKAN)</string>
-    <!-- The status of pending contact request (PENDING), placeholder is contact request creation time -->
-    <string name="contact_request_status_pending">%1$s (TERTUNDA)</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versi berhasil dipulihkan.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Ketuk dan tahan untuk merekam, lepaskan untuk mengirim.</string>
+    <string name="recording_less_than_second">Ketuk dan tahan untuk merekam</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Geser untuk membatalkan</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3235,22 +2729,16 @@
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Tambahkan nomor telepon anda ke MEGA. Ini memudahkan kontak anda untuk menemukan anda di MEGA.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
     <string name="not_allowed_recording_voice_clip">Tidak mungkin merekam pesan suara saat ada panggilan yang sedang berlangsung.</string>
-    <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
-    <string name="error_upload_voice_clip">Terjadi kesalahan saat mencoba mengunggah pesan suara.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Panggilan masuk</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
     <string name="title_notification_incoming_group_call">Panggilan grup masuk</string>
-    <!-- Title of the notification shown on the action bar when there is an individual incoming video call -->
-    <string name="title_notification_incoming_individual_video_call">Panggilan video masuk</string>
     <!-- Title of the notification shown on the action bar when there is an individual incoming audio call -->
     <string name="title_notification_incoming_individual_audio_call">Panggilan audio masuk</string>
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">Memuat</string>
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">Mohon tunggu&#8230;</string>
-    <!-- Head label to show the business account type -->
-    <string name="account_label">Jenis akun</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Bisnis</string>
     <!-- Business user role -->
@@ -3259,20 +2747,14 @@
     <string name="user_label">Pengguna</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">Status</string>
-    <!-- State to indicate something is active (business status account for instance) -->
-    <string name="active_label">Aktif</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Pembayaran diperlukan</string>
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">Pembayaran lewat jatuh tempo</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Manajemen pengguna hanya tersedia dari browser web desktop.</string>
-    <!-- Title of the usage tab in My Account Section -->
-    <string name="tab_my_account_usage">Pemakaian</string>
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Kerusakan penggunaan penyimpanan</string>
-    <!-- Title of overall usage section in Storage -->
-    <string name="overall_usage_label">Penggunaan keseluruhan</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Pemindahan</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -3335,18 +2817,12 @@
     <string name="snackbar_nickname_added">Nama panggilan ditambahkan</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">Nama panggilan dihapus</string>
-    <!-- Label showing that a nickname has not been added -->
-    <string name="error_snackbar_nickname_added">Terjadi kesalahan saat mencoba menambahkan nama panggilan</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">Nama panggilan</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Nomor telepon</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">Menghubungkan kembali</string>
-    <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
-    <string name="connected_message">Anda kembali.</string>
-    <!-- Text shown in a call when the own internet connection is of low quality -->
-    <string name="poor_internet_connection_message">Sambungan Internet buruk</string>
     <!-- Text is displayed while a voice clip is being recorded -->
     <string name="recording_layout">Rekaman&#8230;</string>
     <!-- Text shown for the action create new file -->
@@ -3377,8 +2853,6 @@
     <string name="inactive_chat_title">Obrolan dibuat pada %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Pilih pesan</string>
-    <!-- Storage root label -->
-    <string name="storage_root_label">Root penyimpanan</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">Gagal</string>
     <!-- Text warning of transfer over quota -->
@@ -3439,8 +2913,6 @@
     <string name="joining_label">Bergabung&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Keluar&#8230;</string>
-    <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
-    <string name="remove_phone_number">Hapus nomor telepon anda?</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Nomor telepon anda telah berhasil dihapus.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3449,8 +2921,6 @@
     <string name="search_hint">Cari di MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Akun yang anda coba untuk reset telah diblokir.</string>
-    <!-- Error message when trying to login and the account is blocked -->
-    <string name="error_account_blocked">Akun anda telah diblok. Harap kontak support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Akun anda telah dinonaktifkan oleh administrator anda. Anda dapat menghubungi administrator akun bisnis anda untuk rincian lebih lanjut.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -3645,8 +3115,6 @@
     <string name="audio_player_now_playing_paused">Sedang diputar (dihentikan sebentar)</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">Lacak info</string>
-    <!-- Action to get more information -->
-    <string name="action_more_information">Informasi Lebih Lanjut</string>
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Kebijakan Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
@@ -3683,16 +3151,12 @@
     <string name="theme_system_default">Default sistem</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Diatur oleh Penghemat Baterai</string>
-    <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">Pilih root kartu SD.</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Pilih tujuan</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Buang perubahan dan tutup editor?</string>
     <!-- Action discard -->
     <string name="discard_close_action">Buang dan tutup</string>
-    <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">Menyimpan file&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">File dibuat</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3742,7 +3206,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B], %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">Unggah sedang berlangsung, %1$dfile tertunda</item>
@@ -3803,8 +3267,8 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Tetap ganti</string>
-    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
-    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
+    <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4157,10 +3621,6 @@
     <string name="action_do_not_cancel">Jangan batalkan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Hapus moderator</string>
-    <!-- Title of DCIM folder warning dialog -->
-    <string name="title_dcim_folder_dialog">folder DCIM</string>
-    <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">MEGA mengunggah gambar anda dari galeri. Untuk mengubah lokasi unggahan, silakan buka pengaturan Unggah Kamera.</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Beli langganan baru?</string>
     <!-- Text of buy new subscription button -->
@@ -4177,8 +3637,6 @@
     <string name="upgrade_billing_warning">Kami tidak dapat melanjutkan penagihan. Jika anda menggunakan aplikasi ganda, harap pertimbangkan untuk masuk ke MEGA tanpa itu. Jika tidak, coba perbarui melalui browser web anda.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Langganan %1s</string>
-    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">Langganan aktif</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Anda memiliki langganan MEGA aktif dengan %1$s. Anda harus membatalkannya secara terpisah di %2$s, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
@@ -4265,4 +3723,162 @@
     <string name="account_info_renews_on">[A]Memperbarui pada[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_expires_on">[A]Kadaluarsa pada[/A] [B]%s[/B]</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">Favorit</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">Masukkan password anda</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">Transfer telah dijeda. Lanjutkan untuk melanjutkan pengunduhan.</string>
+    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
+    <string name="warning_scanning_transfers">Tolong jangan tutup aplikasinya.</string>
+    <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
+    <string name="scanning_transfers">Memindai&#8230;</string>
+    <!-- Label cancel transfers. -->
+    <string name="cancel_transfers">Batalkan pemindahan</string>
+    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
+    <string name="warning_cancel_transfers">Transfer yang belum diproses akan dibatalkan.</string>
+    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
+    <string name="button_proceed">Melanjutkan</string>
+    <!-- Warning informing transfers were cancelled. -->
+    <string name="transfers_cancelled">Transfer telah dibatalkan.</string>
+    <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
+    <string name="title_duplicated_items">Item duplikat</string>
+    <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
+    <string name="file_already_exists_in_location">Sebuah file bernama [B]%1$s[/B] sudah ada di lokasi ini.</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
+    <string name="choose_file">Pilih file yang ingin anda simpan</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose. -->
+    <string name="choose_folder">Pilih apakah anda ingin menggabungkan folder</string>
+    <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_upload_and_replace">Versi file saat ini akan diganti dengan file yang anda unggah.</string>
+    <!-- Upload and replace action button for a name collision. -->
+    <string name="upload_and_replace">Unggah dan ganti</string>
+    <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
+    <string name="warning_versioning_upload_and_update">File akan diperbarui dengan riwayat versi:</string>
+    <!-- Upload and update action button for a name collision. -->
+    <string name="upload_and_update">Unggah dan perbarui</string>
+    <!-- Don’t upload action button for a name collision. -->
+    <string name="do_not_upload">Jangan upload</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
+    <string name="warning_upload_and_rename">File yang Anda upload akan diganti namanya menjadi:</string>
+    <!-- Upload and rename action button for a name collision. -->
+    <string name="upload_and_rename">Unggah dan ganti nama</string>
+    <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_move_and_replace">Ganti file di folder tujuan dengan file yang anda pindahkan.</string>
+    <!-- Move and replace action button for a name collision. -->
+    <string name="move_and_replace">Pindahkan dan ganti</string>
+    <!-- Don’t move action button for a name collision. -->
+    <string name="do_not_move">Jangan pindahkan</string>
+    <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
+    <string name="warning_move_and_rename">File yang anda pindahkan akan diganti namanya menjadi:</string>
+    <!-- Move and rename action button for a name collision. -->
+    <string name="move_and_rename">Pindahkan dan ganti nama</string>
+    <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_copy_and_replace">Ganti file di folder tujuan dengan file yang anda salin.</string>
+    <!-- Copy and replace action button for a name collision. -->
+    <string name="copy_and_replace">Copy dan ganti</string>
+    <!-- Don’t copy action button for a name collision. -->
+    <string name="do_not_copy">Jangan salin</string>
+    <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
+    <string name="warning_copy_and_rename">File yang anda salin akan diganti namanya menjadi:</string>
+    <!-- Copy and rename action button for a name collision. -->
+    <string name="copy_and_rename">Salin dan ganti nama</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <string name="file_apply_for_all">Terapkan opsi ini di konflik %1$d berikutnya</string>
+    <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
+    <string name="warning_copy_and_merge">Gabungkan folder di tujuan dengan folder yang anda salin.</string>
+    <!-- Copy and merge action button for a name collision. -->
+    <string name="copy_and_merge">Salin dan gabungkan</string>
+    <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
+    <string name="warning_move_and_merge">Gabungkan folder di tempat tujuan dengan folder yang anda pindahkan.</string>
+    <!-- Move and merge action button for a name collision. -->
+    <string name="move_and_merge">Pindah dan gabungkan</string>
+    <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
+    <string name="warning_upload_and_merge">Gabungkan folder di tujuan dengan folder yang anda unggah.</string>
+    <!-- Upload and merge action button for a name collision. -->
+    <string name="upload_and_merge">Unggah dan gabungkan</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
+    <string name="skip_file">Tidak ada file yang akan diubah. Anda akan menyimpan file di bawah ini:</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
+    <string name="skip_folder">Lewati folder ini</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">Folder bernama [B]%1$s[/B] sudah ada di lokasi ini.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">Bad connection</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Panggilan akan berakhir di %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">You’re the only one here</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Anda masih dalam panggilan</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Call will automatically end in 2 mins unless you want to stay on it.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">Akhiri panggilan sekarang</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Tetap di panggilan</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Laporkan masalah</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Umpan balik anda membantu kami meningkatkan MEGA. Jelaskan dengan jelas masalah yang anda alami. Semakin banyak detail yang anda berikan, semakin mudah bagi kami untuk menyelesaikannya.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Jelaskan masalahnya</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Kirim log file</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Serahkan</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Ada yang salah. Silakan coba lagi nanti. Jika anda masih tidak dapat mengirimkan masalah, hubungi %s untuk bantuan.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">Kami telah menerima laporan anda. Kami akan menyelidiki masalah ini dan menghubungi anda kembali.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Mengunggah file log</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Hapus laporan?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Buang</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Ubah pesan</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Galeri</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Suara</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Pindai</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Klip suara</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Undang teman ke [/B][A]Obrolan[/A][B] dan nikmati platform terenkripsi kami dengan privasi dan keamanan[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filter</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">Dari Cloud Drive</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Unggahan kamera</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Hanya video</string>
 </resources>

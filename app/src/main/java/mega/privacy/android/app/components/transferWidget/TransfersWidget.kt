@@ -60,7 +60,7 @@ class TransfersWidget(
     fun update(transferType: Int = NO_TYPE) {
         if (context is ManagerActivity) {
             if (context.drawerItem === DrawerItem.TRANSFERS) {
-                transfersManagement.areFailedTransfers = false
+                transfersManagement.setAreFailedTransfers(false)
             }
 
             if (!isOnFileManagementManagerSection) {
@@ -75,7 +75,7 @@ class TransfersWidget(
                 updateState()
             }
             (pendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
-                    || transfersManagement.areFailedTransfers -> {
+                    || transfersManagement.getAreFailedTransfers() -> {
                 setFailedTransfers()
             }
             else -> {
@@ -118,7 +118,7 @@ class TransfersWidget(
      */
     private fun setProgressTransfers() {
         when {
-            transfersManagement.areFailedTransfers -> {
+            transfersManagement.getAreFailedTransfers() -> {
                 updateStatus(getDrawable(R.drawable.ic_transfers_error))
             }
             isOverQuota -> {
