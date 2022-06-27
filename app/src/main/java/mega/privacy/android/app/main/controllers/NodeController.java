@@ -15,9 +15,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTA
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
@@ -56,6 +53,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
+import timber.log.Timber;
 
 public class NodeController {
 
@@ -65,40 +63,39 @@ public class NodeController {
 
     boolean isFolderLink = false;
 
-    public NodeController(Context context){
-        logDebug("NodeController created");
+    public NodeController(Context context) {
+        Timber.d("NodeController created");
         this.context = context;
-        if (megaApi == null){
+        if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
-        if (dbH == null){
+        if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
-    public NodeController(Context context, boolean isFolderLink){
-        logDebug("NodeController created");
+    public NodeController(Context context, boolean isFolderLink) {
+        Timber.d("NodeController created");
         this.context = context;
         this.isFolderLink = isFolderLink;
-        if (megaApi == null){
+        if (megaApi == null) {
             if (isFolderLink) {
                 megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
-            }
-            else {
+            } else {
                 megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
             }
         }
-        if (dbH == null){
+        if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
-    public void chooseLocationToCopyNodes(ArrayList<Long> handleList){
-        logDebug("chooseLocationToCopyNodes");
+    public void chooseLocationToCopyNodes(ArrayList<Long> handleList) {
+        Timber.d("chooseLocationToCopyNodes");
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
-        for (int i=0; i<handleList.size(); i++){
+        for (int i = 0; i < handleList.size(); i++) {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
@@ -106,40 +103,38 @@ public class NodeController {
     }
 
     public void copyNodes(long[] copyHandles, long toHandle) {
-        logDebug("copyNodes");
+        Timber.d("copyNodes");
 
-        if(!isOnline(context)){
+        if (!isOnline(context)) {
             ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
         MegaNode parent = megaApi.getNodeByHandle(toHandle);
-        if(parent!=null) {
+        if (parent != null) {
             MultipleRequestListener copyMultipleListener = null;
             if (copyHandles.length > 1) {
-                logDebug("Copy multiple files");
+                Timber.d("Copy multiple files");
                 copyMultipleListener = new MultipleRequestListener(MULTIPLE_COPY, context);
                 for (int i = 0; i < copyHandles.length; i++) {
                     MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                    if (cN != null){
-                        logDebug("cN != null, i = " + i + " of " + copyHandles.length);
+                    if (cN != null) {
+                        Timber.d("cN != null, i = %d of %d", i, copyHandles.length);
                         megaApi.copyNode(cN, parent, copyMultipleListener);
-                    }
-                    else{
-                        logWarning("cN == null, i = " + i + " of " + copyHandles.length);
+                    } else {
+                        Timber.w("cN == null, i = %d of %d", i, copyHandles.length);
                     }
                 }
             } else {
-                logDebug("Copy one file");
+                Timber.d("Copy one file");
                 MegaNode cN = megaApi.getNodeByHandle(copyHandles[0]);
-                if (cN != null){
-                    logDebug("cN != null");
+                if (cN != null) {
+                    Timber.d("cN != null");
                     megaApi.copyNode(cN, parent, (ManagerActivity) context);
-                }
-                else{
-                    logWarning("cN == null");
-                    if(context instanceof ManagerActivity){
-                        ((ManagerActivity)context).copyError();
+                } else {
+                    Timber.w("cN == null");
+                    if (context instanceof ManagerActivity) {
+                        ((ManagerActivity) context).copyError();
                     }
                 }
             }
@@ -147,12 +142,12 @@ public class NodeController {
 
     }
 
-    public void chooseLocationToMoveNodes(ArrayList<Long> handleList){
-        logDebug("chooseLocationToMoveNodes");
+    public void chooseLocationToMoveNodes(ArrayList<Long> handleList) {
+        Timber.d("chooseLocationToMoveNodes");
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
         long[] longArray = new long[handleList.size()];
-        for (int i=0; i<handleList.size(); i++){
+        for (int i = 0; i < handleList.size(); i++) {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
@@ -162,7 +157,7 @@ public class NodeController {
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
         MegaNode currentNode;
 
-        for (int i=0; i<nodes.size(); i++) {
+        for (int i = 0; i < nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode == null) continue;
 
@@ -170,8 +165,7 @@ public class NodeController {
 
             if (nodeOwner != null) {
                 ownerNodes.add(nodeOwner);
-            }
-            else {
+            } else {
                 notOwnerNodes.add(currentNode);
             }
         }
@@ -218,7 +212,7 @@ public class NodeController {
         int dBT = 0;
         MegaNode parent = node;
 
-        while (megaApi.getParentNode(parent) != null){
+        while (megaApi.getParentNode(parent) != null) {
             dBT++;
             parent = megaApi.getParentNode(parent);
         }
@@ -229,17 +223,16 @@ public class NodeController {
     public int importLink(String url) {
         try {
             url = URLDecoder.decode(url, "UTF-8");
-        }
-        catch (Exception e) {
-            logError("Error decoding URL: " + url, e);
+        } catch (Exception e) {
+            Timber.e(e, "Error decoding URL: %s", url);
         }
 
         url.replace(' ', '+');
-        if(url.startsWith("mega://")){
+        if (url.startsWith("mega://")) {
             url = url.replace("mega://", "https://mega.co.nz/");
         }
 
-        logDebug("url " + url);
+        Timber.d("url %s", url);
 
         // Download link
         if (AndroidMegaRichLinkMessage.isFileLink(url)) {
@@ -262,22 +255,22 @@ public class NodeController {
             return CONTACT_LINK;
         }
 
-        logWarning("wrong url");
+        Timber.w("wrong url");
         return ERROR_LINK;
     }
 
     //old getPublicLinkAndShareIt
-    public void exportLink(MegaNode document){
-        logDebug("exportLink");
+    public void exportLink(MegaNode document) {
+        Timber.d("exportLink");
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if(context instanceof MegaRequestListenerInterface) {
+        } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
     }
 
-    public void exportLinkTimestamp(MegaNode document, int timestamp){
-        logDebug("exportLinkTimestamp: " + timestamp);
+    public void exportLinkTimestamp(MegaNode document, int timestamp) {
+        Timber.d("exportLinkTimestamp: %s", timestamp);
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
         } else if (context instanceof MegaRequestListenerInterface) {
@@ -285,12 +278,12 @@ public class NodeController {
         }
     }
 
-    public void removeLink(MegaNode document, ExportListener exportListener){
+    public void removeLink(MegaNode document, ExportListener exportListener) {
         megaApi.disableExport(document, exportListener);
     }
 
-    public void removeLinks(ArrayList<MegaNode> nodes){
-        if (!isOnline(context)){
+    public void removeLinks(ArrayList<MegaNode> nodes) {
+        if (!isOnline(context)) {
             ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -303,11 +296,11 @@ public class NodeController {
     }
 
 
-    public void selectContactToShareFolders(ArrayList<Long> handleList){
-        logDebug("shareFolders ArrayListLong");
+    public void selectContactToShareFolders(ArrayList<Long> handleList) {
+        Timber.d("shareFolders ArrayListLong");
         //TODO shareMultipleFolders
 
-        if (!isOnline(context)){
+        if (!isOnline(context)) {
             ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -316,10 +309,10 @@ public class NodeController {
         intent.setClass(context, AddContactActivity.class);
         intent.putExtra("contactType", CONTACT_TYPE_BOTH);
 
-        long[] handles=new long[handleList.size()];
-        int j=0;
-        for(int i=0; i<handleList.size();i++){
-            handles[j]=handleList.get(i);
+        long[] handles = new long[handleList.size()];
+        int j = 0;
+        for (int i = 0; i < handleList.size(); i++) {
+            handles[j] = handleList.get(i);
             j++;
         }
         intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handles);
@@ -328,8 +321,8 @@ public class NodeController {
         ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
-    public void selectContactToShareFolder(MegaNode node){
-        logDebug("shareFolder");
+    public void selectContactToShareFolder(MegaNode node) {
+        Timber.d("shareFolder");
 
         Intent intent = new Intent();
         intent.setClass(context, AddContactActivity.class);
@@ -340,71 +333,68 @@ public class NodeController {
         ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
-    public void openFolderFromSearch(long folderHandle){
-        logDebug("openFolderFromSearch: " + folderHandle);
-        ((ManagerActivity)context).openFolderRefresh = true;
-        boolean firstNavigationLevel=true;
+    public void openFolderFromSearch(long folderHandle) {
+        Timber.d("openFolderFromSearch: %s", folderHandle);
+        ((ManagerActivity) context).openFolderRefresh = true;
+        boolean firstNavigationLevel = true;
         int access = -1;
         DrawerItem drawerItem = DrawerItem.CLOUD_DRIVE;
         if (folderHandle != -1) {
             MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
             if (parentIntentN != null) {
-                logDebug("Check the parent node: " + parentIntentN.getName() + " handle: " + parentIntentN.getHandle());
+                Timber.d("Check the parent node: %s handle: %d", parentIntentN.getName(), parentIntentN.getHandle());
                 access = megaApi.getAccess(parentIntentN);
                 switch (access) {
                     case MegaShare.ACCESS_OWNER:
                     case MegaShare.ACCESS_UNKNOWN: {
                         //Not incoming folder, check if Cloud or Rubbish tab
-                        if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
+                        if (parentIntentN.getHandle() == megaApi.getRootNode().getHandle()) {
                             drawerItem = DrawerItem.CLOUD_DRIVE;
-                            logDebug("Navigate to TAB CLOUD first level" + parentIntentN.getName());
-                            firstNavigationLevel=true;
+                            Timber.d("Navigate to TAB CLOUD first level%s", parentIntentN.getName());
+                            firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
-                        }
-                        else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
+                        } else if (parentIntentN.getHandle() == megaApi.getRubbishNode().getHandle()) {
                             drawerItem = DrawerItem.RUBBISH_BIN;
-                            logDebug("Navigate to TAB RUBBISH first level" + parentIntentN.getName());
-                            firstNavigationLevel=true;
+                            Timber.d("Navigate to TAB RUBBISH first level%s", parentIntentN.getName());
+                            firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                        }
-                        else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
-                            logDebug("Navigate to INBOX first level" + parentIntentN.getName());
-                            firstNavigationLevel=true;
+                        } else if (parentIntentN.getHandle() == megaApi.getInboxNode().getHandle()) {
+                            Timber.d("Navigate to INBOX first level%s", parentIntentN.getName());
+                            firstNavigationLevel = true;
                             ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
                             drawerItem = DrawerItem.INBOX;
-                        }
-                        else{
+                        } else {
                             int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
-                            logDebug("The parent result is: " + parent);
+                            Timber.d("The parent result is: %s", parent);
 
-                            switch (parent){
-                                case 0:{
+                            switch (parent) {
+                                case 0: {
                                     //ROOT NODE
                                     drawerItem = DrawerItem.CLOUD_DRIVE;
-                                    logDebug("Navigate to TAB CLOUD with parentHandle");
+                                    Timber.d("Navigate to TAB CLOUD with parentHandle");
                                     ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
-                                    firstNavigationLevel=false;
+                                    firstNavigationLevel = false;
                                     break;
                                 }
-                                case 1:{
-                                    logDebug("Navigate to TAB RUBBISH");
+                                case 1: {
+                                    Timber.d("Navigate to TAB RUBBISH");
                                     drawerItem = DrawerItem.RUBBISH_BIN;
                                     ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
-                                    firstNavigationLevel=false;
+                                    firstNavigationLevel = false;
                                     break;
                                 }
-                                case 2:{
-                                    logDebug("Navigate to INBOX WITH parentHandle");
+                                case 2: {
+                                    Timber.d("Navigate to INBOX WITH parentHandle");
                                     drawerItem = DrawerItem.INBOX;
                                     ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
-                                    firstNavigationLevel=false;
+                                    firstNavigationLevel = false;
                                     break;
                                 }
-                                case -1:{
+                                case -1: {
                                     drawerItem = DrawerItem.CLOUD_DRIVE;
-                                    logDebug("Navigate to TAB CLOUD general");
+                                    Timber.d("Navigate to TAB CLOUD general");
                                     ((ManagerActivity) context).setParentHandleBrowser(-1);
-                                    firstNavigationLevel=true;
+                                    firstNavigationLevel = true;
                                     break;
                                 }
                             }
@@ -415,40 +405,38 @@ public class NodeController {
                     case MegaShare.ACCESS_READ:
                     case MegaShare.ACCESS_READWRITE:
                     case MegaShare.ACCESS_FULL: {
-                        logDebug("GO to INCOMING TAB: " + parentIntentN.getName());
+                        Timber.d("GO to INCOMING TAB: %s", parentIntentN.getName());
                         drawerItem = DrawerItem.SHARED_ITEMS;
-                        if(parentIntentN.getHandle()==-1){
-                            logDebug("Level 0 of Incoming");
+                        if (parentIntentN.getHandle() == -1) {
+                            Timber.d("Level 0 of Incoming");
                             ((ManagerActivity) context).setParentHandleIncoming(-1);
                             ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
-                            firstNavigationLevel=true;
-                        }
-                        else{
-                            firstNavigationLevel=false;
+                            firstNavigationLevel = true;
+                        } else {
+                            firstNavigationLevel = false;
                             ((ManagerActivity) context).setParentHandleIncoming(parentIntentN.getHandle());
                             int deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, context);
                             ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
-                            logDebug("After calculating deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
+                            Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
                         }
                         ((ManagerActivity) context).setTabItemShares(0);
                         break;
                     }
                     default: {
-                        logDebug("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
+                        Timber.d("DEFAULT: The intent set the parentHandleBrowser to %s", parentIntentN.getHandle());
                         ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
                         drawerItem = DrawerItem.CLOUD_DRIVE;
-                        firstNavigationLevel=true;
+                        firstNavigationLevel = true;
                         break;
                     }
                 }
-            }
-            else{
-                logWarning("Parent is already NULL");
+            } else {
+                Timber.w("Parent is already NULL");
 
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 ((ManagerActivity) context).setParentHandleIncoming(-1);
                 ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
-                firstNavigationLevel=true;
+                firstNavigationLevel = true;
                 ((ManagerActivity) context).setTabItemShares(0);
             }
             ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
@@ -457,32 +445,28 @@ public class NodeController {
         }
     }
 
-    public int checkParentNodeToOpenFolder(long folderHandle){
-        logDebug("Folder handle: " + folderHandle);
+    public int checkParentNodeToOpenFolder(long folderHandle) {
+        Timber.d("Folder handle: %s", folderHandle);
         MegaNode folderNode = megaApi.getNodeByHandle(folderHandle);
         MegaNode parentNode = megaApi.getParentNode(folderNode);
-        if(parentNode!=null){
-            logDebug("Parent handle: "+parentNode.getHandle());
-            if(parentNode.getHandle()==megaApi.getRootNode().getHandle()){
-                logDebug("The parent is the ROOT");
+        if (parentNode != null) {
+            Timber.d("Parent handle: %s", parentNode.getHandle());
+            if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
+                Timber.d("The parent is the ROOT");
                 return 0;
-            }
-            else if(parentNode.getHandle()==megaApi.getRubbishNode().getHandle()){
-                logDebug("The parent is the RUBBISH");
+            } else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
+                Timber.d("The parent is the RUBBISH");
                 return 1;
-            }
-            else if(parentNode.getHandle()==megaApi.getInboxNode().getHandle()){
-                logDebug("The parent is the INBOX");
+            } else if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) {
+                Timber.d("The parent is the INBOX");
                 return 2;
-            }
-            else if(parentNode.getHandle()==-1){
-                logWarning("The parent is -1");
+            } else if (parentNode.getHandle() == -1) {
+                Timber.w("The parent is -1");
                 return -1;
-            }
-            else{
+            } else {
                 int result = checkParentNodeToOpenFolder(parentNode.getHandle());
-                logDebug("Call returns " + result);
-                switch(result){
+                Timber.d("Call returns %s", result);
+                switch (result) {
                     case -1:
                         return -1;
                     case 0:
@@ -497,7 +481,7 @@ public class NodeController {
         return -1;
     }
 
-    public void removeShares(ArrayList<MegaShare> listShares, MegaNode node){
+    public void removeShares(ArrayList<MegaShare> listShares, MegaNode node) {
         if (listShares == null || listShares.isEmpty()) return;
 
         ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, listShares.size());
@@ -531,7 +515,7 @@ public class NodeController {
         }
     }
 
-    public void removeShare(ShareListener shareListener, MegaNode node, String email){
+    public void removeShare(ShareListener shareListener, MegaNode node, String email) {
         megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, shareListener);
     }
 
@@ -550,9 +534,9 @@ public class NodeController {
         }
     }
 
-    public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions){
+    public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions) {
 
-        if(!isOnline(context)){
+        if (!isOnline(context)) {
             ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -568,7 +552,7 @@ public class NodeController {
         if (node == null || email == null) return;
 
         int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-        logDebug("MyBackup + shareFolders nodeType = " + nodeType);
+        Timber.d("MyBackup + shareFolders nodeType = %s", nodeType);
 
         if (nodeType == BACKUP_NONE) {
             megaApi.share(node, email, permissions, shareListener);
@@ -578,13 +562,13 @@ public class NodeController {
 
     }
 
-    public void cleanRubbishBin(){
-        logDebug("cleanRubbishBin");
+    public void cleanRubbishBin() {
+        Timber.d("cleanRubbishBin");
         megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
     }
 
-    public void clearAllVersions(){
-        logDebug("clearAllVersions");
+    public void clearAllVersions() {
+        Timber.d("clearAllVersions");
         megaApi.removeVersions(new RemoveVersionsListener(context));
     }
 }

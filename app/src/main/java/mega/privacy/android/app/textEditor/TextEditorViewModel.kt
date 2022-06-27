@@ -41,7 +41,6 @@ import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
@@ -378,7 +377,7 @@ class TextEditorViewModel @Inject constructor(
             try {
                 deferred.await()
             } catch (e: Exception) {
-                Timber.e("Creating connection for reading by streaming.", e)
+                Timber.e(e, "Creating connection for reading by streaming.")
                 downloadFileForReading()
             }
         }
@@ -451,7 +450,7 @@ class TextEditorViewModel @Inject constructor(
 
                 br.close()
             } catch (e: IOException) {
-                Timber.e("Exception while reading text file.", e)
+                Timber.e(e, "Exception while reading text file.")
             }
 
             checkIfNeedsStopHttpServer()
@@ -507,7 +506,7 @@ class TextEditorViewModel @Inject constructor(
         }
 
         if (parentHandle == null) {
-            logError("Parent handle not valid.")
+            Timber.e("Parent handle not valid.")
             return
         }
 
@@ -527,7 +526,7 @@ class TextEditorViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ParentDoesNotExistException -> {
-                            logError(error.message)
+                            Timber.e(error)
                         }
                         is MegaNodeException.ChildDoesNotExistsException -> {
                             uploadFile(activity, fromHome, tempFile, parentHandle)
@@ -603,7 +602,7 @@ class TextEditorViewModel @Inject constructor(
                     },
                     onError = { error ->
                         throwable.value = error
-                        logError("Not copied: ", error)
+                        Timber.e(error, "Not copied: ")
                     }
                 )
                 .addTo(composite)
@@ -632,7 +631,7 @@ class TextEditorViewModel @Inject constructor(
                     },
                     onError = { error ->
                         throwable.value = error
-                        logError("Not moved: ", error)
+                        Timber.e(error, "Not moved: ")
                     }
                 )
                 .addTo(composite)
@@ -661,7 +660,7 @@ class TextEditorViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> logError(error.stackTraceToString())
+                        else -> Timber.e(error)
                     }
                 }
             )

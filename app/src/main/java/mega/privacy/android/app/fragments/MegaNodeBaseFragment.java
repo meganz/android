@@ -1,21 +1,44 @@
 package mega.privacy.android.app.fragments;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
+import static mega.privacy.android.app.main.ManagerActivity.ERROR_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
+import static mega.privacy.android.app.utils.Constants.ORDER_OTHERS;
+import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +52,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -65,22 +98,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
-import static mega.privacy.android.app.main.ManagerActivity.*;
-import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
@@ -150,7 +168,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         protected List<MegaNode> selected;
         private int currentTab;
 
-        public BaseActionBarCallBack (int currentTab) {
+        public BaseActionBarCallBack(int currentTab) {
             this.currentTab = currentTab;
         }
 
@@ -179,7 +197,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            logDebug("onActionItemClicked");
+            Timber.d("onActionItemClicked");
             ArrayList<Long> handleList = new ArrayList<>();
             for (MegaNode node : selected) {
                 handleList.add(node.getHandle());
@@ -195,7 +213,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
                 case R.id.cab_menu_rename:
                     if (selected.get(0) == null) {
-                        logWarning("The selected node is NULL");
+                        Timber.w("The selected node is NULL");
                         break;
                     }
                     managerActivity.showRenameDialog(selected.get(0));
@@ -225,7 +243,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 case R.id.cab_menu_share_link:
                 case R.id.cab_menu_edit_link:
                     if (selected.get(0) == null) {
-                        logWarning("The selected node is NULL");
+                        Timber.w("The selected node is NULL");
                         break;
                     }
                     managerActivity.showGetLinkActivity(selected.get(0).getHandle());
@@ -234,7 +252,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
                 case R.id.cab_menu_remove_link:
                     if (selected.size() == 1 && selected.get(0) == null) {
-                        logWarning("The selected node is NULL");
+                        Timber.w("The selected node is NULL");
                         break;
                     }
 
@@ -366,7 +384,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             actionMode.invalidate();
         } catch (NullPointerException e) {
             e.printStackTrace();
-            logError("Invalidate error", e);
+            Timber.e(e, "Invalidate error");
         }
     }
 
@@ -512,7 +530,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     megaApi.httpServerStart();
                     intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                 } else {
-                    logWarning("ERROR:httpServerAlreadyRunning");
+                    Timber.w("ERROR:httpServerAlreadyRunning");
                 }
 
                 ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -520,10 +538,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
-                    logDebug("total mem: " + mi.totalMem + " allocate 32 MB");
+                    Timber.d("total mem: %d allocate 32 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                 } else {
-                    logDebug("total mem: " + mi.totalMem + " allocate 16 MB");
+                    Timber.d("total mem: %d allocate 16 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
@@ -536,7 +554,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 if (parsedUri != null) {
                     intent.setDataAndType(parsedUri, mimeTypeType);
                 } else {
-                    logError("ERROR:httpServerGetLocalLink");
+                    Timber.e("ERROR:httpServerGetLocalLink");
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), INVALID_HANDLE);
                     return;
                 }
@@ -550,7 +568,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         } else if (mimeType.isURL()) {
             manageURLNode(context, megaApi, node);
         } else if (mimeType.isPdf()) {
-            logDebug("isFile:isPdf");
+            Timber.d("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivity.class);
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", fragmentAdapter);
@@ -576,10 +594,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
-                    logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                    Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                 } else {
-                    logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                    Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
@@ -592,7 +610,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 if (parsedUri != null) {
                     intent.setDataAndType(parsedUri, mimeTypeType);
                 } else {
-                    logError("ERROR:httpServerGetLocalLink");
+                    Timber.e("ERROR:httpServerGetLocalLink");
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), INVALID_HANDLE);
                     return;
                 }
@@ -602,7 +620,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         } else if (mimeType.isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
         } else {
-            logDebug("itemClick:isFile:otherOption");
+            Timber.d("itemClick:isFile:otherOption");
             onNodeTapped(context, node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
     }
@@ -610,9 +628,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     /**
      * Launch corresponding intent to open the file based on its type.
      *
-     * @param intent Intent to launch activity.
+     * @param intent         Intent to launch activity.
      * @param internalIntent true, if the intent is for launching an intent in-app; false, otherwise.
-     * @param position Clicked item position.
+     * @param position       Clicked item position.
      */
     private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
@@ -740,16 +758,16 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         try {
-            text = text.replace("[A]","<font color=\'"
+            text = text.replace("[A]", "<font color=\'"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                     + "\'>");
-            text = text.replace("[/A]","</font>");
-            text = text.replace("[B]","<font color=\'"
+            text = text.replace("[/A]", "</font>");
+            text = text.replace("[B]", "<font color=\'"
                     + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
                     + "\'>");
-            text = text.replace("[/B]","</font>");
+            text = text.replace("[/B]", "</font>");
         } catch (Exception e) {
-            logWarning("Exception formatting text", e);
+            Timber.w(e, "Exception formatting text");
         }
 
         emptyTextViewFirst.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));

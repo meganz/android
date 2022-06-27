@@ -1,10 +1,18 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_ADD_CONTACTS;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getCircleBitmap;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -12,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,32 +33,26 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.AddContactActivity;
 import nz.mega.sdk.MegaApiAndroid;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-
-public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContactsAdapter.ViewHolderChips> implements View.OnClickListener{
+public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContactsAdapter.ViewHolderChips> implements View.OnClickListener {
 
     private int positionClicked;
     ArrayList<MegaContactAdapter> contacts;
     private MegaApiAndroid megaApi;
     private Context context;
 
-    public MegaAddContactsAdapter(Context _context, ArrayList <MegaContactAdapter> _contacts){
+    public MegaAddContactsAdapter(Context _context, ArrayList<MegaContactAdapter> _contacts) {
         this.contacts = _contacts;
         this.context = _context;
         this.positionClicked = -1;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
-    public static class ViewHolderChips extends RecyclerView.ViewHolder{
+    public static class ViewHolderChips extends RecyclerView.ViewHolder {
         public ViewHolderChips(View itemView) {
             super(itemView);
         }
@@ -64,10 +68,10 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
 
     @Override
     public MegaAddContactsAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
+        Timber.d("onCreateViewHolder");
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
@@ -89,7 +93,7 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
 
     @Override
     public void onBindViewHolder(MegaAddContactsAdapter.ViewHolderChips holder, int position) {
-        logDebug("onBindViewHolderList");
+        Timber.d("onBindViewHolderList");
 
         MegaContactAdapter contact = (MegaContactAdapter) getItem(position);
 
@@ -100,17 +104,14 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
                 s = contact.getFullName().split("[@._]");
                 if (s != null && s.length > 0) {
                     holder.textViewName.setText(s[0]);
-                }
-                else {
+                } else {
                     holder.textViewName.setText(contact.getFullName());
                 }
-            }
-            else {
+            } else {
                 s = contact.getFullName().split(" ");
                 if (s != null && s.length > 0) {
                     holder.textViewName.setText(s[0]);
-                }
-                else {
+                } else {
                     holder.textViewName.setText(contact.getFullName());
                 }
             }
@@ -125,15 +126,15 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
 
     @Override
     public void onClick(View view) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         ViewHolderChips holder = (ViewHolderChips) view.getTag();
-        if(holder!=null){
+        if (holder != null) {
             int currentPosition = holder.getLayoutPosition();
-            logDebug("Current position: "+currentPosition);
+            Timber.d("Current position: %s", currentPosition);
 
-            if(currentPosition<0){
-                logError("Current position error - not valid value");
+            if (currentPosition < 0) {
+                Timber.e("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -142,9 +143,8 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
                     break;
                 }
             }
-        }
-        else{
-            logError("Error. Holder is Null");
+        } else {
+            Timber.e("Error. Holder is Null");
         }
     }
 
@@ -158,55 +158,53 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
     }
 
     public void setPositionClicked(int p) {
-        logDebug("Position: " + p);
+        Timber.d("Position: %s", p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
-    public void setContacts (ArrayList<MegaContactAdapter> contacts){
-        logDebug("setContacts");
+    public void setContacts(ArrayList<MegaContactAdapter> contacts) {
+        Timber.d("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         return contacts.get(position);
     }
 
-    private Bitmap setUserAvatar(MegaContactAdapter contact){
-        logDebug("setUserAvatar");
+    private Bitmap setUserAvatar(MegaContactAdapter contact) {
+        Timber.d("setUserAvatar");
 
         File avatar = null;
         String mail;
 
         if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
             mail = contact.getMegaUser().getEmail();
-        }
-        else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
+        } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
             mail = contact.getMegaContactDB().getMail();
-        }
-        else {
+        } else {
             mail = contact.getFullName();
         }
 
         int color = getColorAvatar(contact.getMegaUser());
 
         if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
-            return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE,true);
+            return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE, true);
         }
 
         /*Avatar*/
         avatar = buildAvatarFile(context, mail + ".jpg");
         Bitmap bitmap = null;
-        if (isFileAvailable(avatar) && avatar.length() > 0){
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             bOpts.inPurgeable = true;
             bOpts.inInputShareable = true;
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap != null) {
-            return getCircleBitmap(bitmap);
+                return getCircleBitmap(bitmap);
             }
         }
 
@@ -217,8 +215,8 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
         } else {
             fullName = mail;
         }
-        return getDefaultAvatar(color, fullName, AVATAR_SIZE,true);
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
     }
 
 
-    }
+}

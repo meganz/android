@@ -6,10 +6,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.PaymentActivity.Companion.UPGRADE_TYPE
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
+import mega.privacy.android.app.utils.Constants.PRO_LITE
+import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
@@ -131,7 +136,7 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
             text = text.replace("[A]", "<font color='$color'>")
             text = text.replace("[/A]", "</font>")
         } catch (e: Exception) {
-            LogUtil.logWarning("Exception formatting string", e)
+            Timber.w(e, "Exception formatting string")
         }
 
         binding.textOfMyAccount.text = text.toSpannedHtmlText()
@@ -145,13 +150,13 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     override fun onUpgradeClick(upgradeType: Int) {
         with(viewModel) {
             if (!isBillingAvailable()) {
-                LogUtil.logWarning("Billing not available")
+                Timber.w("Billing not available")
                 showBillingWarning()
                 return
             }
 
             if (getPaymentBitSet() == null) {
-                LogUtil.logWarning("PaymentBitSet Null")
+                Timber.w("PaymentBitSet Null")
                 return
             }
 

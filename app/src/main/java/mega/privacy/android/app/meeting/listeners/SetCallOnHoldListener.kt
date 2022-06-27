@@ -5,12 +5,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
 
@@ -26,7 +26,7 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
 
     constructor(
         context: Context?,
-        callback: OnCallOnHoldCallback
+        callback: OnCallOnHoldCallback,
     ) : this(context) {
         this.callback = callback
     }
@@ -34,7 +34,7 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
     constructor(
         context: Context?,
         snackbarShower: SnackbarShower,
-        callback: OnCallOnHoldCallback
+        callback: OnCallOnHoldCallback,
     ) : this(context) {
         this.callback = callback
         this.snackbarShower = snackbarShower
@@ -47,20 +47,18 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
 
         when (e.errorCode) {
             MegaError.API_OK -> {
-                LogUtil.logDebug("Call on hold")
+                Timber.d("Call on hold")
                 callback?.onCallOnHold(request.chatHandle, request.flag)
             }
             MegaChatError.ERROR_NOENT -> {
-                LogUtil.logWarning("Error. No calls in this chat " + e.errorString + ", error code " + e.errorCode)
-
+                Timber.w("Error. No calls in this chat ${e.errorString}, error code ${e.errorCode}")
             }
             MegaChatError.ERROR_ACCESS -> {
-                LogUtil.logWarning("Error. The call is not in progress " + e.errorString + ", error code " + e.errorCode)
+                Timber.w("Error. The call is not in progress ${e.errorString}, error code ${e.errorCode}")
                 snackbarShower?.showSnackbar(StringResourcesUtils.getString(R.string.call_error_call_on_hold))
             }
             MegaChatError.ERROR_ARGS -> {
-                LogUtil.logWarning("Error. The call was already in that state " + e.errorString + ", error code " + e.errorCode)
-
+                Timber.w("Error. The call was already in that state ${e.errorString}, error code ${e.errorCode}")
             }
         }
     }

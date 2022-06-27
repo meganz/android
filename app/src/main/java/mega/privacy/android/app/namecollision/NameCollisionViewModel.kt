@@ -12,7 +12,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
-import mega.privacy.android.app.namecollision.data.*
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionChoice
+import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
@@ -20,11 +24,9 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -42,7 +44,7 @@ class NameCollisionViewModel @Inject constructor(
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
     private val uploadUseCase: UploadUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase
+    private val copyNodeUseCase: CopyNodeUseCase,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -103,10 +105,10 @@ class NameCollisionViewModel @Inject constructor(
                     }
                 },
                 onError = { error ->
-                    logError("Error getting collisionResult", error)
+                    Timber.e(error, "Error getting collisionResult")
                     currentCollision.value = null
                 },
-                onComplete = { logDebug("Get current name collision finished") }
+                onComplete = { Timber.d("Get current name collision finished") }
             )
             .addTo(composite)
     }
@@ -134,7 +136,7 @@ class NameCollisionViewModel @Inject constructor(
                     }
                 },
                 onError = { error ->
-                    logError("No pending collisions", error)
+                    Timber.e(error, "No pending collisions")
                     currentCollision.value = null
                 }
             )
@@ -151,12 +153,12 @@ class NameCollisionViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError = { error -> logError("No pending collisions", error) },
+                onError = { error -> Timber.e(error, "No pending collisions") },
                 onNext = { collisionsResult ->
                     pendingCollisions.clear()
                     pendingCollisions.addAll(collisionsResult)
                 },
-                onComplete = { logDebug("Get complete name collisions finished") }
+                onComplete = { Timber.d("Get complete name collisions finished") }
             )
             .addTo(composite)
     }
@@ -170,9 +172,9 @@ class NameCollisionViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onComplete = { logDebug("File versioning: ${MegaApplication.isDisableFileVersions()}") },
-                    onError = { error -> LogUtil.logWarning(error.message) })
-                .addTo(composite)
+                    onComplete = { Timber.d("File versioning: ${MegaApplication.isDisableFileVersions()}") },
+                    onError = Timber::w
+                ).addTo(composite)
         }
     }
 
@@ -324,8 +326,8 @@ class NameCollisionViewModel @Inject constructor(
                 onComplete = {
                     proceedWithAction(context = context, applyOnNext = applyOnNext, rename = true)
                 },
-                onError = { error -> LogUtil.logWarning(error.message) })
-            .addTo(composite)
+                onError = Timber::w
+            ).addTo(composite)
     }
 
     /**
@@ -339,7 +341,7 @@ class NameCollisionViewModel @Inject constructor(
     fun proceedWithAction(
         context: Context? = null,
         applyOnNext: Boolean,
-        rename: Boolean = false
+        rename: Boolean = false,
     ) {
         val choice =
             if (rename) NameCollisionChoice.RENAME
@@ -416,8 +418,8 @@ class NameCollisionViewModel @Inject constructor(
                     setUploadResult(1)
                     continueWithNext(choice)
                 },
-                onError = { error -> LogUtil.logWarning(error.message) })
-            .addTo(composite)
+                onError = Timber::w
+            ).addTo(composite)
     }
 
     /**
@@ -430,7 +432,7 @@ class NameCollisionViewModel @Inject constructor(
     private fun upload(
         context: Context,
         list: MutableList<NameCollisionResult>,
-        rename: Boolean
+        rename: Boolean,
     ) {
         if (isFolderUploadContext) {
             return
@@ -441,8 +443,8 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { setUploadResult(list.size) },
-                onError = { error -> LogUtil.logWarning(error.message) })
-            .addTo(composite)
+                onError = Timber::w
+            ).addTo(composite)
     }
 
     /**
@@ -482,7 +484,7 @@ class NameCollisionViewModel @Inject constructor(
                 },
                 onError = { error ->
                     throwable.value = error
-                    LogUtil.logWarning(error.message)
+                    Timber.w(error)
                 })
             .addTo(composite)
     }
@@ -501,7 +503,7 @@ class NameCollisionViewModel @Inject constructor(
                 onSuccess = { result -> setMovementResult(result) },
                 onError = { error ->
                     throwable.value = error
-                    LogUtil.logWarning(error.message)
+                    Timber.w(error)
                 })
             .addTo(composite)
     }
@@ -539,7 +541,7 @@ class NameCollisionViewModel @Inject constructor(
                 },
                 onError = { error ->
                     throwable.value = error
-                    LogUtil.logWarning(error.message)
+                    Timber.w(error)
                 })
             .addTo(composite)
     }
@@ -558,7 +560,7 @@ class NameCollisionViewModel @Inject constructor(
                 onSuccess = { result -> setCopyResult(result) },
                 onError = { error ->
                     throwable.value = error
-                    LogUtil.logWarning(error.message)
+                    Timber.w(error)
                 })
             .addTo(composite)
     }

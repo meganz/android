@@ -16,8 +16,8 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,9 +65,7 @@ class HomePageViewModel @Inject constructor(
                 onNext = {
                     showCallIcon.value = it
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
 

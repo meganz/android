@@ -1,5 +1,25 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
+import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
+import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
+import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,11 +57,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
@@ -320,7 +336,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * @param value the new value.
      */
     public void setRBSchedulerValue(String value) {
-        logDebug("Value: " + value);
+        Timber.d("Value: %s", value);
         int intValue = Integer.parseInt(value);
 
         if (megaApi != null) {

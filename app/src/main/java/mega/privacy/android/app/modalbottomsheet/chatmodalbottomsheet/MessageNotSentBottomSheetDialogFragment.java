@@ -1,11 +1,18 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
@@ -15,13 +22,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -50,7 +51,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         selectedChat = megaChatApi.getChatRoom(chatId);
-        logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
+        Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId);
 
         return contentView;
     }
@@ -95,7 +96,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void onClick(View v) {
         if (selectedMessage == null && selectedChat == null) {
-            logWarning("Chat or message are NULL");
+            Timber.w("Chat or message are NULL");
             return;
         }
 
@@ -111,7 +112,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
 
                         ((ChatActivity) requireActivity()).retryNodeAttachment(nodeHandle);
                     } else {
-                        logWarning("Error the nodeList cannot be recovered");
+                        Timber.w("Error the nodeList cannot be recovered");
                     }
                 } else if (selectedMessage.getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                     long userCount = selectedMessage.getMessage().getUsersCount();
@@ -132,12 +133,12 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
                     if (selectedMessage.getMessage().isEdited()) {
-                        logDebug("Message is edited --> edit");
+                        Timber.d("Message is edited --> edit");
                         if (originalMsg != null) {
                             ((ChatActivity) requireActivity()).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
                         }
                     } else {
-                        logDebug("Message NOT edited --> send");
+                        Timber.d("Message NOT edited --> send");
                         ((ChatActivity) requireActivity()).sendMessage(selectedMessage.getMessage().getContent());
                     }
                 }

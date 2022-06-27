@@ -4,8 +4,6 @@ import android.text.format.DateFormat
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import mega.privacy.android.app.logging.TimberLegacyLog
-import mega.privacy.android.app.utils.LogUtil
 import timber.log.Timber
 import java.util.Calendar
 import java.util.TimeZone
@@ -26,8 +24,6 @@ class ChatFlowLogTree @Inject constructor(
         Timber.Forest::class.java.name,
         Timber.Tree::class.java.name,
         Timber.DebugTree::class.java.name,
-        TimberLegacyLog::class.java.name,
-        LogUtil::class.java.name,
         ChatFlowLogTree::class.java.name,
     )
 

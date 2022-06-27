@@ -15,7 +15,6 @@ import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
@@ -163,7 +162,7 @@ class GetSeveralLinksViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { handle -> notifyThumbnailUpdate(handle) },
-                    onError = { error -> logError(error.stackTraceToString()) }
+                    onError = Timber::e
                 )
                 .addTo(composite)
         }

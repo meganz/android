@@ -1,7 +1,12 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.ICON_SIZE_DP;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getNumberItemChildren;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -10,21 +15,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
+import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.FileStorageActivity.Mode;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP;
-import static mega.privacy.android.app.utils.Constants.ICON_SIZE_DP;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 /*
  * Adapter for FileStorageAdapter list
@@ -119,6 +122,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
 
     /**
      * Reset the imageview's params
+     *
      * @param imageView the imageview shows the icon and the thumbnail
      */
     public void resetImageView(ImageView imageView) {
@@ -132,10 +136,10 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
     /**
      * Set new files on folder change.
      *
-     * @param newFiles  List of files
+     * @param newFiles List of files
      */
     public void setFiles(List<FileDocument> newFiles) {
-        logDebug("setFiles");
+        Timber.d("setFiles");
         currentFiles = newFiles;
         notifyDataSetChanged();
     }
@@ -156,7 +160,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
     /**
      * Checks if the view item has to be enabled or not.
      *
-     * @param position  position of the item
+     * @param position position of the item
      * @return True if the view item has to be enabled, false otherwise.
      */
     public boolean isEnabled(int position) {

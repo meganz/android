@@ -4,20 +4,40 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
-import mega.privacy.android.app.*
-import mega.privacy.android.app.DownloadService.*
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.DownloadService
+import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_BY_TAP
+import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_TO_SDCARD
+import mega.privacy.android.app.DownloadService.EXTRA_FOLDER_LINK
+import mega.privacy.android.app.DownloadService.EXTRA_FROM_MV
+import mega.privacy.android.app.DownloadService.EXTRA_HASH
+import mega.privacy.android.app.DownloadService.EXTRA_OPEN_FILE
+import mega.privacy.android.app.DownloadService.EXTRA_PATH
+import mega.privacy.android.app.DownloadService.EXTRA_SIZE
+import mega.privacy.android.app.DownloadService.EXTRA_TARGET_PATH
+import mega.privacy.android.app.DownloadService.EXTRA_TARGET_URI
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.APP_DATA_VOICE_CLIP
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.EXTRA_TRANSFER_TYPE
+import mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER
+import mega.privacy.android.app.utils.Constants.SEPARATOR
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeParceler
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
-import mega.privacy.android.app.utils.StringResourcesUtils.*
+import mega.privacy.android.app.utils.SDCardOperator
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
-import java.util.*
 
 @Parcelize
 @TypeParceler<MegaNode, MegaNodeParceler>()
@@ -29,7 +49,7 @@ class MegaNodeSaving(
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
     private val isVoiceClip: Boolean = false,
-    private val downloadByTap: Boolean = false
+    private val downloadByTap: Boolean = false,
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -49,7 +69,7 @@ class MegaNodeSaving(
                     return true
                 }
             } catch (e: Exception) {
-                LogUtil.logWarning("isIntentAvailable error", e)
+                Timber.w(e, "isIntentAvailable error")
                 return true
             }
         }

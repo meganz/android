@@ -1,5 +1,18 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE;
+import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
+import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_X_TIME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
+
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -13,21 +26,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.main.megachat.ChatSettings;
 import nz.mega.sdk.MegaPushNotificationSettings;
-
-import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND;
-import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS;
-import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND;
-import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE;
-import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
-import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
-import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_X_TIME;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
+import timber.log.Timber;
 
 public class SettingsChatNotificationsFragment extends SettingsBaseFragment {
 
@@ -129,7 +128,7 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment {
                 if (sound != null) {
                     chatSoundPreference.setSummary(sound.getTitle(context));
                 } else {
-                    logWarning("Sound is null");
+                    Timber.w("Sound is null");
                 }
             }
         }
@@ -191,7 +190,7 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment {
             Ringtone sound = RingtoneManager.getRingtone(context, uri);
             String title = sound.getTitle(context);
             if (title != null) {
-                logDebug("Title sound notification: " + title);
+                Timber.d("Title sound notification: %s", title);
                 chatSoundPreference.setSummary(title);
             }
             chosenSound = uri.toString();

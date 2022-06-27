@@ -43,11 +43,6 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
 import mega.privacy.android.app.utils.Constants.BUFFER_COMP
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
@@ -55,8 +50,6 @@ import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_HANDLES
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
@@ -64,8 +57,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_URL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
@@ -230,7 +221,7 @@ object MegaNodeUtil {
     fun shareNode(
         context: Context,
         node: MegaNode?,
-        onExportFinishedListener: ExportListener.OnExportFinishedListener?
+        onExportFinishedListener: ExportListener.OnExportFinishedListener?,
     ) {
         if (shouldContinueWithoutError(context, node)) {
             val path = getLocalFile(node)
@@ -376,7 +367,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun shouldContinueWithoutError(
         context: Context,
-        node: MegaNode?
+        node: MegaNode?,
     ): Boolean {
         contract { returns(true) implies (node != null) }
         if (node == null) {
@@ -401,7 +392,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun shouldContinueWithoutError(
         context: Context,
-        nodes: List<MegaNode>?
+        nodes: List<MegaNode>?,
     ): Boolean {
         if (nodes == null || nodes.isEmpty()) {
             Timber.e("Error sharing nodes: No nodes")
@@ -848,7 +839,7 @@ object MegaNodeUtil {
     fun showConfirmationLeaveIncomingShare(
         activity: Activity,
         snackbarShower: SnackbarShower,
-        node: MegaNode
+        node: MegaNode,
     ) {
         showConfirmationLeaveIncomingShares(activity, snackbarShower, node, null)
     }
@@ -864,7 +855,7 @@ object MegaNodeUtil {
     fun showConfirmationLeaveIncomingShares(
         activity: Activity,
         snackbarShower: SnackbarShower,
-        handleList: ArrayList<Long>
+        handleList: ArrayList<Long>,
     ) {
         showConfirmationLeaveIncomingShares(activity, snackbarShower, null, handleList)
     }
@@ -881,7 +872,7 @@ object MegaNodeUtil {
         activity: Activity,
         snackbarShower: SnackbarShower,
         node: MegaNode?,
-        handles: ArrayList<Long>?
+        handles: ArrayList<Long>?,
     ) {
         val onlyOneIncomingShare = node != null && handles == null
         val numIncomingShares = if (onlyOneIncomingShare) 1 else handles!!.size
@@ -911,7 +902,7 @@ object MegaNodeUtil {
      */
     private fun leaveIncomingShare(
         snackbarShower: SnackbarShower,
-        node: MegaNode
+        node: MegaNode,
     ) {
         Timber.d("Node handle: ${node.handle}")
         MegaApplication.getInstance().megaApi.remove(
@@ -929,7 +920,7 @@ object MegaNodeUtil {
     private fun leaveMultipleIncomingShares(
         activity: Activity,
         snackbarShower: SnackbarShower,
-        handles: List<Long>
+        handles: List<Long>,
     ) {
         Timber.d("Leaving ${handles.size} incoming shares")
 
@@ -990,7 +981,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun getDlList(
         megaApi: MegaApiAndroid, dlFiles: MutableMap<MegaNode, String>,
-        parent: MegaNode?, folder: File
+        parent: MegaNode?, folder: File,
     ) {
         if (megaApi.rootNode == null) {
             return
@@ -1139,7 +1130,7 @@ object MegaNodeUtil {
         isFolder: Boolean,
         currentPosition: Int,
         listener: NodeTakenDownDialogListener,
-        context: Context
+        context: Context,
     ): AlertDialog {
         val builder = MaterialAlertDialogBuilder(context)
         val inflater = LayoutInflater.from(context)
@@ -1242,7 +1233,7 @@ object MegaNodeUtil {
     fun getNodeLocationInfo(
         adapterType: Int,
         fromIncomingShare: Boolean,
-        handle: Long
+        handle: Long,
     ): LocationInfo? {
         val app = MegaApplication.getInstance()
         val dbHandler = DatabaseHandler.getDbHandler(app)
@@ -1365,7 +1356,7 @@ object MegaNodeUtil {
 
     private fun getTranslatedNameForParentNode(
         megaApi: MegaApiAndroid,
-        parent: MegaNode
+        parent: MegaNode,
     ): String {
         return when (parent.handle) {
             megaApi.rootNode.handle -> getString(R.string.section_cloud_drive)
@@ -1388,7 +1379,7 @@ object MegaNodeUtil {
         context: Context,
         autoPlayInfo: AutoPlayInfo,
         activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
@@ -1498,7 +1489,7 @@ object MegaNodeUtil {
         activityLauncher: ActivityLauncher,
         zipFilePath: String,
         snackbarShower: SnackbarShower,
-        nodeHandle: Long
+        nodeHandle: Long,
     ) {
         if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
             activityLauncher.launchActivity(Intent(context, ZipBrowserActivity::class.java).apply {
@@ -1530,7 +1521,7 @@ object MegaNodeUtil {
         nodeName: String,
         localPath: String,
         activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         try {
             val viewIntent = Intent(Intent.ACTION_VIEW)
@@ -1574,7 +1565,7 @@ object MegaNodeUtil {
         nodeName: String,
         localPath: String,
         activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val intentShare = Intent(Intent.ACTION_SEND)
 
@@ -1645,7 +1636,7 @@ object MegaNodeUtil {
         context: Context,
         node: MegaNode,
         adapterType: Int,
-        urlFileLink: String?
+        urlFileLink: String?,
     ) {
         manageTextFileIntent(context, node, adapterType, urlFileLink, VIEW_MODE)
     }
@@ -1665,7 +1656,7 @@ object MegaNodeUtil {
         node: MegaNode,
         adapterType: Int,
         urlFileLink: String?,
-        mode: String
+        mode: String,
     ) {
         val textFileIntent = Intent(context, TextEditorActivity::class.java)
 
@@ -1772,7 +1763,7 @@ object MegaNodeUtil {
         node: MegaNode,
         nodeDownloader: (node: MegaNode) -> Unit,
         activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val possibleLocalFile = getTappedNodeLocalFile(node)
 
@@ -1818,7 +1809,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun getBackupRootNodeByHandle(
         megaApi: MegaApiAndroid,
-        handleList: ArrayList<Long>?
+        handleList: ArrayList<Long>?,
     ): MegaNode? {
         if (handleList != null && handleList.size > 0) {
             for (handle in handleList) {

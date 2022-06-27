@@ -12,8 +12,7 @@ import java.util.List;
 
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class ContactsUtil {
 
@@ -97,7 +96,7 @@ public class ContactsUtil {
         Cursor cursor = resolver.query(contactsUri, new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
         LocalContact contact;
         if (cursor != null) {
-            logDebug("has " + cursor.getCount() + " contacts");
+            Timber.d("has %d contacts", cursor.getCount());
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
                 String name = cursor.getString(1);
@@ -126,7 +125,7 @@ public class ContactsUtil {
                             //If roaming, don't normalize the phone number.
                             if (!Util.isRoaming(context)) {
                                 // use current country code to normalize the phone number.
-                                normalizedPhone = Util.normalizePhoneNumberByNetwork(context,phone);
+                                normalizedPhone = Util.normalizePhoneNumberByNetwork(context, phone);
                             }
                         }
                         if (normalizedPhone != null && normalizedPhone.startsWith(PLUS)) {
@@ -148,7 +147,7 @@ public class ContactsUtil {
                 long id = emails.getLong(0);
                 String email = emails.getString(1);
                 // Check if it's a valid email.
-                if(!TextUtil.isEmail(email)) continue;
+                if (!TextUtil.isEmail(email)) continue;
 
                 for (LocalContact temp : localContacts) {
                     if (temp.getId() == id) {

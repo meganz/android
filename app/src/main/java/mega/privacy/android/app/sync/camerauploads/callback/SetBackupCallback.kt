@@ -3,10 +3,10 @@ package mega.privacy.android.app.sync.camerauploads.callback
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.SyncEventCallback
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 
 /**
  * Set backup event callback.
@@ -18,7 +18,7 @@ open class SetBackupCallback : SyncEventCallback {
     override fun onSuccess(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     ) {
         // Save backup to local database.
         request.apply {
@@ -31,7 +31,7 @@ open class SetBackupCallback : SyncEventCallback {
                 state = access,
                 subState = numDetails
             )
-            logDebug("Save back $backup to local cache.")
+            Timber.d("Save back $backup to local cache.")
             getDatabase().saveBackup(backup)
             CameraUploadSyncManager.reEnableCameraUploadsPreference(totalBytes.toInt())
         }
