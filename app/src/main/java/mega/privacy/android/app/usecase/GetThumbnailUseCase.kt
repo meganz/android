@@ -14,7 +14,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.ThumbnailDoesNotExistException
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.LogUtil.logWarning
+
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -34,7 +35,7 @@ import javax.inject.Inject
 class GetThumbnailUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
 ) {
 
     /**
@@ -111,7 +112,7 @@ class GetThumbnailUseCase @Inject constructor(
                 }
 
                 get(node).blockingSubscribeBy(
-                    onError = { error -> logWarning("No thumbnail.", error) },
+                    onError = { error -> Timber.w(error, "No thumbnail.") },
                     onSuccess = { emitter.onNext(node.handle) }
                 )
             }

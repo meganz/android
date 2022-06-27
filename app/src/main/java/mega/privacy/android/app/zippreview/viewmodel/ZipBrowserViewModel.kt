@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.zippreview.domain.FileType
@@ -29,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ZipBrowserViewModel @Inject constructor(
     private val zipFileRepository: ZipFileRepository,
-    private val crashReporter: CrashReporter
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
     companion object {
         private const val TITLE_ZIP = "ZIP "
@@ -210,7 +209,7 @@ class ZipBrowserViewModel @Inject constructor(
             StatusItemClicked.OPEN_FILE -> {
                 //If the zip file name is start with ".", it cannot be unzip. So show the alert.
                 if (zipInfoUIO.fileType == FileType.ZIP && zipInfoUIO.name.startsWith(".")) {
-                    LogUtil.logError("zip file ${zipInfoUIO.name} start with \".\" cannot unzip")
+                    Timber.e("zip file ${zipInfoUIO.name} start with \".\" cannot unzip")
                     _showAlert.value = true
                 } else {
                     _openFile.value = Pair(position, zipInfoUIO)
@@ -223,7 +222,7 @@ class ZipBrowserViewModel @Inject constructor(
                 updateZipInfoList(zipInfoUIO.path)
             }
             StatusItemClicked.ITEM_NOT_EXIST -> {
-                LogUtil.logError("zip entry position $position file not exists")
+                Timber.e("zip entry position $position file not exists")
                 _showAlert.value = true
             }
         }

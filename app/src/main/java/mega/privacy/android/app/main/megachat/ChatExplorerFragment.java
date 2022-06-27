@@ -1,20 +1,18 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.main.FileExplorerActivity.CHAT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
+import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import com.google.android.material.appbar.AppBarLayout;
-
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.text.HtmlCompat;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -28,6 +26,17 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,12 +62,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.main.FileExplorerActivity.CHAT_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
 
@@ -115,10 +119,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
@@ -137,14 +141,14 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
 
     public static ChatExplorerFragment newInstance() {
-        logDebug("newInstance");
+        Timber.d("newInstance");
         ChatExplorerFragment fragment = new ChatExplorerFragment();
         return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -169,13 +173,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
             if (context instanceof ChatExplorerActivity) {
                 newGroupButton.setOnClickListener((ChatExplorerActivity) context);
-            }
-            else if (context instanceof FileExplorerActivity) {
+            } else if (context instanceof FileExplorerActivity) {
                 newGroupButton.setOnClickListener((FileExplorerActivity) context);
             }
             setFirstLayoutVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             addLayout.setVisibility(View.GONE);
         }
 
@@ -186,7 +188,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         listView.setHasFixedSize(true);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.setClipToPadding(false);
-        listView.setPadding(0,scaleHeightPx(8, outMetrics),0, 0);
+        listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, 0);
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -199,7 +201,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
         String textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-        try{
+        try {
             textToShow = textToShow.replace("[A]", "<font color=\'" +
                     ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
                     + "\'>");
@@ -208,12 +210,12 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
                     + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
+        } catch (Exception e) {
         }
-        catch (Exception e){}
         Spanned resultB = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(resultB);
 
-        LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
+        LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams) emptyTextView.getLayoutParams();
         emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
@@ -222,14 +224,13 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
 
-        if(megaChatApi.isSignalActivityRequired()){
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
         if (savedInstanceState != null) {
             addedItemsSaved = savedInstanceState.getStringArrayList("addedItemsSaved");
-        }
-        else {
+        } else {
             addedItemsSaved = new ArrayList<>();
         }
 
@@ -270,12 +271,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    private void setFirstLayoutVisibility (int visibility) {
+    private void setFirstLayoutVisibility(int visibility) {
         newGroupButton.setVisibility(visibility);
         if (visibility == View.VISIBLE) {
             addedList.setVisibility(View.GONE);
-        }
-        else if (visibility == View.GONE) {
+        } else if (visibility == View.GONE) {
             addedList.setVisibility(View.VISIBLE);
         }
     }
@@ -287,7 +287,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
 //        Maybe the contact is not my contact already
         if (user == null) {
-            logDebug("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
+            Timber.d("Chat ID %d with PeerHandle: %d is NULL", chat.getChatId(), handle);
             return null;
         }
         MegaContactDB contactDB = getContactDB(handle);
@@ -298,7 +298,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                logDebug("Request last green for user");
+                Timber.d("Request last green for user");
                 megaChatApi.requestLastGreen(handle, null);
             }
         }
@@ -312,15 +312,14 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (megaChatApi != null) {
             if (context instanceof ChatExplorerActivity) {
                 ((ChatExplorerActivity) context).composite.clear();
-            }
-            else if (context instanceof FileExplorerActivity) {
+            } else if (context instanceof FileExplorerActivity) {
                 ((FileExplorerActivity) context).composite.clear();
             }
         }
     }
 
-    private void sortByAlphabetical ( ) {
-        Collections.sort(items, new Comparator<ChatExplorerListItem> (){
+    private void sortByAlphabetical() {
+        Collections.sort(items, new Comparator<ChatExplorerListItem>() {
 
             public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
                 String n1 = c1.getTitle();
@@ -335,8 +334,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         });
     }
 
-    public void setChats(){
-        logDebug("setChats");
+    public void setChats() {
+        Timber.d("setChats");
 
         emptyTextView.setVisibility(View.GONE);
         contentLayout.setVisibility(View.GONE);
@@ -344,11 +343,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         new RecoverItemsTask().execute();
     }
 
-    private void getVisibleMEGAContacts () {
+    private void getVisibleMEGAContacts() {
         ArrayList<MegaUser> contactsMEGA = megaApi.getContacts();
-        for (int i=0;i<contactsMEGA.size();i++){
-            logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
-            if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+        for (int i = 0; i < contactsMEGA.size(); i++) {
+            Timber.d("Contact: %s_%d", contactsMEGA.get(i).getEmail(), contactsMEGA.get(i).getVisibility());
+            if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contactsMEGA.get(i).getHandle();
                 MegaContactDB contactDB = getContactDB(contactHandle);
                 String fullName = getContactNameDB(contactDB);
@@ -361,7 +360,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    public ArrayList<ChatExplorerListItem> getAddedChats () {
+    public ArrayList<ChatExplorerListItem> getAddedChats() {
 
         if (addedItems != null) {
             return addedItems;
@@ -371,8 +370,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     }
 
     public void itemClick(int position) {
-        logDebug("Position: " + position);
-        if(megaChatApi.isSignalActivityRequired()){
+        Timber.d("Position: %s", position);
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
@@ -385,8 +384,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (adapterList.isSearchEnabled()) {
             if (context instanceof ChatExplorerActivity) {
                 ((ChatExplorerActivity) context).collapseSearchView();
-            }
-            else if (context instanceof FileExplorerActivity){
+            } else if (context instanceof FileExplorerActivity) {
                 ((FileExplorerActivity) context).collapseSearchView();
             }
             if (!adapterList.getItems().equals(items)) {
@@ -394,8 +392,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             }
             int togglePossition = adapterList.getPosition(item);
             adapterList.toggleSelection(togglePossition);
-        }
-        else {
+        } else {
             adapterList.toggleSelection(position);
         }
 
@@ -410,20 +407,18 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             adapterAdded.setItems(addedItems);
             setFirstLayoutVisibility(View.GONE);
 
-            if(context instanceof  ChatExplorerActivity){
-                ((ChatExplorerActivity)context).showFabButton(true);
-                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-            }
-            else if (context instanceof FileExplorerActivity){
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).showFabButton(true);
+                ((ChatExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            } else if (context instanceof FileExplorerActivity) {
                 if (addedItems.size() == 1) {
                     ((FileExplorerActivity) context).hideTabs(true, CHAT_FRAGMENT);
                 }
 
-                ((FileExplorerActivity)context).showFabButton(true);
-                ((FileExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                ((FileExplorerActivity) context).showFabButton(true);
+                ((FileExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
-        }
-        else if (addedItems.contains(item)) {
+        } else if (addedItems.contains(item)) {
             deleteItem(item);
 
             if (addedItems.isEmpty()) {
@@ -436,7 +431,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
+        aB = ((AppCompatActivity) activity).getSupportActionBar();
     }
 
 
@@ -444,23 +439,22 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        aB = ((AppCompatActivity)context).getSupportActionBar();
+        aB = ((AppCompatActivity) context).getSupportActionBar();
     }
 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        if(listView.getLayoutManager()!=null){
+        if (listView.getLayoutManager() != null) {
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
 
         if (addedItems != null && !addedItems.isEmpty()) {
             if (addedItemsSaved == null) {
                 addedItemsSaved = new ArrayList<>();
-            }
-            else {
+            } else {
                 addedItemsSaved.clear();
             }
             for (ChatExplorerListItem item : addedItems) {
@@ -472,26 +466,26 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     @Override
     public void onPause() {
-        logDebug("onPause");
-        lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        Timber.d("onPause");
+        lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        logDebug("lastFirstVisiblePosition: " + lastFirstVisiblePosition);
-        if(lastFirstVisiblePosition>0){
+        Timber.d("lastFirstVisiblePosition: %s", lastFirstVisiblePosition);
+        if (lastFirstVisiblePosition > 0) {
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
-        }else{
+        } else {
             (listView.getLayoutManager()).scrollToPosition(0);
         }
-        lastFirstVisiblePosition=0;
+        lastFirstVisiblePosition = 0;
         super.onResume();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        logDebug("onActivityCreated");
+        Timber.d("onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -500,22 +494,21 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    private long getMegaContactHandle (MegaContactAdapter contact) {
+    private long getMegaContactHandle(MegaContactAdapter contact) {
         long handle = -1;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
                 handle = contact.getMegaUser().getHandle();
-            }
-            else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
+            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
                 handle = Long.parseLong(contact.getMegaContactDB().getHandle());
             }
         }
         return handle;
     }
 
-    public void updateLastGreenContact (long userhandle, String formattedDate) {
+    public void updateLastGreenContact(long userhandle, String formattedDate) {
 
-        if(adapterList!=null && adapterList.getItems() != null){
+        if (adapterList != null && adapterList.getItems() != null) {
             ListIterator<ChatExplorerListItem> itrReplace = adapterList.getItems().listIterator();
             while (itrReplace.hasNext()) {
                 ChatExplorerListItem itemToUpdate = itrReplace.next();
@@ -527,8 +520,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                             items = adapterList.getItems();
                             break;
                         }
-                    }
-                    else {
+                    } else {
                         continue;
                     }
                 } else {
@@ -537,7 +529,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             }
         }
 
-        if(adapterAdded!=null && adapterAdded.getItems() != null){
+        if (adapterAdded != null && adapterAdded.getItems() != null) {
             ListIterator<ChatExplorerListItem> itrReplace = adapterAdded.getItems().listIterator();
             while (itrReplace.hasNext()) {
                 ChatExplorerListItem itemToUpdate = itrReplace.next();
@@ -548,8 +540,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                             items = adapterAdded.getItems();
                             break;
                         }
-                    }
-                    else {
+                    } else {
                         continue;
                     }
                 } else {
@@ -577,25 +568,22 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
             if (addedItems.size() > 0) {
                 setFirstLayoutVisibility(View.GONE);
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                if (context instanceof ChatExplorerActivity) {
+                    ((ChatExplorerActivity) context).showFabButton(true);
+                    ((ChatExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                } else if (context instanceof FileExplorerActivity) {
+                    ((FileExplorerActivity) context).showFabButton(true);
+                    ((FileExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
-                else if (context instanceof FileExplorerActivity){
-                    ((FileExplorerActivity)context).showFabButton(true);
-                    ((FileExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
-            }
-            else {
+            } else {
                 setFirstLayoutVisibility(View.VISIBLE);
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(false);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(null);
-                }
-                else if (context instanceof FileExplorerActivity){
+                if (context instanceof ChatExplorerActivity) {
+                    ((ChatExplorerActivity) context).showFabButton(false);
+                    ((ChatExplorerActivity) context).setToolbarSubtitle(null);
+                } else if (context instanceof FileExplorerActivity) {
                     ((FileExplorerActivity) context).hideTabs(false, CHAT_FRAGMENT);
-                    ((FileExplorerActivity)context).showFabButton(false);
-                    ((FileExplorerActivity)context).setToolbarSubtitle(null);
+                    ((FileExplorerActivity) context).showFabButton(false);
+                    ((FileExplorerActivity) context).setToolbarSubtitle(null);
                 }
             }
         }
@@ -605,39 +593,34 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if(isAdded()){
+            if (isAdded()) {
                 if (items != null) {
                     items.clear();
-                }
-                else {
+                } else {
                     items = new ArrayList<>();
                 }
 
                 if (addedItems != null) {
                     addedItems.clear();
-                }
-                else {
+                } else {
                     addedItems = new ArrayList<>();
                 }
 
-                if(chats!=null){
+                if (chats != null) {
                     chats.clear();
-                }
-                else{
+                } else {
                     chats = new ArrayList<>();
                 }
 
                 if (archievedChats != null) {
                     archievedChats.clear();
-                }
-                else {
-                    archievedChats =  new ArrayList<>();
+                } else {
+                    archievedChats = new ArrayList<>();
                 }
 
                 if (contacts != null) {
                     contacts.clear();
-                }
-                else {
+                } else {
                     contacts = new ArrayList<>();
                 }
 
@@ -665,8 +648,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                         ChatExplorerListItem item;
                         if (chat.isGroup()) {
                             item = new ChatExplorerListItem(chat);
-                        }
-                        else {
+                        } else {
                             item = new ChatExplorerListItem(chat, getContact(chat));
                         }
                         item.setRecent(true);
@@ -676,7 +658,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                             break;
                         }
                     }
-                    for (MegaChatListItem remove: removeChats) {
+                    for (MegaChatListItem remove : removeChats) {
                         chats.remove(remove);
                     }
                 }
@@ -690,8 +672,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     }
                     if (chat.isGroup()) {
                         items.add(new ChatExplorerListItem(chat));
-                    }
-                    else {
+                    } else {
                         items.add(new ChatExplorerListItem(chat, getContact(chat)));
                     }
                 }
@@ -702,8 +683,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     }
                     if (archieved.isGroup()) {
                         items.add(new ChatExplorerListItem(archieved));
-                    }
-                    else {
+                    } else {
                         items.add(new ChatExplorerListItem(archieved, getContact(archieved)));
                     }
                 }
@@ -717,11 +697,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                                 if (handle != -1) {
                                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                                     if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                                        logDebug("Request last green for user");
+                                        Timber.d("Request last green for user");
                                         if (context instanceof ChatExplorerActivity) {
                                             megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
-                                        }
-                                        else if (context instanceof FileExplorerActivity) {
+                                        } else if (context instanceof FileExplorerActivity) {
                                             megaChatApi.requestLastGreen(handle, (FileExplorerActivity) context);
                                         }
                                     }
@@ -732,7 +711,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     }
                 }
 
-                logDebug("Items number: " + items.size());
+                Timber.d("Items number: %s", items.size());
 
                 //Order by title
                 sortByAlphabetical();
@@ -752,18 +731,16 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (adapterList == null){
-                logWarning("AdapterList is NULL");
+            if (adapterList == null) {
+                Timber.w("AdapterList is NULL");
                 adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
-            }
-            else{
+            } else {
                 adapterList.setItems(items);
             }
 
             if (adapterAdded == null) {
                 adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
-            }
-            else {
+            } else {
                 adapterAdded.setItems(addedItems);
             }
 
@@ -782,8 +759,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         int position;
         if (recents != null && !recents.isEmpty()) {
             position = recents.size();
-        }
-        else {
+        } else {
             position = -1;
         }
         positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
@@ -794,21 +770,18 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (adapterAdded.getItemCount() == 0) {
             setFirstLayoutVisibility(View.VISIBLE);
 
-            if(context instanceof  ChatExplorerActivity){
-                ((ChatExplorerActivity)context).setToolbarSubtitle(null);
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).setToolbarSubtitle(null);
+            } else if (context instanceof FileExplorerActivity) {
+                ((FileExplorerActivity) context).setToolbarSubtitle(null);
             }
-            else if (context instanceof FileExplorerActivity){
-                ((FileExplorerActivity)context).setToolbarSubtitle(null);
-            }
-        }
-        else {
+        } else {
             setFirstLayoutVisibility(View.GONE);
 
-            if(context instanceof  ChatExplorerActivity){
-                ((ChatExplorerActivity)context).showFabButton(true);
-                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-            }
-            else if (context instanceof FileExplorerActivity){
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).showFabButton(true);
+                ((ChatExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            } else if (context instanceof FileExplorerActivity) {
                 ((FileExplorerActivity) context).showFabButton(true);
                 ((FileExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
@@ -816,8 +789,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         if (context instanceof ChatExplorerActivity) {
             ((ChatExplorerActivity) context).isPendingToOpenSearchView();
-        }
-        else if (context instanceof FileExplorerActivity) {
+        } else if (context instanceof FileExplorerActivity) {
             ((FileExplorerActivity) context).isPendingToOpenSearchView();
         }
         contentLayout.setVisibility(View.VISIBLE);
@@ -855,15 +827,14 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    private void setListVisibility () {
-        if (adapterList.getItemCount() == 0){
-            logDebug("adapterList.getItemCount() == 0");
+    private void setListVisibility() {
+        if (adapterList.getItemCount() == 0) {
+            Timber.d("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
             addLayout.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
-        }
-        else{
-            logDebug("adapterList.getItemCount() NOT = 0");
+        } else {
+            Timber.d("adapterList.getItemCount() NOT = 0");
             listView.setVisibility(View.VISIBLE);
             if (!adapterList.isSearchEnabled()) {
                 addLayout.setVisibility(View.VISIBLE);
@@ -909,7 +880,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    public void search (String s) {
+    public void search(String s) {
         if (searchTask != null && searchTask.getStatus() != AsyncTask.Status.FINISHED) {
             searchTask.cancel(true);
         }
@@ -929,14 +900,12 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (adapterList != null && !adapterList.isSearchEnabled()) {
                 adapterList.setSearchEnabled(enable);
             }
-            if(context instanceof  ChatExplorerActivity){
-                ((ChatExplorerActivity)context).showFabButton(false);
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).showFabButton(false);
+            } else if (context instanceof FileExplorerActivity) {
+                ((FileExplorerActivity) context).showFabButton(false);
             }
-            else if (context instanceof FileExplorerActivity){
-                ((FileExplorerActivity)context).showFabButton(false);
-            }
-        }
-        else{
+        } else {
             listView.removeItemDecoration(simpleDividerItemDecoration);
             listView.addItemDecoration(positionDividerItemDecoration);
             listView.invalidateItemDecorations();
@@ -954,15 +923,13 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
             if (adapterAdded != null && adapterAdded.getItemCount() == 0) {
                 setFirstLayoutVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 setFirstLayoutVisibility(View.GONE);
 
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                }
-                else if (context instanceof FileExplorerActivity){
-                    ((FileExplorerActivity)context).showFabButton(true);
+                if (context instanceof ChatExplorerActivity) {
+                    ((ChatExplorerActivity) context).showFabButton(true);
+                } else if (context instanceof FileExplorerActivity) {
+                    ((FileExplorerActivity) context).showFabButton(true);
                 }
             }
         }

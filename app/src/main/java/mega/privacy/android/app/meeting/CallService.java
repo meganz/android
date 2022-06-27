@@ -1,5 +1,31 @@
 package mega.privacy.android.app.meeting;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CallUtil.callStatusToString;
+import static mega.privacy.android.app.utils.CallUtil.getCallNotificationId;
+import static mega.privacy.android.app.utils.CallUtil.getCallsParticipating;
+import static mega.privacy.android.app.utils.CallUtil.getPendingIntentMeetingInProgress;
+import static mega.privacy.android.app.utils.CallUtil.getPendingIntentMeetingRinging;
+import static mega.privacy.android.app.utils.CallUtil.isAnotherActiveCall;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.INVALID_CALL;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,6 +45,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
@@ -37,23 +64,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-public class CallService extends Service{
+public class CallService extends Service {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -75,7 +88,7 @@ public class CallService extends Service{
 
     private final Observer<MegaChatCall> callStatusObserver = call -> {
         int callStatus = call.getStatus();
-        logDebug("Call status " + callStatusToString(callStatus)+" current chat = "+currentChatId);
+        Timber.d("Call status %s current chat = %d", callStatusToString(callStatus), currentChatId);
         switch (callStatus) {
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
@@ -98,7 +111,7 @@ public class CallService extends Service{
 
     private final Observer<Long> removeNotificationObserver = callId -> {
         MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCallByCallId(callId);
-        if(call != null){
+        if (call != null) {
             removeNotification(call.getChatid());
         }
     };
@@ -138,11 +151,11 @@ public class CallService extends Service{
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 currentChatId = extras.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-                logDebug("Chat handle to call: " + currentChatId);
+                Timber.d("Chat handle to call: %s", currentChatId);
             }
         }
 
-        if(currentChatId == MEGACHAT_INVALID_HANDLE)
+        if (currentChatId == MEGACHAT_INVALID_HANDLE)
             stopSelf();
 
         if (MegaApplication.getOpenCallChatId() != currentChatId) {
@@ -152,17 +165,17 @@ public class CallService extends Service{
         return START_NOT_STICKY;
     }
 
-    private void checkAnotherActiveCall(){
+    private void checkAnotherActiveCall() {
         long activeCall = isAnotherActiveCall(currentChatId);
-        if(currentChatId == activeCall){
+        if (currentChatId == activeCall) {
             updateNotificationContent();
-        }else{
+        } else {
             updateCall(activeCall);
         }
     }
 
     private void updateNotificationContent() {
-        logDebug("Updating notification");
+        Timber.d("Updating notification");
         MegaChatRoom chat = megaChatApi.getChatRoom(currentChatId);
         MegaChatCall call = megaChatApi.getChatCall(currentChatId);
         if (call == null || chat == null) return;
@@ -177,25 +190,25 @@ public class CallService extends Service{
             contentText = StringResourcesUtils.getString(R.string.title_notification_incoming_call);
             intentCall = getPendingIntentMeetingRinging(this, currentChatId, notificationId + 1);
         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            if(call.isOnHold()) {
+            if (call.isOnHold()) {
                 contentText = StringResourcesUtils.getString(R.string.call_on_hold);
             } else {
                 contentText = StringResourcesUtils.getString(R.string.title_notification_call_in_progress);
             }
 
             // Quit in meeting page. Then can return to the call by tapping the notification.
-            if(!isInMeeting) {
+            if (!isInMeeting) {
                 boolean isGuest = megaApi.isEphemeralPlusPlus();
                 intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1, isGuest);
             } else {
                 // An empty PendingIntent, tapping it can collapse status bar.
-                intentCall = PendingIntent.getBroadcast(this, 0, new Intent(""),PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                intentCall = PendingIntent.getBroadcast(this, 0, new Intent(""), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             }
         }
 
         String title = getTitleChat(chat);
         Bitmap largeIcon = null;
-        if(chat.isGroup()){
+        if (chat.isGroup()) {
             largeIcon = createDefaultAvatar(-1, title);
         }
 
@@ -231,7 +244,7 @@ public class CallService extends Service{
     }
 
     private void showCallInProgressNotification() {
-        logDebug("Showing the notification");
+        Timber.d("Showing the notification");
         int notificationId = getCurrentCallNotifId();
         if (notificationId == INVALID_CALL) return;
 
@@ -341,8 +354,8 @@ public class CallService extends Service{
             return;
         }
 
-        for(long chatCall:listCalls){
-            if(chatCall != currentChatId){
+        for (long chatCall : listCalls) {
+            if (chatCall != currentChatId) {
                 updateCall(chatCall);
                 return;
             }
@@ -431,9 +444,9 @@ public class CallService extends Service{
         return getCallNotificationId(call.getCallId());
     }
 
-    private void cancelNotification(){
+    private void cancelNotification() {
         int notificationId = getCurrentCallNotifId();
-        if(notificationId == INVALID_CALL)
+        if (notificationId == INVALID_CALL)
             return;
 
         mNotificationManager.cancel(notificationId);

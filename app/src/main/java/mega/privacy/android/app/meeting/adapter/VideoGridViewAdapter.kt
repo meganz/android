@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
+import mega.privacy.android.app.utils.Constants.TYPE_VIDEO
+import timber.log.Timber
 
 class VideoGridViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -15,14 +17,14 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private var pagePosition: Int,
-    private val onPageClickedCallback: () -> Unit
+    private val onPageClickedCallback: () -> Unit,
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(gridHolder: VideoMeetingViewHolder, position: Int) {
-        logDebug("Bind view holder position $position, pagePosition $pagePosition")
+        Timber.d("Bind view holder position $position, pagePosition $pagePosition")
         gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 

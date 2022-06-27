@@ -13,11 +13,11 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -188,7 +188,7 @@ class CheckNameCollisionUseCase @Inject constructor(
 
                 check(node = node, parentHandle = parentHandle, type = type).blockingSubscribeBy(
                     onError = { error ->
-                        logError("No collision.", error)
+                        Timber.e(error, "No collision.")
                         results.add(node)
                     },
                     onSuccess = { collision -> collisions.add(collision) }
@@ -230,7 +230,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                 check(handle = handle, parentHandle = parentHandle, type = type)
                     .blockingSubscribeBy(
                         onError = { error ->
-                            logError("No collision.", error)
+                            Timber.e(error, "No collision.")
                             results.add(handle)
                         },
                         onSuccess = { collision -> collisions.add(collision) }
@@ -273,7 +273,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                 } else {
                     check(node.name, parent).blockingSubscribeBy(
                         onError = { error ->
-                            logError("No collision.", error)
+                            Timber.e(error, "No collision.")
                             results.add(node)
                         },
                         onSuccess = { handle ->
@@ -434,7 +434,7 @@ class CheckNameCollisionUseCase @Inject constructor(
 
             messageIds.forEach { messageId ->
                 getChatMessageUseCase.getChatNodes(chatId, messageId).blockingSubscribeBy(
-                    onError = { error -> logError("Error getting chat node.", error) },
+                    onError = { error -> Timber.e(error, "Error getting chat node.") },
                     onSuccess = { nodes ->
                         nodes.forEach { node ->
                             check(node.name, parentNode).blockingSubscribeBy(

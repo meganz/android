@@ -17,7 +17,6 @@ import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
@@ -25,8 +24,9 @@ import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -44,7 +44,7 @@ class GetLinkViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
-    private val exportNodeUseCase: ExportNodeUseCase
+    private val exportNodeUseCase: ExportNodeUseCase,
 ) : BaseRxViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
@@ -128,9 +128,7 @@ class GetLinkViewModel @Inject constructor(
                     updateLink(node.handle)
                     password.notifyObserver()
                 },
-                onError = { error ->
-                    logWarning(error.message)
-                }
+                onError = Timber::w
             )
             .addTo(composite)
     }
@@ -146,9 +144,7 @@ class GetLinkViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { updateLink(node.handle) },
-                onError = { error ->
-                    logWarning(error.message)
-                }
+                onError = Timber::w
             )
             .addTo(composite)
     }
@@ -298,7 +294,7 @@ class GetLinkViewModel @Inject constructor(
     fun sendLinkToChat(
         data: Intent?,
         shouldAttachKeyOrPassword: Boolean,
-        action: (Intent?) -> Unit
+        action: (Intent?) -> Unit,
     ) {
         sendToChat(data, getLinkToShare(), shouldAttachKeyOrPassword, action)
     }
@@ -315,7 +311,7 @@ class GetLinkViewModel @Inject constructor(
         data: Intent?,
         link: String? = null,
         shouldAttachKeyOrPassword: Boolean,
-        action: (Intent?) -> Unit
+        action: (Intent?) -> Unit,
     ) {
         data?.putExtra(Constants.EXTRA_LINK, link ?: node.publicLink)
 
@@ -380,9 +376,7 @@ class GetLinkViewModel @Inject constructor(
                     this.linkWithPassword = link
                     updateLink()
                 },
-                onError = { error ->
-                    logWarning(error.message)
-                }
+                onError = Timber::w
             )
             .addTo(composite)
     }

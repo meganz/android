@@ -1,5 +1,8 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
+
 import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -44,9 +47,7 @@ import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
@@ -171,7 +172,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
         try {
             return geocoder.getFromLocation(latitude, longitude, 1);
         } catch (IOException e) {
-            logError("Exception trying to get an address from a latitude and a longitude", e);
+            Timber.e(e, "Exception trying to get an address from a latitude and a longitude");
             e.printStackTrace();
             return null;
         }
@@ -207,7 +208,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
                 textToShow = textToShow.replace("[/A]", "</font>");
             } catch (Exception e) {
                 e.printStackTrace();
-                logWarning("Exception changing the format of a string", e);
+                Timber.w(e, "Exception changing the format of a string");
             }
 
             currentLocationLandscape.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
@@ -402,7 +403,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
      * @param animateCamera determines if has to have an animation or not while the camera of the map is moving
      */
     public void setMyLocation(final boolean animateCamera) {
-        logDebug("setMyLocation");
+        Timber.d("setMyLocation");
         mapHandler.setMyLocation(animateCamera);
 
     }
@@ -557,7 +558,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     private void providerEnabled() {
         if (mapHandler == null || mapHandler.isMapNull()) {
-            logWarning("mapHandler or mMap is null");
+            Timber.w("mapHandler or mMap is null");
             return;
         }
 
@@ -574,7 +575,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     private void providerDisabled() {
         if (mapHandler == null || mapHandler.isMapNull()) {
-            logWarning("mapHandler or mMap is null");
+            Timber.w("mapHandler or mMap is null");
             return;
         }
 
@@ -585,17 +586,17 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onLocationChanged(Location location) {
-        logDebug("LocationListener onLocationChanged");
+        Timber.d("LocationListener onLocationChanged");
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        logDebug("LocationListener onStatusChanged");
+        Timber.d("LocationListener onStatusChanged");
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        logDebug("LocationListener onProviderEnabled");
+        Timber.d("LocationListener onProviderEnabled");
 
         if (!provider.equals(LocationManager.GPS_PROVIDER)) {
             return;
@@ -606,7 +607,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onProviderDisabled(String provider) {
-        logDebug("LocationListener onProviderDisabled");
+        Timber.d("LocationListener onProviderDisabled");
 
         if (!provider.equals(LocationManager.GPS_PROVIDER)) {
             return;

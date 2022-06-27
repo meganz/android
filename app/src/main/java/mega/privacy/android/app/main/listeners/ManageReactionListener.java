@@ -1,6 +1,10 @@
 package mega.privacy.android.app.main.listeners;
 
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
+
 import android.content.Context;
+
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatApiJava;
@@ -8,10 +12,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
-
-import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_MESSAGE;
-import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import timber.log.Timber;
 
 public class ManageReactionListener extends ChatBaseListener {
 
@@ -40,7 +41,7 @@ public class ManageReactionListener extends ChatBaseListener {
 
             case MegaError.API_EEXIST:
                 if (hasReactionBeenAdded) {
-                    logDebug("This reaction is already added in this message, so it should be removed");
+                    Timber.d("This reaction is already added in this message, so it should be removed");
                 }
                 break;
 
@@ -54,5 +55,6 @@ public class ManageReactionListener extends ChatBaseListener {
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) { }
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    }
 }

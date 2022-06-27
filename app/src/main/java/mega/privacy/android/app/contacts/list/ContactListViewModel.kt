@@ -22,7 +22,6 @@ import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
@@ -73,9 +72,7 @@ class ContactListViewModel @Inject constructor(
                         ContactActionItem(Type.GROUPS, getString(R.string.section_groups))
                     )
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -89,9 +86,7 @@ class ContactListViewModel @Inject constructor(
                 onNext = { items ->
                     contacts.value = items.toList()
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -141,9 +136,7 @@ class ContactListViewModel @Inject constructor(
                     onSuccess = { megaUser ->
                         result.value = megaUser
                     },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                    onError = Timber::e
                 )
                 .addTo(composite)
             result
@@ -158,9 +151,7 @@ class ContactListViewModel @Inject constructor(
                 onSuccess = { chatId ->
                     result.value = chatId
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
         return result
@@ -170,9 +161,7 @@ class ContactListViewModel @Inject constructor(
         removeContactUseCase.remove(megaUser)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { error ->
-                logError(error.stackTraceToString())
-            })
+            .subscribeBy(onError = Timber::e)
             .addTo(composite)
     }
 

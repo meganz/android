@@ -10,12 +10,12 @@ import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import timber.log.Timber
 
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val listView: RecyclerView,
-    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?,
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
@@ -47,7 +47,7 @@ class VideoListViewAdapter(
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(holder: VideoMeetingViewHolder, position: Int) {
-        logDebug("Bind view holder position $position")
+        Timber.d("Bind view holder position $position")
         holder.bind(inMeetingViewModel, getItem(position), itemCount, true)
     }
 

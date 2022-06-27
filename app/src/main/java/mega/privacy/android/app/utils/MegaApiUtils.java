@@ -1,5 +1,10 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
@@ -21,27 +26,21 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import timber.log.Timber;
 
 
 public class MegaApiUtils {
 
     public static long getFolderSize(MegaNode parent, Context context) {
-        logDebug("getFolderSize: " + parent.getName());
-        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        Timber.d("getFolderSize: %s", parent.getName());
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         long size = 0;
 //        File[] files = dir.listFiles();
         ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
         for (MegaNode node : nodeList) {
             if (node.isFile()) {
                 size += node.getSize();
-            }
-            else{
+            } else {
                 size += getFolderSize(node, context);
             }
         }
@@ -62,6 +61,7 @@ public class MegaApiUtils {
 
     /**
      * Get the number of device node in backup folder
+     *
      * @param subBackupNodes The node list of MyBackup folder
      * @return the number of device node
      */
@@ -110,38 +110,37 @@ public class MegaApiUtils {
     }
 
     /*
- * If there is an application that can manage the Intent, returns true. Otherwise, false.
- */
+     * If there is an application that can manage the Intent, returns true. Otherwise, false.
+     */
     public static boolean isIntentAvailable(Context ctx, Intent intent) {
-        logDebug("isIntentAvailable");
+        Timber.d("isIntentAvailable");
         final PackageManager mgr = ctx.getPackageManager();
         List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
 
-    public static int calculateDeepBrowserTreeIncoming(MegaNode node, Context context){
-        logDebug("calculateDeepBrowserTreeIncoming");
-        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+    public static int calculateDeepBrowserTreeIncoming(MegaNode node, Context context) {
+        Timber.d("calculateDeepBrowserTreeIncoming");
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         String path = megaApi.getNodePath(node);
-        logDebug("The path is: " + path);
+        Timber.d("The path is: %s", path);
 
         Pattern pattern = Pattern.compile("/");
         int count = Util.countMatches(pattern, path);
 
-        return count+1;
+        return count + 1;
     }
 
-    public static String createStringTree (MegaNode node, Context context){
-        logDebug("createStringTree");
+    public static String createStringTree(MegaNode node, Context context) {
+        Timber.d("createStringTree");
         MegaApiAndroid megaApi = null;
-        if (context instanceof Service){
-            megaApi = ((MegaApplication) ((Service)context).getApplication()).getMegaApi();
+        if (context instanceof Service) {
+            megaApi = ((MegaApplication) ((Service) context).getApplication()).getMegaApi();
+        } else if (context instanceof Activity) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
-        else if (context instanceof Activity){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-        if(megaApi==null){
-            logError("ERROR megaApi is null");
+        if (megaApi == null) {
+            Timber.e("ERROR megaApi is null");
             return null;
         }
 
@@ -153,8 +152,8 @@ public class MegaApiUtils {
 
         dTreeList.add(node);
 
-        if(node.getType() != MegaNode.TYPE_ROOT){
-            parentNode=megaApi.getParentNode(nodeTemp);
+        if (node.getType() != MegaNode.TYPE_ROOT) {
+            parentNode = megaApi.getParentNode(nodeTemp);
 
 //			if(parentNode!=null){
 //				while (parentNode.getType() != MegaNode.TYPE_ROOT){
@@ -167,32 +166,31 @@ public class MegaApiUtils {
 //				}
 //			}
 
-            if(parentNode!=null){
+            if (parentNode != null) {
 
-                if((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle()!=megaApi.getInboxNode().getHandle())){
-                    do{
+                if ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getInboxNode().getHandle())) {
+                    do {
 
                         dTreeList.add(parentNode);
-                        dTree.insert(0, parentNode.getName()+"/");
-                        nodeTemp=parentNode;
+                        dTree.insert(0, parentNode.getName() + "/");
+                        nodeTemp = parentNode;
 
-                        parentNode=megaApi.getParentNode(nodeTemp);
-                        if(parentNode==null){
+                        parentNode = megaApi.getParentNode(nodeTemp);
+                        if (parentNode == null) {
                             break;
                         }
-                    }while ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle()!=megaApi.getInboxNode().getHandle()));
+                    } while ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle() != megaApi.getInboxNode().getHandle()));
                 }
             }
         }
 
-        if(dTree.length()>0){
+        if (dTree.length() > 0) {
             s = dTree.toString();
-        }
-        else{
-            s="";
+        } else {
+            s = "";
         }
 
-        logDebug("createStringTree: " + s);
+        Timber.d("createStringTree: %s", s);
         return s;
     }
 
@@ -208,7 +206,7 @@ public class MegaApiUtils {
 
     public static ArrayList<MegaUser> getLastContactedUsers(Context context) {
 
-        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
 
         ArrayList<MegaUser> lastContacted = new ArrayList<MegaUser>();
 
@@ -248,10 +246,10 @@ public class MegaApiUtils {
 
         ArrayList<MegaUser> usersNoAvatar = new ArrayList<>();
 
-        for(int i=0; i<users.size(); i++){
-            if (users.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 boolean included = false;
-                for(int j=0; j<lastContacted.size(); j++) {
+                for (int j = 0; j < lastContacted.size(); j++) {
                     if (lastContacted.get(j).getHandle() == users.get(i).getHandle()) {
                         //Already included on the list
                         included = true;
@@ -259,21 +257,19 @@ public class MegaApiUtils {
                     }
                 }
 
-                if(!included){
+                if (!included) {
                     File avatar = buildAvatarFile(context, users.get(i).getEmail() + ".jpg");
                     if (isFileAvailable(avatar)) {
                         if (avatar.length() > 0) {
                             lastContacted.add(users.get(i));
-                        }
-                        else{
+                        } else {
                             usersNoAvatar.add(users.get(i));
                         }
-                    }
-                    else{
+                    } else {
                         usersNoAvatar.add(users.get(i));
                     }
 
-                    if(lastContacted.size() >= 6){
+                    if (lastContacted.size() >= 6) {
                         return lastContacted;
                     }
                 }
@@ -281,10 +277,10 @@ public class MegaApiUtils {
         }
 
         //Add contacts without avatar
-        for(int i=0; i<usersNoAvatar.size(); i++){
+        for (int i = 0; i < usersNoAvatar.size(); i++) {
             lastContacted.add(usersNoAvatar.get(i));
 
-            if(lastContacted.size() >= 6){
+            if (lastContacted.size() >= 6) {
                 return lastContacted;
             }
         }

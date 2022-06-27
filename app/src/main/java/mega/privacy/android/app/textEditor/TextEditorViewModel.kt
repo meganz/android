@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
@@ -48,6 +47,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import java.io.*
 import java.lang.Exception
 import java.net.HttpURLConnection
@@ -356,7 +356,7 @@ class TextEditorViewModel @Inject constructor(
             }
 
             if (streamingFileURL == null) {
-                logError("Error getting the file URL.")
+                Timber.e("Error getting the file URL.")
                 return@withContext
             }
 
@@ -365,7 +365,7 @@ class TextEditorViewModel @Inject constructor(
             try {
                 deferred.await()
             } catch (e: Exception) {
-                logError("Creating connection for reading by streaming.", e)
+                Timber.e(e, "Creating connection for reading by streaming.")
             }
         }
     }
@@ -400,7 +400,7 @@ class TextEditorViewModel @Inject constructor(
 
                 br.close()
             } catch (e: IOException) {
-                logError("Exception while reading text file.", e)
+                Timber.e(e, "Exception while reading text file.")
             }
 
             checkIfNeedsStopHttpServer()
@@ -433,7 +433,7 @@ class TextEditorViewModel @Inject constructor(
 
         val tempFile = CacheFolderManager.buildTempFile(activity, fileName.value)
         if (tempFile == null) {
-            logError("Cannot get temporal file.")
+            Timber.e("Cannot get temporal file.")
             return
         }
 
@@ -443,7 +443,7 @@ class TextEditorViewModel @Inject constructor(
         out.close()
 
         if (!isFileAvailable(tempFile)) {
-            logError("Cannot manage temporal file.")
+            Timber.e("Cannot manage temporal file.")
             return
         }
 
@@ -456,7 +456,7 @@ class TextEditorViewModel @Inject constructor(
         }
 
         if (parentHandle == null) {
-            logError("Parent handle not valid.")
+            Timber.e("Parent handle not valid.")
             return
         }
 
@@ -476,7 +476,7 @@ class TextEditorViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ParentDoesNotExistException -> {
-                            logError(error.message)
+                            Timber.e(error)
                         }
                         is MegaNodeException.ChildDoesNotExistsException -> {
                             uploadFile(activity, fromHome, tempFile, parentHandle)
@@ -544,7 +544,7 @@ class TextEditorViewModel @Inject constructor(
                     },
                     onError = { error ->
                         throwable.value = error
-                        logError("Not copied: ", error)
+                        Timber.e(error, "Not copied: ")
                     }
                 )
                 .addTo(composite)
@@ -573,7 +573,7 @@ class TextEditorViewModel @Inject constructor(
                     },
                     onError = { error ->
                         throwable.value = error
-                        logError("Not moved: ", error)
+                        Timber.e(error, "Not moved: ")
                     }
                 )
                 .addTo(composite)
@@ -602,7 +602,7 @@ class TextEditorViewModel @Inject constructor(
                 onError = { error ->
                     when (error) {
                         is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> logError(error.stackTraceToString())
+                        else -> Timber.e(error)
                     }
                 }
             )

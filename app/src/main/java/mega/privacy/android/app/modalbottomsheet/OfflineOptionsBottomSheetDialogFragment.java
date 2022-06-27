@@ -1,12 +1,18 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
+import static mega.privacy.android.app.utils.FileUtil.getFileFolderInfo;
+import static mega.privacy.android.app.utils.FileUtil.getFileInfo;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.io.File;
 import java.util.Collections;
 
@@ -23,11 +33,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.OfflineUtils;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -84,7 +90,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
 
             nodeName.setText(nodeOffline.getName());
 
-            logDebug("Set node info");
+            Timber.d("Set node info");
             file = OfflineUtils.getOfflineFile(requireContext(), nodeOffline);
             if (!isFileAvailable(file)) return;
 
