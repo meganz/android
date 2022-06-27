@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,183 +17,183 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 
 public class PreviewUtils {
 
-	private static MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+    private static MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
 
-	public static File previewDir;
-	public static PreviewCache previewCache = new PreviewCache();
+    public static File previewDir;
+    public static PreviewCache previewCache = new PreviewCache();
 
-	//10mb
-	private static final long THRESHOLD = 10 * 1024 * 1024;
+    //10mb
+    private static final long THRESHOLD = 10 * 1024 * 1024;
 
-	/*
-	 * Get preview folder
-	 */	
-	public static File getPreviewFolder(Context context) {
-	    if(!isFileAvailable(previewDir)) {
+    /*
+     * Get preview folder
+     */
+    public static File getPreviewFolder(Context context) {
+        if (!isFileAvailable(previewDir)) {
             previewDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER);
         }
         return previewDir;
-	}
+    }
 
-	public static Bitmap getPreviewFromCache(MegaNode node){
-		return previewCache.get(node.getHandle());
-	}
-	
-	public static Bitmap getPreviewFromCache(long handle){
-		return previewCache.get(handle);
-	}
-	
-	public static void setPreviewCache(long handle, Bitmap bitmap){
-		previewCache.put(handle, bitmap);
-	}
+    public static Bitmap getPreviewFromCache(MegaNode node) {
+        return previewCache.get(node.getHandle());
+    }
 
-	/**
-	 * Get the preview of a node.
-	 * @param node Node from which want to get the preview.
-	 * @param context The current context.
-	 * @return The bitmap of the preview.
-	 */
-	public static Bitmap getPreviewFromFolder(MegaNode node, Context context) {
-		return getPreview(node.getHandle(), context);
-	}
+    public static Bitmap getPreviewFromCache(long handle) {
+        return previewCache.get(handle);
+    }
 
-	/**
-	 * Get the preview of a local file.
-	 * @param localPath Local path of the file from which want to get the preview.
-	 * @param context The current context.
-	 * @return The bitmap of the preview.
-	 */
-	public static Bitmap getPreview(String localPath, Context context) {
-		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(localPath));
-		return getPreview(fingerprintCache, context);
-	}
+    public static void setPreviewCache(long handle, Bitmap bitmap) {
+        previewCache.put(handle, bitmap);
+    }
 
-	/**
-	 * Get a preview using a handle as identifier.
-	 * @param handle Handle of the node from which want to get the preview.
-	 * @param context The current context.
-	 * @return The bitmap of the preview.
-	 */
-	private static Bitmap getPreview(long handle, Context context) {
-		Bitmap bmp = previewCache.get(handle);
-		if (bmp == null) {
-			File previewDir = getPreviewFolder(context);
-			File preview = new File(previewDir, handle + ".jpg");
-			if (preview.exists()) {
-				if (preview.length() > 0) {
-					bmp = getBitmapForCache(preview, context);
-					if (bmp == null) {
-						preview.delete();
-					} else {
-						previewCache.put(handle, bmp);
-					}
-				}
-			}
-		}
-		return bmp;
-	}
+    /**
+     * Get the preview of a node.
+     *
+     * @param node    Node from which want to get the preview.
+     * @param context The current context.
+     * @return The bitmap of the preview.
+     */
+    public static Bitmap getPreviewFromFolder(MegaNode node, Context context) {
+        return getPreview(node.getHandle(), context);
+    }
 
-	public static Bitmap createVideoPreview(String filePath, int kind) {
-		Bitmap bitmap = null;
-		MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-		try {
-			retriever.setDataSource(filePath);
-			bitmap = retriever.getFrameAtTime(-1);
-		} catch (IllegalArgumentException ex) {
-			// Assume this is a corrupt video file
-		} catch (RuntimeException ex) {
-			// Assume this is a corrupt video file.
-		} finally {
-			try {
-				retriever.release();
-			} catch (RuntimeException ex) {
-				// Ignore failures while cleaning up.
-			}
-		}
+    /**
+     * Get the preview of a local file.
+     *
+     * @param localPath Local path of the file from which want to get the preview.
+     * @param context   The current context.
+     * @return The bitmap of the preview.
+     */
+    public static Bitmap getPreview(String localPath, Context context) {
+        long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(localPath));
+        return getPreview(fingerprintCache, context);
+    }
 
-		if (bitmap == null) return null;
+    /**
+     * Get a preview using a handle as identifier.
+     *
+     * @param handle  Handle of the node from which want to get the preview.
+     * @param context The current context.
+     * @return The bitmap of the preview.
+     */
+    private static Bitmap getPreview(long handle, Context context) {
+        Bitmap bmp = previewCache.get(handle);
+        if (bmp == null) {
+            File previewDir = getPreviewFolder(context);
+            File preview = new File(previewDir, handle + ".jpg");
+            if (preview.exists()) {
+                if (preview.length() > 0) {
+                    bmp = getBitmapForCache(preview, context);
+                    if (bmp == null) {
+                        preview.delete();
+                    } else {
+                        previewCache.put(handle, bmp);
+                    }
+                }
+            }
+        }
+        return bmp;
+    }
 
-		if (kind == MediaStore.Images.Thumbnails.FULL_SCREEN_KIND) {
-			// Scale down the bitmap if it's too large.
-			int width = bitmap.getWidth();
-			int height = bitmap.getHeight();
-			int max = Math.max(width, height);
-			if (max > 1000) {
-				float scale = 1000f / max;
-				int w = Math.round(scale * width);
-				int h = Math.round(scale * height);
-				bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
-			}
-		}
-		return bitmap;
-	}
+    public static Bitmap createVideoPreview(String filePath, int kind) {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(filePath);
+            bitmap = retriever.getFrameAtTime(-1);
+        } catch (IllegalArgumentException ex) {
+            // Assume this is a corrupt video file
+        } catch (RuntimeException ex) {
+            // Assume this is a corrupt video file.
+        } finally {
+            try {
+                retriever.release();
+            } catch (Exception ex) {
+                // Ignore failures while cleaning up.
+            }
+        }
 
-    public static Bitmap getBitmapForCache(File bmpFile,Context context) {
+        if (bitmap == null) return null;
+
+        if (kind == MediaStore.Images.Thumbnails.FULL_SCREEN_KIND) {
+            // Scale down the bitmap if it's too large.
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            int max = Math.max(width, height);
+            if (max > 1000) {
+                float scale = 1000f / max;
+                int w = Math.round(scale * width);
+                int h = Math.round(scale * height);
+                bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+            }
+        }
+        return bitmap;
+    }
+
+    public static Bitmap getBitmapForCache(File bmpFile, Context context) {
         BitmapFactory.Options bOpts = new BitmapFactory.Options();
         bOpts.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
+        BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 
         // set inSampleSize to avoid OOM
         int inSampleSize = 1;
         if (context instanceof Activity) {
-            Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+            Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
             //half of the screen size.
-            inSampleSize = calculateInSampleSize(bOpts,size.x / 2,size.y / 2);
+            inSampleSize = calculateInSampleSize(bOpts, size.x / 2, size.y / 2);
         }
-		logDebug("inSampleSize: " + inSampleSize);
+        Timber.d("inSampleSize: %s", inSampleSize);
         bOpts.inJustDecodeBounds = false;
         bOpts.inSampleSize = inSampleSize;
-		logDebug("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
-        return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
+        Timber.d("PREVIEW_SIZE %s____ %d", bmpFile.getAbsolutePath(), bmpFile.length());
+        return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
     }
 
-    public static Bitmap getPreviewFromFolderFullImage(MegaNode node, Context context){
-		if (node == null) return null;
+    public static Bitmap getPreviewFromFolderFullImage(MegaNode node, Context context) {
+        if (node == null) return null;
 
         Bitmap bmp = previewCache.get(node.getHandle());
-        if(bmp == null) {
+        if (bmp == null) {
             File previewDir = getPreviewFolder(context);
-            File preview = new File(previewDir, node.getBase64Handle()+".jpg");
-            if (preview.exists() && preview.length() > 0){
-				bmp = getBitmapForCacheFullImage(preview, context);
-				if (bmp == null) {
-					preview.delete();
-				}
-				else{
-					previewCache.put(node.getHandle(), bmp);
-				}
+            File preview = new File(previewDir, node.getBase64Handle() + ".jpg");
+            if (preview.exists() && preview.length() > 0) {
+                bmp = getBitmapForCacheFullImage(preview, context);
+                if (bmp == null) {
+                    preview.delete();
+                } else {
+                    previewCache.put(node.getHandle(), bmp);
+                }
             }
         }
         return bmp;
     }
 
     public static Bitmap getBitmapForCacheFullImage(File bmpFile, Context context) {
-	    if(!testAllocation()) {
+        if (!testAllocation()) {
             return null;
         } else {
-	        return getBitmapForCache(bmpFile, context);
+            return getBitmapForCache(bmpFile, context);
         }
     }
 
     public static boolean testAllocation() {
-	    Runtime runtime = Runtime.getRuntime();
+        Runtime runtime = Runtime.getRuntime();
         long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
         long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
         long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
-        logDebug("maxHeapSizeInMB " + maxHeapSizeInMB + " availHeapSizeInMB is " + availHeapSizeInMB + " usedMemInMB is" + usedMemInMB);
+        Timber.d("maxHeapSizeInMB %d availHeapSizeInMB is %d usedMemInMB is%d", maxHeapSizeInMB, availHeapSizeInMB, usedMemInMB);
         return runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()) > THRESHOLD;
     }
 
-	/*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
+    /*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -214,21 +216,20 @@ public class PreviewUtils {
 
 
     public static Bitmap resizeBitmapUpload(Bitmap bitmap, int width, int height) {
-		Bitmap resizeBitmap = null;
-		int resizeWidth, resizeHeight;
-		float resize;
+        Bitmap resizeBitmap = null;
+        int resizeWidth, resizeHeight;
+        float resize;
 
-		if (width > height) {
-			resize = (float) 1000 / width;
-		}
-		else {
-			resize = (float) 1000 / height;
-		}
-		resizeWidth = (int) (width * resize);
-		resizeHeight = (int) (height * resize);
+        if (width > height) {
+            resize = (float) 1000 / width;
+        } else {
+            resize = (float) 1000 / height;
+        }
+        resizeWidth = (int) (width * resize);
+        resizeHeight = (int) (height * resize);
 
-		resizeBitmap = Bitmap.createScaledBitmap(bitmap, resizeWidth, resizeHeight, false);
+        resizeBitmap = Bitmap.createScaledBitmap(bitmap, resizeWidth, resizeHeight, false);
 
-		return resizeBitmap;
-	}
+        return resizeBitmap;
+    }
 }

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.main.megaachievements;
 
+import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,89 +24,87 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import timber.log.Timber;
 
 public class ReferralBonusesFragment extends BaseFragment implements OnClickListener
-		, GetAchievementsListener.DataCallback{
-	RelativeLayout parentRelativeLayout;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	MegaReferralBonusesAdapter adapter;
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		logDebug("onCreateView");
+        , GetAchievementsListener.DataCallback {
+    RelativeLayout parentRelativeLayout;
+    RecyclerView recyclerView;
+    LinearLayoutManager mLayoutManager;
+    MegaReferralBonusesAdapter adapter;
 
-		boolean enabledAchievements = megaApi.isAchievementsEnabled();
-		logDebug("The achievements are: " + enabledAchievements);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Timber.d("onCreateView");
 
-		View v = inflater.inflate(R.layout.fragment_referral_bonuses, container, false);
+        boolean enabledAchievements = megaApi.isAchievementsEnabled();
+        Timber.d("The achievements are: %s", enabledAchievements);
 
-		parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
+        View v = inflater.inflate(R.layout.fragment_referral_bonuses, container, false);
 
-		recyclerView = (RecyclerView) v.findViewById(R.id.referral_bonuses_recycler_view);
-		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
-		mLayoutManager = new LinearLayoutManager(context);
-		recyclerView.setLayoutManager(mLayoutManager);
-		recyclerView.setItemAnimator(new DefaultItemAnimator());
+        parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
 
-		return v;
-	}
+        recyclerView = (RecyclerView) v.findViewById(R.id.referral_bonuses_recycler_view);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+        mLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-	@Override
-	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+        return v;
+    }
 
-		// Activity actionbar has been created which might be accessed by UpdateUI().
-		if (mActivity != null) {
-			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
-			if (actionBar != null) {
-				actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
-						.toUpperCase(Locale.getDefault()));
-			}
-		}
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-		// The root view has been created, fill it with the data when data ready
-		if (sFetcher != null) {
-			sFetcher.setDataCallback(this);
-		}
-	}
+        // Activity actionbar has been created which might be accessed by UpdateUI().
+        if (mActivity != null) {
+            ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
+                        .toUpperCase(Locale.getDefault()));
+            }
+        }
 
-	@Override
-	public void onClick(View v) {
-		logDebug("onClick");
-		switch (v.getId()) {
-			case R.id.referral_bonuses_layout:{
-				logDebug("Go to section Referral bonuses");
-				break;
-			}
-		}
-	}
+        // The root view has been created, fill it with the data when data ready
+        if (sFetcher != null) {
+            sFetcher.setDataCallback(this);
+        }
+    }
 
-	public int onBackPressed(){
-		logDebug("onBackPressed");
-		return 0;
-	}
+    @Override
+    public void onClick(View v) {
+        Timber.d("onClick");
+        switch (v.getId()) {
+            case R.id.referral_bonuses_layout: {
+                Timber.d("Go to section Referral bonuses");
+                break;
+            }
+        }
+    }
 
-	private void updateUI() {
-		if (context == null || sFetcher == null) return;
+    public int onBackPressed() {
+        Timber.d("onBackPressed");
+        return 0;
+    }
 
-		ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
-		if (bonuses.size() == 0) return;
+    private void updateUI() {
+        if (context == null || sFetcher == null) return;
 
-		if (adapter == null) {
-			adapter = new MegaReferralBonusesAdapter(context, this, bonuses, recyclerView);
-		} else {
-			adapter.setReferralBonuses(bonuses);
-		}
+        ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
+        if (bonuses.size() == 0) return;
 
-		recyclerView.setAdapter(adapter);
-	}
+        if (adapter == null) {
+            adapter = new MegaReferralBonusesAdapter(context, this, bonuses, recyclerView);
+        } else {
+            adapter.setReferralBonuses(bonuses);
+        }
 
-	@Override
-	public void onAchievementsReceived() {
-		updateUI();
-	}
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onAchievementsReceived() {
+        updateUI();
+    }
 }

@@ -1,6 +1,8 @@
 package mega.privacy.android.app.utils;
 
 import static android.app.Activity.RESULT_OK;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,11 +13,8 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
-import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class UploadUtil {
 
@@ -26,7 +25,7 @@ public class UploadUtil {
      * @return The temporal file in which the picture is stored.
      */
     public static File getTemporalTakePictureFile(Context context) {
-        logDebug("uploadTakePicture");
+        Timber.d("uploadTakePicture");
         File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
             Util.showSnackbar(context, StringResourcesUtils.getString(R.string.general_error));
@@ -34,7 +33,7 @@ public class UploadUtil {
         }
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-        logDebug("Taken picture Name: "+name);
+        Timber.d("Taken picture Name: %s", name);
         File newFile = CacheFolderManager.buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
@@ -72,7 +71,7 @@ public class UploadUtil {
      */
     public static void getFolder(Activity activity, int resultCode, Intent data, long parentHandle) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            logWarning("resultCode: " + resultCode);
+            Timber.w("resultCode: %s", resultCode);
             return;
         }
 
@@ -85,7 +84,9 @@ public class UploadUtil {
                 Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
     }
 
-    /** The method is to return sdcard root of the file
+    /**
+     * The method is to return sdcard root of the file
+     *
      * @param sd the sd card file
      * @return where the file's sd card root is
      */

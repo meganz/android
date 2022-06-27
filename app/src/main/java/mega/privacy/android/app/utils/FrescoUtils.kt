@@ -26,7 +26,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import timber.log.Timber
 
 object FrescoUtils {
 
@@ -45,7 +45,7 @@ object FrescoUtils {
         pb: ProgressBar?,
         shouldDisplayPlaceHolder: Boolean,
         placeholder: Drawable?,
-        uri: Uri?
+        uri: Uri?,
     ) {
         // Set placeholder and its scale type here rather than in xml.
         if (shouldDisplayPlaceHolder) {
@@ -69,14 +69,14 @@ object FrescoUtils {
                 override fun onFinalImageSet(
                     id: String,
                     imageInfo: ImageInfo?,
-                    animatable: Animatable?
+                    animatable: Animatable?,
                 ) {
                     hideProgressBar(pb)
                 }
 
                 override fun onFailure(id: String, throwable: Throwable) {
                     hideProgressBar(pb)
-                    logWarning("Load gif failed, error: " + throwable.message)
+                    Timber.w(throwable, "Load gif failed, error")
                 }
             })
             .build()
@@ -96,7 +96,7 @@ object FrescoUtils {
         gifImgDisplay: SimpleDraweeView,
         pb: ProgressBar?,
         placeholder: Drawable?,
-        uri: Uri?
+        uri: Uri?,
     ) {
         loadGif(gifImgDisplay, pb, true, placeholder, uri)
     }
@@ -155,10 +155,10 @@ object FrescoUtils {
         pb: ProgressBar?,
         preview: RoundedImageView?,
         fileView: RelativeLayout?,
-        uri: Uri?
+        uri: Uri?,
     ) {
         if (gifImgDisplay == null) {
-            logWarning("Unable to load GIF, view is null.")
+            Timber.w("Unable to load GIF, view is null.")
             return
         }
         if (gifImgDisplay.visibility != View.VISIBLE) {
@@ -174,7 +174,7 @@ object FrescoUtils {
                 override fun onFinalImageSet(
                     id: String,
                     imageInfo: ImageInfo?,
-                    animatable: Animatable?
+                    animatable: Animatable?,
                 ) {
                     MegaChatAdapter.updateViewDimensions(
                         gifImgDisplay,
@@ -191,7 +191,7 @@ object FrescoUtils {
                 }
 
                 override fun onFailure(id: String, throwable: Throwable) {
-                    logWarning("Load gif failed, error: " + throwable.message)
+                    Timber.w(throwable, "Load gif failed, error")
                 }
             })
             .build()

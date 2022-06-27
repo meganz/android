@@ -1,5 +1,12 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.Constants.ACTION_PARK_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS;
+import static mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,10 +17,7 @@ import mega.privacy.android.app.main.LoginActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class QueryRecoveryLinkListener extends BaseListener {
 
@@ -26,7 +30,7 @@ public class QueryRecoveryLinkListener extends BaseListener {
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != MegaRequest.TYPE_QUERY_RECOVERY_LINK) return;
-        logDebug("TYPE_GET_RECOVERY_LINK");
+        Timber.d("TYPE_GET_RECOVERY_LINK");
 
         if (context instanceof OpenLinkActivity) {
             openLinkActivity = (OpenLinkActivity) context;
@@ -36,7 +40,7 @@ public class QueryRecoveryLinkListener extends BaseListener {
 
         if (openLinkActivity != null) {
             if (url == null) {
-                logWarning("Error opening link URL null: " + e.getErrorString() + "___" + e.getErrorCode());
+                Timber.w("Error opening link URL null: %s___%d", e.getErrorString(), e.getErrorCode());
                 openLinkActivity.setError(openLinkActivity.getString(R.string.general_text_error));
             }
 
@@ -69,7 +73,7 @@ public class QueryRecoveryLinkListener extends BaseListener {
 
                 case MegaError.API_EACCESS:
                     if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
-                        logWarning("Error opening link not related to this account: " + e.getErrorString() + "___" + e.getErrorCode());
+                        Timber.w("Error opening link not related to this account: %s___%d", e.getErrorString(), e.getErrorCode());
                         openLinkActivity.setError(openLinkActivity.getString(R.string.error_not_logged_with_correct_account));
                     }
                     break;

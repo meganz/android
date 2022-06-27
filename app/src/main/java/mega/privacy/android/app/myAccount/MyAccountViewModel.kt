@@ -31,21 +31,50 @@ import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.qrcode.QRCodeActivity
-import mega.privacy.android.app.myAccount.usecase.*
+import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
+import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
+import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
+import mega.privacy.android.app.myAccount.usecase.CheckVersionsUseCase
+import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
+import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
+import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
+import mega.privacy.android.app.myAccount.usecase.GetMyAvatarUseCase
+import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
+import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
+import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
+import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
+import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
+import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
+import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
+import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
+import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
+import mega.privacy.android.app.utils.Constants.FREE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
+import mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR
+import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
+import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
+import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
+import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EARGS
 import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -71,7 +100,7 @@ class MyAccountViewModel @Inject constructor(
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
-    private val filePrepareUseCase: FilePrepareUseCase
+    private val filePrepareUseCase: FilePrepareUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -267,7 +296,7 @@ class MyAccountViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onComplete = { setVersionsInfo() },
-                    onError = { error -> logWarning(error.message) }
+                    onError = Timber::w
                 )
                 .addTo(composite)
         } else setVersionsInfo()
@@ -287,7 +316,7 @@ class MyAccountViewModel @Inject constructor(
                 .subscribeBy(
                     onSuccess = { action.invoke(true) },
                     onError = { error ->
-                        logWarning(error.message)
+                        Timber.w(error)
                         action.invoke(false)
                     }
                 )
@@ -307,7 +336,7 @@ class MyAccountViewModel @Inject constructor(
             .subscribeBy(
                 onSuccess = { action.invoke(true) },
                 onError = { error ->
-                    logWarning("Error when killing sessions: ${error.message}")
+                    Timber.w("Error when killing sessions: ${error.message}")
                     action.invoke(false)
                 }
             )
@@ -345,10 +374,10 @@ class MyAccountViewModel @Inject constructor(
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         if (resultCode != RESULT_OK) {
-            logWarning("Result code not OK. Request code $requestCode")
+            Timber.w("Result code not OK. Request code $requestCode")
             return
         }
 
@@ -411,7 +440,7 @@ class MyAccountViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { info -> addProfileAvatar(info.fileAbsolutePath) },
-                onError = { error -> logWarning(error.message) }
+                onError = Timber::w
             )
             .addTo(composite)
     }
@@ -473,7 +502,7 @@ class MyAccountViewModel @Inject constructor(
             .subscribeBy(
                 onSuccess = { action.invoke(true) },
                 onError = { error ->
-                    logWarning("Error when killing sessions: ${error.message}")
+                    Timber.w("Error when killing sessions: ${error.message}")
                     action.invoke(false)
                 }
             )
@@ -499,7 +528,7 @@ class MyAccountViewModel @Inject constructor(
                     } else AccountController.logout(context, megaApi, viewModelScope)
                 },
                 onError = { error ->
-                    logError("Error when killing sessions: ${error.message}")
+                    Timber.e(error, "Error when killing sessions")
                 }
             )
             .addTo(composite)
@@ -617,7 +646,7 @@ class MyAccountViewModel @Inject constructor(
                 )
                 .addTo(composite)
         } else {
-            logError("ERROR! Destination PATH is NULL")
+            Timber.e("Destination PATH is NULL")
         }
     }
 
@@ -630,7 +659,7 @@ class MyAccountViewModel @Inject constructor(
     fun deleteProfileAvatar(context: Context, snackbarShower: SnackbarShower) {
         CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.let {
             if (FileUtil.isFileAvailable(it)) {
-                Timber.d("Avatar to delete: " + it.absolutePath)
+                Timber.d("Avatar to delete: ${it.absolutePath}")
                 it.delete()
             }
         }
@@ -745,7 +774,7 @@ class MyAccountViewModel @Inject constructor(
             .subscribeBy(
                 onComplete = { getUserData(isModify, snackbarShower, action) },
                 onError = { error ->
-                    logWarning("Reset phone number failed: ${error.message}")
+                    Timber.w("Reset phone number failed: ${error.message}")
                     snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
                 })
             .addTo(composite)
@@ -768,7 +797,7 @@ class MyAccountViewModel @Inject constructor(
                     else snackbarShower.showSnackbar(getString(R.string.remove_phone_number_success))
                 },
                 onError = { error ->
-                    logWarning("Reset phone number failed: ${error.message}")
+                    Timber.w("Reset phone number failed: ${error.message}")
                     snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
                 })
             .addTo(composite)
@@ -783,7 +812,7 @@ class MyAccountViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { setVersionsInfo() },
-                onError = { error -> logWarning(error.message) })
+                onError = Timber::w)
             .addTo(composite)
     }
 
@@ -816,7 +845,7 @@ class MyAccountViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onComplete = { logDebug("ACCOUNT CANCELED") },
+                    onComplete = { Timber.d("ACCOUNT CANCELED") },
                     onError = { error -> error.message?.let { message -> action.invoke(message) } })
                 .addTo(composite)
         }
@@ -849,7 +878,7 @@ class MyAccountViewModel @Inject constructor(
     fun finishConfirmChangeEmail(
         password: String,
         actionSuccess: (String) -> Unit,
-        actionError: (String) -> Unit
+        actionError: (String) -> Unit,
     ) {
         confirmationLink?.let { link ->
             confirmChangeEmailUseCase.confirm(link, password)
@@ -857,7 +886,7 @@ class MyAccountViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy { result ->
                     if (Patterns.EMAIL_ADDRESS.matcher(result).find()) {
-                        logDebug("EMAIL_CHANGED")
+                        Timber.d("EMAIL_CHANGED")
                         actionSuccess.invoke(result)
                     } else {
                         actionError.invoke(result)
@@ -877,7 +906,7 @@ class MyAccountViewModel @Inject constructor(
     fun finishPasswordChange(
         result: Int,
         actionSuccess: (String) -> Unit,
-        actionError: (String) -> Unit
+        actionError: (String) -> Unit,
     ) {
         when (result) {
             API_OK -> actionSuccess.invoke(getString(R.string.pass_changed_alert))

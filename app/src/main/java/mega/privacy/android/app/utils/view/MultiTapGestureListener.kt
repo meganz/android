@@ -17,14 +17,14 @@ class MultiTapGestureListener constructor(
     private val onZoomCallback: () -> Unit
 ) : DoubleTapGestureListener(zoomableDraweeView) {
 
-    override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
         onSingleTapCallback.invoke()
         return super.onSingleTapConfirmed(e)
     }
 
     override fun onScroll(
-        e1: MotionEvent?,
-        e2: MotionEvent?,
+        e1: MotionEvent,
+        e2: MotionEvent,
         distanceX: Float,
         distanceY: Float
     ): Boolean {

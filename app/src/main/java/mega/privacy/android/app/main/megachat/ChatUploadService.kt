@@ -1,63 +1,82 @@
 package mega.privacy.android.app.main.megachat
 
 import android.annotation.SuppressLint
-import android.app.*
-import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
-import mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile
-import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpty
-import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
-import nz.mega.sdk.MegaTransferListenerInterface
-import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaChatRequestListenerInterface
-import nz.mega.sdk.MegaTransfer
-import mega.privacy.android.app.MegaApplication
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import android.net.wifi.WifiManager.WifiLock
-import mega.privacy.android.app.DatabaseHandler
-import nz.mega.sdk.MegaNode
-import mega.privacy.android.app.VideoDownsampling
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.net.wifi.WifiManager
 import android.content.Intent
 import android.content.IntentFilter
-import nz.mega.sdk.MegaChatApiJava
-import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
-import androidx.core.content.ContextCompat
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import mega.privacy.android.app.AndroidCompletedTransfer
-import com.shockwave.pdfium.PdfiumCore
 import android.graphics.Bitmap
-import android.os.*
+import android.net.wifi.WifiManager
+import android.net.wifi.WifiManager.WifiLock
+import android.os.Build
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.ParcelFileDescriptor
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+
 import com.jeremyliao.liveeventbus.LiveEventBus
+import androidx.core.content.ContextCompat
+import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.constants.EventConstants
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.AndroidCompletedTransfer
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
+import mega.privacy.android.app.VideoDownsampling
+import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.ChatImageQuality
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatError
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile
+import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
+import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpty
+import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.MegaTransferUtils.isVoiceClipType
+import mega.privacy.android.app.utils.PreviewUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
-import java.util.ArrayList
-import java.util.HashMap
 import javax.inject.Inject
 
 /**
@@ -175,7 +194,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             )
             true
         } catch (e: Exception) {
-            Timber.w("Error starting foreground.", e)
+            Timber.w(e, "Error starting foreground.")
             false
         }
     }
@@ -250,7 +269,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 if (!TextUtil.isTextEmpty(data) && data.contains(Constants.APP_DATA_CHAT)) {
                     mapProgressTransfers!![transfer.tag] = transfer
 
-                    if (isVoiceClip(data)) {
+                    if (transfer.isVoiceClipType()) {
                         voiceClipsInProgress++
                     } else {
                         transfersManagement.checkIfTransferIsPaused(transfer)
@@ -528,7 +547,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
      */
     private fun addPendingMessagesAndStartUpload(
         idPendingMessage: Long, type: String?, fileName: String?,
-        localPath: String, pendingMsgs: ArrayList<PendingMessageSingle>
+        localPath: String, pendingMsgs: ArrayList<PendingMessageSingle>,
     ) {
         pendingMessages!!.addAll(pendingMsgs)
         startUpload(idPendingMessage, type, fileName, localPath)
@@ -546,7 +565,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         idPendingMessage: Long,
         type: String?,
         fileName: String?,
-        localPath: String
+        localPath: String,
     ) {
         var data = Constants.APP_DATA_CHAT + Constants.APP_DATA_INDICATOR + idPendingMessage
 
@@ -691,7 +710,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             var inProgress: Long = 0
 
             for (currentTransfer in transfers) {
-                if (!isVoiceClip(currentTransfer.appData)) {
+                if (!currentTransfer.isVoiceClipType()) {
                     if (currentTransfer.state == MegaTransfer.STATE_COMPLETED) {
                         total += currentTransfer.totalBytes
                         inProgress += currentTransfer.totalBytes
@@ -707,7 +726,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             }
         } else if (totalVideos > 0) {
             for (currentTransfer in transfers) {
-                if (!isVoiceClip(currentTransfer.appData)) {
+                if (!currentTransfer.isVoiceClipType()) {
                     val individualInProgress = currentTransfer.transferredBytes
                     val individualTotalBytes = currentTransfer.totalBytes
                     var individualProgressPercent: Long = 0
@@ -743,7 +762,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             var inProgress: Long = 0
 
             for (currentTransfer in transfers) {
-                if (!isVoiceClip(currentTransfer.appData)) {
+                if (!currentTransfer.isVoiceClipType()) {
                     total += currentTransfer.totalBytes
                     inProgress += currentTransfer.transferredBytes
                 }
@@ -861,7 +880,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
     override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
         if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            Timber.d("onTransferStart: " + transfer.nodeHandle)
+            Timber.d("onTransferStart: ${transfer.nodeHandle}")
             val appData = transfer.appData ?: return
 
             if (appData.contains(Constants.APP_DATA_CHAT)) {
@@ -870,7 +889,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
                 Timber.d("This is a chat upload: $appData")
 
-                if (!isVoiceClip(appData)) {
+                if (!transfer.isVoiceClipType()) {
                     transfersCount++
                 }
 
@@ -888,7 +907,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 dbH.updatePendingMessageOnTransferStart(id, transfer.tag)
                 mapProgressTransfers!![transfer.tag] = transfer
 
-                if (!transfer.isFolderTransfer && !isVoiceClip(appData)) {
+                if (!transfer.isFolderTransfer && !transfer.isVoiceClipType()) {
                     updateProgressNotification()
                 }
             }
@@ -899,8 +918,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
             LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
                 .post(MegaTransfer.TYPE_UPLOAD)
-
-            Timber.d("onTransferUpdate: " + transfer.nodeHandle)
+            Timber.d("onTransferUpdate: ${transfer.nodeHandle}")
             val appData = transfer.appData
 
             if (appData?.contains(Constants.APP_DATA_CHAT) == false
@@ -909,7 +927,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             ) return
 
             if (canceled) {
-                Timber.w("Transfer cancel: " + transfer.nodeHandle)
+                Timber.w("Transfer cancel: ${transfer.nodeHandle}")
                 if (lock != null && lock!!.isHeld) try {
                     lock!!.release()
                 } catch (ex: Exception) {
@@ -937,7 +955,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
             mapProgressTransfers!![transfer.tag] = transfer
 
-            if (!isVoiceClip(appData)) {
+            if (!transfer.isVoiceClipType()) {
                 updateProgressNotification()
             }
         }
@@ -956,11 +974,11 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     }
 
                     if (e.value != 0L) {
-                        Timber.w("TRANSFER OVERQUOTA ERROR: " + e.errorCode)
+                        Timber.w("TRANSFER OVERQUOTA ERROR: ${e.errorCode}")
                     } else {
-                        Timber.w("STORAGE OVERQUOTA ERROR: " + e.errorCode)
+                        Timber.w("STORAGE OVERQUOTA ERROR: ${e.errorCode}")
 
-                        if (!isVoiceClip(transfer.appData)) {
+                        if (!transfer.isVoiceClipType()) {
                             updateProgressNotification()
                         }
                     }
@@ -975,7 +993,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         }
 
         if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            Timber.d("onTransferFinish: " + transfer.nodeHandle)
+            Timber.d("onTransferFinish: ${transfer.nodeHandle}")
             val appData = transfer.appData
 
             if (appData != null && appData.contains(Constants.APP_DATA_CHAT)) {
@@ -983,7 +1001,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     return
                 }
 
-                if (!isVoiceClip(appData)) {
+                if (!transfer.isVoiceClipType()) {
                     transfersCount--
                     totalUploadsCompleted++
                 }
@@ -995,7 +1013,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     .post(MegaTransfer.TYPE_UPLOAD)
 
                 if (canceled) {
-                    Timber.w("Upload cancelled: " + transfer.nodeHandle)
+                    Timber.w("Upload cancelled: ${transfer.nodeHandle}")
                     if (lock != null && lock!!.isHeld) try {
                         lock!!.release()
                     } catch (ex: Exception) {
@@ -1010,7 +1028,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     cancel()
                     Timber.d("After cancel")
 
-                    if (isVoiceClip(appData)) {
+                    if (transfer.isVoiceClipType()) {
                         val localFile = buildVoiceClipFile(this, transfer.fileName)
 
                         if (FileUtil.isFileAvailable(localFile) && localFile!!.name != transfer.fileName) {
@@ -1025,7 +1043,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     }
                 } else {
                     if (error.errorCode == MegaError.API_OK) {
-                        Timber.d("Upload OK: " + transfer.nodeHandle)
+                        Timber.d("Upload OK: ${transfer.nodeHandle}")
 
                         if (FileUtil.isVideoFile(transfer.path)) {
                             Timber.d("Is video!!!")
@@ -1143,7 +1161,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                                     Timber.e(e)
                                 }
                             }
-                        } else if (isVoiceClip(transfer.appData)) {
+                        } else if (transfer.isVoiceClipType()) {
                             Timber.d("Is voice clip")
                             attachVoiceClips(transfer)
                         } else {
@@ -1151,9 +1169,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                             attachNodes(transfer)
                         }
                     } else {
-                        Timber.e("Upload Error: " + transfer.nodeHandle + "_" + error.errorCode + "___" + error.errorString)
+                        Timber.e("Upload Error: ${transfer.nodeHandle}_${error.errorCode}___${error.errorString}")
                         if (error.errorCode == MegaError.API_EEXIST) {
-                            Timber.w("Transfer API_EEXIST: " + transfer.nodeHandle)
+                            Timber.w("Transfer API_EEXIST: ${transfer.nodeHandle}")
                         } else {
                             if (error.errorCode == MegaError.API_EOVERQUOTA) {
                                 isOverQuota = 1
@@ -1181,7 +1199,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     val tempPic =
                         getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
 
-                    Timber.d("IN Finish: " + transfer.nodeHandle)
+                    Timber.d("IN Finish: ${transfer.nodeHandle}")
 
                     if (FileUtil.isFileAvailable(tempPic) && transfer.path != null) {
                         if (transfer.path.startsWith(tempPic!!.absolutePath)) {
@@ -1195,7 +1213,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
                 if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
                     onQueueComplete()
-                } else if (!isVoiceClip(appData)) {
+                } else if (!transfer.isVoiceClipType()) {
                     updateProgressNotification()
                 }
             }
@@ -1327,7 +1345,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
             if (pendMsg.getFilePath() == transfer.path) {
                 if (pendMsg.getNodeHandle() == -1L) {
-                    Timber.d("Set node handle to the pdf file: " + transfer.nodeHandle)
+                    Timber.d("Set node handle to the pdf file: ${transfer.nodeHandle}")
                     pendMsg.setNodeHandle(transfer.nodeHandle)
                 } else {
                     Timber.e("Set node handle error")
@@ -1369,7 +1387,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             val pendMsg = pendingMessages!![i]
 
             if (pendMsg.getNodeHandle() == nodeHandle) {
-                Timber.d("Send node: " + nodeHandle + " to chat: " + pendMsg.getChatId())
+                Timber.d("Send node: $nodeHandle to chat: ${pendMsg.getChatId()}")
                 requestSent++
                 val nodePdf = megaApi.getNodeByHandle(nodeHandle)
 
@@ -1385,7 +1403,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart: " + request.name)
+        Timber.d("onRequestStart: ${request.name}")
 
         if (request.type == MegaRequest.TYPE_COPY) {
             updateProgressNotification()
@@ -1395,7 +1413,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     }
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("UPLOAD: onRequestFinish " + request.requestString)
+        Timber.d("UPLOAD: onRequestFinish ${request.requestString}")
 
         //Send the file without preview if the set attribute fails
         if (request.type == MegaRequest.TYPE_SET_ATTR_FILE && request.paramType == MegaApiJava.ATTR_TYPE_PREVIEW) {
@@ -1414,12 +1432,12 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("onRequestFinish OK")
         } else {
-            Timber.e("onRequestFinish:ERROR: " + e.errorCode)
+            Timber.e("onRequestFinish:ERROR: ${e.errorCode}")
             if (e.errorCode == MegaError.API_EOVERQUOTA) {
-                Timber.w("OVERQUOTA ERROR: " + e.errorCode)
+                Timber.w("OVERQUOTA ERROR: ${e.errorCode}")
                 isOverQuota = 1
             } else if (e.errorCode == MegaError.API_EGOINGOVERQUOTA) {
-                Timber.w("PRE-OVERQUOTA ERROR: " + e.errorCode)
+                Timber.w("PRE-OVERQUOTA ERROR: ${e.errorCode}")
                 isOverQuota = 2
             }
             onQueueComplete()
@@ -1428,19 +1446,19 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
     override fun onRequestTemporaryError(
         api: MegaApiJava, request: MegaRequest,
-        e: MegaError
+        e: MegaError,
     ) {
-        Timber.w("onRequestTemporaryError: " + request.name)
+        Timber.w("onRequestTemporaryError: ${request.name}")
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate: " + request.name)
+        Timber.d("onRequestUpdate: ${request.name}")
     }
 
     override fun onTransferData(
         api: MegaApiJava,
         transfer: MegaTransfer,
-        buffer: ByteArray
+        buffer: ByteArray,
     ): Boolean {
         return true
     }
@@ -1479,7 +1497,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     }
                 }
             } else {
-                Timber.w("Attachment not correctly sent: " + e.errorCode + " " + e.errorString)
+                Timber.w("Attachment not correctly sent: ${e.errorCode} ${e.errorString}")
                 val nodeList = request.megaNodeList
 
                 //Find the pending message
@@ -1535,7 +1553,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     override fun onRequestTemporaryError(
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        e: MegaChatError
+        e: MegaChatError,
     ) {
     }
 
@@ -1596,10 +1614,6 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         mNotificationManager!!.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, notification)
     }
 
-    private fun isVoiceClip(appData: String): Boolean {
-        return !TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_VOICE_CLIP)
-    }
-
     /**
      * Checks if there are chat uploads in progress, regardless of the voice clips.
      * @return True if there are chat uploads in progress, false otherwise.
@@ -1613,7 +1627,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 val transfer = megaApi.getTransferByTag(transferData.getUploadTag(i)) ?: continue
                 val data = transfer.appData
 
-                if (data?.contains(Constants.APP_DATA_CHAT) == true && !isVoiceClip(data)) {
+                if (data?.contains(Constants.APP_DATA_CHAT) == true && !transfer.isVoiceClipType()) {
                     return true
                 }
             }
@@ -1658,7 +1672,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         try {
             fileName = fileName!!.substring(0, fileName.lastIndexOf("."))
         } catch (e: Exception) {
-            Timber.w("Exception getting file name without extension.", e)
+            Timber.w(e, "Exception getting file name without extension.")
         }
 
         for (downSamplingPath in mapVideoDownsampling!!.keys) {

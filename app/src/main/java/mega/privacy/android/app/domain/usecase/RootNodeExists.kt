@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Root node exists
  *
  */
-interface RootNodeExists {
+fun interface RootNodeExists {
     /**
      * Invoke
      *

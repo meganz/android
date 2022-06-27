@@ -7,9 +7,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import timber.log.Timber
 
 /**
  * Action mode callback is use for feature regarding to favourite
@@ -18,7 +18,8 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
  */
 class FavouriteActionModeCallback(
     private val mainActivity: ManagerActivity,
-    private val viewModel: FavouritesViewModel) :
+    private val viewModel: FavouritesViewModel,
+) :
     ActionMode.Callback {
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -59,11 +60,11 @@ class FavouriteActionModeCallback(
                     MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
                 }
                 R.id.cab_menu_share_link -> {
-                    LogUtil.logDebug("Public link option")
+                    Timber.d("Public link option")
                     LinksUtil.showGetLinkActivity(mainActivity, nodeHandles.toLongArray())
                 }
                 R.id.cab_menu_send_to_chat -> {
-                    LogUtil.logDebug("Send files to chat")
+                    Timber.d("Send files to chat")
                     mainActivity.attachNodesToChats(selectedNodes)
                 }
                 R.id.cab_menu_trash -> {

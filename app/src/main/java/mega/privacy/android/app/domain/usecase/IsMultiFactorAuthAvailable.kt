@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Is multi factor auth available
  *
  */
-interface IsMultiFactorAuthAvailable {
+fun interface IsMultiFactorAuthAvailable {
     /**
      * Invoke
      *

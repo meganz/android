@@ -1,5 +1,10 @@
 package mega.privacy.android.app.smsVerification;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
+import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
+import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.ENTERED_PHONE_NUMBER;
+import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.SELECTED_COUNTRY_CODE;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
@@ -8,8 +13,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -28,6 +31,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.appbar.MaterialToolbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
@@ -35,19 +41,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
-import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
-import static mega.privacy.android.app.main.LoginFragment.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
 
@@ -64,7 +66,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
         //navigation bar
@@ -84,7 +86,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
             TextView phoneNumberLbl = findViewById(R.id.entered_phone_number);
             phoneNumberLbl.setText(phoneNumber);
 
-            isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
+            isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED, false);
         }
 
         //resend
@@ -108,7 +110,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                 ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             }
         };
-        spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         resendTextView.setText(spanString);
         resendTextView.setMovementMethod(LinkMovementMethod.getInstance());
         resendTextView.setHighlightColor(Color.TRANSPARENT);
@@ -127,12 +129,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                 allowResend = true;
                 showResendAndBackButton();
             }
-        },RESEND_TIME_LIMIT);
+        }, RESEND_TIME_LIMIT);
 
         pinError = findViewById(R.id.verify_account_pin_error);
 
         //input fields
-        imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -143,12 +145,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         firstPin.setOnFocusChangeListener(this);
         firstPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -179,12 +181,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         secondPin.setOnFocusChangeListener(this);
         secondPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -214,12 +216,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         thirdPin.setOnFocusChangeListener(this);
         thirdPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -248,12 +250,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         fourthPin.setOnFocusChangeListener(this);
         fourthPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -281,12 +283,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         fifthPin.setOnFocusChangeListener(this);
         fifthPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -313,12 +315,12 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         sixthPin.setOnFocusChangeListener(this);
         sixthPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
 
@@ -342,77 +344,77 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb1.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb1.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb1.width = Util.scaleWidthPx(25, outMetrics);
         }
         firstPin.setLayoutParams(paramsb1);
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
+        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams) firstPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         firstPin.setLayoutParams(textParams);
 
         secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb2.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb2.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb2.width = Util.scaleWidthPx(25, outMetrics);
         }
         secondPin.setLayoutParams(paramsb2);
-        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
+        textParams = (LinearLayout.LayoutParams) secondPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
         thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb3.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb3.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb3.width = Util.scaleWidthPx(25, outMetrics);
         }
         thirdPin.setLayoutParams(paramsb3);
-        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0,0,Util.scaleWidthPx(25,outMetrics),0);
+        textParams = (LinearLayout.LayoutParams) thirdPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
         thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
         fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb4.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb4.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb4.width = Util.scaleWidthPx(25, outMetrics);
         }
         fourthPin.setLayoutParams(paramsb4);
-        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
+        textParams = (LinearLayout.LayoutParams) fourthPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
         fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb5.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb5.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb5.width = Util.scaleWidthPx(25, outMetrics);
         }
         fifthPin.setLayoutParams(paramsb5);
-        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
+        textParams = (LinearLayout.LayoutParams) fifthPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
         sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = Util.scaleWidthPx(42,outMetrics);
+            paramsb6.width = Util.scaleWidthPx(42, outMetrics);
         } else {
-            paramsb6.width = Util.scaleWidthPx(25,outMetrics);
+            paramsb6.width = Util.scaleWidthPx(25, outMetrics);
         }
         sixthPin.setLayoutParams(paramsb6);
-        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-        textParams.setMargins(0,0,0,0);
+        textParams = (LinearLayout.LayoutParams) sixthPin.getLayoutParams();
+        textParams.setMargins(0, 0, 0, 0);
         sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
     }
@@ -426,14 +428,14 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
             @Override
             public void run() {
 
-                imm.showSoftInput(firstPin,0);
+                imm.showSoftInput(firstPin, 0);
             }
-        },900);
+        }, 900);
     }
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         if (allowResend) {
@@ -444,15 +446,15 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
 
     @Override
     public void onClick(View v) {
-        logDebug("on click ");
+        Timber.d("on click ");
         switch (v.getId()) {
             case R.id.verify_account_back_button: {
-                logDebug("verify_account_back_button clicked");
+                Timber.d("verify_account_back_button clicked");
                 backButtonClicked();
                 break;
             }
             case R.id.verify_account_confirm_button: {
-                logDebug("verify_account_confirm_button clicked");
+                Timber.d("verify_account_confirm_button clicked");
                 confirmButtonClicked();
                 break;
             }
@@ -463,7 +465,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
 
     @Override
     public boolean onLongClick(View v) {
-        logDebug("onLongClick");
+        Timber.d("onLongClick");
         switch (v.getId()) {
             case R.id.verify_account_input_code_first:
             case R.id.verify_account_input_code_second:
@@ -480,8 +482,8 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     }
 
     @Override
-    public void onFocusChange(View v,boolean hasFocus) {
-        logDebug("onFocusChange");
+    public void onFocusChange(View v, boolean hasFocus) {
+        Timber.d("onFocusChange");
         switch (v.getId()) {
             case R.id.pass_first: {
                 if (hasFocus) {
@@ -525,23 +527,23 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            logDebug("nav back pressed");
+            Timber.d("nav back pressed");
             backButtonClicked();
         }
         return super.onOptionsItemSelected(item);
     }
 
     void pasteClipboard() {
-        logDebug("pasteClipboard");
+        Timber.d("pasteClipboard");
         pinLongClick = false;
-        ClipboardManager clipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            logDebug("code: " + code);
+            Timber.d("code: %s", code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
-                for (int i = 0;i < 6;i++) {
+                for (int i = 0; i < 6; i++) {
                     if (!Character.isDigit(code.charAt(i))) {
                         areDigits = false;
                         break;
@@ -567,36 +569,36 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     }
 
     private void hideError() {
-        logDebug("hideError");
+        Timber.d("hideError");
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
     }
 
     private void showError(String errorMessage) {
-        logDebug("showError");
+        Timber.d("showError");
         firstTime = false;
         isErrorShown = true;
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
         pinError.setVisibility(View.VISIBLE);
         if (errorMessage != null) {
-            logWarning("Error message is: " + errorMessage);
+            Timber.w("Error message is: %s", errorMessage);
             pinError.setText(errorMessage);
         }
     }
 
     private void validateVerificationCode() {
-        logDebug("validateVerificationCode");
+        Timber.d("validateVerificationCode");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
                 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1) {
             Util.hideKeyboard(this);
@@ -608,9 +610,9 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
             sb.append(fifthPin.getText());
             sb.append(sixthPin.getText());
             String pin = sb.toString().trim();
-            logDebug("PIN: " + pin);
+            Timber.d("PIN: %s", pin);
             if (pin != null) {
-                megaApi.checkSMSVerificationCode(pin,this);
+                megaApi.checkSMSVerificationCode(pin, this);
                 return;
             }
         }
@@ -618,17 +620,17 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     }
 
     private void confirmButtonClicked() {
-        logDebug("confirmButtonClicked");
+        Timber.d("confirmButtonClicked");
         validateVerificationCode();
     }
 
     private void backButtonClicked() {
-        logDebug("backButtonClicked");
+        Timber.d("backButtonClicked");
         finish();
     }
 
     private void showResendAndBackButton() {
-        logDebug("showResendAndBackButton");
+        Timber.d("showResendAndBackButton");
         backButton.setVisibility(View.VISIBLE);
         resendTextView.setVisibility(View.VISIBLE);
         actionBar.setHomeButtonEnabled(true);
@@ -636,7 +638,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     }
 
     private void hideResendAndBackButton() {
-        logDebug("hideResendAndBackButton");
+        Timber.d("hideResendAndBackButton");
         backButton.setVisibility(View.GONE);
         resendTextView.setVisibility(View.GONE);
         actionBar.setHomeButtonEnabled(false);
@@ -644,34 +646,34 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     }
 
     @Override
-    public void onRequestStart(MegaApiJava api,MegaRequest request) {
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
         confirmButton.setClickable(false);
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 
     }
 
     @Override
-    public void onRequestFinish(final MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestFinish(final MegaApiJava api, MegaRequest request, MegaError e) {
         confirmButton.setClickable(true);
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
-            logDebug("send verification code,get " +  e.getErrorCode());
+Timber.d("send verification code,get %s",  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
-                logWarning("The code has been already verified.");
+                Timber.w("The code has been already verified.");
                 showError(getString(R.string.verify_account_error_code_verified));
             } else if (e.getErrorCode() == MegaError.API_EACCESS) {
-                logWarning("You have reached the verification limits.");
+                Timber.w("You have reached the verification limits.");
                 showError(getString(R.string.verify_account_error_reach_limit));
             } else if (e.getErrorCode() == MegaError.API_EEXIST) {
-                logWarning("This number is already associated with an account.");
+                Timber.w("This number is already associated with an account.");
                 showError(getString(R.string.verify_account_error_phone_number_register));
-            } else if(e.getErrorCode() == MegaError.API_EFAILED) {
-                logWarning("The verification code does not match.");
+            } else if (e.getErrorCode() == MegaError.API_EFAILED) {
+                Timber.w("The verification code does not match.");
                 showError(getString(R.string.verify_account_error_wrong_code));
             } else if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("verification successful");
+                Timber.d("verification successful");
                 LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class).post(true);
                 showSnackbar(inputContainer, getString(R.string.verify_account_successfully));
                 //showing the successful text for 2 secs, then finish itself back to previous page.
@@ -679,7 +681,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                     @Override
                     public void run() {
                         //haven't logged in, if has credential will auto-login
-                        if(api.isLoggedIn() == 0 || api.getRootNode() == null) {
+                        if (api.isLoggedIn() == 0 || api.getRootNode() == null) {
                             refreshSession();
                         } else {
                             setResult(RESULT_OK);
@@ -688,14 +690,14 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                     }
                 }, 2000);
             } else {
-                logWarning("Invalid code");
+                Timber.w("Invalid code");
                 showError(getString(R.string.verify_account_error_invalid_code));
             }
         }
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
 }

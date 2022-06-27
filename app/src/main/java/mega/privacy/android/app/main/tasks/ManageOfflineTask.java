@@ -1,13 +1,15 @@
 package mega.privacy.android.app.main.tasks;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
+import static mega.privacy.android.app.utils.OfflineUtils.clearOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineSize;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 
 import mega.privacy.android.app.MegaApplication;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
+import timber.log.Timber;
 
 /**
  * Background task to calculate the size of offline folder or to clear offline files.
@@ -22,7 +24,7 @@ public class ManageOfflineTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        logDebug("doInBackground-Async Task ManageOfflineTask");
+        Timber.d("doInBackground-Async Task ManageOfflineTask");
 
         if (isClearOption) {
             clearOffline(MegaApplication.getInstance());
@@ -34,7 +36,7 @@ public class ManageOfflineTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String size) {
-        logDebug("ManageOfflineTask::onPostExecute");
+        Timber.d("ManageOfflineTask::onPostExecute");
         Intent intent = new Intent(ACTION_UPDATE_OFFLINE_SIZE_SETTING);
         intent.putExtra(OFFLINE_SIZE, size);
         MegaApplication.getInstance().sendBroadcast(intent);

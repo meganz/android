@@ -24,27 +24,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TransfersManagementActivity
-import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.namecollision.NameCollisionActivity
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
+import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
@@ -101,7 +102,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                         finish()
                     }
                     else -> {
-                        logWarning("resultCode: ${result.resultCode}")
+                        Timber.w("resultCode: ${result.resultCode}")
                     }
                 }
             }
@@ -425,15 +426,15 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
         animatorSet = AnimatorSet().apply {
             addListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {}
+                override fun onAnimationStart(animation: Animator) {}
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     viewModel.checkSelection()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {}
+                override fun onAnimationCancel(animation: Animator) {}
 
-                override fun onAnimationRepeat(animation: Animator?) {}
+                override fun onAnimationRepeat(animation: Animator) {}
 
             })
 

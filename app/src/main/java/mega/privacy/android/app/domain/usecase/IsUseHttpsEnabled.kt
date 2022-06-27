@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Is use https preference enabled
  *
  */
-interface IsUseHttpsEnabled {
+fun interface IsUseHttpsEnabled {
     /**
      * Invoke the use case
      *

@@ -1,15 +1,16 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.setImageAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.graphics.PorterDuff;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -19,6 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -33,12 +39,7 @@ import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
@@ -110,7 +111,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                     notifyDataSetChanged();
 
                     String email = holder.contactMail;
-                    logDebug("Sent invite to: " + email);
+                    Timber.d("Sent invite to: %s", email);
                     // for UI smoothness, ignore the callback
                     megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
                     showSnackbar(context, context.getString(R.string.context_contact_request_sent, email));
@@ -122,7 +123,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         };
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
+        String message = String.format(context.getString(R.string.title_confirm_send_invitation), contact.getLocalName());
         builder.setMessage(message);
         String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
         builder.setPositiveButton(invite, dialogClickListener);
@@ -133,7 +134,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public void dismissDialog() {
-        if(sendInvitationDialog != null) {
+        if (sendInvitationDialog != null) {
             sendInvitationDialog.dismiss();
         }
     }
@@ -185,7 +186,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public MegaContactGetter.MegaContact getItem(int position) {
-        logDebug("getItem");
+        Timber.d("getItem");
         return contacts.get(position);
     }
 

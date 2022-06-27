@@ -15,22 +15,23 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import nz.mega.sdk.MegaApiJava
@@ -59,6 +60,14 @@ class TimelineViewModel @Inject constructor(
         const val MONTHS_VIEW = 2
         const val YEARS_VIEW = 3
 
+        const val FILTER_ALL_PHOTOS = 0
+        const val FILTER_CLOUD_DRIVE = 1
+        const val FILTER_CAMERA_UPLOADS = 2
+        const val FILTER_VIDEOS_ONLY = 3
+
+        const val SORT_DESC = 0
+        const val SORT_ASC = 1
+
         const val SPAN_CARD_PORTRAIT = 1
         const val SPAN_CARD_LANDSCAPE = 2
 
@@ -72,6 +81,9 @@ class TimelineViewModel @Inject constructor(
     private val composite = CompositeDisposable()
 
     var mZoom = PHOTO_ZOOM_LEVEL
+
+    private var currentFilter: Int = FILTER_ALL_PHOTOS
+    private var currentSort: Int = SORT_DESC
 
     /**
      * Get current sort rule from SortOrderManagement
@@ -258,8 +270,6 @@ class TimelineViewModel @Inject constructor(
         return monthCards.size - 1
     }
 
-
-
     /**
      * Checks the clicked month card and gets the day card to show after click on a month card.
      *
@@ -428,7 +438,7 @@ class TimelineViewModel @Inject constructor(
                 enableCUSettingForDb(enableCellularSync, syncVideo)
                 startCameraUploadJob(context)
             }.onFailure {
-                Timber.e("enableCu" + it.message)
+                Timber.e("enableCu${it.message}")
             }
         }
     }
@@ -468,16 +478,53 @@ class TimelineViewModel @Inject constructor(
         camSyncEnabled.postValue(mDbHandler.preferences?.camSyncEnabled.toBoolean())
     }
 
-    private fun add(disposable: Disposable) {
-        composite.add(disposable)
-    }
-
     override fun onCleared() {
         super.onCleared()
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
         composite.clear()
+    }
+
+    /**
+     * Return the current filter set as string
+     */
+    fun getCurrentFilterAsString(): String {
+        return when (currentFilter) {
+            FILTER_ALL_PHOTOS -> getString(R.string.photos_filter_all_photos)
+            FILTER_CLOUD_DRIVE -> getString(R.string.photos_filter_cloud_drive)
+            FILTER_CAMERA_UPLOADS -> getString(R.string.photos_filter_camera_uploads)
+            FILTER_VIDEOS_ONLY -> getString(R.string.photos_filter_videos_only)
+            else -> ""
+        }
+    }
+
+    /**
+     * Return the current filter
+     */
+    fun getCurrentFilter(): Int {
+        return currentFilter
+    }
+
+    /**
+     * Set the current selected filter
+     */
+    fun setCurrentFilter(filter: Int) {
+        currentFilter = filter
+    }
+
+    /**
+     * Get the current sort
+     */
+    fun getCurrentSort(): Int {
+        return currentSort
+    }
+
+    /**
+     * Set the current sort
+     */
+    fun setCurrentSort(sort: Int) {
+        currentSort = sort
     }
 }
 

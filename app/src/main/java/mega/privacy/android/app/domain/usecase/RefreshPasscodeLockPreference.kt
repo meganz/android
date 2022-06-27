@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Refresh passcode lock preference
  *
  */
-interface RefreshPasscodeLockPreference {
+fun interface RefreshPasscodeLockPreference {
     /**
      * Invoke
      *

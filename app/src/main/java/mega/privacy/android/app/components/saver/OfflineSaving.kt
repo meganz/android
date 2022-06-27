@@ -11,8 +11,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.FileUtil.copyFile
 import mega.privacy.android.app.utils.FileUtil.fileExistsInTargetPath
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -20,6 +18,7 @@ import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
+import timber.log.Timber
 import java.io.File
 
 @Parcelize
@@ -42,7 +41,7 @@ class OfflineSaving(
             try {
                 !MegaApiUtils.isIntentAvailable(context, checkIntent)
             } catch (e: Exception) {
-                LogUtil.logWarning("isIntentAvailable error", e)
+                Timber.w(e, "isIntentAvailable error")
                 return true
             }
         }
@@ -102,7 +101,7 @@ class OfflineSaving(
         file: File,
         parentPath: String,
         externalSDCard: Boolean,
-        sdCardOperator: SDCardOperator?
+        sdCardOperator: SDCardOperator?,
     ): Pair<Int, Int> {
         if (file.isDirectory) {
             val dstDir = File(parentPath, file.name)
@@ -132,7 +131,7 @@ class OfflineSaving(
                 try {
                     sdCardOperator.moveFile(parentPath, file)
                 } catch (e: Exception) {
-                    logError("Error moving file to the sd card path with exception", e);
+                    Timber.e(e, "Error moving file to the sd card path with exception");
                 }
 
                 return Pair(1, 0)

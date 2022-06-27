@@ -1,5 +1,13 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.utils.Constants.EMAIL;
+import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.changeViewElevation;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,19 +24,13 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.VerifyCredentialsListener;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class AuthenticityCredentialsActivity extends PasscodeActivity {
 
@@ -82,19 +84,19 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
         super.onCreate(savedInstanceState);
 
         if (getIntent() == null || getIntent().getExtras() == null) {
-            logError("Cannot init view, Intent is null");
+            Timber.e("Cannot init view, Intent is null");
             finish();
         }
 
         String email = getIntent().getExtras().getString(EMAIL);
         if (isTextEmpty(email)) {
-            logError("Cannot init view, contact' email is empty");
+            Timber.e("Cannot init view, contact' email is empty");
             finish();
         }
 
         contact = megaApi.getContact(email);
         if (contact == null) {
-            logError("Cannot init view, contact is null");
+            Timber.e("Cannot init view, contact is null");
             finish();
         }
 
@@ -108,7 +110,7 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if (aB == null) {
-            logError("Cannot init view, ActionBar is null");
+            Timber.e("Cannot init view, ActionBar is null");
             finish();
         }
 
@@ -288,8 +290,8 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      * Finishes the verify or reset action of credentials when the request finishes.
      * If everything went well, updates the text of the button. Otherwise, shows an error message.
      *
-     * @param request   MegaRequest that contains the results of the request
-     * @param e         MegaError that contains the error result of the request
+     * @param request MegaRequest that contains the results of the request
+     * @param e       MegaError that contains the error result of the request
      */
     public void finishVerifyCredentialsAction(MegaRequest request, MegaError e) {
         if (request.getNodeHandle() != contact.getHandle()) return;
@@ -313,7 +315,7 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
     private void setMyCredentials() {
         ArrayList<String> myCredentialsList = getCredentialsList(megaApi.getMyCredentials());
         if (myCredentialsList.size() != 10) {
-            logWarning("Error, my credentials are wrong");
+            Timber.w("Error, my credentials are wrong");
             return;
         }
 
@@ -332,12 +334,12 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
     /**
      * Sets the credentials of the contact in question in the view.
      *
-     * @param contactCredentials    String that contains the contact's credentials
+     * @param contactCredentials String that contains the contact's credentials
      */
     private void setContactCredentials(String contactCredentials) {
         ArrayList<String> contactCredentialsList = getCredentialsList(contactCredentials);
         if (contactCredentialsList.size() != 10) {
-            logWarning("Error, the contact's credentials are wrong");
+            Timber.w("Error, the contact's credentials are wrong");
             return;
         }
 
@@ -357,8 +359,8 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      * Sets the contact's credentials after the request for ask for them finishes.
      * If everything went well, sets contact's credentials in the view. Otherwise, shows an error message.
      *
-     * @param request   MegaRequest that contains the results of the request
-     * @param e         MegaError that contains the error result of the request
+     * @param request MegaRequest that contains the results of the request
+     * @param e       MegaError that contains the error result of the request
      */
     public void setContactCredentials(MegaRequest request, MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK && request.getFlag()) {
@@ -372,14 +374,14 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
     /**
      * Divides in 10 equal parts the credentials string to show it in the view.
      *
-     * @param credentials   String that contains the credentials
+     * @param credentials String that contains the credentials
      * @return An ArrayList of Strings containing the credentials divided in 10.
      */
     private ArrayList<String> getCredentialsList(String credentials) {
         ArrayList<String> credentialsList = new ArrayList<>();
 
         if (isTextEmpty(credentials)) {
-            logWarning("Error getting credentials list");
+            Timber.w("Error getting credentials list");
             return credentialsList;
         }
 

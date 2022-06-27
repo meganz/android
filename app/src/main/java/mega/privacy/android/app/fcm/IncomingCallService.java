@@ -27,10 +27,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class IncomingCallService extends Service implements MegaRequestListenerInterface {
 
@@ -56,7 +54,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     @Override
     public void onCreate() {
         super.onCreate();
-        logDebug("onCreateFCM");
+        Timber.d("onCreateFCM");
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
@@ -77,14 +75,14 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     @Override
     public void onDestroy() {
-        logDebug("Incoming call foreground service");
+        Timber.d("Incoming call foreground service");
         super.onDestroy();
         if (wl != null) {
-            logDebug("Wifi lock release");
+            Timber.d("Wifi lock release");
             wl.release();
         }
         if (lock != null) {
-            logDebug("Wake lock release");
+            Timber.d("Wake lock release");
             lock.release();
         }
         stop();
@@ -119,10 +117,10 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        logDebug("Network available: " + (cm.getActiveNetworkInfo() != null));
+        Timber.d("Network available: %s", (cm.getActiveNetworkInfo() != null));
         if (cm.getActiveNetworkInfo() != null) {
-            logDebug(cm.getActiveNetworkInfo().getState() + "");
-            logDebug(cm.getActiveNetworkInfo().getDetailedState() + "");
+            Timber.d(cm.getActiveNetworkInfo().getState().toString());
+            Timber.d(cm.getActiveNetworkInfo().getDetailedState().toString());
         }
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "MegaIncomingCallWifiLock");
@@ -136,27 +134,27 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         }
 
         createNotification();
-        logDebug("CALL notification");
+        Timber.d("CALL notification");
         //Leave the flag showMessageNotificationAfterPush as it is
         //If true - wait until connection finish
         //If false, no need to change it
-        logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
+        Timber.d("Flag showMessageNotificationAfterPush: %s", showMessageNotificationAfterPush);
         UserCredentials credentials = dbH.getCredentials();
         if (credentials == null) {
-            logWarning("There are not user credentials");
+            Timber.w("There are not user credentials");
         } else {
             String gSession = credentials.getSession();
             if (megaApi.getRootNode() == null) {
-                logWarning("RootNode = null");
+                Timber.w("RootNode = null");
                 performLoginProccess(gSession);
             } else {
-                logDebug("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+                Timber.d("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
                 int ret = megaChatApi.getInitState();
-                logDebug("result of init ---> " + ret);
+                Timber.d("result of init ---> %s", ret);
                 int status = megaChatApi.getOnlineStatus();
-                logDebug("online status ---> " + status);
+                Timber.d("online status ---> %s", status);
                 int connectionState = megaChatApi.getConnectionState();
-                logDebug("connection state ---> " + connectionState);
+                Timber.d("connection state ---> %s", connectionState);
             }
         }
         return START_NOT_STICKY;
@@ -189,51 +187,51 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart: " + request.getRequestString());
+        Timber.d("onRequestStart: %s", request.getRequestString());
         allowBackgroundLogin = false;
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestUpdate: " + request.getRequestString());
+        Timber.d("onRequestUpdate: %s", request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish: " + request.getRequestString());
+        Timber.d("onRequestFinish: %s", request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             allowBackgroundLogin = true;
 
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Fast login OK");
-                logDebug("Logged in. Setting account auth token for folder links.");
+                Timber.d("Fast login OK");
+                Timber.d("Logged in. Setting account auth token for folder links.");
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
-                logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
+                Timber.d("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
 
                 // Get cookies settings after login.
                 MegaApplication.getInstance().checkEnabledCookies();
             } else {
-                logError("ERROR: " + e.getErrorString());
+                Timber.e("ERROR: %s", e.getErrorString());
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            if(e.getErrorCode() == MegaError.API_OK) {
+            if (e.getErrorCode() == MegaError.API_OK) {
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;
                     megaChatApi.pushReceived(beep);
                     beep = false;
                 } else {
-                    logDebug("Login do not started by CHAT message");
+                    Timber.d("Login do not started by CHAT message");
                 }
             } else {
-                logDebug(request.getRequestString() + " failed. Error code: " + e.getErrorCode() + ", error string: " + e.getErrorString());
+                Timber.d("%s failed. Error code: %d, error string: %s", request.getRequestString(), e.getErrorCode(), e.getErrorString());
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporary: " + request.getRequestString());
+        Timber.w("onRequestTemporary: %s", request.getRequestString());
     }
 }

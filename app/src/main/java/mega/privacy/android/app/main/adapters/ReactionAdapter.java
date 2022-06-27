@@ -1,5 +1,13 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.ChatUtil.addReactionInMsg;
+import static mega.privacy.android.app.utils.ChatUtil.isMyOwnReaction;
+import static mega.privacy.android.app.utils.ChatUtil.shouldReactionBeClicked;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVALID_REACTION;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -27,12 +35,7 @@ import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
-
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.dp2px;
+import timber.log.Timber;
 
 public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -56,8 +59,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         chatRoom = megaChatApi.getChatRoom(chatId);
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
     }
 
@@ -95,9 +98,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         if (reaction.equals(INVALID_REACTION)) {
             RelativeLayout.LayoutParams paramsMoreReaction = new RelativeLayout.LayoutParams(holder.moreReactionsLayout.getLayoutParams());
 
-            if(megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
+            if (megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                 paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_END);
-            }else{
+            } else {
                 paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_START);
             }
             holder.moreReactionsLayout.setLayoutParams(paramsMoreReaction);
@@ -108,9 +111,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         }
 
         RelativeLayout.LayoutParams paramsMoreReaction = new RelativeLayout.LayoutParams(holder.itemReactionLayout.getLayoutParams());
-        if(megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
+        if (megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
             paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_END);
-        }else{
+        } else {
             paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_START);
         }
         holder.itemReactionLayout.setLayoutParams(paramsMoreReaction);
@@ -120,23 +123,23 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
         Emoji emoji = null;
-        if(!emojis.isEmpty() && emojis.get(0) != null){
+        if (!emojis.isEmpty() && emojis.get(0) != null) {
             emoji = emojis.get(0).emoji;
         }
 
         holder.reaction = reaction;
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        if(numUsers > 0){
+        if (numUsers > 0) {
             String text = numUsers + "";
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
 
-            if(emoji == null){
+            if (emoji == null) {
                 holder.itemEmojiReaction.setVisibility(View.GONE);
                 holder.itemEmojiReactionText.setVisibility(View.VISIBLE);
                 holder.itemEmojiReactionText.setText(reaction);
-            }else{
+            } else {
                 holder.itemEmojiReaction.setVisibility(View.VISIBLE);
                 holder.itemEmojiReactionText.setVisibility(View.GONE);
                 if (holder.itemEmojiReaction.getEmoji() == null || !holder.itemEmojiReaction.getEmoji().equals(emoji)) {
@@ -156,7 +159,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                     ownReaction ? R.style.TextAppearance_Mega_Body2_Variant7
                             : R.style.TextAppearance_Mega_Body2_Variant6);
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
-        }else{
+        } else {
             holder.moreReactionsLayout.setVisibility(View.GONE);
             holder.itemReactionLayout.setVisibility(View.GONE);
         }
@@ -183,6 +186,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public void setListFragment(RecyclerView recyclerViewFragment) {
         this.recyclerViewFragment = recyclerViewFragment;
     }
+
     public ArrayList<String> getListReactions() {
         return listReactions;
     }
@@ -201,7 +205,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param reaction The reaction.
      */
     public void removeItem(String reaction, long receivedChatId, long receivedMessageId) {
-        if(isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId){
+        if (isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId) {
             return;
         }
 
@@ -227,7 +231,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param reaction The reaction.
      */
     public void updateItem(String reaction, long receivedChatId, long receivedMessageId) {
-        if(isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId){
+        if (isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId) {
             return;
         }
 
@@ -258,7 +262,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param listReactions The reactions list.
      */
     public void setReactions(ArrayList<String> listReactions, long receivedChatId, long receivedMessageId) {
-        if(receivedChatId != this.chatId || receivedMessageId != this.messageId){
+        if (receivedChatId != this.chatId || receivedMessageId != this.messageId) {
             return;
         }
 
@@ -302,7 +306,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         int currentPosition = holder.getAdapterPosition();
         if (currentPosition < 0) {
-            logWarning("Current position error - not valid value");
+            Timber.w("Current position error - not valid value");
             return true;
         }
 

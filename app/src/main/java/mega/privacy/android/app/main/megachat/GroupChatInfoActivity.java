@@ -1,23 +1,61 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
+import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
+import static mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContactOption;
+import static mega.privacy.android.app.utils.CallUtil.checkCameraPermission;
+import static mega.privacy.android.app.utils.CallUtil.isChatConnectedInOrderToInitiateACall;
+import static mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo;
+import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
+import static mega.privacy.android.app.utils.ChatUtil.isAllowedTitle;
+import static mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.CHAT_TITLE;
+import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
+import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
+import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
+import static mega.privacy.android.app.utils.Constants.EMOJI_SIZE;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
+import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.lastGreenDate;
+import static mega.privacy.android.app.utils.Util.changeViewElevation;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-
 import android.graphics.Bitmap;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -35,6 +73,14 @@ import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -45,12 +91,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -58,15 +107,17 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
+import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -81,11 +132,11 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -95,7 +146,6 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -104,6 +154,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
+
 
 @AndroidEntryPoint
 public class GroupChatInfoActivity extends PasscodeActivity
@@ -114,16 +165,22 @@ public class GroupChatInfoActivity extends PasscodeActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     StartCallUseCase startCallUseCase;
+    @Inject
+    EndCallUseCase endCallUseCase;
+    @Inject
+    GetCallUseCase getCallUseCase;
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
     private static final int MAX_LENGTH_CHAT_TITLE = 60;
+    private final static String END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown";
 
     private ChatController chatC;
     private long chatHandle;
     private long selectedHandleParticipant;
     private long participantsCount;
     private boolean isChatOpen;
+    private boolean endCallForAllShouldBeVisible = false;
 
     private GroupChatInfoActivity groupChatInfoActivity;
     private MegaChatRoom chat;
@@ -131,6 +188,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     private AlertDialog permissionsDialog;
     private AlertDialog changeTitleDialog;
     private AlertDialog chatLinkDialog;
+    private AlertDialog endCallForAllDialog;
 
     private LinearLayout containerLayout;
     private Toolbar toolbar;
@@ -160,9 +218,9 @@ public class GroupChatInfoActivity extends PasscodeActivity
             if (intent == null || intent.getAction() == null) return;
 
             if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
-                || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
-                || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
-                || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+                    || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+                    || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
+                    || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
                 long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
 
                 if (userHandle != INVALID_HANDLE) {
@@ -206,7 +264,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
         groupChatInfoActivity = this;
         chatC = new ChatController(this);
 
@@ -232,7 +290,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
             chat = megaChatApi.getChatRoom(chatHandle);
             if (chat == null) {
-                logError("Chatroom NULL cannot be recovered");
+                Timber.e("Chatroom NULL cannot be recovered");
                 finish();
                 return;
             }
@@ -296,8 +354,37 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
             setParticipants();
             updateAdapterHeader();
-            if(adapter != null){
+            if (adapter != null) {
                 adapter.checkNotifications(chatHandle);
+            }
+
+            if (chat.isPreview() || !chat.isActive()) {
+                endCallForAllShouldBeVisible = false;
+            } else {
+                Disposable callSubscription = getCallUseCase.isThereACallAndIAmModerator(chat.getChatId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((shouldBeVisible) -> {
+                            endCallForAllShouldBeVisible = shouldBeVisible;
+
+                            if (adapter != null) {
+                                adapter.updateEndCallOption(shouldBeVisible);
+                            }
+
+                            if (!shouldBeVisible && endCallForAllDialog != null) {
+                                endCallForAllDialog.dismiss();
+                            }
+
+                        }, (error) -> Timber.e("Error " + error));
+
+                composite.add(callSubscription);
+            }
+
+            if (savedInstanceState != null) {
+                boolean isEndCallForAllDialogShown = savedInstanceState.getBoolean(END_CALL_FOR_ALL_DIALOG, false);
+                if (isEndCallForAllDialogShown) {
+                    showEndCallForAllDialog();
+                }
             }
         }
     }
@@ -309,12 +396,13 @@ public class GroupChatInfoActivity extends PasscodeActivity
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
+        composite.clear();
     }
 
     private void setParticipants() {
         //Set the first element = me
         participantsCount = chat.getPeerCount();
-        logDebug("Participants count: " + participantsCount);
+        Timber.d("Participants count: %s", participantsCount);
 
         if (!chat.isPreview() && chat.isActive()) {
             String myFullName = megaChatApi.getMyFullname();
@@ -342,7 +430,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             }
         }
 
-        logDebug("Number of participants with me: " + participants.size());
+        Timber.d("Number of participants with me: %s", participants.size());
         if (adapter == null) {
             adapter = new MegaParticipantsChatAdapter(this, recyclerView);
             adapter.setHasStableIds(true);
@@ -416,7 +504,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     public void chooseAddParticipantDialog() {
-        logDebug("chooseAddContactDialog");
+        Timber.d("chooseAddContactDialog");
 
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
@@ -439,7 +527,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 }
             }
         } else {
-            logWarning("Online but not megaApi");
+            Timber.w("Online but not megaApi");
             showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
         }
     }
@@ -447,7 +535,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     /**
      * Shows an alert dialog to confirm the deletion of a participant.
      *
-     * @param handle        participant's handle
+     * @param handle participant's handle
      */
     public void showRemoveParticipantConfirmation(long handle) {
         if (megaChatApi.isSignalActivityRequired()) {
@@ -463,8 +551,8 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     private void removeParticipant() {
-        logDebug("selectedHandleParticipant: " + selectedHandleParticipant);
-        logDebug("before remove, participants: " + chat.getPeerCount());
+        Timber.d("selectedHandleParticipant: %s", selectedHandleParticipant);
+        Timber.d("before remove, participants: %s", chat.getPeerCount());
         chatC.removeParticipant(chatHandle, selectedHandleParticipant);
     }
 
@@ -559,17 +647,17 @@ public class GroupChatInfoActivity extends PasscodeActivity
         memberLayout.setOnClickListener(clickListener);
         observerLayout.setOnClickListener(clickListener);
 
-        logDebug("Change permissions");
+        Timber.d("Change permissions");
     }
 
 
     private void changePermissions(int newPermissions) {
-        logDebug("New permissions: " + newPermissions);
+        Timber.d("New permissions: %s", newPermissions);
         chatC.alterParticipantsPermissions(chatHandle, selectedHandleParticipant, newPermissions);
     }
 
     public void showParticipantsPanel(MegaChatParticipant participant) {
-        logDebug("Participant Handle: " + participant.getHandle());
+        Timber.d("Participant Handle: %s", participant.getHandle());
 
         if (participant == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
@@ -594,7 +682,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     public void copyLink() {
-        logDebug("copyLink");
+        Timber.d("copyLink");
         if (chatLink != null) {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
@@ -606,35 +694,35 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     public void removeChatLink() {
-        logDebug("removeChatLink");
+        Timber.d("removeChatLink");
         megaChatApi.removeChatLink(chatHandle, this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        logDebug("Result Code: " + resultCode);
+        Timber.d("Result Code: %s", resultCode);
 
         if (intent == null) {
-            logWarning("Intent is null");
+            Timber.w("Intent is null");
             return;
         }
 
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            logDebug("Participants successfully added");
+            Timber.d("Participants successfully added");
 
             final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
             if (contactsData != null) {
                 new InviteToChatRoomListener(this).inviteToChat(chatHandle, contactsData);
             }
         } else {
-            logError("Error adding participants");
+            Timber.e("Error adding participants");
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
     public void showRenameGroupDialog(boolean fromGetLink) {
-        logDebug("fromGetLink: " + fromGetLink);
+        Timber.d("fromGetLink: %s", fromGetLink);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -675,7 +763,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 changeTitle(input);
             } else {
-                logDebug("Other IME" + actionId);
+                Timber.d("Other IME%s", actionId);
             }
             return false;
         });
@@ -695,22 +783,22 @@ public class GroupChatInfoActivity extends PasscodeActivity
     private void changeTitle(EmojiEditText input) {
         String title = input.getText().toString();
         if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
-            logWarning("Input is empty");
+            Timber.w("Input is empty");
             input.setError(getString(R.string.invalid_string));
             input.requestFocus();
         } else if (!isAllowedTitle(title)) {
-            logWarning("Title is too long");
+            Timber.w("Title is too long");
             input.setError(getString(R.string.title_long));
             input.requestFocus();
         } else {
-            logDebug("Positive button pressed - change title");
+            Timber.d("Positive button pressed - change title");
             chatC.changeTitle(chatHandle, title);
             changeTitleDialog.dismiss();
         }
     }
 
     public void showConfirmationLeaveChat() {
-        logDebug("Chat ID: " + chat.getChatId());
+        Timber.d("Chat ID: %s", chat.getChatId());
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
@@ -719,6 +807,39 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 .setPositiveButton(R.string.general_leave, (dialog, which) -> notifyShouldLeaveChat())
                 .setNegativeButton(R.string.general_cancel, null)
                 .show();
+    }
+
+
+    /**
+     * Method to show the End call for all dialog
+     */
+    public void showEndCallForAllDialog() {
+        if (AlertDialogUtil.isAlertDialogShown(endCallForAllDialog))
+            return;
+
+        endCallForAllDialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+                .setMessage(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+                .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all, (dialogInterface, i) -> AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog))
+                .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all, (dialogInterface, i) -> {
+                    AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog);
+                    endCallForAll();
+                })
+                .show();
+    }
+
+    /**
+     * Method to end call for all
+     */
+    private void endCallForAll() {
+        if (chat == null)
+            return;
+
+        endCallUseCase.endCallForAllWithChatId(chat.getChatId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                }, (error) -> Timber.e("Error " + error));
     }
 
     /**
@@ -748,14 +869,14 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish CHAT: " + request.getType() + " " + e.getErrorCode());
+        Timber.d("onRequestFinish CHAT: %d %d", request.getType(), e.getErrorCode());
 
         if (request.getType() == MegaChatRequest.TYPE_UPDATE_PEER_PERMISSIONS) {
-            logDebug("Permissions changed");
+            Timber.d("Permissions changed");
             int index = -1;
             MegaChatParticipant participantToUpdate = null;
 
-            logDebug("Participants count: " + participantsCount);
+            Timber.d("Participants count: %s", participantsCount);
             for (int i = 0; i < participantsCount; i++) {
                 if (request.getUserHandle() == participants.get(i).getHandle()) {
                     participantToUpdate = participants.get(i);
@@ -788,70 +909,70 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getFlag()) {
-                    logDebug("Chat archived");
+                    Timber.d("Chat archived");
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP);
                     intent.putExtra(CHAT_TITLE, chatTitle);
                     sendBroadcast(intent);
                     finish();
                 } else {
-                    logDebug("Chat unarchived");
+                    Timber.d("Chat unarchived");
                     showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
                 }
             } else if (request.getFlag()) {
-                logError("ERROR WHEN ARCHIVING CHAT " + e.getErrorString());
+                Timber.e("ERROR WHEN ARCHIVING CHAT %s", e.getErrorString());
                 showSnackbar(getString(R.string.error_archive_chat, chatTitle));
             } else {
-                logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+                Timber.e("ERROR WHEN UNARCHIVING CHAT %s", e.getErrorString());
                 showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
             }
 
             updateAdapterHeader();
         } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
-            logDebug("Remove participant: " + request.getUserHandle());
-            logDebug("My user handle: " + megaChatApi.getMyUserHandle());
+            Timber.d("Remove participant: %s", request.getUserHandle());
+            Timber.d("My user handle: %s", megaChatApi.getMyUserHandle());
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getUserHandle() == INVALID_HANDLE) {
-                    logDebug("I left the chatroom");
+                    Timber.d("I left the chatroom");
                     finish();
                 } else {
-                    logDebug("Removed from chat");
+                    Timber.d("Removed from chat");
 
                     chat = megaChatApi.getChatRoom(chatHandle);
-                    logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
+                    Timber.d("Peers after onChatListItemUpdate: %s", chat.getPeerCount());
                     updateParticipants();
                     showSnackbar(getString(R.string.remove_participant_success));
                 }
             } else if (request.getUserHandle() == -1) {
-                logError("ERROR WHEN LEAVING CHAT" + e.getErrorString());
+                Timber.e("ERROR WHEN LEAVING CHAT%s", e.getErrorString());
                 showSnackbar("Error.Chat not left");
             } else {
-                logError("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+                Timber.e("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM %s", e.getErrorString());
                 showSnackbar(getString(R.string.remove_participant_error));
             }
         } else if (request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
-            logDebug("Change title");
+            Timber.d("Change title");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getText() != null) {
                     updateAdapterHeader();
                 }
             } else {
-                logError("ERROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
+                Timber.e("ERROR WHEN TYPE_EDIT_CHATROOM_NAME %s", e.getErrorString());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
-            logDebug("Create chat request finish!!!");
+            Timber.d("Create chat request finish!!!");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Open new chat");
+                Timber.d("Open new chat");
                 Intent intent = new Intent(this, ChatActivity.class);
                 intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
                 intent.putExtra(CHAT_ID, request.getChatHandle());
                 this.startActivity(intent);
             } else {
-                logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
+                Timber.e("ERROR WHEN CREATING CHAT %s", e.getErrorString());
                 showSnackbar(getString(R.string.create_chat_error));
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
-            logDebug("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
+            Timber.d("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
             if (request.getFlag() == false) {
                 if (request.getNumRetry() == 0) {
 //                    Query chat link
@@ -860,13 +981,13 @@ public class GroupChatInfoActivity extends PasscodeActivity
                         showGetChatLinkPanel();
                         return;
                     } else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                        logError("The chatroom isn't grupal or public");
+                        Timber.e("The chatroom isn't grupal or public");
                     } else if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
-                        logError("The chatroom doesn't exist or the chatid is invalid");
+                        Timber.e("The chatroom doesn't exist or the chatid is invalid");
                     } else if (e.getErrorCode() == MegaChatError.ERROR_ACCESS) {
-                        logError("The chatroom doesn't have a topic or the caller isn't an operator");
+                        Timber.e("The chatroom doesn't have a topic or the caller isn't an operator");
                     } else {
-                        logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
+                        Timber.e("Error TYPE_CHAT_LINK_HANDLE %s", e.getErrorCode());
                     }
                     if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
                         if (chat.hasCustomTitle()) {
@@ -883,25 +1004,25 @@ public class GroupChatInfoActivity extends PasscodeActivity
                         chatLink = request.getText();
                         showGetChatLinkPanel();
                     } else {
-                        logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
+                        Timber.e("Error TYPE_CHAT_LINK_HANDLE %s", e.getErrorCode());
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                 }
             } else {
                 if (request.getNumRetry() == 0) {
-                    logDebug("Removing chat link");
+                    Timber.d("Removing chat link");
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = null;
                         showSnackbar(getString(R.string.chat_link_deleted));
                     } else {
                         if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                            logError("The chatroom isn't grupal or public");
+                            Timber.e("The chatroom isn't grupal or public");
                         } else if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
-                            logError("The chatroom doesn't exist or the chatid is invalid");
+                            Timber.e("The chatroom doesn't exist or the chatid is invalid");
                         } else if (e.getErrorCode() == MegaChatError.ERROR_ACCESS) {
-                            logError("The chatroom doesn't have a topic or the caller isn't an operator");
+                            Timber.e("The chatroom doesn't have a topic or the caller isn't an operator");
                         } else {
-                            logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
+                            Timber.e("Error TYPE_CHAT_LINK_HANDLE %s", e.getErrorCode());
                         }
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
@@ -909,18 +1030,18 @@ public class GroupChatInfoActivity extends PasscodeActivity
             }
             updateAdapterHeader();
         } else if (request.getType() == MegaChatRequest.TYPE_SET_PRIVATE_MODE) {
-            logDebug("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!");
+            Timber.d("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 chatLink = null;
-                logDebug("Chat is PRIVATE now");
+                Timber.d("Chat is PRIVATE now");
                 updateAdapterHeader();
                 return;
             } else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                logError("NOT public chatroom");
+                Timber.e("NOT public chatroom");
             } else if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
-                logError("Chatroom not FOUND");
+                Timber.e("Chatroom not FOUND");
             } else if (e.getErrorCode() == MegaChatError.ERROR_ACCESS) {
-                logError("NOT privileges or private chatroom");
+                Timber.e("NOT privileges or private chatroom");
             }
 
             showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
@@ -948,15 +1069,15 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish " + request.getRequestString());
+        Timber.d("onRequestFinish %s", request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
-            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
+            Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.getNumber());
             if (request.getNumber() == MegaContactRequest.INVITE_ACTION_REMIND) {
                 showSnackbar(getString(R.string.context_contact_invitation_resent));
             } else {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    logDebug("OK INVITE CONTACT: " + request.getEmail());
+                    Timber.d("OK INVITE CONTACT: %s", request.getEmail());
                     if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
                         showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
                     }
@@ -969,7 +1090,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
                     showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                 }
 
-                logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                Timber.e("ERROR: %d___%s", e.getErrorCode(), e.getErrorString());
             }
         }
     }
@@ -984,43 +1105,43 @@ public class GroupChatInfoActivity extends PasscodeActivity
             return;
         }
 
-        logDebug("Chat ID: " + item.getChatId());
+        Timber.d("Chat ID: %s", item.getChatId());
         chat = megaChatApi.getChatRoom(chatHandle);
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
-            logDebug("Change participants");
+            Timber.d("Change participants");
             updateParticipants();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
-            logDebug("Change status: CHANGE_TYPE_OWN_PRIV");
+            Timber.d("Change status: CHANGE_TYPE_OWN_PRIV");
             updateAdapterHeader();
             updateParticipants();
             supportInvalidateOptionsMenu();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
-            logDebug("Change status: CHANGE_TYPE_TITLE");
+            Timber.d("Change status: CHANGE_TYPE_TITLE");
             updateAdapterHeader();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
-            logDebug("CHANGE_TYPE_CLOSED");
+            Timber.d("CHANGE_TYPE_CLOSED");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            logDebug("CHANGE_TYPE_UNREAD_COUNT");
+            Timber.d("CHANGE_TYPE_UNREAD_COUNT");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS)) {
             updateAdapterHeader();
         } else {
-            logDebug("Changes other: " + item.getChanges());
+            Timber.d("Changes other: %s", item.getChanges());
         }
     }
 
     private void onChatOnlineStatusUpdate(long userHandle, int status, boolean inProgress) {
-        logDebug("User Handle: " + userHandle + ", Status: " + status + ", inProgress: " + inProgress);
+        Timber.d("User Handle: %d, Status: %d, inProgress: %s", userHandle, status, inProgress);
 
         if (inProgress) {
             status = -1;
         }
         if (userHandle == megaChatApi.getMyUserHandle()) {
-            logDebug("My own status update");
+            Timber.d("My own status update");
             int position = participants.size() - 1;
             adapter.updateContactStatus(position);
         } else {
-            logDebug("Status update for the user: " + userHandle);
+            Timber.d("Status update for the user: %s", userHandle);
             int indexToReplace = -1;
             ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
             while (itrReplace.hasNext()) {
@@ -1028,7 +1149,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 if (participant != null) {
                     if (participant.getHandle() == userHandle) {
                         if (status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID) {
-                            logDebug("Request last green for user");
+                            Timber.d("Request last green for user");
                             megaChatApi.requestLastGreen(userHandle, this);
                         } else {
                             participant.setLastGreen("");
@@ -1041,23 +1162,23 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 }
             }
             if (indexToReplace != -1) {
-                logDebug("Index to replace: " + indexToReplace);
+                Timber.d("Index to replace: %s", indexToReplace);
                 adapter.updateContactStatus(indexToReplace);
             }
         }
     }
 
-   private void onChatConnectionStateUpdate(long chatid, int newState) {
-        logDebug("Chat ID: " + chatid + ", New state: " + newState);
+    private void onChatConnectionStateUpdate(long chatid, int newState) {
+        Timber.d("Chat ID: %d, New state: %d", chatid, newState);
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatid);
 
-       if (isChatConnectedInOrderToInitiateACall(newState, chatRoom) && canCallBeStartedFromContactOption(this, passcodeManagement)) {
-           startCall();
-       }
+        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom) && canCallBeStartedFromContactOption(this, passcodeManagement)) {
+            startCall();
+        }
     }
 
     public void showConfirmationPrivateChatDialog() {
-        logDebug("showConfirmationPrivateChatDialog");
+        Timber.d("showConfirmationPrivateChatDialog");
         MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -1091,7 +1212,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     public void showConfirmationCreateChatLinkDialog() {
-        logDebug("showConfirmationCreateChatLinkDialog");
+        Timber.d("showConfirmationCreateChatLinkDialog");
 
         MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 
@@ -1124,7 +1245,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
 
     public void startConversation(long handle) {
-        logDebug("Handle: " + handle);
+        Timber.d("Handle: %s", handle);
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
 
@@ -1143,7 +1264,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
         long participantsCount = chat.getPeerCount();
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         for (int i = 0; i < participantsCount; i++) {
-            logDebug("Add participant: " + chat.getPeerHandle(i) + ", privilege: " + chat.getPeerPrivilege(i));
+            Timber.d("Add participant: %d, privilege: %d", chat.getPeerHandle(i), chat.getPeerPrivilege(i));
             peers.addPeer(chat.getPeerHandle(i), chat.getPeerPrivilege(i));
         }
 
@@ -1162,7 +1283,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             }
             this.startActivity(intent);
         } else {
-            logError("ERROR WHEN CREATING CHAT " + errorCode);
+            Timber.e("ERROR WHEN CREATING CHAT %s", errorCode);
             showSnackbar(getString(R.string.create_chat_error));
         }
     }
@@ -1203,13 +1324,13 @@ public class GroupChatInfoActivity extends PasscodeActivity
     }
 
     private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
-        logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
+        Timber.d("User Handle: %d, Last green: %d", userhandle, lastGreen);
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if (state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
             String formattedDate = lastGreenDate(this, lastGreen);
 
             if (userhandle != megaChatApi.getMyUserHandle()) {
-                logDebug("Status last green for the user: " + userhandle);
+                Timber.d("Status last green for the user: %s", userhandle);
                 ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
                 while (itrReplace.hasNext()) {
                     MegaChatParticipant participant = itrReplace.next();
@@ -1223,15 +1344,15 @@ public class GroupChatInfoActivity extends PasscodeActivity
                 }
             }
 
-            logDebug("Date last green: " + formattedDate);
+            Timber.d("Date last green: %s", formattedDate);
         }
     }
 
     /**
      * Stores a MegaChatParticipant with their position in the adapter.
      *
-     * @param position      position of the participant in the adapter.
-     * @param participant   MegaChatParticipant to store.
+     * @param position    position of the participant in the adapter.
+     * @param participant MegaChatParticipant to store.
      */
     public void addParticipantRequest(int position, MegaChatParticipant participant) {
         pendingParticipantRequests.put(position, participant);
@@ -1241,7 +1362,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
      * If there are participants visibles in the UI without attributes,
      * it launches a request to ask for them.
      *
-     * @param scrollState   current scroll state of the RecyclerView
+     * @param scrollState current scroll state of the RecyclerView
      */
     private void checkIfShouldAskForUsersAttributes(int scrollState) {
         if (scrollState != RecyclerView.SCROLL_STATE_IDLE) {
@@ -1296,9 +1417,9 @@ public class GroupChatInfoActivity extends PasscodeActivity
     /**
      * Requests the attributes of some MegaChatParticipants
      *
-     * @param handleList            MegaHandleList in which the participant's handles are stored to ask for their attributes
-     * @param participantRequests   HashMap in which the participants and their positions in the adapter are stored
-     * @param participantAvatars    HastMap in which the participants' handles and their positions in the adapter are stored
+     * @param handleList          MegaHandleList in which the participant's handles are stored to ask for their attributes
+     * @param participantRequests HashMap in which the participants and their positions in the adapter are stored
+     * @param participantAvatars  HastMap in which the participants' handles and their positions in the adapter are stored
      */
     private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests, HashMap<Integer, String> participantAvatars) {
         if (handleList.size() > 0) {
@@ -1316,9 +1437,9 @@ public class GroupChatInfoActivity extends PasscodeActivity
     /**
      * Updates in the adapter the requested participants in loadUserAttributes().
      *
-     * @param chatHandle            identifier of the current MegaChatRoom
-     * @param participantUpdates    list of requested participants
-     * @param handleList            list of the participants' identifiers
+     * @param chatHandle         identifier of the current MegaChatRoom
+     * @param participantUpdates list of requested participants
+     * @param handleList         list of the participants' identifiers
      */
     public void updateParticipants(long chatHandle, final HashMap<Integer, MegaChatParticipant> participantUpdates, MegaHandleList handleList) {
         if (chatHandle != chat.getChatId() || megaChatApi.getChatRoom(chatHandle) == null || adapter == null)
@@ -1355,7 +1476,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
      * @param positionInAdapter participant's position in the adapter
      * @param emailOrHandle     participant's email or handle in Base64
      */
-    public void updateParticipantAvatar (int positionInAdapter, String emailOrHandle) {
+    public void updateParticipantAvatar(int positionInAdapter, String emailOrHandle) {
         int positionInArray = adapter.getParticipantPositionInArray(positionInAdapter);
         boolean isEmail = EMAIL_ADDRESS.matcher(emailOrHandle).matches();
 
@@ -1372,8 +1493,8 @@ public class GroupChatInfoActivity extends PasscodeActivity
     /**
      * Updates a participant in the participants' list.
      *
-     * @param position      position of the participant in the list
-     * @param participant   MegaChatParticipant to update
+     * @param position    position of the participant in the list
+     * @param participant MegaChatParticipant to update
      */
     public void updateParticipant(int position, MegaChatParticipant participant) {
         participants.set(position, participant);
@@ -1383,7 +1504,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
      * Checks if a participant has attributes.
      * If so, the mail and full name do not have to be empty.
      *
-     * @param participant   MegaChatParticipant to check.
+     * @param participant MegaChatParticipant to check.
      * @return True if the participant was correctly updated, false otherwise.
      */
     public boolean hasParticipantAttributes(MegaChatParticipant participant) {
@@ -1415,7 +1536,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
     public void updateParticipants() {
         MegaChatRoom chatRoomUpdated = megaChatApi.getChatRoom(chatHandle);
         if (chatRoomUpdated == null) {
-            logWarning("The chatRoom updated is null");
+            Timber.w("The chatRoom updated is null");
             return;
         }
 
@@ -1431,6 +1552,10 @@ public class GroupChatInfoActivity extends PasscodeActivity
      */
     public boolean isChatOpen() {
         return isChatOpen;
+    }
+
+    public boolean endCallForAllShouldBeVisible(){
+        return endCallForAllShouldBeVisible;
     }
 
     @Override
@@ -1472,8 +1597,15 @@ public class GroupChatInfoActivity extends PasscodeActivity
                         onChatPresenceLastGreen(userHandle, lastGreen);
                     }
 
-                }, (error) -> logError("Error " + error));
+                }, Timber::e);
 
         composite.add(chatSubscription);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putLong(CHAT_ID, chat.getChatId());
+        outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
     }
 }
