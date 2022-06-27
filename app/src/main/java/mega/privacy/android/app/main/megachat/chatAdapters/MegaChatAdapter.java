@@ -181,6 +181,7 @@ import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2001,17 +2002,19 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
                 holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
                 textToShow = context.getResources().getString(R.string.call_started_messages);
-            } else {
-                switch (message.getTermCode()) {
-                    case MegaChatMessage.END_CALL_REASON_ENDED: {
+            }
+            else{
+                switch(message.getTermCode()){
+                    case MegaChatMessage.END_CALL_REASON_ENDED:
+                    case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
 
                         int hours = message.getDuration() / 3600;
                         int minutes = (message.getDuration() % 3600) / 60;
                         int seconds = message.getDuration() % 60;
 
-                        textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
-                                context.getString(R.string.call_ended_message);
+                        textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
+                                StringResourcesUtils.getString(R.string.call_ended_message);
 
                         if (hours != 0) {
                             String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -2045,8 +2048,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         }
 
                         break;
-                    }
-                    case MegaChatMessage.END_CALL_REASON_REJECTED: {
+
+                    case MegaChatMessage.END_CALL_REASON_REJECTED:{
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
 
                         textToShow = context.getString(R.string.call_rejected_messages);
@@ -2157,17 +2160,17 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 textToShow = context.getResources().getString(R.string.call_started_messages);
 
             } else {
-
-                switch (message.getTermCode()) {
-                    case MegaChatMessage.END_CALL_REASON_ENDED: {
+                switch(message.getTermCode()){
+                    case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
+                    case MegaChatMessage.END_CALL_REASON_ENDED:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
 
                         int hours = message.getDuration() / 3600;
                         int minutes = (message.getDuration() % 3600) / 60;
                         int seconds = message.getDuration() % 60;
 
-                        textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
-                                context.getString(R.string.call_ended_message);
+                        textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
+                                StringResourcesUtils.getString(R.string.call_ended_message);
 
                         if (hours != 0) {
                             String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -2199,10 +2202,9 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         } catch (Exception e) {
                         }
 
-
                         break;
-                    }
-                    case MegaChatMessage.END_CALL_REASON_REJECTED: {
+
+                    case MegaChatMessage.END_CALL_REASON_REJECTED:{
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
                         textToShow = context.getString(R.string.call_rejected_messages);
                         try {

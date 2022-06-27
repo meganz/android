@@ -1716,8 +1716,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
                     try {
                         Timber.d("Show missed call notification");
-                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-                        notificationBuilder.showMissedCallNotification(chatId, callId);
+                        ChatAdvancedNotificationBuilder.newInstance(this)
+                                .showMissedCallNotification(chatId, callId);
                     } catch (Exception e) {
                         Timber.e(e, "EXCEPTION when showing missed call notification");
                     }

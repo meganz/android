@@ -3,10 +3,8 @@ package mega.privacy.android.app.main.controllers
 import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
-import androidx.core.content.ContextCompat
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.constants.SettingsConstants
 import nz.mega.sdk.MegaApiJava
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -21,6 +19,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +34,7 @@ import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.domain.entity.SyncRecordType
+import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.LoginActivity
