@@ -56,4 +56,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideLoginRepository(): LoginRepository = mock()
+
+    @Provides
+    fun provideTransfersRepository(): TransfersRepository = mock()
 }
