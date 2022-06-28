@@ -28,8 +28,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -65,6 +67,7 @@ import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.listeners.SimpleChatRequestListener
 import mega.privacy.android.app.listeners.SimpleMegaRequestListener
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
@@ -82,6 +85,8 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
+import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
@@ -103,6 +108,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -178,7 +184,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var amIOnlyOneOnTheCall:Boolean = false
 
-    val inMeetingViewModel: InMeetingViewModel by activityViewModels()
+    private val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
     private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
         val chatId = inMeetingViewModel.getChatId()
@@ -274,12 +280,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED,
+                MegaChatCall.CALL_STATUS_DESTROYED
                 -> {
                     disableCamera()
                     removeUI()
                     if (inMeetingViewModel.amIAGuest()) {
-                        inMeetingViewModel.finishActivityAsGuest(meetingActivity)
+                        inMeetingViewModel.logOutTheGuest(meetingActivity)
                     }
                 }
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
@@ -937,6 +943,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.logOut.collect { shouldLogOut ->
+                if (shouldLogOut) {
+                    inMeetingViewModel.logOutTheGuest(requireActivity())
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
             sharedModel.cameraGranted.collect { allowed ->
                 if (allowed) {
                     bottomFloatingPanelViewHolder.updateCamPermissionWaring(allowed)
@@ -1208,6 +1222,38 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         clearAnimation()
                         inMeetingViewModel.checkBannerInfo()
                     }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showAssignModeratorBottomPanel.collect { shouldBeShown ->
+                if (shouldBeShown) {
+                    AssignModeratorBottomSheetDialogFragment()
+                        .run {
+                            setLeaveMeetingCallBack{ inMeetingViewModel.hangCall() }
+                            setAssignModeratorCallBack(showAssignModeratorFragment)
+                            show(
+                                this@InMeetingFragment.childFragmentManager,
+                                tag
+                            )
+                        }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showEndMeetingAsModeratorBottomPanel.collect { shouldBeShown ->
+                if (shouldBeShown) {
+                    EndMeetingAsModeratorBottomSheetDialogFragment()
+                        .run {
+                            setLeaveMeetingCallBack { inMeetingViewModel.checkClickLeaveButton() }
+                            setEndForAllCallBack{ inMeetingViewModel.endCallForAll() }
+                            show(
+                                this@InMeetingFragment.childFragmentManager,
+                                tag
+                            )
+                        }
                 }
             }
         }
@@ -1874,8 +1920,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         ).commit()
     }
 
-    private fun removeChildFragment(fragment: Fragment) {
-        childFragmentManager.beginTransaction().remove(fragment).commit()
+    private fun removeChildFragment(fragment: Fragment?) {
+        fragment?.let {
+            childFragmentManager.beginTransaction().remove(it).commit()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -2440,26 +2488,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-        if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
-            logDebug("End the one to one or group call")
-            leaveMeeting()
-        } else if (inMeetingViewModel.shouldAssignModerator()) {
-            EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
-                .run {
-                    setLeaveMeetingCallBack(leaveMeetingModerator)
-                    setAssignCallBack(showAssignModeratorFragment)
-                    show(
-                        this@InMeetingFragment.childFragmentManager,
-                        tag
-                    )
-                }
-        } else {
-            askConfirmationEndMeetingForUser()
-        }
-    }
-
-    private val leaveMeetingModerator = fun() {
-        leaveMeeting()
+        inMeetingViewModel.checkClickEndButton()
     }
 
     private fun collapsePanel() {
@@ -2479,20 +2508,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )
-
-    }
-
-    /**
-     * Dialog for confirming leave meeting action
-     */
-    private fun askConfirmationEndMeetingForUser() {
-        leaveDialog = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).setMessage(StringResourcesUtils.getString(R.string.title_end_meeting))
-            .setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
     }
 
     /**
@@ -2522,7 +2537,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             hideCallWillEndInBanner()
             dismissDialog(onlyMeDialog)
-            leaveMeeting()
+            inMeetingViewModel.hangCall()
         }
 
         secondButton.setOnClickListener {
@@ -2544,22 +2559,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         onlyMeDialog?.setOnDismissListener {
             MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             it.dismiss()
-        }
-    }
-
-    /**
-     * Method to control when I leave the call
-     */
-    private fun leaveMeeting() {
-        logDebug("Leaving meeting")
-        disableCamera()
-        removeUI()
-
-        inMeetingViewModel.leaveMeeting()
-        if (inMeetingViewModel.amIAGuest()) {
-            inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else {
-            sharedModel.clickEndCall()
         }
     }
 
@@ -2680,6 +2679,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.setCall(chatId)
         checkChildFragments()
         showMuteBanner()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disableCamera()
     }
 
     override fun onDestroy() {

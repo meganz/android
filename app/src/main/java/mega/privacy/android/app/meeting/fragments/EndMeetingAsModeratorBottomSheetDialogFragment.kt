@@ -4,39 +4,38 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.databinding.BottomSheetEndMeetingAsModeratorBinding
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 
 /**
- * The fragment shows two options for moderator when the moderator leave the meeting
+ * The fragment shows two options for moderator when the moderator leave the meeting:
+ * LEAVE CALL or END CALL FOR ALL
  */
-class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
-    private lateinit var binding: BottomSheetEndMeetingBinding
-    private val sharedViewModel: InMeetingViewModel by activityViewModels()
+class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment() {
+    private lateinit var binding: BottomSheetEndMeetingAsModeratorBinding
+    private val viewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
+
     private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-    private var callBack: (() -> Unit)? = null
+
+    private var callBackEndForAll: (() -> Unit)? = null
     private var callBackLeaveMeeting: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            chatId = it.getLong(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-        }
+
+        chatId = viewModel.getChatId()
 
         if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             LogUtil.logError("Error. Chat doesn't exist")
             return
         }
 
-        chatId?.let { sharedViewModel.setChatId(it) }
-
-        if (sharedViewModel.getCall() == null) {
+        if (viewModel.getCall() == null) {
             LogUtil.logError("Error. Call doesn't exist")
             return
         }
@@ -47,12 +46,15 @@ class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.setupDialog(dialog, style)
 
         binding =
-            BottomSheetEndMeetingBinding.inflate(LayoutInflater.from(context), null, false).apply {
-                lifecycleOwner = this@EndMeetingBottomSheetDialogFragment
+            BottomSheetEndMeetingAsModeratorBinding.inflate(LayoutInflater.from(context),
+                null,
+                false).apply {
+                lifecycleOwner = this@EndMeetingAsModeratorBottomSheetDialogFragment
             }
 
-        binding.assignModerator.setOnClickListener { assignModerator() }
-        binding.leaveAnyway.setOnClickListener { leaveAnyway() }
+        binding.endForAll.setOnClickListener { endForAll() }
+        binding.leaveMeeting.setOnClickListener { leaveMeeting() }
+
         dialog.setContentView(binding.root)
     }
 
@@ -67,15 +69,15 @@ class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
     /**
      * Assign moderator listener will close the page and open assign moderator activity
      */
-    private fun assignModerator() {
+    private fun endForAll() {
         dismiss()
-        callBack?.invoke()
+        callBackEndForAll?.invoke()
     }
 
     /**
      * Leave anyway listener, will leave meeting directly
      */
-    private fun leaveAnyway() {
+    private fun leaveMeeting() {
         dismiss()
         callBackLeaveMeeting?.invoke()
     }
@@ -90,21 +92,11 @@ class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Set the call back for clicking assign moderator option
+     * Set the call back for clicking end for all option
      *
-     * @param showAssignModeratorFragment call back
+     * @param endMeetingForAll call back
      */
-    fun setAssignCallBack(showAssignModeratorFragment: () -> Unit) {
-        callBack = showAssignModeratorFragment
-    }
-
-    companion object {
-        fun newInstance(chatId: Long): EndMeetingBottomSheetDialogFragment {
-            return EndMeetingBottomSheetDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putLong(Constants.CHAT_ID, chatId)
-                }
-            }
-        }
+    fun setEndForAllCallBack(endMeetingForAll: () -> Unit) {
+        callBackEndForAll = endMeetingForAll
     }
 }

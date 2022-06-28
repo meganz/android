@@ -3464,8 +3464,6 @@
     <string name="pin_to_speaker">Display in main view</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make moderator</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Leave meeting now?</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Make moderator</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->

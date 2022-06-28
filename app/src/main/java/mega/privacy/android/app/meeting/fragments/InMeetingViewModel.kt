@@ -37,9 +37,9 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
+import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import javax.inject.Inject
@@ -66,9 +67,9 @@ class InMeetingViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val endCallUseCase: EndCallUseCase,
     getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
-    HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     /**
      * Enum defining the type of call subtitle.
@@ -112,6 +113,15 @@ class InMeetingViewModel @Inject constructor(
 
     private val _showOnlyMeBanner = MutableStateFlow(false)
     val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
+
+    private val _showEndMeetingAsModeratorBottomPanel = MutableStateFlow(false)
+    val showEndMeetingAsModeratorBottomPanel: StateFlow<Boolean> get() = _showEndMeetingAsModeratorBottomPanel
+
+    private val _showAssignModeratorBottomPanel = MutableStateFlow(false)
+    val showAssignModeratorBottomPanel: StateFlow<Boolean> get() = _showAssignModeratorBottomPanel
+
+    private val _logOut = MutableStateFlow(false)
+    val logOut: StateFlow<Boolean> get() = _logOut
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -1535,28 +1545,7 @@ class InMeetingViewModel @Inject constructor(
      * @param callId Call ID
      */
     private fun hangUpSpecificCall(callId: Long) {
-        inMeetingRepository.leaveMeeting(
-            callId,
-            HangChatCallListener(MegaApplication.getInstance(), this)
-        )
-    }
-
-    /**
-     * Method for leave the meeting
-     */
-    fun leaveMeeting() {
-        _callLiveData.value?.let {
-            if (amIAGuest()) {
-                LiveEventBus.get(
-                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
-                    Long::class.java
-                ).post(it.callId)
-            }
-            inMeetingRepository.leaveMeeting(
-                it.callId,
-                HangChatCallListener(MegaApplication.getInstance(), this)
-            )
-        }
+        hangCall(callId)
     }
 
     /**
@@ -1874,8 +1863,8 @@ class InMeetingViewModel @Inject constructor(
         val hasOneModerator = participants.value?.toList()?.filter { it.isModerator }?.size?.let {
             when {
                 it > 1 -> false
-                it == 1 -> getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
-                else -> getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+                it == 1 -> getOwnPrivileges() != PRIV_MODERATOR
+                else -> getOwnPrivileges() == PRIV_MODERATOR
             }
         } == true
 
@@ -2067,9 +2056,6 @@ class InMeetingViewModel @Inject constructor(
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
         const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
-    }
-
-    override fun onCallHungUp(callId: Long) {
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
@@ -2304,7 +2290,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to control when I am a guest and my participation in the meeting ends
      */
-    fun finishActivityAsGuest(meetingActivity: Context) {
+    fun logOutTheGuest(meetingActivity: Context) {
         val chatId = getChatId()
         val callId = getCall()?.callId
         logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
@@ -2337,5 +2323,84 @@ class InMeetingViewModel @Inject constructor(
         }
 
         return true
+    }
+
+    private fun endCallForAll(chatId: Long) {
+        endCallUseCase.endCallForAllWithChatId(chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { error ->
+                Timber.e(error.stackTraceToString())
+            })
+            .addTo(composite)
+    }
+
+    fun endCallForAll() {
+        callLiveData.value?.let { call ->
+            endCallForAll(call.chatid)
+        }
+    }
+
+    private fun hangCall(callId: Long) {
+        endCallUseCase.hangCall(callId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    if (amIAGuest()) {
+                        _logOut.value = true
+                    }
+                },
+                onError = { error -> Timber.e(error.stackTraceToString()) })
+            .addTo(composite)
+    }
+
+    fun hangCall() {
+        callLiveData.value?.let { call ->
+            hangCall(call.callId)
+        }
+    }
+
+    fun checkClickEndButton() {
+        if (isOneToOneCall()) {
+            hangCall()
+
+        } else if (amIAGuest()) {
+            _callLiveData.value?.let {
+                LiveEventBus.get(
+                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
+                    Long::class.java
+                ).post(it.callId)
+
+                hangCall(it.callId)
+            }
+        } else {
+            getChat()?.let { chat ->
+                when (chat.ownPrivilege) {
+                    PRIV_MODERATOR -> {
+                        if (_showEndMeetingAsModeratorBottomPanel.value) {
+                            _showEndMeetingAsModeratorBottomPanel.value = false
+                        }
+
+                        _showEndMeetingAsModeratorBottomPanel.value = true
+                    }
+                    else -> {
+                        hangCall()
+                    }
+                }
+            }
+        }
+    }
+
+    fun checkClickLeaveButton() {
+        if (shouldAssignModerator()) {
+            if (_showAssignModeratorBottomPanel.value) {
+                _showAssignModeratorBottomPanel.value = false
+            }
+
+            _showAssignModeratorBottomPanel.value = true
+        } else {
+            hangCall()
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
@@ -17,6 +18,7 @@ import nz.mega.sdk.MegaChatSession
 class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
+    private val viewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
 
     private var maxWidth = 0
     private var maxHeight = 0
@@ -64,7 +66,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         adapterPager = GridViewPagerAdapter(
             viewPagerData,
-            (parentFragment as InMeetingFragment).inMeetingViewModel,
+            viewModel,
             maxWidth,
             maxHeight,
             (parentFragment as InMeetingFragment)::onPageClick
@@ -79,7 +81,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                     currentPage = position
 
                     logDebug("New page selected $position")
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.removeAllParticipantVisible()
+                    viewModel.removeAllParticipantVisible()
 
                     val data = sliceBy6(participants)
                     updateVisibleParticipantsGrid(data)
@@ -87,7 +89,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
             }
         })
 
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.value?.let {
+        viewModel.participants.value?.let {
             participants = it
         }
         val newData = sliceBy6(participants)
@@ -100,7 +102,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
         viewDataBinding.gridViewPager.adapter = adapterPager
         updateVisibleParticipantsGrid(newData)
 
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observe(
+        viewModel.participants.observe(
             viewLifecycleOwner,
             participantsObserver
         )
@@ -117,11 +119,11 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         if (data.size > currentPage) {
             val dataInPage = data[currentPage]
-            (parentFragment as InMeetingFragment).inMeetingViewModel.updateVisibleParticipants(
+            viewModel.updateVisibleParticipants(
                 dataInPage
             )
         } else {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.removeAllParticipantVisible()
+            viewModel.removeAllParticipantVisible()
         }
 
         closeVideoWhenScroll()
@@ -132,8 +134,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * Method that asks to receive videos from participants who are visible
      */
     private fun activateVideoWhenScroll() {
-        val visibleParticipants =
-            (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
+        val visibleParticipants = viewModel.visibleParticipants
         if (visibleParticipants.isNotEmpty()) {
             val iteratorParticipants = visibleParticipants.iterator()
             iteratorParticipants.forEach {
@@ -154,8 +155,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * Method to stop receiving videos from participants who are not visible
      */
     private fun closeVideoWhenScroll() {
-        val visibleParticipants =
-            (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
+        val visibleParticipants = viewModel.visibleParticipants
 
         participants.let { iteratorParticipants ->
             iteratorParticipants.iterator().forEach { participant ->
@@ -256,7 +256,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param session MegaChatSession
      */
     fun updateSessionOnHold(session: MegaChatSession) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+        viewModel.getParticipant(
             session.peerid,
             session.clientid
         )?.let {
@@ -277,7 +277,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param session MegaChatSession
      */
     fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+        viewModel.getParticipant(
             session.peerid,
             session.clientid
         )?.let {
@@ -300,7 +300,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
-            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            viewModel.getParticipant(
                 peer.peerId,
                 peer.clientId
             )?.let {
@@ -323,7 +323,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     fun updatePrivileges(listPeers: MutableSet<Participant>) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
-            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            viewModel.getParticipant(
                 peer.peerId,
                 peer.clientId
             )?.let {

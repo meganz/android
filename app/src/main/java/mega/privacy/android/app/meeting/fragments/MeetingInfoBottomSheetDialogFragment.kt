@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -36,7 +37,8 @@ import mega.privacy.android.app.utils.Util.showSnackbar
  */
 class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
-    private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
+    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
+
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
     private var changeTitleDialog: AlertDialog? = null
     private var chatTitle: String = ""

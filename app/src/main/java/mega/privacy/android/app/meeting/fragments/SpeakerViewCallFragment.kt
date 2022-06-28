@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +30,7 @@ import nz.mega.sdk.MegaChatSession
 class SpeakerViewCallFragment : MeetingBaseFragment(),
     MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
-    private lateinit var inMeetingViewModel: InMeetingViewModel
+    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
 
     private lateinit var surfaceContainer: RelativeLayout
 
@@ -100,7 +101,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel
     }
 
     override fun onCreateView(

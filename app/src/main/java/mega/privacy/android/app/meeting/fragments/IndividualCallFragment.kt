@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -56,7 +57,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
-    private lateinit var inMeetingViewModel: InMeetingViewModel
+    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
 
     private var videoListener: IndividualCallVideoListener? = null
 
@@ -151,10 +152,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         inMeetingFragment = parentFragment as InMeetingFragment
-
-        inMeetingViewModel = inMeetingFragment.inMeetingViewModel
-
-        inMeetingViewModel.setChatId(chatId)
 
         if (inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE) {
             logError("Error. Call doesn't exist")

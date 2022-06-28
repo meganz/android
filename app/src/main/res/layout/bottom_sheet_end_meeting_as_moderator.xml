@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_meeting_bottom_sheet_dialog"
+        android:paddingStart="24dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/leave_meeting"
+            style="@style/BottomSheetCallPositiveItem"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="@string/calls_call_screen_bottom_panel_leave_call_option"
+            app:layout_constraintBottom_toTopOf="@id/end_for_all"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/end_for_all"
+            style="@style/BottomSheetCallNegativeItem"
+            android:gravity="center"
+            android:text="@string/calls_call_screen_bottom_panel_end_call_for_all_option"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

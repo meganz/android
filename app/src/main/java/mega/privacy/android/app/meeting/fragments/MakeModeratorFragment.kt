@@ -312,18 +312,14 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         disableLocalCamera()
         logDebug("Leave meeting")
-        inMeetingViewModel.leaveMeeting()
+        inMeetingViewModel.checkClickEndButton()
     }
 
     /**
      * Method to control how the meeting activity should finish correctly
      */
     fun finishActivity() {
-        if (inMeetingViewModel.amIAGuest()) {
-            inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else {
-            sharedModel.clickEndCall()
-        }
+        sharedModel.clickEndCall()
     }
 
     /**
