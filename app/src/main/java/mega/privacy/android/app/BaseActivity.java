@@ -1,11 +1,9 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
@@ -21,6 +19,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAI
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR;
@@ -319,10 +318,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
-        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
-        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-        registerReceiver(transferOverQuotaReceiver, filterTransfers);
-
         registerReceiver(showSnackbarReceiver,
                 new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
 
@@ -331,6 +326,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         registerReceiver(cookieSettingsReceiver,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
+        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class)
+                .observe(this, overQuota -> showGeneralTransferOverQuotaWarning());
 
         LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, type -> {
             if (this instanceof PaymentActivity) {
@@ -487,7 +485,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
         unregisterReceiver(showSnackbarReceiver);
-        unregisterReceiver(transferOverQuotaReceiver);
         unregisterReceiver(resumeTransfersReceiver);
 
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
@@ -675,22 +672,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             if (!isTextEmpty(message)) {
                 Util.showSnackbar(baseActivity, message);
             }
-        }
-    };
-
-    /**
-     * Broadcast to show a warning when transfer over quota occurs.
-     */
-    private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null
-                    || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
-                    || isActivityInBackground()) {
-                return;
-            }
-
-            showGeneralTransferOverQuotaWarning();
         }
     };
 
@@ -1219,7 +1200,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows a warning indicating transfer over quota occurred.
      */
     public void showGeneralTransferOverQuotaWarning() {
-        if (transfersManagement.isOnTransfersSection() || transferGeneralOverQuotaWarning != null)
+        if (isActivityInBackground() || transfersManagement.isOnTransfersSection() || transferGeneralOverQuotaWarning != null)
             return;
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);

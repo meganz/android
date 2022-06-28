@@ -13,7 +13,7 @@
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Окончательная ошибка</string>
     <!-- Error shown when terms of service are breached during download. -->
-    <string name="api_etoomany_ec_download">Нарушены условия предоставления услуг</string>
+    <string name="api_etoomany_ec_download">Нарушены условия использования</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
     <string name="api_etoomay">Слишком много одновременных соединений или передач</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Неверный идентификатор сессии</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения наших условий обслуживания.</string>
+    <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения наших условий использования.</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Заблокировано</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

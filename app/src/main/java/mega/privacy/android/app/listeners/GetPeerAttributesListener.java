@@ -124,7 +124,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
      * Updates a notification with the user's attributes reveived in the request.
      */
     private void updateNotificationName() {
-        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(context, MegaApplication.getInstance().getMegaApi(), MegaApplication.getInstance().getMegaChatApi());
+        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(context);
         notificationBuilder.setIsUpdatingUserName();
         notificationBuilder.generateChatNotification(request);
     }

@@ -172,11 +172,6 @@ public class PdfViewerActivity extends PasscodeActivity
     @Inject
     CopyNodeUseCase copyNodeUseCase;
 
-    MegaApplication app = null;
-    MegaApiAndroid megaApi;
-    MegaApiAndroid megaApiFolder;
-    MegaChatApiAndroid megaChatApi;
-
     public ProgressBar progressBar;
 
     public static boolean loading = true;
@@ -362,28 +357,19 @@ public class PdfViewerActivity extends PasscodeActivity
         }
 
         if (!isOffLine && type != ZIP_ADAPTER) {
-            app = (MegaApplication) getApplication();
-            megaApi = app.getMegaApi();
-            if (isFolderLink) {
-                megaApiFolder = app.getMegaApiFolder();
-            }
-
-            megaChatApi = app.getMegaChatApi();
-            if (megaChatApi != null) {
-                if (msgId != -1 && chatId != -1) {
-                    msgChat = megaChatApi.getMessage(chatId, msgId);
-                    if (msgChat == null) {
-                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                    }
-                    if (msgChat != null) {
-                        node = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-                        if (isDeleteDialogShow) {
-                            showConfirmationDeleteNode(chatId, msgChat);
-                        }
-                    }
-                } else {
-                    Timber.w("msgId or chatId null");
+            if (msgId != -1 && chatId != -1) {
+                msgChat = megaChatApi.getMessage(chatId, msgId);
+                if (msgChat == null) {
+                    msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                 }
+                if (msgChat != null) {
+                    node = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+                    if (isDeleteDialogShow) {
+                        showConfirmationDeleteNode(chatId, msgChat);
+                    }
+                }
+            } else {
+                Timber.w("msgId or chatId null");
             }
 
             Timber.d("Add transfer listener");
@@ -611,23 +597,17 @@ public class PdfViewerActivity extends PasscodeActivity
 
             setContentView(R.layout.activity_pdfviewer);
 
-            if (!isOffLine && type != ZIP_ADAPTER) {
-                app = (MegaApplication) getApplication();
-                megaApi = app.getMegaApi();
-
-                megaChatApi = app.getMegaChatApi();
-                if (megaChatApi != null) {
-                    if (msgId != -1 && chatId != -1) {
-                        msgChat = megaChatApi.getMessage(chatId, msgId);
-                        if (msgChat == null) {
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                        }
-                        if (msgChat != null) {
-                            node = msgChat.getMegaNodeList().get(0);
-                        }
-                    } else {
-                        Timber.w("msgId or chatId null");
+            if (!isOffLine && type != ZIP_ADAPTER){
+                if (msgId != -1 && chatId != -1) {
+                    msgChat = megaChatApi.getMessage(chatId, msgId);
+                    if (msgChat == null) {
+                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                     }
+                    if (msgChat != null) {
+                        node = msgChat.getMegaNodeList().get(0);
+                    }
+                } else {
+                    Timber.w("msgId or chatId null");
                 }
 
                 Timber.d("Add transfer listener");
@@ -1029,7 +1009,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             } else if (type == RUBBISH_BIN_ADAPTER
-                    || (megaApi != null && megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
+                    || (megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
                 shareMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
@@ -1578,12 +1558,6 @@ public class PdfViewerActivity extends PasscodeActivity
                         File mediaFile = new File(localPath);
                         uri = getUriForFile(this, mediaFile);
                     } else {
-                        if (megaApi == null) {
-                            MegaApplication app = (MegaApplication) getApplication();
-                            megaApi = app.getMegaApi();
-                            megaApi.addTransferListener(this);
-                            megaApi.addGlobalListener(this);
-                        }
                         if (megaApi.httpServerIsRunning() == 0) {
                             megaApi.httpServerStart();
                         }
@@ -1920,16 +1894,14 @@ public class PdfViewerActivity extends PasscodeActivity
 
         boolean needStopHttpServer = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false);
 
-        if (megaApi != null) {
-            megaApi.removeTransferListener(this);
-            megaApi.removeGlobalListener(this);
+        megaApi.removeTransferListener(this);
+        megaApi.removeGlobalListener(this);
 
-            if (needStopHttpServer) {
-                megaApi.httpServerStop();
-            }
+        if (needStopHttpServer) {
+            megaApi.httpServerStop();
         }
 
-        if (megaApiFolder != null && needStopHttpServer) {
+        if (needStopHttpServer) {
             megaApiFolder.httpServerStop();
         }
 

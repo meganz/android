@@ -30,13 +30,14 @@ data class ScanningTransferData(
     }
 
     /**
-     * Checks if the transfer data related to the start request, is the same as this ScanningTransferData.
+     * Checks if the transfer data, is the same as this ScanningTransferData.
      *
      * @param transfer  MegaTransfer to check.
      * @return True if the transfer data is the same as this ScanningFolderData, false otherwise.
      */
     fun isTheSameTransfer(transfer: MegaTransfer): Boolean =
-        transferType == transfer.type && isFolder == transfer.isFolderTransfer
+        if (transferTag != INVALID_VALUE) transferTag == transfer.tag
+        else transferType == transfer.type && isFolder == transfer.isFolderTransfer
                 && (isTheSameUpload(transfer) || isTheSameDownload(transfer))
 
     /**
@@ -62,7 +63,4 @@ data class ScanningTransferData(
         transferType == MegaTransfer.TYPE_DOWNLOAD
                 && localPath == transfer.parentPath
                 && node.handle == transfer.nodeHandle
-
-    fun isTheSameFolderTransfer(transfer: MegaTransfer): Boolean =
-        isTheSameTransfer(transfer) && transferTag == transfer.tag
 }
