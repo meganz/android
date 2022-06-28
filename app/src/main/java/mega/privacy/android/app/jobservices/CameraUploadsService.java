@@ -109,7 +109,6 @@ import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
-import mega.privacy.android.app.domain.usecase.IsCameraUploadRunning;
 import mega.privacy.android.app.domain.usecase.UpdateTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
@@ -132,9 +131,6 @@ import timber.log.Timber;
 
 @AndroidEntryPoint
 public class CameraUploadsService extends LifecycleService implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
-
-    @Inject
-    IsCameraUploadRunning isUploadRunning;
 
     @Inject
     UpdateTimeStamp updateTimeStamp;

@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.*
-import mega.privacy.android.app.data.preferences.CameraUploadPreferences
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.domain.entity.SyncRecordType
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -347,7 +346,6 @@ class AccountController(private val context: Context) {
             // Clear chat and camera upload preferences
             sharingScope.launch {
                 ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
-                CameraUploadPreferences(context, Dispatchers.IO).clearPreferences()
             }
 
             // Clear text editor preference
