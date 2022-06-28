@@ -1793,7 +1793,7 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s o</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s&#160;Ko</string>
+    <string name="label_file_size_kilo_byte">%s&#160;ko</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;Mo</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1803,7 +1803,7 @@
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_byte">%s&#160;o/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s&#160;Ko/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;ko/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;Mo/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -3108,7 +3108,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Reprendre les transferts pour poursuivre votre téléversement.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d&#160;%% sur %2$s</string>
+    <string name="progress_size_indicator">%1$d%&#160;% sur %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Les renseignements de débogage des conversations sont activés</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3444,7 +3444,7 @@
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%1$s&#160;%%</string>
+    <string name="used_storage_transfer_percentage">%1$s%&#160;%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;Po</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4000,7 +4000,7 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;o</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;Ko</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;ko</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;Mo</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4069,4 +4069,20 @@
     <string name="photos_filter_camera_uploads">Téléversements de l’appareil photo</string>
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">Vidéos seulement</string>
+    <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_title">Impossible d’ouvrir le fichier</string>
+    <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_text">Ce type de fichier n’est pas pris en charge. Pour ouvrir le fichier, téléchargez-le d’abord.</string>
+    <!-- General open action. -->
+    <string name="general_confirmation_open">Ouvrir</string>
+    <!-- Option in the chat menu to end call for all participants -->
+    <string name="meetings_chat_screen_menu_option_end_call_for_all">Mettre fin à l’appel pour tous</string>
+    <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_title_end_call_for_all">Mettre fin à l’appel pour tous ?</string>
+    <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Ceci mettra fin à l’appel pour tous les participants.</string>
+    <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Oui</string>
+    <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">Non</string>
 </resources>
