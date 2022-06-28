@@ -73,18 +73,6 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun isSyncByWifiDefault(): Boolean =
         databaseHandler.preferences.camSyncWifi?.toBoolean() ?: true
 
-    override fun getSyncTimeStamp() =
-        databaseHandler.preferences.camSyncTimeStamp?.toLongOrNull() ?: 0
-
-    override fun getVideoSyncTimeStamp() =
-        databaseHandler.preferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0
-
-    override fun getSecondarySyncTimeStamp(): String? =
-        databaseHandler.preferences.secSyncTimeStamp
-
-    override fun getSecondaryVideoSyncTimeStamp(): String? =
-        databaseHandler.preferences.secVideoSyncTimeStamp
-
     override fun getPendingSyncRecords(): List<SyncRecord> =
         databaseHandler.findAllPendingSyncRecords()
 
@@ -147,6 +135,19 @@ class DefaultCameraUploadRepository @Inject constructor(
     ): Boolean = databaseHandler.localPathExists(fileName, isSecondary, type)
 
     override fun saveSyncRecord(record: SyncRecord) = databaseHandler.saveSyncRecord(record)
+
+    override fun getSyncTimeStamp(type: SyncTimeStamp): Long {
+        return when (type) {
+            SyncTimeStamp.PRIMARY ->
+                databaseHandler.preferences.camSyncTimeStamp?.toLongOrNull() ?: 0
+            SyncTimeStamp.PRIMARY_VIDEO ->
+                databaseHandler.preferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0
+            SyncTimeStamp.SECONDARY ->
+                databaseHandler.preferences.secSyncTimeStamp?.toLongOrNull() ?: 0
+            SyncTimeStamp.SECONDARY_VIDEO ->
+                databaseHandler.preferences.secVideoSyncTimeStamp?.toLongOrNull() ?: 0
+        }
+    }
 
     override fun setSyncTimeStamp(timestamp: Long, type: SyncTimeStamp) {
         when (type) {
@@ -215,8 +216,8 @@ class DefaultCameraUploadRepository @Inject constructor(
         TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error),
             databaseHandler)
 
-    override fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long? =
-        databaseHandler.findMaxTimestamp(isSecondary, syncRecordType)
+    override fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
+        databaseHandler.findMaxTimestamp(isSecondary, syncRecordType) ?: 0
 
     override fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
         databaseHandler.findVideoSyncRecordsByState(syncStatusType)

@@ -104,12 +104,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoCompressor;
-import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository;
+import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp;
 import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
 import mega.privacy.android.app.domain.usecase.IsCameraUploadRunning;
+import mega.privacy.android.app.domain.usecase.UpdateTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -136,6 +137,9 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     IsCameraUploadRunning isUploadRunning;
 
     @Inject
+    UpdateTimeStamp updateTimeStamp;
+
+    @Inject
     CameraUploadRepository cameraUploadRepository;
 
     @Inject
@@ -160,7 +164,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     public static final String CU_CACHE_FOLDER = "cu";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
-    private static volatile boolean isServiceRunning = false;
     public static boolean uploadingInProgress;
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
@@ -173,7 +176,9 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private final String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
 
     public static boolean ignoreAttr;
+    public static boolean running;
     private Handler handler;
+    private static volatile boolean isServiceRunning = false;
 
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
@@ -218,10 +223,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private int totalToUpload;
     private final List<MegaTransfer> cuTransfers = new ArrayList<>();
 
-    private long currentTimeStamp = 0;
-    private long secondaryTimeStamp = 0;
-    private long currentVideoTimeStamp = 0;
-    private long secondaryVideoTimeStamp = 0;
     private Notification mNotification;
     private Intent mIntent, batteryIntent;
     private PendingIntent mPendingIntent;
@@ -529,12 +530,12 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         String selectionSecondary = null;
         String selectionSecondaryVideo = null;
 
-        currentTimeStamp = cameraUploadRepository.getSyncTimeStamp();
+        long currentTimeStamp = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.PRIMARY);
         Timber.d("Primary photo timestamp is: %s", currentTimeStamp);
 
         selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
 
-        currentVideoTimeStamp = cameraUploadRepository.getVideoSyncTimeStamp();
+        long currentVideoTimeStamp = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.PRIMARY_VIDEO);
         Timber.d("Primary video timestamp is: %s", currentVideoTimeStamp);
 
         selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
@@ -543,18 +544,16 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             Timber.d("Secondary upload is enabled.");
             secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
 
-            String secondaryTime = cameraUploadRepository.getSecondarySyncTimeStamp();
-            if (secondaryTime != null) {
-                secondaryTimeStamp = Long.parseLong(secondaryTime);
-                Timber.d("Secondary photo timestamp is: %s", secondaryTimeStamp);
-                selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+            long secondaryTime = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.SECONDARY);
+            if (secondaryTime != 0) {
+                Timber.d("Secondary photo timestamp is: %s", secondaryTime);
+                selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTime + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTime + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
             }
 
-            String secondaryVideoTime = cameraUploadRepository.getSecondaryVideoSyncTimeStamp();
-            if (secondaryVideoTime != null) {
-                secondaryVideoTimeStamp = Long.parseLong(secondaryVideoTime);
-                Timber.d("Secondary video timestamp is: %s", secondaryVideoTimeStamp);
-                selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+            long secondaryVideoTime = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.SECONDARY_VIDEO);
+            if (secondaryVideoTime != 0) {
+                Timber.d("Secondary video timestamp is: %s", secondaryVideoTime);
+                selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTime + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTime + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
             }
         }
 
@@ -1007,27 +1006,15 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 } else {
                     if (!isSecondary) {
                         if (isVideo) {
-                            if (media.timestamp > currentVideoTimeStamp) {
-                                currentVideoTimeStamp = media.timestamp;
-                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY_VIDEO);
-                            }
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_VIDEO);
                         } else {
-                            if (media.timestamp > currentTimeStamp) {
-                                currentTimeStamp = media.timestamp;
-                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY);
-                            }
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY);
                         }
                     } else {
                         if (isVideo) {
-                            if (media.timestamp > secondaryVideoTimeStamp) {
-                                secondaryVideoTimeStamp = media.timestamp;
-                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY_VIDEO);
-                            }
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_VIDEO);
                         } else {
-                            if (media.timestamp > secondaryTimeStamp) {
-                                secondaryTimeStamp = media.timestamp;
-                                cameraUploadRepository.setSyncTimeStamp(media.timestamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY);
-                            }
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY);
                         }
                     }
                 }
@@ -1354,10 +1341,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     private void handleException(Exception e) {
         Timber.e(e);
-
-        if (running) {
-            handler.removeCallbacksAndMessages(null);
-        }
+        handler.removeCallbacksAndMessages(null);
         releaseLocks();
 
         if (isOverQuota) {
@@ -1372,11 +1356,9 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     private void finish() {
         Timber.d("Finish Camera upload process.");
+        handler.removeCallbacksAndMessages(null);
 
-        if (running) {
-            handler.removeCallbacksAndMessages(null);
-            running = false;
-        }
+        running = false;
         cancel();
     }
 
@@ -1696,73 +1678,12 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     private void updateTimeStamp() {
-        //primary
-        Long timeStampPrimary = cameraUploadRepository.getMaxTimestamp(false, SyncRecordType.TYPE_PHOTO.getValue());
-        if (timeStampPrimary == null) {
-            timeStampPrimary = 0L;
-        }
-        if (timeStampPrimary > currentTimeStamp) {
-            Timber.d("Update primary photo timestamp with: %s", timeStampPrimary);
-            updateCurrentTimeStamp(timeStampPrimary);
-        } else {
-            Timber.d("Primary photo timestamp is: %s", currentTimeStamp);
-        }
-
-        Long timeStampPrimaryVideo = cameraUploadRepository.getMaxTimestamp(false, SyncRecordType.TYPE_VIDEO.getValue());
-        if (timeStampPrimaryVideo == null) {
-            timeStampPrimaryVideo = 0L;
-        }
-        if (timeStampPrimaryVideo > currentVideoTimeStamp) {
-            Timber.d("Update primary video timestamp with: %s", timeStampPrimaryVideo);
-            updateCurrentVideoTimeStamp(timeStampPrimaryVideo);
-        } else {
-            Timber.d("Primary video timestamp is: %s", currentVideoTimeStamp);
-        }
-
-        //secondary
+        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY);
+        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_VIDEO);
         if (secondaryEnabled) {
-            Long timeStampSecondary = cameraUploadRepository.getMaxTimestamp(true, SyncRecordType.TYPE_PHOTO.getValue());
-            if (timeStampSecondary == null) {
-                timeStampSecondary = 0L;
-            }
-            if (timeStampSecondary > secondaryTimeStamp) {
-                Timber.d("Update secondary photo timestamp with: %s", timeStampSecondary);
-                updateSecondaryTimeStamp(timeStampSecondary);
-            } else {
-                Timber.d("Secondary photo timestamp is: %s", secondaryTimeStamp);
-            }
-
-            Long timeStampSecondaryVideo = cameraUploadRepository.getMaxTimestamp(true, SyncRecordType.TYPE_VIDEO.getValue());
-            if (timeStampSecondaryVideo == null) {
-                timeStampSecondaryVideo = 0L;
-            }
-            if (timeStampSecondaryVideo > secondaryVideoTimeStamp) {
-                Timber.d("Update secondary video timestamp with: %s", timeStampSecondaryVideo);
-                updateSecondaryVideoTimeStamp(timeStampSecondaryVideo);
-            } else {
-                Timber.d("Secondary video timestamp is: %s", secondaryVideoTimeStamp);
-            }
+            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY);
+            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_VIDEO);
         }
-    }
-
-    private void updateCurrentTimeStamp(long timeStamp) {
-        currentTimeStamp = timeStamp;
-        cameraUploadRepository.setSyncTimeStamp(currentTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY);
-    }
-
-    private void updateCurrentVideoTimeStamp(long timeStamp) {
-        currentVideoTimeStamp = timeStamp;
-        cameraUploadRepository.setSyncTimeStamp(currentVideoTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY_VIDEO);
-    }
-
-    private void updateSecondaryTimeStamp(long timeStamp) {
-        secondaryTimeStamp = timeStamp;
-        cameraUploadRepository.setSyncTimeStamp(secondaryTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY);
-    }
-
-    private void updateSecondaryVideoTimeStamp(long timeStamp) {
-        secondaryVideoTimeStamp = timeStamp;
-        cameraUploadRepository.setSyncTimeStamp(secondaryVideoTimeStamp, DefaultCameraUploadRepository.SyncTimeStamp.SECONDARY_VIDEO);
     }
 
     private boolean isCompressedVideoPending() {

@@ -5,7 +5,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.DefaultIsCameraUploadRunning
+import mega.privacy.android.app.domain.usecase.DefaultUpdateTimeStamp
 import mega.privacy.android.app.domain.usecase.IsCameraUploadRunning
+import mega.privacy.android.app.domain.usecase.UpdateTimeStamp
 
 /**
  * Provides the use case implementation for camera upload
@@ -19,4 +21,10 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsCameraUploadRunning(isCameraUploadRunning: DefaultIsCameraUploadRunning): IsCameraUploadRunning
+
+    /**
+     * Provide the UpdateTimeStamp implementation
+     */
+    @Binds
+    abstract fun bindUpdateTimeStamp(updateTimeStamp: DefaultUpdateTimeStamp): UpdateTimeStamp
 }

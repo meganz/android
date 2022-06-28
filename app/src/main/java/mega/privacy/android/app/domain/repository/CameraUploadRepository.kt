@@ -32,28 +32,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    fun getSyncTimeStamp(): Long
-
-    /**
-     * Get camera upload video sync timestamp
-     *
-     * @return video sync timestamp
-     */
-    fun getVideoSyncTimeStamp(): Long
-
-    /**
-     * Get camera upload secondary sync timestamp
-     *
-     * @return secondary sync timestamp string
-     */
-    fun getSecondarySyncTimeStamp(): String?
-
-    /**
-     * Get camera upload secondary video sync timestamp
-     *
-     * @return secondary video sync timestamp string
-     */
-    fun getSecondaryVideoSyncTimeStamp(): String?
+    fun getSyncTimeStamp(type: DefaultCameraUploadRepository.SyncTimeStamp): Long
 
     /**
      * Set camera upload sync timestamp
@@ -306,7 +285,7 @@ interface CameraUploadRepository {
      *
      * @return maximum timestamp
      */
-    fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long?
+    fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long
 
     /**
      * Get video sync records by status
