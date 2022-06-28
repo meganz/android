@@ -19,11 +19,11 @@
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_destination">Destinație</string>
     <!-- Document scanner high quality option -->
-    <string name="scan_quality_high">Ridicat(ă)</string>
+    <string name="scan_quality_high">Superioară</string>
     <!-- Document scanner medium quality option -->
     <string name="scan_quality_medium">Medie</string>
     <!-- Document scanner low quality option -->
-    <string name="scan_quality_low">Scăzut(ă)</string>
+    <string name="scan_quality_low">Scăzută</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_title">Înlături scanarea?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->

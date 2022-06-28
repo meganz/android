@@ -23,7 +23,7 @@ import android.graphics.PointF;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.OverScroller;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 /**
  * This manager is used by the PDFView to launch animations.
@@ -42,13 +42,13 @@ class AnimationManager {
     private boolean flinging = false;
 
     public AnimationManager(PDFView pdfView) {
-        logDebug("AnimationManager");
+        Timber.d("AnimationManager");
         this.pdfView = pdfView;
         scroller = new OverScroller(pdfView.getContext());
     }
 
     public void startXAnimation(float xFrom, float xTo) {
-        logDebug("startXAnimation");
+        Timber.d("startXAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(xFrom, xTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -58,7 +58,7 @@ class AnimationManager {
     }
 
     public void startYAnimation(float yFrom, float yTo) {
-        logDebug("startYAnimation");
+        Timber.d("startYAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(yFrom, yTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -68,7 +68,7 @@ class AnimationManager {
     }
 
     public void startZoomAnimation(float centerX, float centerY, float zoomFrom, float zoomTo) {
-        logDebug("startZoomAnimation");
+        Timber.d("startZoomAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(zoomFrom, zoomTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -80,14 +80,14 @@ class AnimationManager {
     }
 
     public void startFlingAnimation(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
-        logDebug("startFlingAnimation");
+        Timber.d("startFlingAnimation");
         stopAll();
         flinging = true;
         scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
     }
 
     void computeFling() {
-        logDebug("computeFling");
+        Timber.d("computeFling");
         if (scroller.computeScrollOffset()) {
             pdfView.moveTo(scroller.getCurrX(), scroller.getCurrY());
             pdfView.loadPageByOffset();
@@ -99,7 +99,7 @@ class AnimationManager {
     }
 
     public void stopAll() {
-        logDebug("stopAll");
+        Timber.d("stopAll");
         if (animation != null) {
             animation.cancel();
             animation = null;
@@ -108,7 +108,7 @@ class AnimationManager {
     }
 
     public void stopFling() {
-        logDebug("stopFling");
+        Timber.d("stopFling");
         flinging = false;
         scroller.forceFinished(true);
     }
@@ -117,7 +117,7 @@ class AnimationManager {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            logDebug("onAnimationUpdate");
+            Timber.d("onAnimationUpdate");
             float offset = (Float) animation.getAnimatedValue();
             pdfView.moveTo(offset, pdfView.getCurrentYOffset());
         }
@@ -128,7 +128,7 @@ class AnimationManager {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            logDebug("onAnimationUpdate");
+            Timber.d("onAnimationUpdate");
             float offset = (Float) animation.getAnimatedValue();
             pdfView.moveTo(pdfView.getCurrentXOffset(), offset);
         }
@@ -141,44 +141,44 @@ class AnimationManager {
         private final float centerY;
 
         public ZoomAnimation(float centerX, float centerY) {
-            logDebug("ZoomAnimation");
+            Timber.d("ZoomAnimation");
             this.centerX = centerX;
             this.centerY = centerY;
         }
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            logDebug("onAnimationUpdate");
+            Timber.d("onAnimationUpdate");
             float zoom = (Float) animation.getAnimatedValue();
             pdfView.zoomCenteredTo(zoom, new PointF(centerX, centerY));
         }
 
         @Override
         public void onAnimationCancel(Animator animation) {
-            logDebug("onAnimationCancel");
+            Timber.d("onAnimationCancel");
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
-            logDebug("onAnimationEnd");
+            Timber.d("onAnimationEnd");
             pdfView.loadPages();
             hideHandle();
         }
 
         @Override
         public void onAnimationRepeat(Animator animation) {
-            logDebug("onAnimationRepeat");
+            Timber.d("onAnimationRepeat");
         }
 
         @Override
         public void onAnimationStart(Animator animation) {
-            logDebug("onAnimationStart");
+            Timber.d("onAnimationStart");
         }
 
     }
 
     private void hideHandle() {
-        logDebug("hideHandle");
+        Timber.d("hideHandle");
         if (pdfView.getScrollHandle() != null) {
             pdfView.getScrollHandle().hideDelayed();
         }

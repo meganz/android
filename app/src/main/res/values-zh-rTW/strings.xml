@@ -12,18 +12,12 @@
     <string name="general_cancel">取消</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">移動至</string>
-    <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_copy_to">複製到</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select">選擇</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="general_select_to_upload">選擇檔案</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">選擇資料夾</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">建立</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">下載</string>
     <!-- button -->
     <string name="general_add">新增</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -42,8 +36,6 @@
     <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">跳過</string>
-    <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
-    <string name="general_stop">停止</string>
     <!-- option shown when a message could not be sent -->
     <string name="general_retry">重試</string>
     <!-- Button to open the default web browser -->
@@ -56,24 +48,12 @@
     <string name="general_forwarding">轉發中</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">匯入</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="general_storage">儲存空間</string>
-    <!-- Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer. -->
-    <string name="general_bandwidth">傳輸配額</string>
-    <!-- Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan -->
-    <string name="general_subscribe">訂閱</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">錯誤</string>
-    <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">尚未實施</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">已下載</string>
-    <!-- when trying to upload a file that is already uploaded in the folder -->
-    <string name="general_already_uploaded">已上傳</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">檔案資訊</string>
-    <!-- Label of the option menu. When clicking this button, the app shows the info of the folder -->
-    <string name="general_folder_info">資料夾資訊</string>
     <!-- Hint how to cancel the download -->
     <string name="general_show_info">顯示資訊</string>
     <!-- Error getting the root node -->
@@ -84,12 +64,6 @@
     <string name="secondary_media_service_error_local_folder">第二媒體資料夾不存在，請選擇一個新的資料夾</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">未能偵測到外部儲存裝置</string>
-    <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">此為唯讀資料夾。您沒有上傳的權限</string>
-    <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">您正在移除您以前匯出的還原金鑰檔案</string>
-    <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">您想寄發邀請給 %s 嗎？</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">登出</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,16 +90,12 @@
     <string name="action_help">支援</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">升級帳戶</string>
-    <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">正在升級帳戶</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">全選</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">清除選取</string>
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">縮圖檢視</string>
-    <!-- Menu item to change from grid view to list view -->
-    <string name="action_list">清單檢視</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">備份還原金鑰</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -198,24 +168,8 @@
     <string name="login_before_share">請先登入，以便使用MEGA共享功能</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
-    <!--  -->
-    <string name="tour_space_title">MEGA極大空間</string>
-    <!--  -->
-    <string name="tour_speed_title">MEGA超快速度</string>
-    <!--  -->
-    <string name="tour_privacy_title">MEGA保有隱私</string>
-    <!--  -->
-    <string name="tour_access_title">MEGA輕鬆存取</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
     <string name="tour_space_text">立即註冊即可獲得20&#160;GB免費儲存空間</string>
-    <!--  -->
-    <string name="tour_speed_text">上傳非常快。快速共享給身邊每一位朋友</string>
-    <!--  -->
-    <string name="tour_privacy_text">使用MEGA的點對點加密技術來保存您的檔案</string>
-    <!--  -->
-    <string name="tour_access_text">隨時隨地獲得完全的加密資料存取</string>
-    <!-- button that allows the user to create an account -->
-    <string name="create_account_text">建立帳戶</string>
     <!-- category in sort by action -->
     <string name="name_text">名稱</string>
     <!-- First Name of the user -->
@@ -226,8 +180,6 @@
     <string name="tos">我同意MEGA的[A]服務條款[/A]</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">我了解[B]如果我遺失密碼，我可能會弄丟我的資料[/B]。參考更多關於[A]MEGA點對點加密技術[/A]。</string>
-    <!-- Does the user already have a MEGA account -->
-    <string name="already_account">已有帳戶嗎？</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">您需要接受服務條款</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -237,15 +189,11 @@
     <!-- Warning dialog -->
     <string name="error_enter_userlastname">請輸入您的姓氏。</string>
     <!-- when creating the account -->
-    <string name="error_short_password">密碼太短</string>
-    <!-- when creating the account -->
     <string name="error_passwords_dont_match">密碼不匹配</string>
     <!-- when creating the account -->
     <string name="error_email_registered">此電子郵件已在MEGA註冊過</string>
     <!--  -->
     <string name="create_account_creating_account">正在連接到伺服器：正在建立帳戶</string>
-    <!--  -->
-    <string name="cancel_transfer_confirmation">要取消這個傳輸嗎？</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">要取消所有傳輸嗎？</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -261,17 +209,13 @@
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">媒體上傳</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">收件夾</string>
-    <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">儲存為可離線存取</string>
+    <string name="section_inbox">收件匣</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">離線</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">共享檔案</string>
-    <!-- title of the screen that shows all the shared items -->
-    <string name="section_shared_items">共享的資料夾</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">垃圾筒</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -312,8 +256,6 @@
     <string name="file_properties_info_last_modified">最後修改</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">上傳時間</string>
-    <!-- the label when a folder can be accesed by public users -->
-    <string name="file_properties_shared_folder_public_link">公開連結</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">權限</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -322,8 +264,6 @@
     <string name="file_properties_shared_folder_change_permissions">更改權限</string>
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">共享者</string>
-    <!-- send a file to a MEGA user -->
-    <string name="file_properties_send_file_select_contact">寄至</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">擁有者</string>
     <!-- positive button on dialog to invite a contact -->
@@ -340,12 +280,8 @@
     <string name="contact_properties_activity">聯絡資訊</string>
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">使用下方按鈕新增新聯絡人</string>
-    <!-- Add new contacts before sharing. -->
-    <string name="contacts_explorer_list_empty_text">新增一個新聯絡人以共享檔案</string>
     <!-- Error message -->
     <string name="error_not_enough_free_space">您的裝置可用空間不足</string>
-    <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
-    <string name="option_link_without_key">連結不包含金鑰</string>
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">解密金鑰</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
@@ -382,14 +318,10 @@
     <string name="intent_not_available_location">在您的裝罝上沒有可以開啟此位置資訊的應用程式</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">您可能未安裝任何支援此檔案類型的應用程式</string>
-    <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">圖片共享使用</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">共享連結</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">刪除連結</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">離開</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">離開共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -404,14 +336,8 @@
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">重新命名</string>
-    <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">重新命名%1$s</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="context_open_link_title">打開連接</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">開啟</string>
-    <!-- while renaming a file or folder -->
-    <string name="context_renaming">重新命名中</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">準備檔案中</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -432,20 +358,14 @@
     <string name="context_delete_from_mega">從MEGA中移除</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">資料夾名稱</string>
-    <!-- when adding a new contact. in the dialog -->
-    <string name="context_new_contact_name">聯絡人email</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">建立資料夾中</string>
-    <!-- Menu item -->
-    <string name="context_download_to">儲存至</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">清空垃圾筒</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">您將會永久清除垃圾筒中所有的檔案。</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">送出</string>
-    <!-- send the file to inbox -->
-    <string name="context_send_file_inbox">寄給聯絡人</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">移除</string>
     <!-- Menu option to delete selected items of the offline state -->
@@ -456,8 +376,6 @@
     <string name="context_send_file">發送檔案至對話中</string>
     <!-- menu item -->
     <string name="context_send_contact">共享聯絡人至對話中</string>
-    <!-- open a shared folder -->
-    <string name="context_view_shared_folders">查看共享資料夾</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">共享中</string>
     <!-- Menu option to manage a shared folder. -->
@@ -476,14 +394,10 @@
     <string name="context_contact_not_removed">發生錯誤。聯絡人未移除</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">權限已變更</string>
-    <!-- error message -->
-    <string name="context_permissions_not_changed">錯誤。權限未變更</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">資料夾已存在</string>
     <!-- message when trying to create a invite a contact already that is already added -->
     <string name="context_contact_already_exists">%s已經是您的聯絡人</string>
-    <!-- message when trying to send a file without full access -->
-    <string name="context_send_no_permission">您沒有發送此檔案的權限</string>
     <!-- success message when creating a folder -->
     <string name="context_folder_created">資料夾已建立</string>
     <!-- error message when creating a folder -->
@@ -494,8 +408,6 @@
     <string name="context_no_renamed">錯誤。未重新命名</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">複製成功</string>
-    <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">已寄至收件匣</string>
     <!-- error message when sending a node to Inbox -->
     <string name="context_no_sent_node">發生錯誤。未發送至收件匣</string>
     <!-- error message -->
@@ -516,18 +428,8 @@
     <string name="context_correctly_shared">已成功共享</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">發生錯誤。尚未完成%d個共享</string>
-    <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared_removed">成功移除共享資料夾</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number_removed">發生錯誤。未進行完%d個移除共享作業</string>
-    <!-- error message -->
-    <string name="context_no_shared">錯誤。未共享</string>
     <!-- error message -->
     <string name="context_no_removed_shared">發生錯誤，移除共享失敗</string>
-    <!-- success message when removing a sharing -->
-    <string name="context_remove_sharing">已移除資料夾共享</string>
-    <!-- error message -->
-    <string name="context_no_link">連結生成失敗</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">移除成功</string>
     <!-- error message -->
@@ -558,20 +460,8 @@
     <string name="number_contact_removed">已成功移除%d個聯絡人</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
-    <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">已成功與%d聯絡人共享資料夾</string>
-    <!-- success message when sharing multiple files -->
-    <string name="number_correctly_shared">已成功共享%d個資料夾</string>
-    <!-- error message when sharing multiple files -->
-    <string name="number_no_shared">未能共享%d個資料夾</string>
     <!-- success message when sending a file to a contact -->
     <string name="context_correctly_copied_contact">已發送至：</string>
-    <!-- success message when removing all the contacts of a shared folder -->
-    <string name="context_correctly_removed_sharing_contacts">此資料夾已不再共享</string>
-    <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">發生錯誤。資料夾依然與其他聯絡人共享中</string>
-    <!-- option available for just one file -->
-    <string name="context_select_one_file">僅選擇一個檔案</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">已成功清空垃圾筒</string>
     <!-- error message when emptying the RB -->
@@ -586,8 +476,6 @@
     <string name="confirmation_cancel_subscriptions">感謝您的意見回應。您確定要取消您的MEGA訂閱嗎？</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">您的訂閱還未被取消。請告訴我們您取消的理由</string>
-    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">謝謝。您的付款正在處理中。如果您在24小時內未獲得升級，請發送電子郵件至 support&#64;mega.co.nz</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">您的新訂閱將在當前訂閱到期後生效，屆時將以新價格收費。</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -596,30 +484,22 @@
     <string name="subscription_type_monthly">每月</string>
     <!--  -->
     <string name="subscription_type_yearly">每年</string>
-    <!-- success message after removing the public link of a folder -->
-    <string name="context_node_private">該資料夾現在是私人的</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">共享已移除</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">新資料夾</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">新增聯絡人</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_add_contact_and_share">增加聯絡人並且共享</string>
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">解密金鑰</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">請輸入此連結的解密金鑰</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">無效的金鑰</string>
-    <!-- upload to. Then choose an Image file -->
-    <string name="upload_to_image">圖片</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">音樂</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">影片</string>
-    <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
-    <string name="upload_uploaded">已上傳</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">處理檔案中</item>
@@ -634,10 +514,6 @@
     <string name="error_io_problem">檔案系統問題</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">執行操作時發生錯誤</string>
-    <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">圖片檢視器</string>
-    <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">已使用儲存空間</string>
     <!-- menu item -->
     <string name="my_account_change_password">更改密碼</string>
     <!-- Dialog text overquota error -->
@@ -646,34 +522,16 @@
     <string name="my_account_last_session">上次工作階段</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">正在變更密碼</string>
-    <!-- when changing the password, the first edittext is to enter the current password -->
-    <string name="my_account_change_password_oldPassword">目前密碼</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">新密碼</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">確認新密碼</string>
-    <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">密碼不符</string>
-    <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">選擇方案</string>
-    <!-- the user has to decide the way of payment -->
-    <string name="select_membership_1">按月或按年度自動續訂</string>
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">目前沒有為此方案設定付款方式。請選擇一項。</string>
-    <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">每月*</string>
-    <!-- button to decide annually payment. The asterisk is needed -->
-    <string name="upgrade_per_year">每年*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">此連結已被複製到剪貼簿</string>
-    <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">預覽未下載完成，請稍候</string>
-    <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">沒有足夠可用的記憶體來顯示預覽。請稍後再試。</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">建立新帳戶之前請先登出</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">沒有進行中的傳輸</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">暫停傳輸</string>
     <!-- menu item -->
@@ -704,8 +562,6 @@
     <string name="camera_notif_primary_local_unavailable">相機上傳功能已關閉。您的本地資料夾無法使用。</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">媒體上傳功能已關閉。您的本地資料夾無法使用。</string>
-    <!-- notification camera uploads complete -->
-    <string name="settings_camera_notif_complete">相機上傳完成</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">外觀</string>
     <!-- settings of the Features section -->
@@ -736,16 +592,12 @@
     <string name="settings_storage_download_location">預設下載位置</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">總是詢問下載地址</string>
-    <!-- Whether to enable the storage in advanced devices -->
-    <string name="settings_storage_advanced_devices">顯示進階裝置（外部SD）</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">新增電話號碼</string>
     <!-- enter verification code page title -->
     <string name="verify_account_title">驗證您的帳戶</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
     <string name="verify_account_helper_locked">因為潛在的濫用，您的帳戶已被暫停封鎖。請驗證您的電話號碼來解鎖您的帳戶。</string>
-    <!-- Hint text of the country edittext for billing purposes -->
-    <string name="general_country_label">國家</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">地區</string>
     <!-- place holder for enter mobile number field -->
@@ -789,10 +641,6 @@
         <item>內部儲存</item>
         <item>外部儲存</item>
     </string-array>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option -->
-    <string name="internal_storage_label">內部儲存</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string name="external_storage_label">外部儲存</string>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
         <item>填入使用者email</item>
@@ -800,10 +648,6 @@
     </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">啟用相機上傳</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">開啟相機上傳</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_off">停用相機上傳</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">如何上傳</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -825,8 +669,6 @@
         <item>只有影片</item>
         <item>照片和影片</item>
     </string-array>
-    <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">只在充電狀態下</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">包含位置標籤</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -847,8 +689,6 @@
     <string name="settings_camera_upload_only_videos">只有影片</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">照片和影片</string>
-    <!-- status text when no custom photo sync folder has been set -->
-    <string name="settings_pin_lock_code_not_set">未設定</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">密碼鎖定</string>
     <!-- Settings option to change Passcode. -->
@@ -867,12 +707,6 @@
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">嘗試10次失敗後，您將被強制登出而且您的離線檔案將被刪除</string>
-    <!-- error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_incorrect">密碼錯誤</string>
-    <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
-    <plurals name="pin_lock_incorrect_alert">
-        <item quantity="other">錯誤的密碼，請重新再試。您還剩%2d次的嘗試機會</item>
-    </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">密碼錯誤。請重試。</string>
     <!-- Title of the screen to unlock screen with Passcode -->
@@ -883,8 +717,6 @@
     <string name="reset_pin_title">輸入新密碼</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="reset_pin_title_2">重新輸入新密碼</string>
-    <!-- Text of the screen after 10 attemps with a wrong Passcode -->
-    <string name="incorrect_pin_activity">您的本機資料將被刪除，且您將在%1d秒後被強制登出</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">關於</string>
     <!-- Preference screen item action button -->
@@ -899,38 +731,10 @@
     <string name="settings_about_karere_version">MEGAchat SDK版本</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">檢視來源碼</string>
-    <!--  -->
-    <string name="january">一月</string>
-    <!--  -->
-    <string name="february">二月</string>
-    <!--  -->
-    <string name="march">三月</string>
-    <!--  -->
-    <string name="april">四月</string>
-    <!--  -->
-    <string name="may">五月</string>
-    <!--  -->
-    <string name="june">六月</string>
-    <!--  -->
-    <string name="july">七月</string>
-    <!--  -->
-    <string name="august">八月</string>
-    <!--  -->
-    <string name="september">九月</string>
-    <!--  -->
-    <string name="october">十月</string>
-    <!--  -->
-    <string name="november">十一月</string>
-    <!--  -->
-    <string name="december">十二月</string>
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">ZIP Browser</string>
-    <!-- title of the My Account screen -->
-    <string name="my_account_title">帳戶類型</string>
     <!--  -->
     <string name="free_account">免費</string>
-    <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">照片上傳資料夾已建立</string>
     <!-- category in sort by action -->
     <string name="sortby_name">名稱</string>
     <!-- sort files alphabetically ascending -->
@@ -939,12 +743,6 @@
     <string name="sortby_name_descending">降冪</string>
     <!-- category in sort by action -->
     <string name="sortby_date">日期</string>
-    <!-- category in sort by action -->
-    <string name="sortby_creation_date">建立日期</string>
-    <!-- category in sort by action -->
-    <string name="sortby_modification_date">修改日期</string>
-    <!-- category in sort by action -->
-    <string name="sortby_link_creation_date">連結建立日期</string>
     <!-- sort files by date newest first -->
     <string name="sortby_date_newest">由新到舊</string>
     <!-- sort files by date oldest first -->
@@ -955,14 +753,10 @@
     <string name="sortby_size_largest_first">由大至小</string>
     <!-- sort files by size smallest first -->
     <string name="sortby_size_smallest_first">由小至大</string>
-    <!-- Title of sort by media type options -->
-    <string name="sortby_type">媒體類型</string>
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">照片</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">影片</string>
-    <!-- Title to choose the type of Passcode -->
-    <string name="pin_lock_type">密碼類型</string>
     <!-- Passcode with 4 digits -->
     <string name="four_pin_lock">4位數字</string>
     <!-- Passcode with 6 digits -->
@@ -973,16 +767,12 @@
     <string name="settings_enable_logs">日誌已啟用</string>
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">日誌已關閉</string>
-    <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">無法設定MEGA相機上傳資料夾</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">開啟位置</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">這個過程花費的時間比預期的長。請稍候。</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免費帳戶</string>
-    <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Pro Lite 帳戶</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Pro I 帳戶</string>
     <!-- Label in My Account section to show user account type -->
@@ -1013,22 +803,8 @@
     <string name="general_positive_button">是</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">否</string>
-    <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">忘記密碼了？</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">忘記您的密碼？</string>
-    <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">如果您有還原金鑰的備份，則可以選擇「是」以重新設定密碼。資料均不會遺失。</string>
-    <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">如果您在此台電腦或任何其他電腦上的瀏覽器中有已登入MEGA頁面的工作階段，您仍然可以匯出還原金鑰。如果沒有，您將無法再解密現有帳戶，但您可以選擇「否」，即可使用同一個電子郵件地址開啟新的帳戶。</string>
-    <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">您有還原金鑰的備份嗎？</string>
-    <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">很好！</string>
-    <!-- Hint of the text where the user can write his e-mail -->
-    <string name="edit_text_insert_mail">電子信箱在此</string>
-    <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">請於下方輸入您的電子郵件。您將收到一個還原連結，讓您可以提交您的還原金鑰並重置密碼。</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">您的還原金鑰在此</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1065,14 +841,6 @@
     <string name="park_account_dialog_title">停用帳戶</string>
     <!-- Button to park an account -->
     <string name="park_account_button">停用</string>
-    <!-- Title of the screen to park an account -->
-    <string name="park_account_title">噢！</string>
-    <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">因我們嚴謹的點對點加密規範，如果您沒有密碼或還原金鑰，將會無法存取您的資料。</string>
-    <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">您可以先停用現有的帳戶，再以同一個電子信箱重新註冊。您的資料將會被保存至少60天。在這之間，如果您回想起您此一停用帳戶的密碼，請聯繫 support&#64;mega.nz 以尋求復原協助。</string>
-    <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">請於下方輸入您的電子郵件地址。您將收到還原金鑰連結，讓您可以停用您的帳戶。</string>
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">這是停用您的帳戶的最後一步，請輸入您的新密碼。您的資料將被保留至少60天。如果您之後想起了您已停用帳戶的密碼，請聯繫 support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
@@ -1081,16 +849,12 @@
     <string name="recovery_link_expired">這個復原連結已失效，請再試一次。</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">您的還原金鑰將用於重設您的密碼。請輸入您的新密碼。</string>
-    <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
-    <string name="email_verification_text_change_pass">您將會收到一個還原連結，使您可以重新設定密碼。</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">升級</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">現在就升級</string>
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro帳戶以獲得更大儲存空間和傳輸配額。</string>
-    <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到您的還原金鑰檔案。[/A]注意：當您登出時，您的還原金鑰檔案將被刪除，因此請將它保存至您帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1101,12 +865,6 @@
     <string name="change_mail_text_last_step">這是變更您電子信箱的最後一步了。請於下方輸入您的密碼。</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">更改電子信箱</string>
-    <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">您的儲存空間不足。</string>
-    <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">升級到Pro方案，以充分發揮您MEGA帳戶的功用。</string>
-    <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">編輯大頭照</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">拍照</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1117,8 +875,6 @@
     <string name="incorrect_MK">您所填寫的金鑰與此帳戶不相符。請確認您所使用的還原金鑰是正確的，並再試一次。</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">無效的還原金鑰</string>
-    <!-- Alert Dialog to get link -->
-    <string name="option_full_link">連結包含密鑰</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">取得資訊中&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1151,18 +907,10 @@
     <string name="number_correctly_delete_contact_request">已成功刪除%d個邀請。</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">已成功刪除%1$d個邀請，但有%2$d個未被刪除。</string>
-    <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">您要刪除給%s的聯絡人邀請嗎？</string>
-    <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">您要刪除這%d個聯絡人邀請嗎？</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">已回覆%d個聯絡人邀請。</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">已成功回覆%1$d個聯絡人邀請，但有%2$d個尚無法送出。</string>
-    <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
-    <plurals name="general_num_request">
-        <item quantity="other">%1$d個邀請</item>
-    </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">此資料夾正與%1$d個聯絡人共享中。請問要取消所有的共享嗎？</item>
@@ -1197,18 +945,12 @@
     <string name="file_link_unavaible_delete_account">由於多次違反我們的服務條款，相關的用戶帳戶已被終止使用權。</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">您提供的資料夾連結解密密鑰無效。</string>
-    <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
-    <string name="my_account_my_credentials">我的憑證</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
     <string name="limited_bandwith">有限制的</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">對話</string>
-    <!-- Item of the navigation title for the chat section when there is any unread message -->
-    <string name="section_chat_with_notification">對話[A](%1$d)[/A]</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">封存</string>
-    <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">邀請您的朋友加入對話，我們能讓您保有隱私，提供安全的加密對話平台。</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">小時</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1221,12 +963,6 @@
     <string name="remove_contact_shared_folder">將移除聯絡人%s共享資料夾的權限。</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <string name="remove_multiple_contacts_shared_folder">將移除%d位聯絡人共享資料夾的權限。</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_correctly_removed_from_shared">已從共享資料夾中成功移除%d個聯絡人</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_incorrectly_removed_from_shared">未能成功刪除%d個聯絡人</string>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_correctly_changed_from_shared">成功更新%d個聯絡人的權限</string>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">無法更新%d個聯絡人權限</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
@@ -1239,8 +975,6 @@
     <string name="number_no_invite_contact_request">成功發送%1$d個聯絡人邀請，但有%2$d個聯絡人邀請未被發出。</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s（我）</string>
-    <!-- Hint shown in the field to write a message in the chat screen -->
-    <string name="type_message_hint">輸入訊息</string>
     <!-- button -->
     <string name="general_mute">靜音</string>
     <!-- button -->
@@ -1283,12 +1017,8 @@
     <string name="title_properties_chat_contact_notifications">提醒</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">訊息鈴聲</string>
-    <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">清空對話紀錄</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">共享聯絡人</string>
-    <!-- Title of the screen to select the ringtone of the calls -->
-    <string name="call_ringtone_title">來電鈴聲</string>
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">通知鈴聲</string>
     <!-- Button to clear the chat history -->
@@ -1327,8 +1057,6 @@
     <string name="away_status">離開</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="busy_status">忙碌</string>
-    <!-- Info label about the status of the user -->
-    <string name="invalid_status">沒有連線</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">此訊息已刪除</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1387,8 +1115,6 @@
     <string name="manual_resume_alert">傳輸已暫停。點擊來繼續。</string>
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">發生錯誤。您的狀態尚未更改</string>
-    <!-- message shown when a user couldn’t leave chat -->
-    <string name="leave_chat_error">離開對話時發生錯誤</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">建立對話時發生錯誤</string>
     <!-- settings of the chat to choose the status -->
@@ -1419,8 +1145,6 @@
     <string name="chat_error_open_title">開啟對話時發生錯誤</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">該對話無法正常開啟</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">選擇聯絡人</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d個聯絡人</item>
@@ -1451,32 +1175,12 @@
     <string name="more_users_typing">%1$s [A]和其他人正在打字&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">更多</string>
-    <!-- Text button -->
-    <string name="label_close">關閉</string>
-    <!-- Title of the general tab in My Account Section -->
-    <string name="tab_my_account_general">一般</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="tab_my_account_storage">儲存空間</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="label_storage_upgrade_account">儲存空間</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
     <string name="label_transfer_quota_upgrade_account">傳輸配額</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_achievements">傳輸配額</string>
-    <!-- Title of the section about the plan in the storage tab in My Account Section -->
-    <string name="account_plan">會員方案</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">儲存空間</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="transfer_quota">傳輸配額</string>
-    <!-- Label in section the storage tab in My Account Section -->
-    <string name="available_space">可使用的</string>
-    <!-- Label in section the storage tab in My Account Section when no info info is received -->
-    <string name="not_available">無法使用</string>
-    <!-- Label in section the storage tab when the account is Free -->
-    <string name="no_bylling_cycle">沒有結算週期</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="my_account_of_string">[A]%2$s[/A]中的%1$s</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">要移除離線存取嗎？</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1485,14 +1189,6 @@
     <string name="set_color_theme_label">顏色主題</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">忽略</string>
-    <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="general_not_available">無法使用</string>
-    <!-- Accepted request invitacion alert -->
-    <string name="context_invitacion_reply_accepted">接受邀請</string>
-    <!-- Declined request invitacion alert -->
-    <string name="context_invitacion_reply_declined">拒絕邀請</string>
-    <!-- Ignored request invitacion alert -->
-    <string name="context_invitacion_reply_ignored">已忽略邀請</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">無法辨識訊息</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
@@ -1518,8 +1214,6 @@
         <item>忙碌</item>
         <item>離線</item>
     </string-array>
-    <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">沒有任何可離線存取的檔案</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">啟用</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1528,30 +1222,12 @@
     <string name="enable_log_text_dialog">日誌會包含與您帳戶相關的資訊</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">網路已恢復連線。要連上MEGA嗎？</string>
-    <!-- Message shown meanwhile the app is waiting for a the chat status -->
-    <string name="loading_status">載入狀態中&#8230;</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">此訊息無法被編輯</string>
-    <!-- Label to show the number of transfers in progress, Plural -->
-    <plurals name="text_number_transfers">
-        <item quantity="other">%2$d之%1$d的檔案</item>
-    </plurals>
-    <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">處理正在完成中&#8230;</string>
-    <!-- positive button on dialog to view a contact -->
-    <string name="option_to_transfer_manager">檢視</string>
-    <!-- Label of the modal bottom sheet to pause all transfers -->
-    <string name="option_to_pause_transfers">停止所有傳輸</string>
-    <!-- Label of the modal bottom sheet to resume all transfers -->
-    <string name="option_to_resume_transfers">繼續所有傳輸</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
     <string name="option_to_clear_transfers">清除所有傳輸</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">重試所有傳輸</string>
-    <!-- Dialog to confirm the action of pausing one transfer -->
-    <string name="menu_pause_individual_transfer">要暫停傳輸嗎？</string>
-    <!-- Dialog to confirm the action of restarting one transfer -->
-    <string name="menu_resume_individual_transfer">要繼續傳輸嗎？</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">恢復</string>
     <!-- Dialog to confirm before removing completed transfers -->
@@ -1572,10 +1248,6 @@
     <string name="transfer_cancelled">已取消</string>
     <!-- Possible state of a transfer -->
     <string name="transfer_unknown">未知</string>
-    <!-- Title of the panel where the progress of the transfers is shown -->
-    <string name="paused_transfers_title">傳輸暫停</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty">沒有已完成的傳輸</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">正在上傳檔案：%2$d之%1$d個</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1593,10 +1265,6 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="other">有%1$d個檔案未被上傳</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
-    <plurals name="copied_service_upload">
-        <item quantity="other">已複製%1$d個檔案</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
@@ -1678,12 +1346,6 @@
     <plurals name="context_link_removal_success">
         <item quantity="other">連結刪除成功。</item>
     </plurals>
-    <!-- error message -->
-    <string name="context_link_action_error">啟動連結失敗。請稍候再試。</string>
-    <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">寫下使用者電子信箱</string>
-    <!-- title of the screen to see the details of several node attachments -->
-    <string name="activity_title_files_attached">檔案已附加</string>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">聯絡人已附加</string>
     <!--  -->
@@ -1748,28 +1410,16 @@
     <string name="attachment_uploading_state_compressing">正在壓縮&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">發生錯誤，未送出。</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">已下載%d個檔案。</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
-    <string name="pending_multiple">%d個待處理檔案。</string>
     <!--  -->
     <string name="contact_is_me">沒有可用的選項，您已經選擇了自己</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">要移除附加檔案嗎？</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">查看檔案（%1$d已刪除）</string>
-    <!-- Success message when the attachment has been sent to a chat -->
-    <string name="success_attaching_node_from_cloud">檔案已發送至%1$s</string>
-    <!-- Success message when the attachment has been sent to a many chats -->
-    <string name="success_attaching_node_from_cloud_chats">檔案已發送至%1$d個對話對話中</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">發生錯誤。未能發送檔案</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_attaching_node_from_cloud_chats">發生錯誤。檔案並未發送至任何一個所選定的對話中</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">發生錯誤，附件尚未移除</string>
-    <!-- settings option -->
-    <string name="settings_set_up_automatic_uploads">設定自動上傳</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">靜音</string>
     <!-- messages string in chat notification -->
@@ -1788,8 +1438,6 @@
     <string name="title_properties_chat_notifications_contact">訊息通知</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B]已清空對話紀錄[/B]</string>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <string name="number_messages_chat_notification">%1$d則未讀對話訊息</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_permissions_changing_folder">修改權限</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -1804,8 +1452,6 @@
     <string name="confirmation_move_to_rubbish_plural">要移至垃圾筒嗎？</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">確定從MEGA刪除嗎？</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state">正在上傳&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">對話訊息通知</string>
     <!-- title of the section for achievements -->
@@ -1830,8 +1476,6 @@
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">安裝MEGA桌面應用程式</string>
-    <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
-    <string name="camera_uploads_empty">相機上傳中沒有檔案</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
@@ -1846,14 +1490,8 @@
     <string name="first_paragraph_achievement_invite_friends">邀請您的朋友建立一個MEGA免費帳戶並且安裝MEGA手機應用程式。每一個成功的註冊並且應用程式的安裝，您可以獲得免費的空間作為獎勵。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">免費儲存空間獎勵只限於新邀請並且有安裝MEGA手機應用程式或MEGA桌面應用程式才有效。</string>
-    <!-- explanation of screen to invite friends and get an achievement -->
-    <string name="card_title_invite_friends">從手機通訊錄中選擇聯絡人，或輸入多個電子郵件地址。</string>
-    <!-- title of the dialog to confirm the contact request -->
-    <string name="title_confirmation_invite_friends">邀請朋友加入MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">邀請已發送</string>
-    <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">鼓勵你的朋友註冊並安裝MEGA應用程式吧。只要您的朋友註冊時使用的電子郵件地址與您輸入的相同，你就會收到傳輸配額獎勵喔。</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">電子郵件格式錯誤</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1880,8 +1518,6 @@
     <plurals name="confirmation_leave_share_folder">
         <item quantity="other">如果您離開這些資料夾，您將無法再看到它們。</item>
     </plurals>
-    <!-- Info of a contact if there is no folders shared with him -->
-    <string name="no_folders_shared">沒有共享的資料夾</string>
     <!-- Menu item -->
     <string name="settings_help">支援</string>
     <!-- Settings preference title for help centre -->
@@ -1898,8 +1534,6 @@
     <string name="settings_feedback_body_android_version">Android版本</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">新的文字檔案</string>
-    <!-- Title of the dialog to create a new file by inserting the name -->
-    <string name="dialog_title_new_file">新的檔案</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">檔案名稱</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1908,32 +1542,12 @@
     <string name="context_new_link_name">連結網址</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">標題</string>
-    <!-- Title of the field content when a new file is created to upload -->
-    <string name="new_file_content_when_uploading">內容</string>
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">電子郵件</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">轉寄</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">附加檔案</string>
-    <!-- when add or share a file with a new contact, it can type by name or mail -->
-    <string name="type_contact">聯絡人的姓名或電子郵件</string>
-    <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">目前無法加入更多的聯絡人</string>
-    <!-- when changing the password , the old password and new password are equals -->
-    <string name="old_and_new_passwords_equals">新密碼不能與舊密碼相同</string>
-    <!-- Menu item -->
-    <string name="action_search_by_date">按日期搜尋</string>
-    <!-- title of a button to apply search by date -->
-    <string name="general_apply">套用</string>
-    <!-- title of a button to apply search by month -->
-    <string name="general_search_month">上個月</string>
-    <!-- title of a button to apply search by year -->
-    <string name="general_search_year">去年</string>
-    <!-- title of a Search by date tag -->
-    <string name="label_set_day">設定日期</string>
-    <!-- the user can’t choose this date -->
-    <string name="snackbar_search_by_date">所選日期無效</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">無效的名稱</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
@@ -1946,8 +1560,6 @@
     <plurals name="empty_names">
         <item quantity="other">檔案名稱不能空白。</item>
     </plurals>
-    <!-- Label shown when audio file is playing -->
-    <string name="audio_play">音樂檔案</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">發生錯誤。PDF檔案已損毀或不存在。</string>
     <!-- Label to include info of the user email in the feedback form -->
@@ -1956,10 +1568,6 @@
     <string name="save_to_mega">儲存到我的\n雲端硬碟</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">該對話已存在</string>
-    <!-- before sharing a file, has to be downloaded -->
-    <string name="not_download">該檔案尚未被下載</string>
-    <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">只能新增MEGA聯絡人</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">對話重新連線中</string>
     <!-- Message show when a call cannot be established -->
@@ -1970,14 +1578,10 @@
     <string name="rate_the_app_panel">滿意，給我們好評</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">不滿意，賜予我們建議</string>
-    <!-- title of the section advanced options on the get link screen -->
-    <string name="link_advanced_options">進階選項</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">MEGA需要有您外部儲存裝置的讀取與寫入權限，才能將檔案下載至該處。</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">找不到原來的SD記憶卡，請設定新的下載位置。</string>
-    <!-- Dialog title to ask download to internal storage or external storage. -->
-    <string name="title_select_download_location">選擇下載位置</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">未授予任何聯絡權限</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1996,12 +1600,8 @@
     <string name="section_my_code">我的二維條碼</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">掃描條碼</string>
-    <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">自動接受</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">掃描您二維條碼的MEGA用戶將會自動加入至您的聯絡人列表。</string>
-    <!-- Subtitle of QR code settings that reset the code -->
-    <string name="setting_subtitle_qrcode_reset">先前的二維條碼將失效</string>
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">連結已複製到剪貼簿</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
@@ -2052,12 +1652,6 @@
     <string name="external_play">用&#8230;開啟</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">用&#8230;共享</string>
-    <!-- Message shown if the user choose enable button and he is not logged in -->
-    <string name="error_enable_chat_before_login">啟用對話功能前請先登入</string>
-    <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
-    <string name="label_set_period">設定期限</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]邀請朋友[/B][A]對話[/A][B]並享受我們具隱私和安全的加密平台[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]空的[/B][A]垃圾筒[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2164,8 +1758,6 @@
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">還原為此版本</string>
-    <!-- option menu to clear all the previous versions -->
-    <string name="menu_item_clear_versions">清除所有先前的版本</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="other">刪除這些版本？</item>
@@ -2203,8 +1795,6 @@
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <string name="messages_forwarded_success">轉發的訊息</string>
-    <!-- Error message after forwarding one or several messages to several chats -->
-    <string name="messages_forwarded_error">錯誤。未正確轉發</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">發生錯誤。 %1$d則訊息未能成功轉發</item>
@@ -2245,34 +1835,24 @@
     <string name="general_do_not_show">請別再顯示</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
     <string name="remember_pwd_dialog_button_test">測試密碼</string>
-    <!-- Title of the activity that permits user test his password -->
-    <string name="test_pwd_title">測試您的密碼</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">密碼正確</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
     <string name="test_pwd_wrong">密碼錯誤。\n盡快備份您的還原金鑰！</string>
-    <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="recovery_key_exported_dialog_text_logout">您即將登出，請測試您的密碼以確保您有記住它。\n如果您遺失密碼，您將無法存取您在MEGA的資料。</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">複製到剪貼簿</string>
-    <!-- Option that permits user export his recovery key -->
-    <string name="option_export_recovery_key">匯出還原金鑰</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">執行登出</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">還原金鑰</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">儲存在檔案系統</string>
-    <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">已複製到剪貼簿</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">跳至最新</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
     <string name="message_new_messages">新的訊息</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">來電</string>
-    <!-- Text for the notification action to launch the incoming call page -->
-    <string name="notification_incoming_action">開啟通話</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
     <string name="notification_enable_display">MEGA背景彈窗通知停用中。\n點擊以更改設定。</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
@@ -2285,10 +1865,6 @@
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]正在載入[/A][B]訊息&#8230;[/B]</string>
-    <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">找不到檔案或資料夾。您是否在您的瀏覽器中使用不同的帳號登入？您只能從目前應用程式所登入的帳戶存取檔案或資料夾。</string>
-    <!-- menu option to loop video or audio file -->
-    <string name="context_loop_video">迴圈</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">安全性</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2305,16 +1881,8 @@
     <string name="login_API_rate">太多程序進行中。請稍候。</string>
     <!-- Message when previous login is being cancelled -->
     <string name="login_in_progress">取消登入中。請稍候&#8230;</string>
-    <!-- when open audio video player, the file that it try to open is not supported -->
-    <string name="unsupported_file_type">不支援的檔案類型。</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">錯誤。檔案已損毀或不存在。</string>
-    <!-- Title of the screen Playlist -->
-    <string name="section_playlist">播放清單</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing -->
-    <string name="playlist_state_playing">正在播放&#8230;</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
-    <string name="playlist_state_paused">暫停</string>
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">列印</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
@@ -2333,8 +1901,6 @@
     <string name="title_enable_rich_links">啟用網址連結預覽功能</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">讓MEGAchat使用更順暢。為了顯示預覽縮圖，系統將對您所傳的連結內容進行檢索，此動作並不會使用點對點加密。</string>
-    <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">點擊以輸入解密密鑰</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">請輸入一組更高強度的密碼</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2345,8 +1911,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">新的聯絡人請求</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">寫訊息給“%s”&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]沒有進行中[/B]的[A]傳輸[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2377,8 +1941,6 @@
     <string name="general_verify">確認</string>
     <!-- Text button -->
     <string name="general_next">下一步</string>
-    <!-- Text button -->
-    <string name="general_previous">先前的</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">生成種子密鑰或二維條碼時出錯，請再試一次。</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2401,8 +1963,6 @@
     <string name="verify_2fa_subtitle_delete_account">刪除帳戶</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">停用</string>
-    <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">您的驗證裝置不見了？</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">嘗試停用雙重驗證時發生錯誤。請再試一次。</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2459,8 +2019,6 @@
     <string name="call_failed_messages">[A]通話失敗[/A]</string>
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]通話未接[/A]</string>
-    <!-- Indicates that can type a contact email -->
-    <string name="contact_email">聯絡人email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">您已加入此聯絡人。</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2477,8 +2035,6 @@
     <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
-    <!-- Error message on opening a MEGAdrop folder link -->
-    <string name="error_MEGAdrop_not_supported">尚不支援MEGAdrop資料夾</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">此操作無法完成，因為它會超出您目前的儲存限制。您要升級自己的帳戶嗎？</string>
     <!-- Title of the section Archived chats -->
@@ -2501,8 +2057,6 @@
     <string name="success_unarchive_chat">%s個對話未封存。</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">發生錯誤。未能封存%s個對話。</string>
-    <!-- Message shown when the user has no archived chats -->
-    <string name="archived_chats_empty">[A]沒有[/A][B]封存的對話[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">沒有進行中的對話</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2545,8 +2099,6 @@
     <string name="settings_enable_file_versioning_title">檔案版本控制</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">為您整個帳戶啟用或停用檔案版本控制。\n停用檔案版本控制並不會讓您的聯絡人在共享資料夾中無法建立新版本的檔案。</string>
-    <!-- section title to select a chat to send a file -->
-    <string name="choose_chat">選擇對話</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">點擊、輸入姓名或電子郵件</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2619,26 +2171,18 @@
     <string name="title_share_folder_explorer">選擇資料夾</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">所有傳輸將取消，您要登入嗎？</string>
-    <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="logout_warning_abort_transfers">所有傳輸將取消，您要登出嗎？</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">僅能閱讀</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[B]%2$s[/B]的[A]%1$s[/A]已被使用</string>
-    <!-- title of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_title">更改為測試伺服器？</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">您確定要更改為測試伺服器？您的帳戶可能會遇到無法恢復的問題。</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">要開啟相機？</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">如果您開啟相機，您當前通話的視訊傳輸將被中斷。</string>
-    <!-- Title of the notification when there is unknown activity on the Chat -->
-    <string name="notification_chat_undefined_title">對話活動</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">您可能有新的訊息</string>
-    <!-- When app is retrieving push message -->
-    <string name="retrieving_message_title">檢索訊息</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">垃圾筒清理時程</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
@@ -2663,8 +2207,6 @@
     <string name="hint_days">日</string>
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">取得對話連結</string>
-    <!-- Title of the option to manage a public chat link -->
-    <string name="manage_chat_link_option">管理對話連結</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">啟用加密金鑰輪替</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -2697,8 +2239,6 @@
     <string name="error_chat_link">加載對話連結時發生錯誤。</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">當加載對話連結初始化時發生錯誤。</string>
-    <!-- Message on the alert to preview a chat link if the user is already a participant -->
-    <string name="alert_already_participant_chat_link">您已加入對話。</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">此對話預覽已不再可用。如果您退出預覽將無法再開啟它。</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2715,8 +2255,6 @@
     <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的頁面中查看。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">正在將%s儲存到雲端硬碟&#8230;</string>
-    <!-- General label for folders -->
-    <string name="general_folders">資料夾</string>
     <!-- General label for files -->
     <string name="general_files">檔案</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2805,10 +2343,6 @@
     <string name="payment_method">付款方式</string>
     <!-- title of billing period -->
     <string name="billing_period_title">繳費週期</string>
-    <!-- Option of one-off (month) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_month">[A]一次性（月）[/A] %s</string>
-    <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_year">[A]一次性（年）[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
     <string name="billed_monthly_text">[A]月繳[/A] %s/月</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
@@ -2943,8 +2477,6 @@
     <plurals name="plural_call_ended_messages_seconds">
         <item quantity="other">[B]%1$d秒[/B]</item>
     </plurals>
-    <!-- Message to indicate a call has ended without indicate the call duration. -->
-    <string name="call_ended_no_duration_message">[A]通話結束[/A]</string>
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
     <string name="group_call_ended_no_duration_message">[A]群組通話結束[/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
@@ -2961,24 +2493,12 @@
     <string name="label_tomorrow">明天</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]沒有[/B][A]共享的檔案[/A]</string>
-    <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s已加入通話</string>
-    <!-- Text to indicate that a contact has left a group call -->
-    <string name="contact_left_the_call">%1$s已離開通話</string>
-    <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">已超過最大與會人數，通話無法開始。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">已超過最大與會人數，無法加入通話。</string>
-    <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">由於到達參與人數上限，無法加入群組通話</string>
-    <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">已超過最大與會人數，無法加入視訊通話。</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">通話無法保留。</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">發生錯誤，無法使用此應用程式開啟檔案。</string>
-    <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">來電&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">撥號中&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -2995,8 +2515,6 @@
     <string name="explanation_send_location">此位置將使用不屬於MEGA點對點加密平台的第三方地圖供應商開啟。</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">發送這個位置</string>
-    <!-- Label shown when after a maps search and no places were found -->
-    <string name="no_places_found">找不到位置</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">GPS功能已停用</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -3045,8 +2563,6 @@
     <string name="preparing_chats">正在準備檔案</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">以訊息發送。</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_sent_as_message">發生錯誤。檔案並未傳送至任何一個所選定的對話中</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">刪除以前的版本</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
@@ -3089,12 +2605,8 @@
     <string name="title_pdf_password">請輸入您的密碼</string>
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s是受密碼保護的PDF檔。請輸入密碼以開啟此PDF。</string>
-    <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
-    <string name="error_pdf_password">您輸入錯誤密碼，請重試。</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">您輸入的密碼無效。</string>
-    <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
-    <string name="unknownn_file">無法開啟檔案。可能因為它是未知的檔案類型，或者無法成功解壓縮檔案。</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">正在通話時無法播放影音檔案。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -3103,8 +2615,6 @@
     <string name="join_call_layout_in_group_call">點擊加入當前群組通話。</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">點擊即可返回通話</string>
-    <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
-    <string name="not_allowed_to_start_call">您目前正在通話</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]已加入群組對話。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -3115,8 +2625,6 @@
     <string name="context_create_chat_link_question_text">您想建立一個新的群組對話並產出對話連結嗎？</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
-    <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">您已成功加入對話。</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%2$d之%1$d</string>
     <!-- Hint of the Search view -->
@@ -3131,8 +2639,6 @@
     <string name="muted_own_micro">靜音</string>
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">保留通話</string>
-    <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
-    <string name="session_on_hold">%s通話保留中</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">保留通話並接聽</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
@@ -3167,22 +2673,10 @@
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">已成功刪除對話連結。</string>
-    <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
-    <string name="contact_request_status_accepted">%1$s (已接受)</string>
-    <!-- The status of pending contact request (DELETED), placeholder is contact request creation time -->
-    <string name="contact_request_status_deleted">%1$s (已刪除)</string>
-    <!-- The status of pending contact request (DENIED), placeholder is contact request creation time -->
-    <string name="contact_request_status_denied">%1$s (已拒絕)</string>
-    <!-- The status of pending contact request (IGNORED), placeholder is contact request creation time -->
-    <string name="contact_request_status_ignored">%1$s (已忽略)</string>
-    <!-- The status of pending contact request (REMINDED), placeholder is contact request creation time -->
-    <string name="contact_request_status_reminded">%1$s (已提醒)</string>
-    <!-- The status of pending contact request (PENDING), placeholder is contact request creation time -->
-    <string name="contact_request_status_pending">%1$s (等待中)</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">版本已成功還原。</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">點擊並按住以錄製，發佈即送出。</string>
+    <string name="recording_less_than_second">長按即可錄音</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">滑動以取消</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3235,22 +2729,16 @@
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">將您的手機門號加到MEGA。這可以讓您的聯絡人更容易的在MEGA上找到您。</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
     <string name="not_allowed_recording_voice_clip">通話進行中無法錄製語音留言。</string>
-    <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
-    <string name="error_upload_voice_clip">嘗試上傳語音訊息時發生一個錯誤。</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">來電</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
     <string name="title_notification_incoming_group_call">群組通話來電</string>
-    <!-- Title of the notification shown on the action bar when there is an individual incoming video call -->
-    <string name="title_notification_incoming_individual_video_call">視訊來電</string>
     <!-- Title of the notification shown on the action bar when there is an individual incoming audio call -->
     <string name="title_notification_incoming_individual_audio_call">語音通話來電</string>
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">讀取中</string>
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">請等待&#8230;</string>
-    <!-- Head label to show the business account type -->
-    <string name="account_label">帳戶類型</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">商業</string>
     <!-- Business user role -->
@@ -3259,20 +2747,14 @@
     <string name="user_label">用戶</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">狀態</string>
-    <!-- State to indicate something is active (business status account for instance) -->
-    <string name="active_label">有效的</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">應付款</string>
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">付款逾期</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">用戶管理只能在電腦版瀏覽器進行。</string>
-    <!-- Title of the usage tab in My Account Section -->
-    <string name="tab_my_account_usage">用量</string>
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">儲存空間使用分析</string>
-    <!-- Title of overall usage section in Storage -->
-    <string name="overall_usage_label">總使用量</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">傳輸</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -3335,18 +2817,12 @@
     <string name="snackbar_nickname_added">已加入暱稱</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">已移除暱稱</string>
-    <!-- Label showing that a nickname has not been added -->
-    <string name="error_snackbar_nickname_added">嘗試加入暱稱時發生錯誤</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">暱稱</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">電話號碼</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">正在重新連線</string>
-    <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
-    <string name="connected_message">你回來了。</string>
-    <!-- Text shown in a call when the own internet connection is of low quality -->
-    <string name="poor_internet_connection_message">網路連線不良</string>
     <!-- Text is displayed while a voice clip is being recorded -->
     <string name="recording_layout">錄音中&#8230;</string>
     <!-- Text shown for the action create new file -->
@@ -3377,8 +2853,6 @@
     <string name="inactive_chat_title">對話建立於%s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">選擇訊息</string>
-    <!-- Storage root label -->
-    <string name="storage_root_label">儲存根目錄</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">失敗</string>
     <!-- Text warning of transfer over quota -->
@@ -3439,8 +2913,6 @@
     <string name="joining_label">正在加入&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">離開中&#8230;</string>
-    <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
-    <string name="remove_phone_number">要移除您的手機號碼？</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">您的手機號碼已成功移除。</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3449,8 +2921,6 @@
     <string name="search_hint">在MEGA中搜尋</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">您欲重置的帳戶已被鎖定。</string>
-    <!-- Error message when trying to login and the account is blocked -->
-    <string name="error_account_blocked">您的帳戶已被鎖定。請連繫 support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">您的帳戶已被您的管理員停用。相關詳細資訊請與您的商業帳戶管理員聯繫。</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -3645,8 +3115,6 @@
     <string name="audio_player_now_playing_paused">正在播放（暫停）</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">歌曲資訊</string>
-    <!-- Action to get more information -->
-    <string name="action_more_information">更多資訊</string>
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Cookie政策</string>
     <!-- Preferences screen item title for cookie settings -->
@@ -3683,16 +3151,12 @@
     <string name="theme_system_default">系統預設</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">由省電模式設定</string>
-    <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">請選擇SD卡根目錄。</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">選擇目的地</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">捨棄更改並關閉編輯器？</string>
     <!-- Action discard -->
     <string name="discard_close_action">捨棄並關閉</string>
-    <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">正在儲存檔案&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">檔案已建立</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3742,7 +3206,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">%2$s[B]%1$s[/B]</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">%3$s[B]%2$s%1$s[/B]</string>
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B],%3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">正在上傳，%1$d個待處理檔案</item>
@@ -3803,8 +3267,8 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要變更</string>
-    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
-    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
+    <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4157,10 +3621,6 @@
     <string name="action_do_not_cancel">不要取消</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人</string>
-    <!-- Title of DCIM folder warning dialog -->
-    <string name="title_dcim_folder_dialog">DCIM資料夾</string>
-    <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的圖片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -4177,8 +3637,6 @@
     <string name="upgrade_billing_warning">我們無法處理您的付款。如果您正在使用雙開應用程式，請嘗試不要使用它來登入MEGA。否則請透過網頁瀏覽器進行升級。</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
-    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">現行的訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
@@ -4265,4 +3723,162 @@
     <string name="account_info_renews_on">[B]%s[/B][A]更新[/A]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_expires_on">[B]%s[/B][A]到期[/A]</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">收藏</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">忘記密碼？</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">請輸入您的密碼</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">傳輸已暫停。恢復以繼續下載。</string>
+    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
+    <string name="warning_scanning_transfers">請不要關閉應用程式。</string>
+    <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
+    <string name="scanning_transfers">正在掃描&#8230;</string>
+    <!-- Label cancel transfers. -->
+    <string name="cancel_transfers">取消傳輸</string>
+    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
+    <string name="warning_cancel_transfers">尚未處理的傳輸將被取消。</string>
+    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
+    <string name="button_proceed">繼續</string>
+    <!-- Warning informing transfers were cancelled. -->
+    <string name="transfers_cancelled">傳輸已經取消。</string>
+    <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
+    <string name="title_duplicated_items">重複的項目</string>
+    <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
+    <string name="file_already_exists_in_location">此位置已存在名為[B]%1$s[/B]的檔案。</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
+    <string name="choose_file">選擇您要保留的檔案</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose. -->
+    <string name="choose_folder">選擇是否要合併資料夾</string>
+    <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_upload_and_replace">檔案的當前版本將被您上傳的檔案所取代。</string>
+    <!-- Upload and replace action button for a name collision. -->
+    <string name="upload_and_replace">上傳並取代</string>
+    <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
+    <string name="warning_versioning_upload_and_update">檔案將被更新同時保留歷史版本：</string>
+    <!-- Upload and update action button for a name collision. -->
+    <string name="upload_and_update">上傳並更新</string>
+    <!-- Don’t upload action button for a name collision. -->
+    <string name="do_not_upload">不要上傳</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
+    <string name="warning_upload_and_rename">您上傳的檔案將重新命名為：</string>
+    <!-- Upload and rename action button for a name collision. -->
+    <string name="upload_and_rename">上傳並重新命名</string>
+    <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_move_and_replace">您移動的檔案將取代目的地資料夾中的檔案。</string>
+    <!-- Move and replace action button for a name collision. -->
+    <string name="move_and_replace">移動並取代</string>
+    <!-- Don’t move action button for a name collision. -->
+    <string name="do_not_move">不要移動</string>
+    <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
+    <string name="warning_move_and_rename">您移動的檔案將重新命名為：</string>
+    <!-- Move and rename action button for a name collision. -->
+    <string name="move_and_rename">移動並重新命名</string>
+    <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_copy_and_replace">您複製的檔案將取代目的地資料夾中的檔案。</string>
+    <!-- Copy and replace action button for a name collision. -->
+    <string name="copy_and_replace">複製並取代</string>
+    <!-- Don’t copy action button for a name collision. -->
+    <string name="do_not_copy">不要複製</string>
+    <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
+    <string name="warning_copy_and_rename">您複製的檔案將重新命名為：</string>
+    <!-- Copy and rename action button for a name collision. -->
+    <string name="copy_and_rename">複製並重新命名</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <string name="file_apply_for_all">在接下來的%1$d個衝突套用此選項</string>
+    <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
+    <string name="warning_copy_and_merge">將目的地資料夾與您複製的資料夾合併。</string>
+    <!-- Copy and merge action button for a name collision. -->
+    <string name="copy_and_merge">複製並合併</string>
+    <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
+    <string name="warning_move_and_merge">將目的地資料夾與您移動的資料夾合併。</string>
+    <!-- Move and merge action button for a name collision. -->
+    <string name="move_and_merge">移動並且合併</string>
+    <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
+    <string name="warning_upload_and_merge">將目的地資料夾與您上傳的資料夾合併。</string>
+    <!-- Upload and merge action button for a name collision. -->
+    <string name="upload_and_merge">上傳並且合併</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
+    <string name="skip_file">將不會更動任何檔案。您將保留以下檔案：</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
+    <string name="skip_folder">略過此資料夾</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">此位置已存在名為[B]%1$s[/B]的資料夾。</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">連線不穩</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">通話將於%s後結束</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">這裡只有您一人</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">您仍在通話中</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">除非您想繼續通話，否則通話將在2分鐘後自動結束。</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">立即結束通話</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">保持通話</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">報告問題</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">您的意見回饋有助於我們改進MEGA。請清楚地描述您遇到的問題。您提供的訊息越詳細，我們就越容易解決。</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">描述問題</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">傳送日誌檔案</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">沒有網路連線。請檢查您的連線然後重試。</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">提交</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">出了點問題。請稍後再試。如果您仍然無法提交問題，請聯繫%s尋求協助。</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">我們已收到您提交的報告。我們將調查問題並回覆您。</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">正在上傳日誌檔案</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">捨棄報告？</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">捨棄</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">編輯訊息</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">相簿</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">語音</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">掃描</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">語音訊息</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]邀請朋友[/B][A]對話[/A][B]並享受我們具隱私和安全的加密平台[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">過濾</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">從雲端硬碟</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">相機上傳</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">只有影片</string>
 </resources>

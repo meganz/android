@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:padding="@dimen/photo_grid_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/image_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:placeholderImage="@drawable/ic_image_thumbnail"
+            tools:ignore="ImageContrastCheck" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/video_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:placeholderImage="@drawable/ic_video_thumbnail" />
+
+        <ImageView
+            android:id="@+id/ic_selected"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_marginStart="@dimen/cu_fragment_ic_selected_margin_large"
+            android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/video_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/background_video_duration_message"
+            android:gravity="center_vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+            android:visibility="visible"
+            tools:ignore="SmallSp"
+            tools:text="09:00" />
+
+    </RelativeLayout>
+</layout>

@@ -1,11 +1,11 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) {
 
@@ -13,7 +13,7 @@ class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) 
 
     constructor(
         context: Context?,
-        callback: OnJoinedChatCallback
+        callback: OnJoinedChatCallback,
     ) : this(context) {
         this.callback = callback
     }
@@ -24,16 +24,16 @@ class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) 
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            LogUtil.logDebug("Joined chat correctly")
+            Timber.d("Joined chat correctly")
             callback?.onJoinedChat(request.chatHandle, request.userHandle)
         } else {
-            LogUtil.logError("Error Joining the chat, e.errorCode " + e.errorCode)
+            Timber.e("Error Joining the chat, e.errorCode ${e.errorCode}")
             callback?.onErrorJoinedChat(request.chatHandle, request.userHandle, e.errorCode)
         }
     }
 
     interface OnJoinedChatCallback {
         fun onJoinedChat(chatId: Long, userHandle: Long)
-        fun onErrorJoinedChat(chatId: Long, userHandle: Long, error:Int)
+        fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int)
     }
 }

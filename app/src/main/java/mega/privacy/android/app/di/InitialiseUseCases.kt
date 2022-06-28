@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.DefaultMonitorConnectivity
 import mega.privacy.android.app.domain.usecase.DefaultRootNodeExists
 import mega.privacy.android.app.domain.usecase.MonitorConnectivity
@@ -17,7 +18,7 @@ import mega.privacy.android.app.domain.usecase.RootNodeExists
  * @constructor Create empty Initialise use cases
  */
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(ViewModelComponent::class, SingletonComponent::class)
 abstract class InitialiseUseCases {
 
     @Binds

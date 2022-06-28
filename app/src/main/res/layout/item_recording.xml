@@ -35,7 +35,6 @@
                 android:src="@drawable/ic_voice_clip_feedback"
                 app:tint="@color/white_black"/>
             <RelativeLayout
-                android:id="@+id/amplitud_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/recording_micro_image"

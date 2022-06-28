@@ -59,8 +59,7 @@ import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
+
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
@@ -71,6 +70,7 @@ import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -324,7 +324,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun onLowMemory() {
-        logWarning("onLowMemory")
+        Timber.w("onLowMemory")
         if (binding.viewPager.offscreenPageLimit != OFFSCREEN_PAGE_LIMIT_DEFAULT) {
             binding.viewPager.offscreenPageLimit = OFFSCREEN_PAGE_LIMIT_DEFAULT
         }
@@ -394,7 +394,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         viewModel.onImagesIds().observe(this) { items ->
             if (items.isNullOrEmpty()) {
-                logError("Null or empty image items")
+                Timber.e("Null or empty image items")
                 finish()
             } else {
                 binding.viewPager.waitForLayout {
@@ -545,7 +545,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                             }
                         }
                     else ->
-                        logWarning("Node cannot be shared")
+                        Timber.w("Node cannot be shared")
                 }
                 true
             }

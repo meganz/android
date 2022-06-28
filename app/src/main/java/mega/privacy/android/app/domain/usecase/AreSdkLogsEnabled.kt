@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Are sdk logs enabled
  *
  */
-interface AreSdkLogsEnabled {
+fun interface AreSdkLogsEnabled {
     /**
      * Invoke
      *

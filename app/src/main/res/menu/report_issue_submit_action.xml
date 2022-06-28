@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_report_issue_submit"
+        android:icon="@drawable/ic_send_black"
+        android:orderInCategory="100"
+        android:title="@string/settings_help_report_issue_submit_menu_action"
+        android:visible="true"
+        app:showAsAction="always" />
+</menu>

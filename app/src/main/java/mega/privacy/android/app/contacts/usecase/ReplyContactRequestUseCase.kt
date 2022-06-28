@@ -4,10 +4,10 @@ import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -23,7 +23,7 @@ class ReplyContactRequestUseCase @Inject constructor(
         handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
 
     fun ignoreReceivedRequest(requestHandle: Long): Completable =
-        handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
+        handleReceivedRequest(requestHandle, REPLY_ACTION_IGNORE)
 
     fun denyReceivedRequest(requestHandle: Long): Completable =
         handleReceivedRequest(requestHandle, REPLY_ACTION_DENY)
@@ -60,7 +60,7 @@ class ReplyContactRequestUseCase @Inject constructor(
                             }
                         },
                         onRequestTemporaryError = { _, error ->
-                            logError(error.toThrowable().stackTraceToString())
+                            Timber.e(error.toThrowable())
                         }
                     ))
             } else {
@@ -95,7 +95,7 @@ class ReplyContactRequestUseCase @Inject constructor(
                             }
                         },
                         onRequestTemporaryError = { _, error ->
-                            logError(error.toThrowable().stackTraceToString())
+                            Timber.e(error.toThrowable())
                         }
                     ))
             } else {

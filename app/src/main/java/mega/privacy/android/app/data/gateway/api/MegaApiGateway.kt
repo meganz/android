@@ -5,6 +5,8 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 
 /**
@@ -37,6 +39,28 @@ interface MegaApiGateway {
     fun cancelAccount(listener: MegaRequestListenerInterface?)
 
     /**
+     * Create support ticket
+     *
+     * @param ticketContent
+     * @param listener
+     */
+    fun createSupportTicket(
+        ticketContent: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Start upload for support
+     *
+     * @param path of file to upload
+     * @param listener
+     */
+    fun startUploadForSupport(
+        path: String,
+        listener: MegaTransferListenerInterface,
+    )
+
+    /**
      * Registered email address for the account
      */
     val accountEmail: String?
@@ -50,6 +74,16 @@ interface MegaApiGateway {
      * Is master business account
      */
     val isMasterBusinessAccount: Boolean
+
+    /**
+     * Is ephemeral plus plus account.
+     */
+    val isEphemeralPlusPlus: Boolean
+
+    /**
+     * Authentication token that can be used to identify the user account.
+     */
+    val accountAuth: String
 
     /**
      * Are transfers paused (downloads and uploads)
@@ -73,6 +107,11 @@ interface MegaApiGateway {
      *
      */
     suspend fun getRubbishBinNode(): MegaNode?
+
+    /**
+     * Sdk version
+     */
+    suspend fun getSdkVersion(): String
 
     /**
      * Global updates
@@ -217,10 +256,64 @@ interface MegaApiGateway {
     fun handleToBase64(handle: Long): String
 
     /**
-     * Execute a fast login
+     * Cancel transfer
      *
-     * @param session  Session key
-     * @param listener MegaRequestListener to handle callback
+     * @param transfer to be cancelled
+     */
+    fun cancelTransfer(transfer: MegaTransfer)
+
+    /**
+     * Gets the number of unread user alerts for the logged in user.
+     *
+     * @return Number of unread user alerts.
+     */
+    suspend fun getNumUnreadUserAlerts(): Int
+
+    /**
+     * Inbox node of the account
+     *
+     * @return The Inbox node if exists, null otherwise.
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
+     * Checks if the provided node has children.
+     *
+     * @param node  The MegaNode to check.
+     * @return True if the node has children, false otherwise.
+     */
+    suspend fun hasChildren(node: MegaNode): Boolean
+
+    /**
+     * Registers push notifications.
+     *
+     * @param deviceType    Type of device.
+     * @param newToken      New push token.
+     * @param listener      Listener.
+     */
+    fun registerPushNotifications(
+        deviceType: Int,
+        newToken: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Performs a fast login.
+     *
+     * @param session   Required for fast login.
+     * @param listener  Listener.
      */
     fun fastLogin(session: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Performs fetch nodes.
+     *
+     * @param listener  Listener.
+     */
+    fun fetchNodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Retries all pending requests.
+     */
+    fun retryPendingConnections()
 }

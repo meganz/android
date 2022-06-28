@@ -1,5 +1,57 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.main.FileInfoActivity.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
+import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
+import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
+import static mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
+import static mega.privacy.android.app.utils.Constants.ZIP_ADAPTER;
+import static mega.privacy.android.app.utils.FileUtil.addPdfFileExtension;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.getUriForFile;
+import static mega.privacy.android.app.utils.FileUtil.shareFile;
+import static mega.privacy.android.app.utils.FileUtil.shareWithUri;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showShareOption;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
+import static mega.privacy.android.app.utils.Util.getExternalCardPath;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
@@ -61,6 +113,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -71,13 +125,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.data.NameCollisionType;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.MoveNodeUseCase;
-import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -85,7 +132,14 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -103,63 +157,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.main.FileInfoActivity.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
-import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
-import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
-import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
-import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
-import static mega.privacy.android.app.utils.Constants.NAME;
-import static mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
-import static mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
-import static mega.privacy.android.app.utils.Constants.ZIP_ADAPTER;
-import static mega.privacy.android.app.utils.FileUtil.addPdfFileExtension;
-import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtil.getUriForFile;
-import static mega.privacy.android.app.utils.FileUtil.shareFile;
-import static mega.privacy.android.app.utils.FileUtil.shareWithUri;
-import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showShareOption;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
-import static mega.privacy.android.app.utils.Util.getExternalCardPath;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class PdfViewerActivity extends PasscodeActivity
@@ -173,11 +171,6 @@ public class PdfViewerActivity extends PasscodeActivity
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
-
-    MegaApplication app = null;
-    MegaApiAndroid megaApi;
-    MegaApiAndroid megaApiFolder;
-    MegaChatApiAndroid megaChatApi;
 
     public ProgressBar progressBar;
 
@@ -260,8 +253,8 @@ public class PdfViewerActivity extends PasscodeActivity
     }
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
+    public void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -274,14 +267,14 @@ public class PdfViewerActivity extends PasscodeActivity
         registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
-        if (intent == null){
-            logWarning("Intent null");
+        if (intent == null) {
+            Timber.w("Intent null");
             finish();
             return;
         }
         handler = new Handler();
         if (savedInstanceState != null) {
-            logDebug("saveInstanceState");
+            Timber.d("saveInstanceState");
             currentPage = savedInstanceState.getInt("currentPage");
             handle = savedInstanceState.getLong("HANDLE");
             pdfFileName = savedInstanceState.getString("pdfFileName");
@@ -294,15 +287,14 @@ public class PdfViewerActivity extends PasscodeActivity
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
-        }
-        else {
+        } else {
             currentPage = 1;
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
-            logDebug("URI pdf: " + uri);
-            if (uri == null){
-                logError("Uri null");
+            Timber.d("URI pdf: %s", uri);
+            if (uri == null) {
+                Timber.e("Uri null");
                 finish();
                 return;
             }
@@ -318,41 +310,37 @@ public class PdfViewerActivity extends PasscodeActivity
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
 
-        if (type == OFFLINE_ADAPTER){
+        if (type == OFFLINE_ADAPTER) {
             isOffLine = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
-        }
-        else if (type == FILE_LINK_ADAPTER) {
+        } else if (type == FILE_LINK_ADAPTER) {
             String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
-            if(serialize!=null) {
+            if (serialize != null) {
                 node = MegaNode.unserialize(serialize);
                 if (node != null) {
-                    logDebug("currentDocument NOT NULL");
-                }
-                else {
-                    logWarning("currentDocument is NULL");
+                    Timber.d("currentDocument NOT NULL");
+                } else {
+                    Timber.w("currentDocument is NULL");
                 }
             }
             isOffLine = false;
             fromChat = false;
-        }
-        else {
+        } else {
             isOffLine = false;
             pathNavigation = null;
-            if (type == FROM_CHAT){
+            if (type == FROM_CHAT) {
                 fromChat = true;
                 chatC = new ChatController(this);
                 msgId = intent.getLongExtra("msgId", -1);
                 chatId = intent.getLongExtra("chatId", -1);
-            }
-            else {
+            } else {
                 fromChat = false;
                 node = megaApi.getNodeByHandle(handle);
             }
         }
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_pdfviewer);
@@ -364,36 +352,27 @@ public class PdfViewerActivity extends PasscodeActivity
             StrictMode.setVmPolicy(builder.build());
         }
 
-        if (dbH == null){
+        if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
         if (!isOffLine && type != ZIP_ADAPTER) {
-            app = (MegaApplication) getApplication();
-            megaApi = app.getMegaApi();
-            if (isFolderLink) {
-                megaApiFolder = app.getMegaApiFolder();
-            }
-
-            megaChatApi = app.getMegaChatApi();
-            if (megaChatApi != null) {
-                if (msgId != -1 && chatId != -1) {
-                    msgChat = megaChatApi.getMessage(chatId, msgId);
-                    if (msgChat == null) {
-                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                    }
-                    if (msgChat != null) {
-                        node = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-                        if (isDeleteDialogShow) {
-                            showConfirmationDeleteNode(chatId, msgChat);
-                        }
-                    }
-                } else {
-                    logWarning("msgId or chatId null");
+            if (msgId != -1 && chatId != -1) {
+                msgChat = megaChatApi.getMessage(chatId, msgId);
+                if (msgChat == null) {
+                    msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                 }
+                if (msgChat != null) {
+                    node = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+                    if (isDeleteDialogShow) {
+                        showConfirmationDeleteNode(chatId, msgChat);
+                    }
+                }
+            } else {
+                Timber.w("msgId or chatId null");
             }
 
-            logDebug("Add transfer listener");
+            Timber.d("Add transfer listener");
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
@@ -408,15 +387,13 @@ public class PdfViewerActivity extends PasscodeActivity
                     activityManager.getMemoryInfo(mi);
 
                     if (mi.totalMem > BUFFER_COMP) {
-                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                    }
-                    else {
-                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                    } else {
+                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
-                }
-                else if (isFolderLink) {
+                } else if (isFolderLink) {
                     if (megaApiFolder.httpServerIsRunning() == 0) {
                         megaApiFolder.httpServerStart();
                     }
@@ -426,16 +403,15 @@ public class PdfViewerActivity extends PasscodeActivity
                     activityManager.getMemoryInfo(mi);
 
                     if (mi.totalMem > BUFFER_COMP) {
-                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                         megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                    }
-                    else {
-                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                    } else {
+                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                         megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
                 }
 
-                if (savedInstanceState != null && ! isFolderLink) {
+                if (savedInstanceState != null && !isFolderLink) {
                     String url = null;
 
                     if (node != null) {
@@ -452,20 +428,18 @@ public class PdfViewerActivity extends PasscodeActivity
                 }
             }
 
-            if (isFolderLink){
-                logDebug("Folder link node");
+            if (isFolderLink) {
+                Timber.d("Folder link node");
                 node = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
-                if (node == null){
-                    logWarning("CurrentDocumentAuth is null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming)+ ": node not authorized", -1);
-                }
-                else{
-                    logDebug("CurrentDocumentAuth is not null");
+                if (node == null) {
+                    Timber.w("CurrentDocumentAuth is null");
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming) + ": node not authorized", -1);
+                } else {
+                    Timber.d("CurrentDocumentAuth is not null");
                     String url;
                     if (dbH != null && dbH.getCredentials() != null) {
                         url = megaApi.httpServerGetLocalLink(node);
-                    }
-                    else {
+                    } else {
                         url = megaApiFolder.httpServerGetLocalLink(node);
                     }
                     if (url != null) {
@@ -480,8 +454,8 @@ public class PdfViewerActivity extends PasscodeActivity
         }
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
-        if(tB==null){
-            logWarning("Tb is Null");
+        if (tB == null) {
+            Timber.w("Tb is Null");
             return;
         }
 
@@ -504,21 +478,19 @@ public class PdfViewerActivity extends PasscodeActivity
         defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivity.this);
 
         loading = true;
-        if (uri.toString().contains("http://")){
+        if (uri.toString().contains("http://")) {
             isUrl = true;
             loadStreamPDF();
-        }
-        else {
+        } else {
             isUrl = false;
             loadLocalPDF();
         }
 
         setTitle(pdfFileName);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
-        }
-        else{
+        } else {
             fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
         }
 
@@ -529,15 +501,14 @@ public class PdfViewerActivity extends PasscodeActivity
             aB.setTitle(pdfFileName);
             uploadContainer.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             aB.setTitle(" ");
             uploadContainer.setVisibility(View.GONE);
             bottomLayout.setVisibility(View.VISIBLE);
         }
 
         uploadContainer.setOnClickListener(v -> {
-            logDebug("onClick uploadContainer");
+            Timber.d("onClick uploadContainer");
             Intent intent1 = new Intent(PdfViewerActivity.this, FileExplorerActivity.class);
             intent1.setAction(Intent.ACTION_SEND);
             intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -558,57 +529,52 @@ public class PdfViewerActivity extends PasscodeActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        logDebug("onNewIntent");
+        Timber.d("onNewIntent");
 
-        if (intent == null){
-            logWarning("intent null");
+        if (intent == null) {
+            Timber.w("intent null");
             finish();
             return;
         }
 
         handler = new Handler();
-        if (intent.getBooleanExtra("inside", false)){
+        if (intent.getBooleanExtra("inside", false)) {
             setIntent(intent);
-            if (!intent.getBooleanExtra("isUrl", true)){
+            if (!intent.getBooleanExtra("isUrl", true)) {
                 isUrl = false;
                 uri = intent.getData();
                 supportInvalidateOptionsMenu();
             }
-        }
-        else {
+        } else {
             disablePasscode();
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
             inside = false;
-            if (type == OFFLINE_ADAPTER){
+            if (type == OFFLINE_ADAPTER) {
                 isOffLine = true;
                 pathNavigation = intent.getStringExtra("pathNavigation");
-            }
-            else if (type == FILE_LINK_ADAPTER) {
+            } else if (type == FILE_LINK_ADAPTER) {
                 String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
-                if(serialize!=null) {
+                if (serialize != null) {
                     node = MegaNode.unserialize(serialize);
                     if (node != null) {
-                        logDebug("currentDocument NOT NULL");
-                    }
-                    else {
-                        logWarning("currentDocument is NULL");
+                        Timber.d("currentDocument NOT NULL");
+                    } else {
+                        Timber.w("currentDocument is NULL");
                     }
                 }
                 isOffLine = false;
                 fromChat = false;
-            }
-            else {
+            } else {
                 isOffLine = false;
                 pathNavigation = null;
-                if (type == FROM_CHAT){
+                if (type == FROM_CHAT) {
                     fromChat = true;
                     chatC = new ChatController(this);
                     msgId = intent.getLongExtra("msgId", -1);
                     chatId = intent.getLongExtra("chatId", -1);
-                }
-                else {
+                } else {
                     fromChat = false;
                     node = megaApi.getNodeByHandle(handle);
                 }
@@ -616,8 +582,8 @@ public class PdfViewerActivity extends PasscodeActivity
             handle = getIntent().getLongExtra("HANDLE", -1);
 
             uri = intent.getData();
-            if (uri == null){
-                logError("Uri null");
+            if (uri == null) {
+                Timber.e("Uri null");
                 finish();
                 return;
             }
@@ -626,31 +592,25 @@ public class PdfViewerActivity extends PasscodeActivity
             newIntent.setAction(ACTION_OPEN_FOLDER);
             setIntent(newIntent);
             Display display = getWindowManager().getDefaultDisplay();
-            outMetrics = new DisplayMetrics ();
+            outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
 
             setContentView(R.layout.activity_pdfviewer);
 
             if (!isOffLine && type != ZIP_ADAPTER){
-                app = (MegaApplication)getApplication();
-                megaApi = app.getMegaApi();
-
-                megaChatApi = app.getMegaChatApi();
-                if (megaChatApi != null) {
-                    if (msgId != -1 && chatId != -1) {
-                        msgChat = megaChatApi.getMessage(chatId, msgId);
-                        if (msgChat == null) {
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                        }
-                        if (msgChat != null) {
-                            node = msgChat.getMegaNodeList().get(0);
-                        }
-                    } else {
-                        logWarning("msgId or chatId null");
+                if (msgId != -1 && chatId != -1) {
+                    msgChat = megaChatApi.getMessage(chatId, msgId);
+                    if (msgChat == null) {
+                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                     }
+                    if (msgChat != null) {
+                        node = msgChat.getMegaNodeList().get(0);
+                    }
+                } else {
+                    Timber.w("msgId or chatId null");
                 }
 
-                logDebug("Add transfer listener");
+                Timber.d("Add transfer listener");
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
@@ -660,8 +620,8 @@ public class PdfViewerActivity extends PasscodeActivity
             }
 
             tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
-            if(tB==null){
-                logWarning("Tb is Null");
+            if (tB == null) {
+                Timber.w("Tb is Null");
                 return;
             }
 
@@ -691,10 +651,9 @@ public class PdfViewerActivity extends PasscodeActivity
             setTitle(pdfFileName);
             aB.setTitle(pdfFileName);
 
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
-            }
-            else{
+            } else {
                 fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
             }
             fileNameTextView.setText(pdfFileName);
@@ -703,7 +662,7 @@ public class PdfViewerActivity extends PasscodeActivity
             uploadContainer.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
             uploadContainer.setOnClickListener(v -> {
-                logDebug("onClick uploadContainer");
+                Timber.d("onClick uploadContainer");
                 Intent intent1 = new Intent(PdfViewerActivity.this, FileExplorerActivity.class);
                 intent1.setAction(Intent.ACTION_SEND);
                 intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -722,7 +681,7 @@ public class PdfViewerActivity extends PasscodeActivity
         dragToExit.runEnterAnimation(intent, pdfView, animationStart -> {
             if (animationStart) {
                 if (aB != null && aB.isShowing()) {
-                    if(tB != null) {
+                    if (tB != null) {
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
                         tB.animate().translationY(-220).setDuration(0).withEndAction(aB::hide).start();
@@ -742,7 +701,7 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     protected void onSaveInstanceState(@NotNull Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putInt("currentPage", currentPage);
@@ -766,13 +725,13 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
+        Timber.d("onUserAlertsUpdate");
     }
 
     @Override
     public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-        logDebug("onNodesUpdate");
-        if (megaApi.getNodeByHandle(handle) == null){
+        Timber.d("onNodesUpdate");
+        if (megaApi.getNodeByHandle(handle) == null) {
             return;
         }
         supportInvalidateOptionsMenu();
@@ -828,7 +787,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 URL url = new URL(strings[0]);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 if (httpURLConnection.getResponseCode() == 200) {
-                    inputStream = new BufferedInputStream( (httpURLConnection.getInputStream()));
+                    inputStream = new BufferedInputStream((httpURLConnection.getInputStream()));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -839,10 +798,10 @@ public class PdfViewerActivity extends PasscodeActivity
 
         @Override
         protected void onPostExecute(InputStream inputStream) {
-            logDebug("onPostExecute");
+            Timber.d("onPostExecute");
             try {
                 pdfView.fromStream(inputStream, String.valueOf(handle))
-                        .defaultPage(currentPage-1)
+                        .defaultPage(currentPage - 1)
                         .onPageChange(PdfViewerActivity.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivity.this)
@@ -855,35 +814,34 @@ public class PdfViewerActivity extends PasscodeActivity
                 e.printStackTrace();
             }
 
-            if (loading && !transferOverquota){
+            if (loading && !transferOverquota) {
                 progressBar.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    public void reloadPDFwithPassword (String password) {
+    public void reloadPDFwithPassword(String password) {
         this.password = password;
         maxIntents--;
         if (isUrl) {
             loadStreamPDF();
-        }
-        else {
+        } else {
             loadLocalPDF();
         }
     }
 
     public void loadStreamPDF() {
-        logDebug("loading: " + loading);
+        Timber.d("loading: %s", loading);
         new LoadPDFStream().execute(uri.toString());
     }
 
     private void loadLocalPDF() {
-        logDebug("loading: " + loading);
+        Timber.d("loading: %s", loading);
 
         progressBar.setVisibility(View.VISIBLE);
         try {
             pdfView.fromUri(uri)
-                    .defaultPage(currentPage-1)
+                    .defaultPage(currentPage - 1)
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
@@ -915,29 +873,28 @@ public class PdfViewerActivity extends PasscodeActivity
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
-    public void setToolbarVisibilityShow () {
-        logDebug("setToolbarVisibilityShow");
+    public void setToolbarVisibilityShow() {
+        Timber.d("setToolbarVisibilityShow");
         toolbarVisible = true;
 
         aB.show();
         adjustPositionOfScroller();
 
-        if(tB != null) {
+        if (tB != null) {
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
         }
     }
 
-    public void setToolbarVisibilityHide (long duration) {
-        logDebug("Duration: " + duration);
+    public void setToolbarVisibilityHide(long duration) {
+        Timber.d("Duration: %s", duration);
         toolbarVisible = false;
-        if(tB != null) {
+        if (tB != null) {
             tB.animate().translationY(-220).setDuration(duration).withEndAction(() -> aB.hide()).start();
             bottomLayout.animate().translationY(220).setDuration(duration).start();
             uploadContainer.animate().translationY(220).setDuration(duration).start();
-        }
-        else {
+        } else {
             aB.hide();
         }
     }
@@ -957,40 +914,40 @@ public class PdfViewerActivity extends PasscodeActivity
 
             // When there is an intersection between the scroller and the ActionBar, move the scroller.
             if (location[1] < height) {
-                ObjectAnimator animator = ObjectAnimator.ofFloat(defaultScrollHandle, "translationY", height+16);
+                ObjectAnimator animator = ObjectAnimator.ofFloat(defaultScrollHandle, "translationY", height + 16);
                 animator.setDuration(200L).start();
             }
         });
     }
 
-    public boolean isToolbarVisible(){
+    public boolean isToolbarVisible() {
         return toolbarVisible;
     }
 
-    public void setToolbarVisibility (){
+    public void setToolbarVisibility() {
 
         int page = pdfView.getCurrentPage();
 
-        if (queryIfPdfIsHorizontal(page) &&  getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !pdfView.isZooming()) {
+        if (queryIfPdfIsHorizontal(page) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !pdfView.isZooming()) {
             notChangePage = true;
             pdfView.jumpTo(page - 1);
         }
 
         if (aB != null && aB.isShowing()) {
             setToolbarVisibilityHide(200L);
-        } else if (aB != null && !aB.isShowing()){
+        } else if (aB != null && !aB.isShowing()) {
             setToolbarVisibilityShow();
         }
     }
 
-    boolean queryIfPdfIsHorizontal(int page){
+    boolean queryIfPdfIsHorizontal(int page) {
         SizeF sizeF = pdfView.getPageSize(page);
         return sizeF.getWidth() > sizeF.getHeight();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        logDebug("onCreateOptionsMenu");
+        Timber.d("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_pdfviewer, menu);
@@ -1011,7 +968,7 @@ public class PdfViewerActivity extends PasscodeActivity
         MenuItem saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
         MenuItem chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
-        if (!inside){
+        if (!inside) {
             propertiesMenuItem.setVisible(false);
             chatMenuItem.setVisible(false);
             downloadMenuItem.setVisible(false);
@@ -1052,7 +1009,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             } else if (type == RUBBISH_BIN_ADAPTER
-                    || (megaApi != null && megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
+                    || (megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
                 shareMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
@@ -1070,10 +1027,10 @@ public class PdfViewerActivity extends PasscodeActivity
             } else if (type == SEARCH_ADAPTER && !fromIncoming) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if(node.isExported()){
+                if (node.isExported()) {
                     removelinkMenuItem.setVisible(true);
                     getlinkMenuItem.setVisible(false);
-                }else{
+                } else {
                     removelinkMenuItem.setVisible(false);
                     getlinkMenuItem.setVisible(true);
                 }
@@ -1086,23 +1043,21 @@ public class PdfViewerActivity extends PasscodeActivity
                 chatMenuItem.setVisible(true);
 
                 MegaNode parent = megaApi.getNodeByHandle(handle);
-                while (megaApi.getParentNode(parent) != null){
+                while (megaApi.getParentNode(parent) != null) {
                     parent = megaApi.getParentNode(parent);
                 }
 
-                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
                     moveToTrashMenuItem.setVisible(true);
                     removeMenuItem.setVisible(false);
-                }
-                else{
+                } else {
                     moveToTrashMenuItem.setVisible(false);
                     removeMenuItem.setVisible(true);
                 }
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            }
-            else if (type == FROM_CHAT){
+            } else if (type == FROM_CHAT) {
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
@@ -1113,36 +1068,32 @@ public class PdfViewerActivity extends PasscodeActivity
                 removeMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
 
-                if(megaApi==null || !isOnline(this)) {
+                if (megaApi == null || !isOnline(this)) {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
                     chatRemoveMenuItem.setVisible(msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
                             && msgChat.isDeletable());
-                }
-                else if (node != null){
+                } else if (node != null) {
                     downloadMenuItem.setVisible(true);
                     if (chatC.isInAnonymousMode()) {
                         importMenuItem.setVisible(false);
                         saveForOfflineMenuItem.setVisible(false);
-                    }
-                    else {
+                    } else {
                         importMenuItem.setVisible(true);
                         saveForOfflineMenuItem.setVisible(true);
                     }
 
                     chatRemoveMenuItem.setVisible(msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable());
-                }
-                else {
+                } else {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
                 }
-            }
-            else if (type == FILE_LINK_ADAPTER) {
-                logDebug("FILE_LINK_ADAPTER");
+            } else if (type == FILE_LINK_ADAPTER) {
+                Timber.d("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
@@ -1156,8 +1107,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            }
-            else if (type == ZIP_ADAPTER) {
+            } else if (type == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(false);
@@ -1171,8 +1121,7 @@ public class PdfViewerActivity extends PasscodeActivity
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            }
-            else if (type == INCOMING_SHARES_ADAPTER ||  fromIncoming) {
+            } else if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
                 chatMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
@@ -1189,7 +1138,7 @@ public class PdfViewerActivity extends PasscodeActivity
 
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL: {
-                        logDebug("Access FULL");
+                        Timber.d("Access FULL");
                         renameMenuItem.setVisible(true);
                         moveMenuItem.setVisible(true);
                         moveToTrashMenuItem.setVisible(true);
@@ -1197,17 +1146,16 @@ public class PdfViewerActivity extends PasscodeActivity
                         break;
                     }
                     case MegaShare.ACCESS_READ:
-                        logDebug("Access read");
+                        Timber.d("Access read");
                     case MegaShare.ACCESS_READWRITE: {
-                        logDebug("Access read & write");
+                        Timber.d("Access read & write");
                         renameMenuItem.setVisible(false);
                         moveMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
                         break;
                     }
                 }
-            }
-            else if (type == RECENTS_ADAPTER) {
+            } else if (type == RECENTS_ADAPTER) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
@@ -1234,8 +1182,7 @@ public class PdfViewerActivity extends PasscodeActivity
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node == null) {
@@ -1252,8 +1199,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
-                }
-                else {
+                } else {
                     copyMenuItem.setVisible(true);
 
                     if (node.isExported()) {
@@ -1267,7 +1213,7 @@ public class PdfViewerActivity extends PasscodeActivity
                         removelinkMenuItem.setVisible(false);
                     }
 
-                    if(isFolderLink || type == VERSIONS_ADAPTER){
+                    if (isFolderLink || type == VERSIONS_ADAPTER) {
                         propertiesMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
                         removeMenuItem.setVisible(false);
@@ -1275,17 +1221,16 @@ public class PdfViewerActivity extends PasscodeActivity
                         moveMenuItem.setVisible(false);
                         copyMenuItem.setVisible(false);
                         chatMenuItem.setVisible(false);
-                    }
-                    else{
+                    } else {
                         propertiesMenuItem.setVisible(true);
 
-                        if(type==CONTACT_FILE_ADAPTER){
+                        if (type == CONTACT_FILE_ADAPTER) {
                             removeMenuItem.setVisible(false);
                             node = megaApi.getNodeByHandle(handle);
                             int accessLevel = megaApi.getAccess(node);
-                            switch(accessLevel){
+                            switch (accessLevel) {
                                 case MegaShare.ACCESS_OWNER:
-                                case MegaShare.ACCESS_FULL:{
+                                case MegaShare.ACCESS_FULL: {
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
@@ -1293,7 +1238,7 @@ public class PdfViewerActivity extends PasscodeActivity
                                     break;
                                 }
                                 case MegaShare.ACCESS_READWRITE:
-                                case MegaShare.ACCESS_READ:{
+                                case MegaShare.ACCESS_READ: {
                                     renameMenuItem.setVisible(false);
                                     moveMenuItem.setVisible(false);
                                     moveToTrashMenuItem.setVisible(false);
@@ -1301,8 +1246,7 @@ public class PdfViewerActivity extends PasscodeActivity
                                     break;
                                 }
                             }
-                        }
-                        else{
+                        } else {
                             chatMenuItem.setVisible(true);
                             renameMenuItem.setVisible(true);
                             moveMenuItem.setVisible(true);
@@ -1312,7 +1256,7 @@ public class PdfViewerActivity extends PasscodeActivity
                             final long handle = node.getHandle();
                             MegaNode parent = megaApi.getNodeByHandle(handle);
 
-                            while (megaApi.getParentNode(parent) != null){
+                            while (megaApi.getParentNode(parent) != null) {
                                 parent = megaApi.getParentNode(parent);
                             }
 
@@ -1335,10 +1279,10 @@ public class PdfViewerActivity extends PasscodeActivity
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+        Timber.d("onOptionsItemSelected");
 
         int id = item.getItemId();
-        switch(id) {
+        switch (id) {
             case android.R.id.home: {
                 super.onBackPressed();
                 break;
@@ -1400,24 +1344,24 @@ public class PdfViewerActivity extends PasscodeActivity
                 moveToRubbishOrRemove(handle, this, this);
                 break;
             }
-            case R.id.chat_pdf_viewer_import:{
-                if (node != null){
+            case R.id.chat_pdf_viewer_import: {
+                if (node != null) {
                     importNode();
                 }
                 break;
             }
-            case R.id.chat_pdf_viewer_save_for_offline:{
-                if (chatC == null){
+            case R.id.chat_pdf_viewer_save_for_offline: {
+                if (chatC == null) {
                     chatC = new ChatController(this);
                 }
-                if (msgChat != null){
+                if (msgChat != null) {
                     chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId),
                             true, this);
                 }
                 break;
             }
-            case R.id.chat_pdf_viewer_remove:{
-                if (msgChat != null && chatId != -1){
+            case R.id.chat_pdf_viewer_remove: {
+                if (msgChat != null && chatId != -1) {
                     showConfirmationDeleteNode(chatId, msgChat);
                 }
                 break;
@@ -1426,20 +1370,20 @@ public class PdfViewerActivity extends PasscodeActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void importNode(){
-        logDebug("importNode");
+    public void importNode() {
+        Timber.d("importNode");
 
         Intent intent = new Intent(this, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
     }
 
-    public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
-        logDebug("showConfirmationDeleteNode");
+    public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message) {
+        Timber.d("showConfirmationDeleteNode");
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
+            switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    if (chatC == null){
+                    if (chatC == null) {
                         chatC = new ChatController(PdfViewerActivity.this);
                     }
                     chatC.deleteMessage(message, chatId);
@@ -1463,8 +1407,8 @@ public class PdfViewerActivity extends PasscodeActivity
         builder.setOnDismissListener(dialog -> isDeleteDialogShow = false);
     }
 
-    public void showCopy(){
-        logDebug("showCopy");
+    public void showCopy() {
+        Timber.d("showCopy");
 
         ArrayList<Long> handleList = new ArrayList<>();
         handleList.add(handle);
@@ -1472,15 +1416,15 @@ public class PdfViewerActivity extends PasscodeActivity
         Intent intent = new Intent(this, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
-        for (int i=0; i<handleList.size(); i++){
+        for (int i = 0; i < handleList.size(); i++) {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
         startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
-    public void showMove(){
-        logDebug("showMove");
+    public void showMove() {
+        Timber.d("showMove");
 
         ArrayList<Long> handleList = new ArrayList<>();
         handleList.add(handle);
@@ -1488,31 +1432,29 @@ public class PdfViewerActivity extends PasscodeActivity
         Intent intent = new Intent(this, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
         long[] longArray = new long[handleList.size()];
-        for (int i=0; i<handleList.size(); i++){
+        for (int i = 0; i < handleList.size(); i++) {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
         startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
-    public void showPropertiesActivity(){
+    public void showPropertiesActivity() {
         Intent i = new Intent(this, FileInfoActivity.class);
-        if (isOffLine){
+        if (isOffLine) {
             i.putExtra(NAME, pdfFileName);
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
-            if (pathNavigation != null){
+            if (pathNavigation != null) {
                 i.putExtra("pathNavigation", pathNavigation);
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
-            }
-            else{
+            } else {
                 i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
             }
             i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
-        else {
+        } else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
             i.putExtra(NAME, node.getName());
@@ -1527,8 +1469,7 @@ public class PdfViewerActivity extends PasscodeActivity
             if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FROM_INCOMING_SHARES);
                 i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
-            }
-            else if(type == INBOX_ADAPTER){
+            } else if (type == INBOX_ADAPTER) {
                 i.putExtra("from", FROM_INBOX);
             }
         }
@@ -1536,7 +1477,7 @@ public class PdfViewerActivity extends PasscodeActivity
         renamed = false;
     }
 
-    public void showRemoveLink(){
+    public void showRemoveLink() {
         AlertDialog removeLinkDialog;
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
@@ -1562,17 +1503,17 @@ public class PdfViewerActivity extends PasscodeActivity
         float density = getResources().getDisplayMetrics().density;
 
         float scaleW = getScaleW(outMetrics, density);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
-        }else{
-            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleW));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10 * scaleW));
+        } else {
+            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15 * scaleW));
 
         }
 
         builder.setView(dialoglayout);
 
         builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
-            typeExport=TYPE_EXPORT_REMOVE;
+            typeExport = TYPE_EXPORT_REMOVE;
             megaApi.disableExport(megaApi.getNodeByHandle(handle), PdfViewerActivity.this);
         });
 
@@ -1584,20 +1525,20 @@ public class PdfViewerActivity extends PasscodeActivity
         removeLinkDialog.show();
     }
 
-    public void updateFile (){
+    public void updateFile() {
         MegaNode file;
-        if (pdfFileName != null && handle != -1 ) {
+        if (pdfFileName != null && handle != -1) {
             file = megaApi.getNodeByHandle(handle);
-            if (file != null){
-                logDebug("Pdf File: " + pdfFileName + " node file: " + file.getName());
+            if (file != null) {
+                Timber.d("Pdf File: %s node file: %s", pdfFileName, file.getName());
                 if (!pdfFileName.equals(file.getName())) {
-                    logDebug("Update File");
+                    Timber.d("Update File");
 
                     pdfFileName = file.getName();
-                    if (aB != null){
+                    if (aB != null) {
                         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
-                        if(tB==null){
-                            logError("Tb is Null");
+                        if (tB == null) {
+                            Timber.e("Tb is Null");
                             return;
                         }
                         tB.setVisibility(View.VISIBLE);
@@ -1613,17 +1554,10 @@ public class PdfViewerActivity extends PasscodeActivity
 
                     String localPath = getLocalFile(file);
 
-                    if (localPath != null){
+                    if (localPath != null) {
                         File mediaFile = new File(localPath);
                         uri = getUriForFile(this, mediaFile);
-                    }
-                    else {
-                        if (megaApi == null){
-                            MegaApplication app = (MegaApplication)getApplication();
-                            megaApi = app.getMegaApi();
-                            megaApi.addTransferListener(this);
-                            megaApi.addGlobalListener(this);
-                        }
+                    } else {
                         if (megaApi.httpServerIsRunning() == 0) {
                             megaApi.httpServerStart();
                         }
@@ -1632,16 +1566,16 @@ public class PdfViewerActivity extends PasscodeActivity
                         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                         activityManager.getMemoryInfo(mi);
 
-                        if(mi.totalMem>BUFFER_COMP) {
-                            logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        if (mi.totalMem > BUFFER_COMP) {
+                            Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                             megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                         } else {
-                            logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                             megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                         }
 
                         String url = megaApi.httpServerGetLocalLink(file);
-                        if (url != null){
+                        if (url != null) {
                             uri = Uri.parse(url);
                         }
                     }
@@ -1728,7 +1662,7 @@ public class PdfViewerActivity extends PasscodeActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        logDebug("onActivityResult: " + requestCode + "____" + resultCode);
+        Timber.d("onActivityResult: %d____%d", requestCode, resultCode);
         if (intent == null) {
             return;
         }
@@ -1778,12 +1712,12 @@ public class PdfViewerActivity extends PasscodeActivity
 
             checkCollision(toHandle, NameCollisionType.COPY);
         } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
+            Timber.d("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-            if(!isOnline(this)||megaApi==null) {
-                try{
+            if (!isOnline(this) || megaApi == null) {
+                try {
                     statusDialog.dismiss();
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1797,33 +1731,32 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     public void onPageChanged(int page, int pageCount) {
-        logDebug("page: " + page + ", pageCount: " + pageCount);
+        Timber.d("page: %d, pageCount: %d", page, pageCount);
         if (!notChangePage) {
-            currentPage = page+1;
+            currentPage = page + 1;
             setTitle(String.format("%s %s / %s", pdfFileName, currentPage, pageCount));
-        }
-        else {
+        } else {
             notChangePage = false;
         }
     }
 
     @Override
     public void onPageError(int page, Throwable t) {
-        logError("Cannot load page " + page);
+        Timber.e("Cannot load page %s", page);
     }
 
     @Override
     public void loadComplete(int nbPages) {
         defaultScrollHandle.setTotalPages(nbPages);
         PdfDocument.Meta meta = pdfView.getDocumentMeta();
-        logDebug("Title = " + meta.getTitle());
-        logDebug("Author = " + meta.getAuthor());
-        logDebug("Subject = " + meta.getSubject());
-        logDebug("Keywords = " + meta.getKeywords());
-        logDebug("Creator = " + meta.getCreator());
-        logDebug("Producer = " + meta.getProducer());
-        logDebug("Creation Date = " + meta.getCreationDate());
-        logDebug("Mod. Date = " + meta.getModDate());
+        Timber.d("Title = %s", meta.getTitle());
+        Timber.d("Author = %s", meta.getAuthor());
+        Timber.d("Subject = %s", meta.getSubject());
+        Timber.d("Keywords = %s", meta.getKeywords());
+        Timber.d("Creator = %s", meta.getCreator());
+        Timber.d("Producer = %s", meta.getProducer());
+        Timber.d("Creation Date = %s", meta.getCreationDate());
+        Timber.d("Mod. Date = %s", meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
         handler.postDelayed(() -> {
@@ -1836,7 +1769,7 @@ public class PdfViewerActivity extends PasscodeActivity
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
         for (PdfDocument.Bookmark b : tree) {
 
-            logDebug(String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
+            Timber.d(String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
 
             if (b.hasChildren()) {
                 printBookmarksTree(b.getChildren(), sep + "-");
@@ -1844,13 +1777,13 @@ public class PdfViewerActivity extends PasscodeActivity
         }
     }
 
-    public String getPdfFileName () {
+    public String getPdfFileName() {
         return pdfFileName;
     }
 
     public String getFileName(Uri uri) {
         if (uri == null || uri.getScheme() == null) {
-            logWarning("URI is null");
+            Timber.w("URI is null");
             return null;
         }
 
@@ -1861,7 +1794,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } catch (Exception e) {
-                logWarning("Exception getting PDF file name.", e);
+                Timber.w(e, "Exception getting PDF file name.");
             }
         }
         if (result == null) {
@@ -1882,37 +1815,36 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish");
+        Timber.d("onRequestFinish");
 
         String gSession;
-        if (request.getType() == MegaRequest.TYPE_LOGIN){
+        if (request.getType() == MegaRequest.TYPE_LOGIN) {
 
             if (e.getErrorCode() != MegaError.API_OK) {
-                logWarning("Login failed with error code: " + e.getErrorCode());
+                Timber.w("Login failed with error code: %s", e.getErrorCode());
                 MegaApplication.setLoggingIn(false);
             } else {
                 //LOGIN OK
                 gSession = megaApi.dumpSession();
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
                 dbH.saveCredentials(credentials);
-                logDebug("Logged in with session");
-                logDebug("Setting account auth token for folder links.");
+                Timber.d("Logged in with session");
+                Timber.d("Setting account auth token for folder links.");
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 megaApi.fetchNodes(this);
 
                 // Get cookies settings after login.
                 MegaApplication.getInstance().checkEnabledCookies();
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
-            if (e.getErrorCode() == MegaError.API_OK){
+            if (e.getErrorCode() == MegaError.API_OK) {
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();
                 String myUserHandle = "";
-                if(myUser!=null){
+                if (myUser != null) {
                     lastEmail = megaApi.getMyUser().getEmail();
-                    myUserHandle = megaApi.getMyUser().getHandle()+"";
+                    myUserHandle = megaApi.getMyUser().getHandle() + "";
                 }
 
                 credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
@@ -1927,29 +1859,29 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporaryError");
+        Timber.w("onRequestTemporaryError");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        logDebug("onStop");
+        Timber.d("onStop");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        logDebug("onStart");
+        Timber.d("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        logDebug("onResume");
+        Timber.d("onResume");
         if (!isOffLine && !fromChat && !isFolderLink
                 && type != FILE_LINK_ADAPTER
-                && type != ZIP_ADAPTER){
-            if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload){
+                && type != ZIP_ADAPTER) {
+            if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload) {
                 finish();
             }
             updateFile();
@@ -1958,20 +1890,18 @@ public class PdfViewerActivity extends PasscodeActivity
 
     @Override
     protected void onDestroy() {
-        logDebug("onDestroy()");
+        Timber.d("onDestroy()");
 
         boolean needStopHttpServer = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false);
 
-        if (megaApi != null) {
-            megaApi.removeTransferListener(this);
-            megaApi.removeGlobalListener(this);
+        megaApi.removeTransferListener(this);
+        megaApi.removeGlobalListener(this);
 
-            if (needStopHttpServer) {
-                megaApi.httpServerStop();
-            }
+        if (needStopHttpServer) {
+            megaApi.httpServerStop();
         }
 
-        if (megaApiFolder != null && needStopHttpServer) {
+        if (needStopHttpServer) {
             megaApiFolder.httpServerStop();
         }
 
@@ -2006,13 +1936,13 @@ public class PdfViewerActivity extends PasscodeActivity
     @Override
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 
-        if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+        if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
             if (transfer.isForeignOverquota()) {
                 return;
             }
 
             if (e.getValue() != 0) {
-                logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+                Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.getErrorCode());
                 showGeneralTransferOverQuotaWarning();
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED && !isAlertDialogShown(takenDownDialog)) {
@@ -2025,17 +1955,17 @@ public class PdfViewerActivity extends PasscodeActivity
         return false;
     }
 
-    public void openAdvancedDevices (long handleToDownload, boolean highPriority){
-        logDebug("openAdvancedDevices");
+    public void openAdvancedDevices(long handleToDownload, boolean highPriority) {
+        Timber.d("openAdvancedDevices");
         String externalPath = getExternalCardPath();
 
-        if(externalPath!=null){
-            logDebug("ExternalPath for advancedDevices: " + externalPath);
+        if (externalPath != null) {
+            Timber.d("ExternalPath for advancedDevices: %s", externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
-            if(node!=null){
+            if (node != null) {
 
-                File newFile =  new File(node.getName());
-                logDebug("File: " + newFile.getPath());
+                File newFile = new File(node.getName());
+                Timber.d("File: %s", newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
                 // Filter to only show results that can be "opened", such as
@@ -2044,24 +1974,22 @@ public class PdfViewerActivity extends PasscodeActivity
 
                 // Create a file with the requested MIME type.
                 String mimeType = MimeTypeList.getMimeType(newFile);
-                logDebug("Mimetype: " + mimeType);
+                Timber.d("Mimetype: %s", mimeType);
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
                 intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
-                try{
+                try {
                     startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
-                }
-                catch(Exception e) {
-                    logError("Exception in External SDCARD", e);
+                } catch (Exception e) {
+                    Timber.e(e, "Exception in External SDCARD");
                     Environment.getExternalStorageDirectory();
                     Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
-        }
-        else{
-            logWarning("No external SD card");
+        } else {
+            Timber.w("No external SD card");
             Environment.getExternalStorageDirectory();
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
@@ -2072,7 +2000,7 @@ public class PdfViewerActivity extends PasscodeActivity
         return uri;
     }
 
-    public String getPassword () {
+    public String getPassword() {
         return password;
     }
 

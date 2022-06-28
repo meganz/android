@@ -11,7 +11,11 @@ import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,9 +29,9 @@ import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
@@ -40,7 +44,7 @@ class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
-    private val displayMetrics: DisplayMetrics
+    private val displayMetrics: DisplayMetrics,
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -255,7 +259,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun setParticipantsPanel(
         participants: MutableList<Participant>,
-        myOwnParticipant: Participant
+        myOwnParticipant: Participant,
     ) {
         updateParticipants(participants, myOwnParticipant)
         floatingPanelView.participantsNum.text = getString(
@@ -294,8 +298,6 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                listener.onChangePanelState()
-
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
                 if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -505,8 +507,10 @@ class BottomFloatingPanelViewHolder(
      */
     private fun setupFabLabelUpdater(label: TextView) {
         val isDarkMode = Util.isDarkMode(context)
-        val fabLabelColorStart = if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_START_LIGHT_MODE
-        val fabLabelColorEnd = if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_END_LIGHT_MODE
+        val fabLabelColorStart =
+            if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_START_LIGHT_MODE
+        val fabLabelColorEnd =
+            if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_END_LIGHT_MODE
 
         propertyUpdaters.add(
             propertyUpdater(
@@ -637,9 +641,9 @@ class BottomFloatingPanelViewHolder(
      * @param device Current device selected
      */
     fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
-        logDebug("Update speaker icon. Audio device is $device")
+        Timber.d("Update speaker icon. Audio device is $device")
         when (device) {
-            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE ->{
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = true
@@ -652,7 +656,8 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
-            AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
+            AppRTCAudioManager.AudioDevice.BLUETOOTH,
+            -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = true
@@ -695,7 +700,7 @@ class BottomFloatingPanelViewHolder(
         view: V,
         startP: Int,
         endP: Int,
-        update: (view: V, value: Int) -> Unit
+        update: (view: V, value: Int) -> Unit,
     ): (Float) -> Unit {
         return {
             update(view, (startP + (endP - startP) * it).toInt())
@@ -715,7 +720,7 @@ class BottomFloatingPanelViewHolder(
         view: V,
         startP: Float,
         endP: Float,
-        update: (view: V, value: Float) -> Unit
+        update: (view: V, value: Float) -> Unit,
     ): (Float) -> Unit {
         return {
             update(view, startP + (endP - startP) * it)

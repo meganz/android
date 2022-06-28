@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
+import timber.log.Timber
 import java.io.Serializable
 
 data class Participant(
@@ -27,9 +27,9 @@ data class Participant(
     // Flag for selected for assign moderator
     var isChosenForAssign: Boolean = false,
     var isGuest: Boolean = false,
-    var hasOptionsAllowed: Boolean = true
+    var hasOptionsAllowed: Boolean = true,
 
-) : Serializable {
+    ) : Serializable {
 
     /**
      * Get the display name for participant list
@@ -48,7 +48,7 @@ data class Participant(
                 )
                 displayName = displayName.replace("[/A]", "</font>")
             } catch (e: Exception) {
-                LogUtil.logWarning("Exception formatting string", e)
+                Timber.w(e, "Exception formatting string")
             }
 
             HtmlCompat.fromHtml(

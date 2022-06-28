@@ -348,7 +348,8 @@
 					android:layout_height="wrap_content"
 					android:layout_marginHorizontal="16sp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/ic_take_photo"/>
+					android:src="@drawable/ic_take_photo"
+					app:tint="@color/black" />
 
 				<mega.privacy.android.app.components.twemoji.EmojiEditText
 					android:id="@+id/name_group_edittext"

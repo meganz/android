@@ -8,13 +8,13 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
+import timber.log.Timber
 
 class ActionModeCallback constructor(
     private val mainActivity: ManagerActivity,
@@ -53,17 +53,17 @@ class ActionModeCallback constructor(
                 MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
-                LogUtil.logDebug("Public link option")
+                Timber.d("Public link option")
                 LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
             }
             R.id.cab_menu_remove_link -> {
-                LogUtil.logDebug("Remove public link option")
+                Timber.d("Remove public link option")
                 if (selectedNodes.size == 1) {
                     mainActivity.showConfirmationRemovePublicLink(selectedNodes[0])
                 }
             }
             R.id.cab_menu_send_to_chat -> {
-                LogUtil.logDebug("Send files to chat")
+                Timber.d("Send files to chat")
                 mainActivity.attachNodesToChats(selectedNodes)
             }
             R.id.cab_menu_trash -> {

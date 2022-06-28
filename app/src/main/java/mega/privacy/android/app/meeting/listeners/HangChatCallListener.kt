@@ -2,9 +2,11 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class HangChatCallListener(context: Context?) : ChatBaseListener(context) {
 
@@ -12,7 +14,7 @@ class HangChatCallListener(context: Context?) : ChatBaseListener(context) {
 
     constructor(
         context: Context?,
-        callback: OnCallHungUpCallback
+        callback: OnCallHungUpCallback,
     ) : this(context) {
         this.callback = callback
     }
@@ -23,10 +25,10 @@ class HangChatCallListener(context: Context?) : ChatBaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            logDebug("Call hung up")
+            Timber.d("Call hung up")
             callback?.onCallHungUp(request.chatHandle)
         } else {
-            LogUtil.logError("Error Hanging up the call. Error code "+e.errorCode)
+            Timber.e("Error Hanging up the call. Error code ${e.errorCode}")
         }
     }
 

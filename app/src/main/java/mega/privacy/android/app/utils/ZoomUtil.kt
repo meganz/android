@@ -71,14 +71,14 @@ object ZoomUtil {
     }
 
     fun disableButton(context: Context, menuItem: MenuItem) {
-        menuItem.icon.let {
+        menuItem.icon?.let {
             DrawableCompat.setTint(it, ContextCompat.getColor(context, R.color.grey_038_white_038))
             menuItem.setEnabled(false)
         }
     }
 
     fun enableButton(context: Context, menuItem: MenuItem) {
-        menuItem.icon.let {
+        menuItem.icon?.let {
             DrawableCompat.setTint(it, ColorUtils.getThemeColor(context, R.attr.colorControlNormal))
             menuItem.setEnabled(true)
         }

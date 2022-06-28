@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils
 
 import android.os.StatFs
-import mega.privacy.android.app.utils.LogUtil.logError
+import timber.log.Timber
 import java.io.File
 
 object StorageUtils {
@@ -20,7 +20,7 @@ object StorageUtils {
             val stat = StatFs(path)
             availableFreeSpace = stat.availableBlocksLong.toDouble() * stat.blockSizeLong.toDouble()
         } catch (ex: Exception) {
-            logError("Cannot get available space.")
+            Timber.e("Cannot get available space.")
         }
 
         return availableFreeSpace < File(path).length()

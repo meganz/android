@@ -7,8 +7,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import mega.privacy.android.app.main.megachat.ChatActivity;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class MarqueeTextView extends TextView {
 
@@ -41,37 +40,35 @@ public class MarqueeTextView extends TextView {
         formatString();
 
         if (context instanceof ChatActivity) {
-            final  TextPaint textPaint1 = textPaint;
+            final TextPaint textPaint1 = textPaint;
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     scroll(textPaint1, getMeasuredWidth());
                 }
             }, 1000);
-        }
-        else {
+        } else {
             scroll(textPaint, getMaxWidth());
         }
 
 
     }
 
-    private void scroll (TextPaint textPaint, int width) {
+    private void scroll(TextPaint textPaint, int width) {
         if (textPaint.measureText(text.toString()) > width) {
-            logDebug("Text more large than textview --> Animate");
-            mLastIndex = text.length()-1;
-            while (textPaint.measureText(text.subSequence(0, mLastIndex-1).toString()) > width) {
+            Timber.d("Text more large than textview --> Animate");
+            mLastIndex = text.length() - 1;
+            while (textPaint.measureText(text.subSequence(0, mLastIndex - 1).toString()) > width) {
                 mLastIndex--;
             }
             animateText();
-        }
-        else {
-            logDebug("Text less large than textview --> Not animate");
+        } else {
+            Timber.d("Text less large than textview --> Not animate");
             setText(text);
         }
     }
 
-    public void formatString () {
+    public void formatString() {
         String stringToFormat = getText().toString();
         stringToFormat = stringToFormat.replace("[A]", "");
         scrollIndex = stringToFormat.indexOf("[/A]");
@@ -90,14 +87,13 @@ public class MarqueeTextView extends TextView {
 
             if (mFirstIndex <= scrollIndex) {
                 mHandler.postDelayed(characterAdder, mDelay);
-            }
-            else {
+            } else {
                 mHandler.removeCallbacksAndMessages(null);
             }
         }
     };
 
-    public void animateText () {
+    public void animateText() {
         mFirstIndex = 0;
         mHandler.removeCallbacksAndMessages(characterAdder);
         mHandler.postDelayed(characterAdder, mDelay);

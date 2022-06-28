@@ -29,7 +29,7 @@ import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil.logWarning
+
 import mega.privacy.android.app.utils.SharedPreferenceConstants
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -48,8 +48,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property apiFacade
  * @property monitorStartScreenFacade
  * @property monitorHideRecentActivityFacade
- * @property loggingPreferencesGateway
- * @property appScope
  * @property ioDispatcher
  * @property chatPreferencesGateway
  */
@@ -60,8 +58,6 @@ class DefaultSettingsRepository @Inject constructor(
     private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
-    private val loggingPreferencesGateway: LoggingPreferencesGateway,
-    @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val appPreferencesGateway: AppPreferencesGateway,
@@ -72,7 +68,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     private fun initialisePreferences() {
         if (databaseHandler.preferences == null) {
-            logWarning("databaseHandler.preferences is NULL")
+            Timber.w("databaseHandler.preferences is NULL")
             databaseHandler.setStorageAskAlways(true)
             val defaultDownloadLocation = FileUtil.buildDefaultDownloadDir(context)
             defaultDownloadLocation.mkdirs()
@@ -173,21 +169,6 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorHideRecentActivity(): Flow<Boolean> =
         monitorHideRecentActivityFacade.getEvents()
-
-    override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
-        loggingPreferencesGateway.isLoggingPreferenceEnabled()
-            .shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
-
-    override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
-        loggingPreferencesGateway.setLoggingEnabledPreference(enabled)
-    }
-
-    override fun isChatLoggingEnabled(): Flow<Boolean> =
-        loggingPreferencesGateway.isChatLoggingPreferenceEnabled()
-
-    override suspend fun setChatLoggingEnabled(enabled: Boolean) {
-        loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
-    }
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()

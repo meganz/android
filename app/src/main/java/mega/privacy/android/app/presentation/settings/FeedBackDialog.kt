@@ -14,8 +14,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 
 class FeedBackDialog : DialogFragment() {
 
@@ -33,14 +33,14 @@ class FeedBackDialog : DialogFragment() {
 
     private fun createFeedbackDialogView(
         email: String,
-        accountType: Int
+        accountType: Int,
     ): View? {
         val dialogLayout = View.inflate(context, R.layout.evaluate_the_app_dialog, null)
         val displayMetrics = getDisplayMetrics()
         val rateAppCheck = dialogLayout.findViewById<CheckedTextView>(R.id.rate_the_app)
         setFeedbackMargins(rateAppCheck, displayMetrics)
         rateAppCheck.setOnClickListener {
-            LogUtil.logDebug("Rate the app")
+            Timber.d("Rate the app")
             //Rate the app option:
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
             dismiss()
@@ -50,7 +50,7 @@ class FeedBackDialog : DialogFragment() {
             dialogLayout.findViewById<CheckedTextView>(R.id.send_feedback)
         setFeedbackMargins(sendFeedbackCheck, displayMetrics)
         sendFeedbackCheck.setOnClickListener {
-            LogUtil.logDebug("Send Feedback")
+            Timber.d("Send Feedback")
             val body = generateBody(email, accountType)
             val versionApp = getString(R.string.app_version)
             val subject = getString(R.string.setting_feedback_subject) + " v" + versionApp
@@ -70,7 +70,7 @@ class FeedBackDialog : DialogFragment() {
 
     private fun setFeedbackMargins(
         sendFeedbackCheck: CheckedTextView,
-        outMetrics: DisplayMetrics
+        outMetrics: DisplayMetrics,
     ) {
         sendFeedbackCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
         val sendFeedbackMLP = sendFeedbackCheck.layoutParams as ViewGroup.MarginLayoutParams

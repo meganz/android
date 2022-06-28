@@ -72,7 +72,7 @@ class MegaContactGetter(val context: Context) {
                         Timber.w("Contact's email is empty!")
                     }
                 } else {
-                    Timber.e("Get contact's email faild with error code: " + error.errorCode)
+                    Timber.e("Get contact's email faild with error code: ${error.errorCode}")
                 }
                 // Get next contact's email.
                 currentContactIndex++
@@ -136,7 +136,7 @@ class MegaContactGetter(val context: Context) {
      */
     private fun parseMatchedContacts(
         map: MegaStringMap,
-        table: MegaStringTable
+        table: MegaStringTable,
     ): Map<String, MegaContact> {
         val temp: MutableMap<String, MegaContact> = HashMap()
         for (i in 0 until table.size()) {
@@ -261,7 +261,7 @@ class MegaContactGetter(val context: Context) {
                                 }
                             }
                         } else {
-                            Timber.e("Get registered contacts failed with error code: " + error.errorCode)
+                            Timber.e("Get registered contacts failed with error code: ${error.errorCode}")
                             // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
                             // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
                             if (error.errorCode == MegaError.API_ETOOMANY || error.errorCode == MegaError.API_EPAYWALL) {
@@ -299,7 +299,7 @@ class MegaContactGetter(val context: Context) {
                 stringMap[email] = name
             }
         }
-        Timber.d("local contacts size is: " + stringMap.size())
+        Timber.d("local contacts size is: ${stringMap.size()}")
         return stringMap
     }
 
@@ -333,6 +333,6 @@ class MegaContactGetter(val context: Context) {
         var handle: Long = 0,
         var localName: String? = null,
         var email: String? = null,
-        var normalizedPhoneNumber: String? = null
+        var normalizedPhoneNumber: String? = null,
     )
 }
