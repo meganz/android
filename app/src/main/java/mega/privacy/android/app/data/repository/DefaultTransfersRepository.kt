@@ -38,7 +38,7 @@ class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun getNumPendingUploads(): Int = withContext(ioDispatcher) {
-        getUploadTransfers().count { transfer -> transfer.isFinished }
+        getUploadTransfers().count { transfer -> !transfer.isFinished }
     }
 
     override suspend fun getNumPendingTransfers(): Int = withContext(ioDispatcher) {
