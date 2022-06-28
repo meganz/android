@@ -1,11 +1,20 @@
 package mega.privacy.android.app.main.megachat.chatAdapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_ADD_CONTACTS;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getCircleBitmap;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -14,8 +23,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -26,16 +38,10 @@ import mega.privacy.android.app.main.megachat.ChatExplorerListItem;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import timber.log.Timber;
 
 
-public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener{
+public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener {
 
     private ArrayList<ChatExplorerListItem> items;
     private MegaApiAndroid megaApi;
@@ -43,22 +49,22 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     private Context context;
     private Object fragment;
 
-    public MegaChipChatExplorerAdapter (Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items){
+    public MegaChipChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items) {
         this.items = _items;
         this.context = _context;
         this.fragment = _fragment;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
     }
 
 
-    public static class ViewHolderChips extends RecyclerView.ViewHolder{
+    public static class ViewHolderChips extends RecyclerView.ViewHolder {
         public ViewHolderChips(View itemView) {
             super(itemView);
         }
@@ -84,10 +90,10 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public MegaChipChatExplorerAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
+        Timber.d("onCreateViewHolder");
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
@@ -107,36 +113,31 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public void onBindViewHolder(MegaChipChatExplorerAdapter.ViewHolderChips holder, int position) {
-        logDebug("onBindViewHolderList");
+        Timber.d("onBindViewHolderList");
 
         ChatExplorerListItem item = getItem(position);
         if (item.getChat() != null && item.getChat().isGroup()) {
             holder.textViewName.setText(item.getTitle());
-        }
-        else {
+        } else {
             String name;
-            String [] s;
+            String[] s;
             if (item.getContact() != null) {
                 s = item.getContact().getFullName().split(" ");
                 if (s != null && s.length > 0) {
                     name = s[0];
-                }
-                else {
+                } else {
                     s = item.getTitle().split(" ");
-                    if (s!= null && s.length > 0) {
+                    if (s != null && s.length > 0) {
                         name = s[0];
-                    }
-                    else {
+                    } else {
                         name = item.getTitle();
                     }
                 }
-            }
-            else {
+            } else {
                 s = item.getTitle().split(" ");
-                if (s!= null && s.length > 0) {
+                if (s != null && s.length > 0) {
                     name = s[0];
-                }
-                else {
+                } else {
                     name = item.getTitle();
                 }
             }
@@ -149,20 +150,20 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     public int getItemCount() {
         if (items == null) return 0;
 
-        return  items.size();
+        return items.size();
     }
 
     @Override
     public void onClick(View view) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         MegaChipChatExplorerAdapter.ViewHolderChips holder = (MegaChipChatExplorerAdapter.ViewHolderChips) view.getTag();
-        if(holder!=null){
+        if (holder != null) {
             int currentPosition = holder.getLayoutPosition();
-            logDebug("Current position: " + currentPosition);
+            Timber.d("Current position: %s", currentPosition);
 
-            if(currentPosition<0){
-                logWarning("Current position error - not valid value");
+            if (currentPosition < 0) {
+                Timber.w("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -171,9 +172,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                     break;
                 }
             }
-        }
-        else{
-            logWarning("Error. Holder is Null");
+        } else {
+            Timber.w("Error. Holder is Null");
         }
     }
 
@@ -183,28 +183,27 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         return position;
     }
 
-    public void setItems (ArrayList<ChatExplorerListItem> items){
-        logDebug("setContacts");
+    public void setItems(ArrayList<ChatExplorerListItem> items) {
+        Timber.d("setContacts");
         this.items = items;
         notifyDataSetChanged();
     }
 
     public ChatExplorerListItem getItem(int position) {
-        logDebug("position: " + position);
+        Timber.d("position: %s", position);
         return items.get(position);
     }
 
-    public ArrayList<ChatExplorerListItem> getItems () {
+    public ArrayList<ChatExplorerListItem> getItems() {
         return items;
     }
 
-    public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        logDebug("setUserAvatar");
+    public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item) {
+        Timber.d("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
             holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), item.getTitle(), AVATAR_SIZE, true));
-        }
-        else {
+        } else {
             MegaUser user = null;
             if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 user = item.getContact().getMegaUser();
@@ -217,8 +216,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             long handle = -1;
             if (item.getChat() != null) {
                 holder.email = megaChatApi.getContactEmail(item.getChat().getPeerHandle());
-            }
-            else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+            } else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 holder.email = item.getContact().getMegaUser().getEmail();
             }
 
@@ -227,15 +225,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }
             String userHandle = MegaApiAndroid.userHandleToBase64(handle);
 
-            if(holder.email == null){
-                avatar = buildAvatarFile(context,userHandle + ".jpg");
-            }else{
-                avatar = buildAvatarFile(context,holder.email + ".jpg");
+            if (holder.email == null) {
+                avatar = buildAvatarFile(context, userHandle + ".jpg");
+            } else {
+                avatar = buildAvatarFile(context, holder.email + ".jpg");
             }
 
             Bitmap bitmap = null;
-            if (isFileAvailable(avatar)){
-                if (avatar.length() > 0){
+            if (isFileAvailable(avatar)) {
+                if (avatar.length() > 0) {
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
                     bOpts.inInputShareable = true;
@@ -243,28 +241,28 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                     if (bitmap == null) {
                         avatar.delete();
 
-                        if(megaApi==null){
-                            logWarning("megaApi is Null in Offline mode");
+                        if (megaApi == null) {
+                            Timber.w("megaApi is Null in Offline mode");
                             return;
                         }
 
                         megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
-                    }else{
+                    } else {
                         holder.avatar.setImageBitmap(getCircleBitmap(bitmap));
                     }
-                }else{
+                } else {
 
-                    if(megaApi==null){
-                        logWarning("megaApi is Null in Offline mode");
+                    if (megaApi == null) {
+                        Timber.w("megaApi is Null in Offline mode");
                         return;
                     }
 
                     megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
                 }
-            }else{
+            } else {
 
-                if(megaApi==null){
-                    logWarning("megaApi is Null in Offline mode");
+                if (megaApi == null) {
+                    Timber.w("megaApi is Null in Offline mode");
                     return;
                 }
 

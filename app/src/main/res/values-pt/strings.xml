@@ -12,18 +12,12 @@
     <string name="general_cancel">Cancelar</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">Mover para</string>
-    <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_copy_to">Copiar para</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select">Selecionar</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="general_select_to_upload">Selecione os arquivos</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Selecione a pasta</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">Criar</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">Fazer download</string>
     <!-- button -->
     <string name="general_add">Adicionar</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -42,8 +36,6 @@
     <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">Pular</string>
-    <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
-    <string name="general_stop">Parar</string>
     <!-- option shown when a message could not be sent -->
     <string name="general_retry">Tentar novamente</string>
     <!-- Button to open the default web browser -->
@@ -56,24 +48,12 @@
     <string name="general_forwarding">Encaminhando</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">Importar</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="general_storage">Armazenamento</string>
-    <!-- Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer. -->
-    <string name="general_bandwidth">Cota de transferência</string>
-    <!-- Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan -->
-    <string name="general_subscribe">Assinar</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Erro</string>
-    <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">Não implementado</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Já foi baixado</string>
-    <!-- when trying to upload a file that is already uploaded in the folder -->
-    <string name="general_already_uploaded">já enviado</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">Informações do arquivo</string>
-    <!-- Label of the option menu. When clicking this button, the app shows the info of the folder -->
-    <string name="general_folder_info">Informações da pasta</string>
     <!-- Hint how to cancel the download -->
     <string name="general_show_info">Mostrar informações</string>
     <!-- Error getting the root node -->
@@ -84,12 +64,6 @@
     <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Não foi detectado nenhum dispositivo de armazenamento externo</string>
-    <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">Esta pasta é somente leitura. Você não tem permissão para fazer uploads.</string>
-    <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">Você está removendo a chave de recuperação exportada anteriormente</string>
-    <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">Você quer enviar um convite para %s?</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Fazer logout</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,16 +90,12 @@
     <string name="action_help">Ajuda</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Upgrade</string>
-    <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">Fazendo o upgrade da conta</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">Selecionar tudo</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Eliminar seleção</string>
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Visualização em miniaturas</string>
-    <!-- Menu item to change from grid view to list view -->
-    <string name="action_list">Visualização em lista</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Salvar chave de recuperação</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -202,24 +172,8 @@
     <string name="login_before_share">Faça login para compartilhar com o MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">O seu link de confirmação já não é válido. A sua conta pode já estar ativa, ou você pode ter cancelado o seu registro.</string>
-    <!--  -->
-    <string name="tour_space_title">Espaço MEGA</string>
-    <!--  -->
-    <string name="tour_speed_title">Velocidade MEGA</string>
-    <!--  -->
-    <string name="tour_privacy_title">Privacidade MEGA</string>
-    <!--  -->
-    <string name="tour_access_title">Acesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
     <string name="tour_space_text">Cadastre-se agora e obtenha 20&#160;GB de espaço gratuito</string>
-    <!--  -->
-    <string name="tour_speed_text">Os envios são rápidos. Compartilhe rapidamente arquivos com todo mundo</string>
-    <!--  -->
-    <string name="tour_privacy_text">Mantenha todos os seus arquivos seguros com a criptografia MEGA de ponta a ponta</string>
-    <!--  -->
-    <string name="tour_access_text">Tenha acesso completamente criptografado em qualquer lugar, a qualquer momento</string>
-    <!-- button that allows the user to create an account -->
-    <string name="create_account_text">Criar conta</string>
     <!-- category in sort by action -->
     <string name="name_text">Nome</string>
     <!-- First Name of the user -->
@@ -230,8 +184,6 @@
     <string name="tos">Concordo com os Termos de serviço do [A]MEGA[/A]</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Eu entendo que, [B]se eu perder a minha senha, poderei perder os meus dados[/B]. Leia mais sobre a [A]criptografia de ponta a ponta do MEGA[/A].</string>
-    <!-- Does the user already have a MEGA account -->
-    <string name="already_account">Já possui uma conta?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Você precisa aceitar os nossos Termos de Serviço</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -241,15 +193,11 @@
     <!-- Warning dialog -->
     <string name="error_enter_userlastname">Digite o seu sobrenome.</string>
     <!-- when creating the account -->
-    <string name="error_short_password">Senha demasiado curta</string>
-    <!-- when creating the account -->
     <string name="error_passwords_dont_match">As senhas não coincidem</string>
     <!-- when creating the account -->
     <string name="error_email_registered">Já existe uma conta no MEGA com esse email</string>
     <!--  -->
     <string name="create_account_creating_account">Conectando-se ao servidor: criando conta</string>
-    <!--  -->
-    <string name="cancel_transfer_confirmation">Cancelar esta transferência?</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Cancelar todas as transferências?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -268,16 +216,12 @@
     <string name="section_secondary_media_uploads">Upload de mídias</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
     <string name="section_inbox">Caixa de entrada</string>
-    <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">Offline</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Itens compartilhados</string>
-    <!-- title of the screen that shows all the shared items -->
-    <string name="section_shared_items">Pastas compartilhadas</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">Lixeira</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -318,8 +262,6 @@
     <string name="file_properties_info_last_modified">Última alteração</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">Adicionado</string>
-    <!-- the label when a folder can be accesed by public users -->
-    <string name="file_properties_shared_folder_public_link">Link público</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Permissão</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -328,8 +270,6 @@
     <string name="file_properties_shared_folder_change_permissions">Alterar permissões</string>
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">Compartilhado com</string>
-    <!-- send a file to a MEGA user -->
-    <string name="file_properties_send_file_select_contact">Enviar para</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">Dono</string>
     <!-- positive button on dialog to invite a contact -->
@@ -346,12 +286,8 @@
     <string name="contact_properties_activity">Informações do contato</string>
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">Adicione novos contatos usando o botão abaixo</string>
-    <!-- Add new contacts before sharing. -->
-    <string name="contacts_explorer_list_empty_text">Adicione um novo contato para compartilhar</string>
     <!-- Error message -->
     <string name="error_not_enough_free_space">Não há espaço livre suficiente no seu dispositivo</string>
-    <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
-    <string name="option_link_without_key">Link sem chave</string>
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Chave de decodificação</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
@@ -398,14 +334,10 @@
     <string name="intent_not_available_location">Não há no seu dispositivo nenhum aplicativo para acessar esta localização</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Parece que não há nenhum aplicativo que suporte este tipo de arquivo instalado neste dispositivo</string>
-    <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">Compartilhar imagem utilizando</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">Compartilhar link</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Deletar link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">Sair</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Sair do compartilhamento</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -422,14 +354,8 @@
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Renomear</string>
-    <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">Renomear %1$s</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="context_open_link_title">Abrir link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Abrir</string>
-    <!-- while renaming a file or folder -->
-    <string name="context_renaming">Renomeando</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Preparando arquivo</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -450,20 +376,14 @@
     <string name="context_delete_from_mega">Remover do MEGA</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">Nome da Pasta</string>
-    <!-- when adding a new contact. in the dialog -->
-    <string name="context_new_contact_name">Email do contato</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Criando pasta</string>
-    <!-- Menu item -->
-    <string name="context_download_to">Salvar em</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Esvaziar a lixeira</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Você vai remover permanentemente todos os itens da sua Lixeira.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Enviar</string>
-    <!-- send the file to inbox -->
-    <string name="context_send_file_inbox">Enviar para um contato</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">Remover</string>
     <!-- Menu option to delete selected items of the offline state -->
@@ -474,8 +394,6 @@
     <string name="context_send_file">Enviar arquivo ao chat</string>
     <!-- menu item -->
     <string name="context_send_contact">Compartilhar contato ao chat</string>
-    <!-- open a shared folder -->
-    <string name="context_view_shared_folders">Ver pastas compartilhadas</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">Compartilhar</string>
     <!-- Menu option to manage a shared folder. -->
@@ -494,14 +412,10 @@
     <string name="context_contact_not_removed">Erro. Contato não foi removido</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Permissões alteradas</string>
-    <!-- error message -->
-    <string name="context_permissions_not_changed">Erro. Permissões não foram alteradas</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">Pasta já existe</string>
     <!-- message when trying to create a invite a contact already that is already added -->
     <string name="context_contact_already_exists">%s já é um contato</string>
-    <!-- message when trying to send a file without full access -->
-    <string name="context_send_no_permission">Você não tem permissão para enviar este arquivo</string>
     <!-- success message when creating a folder -->
     <string name="context_folder_created">Pasta criada</string>
     <!-- error message when creating a folder -->
@@ -512,8 +426,6 @@
     <string name="context_no_renamed">Erro. Não foi renomeado</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Copiado corretamente</string>
-    <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">Enviar para a Caixa de entrada</string>
     <!-- error message when sending a node to Inbox -->
     <string name="context_no_sent_node">Erro. Não enviados a Caixa de entrada</string>
     <!-- error message -->
@@ -534,18 +446,8 @@
     <string name="context_correctly_shared">Compartilhado corretamente</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Erro. %d compartilhamentos não foram concluídos</string>
-    <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared_removed">Você deixou de compartilhar estas pastas</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number_removed">Erro. %d processo de remoção de compartilhamentos não foi concluído</string>
-    <!-- error message -->
-    <string name="context_no_shared">Erro. Não foi compartilhado</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Erro. Não foi possível remover o compartilhamento</string>
-    <!-- success message when removing a sharing -->
-    <string name="context_remove_sharing">Compartilhamento de pasta removido</string>
-    <!-- error message -->
-    <string name="context_no_link">Erro ao criar o link</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Deletado corretamente</string>
     <!-- error message -->
@@ -576,20 +478,8 @@
     <string name="number_contact_removed">%d contatos foram removidos</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d contatos não foram removidos</string>
-    <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">Pasta compartilhada corretamente com %d contatos</string>
-    <!-- success message when sharing multiple files -->
-    <string name="number_correctly_shared">%d pastas foram compartilhadas</string>
-    <!-- error message when sharing multiple files -->
-    <string name="number_no_shared">%d pastas não foram compartilhadas</string>
     <!-- success message when sending a file to a contact -->
     <string name="context_correctly_copied_contact">Enviado corretamente para:</string>
-    <!-- success message when removing all the contacts of a shared folder -->
-    <string name="context_correctly_removed_sharing_contacts">A pasta não está mais compartilhado</string>
-    <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Ocorreu um erro. Não foi possível deixar de compartilhar a pasta com o seu contato</string>
-    <!-- option available for just one file -->
-    <string name="context_select_one_file">Selecione somente um arquivo</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Lixeira esvaziada com êxito</string>
     <!-- error message when emptying the RB -->
@@ -604,8 +494,6 @@
     <string name="confirmation_cancel_subscriptions">Obrigado pelo seu comentário. Você tem certeza de que quer cancelar a sua assinatura do MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">A sua assinatura não foi cancelada. Por favor, indique um motivo para o cancelamento</string>
-    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">Obrigado. O seu pagamento está sendo processado. Se a sua conta não indicar o upgrade em 24 horas, entre em contato conosco em support&#64;mega.co.nz</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">A sua nova assinatura entrará em vigor assim que o seu plano atual expirar, quando também será cobrado o pagamento correspondente ao novo plano.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -614,30 +502,22 @@
     <string name="subscription_type_monthly">Mensal</string>
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
-    <!-- success message after removing the public link of a folder -->
-    <string name="context_node_private">A pasta agora é privada</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Compartilhamento removido corretamente</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Nova pasta</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Adicionar novo contato</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_add_contact_and_share">Adicionar contato e compartilhar</string>
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Chave de decodificação</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">Por favor, digite a chave de decodificação deste link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Chave de decodificação inválida</string>
-    <!-- upload to. Then choose an Image file -->
-    <string name="upload_to_image">Imagem</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Áudio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vídeo</string>
-    <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
-    <string name="upload_uploaded">enviado</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Processando arquivo</item>
@@ -654,10 +534,6 @@
     <string name="error_io_problem">Problema no sistema de arquivos</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">Erro aconteceu quando executar a ação</string>
-    <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">Visor de imagens</string>
-    <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Espaço de armazenamento usado</string>
     <!-- menu item -->
     <string name="my_account_change_password">Alterar senha</string>
     <!-- Dialog text overquota error -->
@@ -666,34 +542,16 @@
     <string name="my_account_last_session">Última sessão</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Mudando a senha</string>
-    <!-- when changing the password, the first edittext is to enter the current password -->
-    <string name="my_account_change_password_oldPassword">Senha atual</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">Nova senha</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirme a nova senha</string>
-    <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">As senhas não coincidem</string>
-    <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Selecionar plano</string>
-    <!-- the user has to decide the way of payment -->
-    <string name="select_membership_1">Período mensal ou anual</string>
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Neste momento, não há nenhum método de pagamento selecionado para este plano. Por favor, selecione um método de pagamento.</string>
-    <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">Mensal*</string>
-    <!-- button to decide annually payment. The asterisk is needed -->
-    <string name="upgrade_per_year">Anual*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">O link foi copiado para a área de transferência</string>
-    <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">A prévia ainda não foi baixada. Aguarde.</string>
-    <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Não foi possível gerar a visualização por falta de memória disponível no seu dispositivo. Por favor, tente novamente mais tarde.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Por favor, faça logout antes de criar a conta</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">Nenhuma transferência ativa</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Pausar transferências</string>
     <!-- menu item -->
@@ -724,8 +582,6 @@
     <string name="camera_notif_primary_local_unavailable">Os Uploads da câmera foram desativados - a pasta local não está disponível.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">O Upload de mídias foi desativados - a pasta local não está disponível.</string>
-    <!-- notification camera uploads complete -->
-    <string name="settings_camera_notif_complete">Uploads da câmera concluídos</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Aparência</string>
     <!-- settings of the Features section -->
@@ -756,16 +612,12 @@
     <string name="settings_storage_download_location">Pasta predeterminada para downloads</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">Sempre perguntar o destino do download</string>
-    <!-- Whether to enable the storage in advanced devices -->
-    <string name="settings_storage_advanced_devices">Mostrar dispositivos avançados (SD externo)</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">Adicionar um número de telefone</string>
     <!-- enter verification code page title -->
     <string name="verify_account_title">Confirme a sua conta</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
     <string name="verify_account_helper_locked">A sua conta foi temporariamente bloqueada devido a uma suspeita de infração. Por favor, confirme o seu número de telefone para desbloquear a sua conta.</string>
-    <!-- Hint text of the country edittext for billing purposes -->
-    <string name="general_country_label">País</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">País</string>
     <!-- place holder for enter mobile number field -->
@@ -809,10 +661,6 @@
         <item>Armazenamento interno</item>
         <item>Armazenamento externo</item>
     </string-array>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option -->
-    <string name="internal_storage_label">Armazenamento interno</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string name="external_storage_label">Armazenamento externo</string>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
         <item>Digite o email do usuário</item>
@@ -820,10 +668,6 @@
     </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Ativar Uploads da câmera</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">Ativar os Uploads da câmera</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_off">Desativar uploads da câmera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Como fazer o upload</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -845,8 +689,6 @@
         <item>Somente vídeos</item>
         <item>Fotos e vídeos</item>
     </string-array>
-    <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">Somente quando estiver carregando</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Incluir etiquetas de localização</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -867,8 +709,6 @@
     <string name="settings_camera_upload_only_videos">Somente vídeos</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Fotos e vídeos</string>
-    <!-- status text when no custom photo sync folder has been set -->
-    <string name="settings_pin_lock_code_not_set">Não definido</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">Bloqueio com código de acesso</string>
     <!-- Settings option to change Passcode. -->
@@ -889,14 +729,6 @@
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">Depois de 10 tentativas incorretas, você será deslogado e os arquivos salvos em Offline serão deletados</string>
-    <!-- error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_incorrect">Código incorreto</string>
-    <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
-    <plurals name="pin_lock_incorrect_alert">
-        <item quantity="one">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem 1 tentativa</item>
-        <item quantity="many">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem %2d tentativas</item>
-        <item quantity="other">O código de acesso é incorreto. Por favor, tente novamente. Você ainda tem %2d tentativas</item>
-    </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">O código de acesso não esta correto. Tente novamente.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
@@ -907,8 +739,6 @@
     <string name="reset_pin_title">Digite seu novo código de acesso</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="reset_pin_title_2">Digite novamente seu novo código de acesso</string>
-    <!-- Text of the screen after 10 attemps with a wrong Passcode -->
-    <string name="incorrect_pin_activity">Todos os seus dados locais serão deletados e você será desconectado em %1d segundos</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Sobre</string>
     <!-- Preference screen item action button -->
@@ -923,38 +753,10 @@
     <string name="settings_about_karere_version">MEGAchat - versão do SDK</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Ver o código-fonte</string>
-    <!--  -->
-    <string name="january">Janeiro</string>
-    <!--  -->
-    <string name="february">Fevereiro</string>
-    <!--  -->
-    <string name="march">Março</string>
-    <!--  -->
-    <string name="april">Abril</string>
-    <!--  -->
-    <string name="may">Maio</string>
-    <!--  -->
-    <string name="june">Junho</string>
-    <!--  -->
-    <string name="july">Julho</string>
-    <!--  -->
-    <string name="august">Agosto</string>
-    <!--  -->
-    <string name="september">Setembro</string>
-    <!--  -->
-    <string name="october">Outubro</string>
-    <!--  -->
-    <string name="november">Novembro</string>
-    <!--  -->
-    <string name="december">Dezembro</string>
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">Navegador de arquivos ZIP</string>
-    <!-- title of the My Account screen -->
-    <string name="my_account_title">Tipo de conta</string>
     <!--  -->
     <string name="free_account">Grátis</string>
-    <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Pasta de envios da câmera criada</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nome</string>
     <!-- sort files alphabetically ascending -->
@@ -963,12 +765,6 @@
     <string name="sortby_name_descending">Decrescente</string>
     <!-- category in sort by action -->
     <string name="sortby_date">Data</string>
-    <!-- category in sort by action -->
-    <string name="sortby_creation_date">Data de criação</string>
-    <!-- category in sort by action -->
-    <string name="sortby_modification_date">Data de modificação</string>
-    <!-- category in sort by action -->
-    <string name="sortby_link_creation_date">Data de criação do link</string>
     <!-- sort files by date newest first -->
     <string name="sortby_date_newest">Mais recente</string>
     <!-- sort files by date oldest first -->
@@ -979,14 +775,10 @@
     <string name="sortby_size_largest_first">Maior</string>
     <!-- sort files by size smallest first -->
     <string name="sortby_size_smallest_first">Menor</string>
-    <!-- Title of sort by media type options -->
-    <string name="sortby_type">Tipo de arquivo</string>
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">Fotos</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Vídeos</string>
-    <!-- Title to choose the type of Passcode -->
-    <string name="pin_lock_type">Tipo de código de acesso</string>
     <!-- Passcode with 4 digits -->
     <string name="four_pin_lock">4 dígitos</string>
     <!-- Passcode with 6 digits -->
@@ -997,16 +789,12 @@
     <string name="settings_enable_logs">Os logs estão ativos</string>
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Os logs foram desativados</string>
-    <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Não foi possível configurar a pasta para os Uploads da câmera no MEGA</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Abrir localização</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Este processo está demorando mais do que o esperado. Por favor, espere.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Conta Gratuita</string>
-    <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Conta Pro Lite</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Conta Pro I</string>
     <!-- Label in My Account section to show user account type -->
@@ -1037,22 +825,8 @@
     <string name="general_positive_button">Sim</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">Não</string>
-    <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">Esqueceu a sua senha?</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Esqueceu a sua senha?</string>
-    <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">Se você tiver um backup da sua chave de recuperação, você pode resetar a sua senha selecionando SIM. Nenhum dado será perdido.</string>
-    <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">Você ainda pode exportar a sua chave de recuperação agora se você tiver uma sessão do MEGA ativa em outro navegador, neste ou em qualquer outro computador. Se você não fizer isso, você não poderá decodificar a sua conta existente, mas poderá criar uma nova com o mesmo endereço de email selecionando NÃO.</string>
-    <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">Você tem um backup da sua chave de recuperação?</string>
-    <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">Ótimo!</string>
-    <!-- Hint of the text where the user can write his e-mail -->
-    <string name="edit_text_insert_mail">digite o email aqui</string>
-    <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">Por favor, digite o seu endereço de email abaixo. Você receberá um link de recuperação para informar a chave de recuperação, e resetar a sua senha.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">Coloque aqui a sua chave de recuperação</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1089,14 +863,6 @@
     <string name="park_account_dialog_title">Estacionar a minha conta</string>
     <!-- Button to park an account -->
     <string name="park_account_button">Estacionar</string>
-    <!-- Title of the screen to park an account -->
-    <string name="park_account_title">Oops!</string>
-    <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">Devido ao nosso paradigma de criptografia de ponta a ponta, você não poderá acessar os seus dados sem a sua senha ou um backup da sua chave de recuperação.</string>
-    <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">Você pode estacionar sua conta existente e iniciar uma fresca sob o mesmo endereço de e-mail. Os seus dados serão conservados durante pelo menos 60 dias. No caso em que você se lembra a senha da sua conta estacionado, por favor contacte support&#64;mega.nz</string>
-    <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">Por favor, indique o seu endereço de e-mail abaixo. Você receberá um link de recuperação que permitirá que você estacionar sua conta.</string>
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">Este é o último passo para estacionar sua conta. Por favor, digite a sua nova senha. Os seus dados serão mantidos durante um mínimo de 60 dias. Se você lembrar da senha da sua conta estacionada, entre em contato com support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
@@ -1105,16 +871,12 @@
     <string name="recovery_link_expired">O link de recuperação expirou. Tente novamente.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">A sua chave de recuperação será usada para resetar a sua senha. Por favor, digite a sua nova senha.</string>
-    <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
-    <string name="email_verification_text_change_pass">Você receberá um link para resetar a sua senha.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Upgrade</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade</string>
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumente a capacidade da sua nuvem.[A]Obtenha um maior espaço de armazenamento e mais cota de transferência com um plano Pro.</string>
-    <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">A chave de recuperação da sua conta no MEGA foi salva em: %1s. [A]Você pode encontrar o arquivo com a sua chave de recuperação na seção Offline.[/A] Aviso: como este arquivo será deletado se você fizer logout, você precisa salvar a chave de recuperação em um lugar seguro, fora da sua conta no MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Este email já está sendo usado. Por favor, use outro email.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1125,12 +887,6 @@
     <string name="change_mail_text_last_step">Este é o último passo para alterar o seu email. Por favor, digite a sua senha abaixo.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Alterar email</string>
-    <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Você está ficando sem espaço de armazenamento.</string>
-    <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">Tirar o máximo partido da sua conta MEGA fazendo o upgrade a Pro.</string>
-    <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">Editar foto de perfil</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Capturar</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1141,8 +897,6 @@
     <string name="incorrect_MK">A chave proporcionada não coincide com esta conta. Por favor, comprove que você está usando a chave de recuperação correta e tente novamente.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">Chave de recuperação inválida</string>
-    <!-- Alert Dialog to get link -->
-    <string name="option_full_link">Link com chave</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Obtendo informação&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1175,20 +929,10 @@
     <string name="number_correctly_delete_contact_request">%d solicitações de contato foram excluídas corretamente.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d solicitações de contato foram excluídas corretamente, mas %2$d solicitações não foram excluídas.</string>
-    <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">Você quer remover a solicitação de contato enviada para %s?</string>
-    <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">Você quer remover estas %d solicitações de contato?</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">%d respostas de solicitações enviadas.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d respostas de solicitações enviadas corretamente, porém %2$d não foram enviadas.</string>
-    <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
-    <plurals name="general_num_request">
-        <item quantity="one">1 solicitação</item>
-        <item quantity="many">%1$d solicitações</item>
-        <item quantity="other">%1$d solicitações</item>
-    </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Esta pasta está compartilhada com %1$d contato. Você quer deixar de compartilhar?</item>
@@ -1227,18 +971,12 @@
     <string name="file_link_unavaible_delete_account">A conta deste usuário foi encerrada devido a várias infrações aos nossos Termos de serviço.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">A chave de decodificação fornecida para o link desta pasta é inválida.</string>
-    <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
-    <string name="my_account_my_credentials">Minhas credenciais</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
     <string name="limited_bandwith">Limitado</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
-    <!-- Item of the navigation title for the chat section when there is any unread message -->
-    <string name="section_chat_with_notification">Chat [A](%1$d)[/A]</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">Arquivar</string>
-    <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">Convide os seus amigos para que se juntem a você no Chat e aproveite a nossa plataforma criptografada com privacidade e segurança.</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">h</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1251,12 +989,6 @@
     <string name="remove_contact_shared_folder">O acesso do contato %s à pasta compartilhada será removido.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <string name="remove_multiple_contacts_shared_folder">O acesso dos %d contatos à pasta compartilhada será removido.</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_correctly_removed_from_shared">%d contatos foram removidos da pasta compartilhada</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_incorrectly_removed_from_shared">Não foi possível remover %d contatos</string>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_correctly_changed_from_shared">Permissões de %d contatos corretamente atualizadas</string>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Não foi possível atualizar as permissões de %d contatos</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
@@ -1269,8 +1001,6 @@
     <string name="number_no_invite_contact_request">%1$d solicitações de contato foram enviadas corretamente, porém %2$d solicitações não foram enviadas.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (eu)</string>
-    <!-- Hint shown in the field to write a message in the chat screen -->
-    <string name="type_message_hint">Digite uma mensagem</string>
     <!-- button -->
     <string name="general_mute">Silenciar</string>
     <!-- button -->
@@ -1319,12 +1049,8 @@
     <string name="title_properties_chat_contact_notifications">Notificações</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Som das mensagens</string>
-    <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">Deletar o histórico do chat</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">Compartilhar o contato</string>
-    <!-- Title of the screen to select the ringtone of the calls -->
-    <string name="call_ringtone_title">Toque das chamadas</string>
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">Som das notificações</string>
     <!-- Button to clear the chat history -->
@@ -1363,8 +1089,6 @@
     <string name="away_status">Ausente</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="busy_status">Ocupado</string>
-    <!-- Info label about the status of the user -->
-    <string name="invalid_status">Não há conexão</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Esta mensagem foi eliminada</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1423,8 +1147,6 @@
     <string name="manual_resume_alert">Transferências pausadas. Toque para continuar.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Erro. O seu status não foi atualizado.</string>
-    <!-- message shown when a user couldn’t leave chat -->
-    <string name="leave_chat_error">Aconteceu um erro ao sair do chat</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">Aconteceu um erro ao criar do chat</string>
     <!-- settings of the chat to choose the status -->
@@ -1455,8 +1177,6 @@
     <string name="chat_error_open_title">Erro no chat</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Não foi possível abrir o chat corretamente</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">Escolha um contato</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contato</item>
@@ -1495,32 +1215,12 @@
     <string name="more_users_typing">%1$s [A]e outros estão escrevendo&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Mais</string>
-    <!-- Text button -->
-    <string name="label_close">Fechar</string>
-    <!-- Title of the general tab in My Account Section -->
-    <string name="tab_my_account_general">Geral</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="tab_my_account_storage">Armazenamento</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="label_storage_upgrade_account">Armazenamento</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
     <string name="label_transfer_quota_upgrade_account">Cota de transferência</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_achievements">Cota de transferência</string>
-    <!-- Title of the section about the plan in the storage tab in My Account Section -->
-    <string name="account_plan">Plano</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Espaço de armazenamento</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="transfer_quota">Cota de transferência</string>
-    <!-- Label in section the storage tab in My Account Section -->
-    <string name="available_space">Disponível</string>
-    <!-- Label in section the storage tab in My Account Section when no info info is received -->
-    <string name="not_available">não disponível</string>
-    <!-- Label in section the storage tab when the account is Free -->
-    <string name="no_bylling_cycle">Não há ciclo de faturamento</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="my_account_of_string">%1$s [A]de %2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Você quer eliminar da seção Offline?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1529,14 +1229,6 @@
     <string name="set_color_theme_label">Esquema de cores</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">Fechar</string>
-    <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="general_not_available">Não disponível</string>
-    <!-- Accepted request invitacion alert -->
-    <string name="context_invitacion_reply_accepted">Convite aceito</string>
-    <!-- Declined request invitacion alert -->
-    <string name="context_invitacion_reply_declined">Convite recusado</string>
-    <!-- Ignored request invitacion alert -->
-    <string name="context_invitacion_reply_ignored">Convite ignorado</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">Não foi possível reconhecer a mensagem</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
@@ -1562,8 +1254,6 @@
         <item>Ocupado</item>
         <item>Offline</item>
     </string-array>
-    <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">Nenhum arquivo salvo para uso offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Ativar</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1572,32 +1262,12 @@
     <string name="enable_log_text_dialog">Os logs podem conter informação relacionada à sua conta</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">A conexão à internet foi restabelecida. Você quer se conectar ao MEGA?</string>
-    <!-- Message shown meanwhile the app is waiting for a the chat status -->
-    <string name="loading_status">Carregando status&#8230;</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">Esta mensagem não pode ser editada</string>
-    <!-- Label to show the number of transfers in progress, Plural -->
-    <plurals name="text_number_transfers">
-        <item quantity="one">%1$d de %2$d arquivo</item>
-        <item quantity="many">%1$d de %2$d arquivos</item>
-        <item quantity="other">%1$d de %2$d arquivos</item>
-    </plurals>
-    <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">O processo está terminando&#8230;</string>
-    <!-- positive button on dialog to view a contact -->
-    <string name="option_to_transfer_manager">Ver</string>
-    <!-- Label of the modal bottom sheet to pause all transfers -->
-    <string name="option_to_pause_transfers">Pausar todas as transferências</string>
-    <!-- Label of the modal bottom sheet to resume all transfers -->
-    <string name="option_to_resume_transfers">Continuar todas as transferências</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
     <string name="option_to_clear_transfers">Eliminar todas as transferências</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">Tentar fazer novamente todas as transferências</string>
-    <!-- Dialog to confirm the action of pausing one transfer -->
-    <string name="menu_pause_individual_transfer">Você quer pausar esta transferência?</string>
-    <!-- Dialog to confirm the action of restarting one transfer -->
-    <string name="menu_resume_individual_transfer">Você quer continuar esta transferência?</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Continuar</string>
     <!-- Dialog to confirm before removing completed transfers -->
@@ -1618,10 +1288,6 @@
     <string name="transfer_cancelled">Cancelada</string>
     <!-- Possible state of a transfer -->
     <string name="transfer_unknown">Desconhecido</string>
-    <!-- Title of the panel where the progress of the transfers is shown -->
-    <string name="paused_transfers_title">Transferências pausadas</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty">Não há transferências concluídas</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Fazendo upload de arquivos: %1$d de %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1645,12 +1311,6 @@
         <item quantity="one">Upload de %1$d arquivo não concluído</item>
         <item quantity="many">Upload de %1$d arquivos não concluído</item>
         <item quantity="other">Upload de %1$d arquivos não concluído</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
-    <plurals name="copied_service_upload">
-        <item quantity="one">%1$d arquivo copiado</item>
-        <item quantity="many">%1$d arquivos copiados</item>
-        <item quantity="other">%1$d arquivos copiados</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
@@ -1748,12 +1408,6 @@
         <item quantity="many">Os links foram removidos.</item>
         <item quantity="other">Os links foram removidos.</item>
     </plurals>
-    <!-- error message -->
-    <string name="context_link_action_error">Não foi possível acessar o link. Por favor, tente novamente mais tarde.</string>
-    <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">Digite o email do usuário</string>
-    <!-- title of the screen to see the details of several node attachments -->
-    <string name="activity_title_files_attached">Arquivos anexos</string>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contatos anexos</string>
     <!--  -->
@@ -1818,28 +1472,16 @@
     <string name="attachment_uploading_state_compressing">Comprimindo&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">Erro. Não enviado.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d arquivos já foram baixados.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
-    <string name="pending_multiple">%d arquivos pendentes.</string>
     <!--  -->
     <string name="contact_is_me">Não há opções disponíveis, você selecionou a si mesmo</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Você quer remover o anexo?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Ver arquivos (%1$d deletados)</string>
-    <!-- Success message when the attachment has been sent to a chat -->
-    <string name="success_attaching_node_from_cloud">Arquivo enviado para %1$s</string>
-    <!-- Success message when the attachment has been sent to a many chats -->
-    <string name="success_attaching_node_from_cloud_chats">Arquivo enviado para %1$d chats</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">Erro. O arquivo não foi enviado</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_attaching_node_from_cloud_chats">Erro. O arquivo não foi enviado a nenhum dos chats selecionados</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">Erro. O anexo não foi removido.</string>
-    <!-- settings option -->
-    <string name="settings_set_up_automatic_uploads">Ativar o upload automático</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Silenciar</string>
     <!-- messages string in chat notification -->
@@ -1858,8 +1500,6 @@
     <string name="title_properties_chat_notifications_contact">Notificações de chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] deletou o histórico do chat[/B]</string>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <string name="number_messages_chat_notification">%1$d chats não lidos</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_permissions_changing_folder">Modificando permissões</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -1874,8 +1514,6 @@
     <string name="confirmation_move_to_rubbish_plural">Mover para a lixeira?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Deletar do MEGA?</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state">Enviando&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Notificações de chat</string>
     <!-- title of the section for achievements -->
@@ -1900,8 +1538,6 @@
     <string name="title_regitration">Bônus de registro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instalar o app para desktop</string>
-    <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
-    <string name="camera_uploads_empty">Não há arquivos nos Uploads da câmera</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Vence em %1$d d</string>
     <!-- State to indicate an achievement has expired -->
@@ -1916,14 +1552,8 @@
     <string name="first_paragraph_achievement_invite_friends">Convide os seus amigos a criar uma conta gratuita no MEGA e instalar um dos nossos aplicativos para dispositivos móveis. Cada vez que um amigo convidado se cadastrar e instalar um aplicativo, você receberá uma cota extra de armazenamento.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">O bônus de armazenamento gratuito somente será concedido ao convidar novos usuários, os quais devem instalar o aplicativo do MEGA para dispositivos móveis ou para desktop.</string>
-    <!-- explanation of screen to invite friends and get an achievement -->
-    <string name="card_title_invite_friends">Selecione os contatos da agenda do seu telefone ou digite os endereços de email.</string>
-    <!-- title of the dialog to confirm the contact request -->
-    <string name="title_confirmation_invite_friends">Convide amigos para o MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Convite enviado</string>
-    <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">Incentive os seus amigos a criar uma conta e instalar um aplicativo do MEGA. Se o seu amigo usar o mesmo endereço de email que você digitou, você receberá a sua cota de transferência extra.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Formato de email incorreto</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1954,8 +1584,6 @@
         <item quantity="many">Se você sair destas pastas compartilhadas, não poderá acessá-las novamente.</item>
         <item quantity="other">Se você sair destas pastas compartilhadas, não poderá acessá-las novamente.</item>
     </plurals>
-    <!-- Info of a contact if there is no folders shared with him -->
-    <string name="no_folders_shared">Não há pastas compartilhadas</string>
     <!-- Menu item -->
     <string name="settings_help">Ajuda</string>
     <!-- Settings preference title for help centre -->
@@ -1972,8 +1600,6 @@
     <string name="settings_feedback_body_android_version">Versão de Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">Novo arquivo de texto</string>
-    <!-- Title of the dialog to create a new file by inserting the name -->
-    <string name="dialog_title_new_file">Novo arquivo</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nome do arquivo</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1982,32 +1608,12 @@
     <string name="context_new_link_name">URL do link</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">ASSUNTO</string>
-    <!-- Title of the field content when a new file is created to upload -->
-    <string name="new_file_content_when_uploading">CONTEÚDO</string>
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">EMAIL</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Encaminhar</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Anexar</string>
-    <!-- when add or share a file with a new contact, it can type by name or mail -->
-    <string name="type_contact">Nome ou email do contato</string>
-    <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">Não é possível adicionar mais contatos neste momento</string>
-    <!-- when changing the password , the old password and new password are equals -->
-    <string name="old_and_new_passwords_equals">A nova senha não pode ser igual à senha anterior</string>
-    <!-- Menu item -->
-    <string name="action_search_by_date">Pesquisar por data</string>
-    <!-- title of a button to apply search by date -->
-    <string name="general_apply">Aplicar</string>
-    <!-- title of a button to apply search by month -->
-    <string name="general_search_month">Último mês</string>
-    <!-- title of a button to apply search by year -->
-    <string name="general_search_year">Último ano</string>
-    <!-- title of a Search by date tag -->
-    <string name="label_set_day">Definir dia</string>
-    <!-- the user can’t choose this date -->
-    <string name="snackbar_search_by_date">Data inválida</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">Nome inválido</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
@@ -2022,8 +1628,6 @@
         <item quantity="many">Os nomes dos arquivos não podem estar vazios.</item>
         <item quantity="other">Os nomes dos arquivos não podem estar vazios.</item>
     </plurals>
-    <!-- Label shown when audio file is playing -->
-    <string name="audio_play">Arquivo de áudio</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Erro. O arquivo pdf está corrompido ou não existe.</string>
     <!-- Label to include info of the user email in the feedback form -->
@@ -2032,10 +1636,6 @@
     <string name="save_to_mega">Salvar na minha \n Nuvem de arquivos</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">O chat já existe</string>
-    <!-- before sharing a file, has to be downloaded -->
-    <string name="not_download">O arquivo ainda não foi baixado</string>
-    <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">Somente os contatos do MEGA podem ser adicionados</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Reconectando ao chat</string>
     <!-- Message show when a call cannot be established -->
@@ -2046,14 +1646,10 @@
     <string name="rate_the_app_panel">Sim, avaliar o aplicativo</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">Não, enviar feedback</string>
-    <!-- title of the section advanced options on the get link screen -->
-    <string name="link_advanced_options">Opções avançadas</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">O MEGA precisa das permissões de leitura e escritura no seu armazenamento externo para fazer download de arquivos lá.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">O cartão SD já não está disponível. Por favor, escolha um novo destino de download.</string>
-    <!-- Dialog title to ask download to internal storage or external storage. -->
-    <string name="title_select_download_location">Escolher o destino do download</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Sem permissão para acessar os contatos</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -2072,12 +1668,8 @@
     <string name="section_my_code">Meu código</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">Escanear código</string>
-    <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Aceitar automaticamente</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Os usuários do MEGA que escanearem o seu código QR serão automaticamente adicionados à sua lista de contatos.</string>
-    <!-- Subtitle of QR code settings that reset the code -->
-    <string name="setting_subtitle_qrcode_reset">O código QR anterior já não será válido</string>
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Link copiado para a área de transferência</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
@@ -2128,12 +1720,6 @@
     <string name="external_play">Abrir com</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Compartilhar usando</string>
-    <!-- Message shown if the user choose enable button and he is not logged in -->
-    <string name="error_enable_chat_before_login">Por favor, faça login antes de ativar o chat</string>
-    <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
-    <string name="label_set_period">Definir período</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Lixeira [/A][B]vazia[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2244,8 +1830,6 @@
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">Reverter</string>
-    <!-- option menu to clear all the previous versions -->
-    <string name="menu_item_clear_versions">Eliminar versões anteriores</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="one">Eliminar versão?</item>
@@ -2287,8 +1871,6 @@
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <string name="messages_forwarded_success">Mensagens encaminhadas</string>
-    <!-- Error message after forwarding one or several messages to several chats -->
-    <string name="messages_forwarded_error">Erro. Não foi possível encaminhar</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Erro. Não foi possível encaminhar a mensagem %1$d</item>
@@ -2335,34 +1917,24 @@
     <string name="general_do_not_show">Não mostrar novamente</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
     <string name="remember_pwd_dialog_button_test">Confirmar a senha</string>
-    <!-- Title of the activity that permits user test his password -->
-    <string name="test_pwd_title">Confirme a sua senha</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Senha correta</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
     <string name="test_pwd_wrong">Senha incorreta.\nSalve já a sua chave de recuperação!</string>
-    <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="recovery_key_exported_dialog_text_logout">Você está prestes a fazer logout. Por favor, confirme a sua senha para garantir que você se lembra dela.\nSe você perder a sua senha, perderá o acesso aos seus dados no MEGA.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copiar para a área de transferência</string>
-    <!-- Option that permits user export his recovery key -->
-    <string name="option_export_recovery_key">Exportar chave de recuperação</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Fazer logout</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Chave de recuperação</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Salvar no sistema de arquivos</string>
-    <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">Copiado para a área de transferência</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">Ir ao mais recente</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
     <string name="message_new_messages">Novas mensagens</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Chamada recebida</string>
-    <!-- Text for the notification action to launch the incoming call page -->
-    <string name="notification_incoming_action">Acessar a chamada</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
     <string name="notification_enable_display">Os pop-ups do MEGA em segundo plano estão desativados.\nToque para alterar as configurações.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
@@ -2379,10 +1951,6 @@
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Carregando[/A] [B]mensagens&#8230;[/B]</string>
-    <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">Pasta ou arquivo não encontrado. Você está logado em uma conta diferente no navegador? Você só pode acessar arquivos e/ou pastas da conta com a qual você estiver logado no aplicativo</string>
-    <!-- menu option to loop video or audio file -->
-    <string name="context_loop_video">Reprodução contínua</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Segurança</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2399,16 +1967,8 @@
     <string name="login_API_rate">Solicitações em excesso. Por favor, aguarde.</string>
     <!-- Message when previous login is being cancelled -->
     <string name="login_in_progress">Cancelando o processo de login. Por favor, espere&#8230;</string>
-    <!-- when open audio video player, the file that it try to open is not supported -->
-    <string name="unsupported_file_type">Formato de arquivo não suportado.</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Erro. O arquivo é corrupto ou não existe.</string>
-    <!-- Title of the screen Playlist -->
-    <string name="section_playlist">Lista de reprodução</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing -->
-    <string name="playlist_state_playing">Reproduzindo&#8230;</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
-    <string name="playlist_state_paused">Pausado</string>
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Imprimir</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
@@ -2427,8 +1987,6 @@
     <string name="title_enable_rich_links">Ativar a visualização de URLs avançadas</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Melhore a sua experiência no MEGAchat. O conteúdo de URLs será recuperado sem criptografia de ponta a ponta.</string>
-    <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">Toque para digitar a chave de decodificação</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Por favor, digite uma senha mais segura</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2441,8 +1999,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Nova solicitação de contato</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">Escrever uma mensagem para “%s”&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]Não há[/B][A] transferências ativas[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2473,8 +2029,6 @@
     <string name="general_verify">Confirmar</string>
     <!-- Text button -->
     <string name="general_next">Seguinte</string>
-    <!-- Text button -->
-    <string name="general_previous">Anterior</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Ocorreu um erro ao gerar a chave ou o código QR. Tente novamente.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2497,8 +2051,6 @@
     <string name="verify_2fa_subtitle_delete_account">Deletar conta</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Desativar</string>
-    <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">Você perdeu o seu dispositivo de autenticação?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">Ocorreu um erro ao desativar a autenticação de dois fatores. Por favor, tente novamente.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2557,8 +2109,6 @@
     <string name="call_failed_messages">[A]Falha na chamada[/A]</string>
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Chamada não atendida[/A]</string>
-    <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Email do contato</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Você já adicionou este contato.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2575,8 +2125,6 @@
     <string name="context_no_restored">Ocorreu um erro. Não foi possível restaurar este item.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensagem</string>
-    <!-- Error message on opening a MEGAdrop folder link -->
-    <string name="error_MEGAdrop_not_supported">As pastas MEGAdrop ainda não são suportadas</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Esta ação não pode ser concluída, pois você ultrapassaria o seu limite de armazenamento atual. Você que fazer o upgrade da sua conta?</string>
     <!-- Title of the section Archived chats -->
@@ -2599,8 +2147,6 @@
     <string name="success_unarchive_chat">Você deixou de arquivar o chat %s.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">Erro. Não foi possível deixar de arquivar o chat %s.</string>
-    <!-- Message shown when the user has no archived chats -->
-    <string name="archived_chats_empty">[A]Não há[/A] [B]chats arquivados[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Chat inativo</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2645,8 +2191,6 @@
     <string name="settings_enable_file_versioning_title">Controle das versões de arquivos</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Ativar ou desativar o controle das versões de arquivos na sua conta. \nDesativar o controle das versões de arquivos não impede que os seus contatos criem novas versões em pastas compartilhadas.</string>
-    <!-- section title to select a chat to send a file -->
-    <string name="choose_chat">Escolha o chat</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">Digite o nome ou email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2721,26 +2265,18 @@
     <string name="title_share_folder_explorer">Escolher pasta</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">Você quer fazer o login? Todas as transferências serão canceladas</string>
-    <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="logout_warning_abort_transfers">Você quer fazer o logout? Todas as transferências serão canceladas.</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">Somente leitura</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]de %2$s usados[/B]</string>
-    <!-- title of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_title">Alterar para um servidor de teste?</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">Você tem certeza de que quer alterar para um servidor de teste? A sua conta pode sofrer danos irreparáveis.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Abrir a câmera?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">Se você abrir a câmera, a sua transmissão de vídeo na chamada atual será pausada.</string>
-    <!-- Title of the notification when there is unknown activity on the Chat -->
-    <string name="notification_chat_undefined_title">Atividade no chat</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Você pode ter novas mensagens</string>
-    <!-- When app is retrieving push message -->
-    <string name="retrieving_message_title">Recuperando mensagem</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">Planejador de limpeza da lixeira</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
@@ -2765,8 +2301,6 @@
     <string name="hint_days">dias</string>
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Obter o link do chat</string>
-    <!-- Title of the option to manage a public chat link -->
-    <string name="manage_chat_link_option">Administrar o link do chat</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">Ativar a rotação da chave de criptografia</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -2799,8 +2333,6 @@
     <string name="error_chat_link">Não foi possível carregar o link do chat.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Erro ao iniciar quando carregando o link do chat.</string>
-    <!-- Message on the alert to preview a chat link if the user is already a participant -->
-    <string name="alert_already_participant_chat_link">Você já está participando deste chat.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">A visualização deste chat já não está disponível. Se você sair da visualização, não será possível reabri-la.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2817,8 +2349,6 @@
     <string name="invite_not_sent_already_sent">A solicitação de contato a %s já foi enviada anteriormente e pode ser consultada na aba Solicitações enviadas.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">Salvando %s na Nuvem&#8230;</string>
-    <!-- General label for folders -->
-    <string name="general_folders">Pastas</string>
     <!-- General label for files -->
     <string name="general_files">Arquivos</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2909,10 +2439,6 @@
     <string name="payment_method">Método de pagamento</string>
     <!-- title of billing period -->
     <string name="billing_period_title">Ciclo de faturamento</string>
-    <!-- Option of one-off (month) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_month">[A]Pagamento único (mensal)[/A] %s</string>
-    <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_year">[A]Pagamento único (anual)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
     <string name="billed_monthly_text">[A]Faturado mensalmente[/A] %s/mês</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
@@ -3067,8 +2593,6 @@
         <item quantity="many">[B]%1$d segundos[/B]</item>
         <item quantity="other">[B]%1$d segundos[/B]</item>
     </plurals>
-    <!-- Message to indicate a call has ended without indicate the call duration. -->
-    <string name="call_ended_no_duration_message">[A]Chamada finalizada[/A]</string>
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
     <string name="group_call_ended_no_duration_message">[A]Chamada em grupo finalizada[/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
@@ -3085,24 +2609,12 @@
     <string name="label_tomorrow">Amanhã</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]Não há [/B][A]arquivos compartilhados[/A]</string>
-    <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s entrou na chamada</string>
-    <!-- Text to indicate that a contact has left a group call -->
-    <string name="contact_left_the_call">%1$s saiu da chamada</string>
-    <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Não é possível fazer esta chamada porque o número máximo de participantes foi atingido.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Não é possível participar desta chamada porque o número máximo de participantes foi atingido.</string>
-    <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Não é possível participar desta chamada porque o número máximo de participantes no chat de grupo foi atingido</string>
-    <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Não é possível participar desta chamada de vídeo porque o número máximo de participantes foi atingido.</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">Não é possível colocar a chamada em espera.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">Ocorreu um erro. Não foi possível abrir o arquivo com este aplicativo.</string>
-    <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">Chamada recebida&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Chamando&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -3119,8 +2631,6 @@
     <string name="explanation_send_location">Essa localização será aberta usando um provedor de mapas de terceiros, externo à plataforma criptografada de ponta a ponta do MEGA.</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">Enviar esta localização</string>
-    <!-- Label shown when after a maps search and no places were found -->
-    <string name="no_places_found">Não foram encontrados lugares</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">O GPS está desativado</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -3179,8 +2689,6 @@
     <string name="preparing_chats">Preparando arquivos</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Enviado como mensagem.</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_sent_as_message">Erro. O arquivo não foi enviado a nenhum dos chats selecionados</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">Deletar versões anteriores</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
@@ -3227,12 +2735,8 @@
     <string name="title_pdf_password">Digite a sua senha</string>
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s é um documento PDF protegido por senha. Por favor, digite a senha para abrir o PDF.</string>
-    <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
-    <string name="error_pdf_password">Você digitou uma senha incorreta. Tente novamente.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">A senha que você digitou não é válida.</string>
-    <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
-    <string name="unknownn_file">Não é possível abrir o arquivo. Ou é um tipo de arquivo desconhecido, ou não foi possível descompactar o arquivo corretamente.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Não é possível reproduzir arquivos multimídia enquanto houver uma chamada em andamento.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -3241,8 +2745,6 @@
     <string name="join_call_layout_in_group_call">Toque para entrar na chamada em grupo atual.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Pressione para voltar à chamada</string>
-    <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
-    <string name="not_allowed_to_start_call">Você está em uma chamada</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] se uniu ao chat de grupo.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -3253,8 +2755,6 @@
     <string name="context_create_chat_link_question_text">Você quer criar um novo chat de grupo e obter um link do chat?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">A rotação da chave de criptografia é um pouco mais segura, mas não permite que você crie um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
-    <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">Você entrou no chat corretamente.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d de %2$d</string>
     <!-- Hint of the Search view -->
@@ -3269,8 +2769,6 @@
     <string name="muted_own_micro">Silenciado</string>
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">Chamada em espera</string>
-    <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
-    <string name="session_on_hold">%s colocou a chamada em espera</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">Colocar em espera e atender</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
@@ -3305,22 +2803,10 @@
     <string name="no_chat_link_available">Não há link de chat disponível.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">O link do chat foi excluído.</string>
-    <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
-    <string name="contact_request_status_accepted">%1$s (ACEITA)</string>
-    <!-- The status of pending contact request (DELETED), placeholder is contact request creation time -->
-    <string name="contact_request_status_deleted">%1$s (ELIMINADA)</string>
-    <!-- The status of pending contact request (DENIED), placeholder is contact request creation time -->
-    <string name="contact_request_status_denied">%1$s (REJEITADA)</string>
-    <!-- The status of pending contact request (IGNORED), placeholder is contact request creation time -->
-    <string name="contact_request_status_ignored">%1$s (IGNORADA)</string>
-    <!-- The status of pending contact request (REMINDED), placeholder is contact request creation time -->
-    <string name="contact_request_status_reminded">%1$s (LEMBRADA)</string>
-    <!-- The status of pending contact request (PENDING), placeholder is contact request creation time -->
-    <string name="contact_request_status_pending">%1$s (PENDENTE)</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">A versão foi restaurada.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Mantenha pressionado para gravar, solte para enviar.</string>
+    <string name="recording_less_than_second">Mantenha pressionado para gravar</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Deslize para cancelar</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3377,22 +2863,16 @@
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Adicione o seu número de telefone ao MEGA, e assim os seus contatos o encontrarão com mais facilidade.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
     <string name="not_allowed_recording_voice_clip">Não é possível gravar mensagens de voz enquanto houver uma chamada em andamento.</string>
-    <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
-    <string name="error_upload_voice_clip">Ocorreu um erro ao tentar fazer o upload da mensagem de voz.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Chamada recebida</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
     <string name="title_notification_incoming_group_call">Chamada em grupo recebida</string>
-    <!-- Title of the notification shown on the action bar when there is an individual incoming video call -->
-    <string name="title_notification_incoming_individual_video_call">Chamada de vídeo recebida</string>
     <!-- Title of the notification shown on the action bar when there is an individual incoming audio call -->
     <string name="title_notification_incoming_individual_audio_call">Chamada de áudio recebida</string>
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">Carregando</string>
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">Por favor, aguarde&#8230;</string>
-    <!-- Head label to show the business account type -->
-    <string name="account_label">Tipo de conta</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Business</string>
     <!-- Business user role -->
@@ -3401,20 +2881,14 @@
     <string name="user_label">Usuário</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">Status</string>
-    <!-- State to indicate something is active (business status account for instance) -->
-    <string name="active_label">Ativa</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Pagamento necessário</string>
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">Pagamento atrasado</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">O gerenciamento de usuários somente está disponível no navegador de um computador.</string>
-    <!-- Title of the usage tab in My Account Section -->
-    <string name="tab_my_account_usage">Uso</string>
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Informações sobre o uso do armazenamento</string>
-    <!-- Title of overall usage section in Storage -->
-    <string name="overall_usage_label">Uso geral</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Transferência</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -3477,18 +2951,12 @@
     <string name="snackbar_nickname_added">Apelido adicionado</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">Apelido removido</string>
-    <!-- Label showing that a nickname has not been added -->
-    <string name="error_snackbar_nickname_added">Um erro ocorreu ao tentar adicionar o apelido</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">Apelido</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Telefone</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">Reconectando</string>
-    <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
-    <string name="connected_message">Você voltou.</string>
-    <!-- Text shown in a call when the own internet connection is of low quality -->
-    <string name="poor_internet_connection_message">A conexão à Internet é ruim</string>
     <!-- Text is displayed while a voice clip is being recorded -->
     <string name="recording_layout">Gravando&#8230;</string>
     <!-- Text shown for the action create new file -->
@@ -3519,8 +2987,6 @@
     <string name="inactive_chat_title">Chat criado em %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Selecionar mensagens</string>
-    <!-- Storage root label -->
-    <string name="storage_root_label">Tipo de armazenamento</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">Cancelado</string>
     <!-- Text warning of transfer over quota -->
@@ -3585,8 +3051,6 @@
     <string name="joining_label">Entrando&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Saindo&#8230;</string>
-    <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
-    <string name="remove_phone_number">Você quer remover o seu telefone?</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">O seu número de telefone foi removido corretamente.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3595,8 +3059,6 @@
     <string name="search_hint">Pesquisar em MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">A conta que você está tentando resetar está bloqueada.</string>
-    <!-- Error message when trying to login and the account is blocked -->
-    <string name="error_account_blocked">Sua conta foi bloqueada. Por favor, entre em contato com support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">A sua conta foi desativada pelo seu administrador. Você deve entrar em contato com o administrador da sua conta business para obter mais informações.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -3805,8 +3267,6 @@
     <string name="audio_player_now_playing_paused">Reproduzindo agora (em pausa)</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">Informações da faixa</string>
-    <!-- Action to get more information -->
-    <string name="action_more_information">Mais informações</string>
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Política de cookies</string>
     <!-- Preferences screen item title for cookie settings -->
@@ -3843,16 +3303,12 @@
     <string name="theme_system_default">Definido pelo sistema</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Definido pelo modo de energia</string>
-    <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">Selecione a raiz do cartão SD.</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Selecione o destino</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Descartar as alterações e fechar o editor?</string>
     <!-- Action discard -->
     <string name="discard_close_action">Descartar e fechar</string>
-    <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">Salvando o arquivo&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Arquivo criado</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3985,8 +3441,8 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Alterar mesmo assim</string>
-    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
-    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
+    <string name="used_storage_transfer">[A]%1$s[/A] de %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4349,10 +3805,6 @@
     <string name="action_do_not_cancel">Não cancelar</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remover moderador</string>
-    <!-- Title of DCIM folder warning dialog -->
-    <string name="title_dcim_folder_dialog">Pasta DCIM</string>
-    <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">O MEGA faz o upload das suas imagens da galeria. Para alterar o local de upload, acesse as configurações de Upload da câmera.</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Comprar uma nova assinatura?</string>
     <!-- Text of buy new subscription button -->
@@ -4369,8 +3821,6 @@
     <string name="upgrade_billing_warning">Não podemos seguir com o faturamento. Se você está utilizando um dual app, considere fazer login no MEGA sem ele. Caso contrário, tente fazer o upgrade através de um navegador.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Assinatura %1s</string>
-    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">Assinatura ativa</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Você tem uma assinatura MEGA ativa com %1$s. Você deve cancelá-la separadamente em %2$s, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
@@ -4461,4 +3911,162 @@
     <string name="account_info_renews_on">[A]Renova em[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_expires_on">[A]Expira em[/A] [B]%s[/B]</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">Favoritos</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">Esqueceu o seu código de acesso?</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">Digite a sua senha</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">As transferências foram pausadas. Clique em continuar para prosseguir com o download.</string>
+    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
+    <string name="warning_scanning_transfers">Não feche o aplicativo.</string>
+    <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
+    <string name="scanning_transfers">Examinando&#8230;</string>
+    <!-- Label cancel transfers. -->
+    <string name="cancel_transfers">Transferências canceladas</string>
+    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
+    <string name="warning_cancel_transfers">As transferências que ainda não tiverem sido processadas serão canceladas.</string>
+    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
+    <string name="button_proceed">Continuar</string>
+    <!-- Warning informing transfers were cancelled. -->
+    <string name="transfers_cancelled">As transferências foram canceladas.</string>
+    <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
+    <string name="title_duplicated_items">Itens duplicados</string>
+    <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
+    <string name="file_already_exists_in_location">Um arquivo chamado [B]%1$s[/B] já existe neste local.</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
+    <string name="choose_file">Selecione o arquivo que você quer manter</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose. -->
+    <string name="choose_folder">Selecione se quiser combinar as pastas</string>
+    <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_upload_and_replace">A versão atual do arquivo será substituída pelo arquivo que você está fazendo upload.</string>
+    <!-- Upload and replace action button for a name collision. -->
+    <string name="upload_and_replace">Enviar e substituir</string>
+    <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
+    <string name="warning_versioning_upload_and_update">O arquivo será atualizado com um histórico de versões:</string>
+    <!-- Upload and update action button for a name collision. -->
+    <string name="upload_and_update">Fazer upload e atualizar</string>
+    <!-- Don’t upload action button for a name collision. -->
+    <string name="do_not_upload">Não fazer o upload</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
+    <string name="warning_upload_and_rename">O arquivo que você está enviando será renomeado como:</string>
+    <!-- Upload and rename action button for a name collision. -->
+    <string name="upload_and_rename">Fazer upload e renomear</string>
+    <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_move_and_replace">Substituir o arquivo na pasta de destino pelo arquivo que você está movendo.</string>
+    <!-- Move and replace action button for a name collision. -->
+    <string name="move_and_replace">Mover e substituir</string>
+    <!-- Don’t move action button for a name collision. -->
+    <string name="do_not_move">Não mover</string>
+    <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
+    <string name="warning_move_and_rename">O arquivo que você está movendo será renomeado como:</string>
+    <!-- Move and rename action button for a name collision. -->
+    <string name="move_and_rename">Mover com um nome diferente</string>
+    <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_copy_and_replace">Substituir o arquivo na pasta de destino pelo arquivo que você está copiando.</string>
+    <!-- Copy and replace action button for a name collision. -->
+    <string name="copy_and_replace">Copiar e substituir</string>
+    <!-- Don’t copy action button for a name collision. -->
+    <string name="do_not_copy">Não copiar</string>
+    <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
+    <string name="warning_copy_and_rename">O arquivo que você está copiando será renomeado como:</string>
+    <!-- Copy and rename action button for a name collision. -->
+    <string name="copy_and_rename">Copiar com um nome diferente</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <string name="file_apply_for_all">Usar está opção nos próximos %1$d conflitos</string>
+    <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
+    <string name="warning_copy_and_merge">Combina a pasta já existente no destino com a pasta que você está copiando.</string>
+    <!-- Copy and merge action button for a name collision. -->
+    <string name="copy_and_merge">Copiar e combinar</string>
+    <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
+    <string name="warning_move_and_merge">Combina a pasta já existente no destino com a pasta que você está movendo.</string>
+    <!-- Move and merge action button for a name collision. -->
+    <string name="move_and_merge">Mover e combinar</string>
+    <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
+    <string name="warning_upload_and_merge">Combina a pasta já existente no destino com a pasta que você está enviando.</string>
+    <!-- Upload and merge action button for a name collision. -->
+    <string name="upload_and_merge">Fazer upload e combinar</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
+    <string name="skip_file">Nenhum arquivo será alterado. Você manterá o arquivo abaixo:</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
+    <string name="skip_folder">Pular esta pasta</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">Já existe uma pasta chamada [B]%1$s[/B] neste local.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">Conexão ruim</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Não foi possível reconectar</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">A chamada será finalizada em %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">Não tem mais ninguém aqui</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Você ainda está em uma chamada</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">A chamada terminará automaticamente em 2 minutos, a menos que você queira continuar.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">Finalizar chamada agora</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Permanecer na chamada</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">Informar sobre um problema</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">Seus comentários nos ajudam a melhorar o MEGA. Descreva claramente o problema que você encontrou. Quanto mais detalhes você fornecer, mais fácil será para nós resolvê-lo.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">Descreva o problema</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">Enviar arquivo de log</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">Não há conexão à Internet. Verifique a sua conexão e tente novamente.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">Enviar</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">Houve um problema. Por favor, tente novamente mais tarde. Se ainda não for possível enviar a incidência, entre em contato com %s para obter assistência.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">Recebemos as informações. Analisaremos o problema e retornaremos para você.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">Fazendo upload do arquivo de log</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">Descartar relatório?</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">Descartar</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">Editar mensagem</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">Galeria</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">Áudio</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">Digitalizados</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">Clipe de áudio</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança[/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">Filtro</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">Da Nuvem de arquivos</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">Uploads da câmera</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">Somente vídeos</string>
 </resources>

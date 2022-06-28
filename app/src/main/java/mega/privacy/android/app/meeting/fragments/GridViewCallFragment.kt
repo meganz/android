@@ -12,8 +12,8 @@ import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
+import timber.log.Timber
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
@@ -35,7 +35,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
         participants = it
         val newData = sliceBy6(it)
         if (isFirsTime) {
-            logDebug("Participants changed")
+            Timber.d("Participants changed")
             isFirsTime = false
             adapterPager.apply {
                 setNewData(newData)
@@ -48,7 +48,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         viewDataBinding = GridViewCallFragmentBinding.inflate(inflater, container, false)
         return viewDataBinding.root
@@ -79,8 +79,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 super.onPageSelected(position)
                 if (currentPage != position) {
                     currentPage = position
-
-                    logDebug("New page selected $position")
+                    Timber.d("New page selected $position")
                     viewModel.removeAllParticipantVisible()
 
                     val data = sliceBy6(participants)
@@ -139,7 +138,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
             val iteratorParticipants = visibleParticipants.iterator()
             iteratorParticipants.forEach {
                 if (it.isVideoOn) {
-                    logDebug("Activate video of participant visible")
+                    Timber.d("Activate video of participant visible")
                     adapterPager.updateVideoWhenScroll(
                         true,
                         it,
@@ -161,7 +160,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
             iteratorParticipants.iterator().forEach { participant ->
                 if (participant.isVideoOn) {
                     if (visibleParticipants.isEmpty()) {
-                        logDebug("Close video of participant visible")
+                        Timber.d("Close video of participant visible")
                         adapterPager.updateVideoWhenScroll(
                             false,
                             participant,
@@ -174,7 +173,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                         }
 
                         if (participantVisible.isEmpty()) {
-                            logDebug("Close video of participant visible")
+                            Timber.d("Close video of participant visible")
                             adapterPager.updateVideoWhenScroll(
                                 false,
                                 participant,
@@ -203,10 +202,10 @@ class GridViewCallFragment : MeetingBaseFragment() {
         adapterPager.let {
             adapterPager.setNewData(newData)
             if (isAdded) {
-                logDebug("Participant added in $position")
+                Timber.d("Participant added in $position")
                 it.participantAdded(viewPagerData, newData, position)
             } else {
-                logDebug("Participant removed in $position")
+                Timber.d("Participant removed in $position")
                 it.participantRemoved(viewPagerData, newData, position)
             }
         }
@@ -223,7 +222,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     fun updateCallOnHold(isCallOnHold: Boolean) {
         val iterator = participants.iterator()
         iterator.forEach {
-            logDebug("Update call on hold status")
+            Timber.d("Update call on hold status")
             adapterPager.updateCallOnHold(
                 it,
                 isCallOnHold,
@@ -260,7 +259,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
             session.peerid,
             session.clientid
         )?.let {
-            logDebug("Update session on hold status")
+            Timber.d("Update session on hold status")
             adapterPager.updateSessionOnHold(
                 it,
                 session.isOnHold,
@@ -281,7 +280,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
             session.peerid,
             session.clientid
         )?.let {
-            logDebug("Update remote A/V")
+            Timber.d("Update remote A/V")
             adapterPager.updateParticipantAudioVideo(
                 type,
                 it,
@@ -304,7 +303,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 peer.peerId,
                 peer.clientId
             )?.let {
-                logDebug("Update participant name")
+                Timber.d("Update participant name")
                 adapterPager.updateParticipantNameOrAvatar(
                     it,
                     currentPage,
@@ -327,7 +326,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 peer.peerId,
                 peer.clientId
             )?.let {
-                logDebug("Update participant privileges")
+                Timber.d("Update participant privileges")
                 adapterPager.updateParticipantPrivileges(
                     it,
                     currentPage,
@@ -362,7 +361,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     override fun onDestroyView() {
-        logDebug("View destroyed")
+        Timber.d("View destroyed")
         removeTextureView()
         super.onDestroyView()
     }

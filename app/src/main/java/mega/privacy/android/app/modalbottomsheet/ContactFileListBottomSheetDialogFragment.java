@@ -1,5 +1,19 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +23,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,19 +39,7 @@ import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -69,7 +74,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (node == null) {
-            logWarning("Node NULL");
+            Timber.w("Node NULL");
             return;
         }
 
@@ -83,7 +88,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         TextView optionLeave = contentView.findViewById(R.id.leave_option);
         TextView optionCopy = contentView.findViewById(R.id.copy_option);
         TextView optionMove = contentView.findViewById(R.id.move_option);
-        TextView  optionRename = contentView.findViewById(R.id.rename_option);
+        TextView optionRename = contentView.findViewById(R.id.rename_option);
         TextView optionRubbish = contentView.findViewById(R.id.rubbish_bin_option);
 
         optionDownload.setOnClickListener(this);
@@ -198,7 +203,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
     @Override
     public void onClick(View v) {
         if (node == null) {
-            logWarning("The selected node is NULL");
+            Timber.w("The selected node is NULL");
             return;
         }
 

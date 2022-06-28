@@ -2,9 +2,11 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class RequestHiResVideoListener(context: Context?) : ChatBaseListener(context) {
 
@@ -14,9 +16,9 @@ class RequestHiResVideoListener(context: Context?) : ChatBaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            logDebug("Request high res video: chatId = "+request.chatHandle+", hires? "+request.flag+", clientId = "+request.userHandle)
+            Timber.d("Request high res video: chatId = ${request.chatHandle}, hires? ${request.flag}, clientId = ${request.userHandle}")
         } else {
-            logError("Error Request high res video. Error code "+e.errorCode)
+            Timber.e("Error Request high res video. Error code ${e.errorCode}")
         }
     }
 }

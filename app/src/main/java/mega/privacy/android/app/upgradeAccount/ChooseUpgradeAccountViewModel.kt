@@ -17,13 +17,13 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
 import mega.privacy.android.app.utils.DBUtil.callToPricing
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiJava
+import timber.log.Timber
 import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
@@ -181,7 +181,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
             stringPrice = stringPrice.replace("[A]", "<font color='$color'>")
             stringPrice = stringPrice.replace("[/A]", "</font>")
         } catch (e: Exception) {
-            logError("Exception formatting string", e)
+            Timber.e(e, "Exception formatting string")
         }
 
         return HtmlCompat.fromHtml(stringPrice, HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -206,7 +206,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
             )
             textToShow = textToShow.replace("[/A]", "</font>")
         } catch (e: java.lang.Exception) {
-            logError("Exception formatting string", e)
+            Timber.e(e, "Exception formatting string")
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY)

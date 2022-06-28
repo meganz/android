@@ -30,14 +30,12 @@ import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
-import java.util.*
 
 @AndroidEntryPoint
 class RingingMeetingFragment : MeetingBaseFragment() {
@@ -62,7 +60,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         (requireActivity() as MeetingActivity).let {
             toolbarTitle = it.binding.titleToolbar
@@ -117,21 +115,22 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
     private fun answerCall(enableVideo: Boolean) {
-        sharedModel.answerCall(enableVideo, true, enableVideo).observe(viewLifecycleOwner) { result ->
-            val actionString = if (result.enableVideo) {
-                Timber.d("Call answered with video ON and audio ON")
-                MEETING_ACTION_RINGING_VIDEO_ON
-            } else {
-                Timber.d("Call answered with video OFF and audio ON")
-                MEETING_ACTION_RINGING_VIDEO_OFF
-            }
+        sharedModel.answerCall(enableVideo, true, enableVideo)
+            .observe(viewLifecycleOwner) { result ->
+                val actionString = if (result.enableVideo) {
+                    Timber.d("Call answered with video ON and audio ON")
+                    MEETING_ACTION_RINGING_VIDEO_ON
+                } else {
+                    Timber.d("Call answered with video OFF and audio ON")
+                    MEETING_ACTION_RINGING_VIDEO_OFF
+                }
 
-            val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                actionString,
-                result.chatHandle
-            )
-            findNavController().navigate(action)
-        }
+                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                    actionString,
+                    result.chatHandle
+                )
+                findNavController().navigate(action)
+            }
     }
 
     /**
@@ -189,18 +188,18 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.CAMERA)
+                    arrayOf(Manifest.permission.CAMERA)
                 )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickCamera(true)
-                            }
+                    .setOnRequiresPermission { l ->
+                        run {
+                            onRequiresPermission(l)
+                            // Continue expected action after granted
+                            sharedModel.clickCamera(true)
                         }
-                        .setOnShowRationale { l -> onShowRationale(l) }
-                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-                        .build()
+                    }
+                    .setOnShowRationale { l -> onShowRationale(l) }
+                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                    .build()
                 permissionsRequester.launch(false)
             }
         }
@@ -208,18 +207,18 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.RECORD_AUDIO)
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickMic(true)
-                            }
+                    .setOnRequiresPermission { l ->
+                        run {
+                            onRequiresPermission(l)
+                            // Continue expected action after granted
+                            sharedModel.clickMic(true)
                         }
-                        .setOnShowRationale { l -> onShowRationale(l) }
-                        .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
-                        .build()
+                    }
+                    .setOnShowRationale { l -> onShowRationale(l) }
+                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
+                    .build()
                 permissionsRequester.launch(false)
             }
         }
@@ -246,8 +245,9 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      */
     private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)
-            || permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user denies the permission")
+            || permissions.contains(Manifest.permission.CAMERA)
+        ) {
+            Timber.d("user denies the permission")
             showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
         }
     }

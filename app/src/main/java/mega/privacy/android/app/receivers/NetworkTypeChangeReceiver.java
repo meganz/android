@@ -1,11 +1,12 @@
 package mega.privacy.android.app.receivers;
 
+import static mega.privacy.android.app.utils.Util.isOnWifi;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class NetworkTypeChangeReceiver extends BroadcastReceiver {
 
@@ -15,11 +16,11 @@ public class NetworkTypeChangeReceiver extends BroadcastReceiver {
     public static final int WIFI = 1;
 
     @Override
-    public void onReceive(Context context,Intent intent) {
-        logDebug("Network changes: " + intent.getAction());
-        if("android.net.conn.CONNECTIVITY_CHANGE".equalsIgnoreCase(intent.getAction())) {
+    public void onReceive(Context context, Intent intent) {
+        Timber.d("Network changes: %s", intent.getAction());
+        if ("android.net.conn.CONNECTIVITY_CHANGE".equalsIgnoreCase(intent.getAction())) {
             int type = isOnWifi(context) ? WIFI : MOBILE;
-            logDebug("Network type: " + type);
+            Timber.d("Network type: %s", type);
             if (callback != null) {
                 callback.onTypeChanges(type);
             }

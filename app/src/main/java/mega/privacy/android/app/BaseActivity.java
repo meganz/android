@@ -1,11 +1,9 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
@@ -21,15 +19,20 @@ import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAI
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_YEAR;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
@@ -48,19 +51,18 @@ import static mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKB
 import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
+import static mega.privacy.android.app.utils.Constants.PRO_I;
+import static mega.privacy.android.app.utils.Constants.PRO_II;
+import static mega.privacy.android.app.utils.Constants.PRO_III;
+import static mega.privacy.android.app.utils.Constants.PRO_LITE;
 import static mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logInfo;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerKarere;
-import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerSDK;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTimer;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
@@ -88,20 +90,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.Observer;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -118,6 +106,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Observer;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -137,6 +137,7 @@ import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
@@ -167,10 +168,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.Constants.*;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester, SnackbarShower,
@@ -196,6 +194,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     MyAccountInfo myAccountInfo;
     @Inject
     public TransfersManagement transfersManagement;
+    @Inject
+    LegacyLoggingSettings loggingSettings;
 
     public ActivityResultLauncher<ArrayList<NameCollision>> nameCollisionActivityContract;
 
@@ -204,7 +204,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     private BaseActivity baseActivity;
 
-    protected  MegaApplication app;
+    protected MegaApplication app;
 
     protected MegaApiAndroid megaApi;
     protected MegaApiAndroid megaApiFolder;
@@ -287,7 +287,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         baseActivity = this;
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         super.onCreate(savedInstanceState);
@@ -318,10 +318,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
-        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
-        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-        registerReceiver(transferOverQuotaReceiver, filterTransfers);
-
         registerReceiver(showSnackbarReceiver,
                 new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
 
@@ -330,6 +326,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         registerReceiver(cookieSettingsReceiver,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
+        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class)
+                .observe(this, overQuota -> showGeneralTransferOverQuotaWarning());
 
         LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, type -> {
             if (this instanceof PaymentActivity) {
@@ -486,7 +485,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
         unregisterReceiver(showSnackbarReceiver);
-        unregisterReceiver(transferOverQuotaReceiver);
         unregisterReceiver(resumeTransfersReceiver);
 
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
@@ -511,7 +509,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
         if (app != null) {
-            if (megaApi == null){
+            if (megaApi == null) {
                 megaApi = app.getMegaApi();
             }
 
@@ -519,7 +517,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 megaApiFolder = app.getMegaApiFolder();
             }
 
-            if (megaChatApi == null){
+            if (megaChatApi == null) {
                 megaChatApi = app.getMegaChatApi();
             }
 
@@ -550,7 +548,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                logDebug("BROADCAST TO MANAGE A SSL VERIFICATION ERROR");
+                Timber.d("BROADCAST TO MANAGE A SSL VERIFICATION ERROR");
                 if (sslErrorDialog != null && sslErrorDialog.isShowing()) return;
                 showSSLErrorDialog();
             }
@@ -564,8 +562,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                logDebug("BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
+                Timber.d("BROADCAST TO SEND SIGNAL PRESENCE");
+                if (delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
                 }
@@ -590,7 +588,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
 
-            logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
+            Timber.d("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
             int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
             Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
         }
@@ -652,7 +650,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Open the downloaded file.
      */
     private void openDownloadedFile() {
-        if(autoPlayInfo != null) {
+        if (autoPlayInfo != null) {
             MegaNodeUtil.autoPlayNode(
                     BaseActivity.this,
                     autoPlayInfo,
@@ -674,22 +672,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             if (!isTextEmpty(message)) {
                 Util.showSnackbar(baseActivity, message);
             }
-        }
-    };
-
-    /**
-     * Broadcast to show a warning when transfer over quota occurs.
-     */
-    private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null
-                    || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
-                    || isActivityInBackground()) {
-                return;
-            }
-
-            showGeneralTransferOverQuotaWarning();
         }
     };
 
@@ -733,7 +715,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Method to display an alert dialog indicating that the MEGA SSL key
      * can't be verified (API_ESSL Error) and giving the user several options.
      */
-    private void showSSLErrorDialog(){
+    private void showSSLErrorDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -795,10 +777,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         sslErrorDialog.show();
     }
 
-    protected void retryConnectionsAndSignalPresence(){
-        logDebug("retryConnectionsAndSignalPresence");
-        try{
-            if (megaApi != null){
+    protected void retryConnectionsAndSignalPresence() {
+        Timber.d("retryConnectionsAndSignalPresence");
+        try {
+            if (megaApi != null) {
                 megaApi.retryPendingConnections();
             }
 
@@ -808,16 +790,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 if (megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
                     delaySignalPresence = false;
                     if (!(this instanceof MeetingActivity) && megaChatApi.isSignalActivityRequired()) {
-                        logDebug("Send signal presence");
+                        Timber.d("Send signal presence");
                         megaChatApi.signalPresenceActivity();
                     }
                 } else {
                     delaySignalPresence = true;
                 }
             }
-        }
-        catch (Exception e){
-            logWarning("Exception", e);
+        } catch (Exception e) {
+            Timber.w(e, "Exception");
         }
     }
 
@@ -830,7 +811,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN ){
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             retryConnectionsAndSignalPresence();
         }
         return super.dispatchTouchEvent(event);
@@ -840,9 +821,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Method to display a simple Snackbar.
      *
      * @param view Layout where the snackbar is going to show.
-     * @param s Text to shown in the snackbar
+     * @param s    Text to shown in the snackbar
      */
-    public void showSnackbar (View view, String s) {
+    public void showSnackbar(View view, String s) {
         showSnackbar(SNACKBAR_TYPE, view, s, -1);
     }
 
@@ -850,13 +831,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Method to display a simple or action Snackbar.
      *
      * @param type There are three possible values to this param:
-     *            - SNACKBAR_TYPE: creates a simple snackbar
-     *            - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *             - SNACKBAR_TYPE: creates a simple snackbar
+     *             - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *             - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      * @param view Layout where the snackbar is going to show.
-     * @param s Text to shown in the snackbar
+     * @param s    Text to shown in the snackbar
      */
-    public void showSnackbar (int type, View view, String s) {
+    public void showSnackbar(int type, View view, String s) {
         showSnackbar(type, view, s, MEGACHAT_INVALID_HANDLE);
     }
 
@@ -900,22 +881,22 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Method to display a simple or action Snackbar.
      *
-     * @param type There are three possible values to this param:
-     *            - SNACKBAR_TYPE: creates a simple snackbar
-     *            - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
-     *            - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *            - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
-     * @param view Layout where the snackbar is going to show.
-     * @param anchor Sets the view the Snackbar should be anchored above, null as default
-     * @param s Text to shown in the snackbar
-     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
-     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     * @param type      There are three possible values to this param:
+     *                  - SNACKBAR_TYPE: creates a simple snackbar
+     *                  - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *                  - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *                  - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *                  - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view      Layout where the snackbar is going to show.
+     * @param anchor    Sets the view the Snackbar should be anchored above, null as default
+     * @param s         Text to shown in the snackbar
+     * @param idChat    Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *                  If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      * @param userEmail Email of the user to be invited.
      */
-    public void showSnackbar (int type, View view, View anchor, String s, long idChat, String userEmail) {
-        logDebug("Show snackbar: " + s);
-        Display  display = getWindowManager().getDefaultDisplay();
+    public void showSnackbar(int type, View view, View anchor, String s, long idChat, String userEmail) {
+        Timber.d("Show snackbar: %s", s);
+        Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
@@ -938,7 +919,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     break;
             }
         } catch (Exception e) {
-            logError("Error showing snackbar", e);
+            Timber.e(e, "Error showing snackbar");
             return;
         }
 
@@ -992,7 +973,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case OPEN_FILE_SNACKBAR_TYPE:
-                snackbar.setAction(R.string.action_see, (v) -> openDownloadedFile());
+                snackbar.setAction(StringResourcesUtils.getString(R.string.general_confirmation_open),
+                        (v) -> openDownloadedFile());
                 snackbar.show();
                 break;
 
@@ -1021,15 +1003,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Method to display a simple Snackbar.
      *
      * @param outMetrics DisplayMetrics of the current device
-     * @param view Layout where the snackbar is going to show.
-     * @param s Text to shown in the snackbar
+     * @param view       Layout where the snackbar is going to show.
+     * @param s          Text to shown in the snackbar
      */
     public static void showSimpleSnackbar(DisplayMetrics outMetrics, View view, String s) {
         Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
+        params.setMargins(dp2px(8, outMetrics), 0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
@@ -1039,13 +1021,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Method to refresh the account details info if necessary.
      */
-    protected void refreshAccountInfo(){
-        logDebug("refreshAccountInfo");
+    protected void refreshAccountInfo() {
+        Timber.d("refreshAccountInfo");
 
         //Check if the call is recently
-        logDebug("Check the last call to getAccountDetails");
-        if(callToAccountDetails()){
-            logDebug("megaApi.getAccountDetails SEND");
+        Timber.d("Check the last call to getAccountDetails");
+        if (callToAccountDetails()) {
+            Timber.d("megaApi.getAccountDetails SEND");
             app.askForAccountDetails();
         }
     }
@@ -1054,9 +1036,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * This method is shown in a business account when the account is expired.
      * It informs that all the actions are only read.
      * The message is different depending if the account belongs to an admin or an user.
-     *
      */
-    protected void showExpiredBusinessAlert(){
+    protected void showExpiredBusinessAlert() {
         if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
@@ -1074,7 +1055,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                         + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
-                logWarning("Exception formatting string", e);
+                Timber.w(e, "Exception formatting string");
             }
             builder.setMessage(TextUtils.concat(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY), "\n\n" + getString(R.string.expired_user_business_text_2)));
         }
@@ -1111,18 +1092,18 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 //                I am not blocked
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS), loggingSettings));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS), loggingSettings));
                 break;
 
             case DISABLED_BUSINESS_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_disabled)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_disabled), loggingSettings));
                 break;
 
             case REMOVED_BUSINESS_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_removed)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_removed), loggingSettings));
                 break;
 
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
@@ -1144,7 +1125,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     dbH.saveCredentials(credentials);
                 }
 
-                logDebug("Show SMS verification activity.");
+                Timber.d("Show SMS verification activity.");
                 intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(NAME_USER_LOCKED, true);
@@ -1202,11 +1183,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> {
                     switch (logsType) {
                         case SDK_LOGS:
-                            setStatusLoggerSDK(baseActivity, true);
+                            loggingSettings.setStatusLoggerSDK(this, true);
                             break;
 
                         case KARERE_LOGS:
-                            setStatusLoggerKarere(baseActivity, true);
+                            loggingSettings.setStatusLoggerKarere(this, true);
                             break;
                     }
                 })
@@ -1219,7 +1200,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows a warning indicating transfer over quota occurred.
      */
     public void showGeneralTransferOverQuotaWarning() {
-        if (transfersManagement.isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
+        if (isActivityInBackground() || transfersManagement.isOnTransfersSection() || transferGeneralOverQuotaWarning != null)
+            return;
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
@@ -1291,7 +1273,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         try {
             return super.registerReceiver(receiver, filter);
         } catch (IllegalStateException e) {
-            logError("IllegalStateException registering receiver", e);
+            Timber.e(e, "IllegalStateException registering receiver");
             return null;
         }
     }
@@ -1302,7 +1284,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             //If the receiver is not registered, it throws an IllegalArgumentException
             super.unregisterReceiver(receiver);
         } catch (IllegalArgumentException e) {
-            logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
+            Timber.w(e, "IllegalArgumentException unregistering transfersUpdateReceiver");
         }
     }
 
@@ -1329,7 +1311,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      */
     protected boolean shouldRefreshSessionDueToMegaApiIsNull() {
         if (megaApi == null) {
-            logWarning("Refresh session - sdk");
+            Timber.w("Refresh session - sdk");
             refreshSession();
             return true;
         }
@@ -1348,7 +1330,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
         if (megaApi.getRootNode() == null) {
-            logWarning("Refresh session - sdk");
+            Timber.w("Refresh session - sdk");
             refreshSession();
             return true;
         }
@@ -1364,21 +1346,21 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      */
     protected boolean shouldRefreshSessionDueToKarere() {
         if (megaChatApi == null) {
-            logWarning("Refresh session - karere");
+            Timber.w("Refresh session - karere");
             refreshSession();
             return true;
         }
 
         int state = megaChatApi.getInitState();
         if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
-            logWarning("MegaChatApi state: " + state);
+            Timber.w("MegaChatApi state: %s", state);
             UserCredentials credentials = dbH.getCredentials();
             state = megaChatApi.init(credentials == null ? null : credentials.getSession());
-            logDebug("result of init ---> " + state);
+            Timber.d("result of init ---> %s", state);
 
             if (state == MegaChatApi.INIT_ERROR) {
                 // The megaChatApi cannot be recovered, then logout
-                megaChatApi.logout(new ChatLogoutListener(this));
+                megaChatApi.logout(new ChatLogoutListener(this, loggingSettings));
                 return true;
             }
         }
@@ -1409,7 +1391,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
-        logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
+        Timber.d("Request code: %d, Result code:%d", requestCode, resultCode);
 
         if (requestCode == REQ_CODE_BUY) {
             if (resultCode == Activity.RESULT_OK) {
@@ -1418,13 +1400,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
                     billingManager.updatePurchase();
                 } else {
-                    logWarning("Purchase failed, error code: " + purchaseResult);
+                    Timber.w("Purchase failed, error code: %s", purchaseResult);
                 }
             } else {
-                logWarning("cancel subscribe");
+                Timber.w("cancel subscribe");
             }
         } else {
-            logWarning("No request code processed");
+            Timber.w("No request code processed");
             super.onActivityResult(requestCode, resultCode, intent);
         }
     }
@@ -1442,7 +1424,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     protected void launchPayment(String productId) {
         MegaSku skuDetails = getSkuDetails(skuDetailsList, productId);
         if (skuDetails == null) {
-            logError("Cannot launch payment, MegaSku is null.");
+            Timber.e("Cannot launch payment, MegaSku is null.");
             return;
         }
 
@@ -1457,7 +1439,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void onBillingClientSetupFinished() {
-        logInfo("Billing client setup finished");
+        Timber.i("Billing client setup finished");
 
         billingManager.getInventory(skuList -> {
             skuDetailsList = skuList;
@@ -1468,14 +1450,14 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void onBillingClientSetupFailed() {
-        logWarning("Billing not available: Show pricing");
+        Timber.w("Billing not available: Show pricing");
         updatePricing(this);
     }
 
     @Override
     public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
         if (isFailed) {
-            logWarning("Update purchase failed, with result code: " + resultCode);
+            Timber.w("Update purchase failed, with result code: %s", resultCode);
             return;
         }
 
@@ -1488,7 +1470,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
             if (billingManager.isPurchased(purchase)) {
                 //payment has been processed
-                logDebug("Purchase " + sku + " successfully, subscription type is: "
+                Timber.d("Purchase " + sku + " successfully, subscription type is: "
                         + getSubscriptionType(sku) + ", subscription renewal type is: "
                         + getSubscriptionRenewalType(sku));
 
@@ -1498,12 +1480,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 purchaseResult = PurchaseType.SUCCESS;
             } else {
                 //payment is being processed or in unknown state
-                logDebug("Purchase " + sku + " is being processed or in unknown state.");
+                Timber.d("Purchase %s is being processed or in unknown state.", sku);
                 purchaseResult = PurchaseType.PENDING;
             }
         } else {
             //down grade case
-            logDebug("Downgrade, the new subscription takes effect when the old one expires.");
+            Timber.d("Downgrade, the new subscription takes effect when the old one expires.");
             purchaseResult = PurchaseType.DOWNGRADE;
         }
 
@@ -1513,7 +1495,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     @Override
     public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
         if (isFailed || purchases == null) {
-            logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
+            Timber.w("Query of purchases failed, result code is %d, is purchase null: %s", resultCode, purchases == null);
             return;
         }
 
@@ -1534,7 +1516,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      *
      * @param path Download path to set as default location.
      */
-    public void showConfirmationSaveInSameLocation(String path){
+    public void showConfirmationSaveInSameLocation(String path) {
         if (isAndroid11OrUpper() || isAlertDialogShown(setDownloadLocationDialog)) {
             return;
         }

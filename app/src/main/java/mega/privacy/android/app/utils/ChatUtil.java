@@ -1,9 +1,61 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile;
+import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
+import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
+import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVALID_REACTION;
+import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_1_HOUR;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_24_HOURS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_30_MINUTES;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_6_HOURS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_X_TIME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.Constants.PREFERENCE_EMOJI;
+import static mega.privacy.android.app.utils.Constants.PREFERENCE_REACTION;
+import static mega.privacy.android.app.utils.Constants.PREFERENCE_VARIANT_EMOJI;
+import static mega.privacy.android.app.utils.Constants.PREFERENCE_VARIANT_REACTION;
+import static mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY;
+import static mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR;
+import static mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30;
+import static mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK;
+import static mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.ContactUtil.isContact;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.shareFile;
+import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
+import static mega.privacy.android.app.utils.TimeUtils.DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT;
+import static mega.privacy.android.app.utils.TimeUtils.formatDate;
+import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
+import static mega.privacy.android.app.utils.TimeUtils.isTodayOrYesterday;
+import static mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,13 +64,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.Nullable;
-import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.content.ContextCompat;
-
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -32,6 +77,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -54,11 +104,11 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.main.listeners.ManageReactionListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
@@ -82,21 +132,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
-
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtil.shareFile;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import timber.log.Timber;
 
 public class ChatUtil {
     private static final int MIN_WIDTH = 44;
@@ -157,13 +193,13 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-    private static int getRealLength(CharSequence text){
+    private static int getRealLength(CharSequence text) {
         int length = text.length();
 
         List<EmojiRange> emojisFound = EmojiManager.getInstance().findAllEmojis(text);
         int count = 0;
-        if(emojisFound.size() > 0){
-            for (int i=0; i<emojisFound.size();i++) {
+        if (emojisFound.size() > 0) {
+            for (int i = 0; i < emojisFound.size(); i++) {
                 count = count + (emojisFound.get(i).end - emojisFound.get(i).start);
             }
             return length + count;
@@ -184,7 +220,7 @@ public class ChatUtil {
         return getMaxAllowed(text) != text.length() || getRealLength(text) == MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
+    public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
 
@@ -233,7 +269,7 @@ public class ChatUtil {
         try {
             shareLinkDialog.show();
         } catch (Exception e) {
-            logWarning("Exception showing share link dialog.", e);
+            Timber.w(e, "Exception showing share link dialog.");
         }
     }
 
@@ -341,6 +377,7 @@ public class ChatUtil {
 
     /**
      * Gets the image compress format depending on the file extension.
+     *
      * @param name Name of the image file including the extension.
      * @return Image compress format.
      */
@@ -367,6 +404,7 @@ public class ChatUtil {
 
     /**
      * Checks an image before upload to a chat and downscales it if needed.
+     *
      * @param file Original image file.
      * @return Image file to be uploaded.
      */
@@ -375,7 +413,7 @@ public class ChatUtil {
         Rect fileRect = AndroidGfxProcessor.getImageDimensions(file.getAbsolutePath(), orientation);
         Bitmap fileBitmap = AndroidGfxProcessor.getBitmap(file.getAbsolutePath(), fileRect, orientation, fileRect.right, fileRect.bottom);
         if (fileBitmap == null) {
-            logError("Bitmap NULL when decoding image file for upload it to chat.");
+            Timber.e("Bitmap NULL when decoding image file for upload it to chat.");
             return null;
         }
 
@@ -389,18 +427,18 @@ public class ChatUtil {
         if (factor < 1) {
             width *= factor;
             height *= factor;
-            logDebug("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
+            Timber.d("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
                     " DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
 
             Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int) width, (int) height, true);
             if (scaleBitmap == null) {
-                logError("Bitmap NULL when scaling image file for upload it to chat.");
+                Timber.e("Bitmap NULL when scaling image file for upload it to chat.");
                 return null;
             }
 
             outFile = buildChatTempFile(MegaApplication.getInstance().getApplicationContext(), file.getName());
             if (outFile == null) {
-                logError("File NULL when building it for upload a scaled image to chat.");
+                Timber.e("File NULL when building it for upload a scaled image to chat.");
                 return null;
             }
 
@@ -411,7 +449,7 @@ public class ChatUtil {
                 fOut.flush();
                 fOut.close();
             } catch (Exception e) {
-                logError("Exception compressing image file for upload it to chat.", e);
+                Timber.e(e, "Exception compressing image file for upload it to chat.");
             }
 
             scaleBitmap.recycle();
@@ -424,9 +462,10 @@ public class ChatUtil {
 
     /**
      * Method for obtaining the reaction with the largest width.
-     * @param receivedChatId The chat ID.
+     *
+     * @param receivedChatId    The chat ID.
      * @param receivedMessageId The msg ID.
-     * @param listReactions The reactions list.
+     * @param listReactions     The reactions list.
      * @return The size.
      */
     public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions, DisplayMetrics outMetrics) {
@@ -464,14 +503,14 @@ public class ChatUtil {
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
         if (!(context instanceof ChatActivity)) {
-            logWarning("Incorrect context");
+            Timber.w("Incorrect context");
             return;
         }
 
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
         if (editText.getText() == null) {
-            logError("Text null");
+            Timber.e("Text null");
             return;
         }
 
@@ -490,16 +529,16 @@ public class ChatUtil {
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
         if (!(context instanceof ChatActivity)) {
-            logWarning("Incorrect context");
+            Timber.w("Incorrect context");
             return;
         }
 
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (isMyOwnReaction(chatId, messageId, reaction) && !isFromKeyboard) {
-            logDebug("Removing reaction...");
+            Timber.d("Removing reaction...");
             megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         } else {
-            logDebug("Adding reaction...");
+            Timber.d("Adding reaction...");
             megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         }
     }
@@ -554,9 +593,9 @@ public class ChatUtil {
     /**
      * Sets the contact status icon
      *
-     * @param userStatus         contact's status
-     * @param contactStateIcon  view in which the status icon has to be set
-     * @param where Where the icon is placed.
+     * @param userStatus       contact's status
+     * @param contactStateIcon view in which the status icon has to be set
+     * @param where            Where the icon is placed.
      */
     public static void setContactStatus(int userStatus, ImageView contactStateIcon, StatusIconLocation where) {
         if (contactStateIcon == null) {
@@ -569,7 +608,7 @@ public class ChatUtil {
         int statusImageResId = getIconResourceIdByLocation(context, userStatus, where);
 
         // Hide the icon ImageView.
-        if(statusImageResId == 0) {
+        if (statusImageResId == 0) {
             contactStateIcon.setVisibility(View.GONE);
         } else {
             contactStateIcon.setImageResource(statusImageResId);
@@ -629,15 +668,14 @@ public class ChatUtil {
     /**
      * Get status icon image resource id by display mode and where the icon is placed.
      *
-     * @param context Context object.
+     * @param context    Context object.
      * @param userStatus User online status.
-     * @param where Where the icon is placed.
+     * @param where      Where the icon is placed.
      * @return Image resource id based on where the icon is placed.
      * NOTE: when the user has an invalid online status, returns 0.
      * Caller should verify the return value, 0 is an invalid value for resource id.
-     *
      */
-    public static int getIconResourceIdByLocation(Context context,int userStatus, StatusIconLocation where) {
+    public static int getIconResourceIdByLocation(Context context, int userStatus, StatusIconLocation where) {
         int statusImageResId = 0;
 
         switch (userStatus) {
@@ -732,10 +770,10 @@ public class ChatUtil {
     /**
      * Sets the contact status icon and status text
      *
-     * @param userStatus         contact's status
-     * @param contactStateIcon  view in which the status icon has to be set
-     * @param contactStateText  view in which the status text has to be set
-     * @param where The status icon image resource is different based on the place where it's placed.
+     * @param userStatus       contact's status
+     * @param contactStateIcon view in which the status icon has to be set
+     * @param contactStateText view in which the status text has to be set
+     * @param where            The status icon image resource is different based on the place where it's placed.
      */
     public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText, StatusIconLocation where) {
         MegaApplication app = MegaApplication.getInstance();
@@ -773,10 +811,10 @@ public class ChatUtil {
     /**
      * If the contact has last green, sets is as status text
      *
-     * @param context           current Context
-     * @param userStatus        contact's status
-     * @param lastGreen         contact's last green
-     * @param contactStateText  view in which the last green has to be set
+     * @param context          current Context
+     * @param userStatus       contact's status
+     * @param lastGreen        contact's last green
+     * @param contactStateText view in which the last green has to be set
      */
     public static void setContactLastGreen(Context context, int userStatus, String lastGreen, MarqueeTextView contactStateText) {
         if (contactStateText == null || isTextEmpty(lastGreen)) {
@@ -792,7 +830,7 @@ public class ChatUtil {
     /**
      * Gets the name of an attached contact.
      *
-     * @param message   chat message
+     * @param message chat message
      * @return The contact's name by this order if available: nickname, name or email
      */
     public static String getNameContactAttachment(MegaChatMessage message) {
@@ -844,14 +882,14 @@ public class ChatUtil {
                                         AudioManager.OnAudioFocusChangeListener listener,
                                         AudioFocusRequest request, int focusType, int streamType) {
         if (audioManager == null) {
-            logWarning("Audio Manager is NULL");
+            Timber.w("Audio Manager is NULL");
             return false;
         }
 
         int focusRequest;
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             if (request == null) {
-                logWarning("Audio Focus Request is NULL");
+                Timber.w("Audio Focus Request is NULL");
                 return false;
             }
             focusRequest = audioManager.requestAudioFocus(request);
@@ -868,7 +906,7 @@ public class ChatUtil {
     public static void abandonAudioFocus(AudioManager.OnAudioFocusChangeListener listener,
                                          AudioManager audioManager, AudioFocusRequest request) {
         if (SHOULD_BUILD_FOCUS_REQUEST) {
-            if(request != null) {
+            if (request != null) {
                 audioManager.abandonAudioFocusRequest(request);
             }
         } else {
@@ -884,7 +922,7 @@ public class ChatUtil {
      */
     public static String getTitleChat(MegaChatRoom chat) {
         if (chat == null) {
-            logError("chat is null");
+            Timber.e("chat is null");
             return "";
         }
 
@@ -907,7 +945,7 @@ public class ChatUtil {
      */
     public static String getTitleChat(MegaChatListItem chat) {
         if (chat == null) {
-            logError("chat is null");
+            Timber.e("chat is null");
             return "";
         }
 
@@ -949,8 +987,9 @@ public class ChatUtil {
 
     /**
      * Method to display a dialog to mute a specific chat.
+     *
      * @param context Context of Activity.
-     * @param chatId Chat ID.
+     * @param chatId  Chat ID.
      */
     public static void createMuteNotificationsAlertDialogOfAChat(Activity context, long chatId) {
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
@@ -965,7 +1004,7 @@ public class ChatUtil {
      * Method to display a dialog to mute general chat notifications or several specific chats.
      *
      * @param context Context of Activity.
-     * @param chats  Chats. If the chats is null, it's for the general chats notifications.
+     * @param chats   Chats. If the chats is null, it's for the general chats notifications.
      */
     public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
@@ -1044,7 +1083,7 @@ public class ChatUtil {
     /**
      * Method for getting the selected mute option depending on the selected item.
      *
-     * @param itemClicked   The selected item.
+     * @param itemClicked    The selected item.
      * @param optionSelected The right choice when you select the fifth option.
      * @return The right mute option.
      */
@@ -1067,7 +1106,8 @@ public class ChatUtil {
 
     /**
      * Method to mute a specific chat or general notifications chat for a specific period of time.
-     * @param context Context of Activity.
+     *
+     * @param context    Context of Activity.
      * @param muteOption The selected mute option.
      */
     public static void muteChat(Context context, String muteOption) {
@@ -1079,7 +1119,7 @@ public class ChatUtil {
      *
      * @return True, if notifications are activated. False in the opposite case
      */
-    public static boolean isEnableGeneralChatNotifications(){
+    public static boolean isEnableGeneralChatNotifications() {
         MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         return megaPushNotificationSettings == null || !megaPushNotificationSettings.isGlobalChatsDndEnabled();
 
@@ -1137,7 +1177,7 @@ public class ChatUtil {
     /**
      * Gets the user's online status.
      *
-     * @param userHandle    handle of the user
+     * @param userHandle handle of the user
      * @return The user's status.
      */
     public static int getUserStatus(long userHandle) {
@@ -1328,9 +1368,9 @@ public class ChatUtil {
     /**
      * Method for checking whether the positive button should be enabled or not.
      *
-     * @param idChat        The chat ID.
-     * @param itemClicked   The option selected.
-     * @return              True, if it must be enabled. False, if not.
+     * @param idChat      The chat ID.
+     * @param itemClicked The option selected.
+     * @return True, if it must be enabled. False, if not.
      */
     private static boolean checkIfPositiveButtonShouldBeShown(long idChat, int itemClicked) {
         return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED ||
@@ -1584,14 +1624,14 @@ public class ChatUtil {
     /**
      * Method to share a message from the chat.
      *
-     * @param context Context of Activity.
+     * @param context    Context of Activity.
      * @param androidMsg The msg to be shared
-     * @param chatId  The ID of a chat room.
+     * @param chatId     The ID of a chat room.
      */
     public static void shareMsgFromChat(Context context, AndroidMegaChatMessage androidMsg, long chatId) {
         MegaChatMessage msg = androidMsg.getMessage();
         MegaNode node = getNodeFromMessage(msg);
-        if(node == null)
+        if (node == null)
             return;
 
         shareNodeFromChat(context, node, chatId, msg.getMsgId());
@@ -1601,27 +1641,27 @@ public class ChatUtil {
      * Method to share a node from the chat.
      *
      * @param context Context of Activity.
-     * @param node The node to be shared
+     * @param node    The node to be shared
      * @param chatId  The ID of a chat room.
      */
-    public static void shareNodeFromChat(Context context, MegaNode node, long chatId, long msgId){
-        if(!MegaNodeUtil.shouldContinueWithoutError(context, node)){
+    public static void shareNodeFromChat(Context context, MegaNode node, long chatId, long msgId) {
+        if (!MegaNodeUtil.shouldContinueWithoutError(context, node)) {
             return;
         }
 
         String path = getLocalFile(node);
         if (!isTextEmpty(path)) {
-            logDebug("Node is downloaded, so share the file");
+            Timber.d("Node is downloaded, so share the file");
             shareFile(context, new File(path));
         } else if (node.isExported()) {
-            logDebug("Node is exported, so share the public link");
+            Timber.d("Node is exported, so share the public link");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
         } else {
             if (msgId == MEGACHAT_INVALID_HANDLE) {
                 return;
             }
 
-            logDebug("Node is not exported, so export Node");
+            Timber.d("Node is not exported, so export Node");
             MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
         }
     }
@@ -1652,7 +1692,7 @@ public class ChatUtil {
 
         StringBuilder links = MegaNodeUtil.getExportNodesLink(listNodes);
         if (areAllNodesExported(listNodes)) {
-            logDebug("All nodes are exported, so share the public links");
+            Timber.d("All nodes are exported, so share the public links");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
                     links.toString());
             return;
@@ -1664,7 +1704,7 @@ public class ChatUtil {
                     new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
 
             for (MegaNode nodeNotExported : arrayNodesNotExported) {
-                logDebug("Node is not exported, so export Node");
+                Timber.d("Node is not exported, so export Node");
                 MegaApplication.getInstance().getMegaApi().exportNode(nodeNotExported, exportListener);
             }
         }
@@ -1737,7 +1777,7 @@ public class ChatUtil {
             MegaNode nodeAuthorized = megaApi.authorizeChatNode(node, chatRoom.getAuthorizationToken());
 
             if (nodeAuthorized != null) {
-                logDebug("Authorized");
+                Timber.d("Authorized");
                 return nodeAuthorized;
             }
         }
@@ -1749,8 +1789,8 @@ public class ChatUtil {
      * Remove an attachment message from chat.
      *
      * @param activity Android activity
-     * @param chatId chat id
-     * @param message chat message
+     * @param chatId   chat id
+     * @param message  chat message
      */
     public static void removeAttachmentMessage(Activity activity, long chatId,
                                                MegaChatMessage message) {
@@ -1880,7 +1920,7 @@ public class ChatUtil {
      * @return The position of the chat.
      */
     public static int getPositionFromChatId(List<MegaChatListItem> chats, long chatIdToUpdate) {
-        if(chats == null || chats.isEmpty())
+        if (chats == null || chats.isEmpty())
             return INVALID_POSITION;
 
         ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
@@ -1907,7 +1947,7 @@ public class ChatUtil {
     /**
      * Method to get the initial state of megaChatApi and, if necessary, initiates it.
      *
-     * @param session User session
+     * @param session  User session
      * @param listener MegaChat listener for logout request.
      */
     public static void initMegaChatApi(String session, MegaChatRequestListenerInterface listener) {
@@ -1916,17 +1956,17 @@ public class ChatUtil {
         int state = megaChatApi.getInitState();
         if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
             state = megaChatApi.init(session);
-            logDebug("result of init ---> " + state);
+            Timber.d("result of init ---> %s", state);
             switch (state) {
                 case MegaChatApi.INIT_NO_CACHE:
-                    logDebug("INIT_NO_CACHE");
+                    Timber.d("INIT_NO_CACHE");
                     break;
                 case MegaChatApi.INIT_ERROR:
-                    logDebug("INIT_ERROR");
+                    Timber.d("INIT_ERROR");
                     megaChatApi.logout(listener);
                     break;
                 default:
-                    logDebug("Chat correctly initialized");
+                    Timber.d("Chat correctly initialized");
                     break;
             }
         }

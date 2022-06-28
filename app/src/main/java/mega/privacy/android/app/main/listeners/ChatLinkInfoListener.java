@@ -2,9 +2,6 @@ package mega.privacy.android.app.main.listeners;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
-
-import java.io.File;
 
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
@@ -15,12 +12,9 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import timber.log.Timber;
 
 public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
@@ -47,17 +41,16 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish()");
-        if (e.getErrorCode() == MegaError.API_OK){
+        Timber.d("onRequestFinish()");
+        if (e.getErrorCode() == MegaError.API_OK) {
 
-            if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
-                if (e.getErrorCode() == MegaError.API_OK){
+            if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE) {
+                if (e.getErrorCode() == MegaError.API_OK) {
                     ((ChatActivity) context).setRichLinkImage(msgId);
                 }
             }
-        }
-        else{
-            logError("ERROR - Info of the public node not recovered");
+        } else {
+            Timber.e("ERROR - Info of the public node not recovered");
         }
     }
 
@@ -78,15 +71,14 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        if (request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
+        if (request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW) {
             String link = request.getLink();
-            if (e.getErrorCode() == MegaError.API_OK){
+            if (e.getErrorCode() == MegaError.API_OK) {
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, request.getText(), request.getNumber());
 
                 ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
-            }
-            else{
+            } else {
                 //Invalid link
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, "", -1);
                 ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);

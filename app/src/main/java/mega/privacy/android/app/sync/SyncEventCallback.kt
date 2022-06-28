@@ -2,7 +2,6 @@ package mega.privacy.android.app.sync
 
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -23,7 +22,7 @@ interface SyncEventCallback {
     fun onSuccess(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     )
 
     /**
@@ -32,7 +31,7 @@ interface SyncEventCallback {
     fun onFail(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     ) {
         // default empty implementation
     }

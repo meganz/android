@@ -1,16 +1,10 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.MaterialToolbar;
-
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -18,6 +12,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +32,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.adapters.CountryListAdapter;
 import mega.privacy.android.app.utils.Util;
-
-import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class CountryCodePickerActivity extends PasscodeActivity implements CountryListAdapter.CountrySelectedCallback {
     private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
@@ -63,7 +64,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
         setContentView(R.layout.activity_contry_code_picker);
         receivedCountryCodes = getIntent().getExtras().getStringArrayList("country_code");
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         if (countries == null) {
@@ -93,8 +94,8 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
-    
-        if(savedInstanceState != null){
+
+        if (savedInstanceState != null) {
             searchInput = savedInstanceState.getString(SAVED_QUERY_STRING);
         }
     }
@@ -102,9 +103,9 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_country_picker,menu);
+        inflater.inflate(R.menu.activity_country_picker, menu);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView)searchMenuItem.getActionView();
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
         if (searchView != null) {
             searchView.setIconifiedByDefault(true);
         }
@@ -114,23 +115,23 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         if (searchInput != null) {
             searchMenuItem.expandActionView();
-            searchView.setQuery(searchInput,true);
+            searchView.setQuery(searchInput, true);
             search(searchInput);
         }
-        v.setBackgroundColor(ContextCompat.getColor(this,android.R.color.transparent));
+        v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                logDebug("onQueryTextSubmit: " + query);
-                InputMethodManager imm = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                Timber.d("onQueryTextSubmit: %s", query);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
                 View view = getCurrentFocus();
                 if (view == null) {
                     view = new View(CountryCodePickerActivity.this);
                 }
                 if (imm != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
                 return true;
             }
@@ -151,7 +152,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
 
         for (Country country : countries) {
             if (country.name.toLowerCase().contains(query.toLowerCase())) {
-                if(country.name.toLowerCase().startsWith(query.toLowerCase())) {
+                if (country.name.toLowerCase().startsWith(query.toLowerCase())) {
                     l1.add(country);
                 } else {
                     l2.add(country);
@@ -159,17 +160,17 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
             }
         }
         //the countries with name starts with the query string should be put first
-        Collections.sort(l1,new Comparator<Country>() {
+        Collections.sort(l1, new Comparator<Country>() {
 
             @Override
-            public int compare(Country o1,Country o2) {
+            public int compare(Country o1, Country o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
         });
-        Collections.sort(l2,new Comparator<Country>() {
+        Collections.sort(l2, new Comparator<Country>() {
 
             @Override
-            public int compare(Country o1,Country o2) {
+            public int compare(Country o1, Country o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
         });
@@ -192,7 +193,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
             for (String countryString : receivedCountryCodes) {
                 int splitIndex = countryString.indexOf(":");
                 String countryCode = countryString.substring(0, countryString.indexOf(":"));
-                String [] dialCodes = countryString.substring(splitIndex + 1).split(",");
+                String[] dialCodes = countryString.substring(splitIndex + 1).split(",");
                 for (String dialCode : dialCodes) {
                     Locale locale = new Locale("", countryCode);
                     String countryName = locale.getDisplayName();
@@ -206,10 +207,10 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
     @Override
     public void onCountrySelected(Country country) {
         Intent result = new Intent();
-        result.putExtra(COUNTRY_NAME,country.getName());
-        result.putExtra(DIAL_CODE,country.getCode());
-        result.putExtra(COUNTRY_CODE,country.getCountryCode());
-        setResult(Activity.RESULT_OK,result);
+        result.putExtra(COUNTRY_NAME, country.getName());
+        result.putExtra(DIAL_CODE, country.getCode());
+        result.putExtra(COUNTRY_CODE, country.getCountryCode());
+        setResult(Activity.RESULT_OK, result);
         finish();
     }
 
@@ -233,7 +234,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
             code = "";
         }
 
-        public Country(String name,String code,String countryCode) {
+        public Country(String name, String code, String countryCode) {
             this.code = code;
             this.countryCode = countryCode;
             this.name = name;
@@ -254,11 +255,11 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
         public void setCode(String code) {
             this.code = code;
         }
-    
+
         public String getCountryCode() {
             return countryCode;
         }
-    
+
         public void setCountryCode(String countryCode) {
             this.countryCode = countryCode;
         }
@@ -272,12 +273,12 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
                     '}';
         }
     }
-    
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String query = searchAutoComplete.getText().toString();
-        if(searchAutoComplete.hasFocus() || (query != null && !query.isEmpty())){
+        if (searchAutoComplete.hasFocus() || (query != null && !query.isEmpty())) {
             outState.putString(SAVED_QUERY_STRING, query);
         }
     }

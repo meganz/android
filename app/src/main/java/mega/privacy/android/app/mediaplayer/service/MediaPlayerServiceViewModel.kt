@@ -21,17 +21,56 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.SettingsConstants.*
+import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED
+import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
+import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INVALID_SIZE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.getUriForFile
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.isLocalFile
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
-import mega.privacy.android.app.utils.OfflineUtils.*
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -40,11 +79,23 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
+import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
+import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferListenerInterface
 import org.jetbrains.anko.defaultSharedPreferences
+import timber.log.Timber
 import java.io.File
-import java.util.*
+import java.util.Collections
+import java.util.Locale
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -481,7 +532,7 @@ class MediaPlayerServiceViewModel(
                 index = 0,
                 type = PlaylistItem.TYPE_PLAYING,
                 size = node?.size ?: INVALID_SIZE,
-                duration = node.duration
+                duration = node?.duration ?: 0,
             )
             playlistItems.add(playlistItem)
             playlistItemsMap[firstPlayHandle.toString()] = playlistItem
@@ -705,7 +756,7 @@ class MediaPlayerServiceViewModel(
         api: MegaApiAndroid,
         nodes: List<MegaNode>,
         firstPlayHandle: Long,
-        isFolderLink: Boolean = false
+        isFolderLink: Boolean = false,
     ) {
         doBuildPlaylist(
             api, nodes, firstPlayHandle,
@@ -846,7 +897,7 @@ class MediaPlayerServiceViewModel(
      * @param isScroll whether scroll to the specific position
      */
     private fun postPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
-        logDebug("postPlaylistItems")
+        Timber.d("postPlaylistItems")
         compositeDisposable.add(Completable.fromCallable {
             doPostPlaylistItems(currentPosition,
                 isScroll)
@@ -860,7 +911,7 @@ class MediaPlayerServiceViewModel(
      * @param isScroll whether scroll to the specific position
      */
     private fun doPostPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
-        logDebug("doPostPlaylistItems ${playlistItems.size} items")
+        Timber.d("doPostPlaylistItems ${playlistItems.size} items")
         if (playlistItems.isEmpty()) {
             return
         }
@@ -936,7 +987,7 @@ class MediaPlayerServiceViewModel(
         if (hasNext) {
             playingPosition = playingIndex
         }
-        logDebug("doPostPlaylistItems post ${items.size} items")
+        Timber.d("doPostPlaylistItems post ${items.size} items")
         if (!isScroll) {
             scrollPosition = -1
         }

@@ -14,17 +14,30 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.*
-import mega.privacy.android.app.interfaces.*
+import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.PermissionRequester
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showNotEnoughSpaceSnackbar
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.FileStorageActivity.*
+import mega.privacy.android.app.main.FileStorageActivity.EXTRA_PATH
+import mega.privacy.android.app.main.FileStorageActivity.EXTRA_PROMPT
 import mega.privacy.android.app.main.FileStorageActivity.Mode.PICK_FOLDER
+import mega.privacy.android.app.main.FileStorageActivity.PICK_FOLDER_TYPE
+import mega.privacy.android.app.main.FileStorageActivity.PickFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
+import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
+import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
+import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
+import mega.privacy.android.app.utils.FileUtil.getTotalSize
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -39,6 +52,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import timber.log.Timber
 import java.util.concurrent.Callable
 
 /**
@@ -57,7 +71,7 @@ class NodeSaver(
     private val activityLauncher: ActivityLauncher,
     private val permissionRequester: PermissionRequester,
     private val snackbarShower: SnackbarShower,
-    private val confirmDialogShower: (message: String, onConfirmed: (Boolean) -> Unit) -> Unit
+    private val confirmDialogShower: (message: String, onConfirmed: (Boolean) -> Unit) -> Unit,
 ) {
     private val compositeDisposable = CompositeDisposable()
 
@@ -66,7 +80,7 @@ class NodeSaver(
     private val megaApiFolder = app.megaApiFolder
     private val dbHandler = DatabaseHandler.getDbHandler(app)
 
-    private var saving : Saving = Saving.Companion.NOTHING
+    private var saving: Saving = Saving.Companion.NOTHING
 
     /**
      * Save an offline node into device.
@@ -77,7 +91,7 @@ class NodeSaver(
     @JvmOverloads
     fun saveOfflineNode(
         handle: Long,
-        fromMediaViewer: Boolean = false
+        fromMediaViewer: Boolean = false,
     ) {
         val node = dbHandler.findByHandle(handle) ?: return
         saveOfflineNodes(listOf(node), fromMediaViewer)
@@ -92,7 +106,7 @@ class NodeSaver(
     @JvmOverloads
     fun saveOfflineNode(
         node: MegaOffline,
-        fromMediaViewer: Boolean = false
+        fromMediaViewer: Boolean = false,
     ) {
         saveOfflineNodes(listOf(node), fromMediaViewer)
     }
@@ -106,7 +120,7 @@ class NodeSaver(
     @JvmOverloads
     fun saveOfflineNodes(
         nodes: List<MegaOffline>,
-        fromMediaViewer: Boolean = false
+        fromMediaViewer: Boolean = false,
     ) {
         save {
             var totalSize = 0L
@@ -132,7 +146,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
     ) {
         saveHandles(
             listOf(handle),
@@ -159,7 +173,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -198,7 +212,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
     ) {
         saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
     }
@@ -218,7 +232,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -253,7 +267,7 @@ class NodeSaver(
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadByTap: Boolean = false
+        downloadByTap: Boolean = false,
     ) {
         save {
             MegaNodeSaving(
@@ -370,22 +384,22 @@ class NodeSaver(
         activity: Activity,
         requestCode: Int,
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): Boolean {
         if (saving == Saving.Companion.NOTHING) {
             return false
         }
 
         if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == Activity.RESULT_OK) {
-            logDebug("REQUEST_CODE_SELECT_LOCAL_FOLDER")
+            Timber.d("REQUEST_CODE_SELECT_LOCAL_FOLDER")
             if (intent == null) {
-                logWarning("Intent null")
+                Timber.w("Intent null")
                 return false
             }
 
             val parentPath = intent.getStringExtra(EXTRA_PATH)
             if (parentPath == null) {
-                logWarning("parentPath null")
+                Timber.w("parentPath null")
                 return false
             }
 
@@ -405,7 +419,7 @@ class NodeSaver(
             return true
         } else if (requestCode == REQUEST_CODE_TREE) {
             if (intent == null) {
-                logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
+                Timber.w("handleActivityResult REQUEST_CODE_TREE: result intent is null")
 
                 val message = if (resultCode != Activity.RESULT_OK) {
                     getString(R.string.download_requires_permission)
@@ -420,13 +434,13 @@ class NodeSaver(
 
             val uri = intent.data
             if (uri == null) {
-                logWarning("handleActivityResult REQUEST_CODE_TREE: tree uri is null!")
+                Timber.w("handleActivityResult REQUEST_CODE_TREE: tree uri is null!")
                 return false
             }
 
             val pickedDir = DocumentFile.fromTreeUri(app, uri)
             if (pickedDir == null || !pickedDir.canWrite()) {
-                logWarning("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
+                Timber.w("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
                 return false
             }
 
@@ -434,7 +448,7 @@ class NodeSaver(
 
             val parentPath = getFullPathFromTreeUri(uri, app)
             if (parentPath == null) {
-                logWarning("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
+                Timber.w("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
                 return false
             }
 
@@ -530,7 +544,7 @@ class NodeSaver(
     }
 
     private fun requestLocalFolder(
-        prompt: String?, activityLauncher: ActivityLauncher
+        prompt: String?, activityLauncher: ActivityLauncher,
     ) {
         val intent = Intent(PICK_FOLDER.action)
         intent.putExtra(PICK_FOLDER_TYPE, PickFolderType.DOWNLOAD_FOLDER.folderType)
@@ -560,11 +574,11 @@ class NodeSaver(
             availableFreeSpace = stat.availableBlocksLong * stat.blockSizeLong
         } catch (ex: Exception) {
         }
-        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: $totalSize")
+        Timber.d("availableFreeSpace: $availableFreeSpace, totalSize: $totalSize")
 
         if (availableFreeSpace < totalSize) {
             post { snackbarShower.showNotEnoughSpaceSnackbar() }
-            logWarning("Not enough space")
+            Timber.w("Not enough space")
             return true
         }
 

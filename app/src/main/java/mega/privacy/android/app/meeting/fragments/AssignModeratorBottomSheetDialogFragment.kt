@@ -9,8 +9,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetAssignModeratorBinding
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
+import timber.log.Timber
 
 /**
  * The fragment shows two options for moderator when the moderator leave the meeting
@@ -32,12 +32,12 @@ class AssignModeratorBottomSheetDialogFragment : BottomSheetDialogFragment() {
         chatId = viewModel.getChatId()
 
         if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            LogUtil.logError("Error. Chat doesn't exist")
+            Timber.e("Error. Chat doesn't exist")
             return
         }
 
         if (viewModel.getCall() == null) {
-            LogUtil.logError("Error. Call doesn't exist")
+            Timber.e("Error. Call doesn't exist")
             return
         }
     }
@@ -47,9 +47,10 @@ class AssignModeratorBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.setupDialog(dialog, style)
 
         binding =
-            BottomSheetAssignModeratorBinding.inflate(LayoutInflater.from(context), null, false).apply {
-                lifecycleOwner = this@AssignModeratorBottomSheetDialogFragment
-            }
+            BottomSheetAssignModeratorBinding.inflate(LayoutInflater.from(context), null, false)
+                .apply {
+                    lifecycleOwner = this@AssignModeratorBottomSheetDialogFragment
+                }
 
         binding.assignModerator.setOnClickListener { assignModerator() }
         binding.leaveAnyway.setOnClickListener { leaveAnyway() }

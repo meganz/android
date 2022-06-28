@@ -12,7 +12,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil.logWarning
+
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.OfflineUtils
@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -40,7 +41,7 @@ class GetImageHandlesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
 ) {
 
     /**
@@ -66,7 +67,7 @@ class GetImageHandlesUseCase @Inject constructor(
         imageFileUri: Uri? = null,
         showNearbyFiles: Boolean? = false,
         sortOrder: Int? = ORDER_PHOTO_ASC,
-        isOffline: Boolean? = false
+        isOffline: Boolean? = false,
     ): Single<List<ImageItem>> =
         Single.fromCallable {
             val items = mutableListOf<ImageItem>()
@@ -198,7 +199,9 @@ class GetImageHandlesUseCase @Inject constructor(
         messageIds.forEach { messageId ->
             val node = getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                val deletable = deleteChatMessageUseCase.check(chatRoomId, messageId).blockingGetOrNull() ?: false
+                val deletable =
+                    deleteChatMessageUseCase.check(chatRoomId, messageId).blockingGetOrNull()
+                        ?: false
                 this.add(
                     ImageItem.ChatNode(
                         id = (chatRoomId.hashCode() + messageId.hashCode()).toLong(),
@@ -222,7 +225,7 @@ class GetImageHandlesUseCase @Inject constructor(
      */
     private fun MutableList<ImageItem>.addFileImageUris(
         imageFileUri: Uri,
-        showNearbyFiles: Boolean? = false
+        showNearbyFiles: Boolean? = false,
     ) {
         var imageUris = listOf(imageFileUri)
         if (showNearbyFiles == true) {
@@ -232,7 +235,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     imageUris = nearbyImages
                 }
             } catch (ignored: Exception) {
-                logWarning(ignored.stackTraceToString())
+                Timber.w(ignored)
             }
         }
 
@@ -252,7 +255,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     )
                 )
             } else {
-                logWarning("File ($imageUri) can't be read or isn't valid for Image Viewer")
+                Timber.w("File ($imageUri) can't be read or isn't valid for Image Viewer")
             }
         }
     }

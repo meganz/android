@@ -1,7 +1,10 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
@@ -16,11 +19,22 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChooseUpgradeAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
+import mega.privacy.android.app.utils.Constants.FREE
+import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
+import mega.privacy.android.app.utils.Constants.PRO_LITE
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import java.util.*
+import mega.privacy.android.app.utils.Util
+import timber.log.Timber
+import java.util.Locale
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
@@ -186,7 +200,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         val productAccounts = viewModel.getProductAccounts()
 
         if (productAccounts == null) {
-            LogUtil.logDebug("productAccounts == null")
+            Timber.d("productAccounts == null")
             viewModel.refreshPricing()
             return
         }
@@ -249,7 +263,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                         + "'>"
             ).replace("[/A]", "</font>")
         } catch (e: Exception) {
-            LogUtil.logWarning("Exception formatting string", e)
+            Timber.w(e, "Exception formatting string")
         }
 
         binding.storageFree.text =
@@ -269,7 +283,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                             + "'>"
                 ).replace("[/A]", "</font>")
         } catch (e: Exception) {
-            LogUtil.logWarning("Exception formatting string", e)
+            Timber.w(e, "Exception formatting string")
         }
 
         binding.bandwidthFree.text = textToShowFreeBandwidth.toSpannedHtmlText()

@@ -28,7 +28,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -36,7 +35,8 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,7 +64,8 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         if (inMeetingViewModel.isSameCall(it.callId)) {
             when (it.status) {
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED -> {
+                MegaChatCall.CALL_STATUS_DESTROYED,
+                -> {
                     disableLocalCamera()
                     finishActivity()
                 }
@@ -79,11 +80,11 @@ class MakeModeratorFragment : MeetingBaseFragment() {
             if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.isOneToOneCall()) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                        logDebug("Session in progress, clientID = ${callAndSession.second.clientid}")
+                        Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.addParticipant(callAndSession.second)
                     }
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                        logDebug("Session destroyed, clientID = ${callAndSession.second.clientid}")
+                        Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.removeParticipant(callAndSession.second)
                     }
                 }
@@ -92,7 +93,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = MakeModeratorFragmentBinding.inflate(layoutInflater)
         return binding.root
@@ -100,7 +101,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logDebug("In make moderator fragment")
+        Timber.d("In make moderator fragment")
         chatId = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         if (chatId == MEGACHAT_INVALID_HANDLE) {
             sharedModel.currentChatId.value?.let {
@@ -137,7 +138,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun setupView() {
-        logDebug("Update toolbar elements")
+        Timber.d("Update toolbar elements")
         binding.btCancel.setOnClickListener { cancel() }
         binding.btOk.setOnClickListener { makeModerators() }
 
@@ -311,7 +312,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
 
         disableLocalCamera()
-        logDebug("Leave meeting")
+        Timber.d("Leave meeting")
         inMeetingViewModel.checkClickEndButton()
     }
 
@@ -327,7 +328,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      */
     fun disableLocalCamera() {
         if (inMeetingViewModel.isLocalCameraOn()) {
-            logDebug("Disable local camera")
+            Timber.d("Disable local camera")
             sharedModel.clickCamera(false)
         }
     }

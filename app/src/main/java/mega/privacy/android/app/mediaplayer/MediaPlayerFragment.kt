@@ -26,14 +26,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
-import mega.privacy.android.app.mediaplayer.service.*
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
-import java.util.*
+import timber.log.Timber
+import java.util.Locale
 
 class MediaPlayerFragment : Fragment() {
     private var audioPlayerVH: AudioPlayerViewHolder? = null
@@ -79,7 +82,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View =
         if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
@@ -174,7 +177,7 @@ class MediaPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
-                logDebug("MediaPlayerService observed playlist ${it.first.size} items")
+                Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
                 audioPlayerVH?.togglePlaylistEnabled(it.first)
                 videoPlayerVH?.togglePlaylistEnabled(it.first)
@@ -254,7 +257,7 @@ class MediaPlayerFragment : Fragment() {
     private fun setupPlayerView(
         player: MediaMegaPlayer,
         playerView: PlayerView,
-        videoPlayer: Boolean
+        videoPlayer: Boolean,
     ) {
         with(playerView) {
             this.player = player

@@ -13,11 +13,18 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaChatRoom
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,7 +32,7 @@ import javax.inject.Singleton
 class MeetingActivityRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -57,7 +64,8 @@ class MeetingActivityRepository @Inject constructor(
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.absolutePath,
+            CacheFolderManager.buildAvatarFile(context,
+                megaApi.myEmail + JPG_EXTENSION)?.absolutePath,
             listener
         )
     }
@@ -72,13 +80,13 @@ class MeetingActivityRepository @Inject constructor(
     fun switchMic(
         chatId: Long,
         shouldAudioBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         if (shouldAudioBeEnabled) {
-            logDebug("Enable local audio")
+            Timber.d("Enable local audio")
             megaChatApi.enableAudio(chatId, listener)
         } else {
-            logDebug("Disable local audio")
+            Timber.d("Disable local audio")
             megaChatApi.disableAudio(chatId, listener)
         }
     }
@@ -91,13 +99,13 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchCameraBeforeStartMeeting(
         shouldVideoBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         if (shouldVideoBeEnabled) {
-            logDebug("Open video device")
+            Timber.d("Open video device")
             megaChatApi.openVideoDevice(listener)
         } else {
-            logDebug("Release video device")
+            Timber.d("Release video device")
             megaChatApi.releaseVideoDevice(listener)
         }
     }
@@ -112,14 +120,14 @@ class MeetingActivityRepository @Inject constructor(
     fun switchCamera(
         chatId: Long,
         shouldVideoBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         megaChatApi.getChatCall(chatId)?.let {
             if (shouldVideoBeEnabled && !it.hasLocalVideo()) {
-                logDebug("Enable local video")
+                Timber.d("Enable local video")
                 megaChatApi.enableVideo(chatId, listener)
             } else if (!shouldVideoBeEnabled && it.hasLocalVideo()) {
-                logDebug("Disable local video")
+                Timber.d("Disable local video")
                 megaChatApi.disableVideo(chatId, listener)
             }
         }
@@ -132,7 +140,7 @@ class MeetingActivityRepository @Inject constructor(
      * @param listener IndividualCallVideoListener
      */
     fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener) {
-        logDebug("Add Chat video listener")
+        Timber.d("Add Chat video listener")
         megaChatApi.addChatLocalVideoListener(chatId, listener)
     }
 
@@ -143,7 +151,7 @@ class MeetingActivityRepository @Inject constructor(
      * @param listener IndividualCallVideoListener
      */
     fun removeLocalVideo(chatId: Long, listener: IndividualCallVideoListener) {
-        logDebug("Removed Chat video listener")
+        Timber.d("Removed Chat video listener")
         megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, true, listener)
     }
 
@@ -151,7 +159,7 @@ class MeetingActivityRepository @Inject constructor(
      *  Select the video device to be used in calls
      */
     fun setChatVideoInDevice(cameraDevice: String, listener: MegaChatRequestListenerInterface?) {
-        logDebug("Set chat video in device")
+        Timber.d("Set chat video in device")
         megaChatApi.setChatVideoInDevice(cameraDevice, listener)
     }
 
@@ -162,7 +170,7 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
         if (MegaApplication.getInstance().audioManager != null) {
-            logDebug("Switch the speaker")
+            Timber.d("Switch the speaker")
             MegaApplication.getInstance().audioManager.selectAudioDevice(
                 device,
                 false
@@ -252,7 +260,7 @@ class MeetingActivityRepository @Inject constructor(
         chatId: Long,
         userHandle: Long,
         permission: Int,
-        listener: MegaChatRequestListenerInterface?
+        listener: MegaChatRequestListenerInterface?,
     ) {
         megaChatApi.updateChatPermissions(
             chatId,

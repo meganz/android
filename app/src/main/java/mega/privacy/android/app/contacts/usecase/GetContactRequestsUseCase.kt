@@ -23,7 +23,6 @@ import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
@@ -33,6 +32,7 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaContactRequest.STATUS_REMINDED
 import nz.mega.sdk.MegaContactRequest.STATUS_UNRESOLVED
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -88,11 +88,11 @@ class GetContactRequestsUseCase @Inject constructor(
                             emitter.onNext(requestItems)
                         }
                     } else {
-                        logError(error.toThrowable().stackTraceToString())
+                        Timber.e(error.toThrowable())
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    logError(error.toThrowable().stackTraceToString())
+                    Timber.e(error.toThrowable())
                 }
             )
 
@@ -129,9 +129,7 @@ class GetContactRequestsUseCase @Inject constructor(
                             emitter.onNext(requestItems)
                         }
                     },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                    onError = Timber::e
                 )
 
             requestItems.forEach { request ->
@@ -168,9 +166,7 @@ class GetContactRequestsUseCase @Inject constructor(
                         if (emitter.isCancelled) return@subscribeBy
                         emitter.onNext(megaApi.incomingContactRequests.size)
                     },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                    onError = Timber::e
                 )
 
             emitter.setCancellable {

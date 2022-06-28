@@ -154,6 +154,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
         private View dividerLeaveLayout;
+        private RelativeLayout endCallForAllLayout;
+        private View dividerEndCallForAllLayout;
         private RelativeLayout archiveChatLayout;
         private TextView archiveChatTitle;
         private ImageView archiveChatIcon;
@@ -230,6 +232,11 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderHeader.leaveChatLayout.setOnClickListener(this);
                 holderHeader.dividerLeaveLayout = v.findViewById(R.id.divider_leave_layout);
 
+                //Leave chat Layout
+                holderHeader.endCallForAllLayout = v.findViewById(R.id.chat_group_contact_properties_end_call_layout);
+                holderHeader.endCallForAllLayout.setOnClickListener(this);
+                holderHeader.dividerEndCallForAllLayout = v.findViewById(R.id.divider_end_call_layout);
+
                 //Observers layout
                 holderHeader.observersLayout = v.findViewById(R.id.chat_group_observers_layout);
                 holderHeader.observersNumberText = v.findViewById(R.id.chat_group_observers_number_text);
@@ -291,6 +298,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
+                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
+
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
                     holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_unarchive);
@@ -315,16 +324,19 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                     holderHeader.archiveChatSeparator.setVisibility(View.GONE);
                     holderHeader.leaveChatLayout.setVisibility(View.GONE);
                     holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
+                    holderHeader.dividerEndCallForAllLayout.setVisibility(View.GONE);
                     holderHeader.editImageView.setVisibility(View.GONE);
                 } else {
+
                     participantsCount++;
 
                     if (getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
-                        holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
                         holderHeader.privateLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerEndCallForAllLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);
 
                         if (!getChat().isPublic()) {
@@ -362,6 +374,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         if (getChat().getOwnPrivilege() < MegaChatRoom.PRIV_RO) {
                             holderHeader.leaveChatLayout.setVisibility(View.GONE);
                             holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
+                            holderHeader.dividerEndCallForAllLayout.setVisibility(View.GONE);
                         }
                     }
 
@@ -591,6 +604,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 groupChatInfoActivity.showConfirmationLeaveChat();
                 break;
 
+            case R.id.chat_group_contact_properties_end_call_layout:
+                groupChatInfoActivity.showEndCallForAllDialog();
+                break;
+
             case R.id.manage_chat_history_group_info_layout:
                 Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
                 intentManageChat.putExtra(CHAT_ID, chatId);
@@ -679,6 +696,22 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         if (holderHeader != null) {
             updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds);
+        }
+    }
+
+    /**
+     * Update the visibility of end call for all option
+     *
+     * @param isVisible True, if it should be visible. False, if it should be gone.
+     */
+    public void updateEndCallOption(boolean isVisible) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            if(holderHeader.endCallForAllLayout.isShown() != isVisible) {
+                holderHeader.endCallForAllLayout.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+            }
+
+            holderHeader.dividerLeaveLayout.setVisibility(isVisible? View.VISIBLE : View.GONE);
         }
     }
 

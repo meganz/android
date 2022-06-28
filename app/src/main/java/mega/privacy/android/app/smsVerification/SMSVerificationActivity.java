@@ -1,13 +1,18 @@
 package mega.privacy.android.app.smsVerification;
 
+import static mega.privacy.android.app.main.CountryCodePickerActivity.COUNTRY_CODE;
+import static mega.privacy.android.app.main.CountryCodePickerActivity.COUNTRY_NAME;
+import static mega.privacy.android.app.main.CountryCodePickerActivity.DIAL_CODE;
+import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_VERIFY_CODE;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.core.content.ContextCompat;
-
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
@@ -24,6 +29,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
@@ -31,10 +38,10 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.CountryCodePickerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.main.CountryCodePickerActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -44,15 +51,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringListMap;
-
-import static mega.privacy.android.app.main.CountryCodePickerActivity.*;
-import static mega.privacy.android.app.main.LoginFragment.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class SMSVerificationActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
-    
+
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
     private ScrollView container;
@@ -80,24 +82,24 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
         container = findViewById(R.id.scroller_container);
         Intent intent = getIntent();
         if (intent != null) {
-            isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
+            isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED, false);
         }
-        logDebug("Is user locked " + isUserLocked);
+        Timber.d("Is user locked %s", isUserLocked);
 
         //divider
         divider1 = findViewById(R.id.verify_account_divider1);
         divider2 = findViewById(R.id.verify_account_divider2);
-        
+
         //titles
         titleCountryCode = findViewById(R.id.verify_account_country_label);
         titlePhoneNumber = findViewById(R.id.verify_account_phone_number_label);
         selectedCountry = findViewById(R.id.verify_account_selected_country);
         title = findViewById(R.id.title);
 
-        TelephonyManager tm = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
             inferredCountryCode = tm.getNetworkCountryIso();
-            logDebug("Inferred Country Code is: " + inferredCountryCode);
+            Timber.d("Inferred Country Code is: %s", inferredCountryCode);
         }
         megaApi.getCountryCallingCodes(this);
         //set helper text
@@ -127,11 +129,11 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                 public void run() {
                     container.fullScroll(View.FOCUS_DOWN);
                 }
-            },100);
+            }, 100);
         } else {
             title.setText(R.string.add_phone_number_label);
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
-            logDebug("Is achievement user: " + isAchievementUser);
+            Timber.d("Is achievement user: %s", isAchievementUser);
             if (isAchievementUser) {
                 megaApi.getAccountAchievements(this);
                 String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
@@ -144,12 +146,12 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
         //country selector
         countrySelector = findViewById(R.id.verify_account_country_selector);
         countrySelector.setOnClickListener(this);
-        
+
         //phone number input
         phoneNumberInput = findViewById(R.id.verify_account_phone_number_input);
         phoneNumberInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView v,int actionId,KeyEvent event) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     nextButtonClicked();
                     return true;
@@ -157,20 +159,20 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                 return false;
             }
         });
-        phoneNumberInput.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+        phoneNumberInput.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
         phoneNumberInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-            
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
             }
-            
+
             @Override
-            public void onTextChanged(CharSequence s,int start,int before,int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 errorInvalidPhoneNumber.setVisibility(View.GONE);
                 errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
-                divider2.setBackgroundColor(ContextCompat.getColor(SMSVerificationActivity.this,R.color.grey_012_white_012));
+                divider2.setBackgroundColor(ContextCompat.getColor(SMSVerificationActivity.this, R.color.grey_012_white_012));
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 int inputLength = s == null ? 0 : s.toString().length();
@@ -183,79 +185,79 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                 }
             }
         });
-        
+
         //buttons
         nextButton = findViewById(R.id.verify_account_next_button);
         nextButton.setOnClickListener(this);
-        
+
         notNowButton = findViewById(R.id.verify_account_not_now_button);
         notNowButton.setOnClickListener(this);
-        
-        if(isUserLocked){
+
+        if (isUserLocked) {
             notNowButton.setVisibility(View.GONE);
-        }else{
+        } else {
             notNowButton.setVisibility(View.VISIBLE);
         }
-        
+
         //error message and icon
         errorInvalidCountryCode = findViewById(R.id.verify_account_invalid_country_code);
         errorInvalidPhoneNumber = findViewById(R.id.verify_account_invalid_phone_number);
         errorInvalidPhoneNumberIcon = findViewById(R.id.verify_account_invalid_phone_number_icon);
-        
+
         //set saved state
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             selectedCountryCode = savedInstanceState.getString(COUNTRY_CODE);
             selectedCountryName = savedInstanceState.getString(COUNTRY_NAME);
             selectedDialCode = savedInstanceState.getString(DIAL_CODE);
-    
-            if(selectedCountryCode != null && selectedCountryName != null && selectedDialCode != null){
+
+            if (selectedCountryCode != null && selectedCountryName != null && selectedDialCode != null) {
                 String label = selectedCountryName + " (" + selectedDialCode + ")";
                 selectedCountry.setText(label);
                 errorInvalidCountryCode.setVisibility(View.GONE);
                 titleCountryCode.setVisibility(View.VISIBLE);
                 titleCountryCode.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
-                divider1.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_012_white_012));
+                divider1.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             }
         }
     }
-    
+
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
-        if(isUserLocked){
+        if (isUserLocked) {
             return;
         }
         finish();
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         MegaApplication.smsVerifyShowed(false);
     }
-    
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case (R.id.verify_account_country_selector): {
-                logDebug("verify_account_country_selector clicked");
+                Timber.d("verify_account_country_selector clicked");
                 if (this.countryCodeList != null) {
                     launchCountryPicker();
                 } else {
-                    logDebug("Country code is not loaded");
+                    Timber.d("Country code is not loaded");
                     megaApi.getCountryCallingCodes(this);
                     pendingSelectingCountryCode = true;
                 }
                 break;
             }
             case (R.id.verify_account_next_button): {
-                logDebug("verify_account_next_button clicked");
+                Timber.d("verify_account_next_button clicked");
                 nextButtonClicked();
                 break;
             }
-            case (R.id.verify_account_not_now_button):{
-                logDebug("verify_account_not_now_button clicked");
+            case (R.id.verify_account_not_now_button): {
+                Timber.d("verify_account_not_now_button clicked");
                 finish();
                 break;
             }
@@ -295,35 +297,35 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                 .setNegativeButton(getString(R.string.general_negative_button), dialogClickListener)
                 .show();
     }
-    
+
     @Override
-    protected void onActivityResult(int requestCode,int resultCode,Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.REQUEST_CODE_COUNTRY_PICKER && resultCode == RESULT_OK) {
-            logDebug("REQUEST_CODE_COUNTRY_PICKER OK");
+            Timber.d("REQUEST_CODE_COUNTRY_PICKER OK");
             selectedCountryCode = data.getStringExtra(COUNTRY_CODE);
             selectedCountryName = data.getStringExtra(COUNTRY_NAME);
             selectedDialCode = data.getStringExtra(DIAL_CODE);
-            
+
             String label = selectedCountryName + " (" + selectedDialCode + ")";
             selectedCountry.setText(label);
             errorInvalidCountryCode.setVisibility(View.GONE);
             titleCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
-            divider1.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_012_white_012));
+            divider1.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
         } else if (requestCode == Constants.REQUEST_CODE_VERIFY_CODE && resultCode == RESULT_OK) {
-            logDebug("REQUEST_CODE_VERIFY_CODE OK");
+            Timber.d("REQUEST_CODE_VERIFY_CODE OK");
             setResult(RESULT_OK);
             finish();
         }
     }
-    
+
     private void launchCountryPicker() {
         Intent intent = new Intent(getApplicationContext(), CountryCodePickerActivity.class);
         intent.putStringArrayListExtra("country_code", this.countryCodeList);
         startActivityForResult(intent, Constants.REQUEST_CODE_COUNTRY_PICKER);
     }
-    
+
     private void nextButtonClicked() {
         hideKeyboard(this);
         hideError();
@@ -332,132 +334,132 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
             hideError();
             RequestTxt();
         } else {
-            logWarning("Phone number or country code is invalid.");
+            Timber.w("Phone number or country code is invalid.");
             showCountryCodeValidationError();
             showPhoneNumberValidationError(null);
         }
     }
-    
+
     private void validateFields() {
         String inputPhoneNumber = phoneNumberInput.getText().toString();
-        logDebug("Generate normalized number for [" + inputPhoneNumber + "] with country code: " + selectedCountryCode);
+        Timber.d("Generate normalized number for [%s] with country code: %s", inputPhoneNumber, selectedCountryCode);
         String phoneNumber = PhoneNumberUtils.formatNumberToE164(inputPhoneNumber, selectedCountryCode);
         // a valid normalized phone number must start with "+".
-        if(phoneNumber != null && phoneNumber.startsWith("+")){
+        if (phoneNumber != null && phoneNumber.startsWith("+")) {
             isPhoneNumberValid = true;
-        }else{
+        } else {
             phoneNumberInput.setHint("");
             isPhoneNumberValid = false;
         }
 
         isSelectedCountryValid = selectedDialCode != null;
-        
-        logDebug("isSelectedCountryValid: " + isSelectedCountryValid + " , isPhoneNumberValid: " + isPhoneNumberValid);
+
+        Timber.d("isSelectedCountryValid: %s , isPhoneNumberValid: %s", isSelectedCountryValid, isPhoneNumberValid);
     }
-    
+
     private void showCountryCodeValidationError() {
         if (!isSelectedCountryValid) {
-            if(selectedDialCode == null) {
+            if (selectedDialCode == null) {
                 selectedCountry.setText("");
             } else {
                 selectedCountry.setText(R.string.sms_region_label);
             }
-            logWarning("Invalid country code");
+            Timber.w("Invalid country code");
             errorInvalidCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setVisibility(View.VISIBLE);
-            titleCountryCode.setTextColor(ColorUtils.getThemeColor(this,R.attr.colorError));
-            divider1.setBackgroundColor(ColorUtils.getThemeColor(this,R.attr.colorError));
+            titleCountryCode.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorError));
+            divider1.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorError));
         }
     }
-    
+
     private void showPhoneNumberValidationError(String errorMessage) {
         if (!isPhoneNumberValid) {
-            logWarning("Invalid phone number: " + errorMessage);
+            Timber.w("Invalid phone number: %s", errorMessage);
             errorInvalidPhoneNumber.setVisibility(View.VISIBLE);
             errorInvalidPhoneNumberIcon.setVisibility(View.VISIBLE);
             titlePhoneNumber.setVisibility(View.VISIBLE);
-            titlePhoneNumber.setTextColor(ColorUtils.getThemeColor(this,R.attr.colorError));
-            divider2.setBackgroundColor(ColorUtils.getThemeColor(this,R.attr.colorError));
+            titlePhoneNumber.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorError));
+            divider2.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorError));
             if (errorMessage != null) {
                 errorInvalidPhoneNumber.setText(errorMessage);
             }
         }
     }
-    
+
     private void hideError() {
         errorInvalidCountryCode.setVisibility(View.GONE);
         errorInvalidPhoneNumber.setVisibility(View.GONE);
         errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
         titleCountryCode.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
         titlePhoneNumber.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
-        divider1.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_012_white_012));
-        divider2.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_012_white_012));
+        divider1.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+        divider2.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
     }
-    
+
     private void RequestTxt() {
-        logDebug("shouldDisableNextButton is " + shouldDisableNextButton);
-        if(!shouldDisableNextButton){
-            nextButton.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_600_white_087));
-            String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
-            logDebug("Phone number is " + phoneNumber);
+        Timber.d("shouldDisableNextButton is %s", shouldDisableNextButton);
+        if (!shouldDisableNextButton) {
+            nextButton.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_600_white_087));
+            String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(), selectedCountryCode);
+            Timber.d("Phone number is %s", phoneNumber);
             shouldDisableNextButton = true;
-            megaApi.sendSMSVerificationCode(phoneNumber,this);
+            megaApi.sendSMSVerificationCode(phoneNumber, this);
         }
     }
-    
+
     @Override
-    public void onRequestStart(MegaApiJava api,MegaRequest request) {
-    
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
     }
-    
+
     @Override
-    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
-    
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
     }
-    
+
     @Override
-    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         shouldDisableNextButton = false;
         nextButton.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
         nextButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorOnSecondary));
         if (request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
-            logDebug("send phone number,get code" + e.getErrorCode());
+            Timber.d("send phone number,get code%s", e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("The SMS verification request has been sent successfully.");
+                Timber.d("The SMS verification request has been sent successfully.");
                 String enteredPhoneNumber = phoneNumberInput.getText().toString();
                 Intent intent = new Intent(this, SMSVerificationReceiveTxtActivity.class);
-                intent.putExtra(SELECTED_COUNTRY_CODE,selectedDialCode);
-                intent.putExtra(ENTERED_PHONE_NUMBER,enteredPhoneNumber);
-                intent.putExtra(NAME_USER_LOCKED,isUserLocked);
-                startActivityForResult(intent,REQUEST_CODE_VERIFY_CODE);
+                intent.putExtra(SELECTED_COUNTRY_CODE, selectedDialCode);
+                intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber);
+                intent.putExtra(NAME_USER_LOCKED, isUserLocked);
+                startActivityForResult(intent, REQUEST_CODE_VERIFY_CODE);
             } else if (e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
-                logWarning("Reached daily limitation.");
+                Timber.w("Reached daily limitation.");
                 errorInvalidPhoneNumber.setVisibility(View.VISIBLE);
                 errorInvalidPhoneNumber.setText(R.string.verify_account_error_reach_limit);
             } else if (e.getErrorCode() == MegaError.API_EACCESS) {
-                logWarning("The account is already verified with an SMS number.");
+                Timber.w("The account is already verified with an SMS number.");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
-            }else if (e.getErrorCode() == MegaError.API_EARGS) {
-                logWarning("Invalid phone number");
+            } else if (e.getErrorCode() == MegaError.API_EARGS) {
+                Timber.w("Invalid phone number");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
             } else if (e.getErrorCode() == MegaError.API_EEXIST) {
-                logWarning("The phone number is already verified for some other account.");
+                Timber.w("The phone number is already verified for some other account.");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_error_phone_number_register);
                 showPhoneNumberValidationError(errorMessage);
             } else {
-                logWarning("Request TYPE_SEND_SMS_VERIFICATIONCODE error: " + e.getErrorString());
+                Timber.w("Request TYPE_SEND_SMS_VERIFICATIONCODE error: %s", e.getErrorString());
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
             }
         }
 
-        if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+        if (request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
             }
@@ -476,7 +478,7 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                     contentBuffer.append(key + ":");
                     for (int j = 0; j < listMap.get(key).size(); j++) {
                         String dialCode = listMap.get(key).get(j);
-                        if(key.equalsIgnoreCase(inferredCountryCode)) {
+                        if (key.equalsIgnoreCase(inferredCountryCode)) {
                             Locale locale = new Locale("", inferredCountryCode);
                             selectedCountryName = locale.getDisplayName();
                             selectedCountryCode = key;
@@ -495,17 +497,17 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                     pendingSelectingCountryCode = false;
                 }
             } else {
-                logWarning("The country code is not responded correctly");
+                Timber.w("The country code is not responded correctly");
                 Util.showSnackbar(this, getString(R.string.verify_account_not_loading_country_code));
             }
         }
     }
-    
+
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
-    
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
-    
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putCharSequence(COUNTRY_CODE, selectedCountryCode);

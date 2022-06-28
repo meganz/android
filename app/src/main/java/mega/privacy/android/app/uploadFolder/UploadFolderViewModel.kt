@@ -14,19 +14,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.domain.exception.EmptyFolderException
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -40,7 +39,7 @@ import javax.inject.Inject
 class UploadFolderViewModel @Inject constructor(
     private val getFolderContentUseCase: GetFolderContentUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val transfersManagement: TransfersManagement
+    private val transfersManagement: TransfersManagement,
 ) : BaseRxViewModel() {
 
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
@@ -80,7 +79,7 @@ class UploadFolderViewModel @Inject constructor(
         documentFile: DocumentFile,
         parentHandle: Long,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ) {
         parentFolder = documentFile.name.toString()
         currentFolder.value = FolderContent.Data(null, documentFile)
@@ -189,7 +188,7 @@ class UploadFolderViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onError = { error -> logWarning("Cannot reorder", error) },
+                    onError = { error -> Timber.w(error, "Cannot reorder") },
                     onSuccess = { newFolderContent -> folderContent = newFolderContent }
                 )
                 .addTo(composite)
@@ -210,7 +209,7 @@ class UploadFolderViewModel @Inject constructor(
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
-                        onError = { error -> logWarning("No switch view.", error) },
+                        onError = { error -> Timber.w(error, "No switch view.") },
                         onSuccess = { items ->
                             folderItems.value = items
 
@@ -228,7 +227,7 @@ class UploadFolderViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onError = { error -> logWarning("Cannot switch view.", error) },
+                    onError = { error -> Timber.w(error, "Cannot switch view.") },
                     onSuccess = { newFolderContent -> folderContent = newFolderContent }
                 )
                 .addTo(composite)
@@ -354,7 +353,7 @@ class UploadFolderViewModel @Inject constructor(
     private fun addSearchValue(
         folder: FolderContent.Data,
         query: String,
-        searchResult: MutableList<FolderContent>
+        searchResult: MutableList<FolderContent>,
     ) {
         if (searchResults.containsKey(folder)) {
             searchResults.getValue(folder)[query] = searchResult
@@ -380,7 +379,7 @@ class UploadFolderViewModel @Inject constructor(
         ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError = { error -> logError("Cannot upload anything", error) },
+                onError = { error -> Timber.e(error, "Cannot upload anything") },
                 onSuccess = { results -> checkNameCollisions(results) }
             )
     }
@@ -396,7 +395,7 @@ class UploadFolderViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onError = { error -> logError("Cannot upload anything", error) },
+                    onError = { error -> Timber.e(error, "Cannot upload anything") },
                     onSuccess = { result ->
                         collisions.value = result.first
                         pendingUploads.addAll(result.second)
@@ -413,7 +412,7 @@ class UploadFolderViewModel @Inject constructor(
      */
     fun proceedWithUpload(
         context: Context,
-        collisionsResolution: List<NameCollisionResult>? = null
+        collisionsResolution: List<NameCollisionResult>? = null,
     ) {
         transfersManagement.setIsProcessingFolders(true)
         getContentDisposable = getFolderContentUseCase.getContentToUpload(
@@ -431,16 +430,16 @@ class UploadFolderViewModel @Inject constructor(
                         actionResult.value = getString(R.string.no_uploads_empty_folder)
                         return@subscribeBy
                     } else {
-                        logError("Cannot upload anything", error)
+                        Timber.e(error, "Cannot upload anything")
                     }
                 },
                 onSuccess = { uploadResults ->
                     transfersManagement.setIsProcessingFolders(false)
                     actionResult.value = getQuantityString(
-                            R.plurals.upload_began,
-                            uploadResults,
-                            uploadResults
-                        )
+                        R.plurals.upload_began,
+                        uploadResults,
+                        uploadResults
+                    )
                 }
             )
             .addTo(composite)

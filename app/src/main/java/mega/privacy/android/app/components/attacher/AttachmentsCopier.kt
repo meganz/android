@@ -5,7 +5,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.utils.Constants.CHAT_FOLDER
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
@@ -13,6 +12,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest.*
+import timber.log.Timber
 
 class AttachmentsCopier(
     private val megaApi: MegaApiAndroid,
@@ -83,7 +83,7 @@ class AttachmentsCopier(
 
                     copy(api.getNodeByHandle(request.nodeHandle))
                 } else {
-                    logError("Error creating ${getString(R.string.my_chat_files_folder)} folder")
+                    Timber.e("Error creating ${getString(R.string.my_chat_files_folder)} folder")
                 }
             }
             request.type == TYPE_COPY -> {

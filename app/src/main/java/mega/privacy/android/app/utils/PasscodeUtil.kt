@@ -15,18 +15,18 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class PasscodeUtil @Inject constructor(
     @ActivityContext private val context: Context,
     private val dbH: DatabaseHandler,
-    private val passcodeManagement: PasscodeManagement
+    private val passcodeManagement: PasscodeManagement,
 ) {
 
     companion object {
@@ -302,7 +302,7 @@ class PasscodeUtil @Inject constructor(
             val currentTime = System.currentTimeMillis()
             val lastPaused = passcodeManagement.lastPause
 
-            logDebug("Time: $currentTime lastPause: $lastPaused")
+            Timber.d("Time: $currentTime lastPause: $lastPaused")
 
             currentTime - lastPaused > prefs.passcodeLockRequireTime.toInt()
         } else false

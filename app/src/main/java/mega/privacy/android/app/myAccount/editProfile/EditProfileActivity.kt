@@ -4,7 +4,10 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
@@ -35,23 +38,39 @@ import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Constants.EVENT_AVATAR_CHANGE
+import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
+import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
+import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
+import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
+import mega.privacy.android.app.utils.Util.checkTakePicture
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.existOngoingTransfers
+import mega.privacy.android.app.utils.Util.showAlert
+import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.*
-import java.util.*
+import nz.mega.sdk.MegaError.API_EACCESS
+import nz.mega.sdk.MegaError.API_EEXIST
+import nz.mega.sdk.MegaError.API_OK
+import timber.log.Timber
+import java.util.Locale
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
     PhoneNumberBottomSheetDialogFragment.PhoneNumberCallback, SnackbarShower {
@@ -181,12 +200,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (grantResults.isEmpty()) {
-            LogUtil.logWarning("Permissions ${permissions[0]} not granted")
+            Timber.w("Permissions ${permissions[0]} not granted")
             return
         }
 
@@ -208,7 +227,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding.changeName.setOnClickListener { showChangeNameDialog(null, null) }
 
         binding.addPhoto.setOnClickListener {
-            if (isBottomSheetDialogShown(photoBottomSheet))
+            if (photoBottomSheet.isBottomSheetDialogShown())
                 return@setOnClickListener
 
             photoBottomSheet = PhotoBottomSheetDialogFragment()
@@ -470,7 +489,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             SMSVerificationActivity::class.java
                         )
                     )
-                } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
+                } else if (!phoneNumberBottomSheetOld.isBottomSheetDialogShown()) {
                     phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
                     phoneNumberBottomSheetOld!!.show(
                         supportFragmentManager,

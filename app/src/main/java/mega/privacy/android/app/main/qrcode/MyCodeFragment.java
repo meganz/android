@@ -1,5 +1,12 @@
 package mega.privacy.android.app.main.qrcode;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -16,12 +23,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -35,6 +36,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.zxing.BarcodeFormat;
@@ -55,22 +62,17 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-
-public class MyCodeFragment extends Fragment implements View.OnClickListener{
+public class MyCodeFragment extends Fragment implements View.OnClickListener {
 
     final int RELATIVE_WIDTH = 280;
     final int WIDTH = 500;
@@ -80,7 +82,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
     public final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
 
-    /** Avatar's border width */
+    /**
+     * Avatar's border width
+     */
     public final static int BORDER_WIDTH = 3;
 
     MegaUser myUser;
@@ -115,19 +119,19 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     DisplayMetrics outMetrics;
 
     public static MyCodeFragment newInstance() {
-        logDebug("newInstance");
+        Timber.d("newInstance");
         MyCodeFragment fragment = new MyCodeFragment();
         return fragment;
     }
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
+    public void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
 
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
         myEmail = megaApi.getMyUser().getEmail();
@@ -135,7 +139,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
 
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             handle = savedInstanceState.getLong("handle");
             contactLink = savedInstanceState.getString("contactLink");
         }
@@ -148,16 +152,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     }
 
     public File queryIfQRExists() {
-        logDebug("queryIfQRExists");
-        qrFile = buildQrFile(context,myEmail + QR_IMAGE_FILE_NAME);
+        Timber.d("queryIfQRExists");
+        qrFile = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME);
         if (isFileAvailable(qrFile)) {
             return qrFile;
         }
         return null;
     }
 
-    public void setImageQR (){
-        logDebug("setImageQR");
+    public void setImageQR() {
+        Timber.d("setImageQR");
 
         if (qrFile.exists()) {
             if (qrFile.length() > 0) {
@@ -180,7 +184,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
         v = inflater.inflate(R.layout.fragment_mycode, container, false);
 
@@ -188,11 +192,11 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (aB == null){
-            aB = ((AppCompatActivity)context).getSupportActionBar();
+        if (aB == null) {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
         }
 
-        if(aB!=null){
+        if (aB != null) {
             aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code)
                     .toUpperCase(Locale.getDefault()));
 
@@ -212,7 +216,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         qrcode_copy_link.setEnabled(false);
         qrcode_copy_link.setOnClickListener(this);
 
-        if (contactLink != null){
+        if (contactLink != null) {
             qrcode_link.setText(contactLink);
             qrcode_copy_link.setEnabled(true);
         }
@@ -222,14 +226,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         Configuration configuration = getResources().getConfiguration();
         int width = getDP(RELATIVE_WIDTH);
         LinearLayout.LayoutParams params;
-        if(configuration.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            params = new LinearLayout.LayoutParams(width-80, width-80);
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            params = new LinearLayout.LayoutParams(width - 80, width - 80);
             params.gravity = Gravity.CENTER;
             params.setMargins(0, 0, 0, getDP(20));
             relativeContainerQRCode.setLayoutParams(params);
             relativeContainerQRCode.setPadding(0, -40, 0, 0);
 
-        }else{
+        } else {
             params = new LinearLayout.LayoutParams(width, width);
             params.gravity = Gravity.CENTER;
             params.setMargins(0, getDP(55), 0, getDP(58));
@@ -248,16 +252,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    int getDP(int value){
+    int getDP(int value) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
 
-    public Bitmap createQRCode (Bitmap qr, Bitmap avatar){
-        logDebug("createQRCode");
+    public Bitmap createQRCode(Bitmap qr, Bitmap avatar) {
+        Timber.d("createQRCode");
 
-        Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
+        Bitmap qrCode = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         int width = AVATAR_WIDTH;
-        float offset = (float)(width / 2);
+        float offset = (float) (width / 2);
 
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
@@ -267,13 +271,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null); // Util.dp2px(3)
-        c.drawCircle(AVATAR_LEFT + offset, AVATAR_LEFT + offset, offset + Util.dp2px(BORDER_WIDTH),paint);
+        c.drawCircle(AVATAR_LEFT + offset, AVATAR_LEFT + offset, offset + Util.dp2px(BORDER_WIDTH), paint);
         c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
     }
 
-    public Bitmap queryQR () {
+    public Bitmap queryQR() {
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
         BitMatrix bitMatrix;
@@ -304,40 +308,37 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             }
         }
 
-        bitmap.setPixels(pixels, 0, w, 0, 0, w,  h);
+        bitmap.setPixels(pixels, 0, w, 0, 0, w, h);
         return bitmap;
 
     }
 
-    public Bitmap setUserAvatar(){
-        logDebug("setUserAvatar");
+    public Bitmap setUserAvatar() {
+        Timber.d("setUserAvatar");
 
         File avatar = buildAvatarFile(context, myEmail + ".jpg");
         Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
+        if (isFileAvailable(avatar)) {
+            if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
                     return createDefaultAvatar();
-                }
-                else{
+                } else {
                     return getCircleBitmap(bitmap);
                 }
-            }
-            else{
+            } else {
                 return createDefaultAvatar();
             }
-        }
-        else{
+        } else {
             return createDefaultAvatar();
         }
     }
 
     private Bitmap getCircleBitmap(Bitmap bitmap) {
-        logDebug("getCircleBitmap");
+        Timber.d("getCircleBitmap");
 
         final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(output);
@@ -360,25 +361,24 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         return output;
     }
 
-    public Bitmap createDefaultAvatar(){
-        logDebug("createDefaultAvatar()");
+    public Bitmap createDefaultAvatar() {
+        Timber.d("createDefaultAvatar()");
 
         UserCredentials credentials = dbH.getCredentials();
         String fullName;
-        if(credentials!=null){
+        if (credentials != null) {
             fullName = credentials.getFirstName();
             if (fullName == null) {
                 fullName = credentials.getLastName();
                 if (fullName == null) {
 
                     fullName = ((QRCodeActivity) context).getName();
-                    if(fullName == null) {
+                    if (fullName == null) {
                         fullName = myEmail;
                     }
                 }
             }
-        }
-        else{
+        } else {
             fullName = myEmail;
         }
         return getDefaultAvatar(getColorAvatar(myUser), fullName, AVATAR_SIZE, true);
@@ -388,41 +388,40 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        logDebug("onConfigurationChanged");
-        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Changed to LANDSCAPE");
+        Timber.d("onConfigurationChanged");
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Timber.d("Changed to LANDSCAPE");
 
-        }else{
-            logDebug("Changed to PORTRAIT");
+        } else {
+            Timber.d("Changed to PORTRAIT");
 
         }
     }
 
     @Override
     public void onAttach(Activity activity) {
-        logDebug("onAttach");
+        Timber.d("onAttach");
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
+        aB = ((AppCompatActivity) activity).getSupportActionBar();
     }
 
     @Override
     public void onAttach(Context context) {
-        logDebug("onAttach context");
+        Timber.d("onAttach context");
         super.onAttach(context);
         this.context = context;
-        aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        aB = ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
         switch (v.getId()) {
             case R.id.qr_code_button_copy_link: {
                 if (copyLink) {
                     copyLink();
-                }
-                else {
+                } else {
                     createLink();
                 }
                 break;
@@ -430,8 +429,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    public void copyLink () {
-        logDebug("copyLink");
+    public void copyLink() {
+        Timber.d("copyLink");
 
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("label", contactLink);
@@ -439,37 +438,35 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         ((QRCodeActivity) context).showSnackbar(v, getString(R.string.qrcode_link_copied));
     }
 
-    public void createLink () {
+    public void createLink() {
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
         qrFile = queryIfQRExists();
         if (qrFile != null && qrFile.exists()) {
             setImageQR();
             megaApi.contactLinkCreate(false, (QRCodeActivity) context);
-        }
-        else {
+        } else {
             megaApi.contactLinkCreate(false, (QRCodeActivity) context);
             AlertDialog temp = null;
-            try{
+            try {
                 temp = MegaProgressDialogUtil.createProgressDialog(context, getString(R.string.generatin_qr));
                 temp.show();
-            }
-            catch(Exception e){
-                logError(e.getMessage());
+            } catch (Exception e) {
+                Timber.e(e);
             }
             processingDialog = temp;
         }
     }
 
-    public void initCreateQR(MegaRequest request, MegaError e){
+    public void initCreateQR(MegaRequest request, MegaError e) {
         boolean reset = false;
-        if (handle != -1 && handle != request.getNodeHandle() && copyLink){
+        if (handle != -1 && handle != request.getNodeHandle() && copyLink) {
             reset = true;
         }
         if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("Contact link create LONG: " + request.getNodeHandle());
-            logDebug("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+            Timber.d("Contact link create LONG: %s", request.getNodeHandle());
+            Timber.d("Contact link create BASE64: https://mega.nz/C!%s", MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
             handle = request.getNodeHandle();
             contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
@@ -487,10 +484,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             }
             qrcode.setImageBitmap(qrCodeBitmap);
             qrcode_copy_link.setEnabled(true);
-            if (reset){
+            if (reset) {
                 ((QRCodeActivity) context).resetSuccessfully(true);
             }
-            if (createQR){
+            if (createQR) {
                 ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_create_successfully));
                 ((QRCodeActivity) context).createSuccessfully();
                 qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
@@ -500,19 +497,18 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             if (processingDialog != null) {
                 processingDialog.dismiss();
             }
-        }
-        else {
-            if (reset){
+        } else {
+            if (reset) {
                 ((QRCodeActivity) context).resetSuccessfully(false);
             }
         }
     }
 
-    public void initDeleteQR(MegaRequest request, MegaError e){
-        if (e.getErrorCode() == MegaError.API_OK){
-            logDebug("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+    public void initDeleteQR(MegaRequest request, MegaError e) {
+        if (e.getErrorCode() == MegaError.API_OK) {
+            Timber.d("Contact link delete:%d_%d_%s", e.getErrorCode(), request.getNodeHandle(), MegaApiAndroid.handleToBase64(request.getNodeHandle()));
             File qrCodeFile = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME);
-            if (isFileAvailable(qrCodeFile)){
+            if (isFileAvailable(qrCodeFile)) {
                 qrCodeFile.delete();
             }
             ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_successfully));
@@ -522,27 +518,26 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             createQR = true;
             qrcode_link.setText("");
             ((QRCodeActivity) context).deleteSuccessfully();
-        }
-        else {
+        } else {
             ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_not_successfully));
         }
     }
 
-    public void resetQRCode () {
-        logDebug("resetQRCode");
+    public void resetQRCode() {
+        Timber.d("resetQRCode");
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 //        megaApi.contactLinkDelete(handle, this);
         megaApi.contactLinkCreate(true, (QRCodeActivity) context);
     }
 
     public void deleteQRCode() {
-        logDebug("deleteQRCode");
+        Timber.d("deleteQRCode");
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
         megaApi.contactLinkDelete(handle, (QRCodeActivity) context);
     }

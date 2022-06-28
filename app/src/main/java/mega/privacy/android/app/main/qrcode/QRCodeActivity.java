@@ -1,5 +1,15 @@
 package mega.privacy.android.app.main.qrcode;
 
+import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR;
+import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,12 +18,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.core.content.FileProvider;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -21,6 +25,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,11 +44,9 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.globalmanagement.MyAccountInfo;
-import mega.privacy.android.app.main.DrawerItem;
-import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
+import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.settings.SettingsActivity;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
@@ -47,16 +56,10 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
+import timber.log.Timber;
 
 @AndroidEntryPoint
-public class QRCodeActivity extends PasscodeActivity implements MegaRequestListenerInterface{
+public class QRCodeActivity extends PasscodeActivity implements MegaRequestListenerInterface {
 
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
 
@@ -96,13 +99,12 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
 
         if (savedInstanceState != null) {
             showScanQrView = savedInstanceState.getBoolean(OPEN_SCAN_QR, false);
             inviteContacts = savedInstanceState.getBoolean("inviteContacts", false);
-        }
-        else {
+        } else {
             showScanQrView = getIntent().getBooleanExtra(OPEN_SCAN_QR, false);
             inviteContacts = getIntent().getBooleanExtra("inviteContacts", false);
         }
@@ -114,8 +116,8 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         setContentView(R.layout.activity_qr_code);
 
         tB = (Toolbar) findViewById(R.id.toolbar);
-        if(tB==null){
-            logWarning("Tb is Null");
+        if (tB == null) {
+            Timber.w("Tb is Null");
             return;
         }
 
@@ -132,14 +134,14 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
         rootLevelLayout = findViewById(R.id.root_level_layout);
 
-        qrCodePageAdapter =new QRCodePageAdapter(getSupportFragmentManager(),this);
+        qrCodePageAdapter = new QRCodePageAdapter(getSupportFragmentManager(), this);
 
-        tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
+        tabLayoutQRCode = (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
 
         if (!hasPermissions(this, Manifest.permission.CAMERA)) {
             requestPermission(this, MY_PERMISSIONS_REQUEST_CAMERA, Manifest.permission.CAMERA);
-        }else {
+        } else {
             initActivity();
         }
     }
@@ -151,7 +153,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initActivity();
-                }else{
+                } else {
                     this.finish();
                 }
                 return;
@@ -159,7 +161,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         }
     }
 
-    void initActivity(){
+    void initActivity() {
         viewPagerQRCode.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -174,8 +176,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                 if (position == 0) {
                     qrCodeFragment = 0;
                     myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
-                }
-                else {
+                } else {
                     qrCodeFragment = 1;
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
@@ -189,10 +190,9 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
         viewPagerQRCode.setAdapter(qrCodePageAdapter);
         tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
-        if (showScanQrView || inviteContacts){
+        if (showScanQrView || inviteContacts) {
             viewPagerQRCode.setCurrentItem(1);
-        }
-        else {
+        } else {
             viewPagerQRCode.setCurrentItem(0);
         }
     }
@@ -206,7 +206,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        logDebug("onCreateOptionsMenu");
+        Timber.d("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_qr_code, menu);
@@ -241,16 +241,16 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+        Timber.d("onOptionsItemSelected");
 
         int id = item.getItemId();
-        switch(id) {
+        switch (id) {
             case android.R.id.home: {
                 onBackPressed();
                 break;
             }
             case R.id.qr_code_share: {
-                shareQR ();
+                shareQR();
                 break;
             }
             case R.id.qr_code_save: {
@@ -280,8 +280,8 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         return super.onOptionsItemSelected(item);
     }
 
-    public String getName(){
-       return  myAccountInfo.getFullName();
+    public String getName() {
+        return myAccountInfo.getFullName();
 
     }
 
@@ -296,11 +296,10 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                     megaApi = ((MegaApplication) getApplication()).getMegaApi();
                 }
                 String myEmail = megaApi.getMyEmail();
-                qrFile = buildQrFile(this,myEmail + QR_IMAGE_FILE_NAME);
+                qrFile = buildQrFile(this, myEmail + QR_IMAGE_FILE_NAME);
                 if (qrFile == null) {
                     showSnackbar(rootLevelLayout, getString(R.string.general_error));
-                }
-                else {
+                } else {
                     if (qrFile.exists()) {
                         boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         if (!hasStoragePermission) {
@@ -321,8 +320,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                         File newQrFile = new File(parentPath, myEmail + QR_IMAGE_FILE_NAME);
                         if (newQrFile == null) {
                             showSnackbar(rootLevelLayout, getString(R.string.general_error));
-                        }
-                        else {
+                        } else {
                             try {
                                 newQrFile.createNewFile();
                                 FileChannel src = new FileInputStream(qrFile).getChannel();
@@ -336,8 +334,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                                 e.printStackTrace();
                             }
                         }
-                    }
-                    else {
+                    } else {
                         showSnackbar(rootLevelLayout, getString(R.string.error_download_qr));
                     }
                 }
@@ -345,41 +342,39 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         }
     }
 
-    public void shareQR () {
-        logDebug("shareQR");
+    public void shareQR() {
+        Timber.d("shareQR");
 
         if (myCodeFragment == null) {
-            logWarning("MyCodeFragment is NULL");
+            Timber.w("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        if (myCodeFragment!= null && myCodeFragment.isAdded()){
+        if (myCodeFragment != null && myCodeFragment.isAdded()) {
             File qrCodeFile = myCodeFragment.queryIfQRExists();
-            if (qrCodeFile != null && qrCodeFile.exists()){
+            if (qrCodeFile != null && qrCodeFile.exists()) {
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
                 share.setType("image/*");
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    logDebug("Use provider to share");
-                    Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",qrCodeFile);
+                    Timber.d("Use provider to share");
+                    Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", qrCodeFile);
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                else{
+                } else {
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + qrCodeFile));
                 }
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-            }
-            else {
+            } else {
                 showSnackbar(rootLevelLayout, getString(R.string.error_share_qr));
             }
         }
     }
 
-    public void resetQR () {
-        logDebug("resetQR");
+    public void resetQR() {
+        Timber.d("resetQR");
 
         if (myCodeFragment == null) {
-            logWarning("MyCodeFragment is NULL");
+            Timber.w("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
         if (myCodeFragment != null && myCodeFragment.isAdded()) {
@@ -387,33 +382,31 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         }
     }
 
-    public void deleteQR () {
-        logDebug("deleteQR");
+    public void deleteQR() {
+        Timber.d("deleteQR");
 
         if (myCodeFragment == null) {
-            logWarning("MyCodeFragment is NULL");
+            Timber.w("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        if (myCodeFragment != null && myCodeFragment.isAdded()){
+        if (myCodeFragment != null && myCodeFragment.isAdded()) {
             myCodeFragment.deleteQRCode();
         }
     }
 
-    public void resetSuccessfully (boolean success) {
-        logDebug("resetSuccessfully");
-        if (success){
+    public void resetSuccessfully(boolean success) {
+        Timber.d("resetSuccessfully");
+        if (success) {
             showSnackbar(rootLevelLayout, getString(R.string.qrcode_reset_successfully));
-        }
-        else {
+        } else {
             showSnackbar(rootLevelLayout, getString(R.string.qrcode_reset_not_successfully));
         }
     }
 
-    public void showSnackbar(View view, String s){
+    public void showSnackbar(View view, String s) {
         if (view == null) {
             showSnackbar(SNACKBAR_TYPE, rootLevelLayout, s);
-        }
-        else {
+        } else {
             showSnackbar(SNACKBAR_TYPE, view, s);
         }
     }
@@ -430,37 +423,34 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish ");
-        if(request.getType() == MegaRequest.TYPE_INVITE_CONTACT  && request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD){
+        Timber.d("onRequestFinish ");
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT && request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
             if (scanCodeFragment == null) {
-                logWarning("ScanCodeFragment is NULL");
+                Timber.w("ScanCodeFragment is NULL");
                 scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
             }
-            if (scanCodeFragment != null && scanCodeFragment.isAdded()){
+            if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
                 scanCodeFragment.myEmail = request.getEmail();
-                if (e.getErrorCode() == MegaError.API_OK){
-                    logDebug("OK INVITE CONTACT: " + request.getEmail());
+                if (e.getErrorCode() == MegaError.API_OK) {
+Timber.d("OK INVITE CONTACT: %s",  request.getEmail());
                     scanCodeFragment.dialogTitleContent = R.string.invite_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, false);
-                }
-                else if (e.getErrorCode() == MegaError.API_EACCESS){
+                } else if (e.getErrorCode() == MegaError.API_EACCESS) {
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_error;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false, false);
-                }
-                else if (e.getErrorCode() == MegaError.API_EEXIST){
+                } else if (e.getErrorCode() == MegaError.API_EEXIST) {
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, true);
-                }
-                else if (e.getErrorCode() == MegaError.API_EARGS){
+                } else if (e.getErrorCode() == MegaError.API_EARGS) {
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.error_own_email_as_contact;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, false);
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
+        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 dbH.setLastPublicHandle(request.getNodeHandle());
                 dbH.setLastPublicHandleTimeStamp();
@@ -474,7 +464,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                 finish();
             } else {
                 if (scanCodeFragment == null) {
-                    logWarning("ScanCodeFragment is NULL");
+                    Timber.w("ScanCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
                 if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
@@ -482,39 +472,34 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                     scanCodeFragment.initDialogInvite(request, e);
                 }
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
             if (scanCodeFragment == null) {
-                logWarning("ScanCodeFragment is NULL");
+                Timber.w("ScanCodeFragment is NULL");
                 scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
             }
             if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    logDebug("Get user avatar OK");
+                    Timber.d("Get user avatar OK");
                     scanCodeFragment.setAvatar();
                 } else {
-                    logWarning("Get user avatar FAIL");
+                    Timber.w("Get user avatar FAIL");
                     scanCodeFragment.setDefaultAvatar();
                 }
             }
-        }
-
-        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-            if (myCodeFragment == null){
-                logWarning("MyCodeFragment is NULL");
+        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+            if (myCodeFragment == null) {
+                Timber.w("MyCodeFragment is NULL");
                 myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
             }
-            if (myCodeFragment != null && myCodeFragment.isAdded()){
+            if (myCodeFragment != null && myCodeFragment.isAdded()) {
                 myCodeFragment.initCreateQR(request, e);
             }
-        }
-
-        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
-            if (myCodeFragment == null){
-                logWarning("MyCodeFragment is NULL");
+        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE) {
+            if (myCodeFragment == null) {
+                Timber.w("MyCodeFragment is NULL");
                 myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
             }
-            if (myCodeFragment != null && myCodeFragment.isAdded()){
+            if (myCodeFragment != null && myCodeFragment.isAdded()) {
                 myCodeFragment.initDeleteQR(request, e);
             }
         }
@@ -526,7 +511,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     }
 
     public void deleteSuccessfully() {
-        logDebug("deleteSuccessfully");
+        Timber.d("deleteSuccessfully");
         shareMenuItem.setVisible(false);
         saveMenuItem.setVisible(false);
         settingsMenuItem.setVisible(true);
@@ -535,7 +520,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     }
 
     public void createSuccessfully() {
-        logDebug("createSuccesfully");
+        Timber.d("createSuccesfully");
         shareMenuItem.setVisible(true);
         saveMenuItem.setVisible(true);
         settingsMenuItem.setVisible(true);

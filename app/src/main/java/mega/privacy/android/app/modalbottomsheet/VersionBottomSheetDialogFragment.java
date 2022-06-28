@@ -1,5 +1,14 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
+import static nz.mega.sdk.MegaShare.ACCESS_OWNER;
+import static nz.mega.sdk.MegaShare.ACCESS_READWRITE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,22 +17,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.Collections;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaShare.*;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -47,7 +49,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (node == null) {
-            logWarning("Node NULL");
+            Timber.w("Node NULL");
             return;
         }
 
@@ -112,7 +114,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     @Override
     public void onClick(View v) {
         if (node == null) {
-            logWarning("The selected node is NULL");
+            Timber.w("The selected node is NULL");
             return;
         }
 
