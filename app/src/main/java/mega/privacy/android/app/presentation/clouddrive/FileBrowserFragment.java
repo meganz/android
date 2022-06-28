@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.managerSections;
+package mega.privacy.android.app.presentation.clouddrive;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
@@ -103,6 +103,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;

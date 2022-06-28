@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.managerSections;
+package mega.privacy.android.app.presentation.search;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
@@ -92,8 +92,8 @@ import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
-import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
