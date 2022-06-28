@@ -2714,6 +2714,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
+        inMeetingViewModel.checkParticipantsList()
     }
 
     override fun onPause() {
