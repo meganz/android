@@ -9,10 +9,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRE
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
 import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
@@ -87,6 +87,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -1579,7 +1581,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
         cuTransfers.add(transfer);
-        launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
     }
 
     @Override
@@ -1621,7 +1623,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         Timber.d("Image sync finished, error code: %d, handle: %d, size: %d", e.getErrorCode(), transfer.getNodeHandle(), transfer.getTransferredBytes());
 
         try {
-            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
             transferFinished(transfer, e);
         } catch (Throwable th) {
             Timber.e(th);
