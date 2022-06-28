@@ -150,12 +150,15 @@ pipeline {
                         // upload unit test report if unit test fails
                         String unitTestResult = ""
                         if (BUILD_STEP == "Unit Test") {
-                            archiveUnitTestReport()
-                            final String unitTestUploadReponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-                            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadReponse).markdown
+                            if (archiveUnitTestReport()) {
+                                final String unitTestUploadResponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+                                def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
 
-                            String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                            unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
+                                String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                                unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
+                            } else {
+                                unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+                            }
                         }
 
                         // upload SDK build log if SDK build fails
@@ -456,13 +459,19 @@ String wrapBuildWarnings(String rawWarning) {
  * @return summary string of unit test
  */
 String unitTestSummary(String testReportRoot) {
-    return sh(script:  "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
+    return sh(script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
 }
 
 def archiveUnitTestReport() {
-    sh """
-        cd app/build
-        zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
-        mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
-    """
+    sh("rm -f ${WORKSPACE}/${UNIT_TEST_REPORT_ARCHIVE}")
+    if (fileExists(WORKSPACE + "/app/build/reports")) {
+        sh """
+            cd app/build
+            zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
+            mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
+        """
+        return true
+    } else {
+        return false
+    }
 }
