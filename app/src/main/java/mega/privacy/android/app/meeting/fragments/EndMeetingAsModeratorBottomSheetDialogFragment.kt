@@ -1,61 +1,43 @@
 package mega.privacy.android.app.meeting.fragments
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.fragment.app.viewModels
+import android.view.View
+import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingAsModeratorBinding
-import nz.mega.sdk.MegaChatApiJava
-import timber.log.Timber
 
 /**
  * The fragment shows two options for moderator when the moderator leave the meeting:
+ *
  * LEAVE CALL or END CALL FOR ALL
  */
 class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingAsModeratorBinding
-    private val viewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
-
-    private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-
     private var callBackEndForAll: (() -> Unit)? = null
     private var callBackLeaveMeeting: (() -> Unit)? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        chatId = viewModel.getChatId()
-
-        if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            Timber.e("Error. Chat doesn't exist")
-            return
-        }
-
-        if (viewModel.getCall() == null) {
-            Timber.e("Error. Call doesn't exist")
-            return
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireContext(),
+            R.style.BottomSheetFragmentWithTransparentBackground).apply {
+            setCanceledOnTouchOutside(true)
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        binding =
-            BottomSheetEndMeetingAsModeratorBinding.inflate(LayoutInflater.from(context),
-                null,
-                false).apply {
-                lifecycleOwner = this@EndMeetingAsModeratorBottomSheetDialogFragment
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding = BottomSheetEndMeetingAsModeratorBinding.inflate(layoutInflater, container, false)
 
         binding.endForAll.setOnClickListener { endForAll() }
         binding.leaveMeeting.setOnClickListener { leaveMeeting() }
-
-        dialog.setContentView(binding.root)
+        return binding.root
     }
 
     override fun onStart() {

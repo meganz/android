@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -30,7 +29,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -117,14 +115,11 @@ class InMeetingViewModel @Inject constructor(
     private val _showOnlyMeBanner = MutableStateFlow(false)
     val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
 
-    private val _showEndMeetingAsModeratorBottomPanel = MutableStateFlow(false)
-    val showEndMeetingAsModeratorBottomPanel: StateFlow<Boolean> get() = _showEndMeetingAsModeratorBottomPanel
+    private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
+    val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> = _showEndMeetingAsModeratorBottomPanel
 
-    private val _showAssignModeratorBottomPanel = MutableStateFlow(false)
-    val showAssignModeratorBottomPanel: StateFlow<Boolean> get() = _showAssignModeratorBottomPanel
-
-    private val _logOut = MutableStateFlow(false)
-    val logOut: StateFlow<Boolean> get() = _logOut
+    private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
+    val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -223,6 +218,10 @@ class InMeetingViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { (chatId, onlyMeInTheCall) ->
                     if (currentChatId == chatId) {
+                        if(onlyMeInTheCall) {
+                            hideBottomPanels()
+                        }
+
                         _showOnlyMeBanner.value = onlyMeInTheCall
                     }
                 },
@@ -986,10 +985,10 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isParticipantModerator(peerId: Long): Boolean =
         if (isMe(peerId))
-            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+            getOwnPrivileges() == PRIV_MODERATOR
         else
             inMeetingRepository.getChatRoom(currentChatId)
-                ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR }
+                ?.let { it.getPeerPrivilegeByHandle(peerId) == PRIV_MODERATOR }
                 ?: false
 
     /**
@@ -1851,15 +1850,24 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if you can be assigned as a moderator. False, otherwise.
      */
     fun shouldAssignModerator(): Boolean {
-        val hasOneModerator = participants.value?.toList()?.filter { it.isModerator }?.size?.let {
-            when {
-                it > 1 -> false
-                it == 1 -> getOwnPrivileges() != PRIV_MODERATOR
-                else -> getOwnPrivileges() == PRIV_MODERATOR
-            }
-        } == true
+        if (!isModerator() || numParticipants() == 0) {
+            return false
+        }
 
-        return hasOneModerator && isModerator() && participants.value?.none { isStandardUser(it.peerId) } == false
+        return participants.value?.toList()?.filter { it.isModerator }.isNullOrEmpty()
+    }
+
+    /**
+     * Get num of participants in the call
+     *
+     * @return num of participants
+     */
+    fun numParticipants(): Int {
+        participants.value?.size?.let { numParticipants ->
+            return numParticipants
+        }
+
+        return 0
     }
 
     /**
@@ -1932,7 +1940,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
         val participant = inMeetingRepository.getMyInfo(
-            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
+            getOwnPrivileges() == PRIV_MODERATOR,
             audio,
             video
         )
@@ -1950,7 +1958,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
+            return isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
         }
 
         return false
@@ -1962,9 +1970,9 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if the link should be visible. False, if not.
      */
     fun isGuestLinkVisible(): Boolean = if (isChatRoomPublic()) {
-        getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() != PRIV_MODERATOR
     } else {
-        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() == PRIV_MODERATOR
     }
 
     /**
@@ -1984,7 +1992,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if I'm moderator. False, if not.
      */
     fun isModeratorOfPrivateRoom(): Boolean =
-        !isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        !isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Determine if I am a guest
@@ -1998,7 +2006,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if I am a moderator. False if not
      */
-    fun amIAModerator(): Boolean = getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+    fun amIAModerator(): Boolean = getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Determine if the participant has standard privileges
@@ -2015,7 +2023,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if I am a moderator. False, if not
      */
     fun isModerator(): Boolean =
-        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Method for obtaining the bitmap of a participant's avatar
@@ -2279,23 +2287,6 @@ class InMeetingViewModel @Inject constructor(
     fun isLocalCameraOn(): Boolean = getCall()?.hasLocalVideo() ?: false
 
     /**
-     * Method to control when I am a guest and my participation in the meeting ends
-     */
-    fun logOutTheGuest(meetingActivity: Context) {
-        val chatId = getChatId()
-        val callId = getCall()?.callId
-        Timber.d("Finishing the activity as guest: chatId $chatId, callId $callId")
-        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
-            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
-        }
-        AccountController.logout(
-            meetingActivity,
-            MegaApplication.getInstance().megaApi,
-            viewModelScope
-        )
-    }
-
-    /**
      * Method that controls whether a participant's options (3 dots) should be enabled or not
      *
      * @param participantIsMe If the participant is me
@@ -2316,7 +2307,13 @@ class InMeetingViewModel @Inject constructor(
         return true
     }
 
+    /**
+     * End for all specified call
+     *
+     * @param chatId Chat ID
+     */
     private fun endCallForAll(chatId: Long) {
+        Timber.d("End for all. Chat id $chatId")
         endCallUseCase.endCallForAllWithChatId(chatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -2326,37 +2323,50 @@ class InMeetingViewModel @Inject constructor(
             .addTo(composite)
     }
 
+    /**
+     * End for all the current call
+     */
     fun endCallForAll() {
         callLiveData.value?.let { call ->
             endCallForAll(call.chatid)
         }
     }
 
+    /**
+     * Hang up a specified call
+     *
+     * @param callId Call ID
+     */
     private fun hangCall(callId: Long) {
+        Timber.d("Hang up call. Call id $callId")
         endCallUseCase.hangCall(callId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    if (amIAGuest()) {
-                        _logOut.value = true
-                    }
-                },
-                onError = { error -> Timber.e(error.stackTraceToString()) })
+            .subscribeBy(onError = { error ->
+                Timber.e(error.stackTraceToString())
+            })
             .addTo(composite)
     }
 
+    /**
+     * Hang up the current call
+     */
     fun hangCall() {
         callLiveData.value?.let { call ->
             hangCall(call.callId)
         }
     }
 
+    /**
+     * Control when the hang up button is clicked
+     */
     fun checkClickEndButton() {
         if (isOneToOneCall()) {
             hangCall()
+            return
 
-        } else if (amIAGuest()) {
+        }
+        if (amIAGuest()) {
             _callLiveData.value?.let {
                 LiveEventBus.get(
                     EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
@@ -2365,33 +2375,42 @@ class InMeetingViewModel @Inject constructor(
 
                 hangCall(it.callId)
             }
-        } else {
-            getChat()?.let { chat ->
-                when (chat.ownPrivilege) {
-                    PRIV_MODERATOR -> {
-                        if (_showEndMeetingAsModeratorBottomPanel.value) {
-                            _showEndMeetingAsModeratorBottomPanel.value = false
-                        }
+            return
+        }
 
-                        _showEndMeetingAsModeratorBottomPanel.value = true
-                    }
-                    else -> {
-                        hangCall()
-                    }
+        if (numParticipants() == 0) {
+            hangCall()
+            return
+        }
+
+        getChat()?.let { chat ->
+            when (chat.ownPrivilege) {
+                PRIV_MODERATOR -> {
+                    _showEndMeetingAsModeratorBottomPanel.value = true
+                }
+                else -> {
+                    hangCall()
                 }
             }
         }
     }
 
+    /**
+     * Control when the leave button is clicked
+     */
     fun checkClickLeaveButton() {
         if (shouldAssignModerator()) {
-            if (_showAssignModeratorBottomPanel.value) {
-                _showAssignModeratorBottomPanel.value = false
-            }
-
             _showAssignModeratorBottomPanel.value = true
         } else {
             hangCall()
         }
+    }
+
+    /**
+     * Hide bottom panels
+     */
+    fun hideBottomPanels() {
+        _showEndMeetingAsModeratorBottomPanel.value = false
+        _showAssignModeratorBottomPanel.value = false
     }
 }

@@ -115,7 +115,11 @@ class MeetingActivity : BaseActivity() {
         lifecycleScope.launchWhenStarted {
             meetingViewModel.finishMeetingActivity.collect { shouldFinish ->
                 if (shouldFinish) {
-                    finish()
+                    if (meetingViewModel.amIAGuest()) {
+                        meetingViewModel.logOutTheGuest(this@MeetingActivity)
+                    } else {
+                        finish()
+                    }
                 }
             }
         }

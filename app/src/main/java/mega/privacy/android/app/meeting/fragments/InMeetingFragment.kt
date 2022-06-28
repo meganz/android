@@ -61,6 +61,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -192,6 +193,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
+    private var assignModeratorDialog:AssignModeratorBottomSheetDialogFragment? = null
+    private var endMeetingAsModeratorDialog:EndMeetingAsModeratorBottomSheetDialogFragment? = null
+
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
 
@@ -299,9 +303,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 -> {
                     disableCamera()
                     removeUI()
-                    if (inMeetingViewModel.amIAGuest()) {
-                        inMeetingViewModel.logOutTheGuest(meetingActivity)
-                    }
                 }
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
@@ -958,14 +959,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.logOut.collect { shouldLogOut ->
-                if (shouldLogOut) {
-                    inMeetingViewModel.logOutTheGuest(requireActivity())
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
             sharedModel.cameraGranted.collect { allowed ->
                 if (allowed) {
                     bottomFloatingPanelViewHolder.updateCamPermissionWaring(allowed)
@@ -1241,35 +1234,35 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showAssignModeratorBottomPanel.collect { shouldBeShown ->
-                if (shouldBeShown) {
-                    AssignModeratorBottomSheetDialogFragment()
-                        .run {
-                            setLeaveMeetingCallBack{ inMeetingViewModel.hangCall() }
-                            setAssignModeratorCallBack(showAssignModeratorFragment)
-                            show(
-                                this@InMeetingFragment.childFragmentManager,
-                                tag
-                            )
-                        }
+        inMeetingViewModel.showAssignModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
+            if (shouldBeShown) {
+                assignModeratorDialog = AssignModeratorBottomSheetDialogFragment()
+                assignModeratorDialog?.run {
+                    setLeaveMeetingCallBack { inMeetingViewModel.hangCall() }
+                    setAssignModeratorCallBack(showAssignModeratorFragment)
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
                 }
+            } else {
+                assignModeratorDialog?.dismiss()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showEndMeetingAsModeratorBottomPanel.collect { shouldBeShown ->
-                if (shouldBeShown) {
-                    EndMeetingAsModeratorBottomSheetDialogFragment()
-                        .run {
-                            setLeaveMeetingCallBack { inMeetingViewModel.checkClickLeaveButton() }
-                            setEndForAllCallBack{ inMeetingViewModel.endCallForAll() }
-                            show(
-                                this@InMeetingFragment.childFragmentManager,
-                                tag
-                            )
-                        }
+        inMeetingViewModel.showEndMeetingAsModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
+            if (shouldBeShown) {
+                endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
+                endMeetingAsModeratorDialog?.run {
+                    setLeaveMeetingCallBack { inMeetingViewModel.checkClickLeaveButton() }
+                    setEndForAllCallBack { inMeetingViewModel.endCallForAll() }
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
                 }
+            } else {
+                endMeetingAsModeratorDialog?.dismiss()
             }
         }
     }
@@ -2729,6 +2722,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
+        assignModeratorDialog?.dismiss()
+        endMeetingAsModeratorDialog?.dismiss()
     }
 
     /**
