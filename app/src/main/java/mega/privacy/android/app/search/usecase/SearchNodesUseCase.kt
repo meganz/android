@@ -2,7 +2,7 @@ package mega.privacy.android.app.search.usecase
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud
+import mega.privacy.android.app.presentation.shares.links.LinksFragment.getLinksOrderCloud
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity.*

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments;
+package mega.privacy.android.app.presentation.shares.links;
 
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
 import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;

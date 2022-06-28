@@ -7,10 +7,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
-import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import timber.log.Timber;
 
 public class SharesPageAdapter extends FragmentStatePagerAdapter {

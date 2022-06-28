@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.managerSections;
+package mega.privacy.android.app.presentation.shares.incoming;
 
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INCOMING_SHARES;
