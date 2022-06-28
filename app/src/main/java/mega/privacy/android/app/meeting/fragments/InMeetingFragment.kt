@@ -203,7 +203,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var amIOnlyOneOnTheCall: Boolean = false
 
-    private val inMeetingViewModel by viewModels<InMeetingViewModel>()
+    val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
     private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
         val chatId = inMeetingViewModel.getChatId()
@@ -2513,6 +2513,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private val showAssignModeratorFragment = fun() {
         collapsePanel()
+        inMeetingViewModel.hideBottomPanels()
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )

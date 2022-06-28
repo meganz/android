@@ -2386,6 +2386,7 @@ class InMeetingViewModel @Inject constructor(
         getChat()?.let { chat ->
             when (chat.ownPrivilege) {
                 PRIV_MODERATOR -> {
+                    _showAssignModeratorBottomPanel.value = false
                     _showEndMeetingAsModeratorBottomPanel.value = true
                 }
                 else -> {
@@ -2400,6 +2401,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun checkClickLeaveButton() {
         if (shouldAssignModerator()) {
+            _showEndMeetingAsModeratorBottomPanel.value = false
             _showAssignModeratorBottomPanel.value = true
         } else {
             hangCall()

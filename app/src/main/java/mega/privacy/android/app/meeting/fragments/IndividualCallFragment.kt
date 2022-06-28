@@ -56,7 +56,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
-    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
+    private lateinit var inMeetingViewModel: InMeetingViewModel
 
     private var videoListener: IndividualCallVideoListener? = null
 
@@ -151,6 +151,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         inMeetingFragment = parentFragment as InMeetingFragment
+
+        inMeetingViewModel = inMeetingFragment.inMeetingViewModel
+
+        inMeetingViewModel.setChatId(chatId)
 
         if (inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE) {
             Timber.e("Error. Call doesn't exist")

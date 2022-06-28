@@ -30,7 +30,7 @@ import timber.log.Timber
 class SpeakerViewCallFragment : MeetingBaseFragment(),
     MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
-    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
+    private lateinit var inMeetingViewModel: InMeetingViewModel
 
     private lateinit var surfaceContainer: RelativeLayout
 
@@ -101,6 +101,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel
     }
 
     override fun onCreateView(

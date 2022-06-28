@@ -26,7 +26,7 @@ import nz.mega.sdk.*
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
-    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
+    private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
     // Get from activity
     private var isModerator = false

@@ -57,6 +57,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     lateinit var toolbarTitle: EmojiTextView
     lateinit var toolbarSubtitle: TextView
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
+
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
@@ -114,7 +115,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
-                Timber.d("******************** participants observe size "+participants.size)
                 update(participants.filter { inMeetingViewModel.isStandardUser(it.peerId) && !it.isGuest }
                     .map { it.copy() }
                     .toMutableList())
@@ -189,8 +189,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     }
 
     private fun initRecyclerview() {
-        Timber.d("******************** initRecyclerview")
-
         participantsAdapter = AssignParticipantsAdapter(sharedModel, selectCallback)
         selectedParticipantsAdapter =
             SelectedParticipantsAdapter(sharedModel, deleteCallback)
@@ -213,7 +211,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
             clipToPadding = false
             adapter = selectedParticipantsAdapter
         }
-        Timber.d("******************** articipantsAdapter.submitList(participants.toList()) size ${participants.size}")
 
         participantsAdapter.submitList(participants.toList())
     }
@@ -317,7 +314,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         disableLocalCamera()
         Timber.d("Leave meeting")
-        inMeetingViewModel.checkClickEndButton()
+        inMeetingViewModel.hangCall()
     }
 
     /**

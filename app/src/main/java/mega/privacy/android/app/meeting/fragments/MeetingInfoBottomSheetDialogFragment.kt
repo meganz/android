@@ -42,8 +42,7 @@ import timber.log.Timber
  */
 class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentMeetingInfoBinding
-    private val inMeetingViewModel by viewModels<InMeetingViewModel>({ requireParentFragment() })
-
+    private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
     private var changeTitleDialog: AlertDialog? = null
     private var chatTitle: String = ""
