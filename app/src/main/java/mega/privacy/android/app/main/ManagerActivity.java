@@ -3541,6 +3541,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void skipToMediaDiscoveryFragment(Fragment f) {
         mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
+        megaApi.sendEvent(99200, "Media Discovery On");
         isInMDMode = true;
     }
 
