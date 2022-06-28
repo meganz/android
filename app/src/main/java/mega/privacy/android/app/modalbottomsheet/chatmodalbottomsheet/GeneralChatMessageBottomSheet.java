@@ -286,7 +286,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
         }
 
-        if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+        if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && megaChatMessage.getUserHandle() == megaChatApi.getMyUserHandle()) {
             getNode();
         } else {
             checkSeparatorsVisibility();

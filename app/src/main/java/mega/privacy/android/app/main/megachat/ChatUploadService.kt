@@ -20,6 +20,8 @@ import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+
+import com.jeremyliao.liveeventbus.LiveEventBus
 import androidx.core.content.ContextCompat
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
+import mega.privacy.android.app.constants.EventConstants
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
@@ -134,7 +137,6 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     /** the receiver and manager for the broadcast to listen to the pause event  */
     private var pauseBroadcastReceiver: BroadcastReceiver? = null
 
-    @SuppressLint("NewApi")
     override fun onCreate() {
         super.onCreate()
         app = application as MegaApplication
@@ -150,10 +152,8 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock")
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock")
-        mBuilder = Notification.Builder(
-            this@ChatUploadService,
-            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
-        )
+        @Suppress("DEPRECATION")
+        mBuilder = Notification.Builder(this@ChatUploadService)
         mBuilderCompat = NotificationCompat.Builder(
             this@ChatUploadService,
             Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
@@ -283,7 +283,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 stopForeground()
             }
 
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
+
             return
         } else if (Constants.ACTION_CHECK_COMPRESSING_MESSAGE == intent.action) {
             checkCompressingMessage(intent)
@@ -879,7 +881,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             val appData = transfer.appData ?: return
 
             if (appData.contains(Constants.APP_DATA_CHAT)) {
-                TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+                LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                    .post(MegaTransfer.TYPE_UPLOAD)
+
                 Timber.d("This is a chat upload: $appData")
 
                 if (!transfer.isVoiceClipType()) {
@@ -909,7 +913,8 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
     override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
         if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
             Timber.d("onTransferUpdate: ${transfer.nodeHandle}")
             val appData = transfer.appData
 
@@ -937,7 +942,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 return
             }
 
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
+
             if (isOverQuota != 0) {
                 Timber.w("After overquota error")
                 isOverQuota = 0
@@ -998,7 +1005,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
                 addCompletedTransfer(AndroidCompletedTransfer(transfer, error), dbH)
                 mapProgressTransfers!![transfer.tag] = transfer
-                TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+
+                LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                    .post(MegaTransfer.TYPE_UPLOAD)
 
                 if (canceled) {
                     Timber.w("Upload cancelled: ${transfer.nodeHandle}")

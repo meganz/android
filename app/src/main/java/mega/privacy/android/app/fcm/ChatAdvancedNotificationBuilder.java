@@ -136,7 +136,7 @@ public final class ChatAdvancedNotificationBuilder {
 
     private ChatController chatC;
 
-    public static ChatAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
+    public static ChatAdvancedNotificationBuilder newInstance(Context context) {
         Context appContext = context.getApplicationContext();
         Context safeContext = ContextCompat.createDeviceProtectedStorageContext(appContext);
         if (safeContext == null) {
@@ -144,16 +144,16 @@ public final class ChatAdvancedNotificationBuilder {
         }
         NotificationManager notificationManager = (NotificationManager) safeContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        return new ChatAdvancedNotificationBuilder(safeContext, notificationManager, megaApi, megaChatApi);
+        return new ChatAdvancedNotificationBuilder(safeContext, notificationManager);
     }
 
-    public ChatAdvancedNotificationBuilder(Context context, NotificationManager notificationManager, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
+    public ChatAdvancedNotificationBuilder(Context context, NotificationManager notificationManager) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
 
         dbH = DatabaseHandler.getDbHandler(context);
-        this.megaApi = megaApi;
-        this.megaChatApi = megaChatApi;
+        megaApi = MegaApplication.getInstance().getMegaApi();
+        megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChatSummaryChannel(context);
         }
@@ -702,7 +702,6 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.cancel(id);
         }
         notificationIds.clear();
-        notificationManager.cancel(KeepAliveService.NEW_MESSAGE_NOTIFICATION_ID);
     }
 
     /**

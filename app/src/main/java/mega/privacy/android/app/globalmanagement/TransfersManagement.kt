@@ -26,12 +26,13 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE
+import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
-import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
+import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
@@ -45,6 +46,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
+import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import nz.mega.sdk.MegaTransfer.STATE_PAUSED
 import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
 import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
@@ -89,19 +91,6 @@ class TransfersManagement @Inject constructor(
             }
 
             return false
-        }
-
-        /**
-         * Sends a broadcast to update the transfer widget where needed.
-         *
-         * @param transferType  the transfer type.
-         */
-        @JvmStatic
-        fun launchTransferUpdateIntent(transferType: Int) {
-            MegaApplication.getInstance().sendBroadcast(
-                Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
-                    .putExtra(TRANSFER_TYPE, transferType)
-            )
         }
 
         /**
@@ -188,7 +177,7 @@ class TransfersManagement @Inject constructor(
     private var hasNotToBeShowDueToTransferOverQuota = false
     var isCurrentTransferOverQuota = false
     var isOnTransfersSection = false
-    var areFailedTransfers = false
+    private var areFailedTransfers = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
     var hasResumeTransfersWarningAlreadyBeenShown = false
@@ -370,7 +359,7 @@ class TransfersManagement @Inject constructor(
                 }
 
                 shouldShowNetworkWarning = true
-                launchTransferUpdateIntent(NO_TYPE)
+                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
             }
         }.start()
     }
@@ -382,7 +371,7 @@ class TransfersManagement @Inject constructor(
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false
-            launchTransferUpdateIntent(NO_TYPE)
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
         }
     }
 
@@ -507,11 +496,14 @@ class TransfersManagement @Inject constructor(
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    if (isFolder) {
+                    val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
+                    if (!isFolder || updatedTransfer == null
+                        || updatedTransfer.state == STATE_COMPLETED
+                    ) {
+                        removeProcessedScanningTransfer()
+                    } else {
                         transferTag = transfer.tag
                         transferStage = transfer.stage
-                    } else {
-                        removeProcessedScanningTransfer()
                     }
                 }
 
@@ -528,18 +520,31 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
-        if (!transfer.isFolderTransfer) {
-            return
-        }
-
         for (data in scanningTransfers) {
-            if (data.isTheSameFolderTransfer(transfer)) {
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES) {
+            if (data.isTheSameTransfer(transfer)) {
+                val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
+                if (transfer.stage >= STAGE_TRANSFERRING_FILES
+                    || updatedTransfer == null || updatedTransfer.state == STATE_COMPLETED
+                ) {
                     data.removeProcessedScanningTransfer()
                 } else {
                     data.transferStage = transfer.stage
                 }
 
+                break
+            }
+        }
+    }
+
+    /**
+     * If the transfer is a folder removes it from scanningTransfers as is already processed.
+     *
+     * @param transfer  Transfer to check.
+     */
+    fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
+        for (data in scanningTransfers) {
+            if (data.isTheSameTransfer(transfer)) {
+                data.removeProcessedScanningTransfer()
                 break
             }
         }
@@ -634,4 +639,11 @@ class TransfersManagement @Inject constructor(
         } else {
             false
         }
+
+    fun setAreFailedTransfers(failed: Boolean) {
+        areFailedTransfers = failed
+        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean::class.java).post(false)
+    }
+
+    fun getAreFailedTransfers(): Boolean = areFailedTransfers
 }

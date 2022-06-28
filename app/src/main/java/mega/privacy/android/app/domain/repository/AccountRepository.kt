@@ -1,6 +1,7 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.entity.user.UserUpdate
 import mega.privacy.android.app.domain.exception.MegaException
@@ -73,4 +74,18 @@ interface AccountRepository {
      * @return Number of unread user alerts.
      */
     suspend fun getNumUnreadUserAlerts(): Int
+
+    /**
+     * Gets user account credentials.
+     *
+     * @return User credentials if exists, null otherwise.
+     */
+    suspend fun getCredentials(): UserCredentials?
+
+    /**
+     * Refreshes DNS servers and retries pending connections.
+     *
+     * @param disconnect True if should disconnect megaChatApi, false otherwise.
+     */
+    fun retryPendingConnections(disconnect: Boolean)
 }

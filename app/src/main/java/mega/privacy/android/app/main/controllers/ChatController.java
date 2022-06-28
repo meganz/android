@@ -544,15 +544,16 @@ public class ChatController {
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
                     String textToShow = "";
-                    switch (message.getTermCode()) {
-                        case MegaChatMessage.END_CALL_REASON_ENDED: {
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
+                        case MegaChatMessage.END_CALL_REASON_ENDED:
 
                             int hours = message.getDuration() / 3600;
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
-                                    context.getString(R.string.call_ended_message);
+                            textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
+                                    StringResourcesUtils.getString(R.string.call_ended_message);
 
                             if (hours != 0) {
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -587,7 +588,6 @@ public class ChatController {
                             }
 
                             break;
-                        }
                         case MegaChatMessage.END_CALL_REASON_REJECTED: {
 
                             textToShow = String.format(context.getString(R.string.call_rejected_messages));
@@ -719,15 +719,15 @@ public class ChatController {
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
                     String textToShow = "";
-                    switch (message.getTermCode()) {
-                        case MegaChatMessage.END_CALL_REASON_ENDED: {
-
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
+                        case MegaChatMessage.END_CALL_REASON_ENDED:
                             int hours = message.getDuration() / 3600;
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
-                                    context.getString(R.string.call_ended_message);
+                            textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
+                                    StringResourcesUtils.getString(R.string.call_ended_message);
 
                             if (hours != 0) {
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -762,7 +762,7 @@ public class ChatController {
                             }
 
                             break;
-                        }
+
                         case MegaChatMessage.END_CALL_REASON_REJECTED: {
 
                             textToShow = String.format(context.getString(R.string.call_rejected_messages));

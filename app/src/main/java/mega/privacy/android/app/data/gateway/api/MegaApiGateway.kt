@@ -77,6 +77,16 @@ interface MegaApiGateway {
     val isMasterBusinessAccount: Boolean
 
     /**
+     * Is ephemeral plus plus account.
+     */
+    val isEphemeralPlusPlus: Boolean
+
+    /**
+     * Authentication token that can be used to identify the user account.
+     */
+    val accountAuth: String
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
@@ -274,6 +284,39 @@ interface MegaApiGateway {
      * @return True if the node has children, false otherwise.
      */
     suspend fun hasChildren(node: MegaNode): Boolean
+
+    /**
+     * Registers push notifications.
+     *
+     * @param deviceType    Type of device.
+     * @param newToken      New push token.
+     * @param listener      Listener.
+     */
+    fun registerPushNotifications(
+        deviceType: Int,
+        newToken: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Performs a fast login.
+     *
+     * @param session   Required for fast login.
+     * @param listener  Listener.
+     */
+    fun fastLogin(session: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Performs fetch nodes.
+     *
+     * @param listener  Listener.
+     */
+    fun fetchNodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Retries all pending requests.
+     */
+    fun retryPendingConnections()
 
     /**
      * Starts a download.

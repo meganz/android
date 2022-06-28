@@ -532,7 +532,7 @@ class MediaPlayerServiceViewModel(
                 index = 0,
                 type = PlaylistItem.TYPE_PLAYING,
                 size = node?.size ?: INVALID_SIZE,
-                duration = node.duration
+                duration = node?.duration ?: 0,
             )
             playlistItems.add(playlistItem)
             playlistItemsMap[firstPlayHandle.toString()] = playlistItem
