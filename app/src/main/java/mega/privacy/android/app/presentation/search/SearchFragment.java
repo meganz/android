@@ -94,7 +94,6 @@ import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -115,8 +114,6 @@ public class SearchFragment extends RotatableFragment {
 
     @Inject
     SortOrderManagement sortOrderManagement;
-    @Inject
-    SearchNodesUseCase searchNodesUseCase;
 
     private Context context;
     private RecyclerView recyclerView;
