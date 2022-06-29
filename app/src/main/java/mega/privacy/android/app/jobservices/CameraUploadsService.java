@@ -14,7 +14,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
@@ -116,6 +115,7 @@ import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -1363,7 +1363,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mIntent = new Intent(this, ManagerActivity.class);
         mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+        mIntent.putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB);
 
         mPendingIntent = PendingIntent.getActivity(this, 0, mIntent, PendingIntent.FLAG_IMMUTABLE);
 

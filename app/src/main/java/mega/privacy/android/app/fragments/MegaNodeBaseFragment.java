@@ -3,10 +3,6 @@ package mega.privacy.android.app.fragments;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
-import static mega.privacy.android.app.main.ManagerActivity.ERROR_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
@@ -94,6 +90,8 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
 import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
+import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -166,9 +164,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
-        private int currentTab;
+        private final Tab currentTab;
 
-        public BaseActionBarCallBack(int currentTab) {
+        public BaseActionBarCallBack(Tab currentTab) {
             this.currentTab = currentTab;
         }
 
@@ -395,7 +393,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      * @return Null.
      */
     protected Unit showSortByPanel(Unit unit) {
-        managerActivity.showNewSortByPanel(getCurrentSharesTab() == INCOMING_TAB
+        managerActivity.showNewSortByPanel(getCurrentSharesTab() == SharesTab.INCOMING_TAB
                 ? ORDER_OTHERS
                 : ORDER_CLOUD);
 
@@ -710,15 +708,15 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      *
      * @return The current shares tab.
      */
-    private int getCurrentSharesTab() {
-        int tab = ERROR_TAB;
+    private SharesTab getCurrentSharesTab() {
+        SharesTab tab = SharesTab.NONE;
 
         if (MegaNodeBaseFragment.this instanceof IncomingSharesFragment) {
-            tab = INCOMING_TAB;
+            tab = SharesTab.INCOMING_TAB;
         } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragment) {
-            tab = OUTGOING_TAB;
+            tab = SharesTab.OUTGOING_TAB;
         } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
-            tab = LINKS_TAB;
+            tab = SharesTab.LINKS_TAB;
         }
 
         return tab;
@@ -732,7 +730,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int tab = getCurrentSharesTab();
+                SharesTab tab = getCurrentSharesTab();
 
                 if (managerActivity.getTabItemShares() == tab) {
                     checkScroll();

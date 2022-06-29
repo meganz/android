@@ -6,6 +6,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLink
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity.*
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
@@ -104,8 +105,8 @@ class SearchNodesUseCase @Inject constructor(
                                 megaApi.getNodeByHandle(parentHandle)
                             DrawerItem.SHARED_ITEMS -> {
                                 @Suppress("DEPRECATION")
-                                when (sharesTab) {
-                                    INCOMING_TAB -> {
+                                when (SharesTab.fromPosition(sharesTab)) {
+                                    SharesTab.INCOMING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(getInShares(query, megaCancelToken))
                                             return@create
@@ -113,7 +114,7 @@ class SearchNodesUseCase @Inject constructor(
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
                                     }
-                                    OUTGOING_TAB -> {
+                                    SharesTab.OUTGOING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getOutShares(
@@ -126,7 +127,7 @@ class SearchNodesUseCase @Inject constructor(
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
                                     }
-                                    LINKS_TAB -> {
+                                    SharesTab.LINKS_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getLinks(

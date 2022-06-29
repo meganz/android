@@ -12,11 +12,13 @@ import static mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAILABLE;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
+import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
+import static mega.privacy.android.app.data.extensions.MegaTransferKt.isVoiceClipTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
-import static mega.privacy.android.app.main.ManagerActivity.COMPLETED_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
@@ -35,6 +37,7 @@ import static mega.privacy.android.app.utils.Constants.EXTRA_RESULT_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
 import static mega.privacy.android.app.utils.Constants.EXTRA_TRANSFER_TYPE;
 import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_DOWNLOAD;
@@ -116,6 +119,7 @@ import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
@@ -134,13 +138,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.data.extensions.MegaTransferKt.isVoiceClipTransfer;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
-import static mega.privacy.android.app.utils.Constants.*;
-
 /**
  * Background service to download files
  */
@@ -767,7 +764,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 
         Intent intent = new Intent(getApplicationContext(), ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
-        intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
+        intent.putExtra(TRANSFERS_TAB, TransfersTab.COMPLETED_TAB);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -1096,7 +1093,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
                 contentText = getString(R.string.download_touch_to_show);
                 intent = new Intent(DownloadService.this, ManagerActivity.class);
                 intent.setAction(ACTION_SHOW_TRANSFERS);
-                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+                intent.putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB);
                 pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             }
 

@@ -25,8 +25,8 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRA
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.ManagerActivity.PENDING_TAB
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
@@ -174,7 +174,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         startActivity(
             Intent(this, ManagerActivity::class.java)
                 .setAction(ACTION_SHOW_TRANSFERS)
-                .putExtra(TRANSFERS_TAB, PENDING_TAB)
+                .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )

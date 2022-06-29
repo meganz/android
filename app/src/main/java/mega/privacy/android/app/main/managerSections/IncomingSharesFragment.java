@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.managerSections;
 
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
@@ -29,6 +28,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
+import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
@@ -43,7 +44,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 
             if (getActivity() != null) {
                 actionMode = ((AppCompatActivity) getActivity())
-                        .startSupportActionMode(new ActionBarCallBack(INCOMING_TAB));
+                        .startSupportActionMode(new ActionBarCallBack(SharesTab.INCOMING_TAB));
             }
         }
     }
@@ -55,7 +56,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 
     private class ActionBarCallBack extends BaseActionBarCallBack {
 
-        public ActionBarCallBack(int currentTab) {
+        public ActionBarCallBack(Tab currentTab) {
             super(currentTab);
         }
 
@@ -161,7 +162,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
             Timber.w("ParentHandle -1");
             findNodes();
         } else {
-            managerActivity.hideTabs(true, INCOMING_TAB);
+            managerActivity.hideTabs(true, SharesTab.INCOMING_TAB);
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
             Timber.d("ParentHandle to find children: %s", managerActivity.getParentHandleIncoming());
 
@@ -221,7 +222,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 
     @Override
     public void navigateToFolder(MegaNode node) {
-        managerActivity.hideTabs(true, INCOMING_TAB);
+        managerActivity.hideTabs(true, SharesTab.INCOMING_TAB);
         managerActivity.increaseDeepBrowserTreeIncoming();
         Timber.d("Is folder deep: %s", managerActivity.deepBrowserTreeIncoming);
 
@@ -278,7 +279,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 
                 Timber.d("deepBrowserTree==0");
                 managerActivity.setParentHandleIncoming(INVALID_HANDLE);
-                managerActivity.hideTabs(false, INCOMING_TAB);
+                managerActivity.hideTabs(false, SharesTab.INCOMING_TAB);
                 managerActivity.setToolbarTitle();
                 findNodes();
                 visibilityFastScroller();
