@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
+import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments;
+package mega.privacy.android.app.presentation.shares;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
