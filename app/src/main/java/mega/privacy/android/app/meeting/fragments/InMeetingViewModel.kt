@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -30,16 +29,15 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
@@ -47,19 +45,12 @@ import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
-import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.NAME_CHANGE
-import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
-import mega.privacy.android.app.utils.Constants.TYPE_JOIN
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall.*
+import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
@@ -77,9 +68,9 @@ class InMeetingViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val endCallUseCase: EndCallUseCase,
     getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
-    HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     /**
      * Enum defining the type of call subtitle.
@@ -123,6 +114,12 @@ class InMeetingViewModel @Inject constructor(
 
     private val _showOnlyMeBanner = MutableStateFlow(false)
     val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
+
+    private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
+    val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> = _showEndMeetingAsModeratorBottomPanel
+
+    private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
+    val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
@@ -221,6 +218,10 @@ class InMeetingViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { (chatId, onlyMeInTheCall) ->
                     if (currentChatId == chatId) {
+                        if(onlyMeInTheCall) {
+                            hideBottomPanels()
+                        }
+
                         _showOnlyMeBanner.value = onlyMeInTheCall
                     }
                 },
@@ -984,10 +985,10 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isParticipantModerator(peerId: Long): Boolean =
         if (isMe(peerId))
-            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+            getOwnPrivileges() == PRIV_MODERATOR
         else
             inMeetingRepository.getChatRoom(currentChatId)
-                ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR }
+                ?.let { it.getPeerPrivilegeByHandle(peerId) == PRIV_MODERATOR }
                 ?: false
 
     /**
@@ -1534,28 +1535,7 @@ class InMeetingViewModel @Inject constructor(
      * @param callId Call ID
      */
     private fun hangUpSpecificCall(callId: Long) {
-        inMeetingRepository.leaveMeeting(
-            callId,
-            HangChatCallListener(MegaApplication.getInstance(), this)
-        )
-    }
-
-    /**
-     * Method for leave the meeting
-     */
-    fun leaveMeeting() {
-        _callLiveData.value?.let {
-            if (amIAGuest()) {
-                LiveEventBus.get(
-                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
-                    Long::class.java
-                ).post(it.callId)
-            }
-            inMeetingRepository.leaveMeeting(
-                it.callId,
-                HangChatCallListener(MegaApplication.getInstance(), this)
-            )
-        }
+        hangCall(callId)
     }
 
     /**
@@ -1870,15 +1850,24 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if you can be assigned as a moderator. False, otherwise.
      */
     fun shouldAssignModerator(): Boolean {
-        val hasOneModerator = participants.value?.toList()?.filter { it.isModerator }?.size?.let {
-            when {
-                it > 1 -> false
-                it == 1 -> getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
-                else -> getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
-            }
-        } == true
+        if (!isModerator() || numParticipants() == 0) {
+            return false
+        }
 
-        return hasOneModerator && isModerator() && participants.value?.none { isStandardUser(it.peerId) } == false
+        return participants.value?.toList()?.filter { it.isModerator }.isNullOrEmpty()
+    }
+
+    /**
+     * Get num of participants in the call
+     *
+     * @return num of participants
+     */
+    fun numParticipants(): Int {
+        participants.value?.size?.let { numParticipants ->
+            return numParticipants
+        }
+
+        return 0
     }
 
     /**
@@ -1951,7 +1940,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
         val participant = inMeetingRepository.getMyInfo(
-            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
+            getOwnPrivileges() == PRIV_MODERATOR,
             audio,
             video
         )
@@ -1969,7 +1958,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
+            return isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
         }
 
         return false
@@ -1981,9 +1970,9 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if the link should be visible. False, if not.
      */
     fun isGuestLinkVisible(): Boolean = if (isChatRoomPublic()) {
-        getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() != PRIV_MODERATOR
     } else {
-        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() == PRIV_MODERATOR
     }
 
     /**
@@ -2003,7 +1992,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if I'm moderator. False, if not.
      */
     fun isModeratorOfPrivateRoom(): Boolean =
-        !isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        !isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Determine if I am a guest
@@ -2017,7 +2006,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if I am a moderator. False if not
      */
-    fun amIAModerator(): Boolean = getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+    fun amIAModerator(): Boolean = getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Determine if the participant has standard privileges
@@ -2034,7 +2023,7 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if I am a moderator. False, if not
      */
     fun isModerator(): Boolean =
-        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Method for obtaining the bitmap of a participant's avatar
@@ -2066,9 +2055,6 @@ class InMeetingViewModel @Inject constructor(
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
         const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
-    }
-
-    override fun onCallHungUp(callId: Long) {
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
@@ -2301,23 +2287,6 @@ class InMeetingViewModel @Inject constructor(
     fun isLocalCameraOn(): Boolean = getCall()?.hasLocalVideo() ?: false
 
     /**
-     * Method to control when I am a guest and my participation in the meeting ends
-     */
-    fun finishActivityAsGuest(meetingActivity: Context) {
-        val chatId = getChatId()
-        val callId = getCall()?.callId
-        Timber.d("Finishing the activity as guest: chatId $chatId, callId $callId")
-        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
-            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
-        }
-        AccountController.logout(
-            meetingActivity,
-            MegaApplication.getInstance().megaApi,
-            viewModelScope
-        )
-    }
-
-    /**
      * Method that controls whether a participant's options (3 dots) should be enabled or not
      *
      * @param participantIsMe If the participant is me
@@ -2336,5 +2305,114 @@ class InMeetingViewModel @Inject constructor(
         }
 
         return true
+    }
+
+    /**
+     * End for all specified call
+     *
+     * @param chatId Chat ID
+     */
+    private fun endCallForAll(chatId: Long) {
+        Timber.d("End for all. Chat id $chatId")
+        endCallUseCase.endCallForAllWithChatId(chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { error ->
+                Timber.e(error.stackTraceToString())
+            })
+            .addTo(composite)
+    }
+
+    /**
+     * End for all the current call
+     */
+    fun endCallForAll() {
+        callLiveData.value?.let { call ->
+            endCallForAll(call.chatid)
+        }
+    }
+
+    /**
+     * Hang up a specified call
+     *
+     * @param callId Call ID
+     */
+    private fun hangCall(callId: Long) {
+        Timber.d("Hang up call. Call id $callId")
+        endCallUseCase.hangCall(callId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { error ->
+                Timber.e(error.stackTraceToString())
+            })
+            .addTo(composite)
+    }
+
+    /**
+     * Hang up the current call
+     */
+    fun hangCall() {
+        callLiveData.value?.let { call ->
+            hangCall(call.callId)
+        }
+    }
+
+    /**
+     * Control when the hang up button is clicked
+     */
+    fun checkClickEndButton() {
+        if (isOneToOneCall()) {
+            hangCall()
+            return
+
+        }
+        if (amIAGuest()) {
+            _callLiveData.value?.let {
+                LiveEventBus.get(
+                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
+                    Long::class.java
+                ).post(it.callId)
+
+                hangCall(it.callId)
+            }
+            return
+        }
+
+        if (numParticipants() == 0) {
+            hangCall()
+            return
+        }
+
+        getChat()?.let { chat ->
+            when (chat.ownPrivilege) {
+                PRIV_MODERATOR -> {
+                    _showAssignModeratorBottomPanel.value = false
+                    _showEndMeetingAsModeratorBottomPanel.value = true
+                }
+                else -> {
+                    hangCall()
+                }
+            }
+        }
+    }
+
+    /**
+     * Control when the leave button is clicked
+     */
+    fun checkClickLeaveButton() {
+        if (shouldAssignModerator()) {
+            _showEndMeetingAsModeratorBottomPanel.value = false
+            _showAssignModeratorBottomPanel.value = true
+        } else {
+            hangCall()
+        }
+    }
+
+    /**
+     * Hide bottom panels
+     */
+    fun hideBottomPanels() {
+        _showEndMeetingAsModeratorBottomPanel.value = false
+        _showAssignModeratorBottomPanel.value = false
     }
 }
