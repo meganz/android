@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.presentation.transfers
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -15,8 +16,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
+import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
@@ -49,6 +52,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
+
+    val transfersViewModel: TransfersManagementViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +110,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     }
                 }
             }
+
+        transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
+            transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
+        }
     }
 
     /**
@@ -172,7 +181,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * @param transferType  Type of the transfer.
      */
     protected fun updateTransfersWidget(transferType: Int) {
-        transfersWidget?.update(transferType)
+        transfersViewModel.checkTransfersInfo(transferType)
     }
 
     /**
@@ -235,7 +244,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             showScanningTransfersDialog()
         }
 
-        transfersWidget?.update()
+        updateTransfersWidget()
     }
 
     override fun onDestroy() {
@@ -249,7 +258,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the transfers widget.
      */
     fun updateTransfersWidget() {
-        transfersWidget?.update()
+        transfersViewModel.checkTransfersInfo(NO_TYPE)
     }
 
     /**
@@ -265,11 +274,4 @@ open class TransfersManagementActivity : PasscodeActivity() {
     fun hideTransfersWidget() {
         transfersWidget?.hide()
     }
-
-    /**
-     * Gets the pending transfers.
-     *
-     * @return Pending transfers.
-     */
-    fun getPendingTransfers(): Int = transfersWidget?.pendingTransfers ?: 0
 }

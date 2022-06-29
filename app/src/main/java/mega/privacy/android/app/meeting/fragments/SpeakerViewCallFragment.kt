@@ -86,6 +86,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
             if (firstParticipant == null) {
                 speakerAvatar.isVisible = false
+                speakerOnHoldIcon.isVisible = false
+                speakerMuteIcon.isVisible = false
+                surfaceContainer.isVisible = false
             } else {
                 selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
             }
@@ -593,7 +596,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
         }
 
-        if (participants.isNullOrEmpty())
+        if (participants.isEmpty())
             return
 
         //Participant in list
@@ -766,7 +769,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         inMeetingViewModel.removePreviousSpeakers()
         inMeetingViewModel.clearSpeakerParticipants()
 
-        if (participants.isNullOrEmpty())
+        if (participants.isEmpty())
             return
 
         val iterator = participants.iterator()

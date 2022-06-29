@@ -206,7 +206,7 @@ class MegaApiFacade @Inject constructor(
     override fun registerPushNotifications(
         deviceType: Int,
         newToken: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.registerPushNotifications(deviceType, newToken, listener)
 
     override fun fastLogin(session: String, listener: MegaRequestListenerInterface) =
@@ -216,6 +216,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.fetchNodes(listener)
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
+
+    override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

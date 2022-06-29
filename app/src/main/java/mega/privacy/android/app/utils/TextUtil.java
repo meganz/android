@@ -71,6 +71,27 @@ public class TextUtil {
     }
 
     /**
+     * Add the appropriate format in the call ended chat messages.
+     *
+     * @param textToShow The message text
+     * @return The formatted text
+     */
+    public static Spanned replaceFormatCallEndedMessage(String textToShow) {
+        try {
+            textToShow = textToShow.replace("[A]", "");
+            textToShow = textToShow.replace("[/A]", "");
+            textToShow = textToShow.replace("[B]", "<font face=\'sans-serif-medium\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[C]", "");
+            textToShow = textToShow.replace("[/C]", "");
+        } catch (Exception e) {
+            Timber.e(e.getStackTrace().toString());
+        }
+
+        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
+    }
+
+    /**
      * Add appropriate formatting to text on empty screens with chosen colours.
      *
      * @param textToShow The message text
