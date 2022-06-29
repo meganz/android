@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.repository.DefaultChatRepository
 import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
+import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.app.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
@@ -26,6 +27,7 @@ import mega.privacy.android.app.domain.repository.ChatRepository
 import mega.privacy.android.app.domain.repository.ContactsRepository
 import mega.privacy.android.app.domain.repository.EnvironmentRepository
 import mega.privacy.android.app.domain.repository.FavouritesRepository
+import mega.privacy.android.app.domain.repository.FeatureFlagRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.LoggingRepository
@@ -97,6 +99,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
+
+    @Binds
+    abstract fun bindFeatureFlagRepository(repository: DefaultFeatureFlagRepository): FeatureFlagRepository
 
     @Binds
     abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
