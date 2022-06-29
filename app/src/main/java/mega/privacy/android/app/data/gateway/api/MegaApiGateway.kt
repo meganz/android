@@ -319,6 +319,16 @@ interface MegaApiGateway {
     fun retryPendingConnections()
 
     /**
+     * Gets all transfers of a specific type (downloads or uploads).
+     * If the parameter isn't MegaTransfer::TYPE_DOWNLOAD or MegaTransfer::TYPE_UPLOAD
+     * this function returns an empty list.
+     *
+     * @param type MegaTransfer::TYPE_DOWNLOAD or MegaTransfer::TYPE_UPLOAD
+     * @return List with transfers of the desired type.
+     */
+    suspend fun getTransfers(type: Int): List<MegaTransfer>
+
+    /**
      * Starts a download.
      *
      * @param node        MegaNode that identifies the file or folder.

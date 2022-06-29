@@ -67,6 +67,7 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -539,112 +540,31 @@ public class ChatController {
 
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
-                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
                     String textToShow = "";
-                    switch(message.getTermCode()){
+                    switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         case MegaChatMessage.END_CALL_REASON_ENDED:
-
-                            int hours = message.getDuration() / 3600;
-                            int minutes = (message.getDuration() % 3600) / 60;
-                            int seconds = message.getDuration() % 60;
-
-                            textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
-                                    StringResourcesUtils.getString(R.string.call_ended_message);
-
-                            if (hours != 0) {
-                                String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
-                                textToShow = textToShow + textHours;
-                                if ((minutes != 0) || (seconds != 0)) {
-                                    textToShow = textToShow + ", ";
-                                }
-                            }
-
-                            if (minutes != 0) {
-                                String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
-                                textToShow = textToShow + textMinutes;
-                                if (seconds != 0) {
-                                    textToShow = textToShow + ", ";
-                                }
-                            }
-
-                            if (seconds != 0) {
-                                String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
-                                textToShow = textToShow + textSeconds;
-                            }
-
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                                textToShow = textToShow.replace("[C]", "");
-                                textToShow = textToShow.replace("[/C]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration()).toString();
                             break;
-                        case MegaChatMessage.END_CALL_REASON_REJECTED: {
-
-                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallRejected().toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER: {
 
-                            textToShow = String.format(context.getString(R.string.call_not_answered_messages));
-
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle()).toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_FAILED: {
 
-                            textToShow = String.format(context.getString(R.string.call_failed_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_FAILED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallFailed().toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_CANCELLED: {
 
-                            textToShow = String.format(context.getString(R.string.call_cancelled_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle()).toString();
                             break;
-                        }
                     }
 
                     builder.append(textToShow);
@@ -714,7 +634,7 @@ public class ChatController {
                         return "";
                     }
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
-                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
@@ -722,103 +642,24 @@ public class ChatController {
                     switch(message.getTermCode()){
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         case MegaChatMessage.END_CALL_REASON_ENDED:
-                            int hours = message.getDuration() / 3600;
-                            int minutes = (message.getDuration() % 3600) / 60;
-                            int seconds = message.getDuration() % 60;
-
-                            textToShow = (chatRoom.isGroup() && message.getTermCode() == MegaChatMessage.END_CALL_REASON_ENDED) ? StringResourcesUtils.getString(R.string.group_call_ended_message) :
-                                    StringResourcesUtils.getString(R.string.call_ended_message);
-
-                            if (hours != 0) {
-                                String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
-                                textToShow = textToShow + textHours;
-                                if ((minutes != 0) || (seconds != 0)) {
-                                    textToShow = textToShow + ", ";
-                                }
-                            }
-
-                            if (minutes != 0) {
-                                String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
-                                textToShow = textToShow + textMinutes;
-                                if (seconds != 0) {
-                                    textToShow = textToShow + ", ";
-                                }
-                            }
-
-                            if (seconds != 0) {
-                                String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
-                                textToShow = textToShow + textSeconds;
-                            }
-
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                                textToShow = textToShow.replace("[C]", "");
-                                textToShow = textToShow.replace("[/C]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration()).toString();
                             break;
 
-                        case MegaChatMessage.END_CALL_REASON_REJECTED: {
-
-                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallRejected().toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER: {
 
-                            textToShow = String.format(context.getString(R.string.call_missed_messages));
-
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle()).toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_FAILED: {
 
-                            textToShow = String.format(context.getString(R.string.call_failed_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_FAILED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallFailed().toString();
                             break;
-                        }
-                        case MegaChatMessage.END_CALL_REASON_CANCELLED: {
 
-                            textToShow = String.format(context.getString(R.string.call_missed_messages));
-                            try {
-                                textToShow = textToShow.replace("[A]", "");
-                                textToShow = textToShow.replace("[/A]", "");
-                                textToShow = textToShow.replace("[B]", "");
-                                textToShow = textToShow.replace("[/B]", "");
-                            } catch (Exception e) {
-                                Timber.e(e);
-                            }
-
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle()).toString();
                             break;
-                        }
                     }
 
                     builder.append(textToShow);

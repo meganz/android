@@ -7,11 +7,10 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiAndroid
@@ -200,10 +199,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @param activity the current activity
      */
     fun editProfile(activity: Activity) {
-        val editProfile = Intent(activity, ManagerActivity::class.java)
-        editProfile.putExtra(EXTRA_FROM_MEETING, true)
-        editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
-        activity.startActivity(editProfile)
+        activity.startActivity(Intent(activity, MyAccountActivity::class.java))
     }
 
     /**

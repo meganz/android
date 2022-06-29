@@ -40,6 +40,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -262,8 +263,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.edit_profile_group_participants_chat_layout:
-                Intent editProfile = new Intent(requireActivity(), ManagerActivity.class);
-                editProfile.setAction(ACTION_SHOW_MY_ACCOUNT);
+                Intent editProfile = new Intent(requireActivity(), MyAccountActivity.class);
                 startActivity(editProfile);
                 break;
 

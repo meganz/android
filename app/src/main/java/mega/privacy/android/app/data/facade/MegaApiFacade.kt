@@ -218,6 +218,8 @@ class MegaApiFacade @Inject constructor(
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
 
+    override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
+
     override fun startDownload(
         node: MegaNode,
         localPath: String,
