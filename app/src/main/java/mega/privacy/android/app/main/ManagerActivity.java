@@ -7036,7 +7036,8 @@ public class ManagerActivity extends TransfersManagementActivity
      * Removing the full screen mask
      */
     private void removeMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+        ColorUtils.changeStatusBarColorForElevation(this,
+                mElevationCause > 0 && !isInMainHomePage());
         windowContent.removeView(fabMaskLayout);
     }
 
