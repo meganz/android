@@ -1,5 +1,14 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.ACTION_RECOVERY_KEY_EXPORTED;
+import static mega.privacy.android.app.utils.Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;
+import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
@@ -11,10 +20,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -35,6 +40,11 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.BarcodeFormat;
@@ -62,16 +72,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-public class TwoFactorAuthenticationActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener{
+public class TwoFactorAuthenticationActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener {
 
     final int LENGTH_SEED = 13;
     final int WIDTH = 520;
@@ -153,12 +156,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
 
         setContentView(R.layout.activity_two_factor_authentication);
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         if (megaApi == null) {
@@ -168,8 +171,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         twoFactorAuthenticationActivity = this;
 
         tB = (Toolbar) findViewById(R.id.toolbar);
-        if(tB==null){
-            logError("Tb is Null");
+        if (tB == null) {
+            Timber.e("Tb is Null");
             return;
         }
 
@@ -184,8 +187,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     .toUpperCase(Locale.getDefault()));
         }
 
-        if (savedInstanceState != null){
-            logDebug("savedInstanceState No null");
+        if (savedInstanceState != null) {
+            Timber.d("savedInstanceState No null");
             confirm2FAIsShown = savedInstanceState.getBoolean("confirm2FAIsShown", false);
             scanOrCopyIsShown = savedInstanceState.getBoolean("scanOrCopyIsShown", false);
             isEnabled2FA = savedInstanceState.getBoolean("isEnabled2FA", false);
@@ -196,8 +199,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             arraySeed = savedInstanceState.getStringArrayList("arraySeed");
             isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
             isHelpDialogShown = savedInstanceState.getBoolean("isHelpDialogShown", false);
-        }
-        else {
+        } else {
             rkSaved = false;
             confirm2FAIsShown = false;
             scanOrCopyIsShown = false;
@@ -215,12 +217,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         scrollContainer2FAEnabled = (ScrollView) findViewById(R.id.container_2fa_enabled);
 
         explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
-        SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
+        SpannableString text = new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
         Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_question_mark);
         questionMarck.setColorFilter(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary), PorterDuff.Mode.SRC_IN);
         questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
-        ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
-        text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        ImageSpan imageSpan = new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
+        text.setSpan(imageSpan, text.length() - 2, text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         explainSeed.setText(text);
         explainSeed.setOnClickListener(this);
 
@@ -232,7 +234,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         next2FAButton.setOnClickListener(this);
         exportRKButton = (Button) findViewById(R.id.button_export_rk);
         exportRKButton.setOnClickListener(this);
-        dismissRKButton  = (Button) findViewById(R.id.button_dismiss_rk);
+        dismissRKButton = (Button) findViewById(R.id.button_dismiss_rk);
         dismissRKButton.setOnClickListener(this);
         qrSeedContainer = (RelativeLayout) findViewById(R.id.container_qr_seed_2fa);
         confirmContainer = (RelativeLayout) findViewById(R.id.container_confirm_2fa);
@@ -275,26 +277,23 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(firstPin.length() != 0){
+                if (firstPin.length() != 0) {
                     secondPin.requestFocus();
                     secondPin.setCursorVisible(true);
 
-                    if (firstTime && !pinLongClick){
+                    if (firstTime && !pinLongClick) {
                         secondPin.setText("");
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -318,7 +317,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (secondPin.length() != 0){
+                if (secondPin.length() != 0) {
                     thirdPin.requestFocus();
                     thirdPin.setCursorVisible(true);
 
@@ -327,16 +326,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -360,7 +356,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (thirdPin.length()!= 0){
+                if (thirdPin.length() != 0) {
                     fourthPin.requestFocus();
                     fourthPin.setCursorVisible(true);
 
@@ -368,16 +364,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -401,23 +394,20 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (fourthPin.length()!=0){
+                if (fourthPin.length() != 0) {
                     fifthPin.requestFocus();
                     fifthPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -441,22 +431,19 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (fifthPin.length()!=0){
+                if (fifthPin.length() != 0) {
                     sixthPin.requestFocus();
                     sixthPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -480,19 +467,17 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (sixthPin.length()!=0){
+                if (sixthPin.length() != 0) {
                     sixthPin.setCursorVisible(true);
                     hideKeyboard(twoFactorAuthenticationActivity, 0);
 
                     if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         quitError();
                     }
                 }
@@ -517,10 +502,9 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         fileNameRK = findViewById(R.id.fileNameRK);
         fileNameRK.setText(getRecoveryKeyFileName());
 
-        if (scanOrCopyIsShown || newAccount){
+        if (scanOrCopyIsShown || newAccount) {
             showScanOrCopyLayout();
-        }
-        else if (confirm2FAIsShown){
+        } else if (confirm2FAIsShown) {
             qrSeedContainer.setVisibility(View.GONE);
             confirmContainer.setVisibility(View.VISIBLE);
             scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT);
@@ -528,22 +512,19 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             scrollContainerVerify.setVisibility(View.VISIBLE);
             scrollContainer2FAEnabled.setVisibility(View.GONE);
 
-            if (isErrorShown){
+            if (isErrorShown) {
                 showError();
             }
-        }
-        else if (isEnabled2FA){
+        } else if (isEnabled2FA) {
             scrollContainer2FA.setVisibility(View.GONE);
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
                 dismissRKButton.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
                 dismissRKButton.setVisibility(View.GONE);
             }
-        }
-        else {
+        } else {
             megaApi.multiFactorAuthGetCode(this);
             scrollContainer2FA.setVisibility(View.VISIBLE);
             scrollContainerVerify.setVisibility(View.GONE);
@@ -551,26 +532,24 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         }
     }
 
-    void showScanOrCopyLayout () {
+    void showScanOrCopyLayout() {
         scanOrCopyIsShown = true;
         qrSeedContainer.setVisibility(View.VISIBLE);
         confirmContainer.setVisibility(View.GONE);
         scrollContainer2FA.setVisibility(View.GONE);
         scrollContainerVerify.setVisibility(View.VISIBLE);
-        scrollContainerVerify.setBackgroundColor(ContextCompat.getColor(this,R.color.white_grey_700));
+        scrollContainerVerify.setBackgroundColor(ContextCompat.getColor(this, R.color.white_grey_700));
         scrollContainer2FAEnabled.setVisibility(View.GONE);
-        if (seed != null){
-            logDebug("Seed not null");
+        if (seed != null) {
+            Timber.d("Seed not null");
             setSeed();
-            if (qr != null){
-                logDebug("QR not null");
+            if (qr != null) {
+                Timber.d("QR not null");
                 qrImage.setImageBitmap(qr);
-            }
-            else {
+            } else {
                 generate2FAQR();
             }
-        }
-        else {
+        } else {
             megaApi.multiFactorAuthGetCode(this);
         }
 
@@ -599,52 +578,48 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         if (confirm2FAIsShown) {
             confirm2FAIsShown = false;
             showScanOrCopyLayout();
-        }
-        else {
+        } else {
             if (isEnabled2FA) {
                 if (rkSaved) {
                     super.onBackPressed();
-                }
-                else {
+                } else {
                     showSnackbar(getString(R.string.backup_rk_2fa_end));
                 }
                 update2FASetting();
-            }
-            else {
+            } else {
                 super.onBackPressed();
             }
         }
     }
 
-    void update2FASetting () {
+    void update2FASetting() {
         LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class).post(true);
     }
 
     void pasteClipboard() {
-        logDebug("pasteClipboard");
+        Timber.d("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            logDebug("Code: "+code);
+            Timber.d("Code: %s", code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
-                for (int i=0; i<6; i++) {
+                for (int i = 0; i < 6; i++) {
                     if (!Character.isDigit(code.charAt(i))) {
                         areDigits = false;
                         break;
                     }
                 }
                 if (areDigits) {
-                    firstPin.setText(""+code.charAt(0));
-                    secondPin.setText(""+code.charAt(1));
-                    thirdPin.setText(""+code.charAt(2));
-                    fourthPin.setText(""+code.charAt(3));
-                    fifthPin.setText(""+code.charAt(4));
-                    sixthPin.setText(""+code.charAt(5));
-                }
-                else {
+                    firstPin.setText("" + code.charAt(0));
+                    secondPin.setText("" + code.charAt(1));
+                    thirdPin.setText("" + code.charAt(2));
+                    fourthPin.setText("" + code.charAt(3));
+                    fifthPin.setText("" + code.charAt(4));
+                    sixthPin.setText("" + code.charAt(5));
+                } else {
                     firstPin.setText("");
                     secondPin.setText("");
                     thirdPin.setText("");
@@ -656,12 +631,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         }
     }
 
-    void permitVerify(){
-        logDebug("permitVerify");
+    void permitVerify() {
+        Timber.d("permitVerify");
         if (confirm2FAIsShown && firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
-                && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+                && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1) {
             hideKeyboard(this, 0);
-            if (sb.length()>0) {
+            if (sb.length() > 0) {
                 sb.delete(0, sb.length());
             }
             sb.append(firstPin.getText());
@@ -672,17 +647,17 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             sb.append(sixthPin.getText());
             pin = sb.toString().trim();
 
-            if (pin != null){
+            if (pin != null) {
                 megaApi.multiFactorAuthEnable(pin, this);
             }
         }
     }
 
-    void setSeed () {
+    void setSeed() {
         arraySeed = new ArrayList<>();
         int index = 0;
-        for (int i=0; i<LENGTH_SEED; i++) {
-            arraySeed.add(seed.substring(index, index+4));
+        for (int i = 0; i < LENGTH_SEED; i++) {
+            arraySeed.add(seed.substring(index, index + 4));
             index += 4;
         }
         seedText1.setText(arraySeed.get(0));
@@ -700,13 +675,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         seedText13.setText(arraySeed.get(12));
     }
 
-    void generate2FAQR (){
-        logDebug("generate2FAQR");
+    void generate2FAQR() {
+        Timber.d("generate2FAQR");
 
         url = null;
         String myEmail = megaApi.getMyEmail();
 
-        if (myEmail != null & seed != null){
+        if (myEmail != null & seed != null) {
             url = getString(R.string.url_qr_2fa, myEmail, seed);
             setSeed();
         }
@@ -726,8 +701,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             int width = (w * WIDTH) / FACTOR;
 
             qr = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-            int colorBackground = ContextCompat.getColor(this,R.color.white_grey_700);
-            int colorCode = ContextCompat.getColor(this,R.color.dark_grey);
+            int colorBackground = ContextCompat.getColor(this, R.color.white_grey_700);
+            int colorCode = ContextCompat.getColor(this, R.color.dark_grey);
 
             Canvas c = new Canvas(qr);
             Paint paint = new Paint();
@@ -742,17 +717,17 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
                     pixels[offset + x] = bitMatrix.get(x, y) ? colorCode : colorBackground;
-                    if (pixels[offset + x] == colorCode){
-                        c.drawCircle(x*RESIZE, y*RESIZE, 3.5f, paint);
+                    if (pixels[offset + x] == colorCode) {
+                        c.drawCircle(x * RESIZE, y * RESIZE, 3.5f, paint);
                     }
                 }
             }
 
 //            8.5 width
             paint.setColor(colorBackground);
-            c.drawRect(3*RESIZE, 3*RESIZE, 11.5f*RESIZE, 11.5f*RESIZE, paint);
-            c.drawRect(size*RESIZE, 3*RESIZE, (size+8.5f)*RESIZE, 11.5f*RESIZE, paint);
-            c.drawRect(3*RESIZE, size*RESIZE, 11.5f*RESIZE, (size+8.5f)*RESIZE, paint);
+            c.drawRect(3 * RESIZE, 3 * RESIZE, 11.5f * RESIZE, 11.5f * RESIZE, paint);
+            c.drawRect(size * RESIZE, 3 * RESIZE, (size + 8.5f) * RESIZE, 11.5f * RESIZE, paint);
+            c.drawRect(3 * RESIZE, size * RESIZE, 11.5f * RESIZE, (size + 8.5f) * RESIZE, paint);
 
             paint.setColor(colorCode);
 
@@ -769,16 +744,15 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
 
             paint.setColor(colorCode);
-            c.drawCircle(7.25f*RESIZE, 7.25f*RESIZE, 12f, paint);
+            c.drawCircle(7.25f * RESIZE, 7.25f * RESIZE, 12f, paint);
 //            4.25 more than first
-            c.drawCircle((size+4.25f)*RESIZE, 7.25f*RESIZE, 12f, paint);
-            c.drawCircle(7.25f*RESIZE, (size+4.25f)*RESIZE, 12f, paint);
+            c.drawCircle((size + 4.25f) * RESIZE, 7.25f * RESIZE, 12f, paint);
+            c.drawCircle(7.25f * RESIZE, (size + 4.25f) * RESIZE, 12f, paint);
 
-            if (qr != null){
+            if (qr != null) {
                 qrImage.setImageBitmap(qr);
                 qrProgressBar.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 showSnackbar(getResources().getString(R.string.qr_seed_text_error));
             }
         }
@@ -787,7 +761,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
 
         outState.putBoolean("confirm2FAIsShown", confirm2FAIsShown);
         outState.putBoolean("scanOrCopyIsShown", scanOrCopyIsShown);
@@ -798,8 +772,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         outState.putBoolean("isNoAppsDialogShown", isNoAppsDialogShown);
         outState.putBoolean("isHelpDialogShown", isHelpDialogShown);
 
-        if (scanOrCopyIsShown){
-            logDebug("scanOrCopyIsShown");
+        if (scanOrCopyIsShown) {
+            Timber.d("scanOrCopyIsShown");
             outState.putString("seed", seed);
             outState.putStringArrayList("arraySeed", arraySeed);
         }
@@ -808,7 +782,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home: {
                 onBackPressed();
                 break;
@@ -821,7 +795,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.button_enable_2fa: {
                 scanOrCopyIsShown = true;
                 confirm2FAIsShown = false;
@@ -833,7 +807,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 scrollContainer2FAEnabled.setVisibility(View.GONE);
                 break;
             }
-            case R.id.button_next_2fa:{
+            case R.id.button_next_2fa: {
                 scanOrCopyIsShown = false;
                 newAccount = false;
                 confirm2FAIsShown = true;
@@ -851,24 +825,23 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             case R.id.button_open_with_2fa: {
                 if (url == null) {
                     String myEmail = megaApi.getMyEmail();
-                    if (myEmail != null & seed != null){
+                    if (myEmail != null & seed != null) {
                         url = getString(R.string.url_qr_2fa, myEmail, seed);
                     }
                 }
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    logDebug("URL: "+url+" seed: " + seed);
+                    Timber.d("URL: %s seed: %s", url, seed);
                     if (isIntentAvailable(this, intent)) {
                         startActivity(intent);
-                    }
-                    else {
+                    } else {
                         showAlertNotAppAvailable();
                     }
                 }
                 break;
             }
             case R.id.container_rk_2fa:
-            case R.id.button_export_rk:{
+            case R.id.button_export_rk: {
                 update2FASetting();
                 Intent intent = new Intent(this, ManagerActivity.class);
                 intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
@@ -877,7 +850,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 finish();
                 break;
             }
-            case R.id.button_dismiss_rk:{
+            case R.id.button_dismiss_rk: {
                 update2FASetting();
                 this.finish();
                 break;
@@ -885,14 +858,16 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             case R.id.cancel_button_no_app: {
                 try {
                     noAppsDialog.dismiss();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
                 isNoAppsDialogShown = false;
                 break;
             }
             case R.id.open_button_no_app: {
                 try {
                     noAppsDialog.dismiss();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
                 isNoAppsDialogShown = false;
                 openPlayStore();
                 break;
@@ -904,14 +879,16 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             case R.id.cancel_button_help: {
                 try {
                     helpDialog.dismiss();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
                 isHelpDialogShown = false;
                 break;
             }
             case R.id.play_store_button_help: {
                 try {
                     helpDialog.dismiss();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
                 isHelpDialogShown = false;
                 openPlayStore();
                 break;
@@ -924,8 +901,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         startActivity(intent);
     }
 
-    void showAlertHelp () {
-        logDebug("showAlertHelp");
+    void showAlertHelp() {
+        Timber.d("showAlertHelp");
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -942,15 +919,15 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         helpDialog.setOnDismissListener(dialog -> isHelpDialogShown = false);
         try {
             helpDialog.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         isHelpDialogShown = true;
     }
 
-    void showAlertNotAppAvailable () {
-        logDebug("showAlertNotAppAvailable");
+    void showAlertNotAppAvailable() {
+        Timber.d("showAlertNotAppAvailable");
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -986,53 +963,46 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish");
-        if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET){
-            logDebug("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
-            if (e.getErrorCode() == MegaError.API_OK){
-                logDebug("MegaError.API_OK");
+        Timber.d("onRequestFinish");
+        if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET) {
+            Timber.d("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
+            if (e.getErrorCode() == MegaError.API_OK) {
+                Timber.d("MegaError.API_OK");
                 seed = request.getText();
-                if (seed != null){
+                if (seed != null) {
                     qrProgressBar.setVisibility(View.VISIBLE);
                     generate2FAQR();
-                }
-                else {
+                } else {
                     showSnackbar(getResources().getString(R.string.qr_seed_text_error));
                 }
-            }
-            else {
-                logError("e.getErrorCode(): " + e.getErrorCode());
+            } else {
+                Timber.e("e.getErrorCode(): %s", e.getErrorCode());
                 showSnackbar(getResources().getString(R.string.qr_seed_text_error));
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
-            logDebug("TYPE_MULTI_FACTOR_AUTH_SET: " + e.getErrorCode());
+        } else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET) {
+            Timber.d("TYPE_MULTI_FACTOR_AUTH_SET: %s", e.getErrorCode());
             if (request.getFlag() && e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Pin correct: Two-Factor Authentication enabled");
+                Timber.d("Pin correct: Two-Factor Authentication enabled");
                 confirm2FAIsShown = false;
                 isEnabled2FA = true;
                 megaApi.isMasterKeyExported(this);
-            }
-            else if (e.getErrorCode() == MegaError.API_EFAILED){
-                logWarning("Pin not correct: " + request.getPassword());
-                if (request.getFlag()){
+            } else if (e.getErrorCode() == MegaError.API_EFAILED) {
+                Timber.w("Pin not correct: %s", request.getPassword());
+                if (request.getFlag()) {
                     showError();
                 }
-            }
-            else {
-                logError("An error ocurred trying to enable Two-Factor Authentication");
+            } else {
+                Timber.e("An error ocurred trying to enable Two-Factor Authentication");
                 showSnackbar(getString(R.string.error_enable_2fa));
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
-            if (e.getErrorCode() == MegaError.API_OK){
-                logDebug("TYPE_MULTI_FACTOR_AUTH_CHECK: " + request.getFlag());
+        } else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                Timber.d("TYPE_MULTI_FACTOR_AUTH_CHECK: %s", request.getFlag());
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
-            logDebug("TYPE_GET_ATTR_USER");
+        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
+            Timber.d("TYPE_GET_ATTR_USER");
             if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                logDebug("TYPE_GET_ATTR_USER API_OK");
+                Timber.d("TYPE_GET_ATTR_USER API_OK");
 
                 scrollContainer2FA.setVisibility(View.GONE);
                 scrollContainerVerify.setVisibility(View.GONE);
@@ -1041,14 +1011,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
                     dismissRKButton.setVisibility(View.VISIBLE);
-                }
-                else {
+                } else {
                     rkSaved = false;
                     dismissRKButton.setVisibility(View.GONE);
                 }
-            }
-            else {
-                logError("TYPE_GET_ATTR_USER error: " + e.getErrorString());
+            } else {
+                Timber.e("TYPE_GET_ATTR_USER error: %s", e.getErrorString());
             }
         }
     }
@@ -1058,7 +1026,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
     }
 
-    void quitError(){
+    void quitError() {
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
         firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
@@ -1069,7 +1037,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
     }
 
-    void showError(){
+    void showError() {
         firstTime = false;
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
@@ -1084,7 +1052,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     @Override
     public boolean onLongClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.seed_2fa: {
                 copySeed();
                 return true;
@@ -1103,12 +1071,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         return false;
     }
 
-    void copySeed () {
-        logDebug("Copy seed");
+    void copySeed() {
+        Timber.d("Copy seed");
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if (seed != null) {
             ClipData clip = ClipData.newPlainText("seed", seed);
-            if (clip != null){
+            if (clip != null) {
                 clipboard.setPrimaryClip(clip);
                 showSnackbar(getResources().getString(R.string.messages_copied_clipboard));
             }
@@ -1119,12 +1087,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
-            logDebug("REQUEST_DOWNLOAD_FOLDER");
+        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
+            Timber.d("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 
-            if (parentPath != null){
-                logDebug("parentPath no NULL");
+            if (parentPath != null) {
+                Timber.d("parentPath no NULL");
 
                 parentPath = parentPath + File.separator + getRecoveryKeyFileName();
 
@@ -1136,44 +1104,44 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         }
     }
 
-    public void showSnackbar(String s){
+    public void showSnackbar(String s) {
         showSnackbar(container2FA, s);
     }
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         switch (v.getId()) {
-            case R.id.pass_first:{
+            case R.id.pass_first: {
                 if (hasFocus) {
                     firstPin.setText("");
                 }
                 break;
             }
-            case R.id.pass_second:{
+            case R.id.pass_second: {
                 if (hasFocus) {
                     secondPin.setText("");
                 }
                 break;
             }
-            case R.id.pass_third:{
+            case R.id.pass_third: {
                 if (hasFocus) {
                     thirdPin.setText("");
                 }
                 break;
             }
-            case R.id.pass_fourth:{
+            case R.id.pass_fourth: {
                 if (hasFocus) {
                     fourthPin.setText("");
                 }
                 break;
             }
-            case R.id.pass_fifth:{
+            case R.id.pass_fifth: {
                 if (hasFocus) {
                     fifthPin.setText("");
                 }
                 break;
             }
-            case R.id.pass_sixth:{
+            case R.id.pass_sixth: {
                 if (hasFocus) {
                     sixthPin.setText("");
                 }

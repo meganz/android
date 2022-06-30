@@ -13,7 +13,9 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -60,6 +62,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
+import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
@@ -77,7 +80,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 @SuppressLint("NewApi")
 class SettingsFragment :
-    PreferenceFragmentCompat() {
+    PreferenceFragmentCompat(),
+    FragmentResultListener {
 
     @Inject
     lateinit var additionalPreferences: Set<@JvmSuppressWildcards PreferenceResource>
@@ -197,7 +201,6 @@ class SettingsFragment :
     }
 
     private fun refreshSummaries() {
-//        TODO: Once all fragments Settings fragments have been refactored, these functions can be improved.
         updateCameraUploadSummary()
         updatePasscodeLockSummary()
     }
@@ -492,6 +495,21 @@ class SettingsFragment :
         internal const val TERMS_OF_SERVICE_URL = "https://mega.nz/terms"
         internal const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
         internal const val HELP_CENTRE_URL = "https://mega.nz/help/client/android"
+    }
+
+    override fun onFragmentResult(requestKey: String, result: Bundle) {
+        if (requestKey == REPORT_ISSUE) {
+            val fragment = findPreference<Preference>(requestKey)?.fragment
+
+            result.getString(fragment)?.let {
+                Snackbar.make(requireActivity().findViewById(android.R.id.content),
+                    it,
+                    Snackbar.LENGTH_LONG).apply {
+                    view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                        .maxLines = 5
+                }.show()
+            }
+        }
     }
 
 }

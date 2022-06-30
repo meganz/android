@@ -1,5 +1,68 @@
 package mega.privacy.android.app.main;
 
+import static android.app.Activity.RESULT_OK;
+import static android.content.Context.CLIPBOARD_SERVICE;
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.MotionEvent.ACTION_CANCEL;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
+import static mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING;
+import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL;
+import static mega.privacy.android.app.utils.Constants.ACTION_CONFIRM;
+import static mega.privacy.android.app.utils.Constants.ACTION_EXPORT_MASTER_KEY;
+import static mega.privacy.android.app.utils.Constants.ACTION_FILE_EXPLORER_UPLOAD;
+import static mega.privacy.android.app.utils.Constants.ACTION_FILE_PROVIDER;
+import static mega.privacy.android.app.utils.Constants.ACTION_IMPORT_LINK_FETCH_NODES;
+import static mega.privacy.android.app.utils.Constants.ACTION_JOIN_OPEN_CHAT_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_CHAT_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_CONTACTS_SECTION;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED;
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH;
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_AFTER_BLOCKED;
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_API_SERVER;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED;
+import static mega.privacy.android.app.utils.Constants.CLICKS_ENABLE_DEBUG;
+import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
+import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
+import static mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION;
+import static mega.privacy.android.app.utils.Constants.RESULT;
+import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.existOngoingTransfers;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.showAlert;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -54,6 +117,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.DatabaseHandler;
@@ -65,11 +130,11 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.di.ApplicationScope;
-import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.domain.repository.LoginRepository;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatSettings;
-import mega.privacy.android.app.middlelayer.push.PushMessageHandler;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -86,32 +151,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
-
-import static android.app.Activity.RESULT_OK;
-import static android.content.Context.CLIPBOARD_SERVICE;
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static android.view.MotionEvent.ACTION_CANCEL;
-import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_MOVE;
-import static android.view.MotionEvent.ACTION_UP;
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
-import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class LoginFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
@@ -119,6 +159,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @ApplicationScope
     @Inject
     CoroutineScope sharingScope;
+    @Inject
+    LegacyLoggingSettings loggingSettings;
+    @Inject
+    LoginRepository loginRepository;
+
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
@@ -222,16 +267,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(context==null){
-            logWarning("context is null");
+        if (context == null) {
+            Timber.w("context is null");
             return;
         }
     }
@@ -239,7 +284,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
         is2FAEnabled = false;
         accountConfirmed = false;
@@ -249,24 +294,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         UserCredentials credentials = dbH.getCredentials();
         if (credentials != null) {
-            logDebug("Credentials NOT null");
+            Timber.d("Credentials NOT null");
             firstTime = false;
-        }
-        else{
+        } else {
             firstTime = true;
         }
 
         chatSettings = dbH.getChatSettings();
-        if(chatSettings==null){
-            logDebug("chatSettings is null --> enable chat by default");
+        if (chatSettings == null) {
+            Timber.d("chatSettings is null --> enable chat by default");
             chatSettings = new ChatSettings();
             dbH.setChatSettings(chatSettings);
         }
 
-        display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        density  = getResources().getDisplayMetrics().density;
+        density = getResources().getDisplayMetrics().density;
 
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
@@ -429,7 +473,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         confirmingAccountText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
 
-        tB  = v.findViewById(R.id.toolbar_login);
+        tB = v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -457,26 +501,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(firstPin.length() != 0){
+                if (firstPin.length() != 0) {
                     secondPin.requestFocus();
                     secondPin.setCursorVisible(true);
 
-                    if (isFirstTime && !pinLongClick){
+                    if (isFirstTime && !pinLongClick) {
                         secondPin.setText("");
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -500,7 +541,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (secondPin.length() != 0){
+                if (secondPin.length() != 0) {
                     thirdPin.requestFocus();
                     thirdPin.setCursorVisible(true);
 
@@ -509,16 +550,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -542,7 +580,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (thirdPin.length()!= 0){
+                if (thirdPin.length() != 0) {
                     fourthPin.requestFocus();
                     fourthPin.setCursorVisible(true);
 
@@ -550,16 +588,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -583,23 +618,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (fourthPin.length()!=0){
+                if (fourthPin.length() != 0) {
                     fifthPin.requestFocus();
                     fifthPin.setCursorVisible(true);
 
                     if (isFirstTime && !pinLongClick) {
                         fifthPin.setText("");
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -623,22 +655,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (fifthPin.length()!=0){
+                if (fifthPin.length() != 0) {
                     sixthPin.requestFocus();
                     sixthPin.setCursorVisible(true);
 
                     if (isFirstTime && !pinLongClick) {
                         sixthPin.setText("");
-                    }
-                    else if (pinLongClick) {
+                    } else if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else  {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -662,19 +691,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (sixthPin.length()!=0){
+                if (sixthPin.length() != 0) {
                     sixthPin.setCursorVisible(true);
-                    hideKeyboard((LoginActivity)context, 0);
+                    hideKeyboard((LoginActivity) context, 0);
 
                     if (pinLongClick) {
                         pasteClipboard();
-                    }
-                    else {
+                    } else {
                         permitVerify();
                     }
-                }
-                else {
-                    if (isErrorShown){
+                } else {
+                    if (isErrorShown) {
                         verifyQuitError();
                     }
                 }
@@ -693,17 +720,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         sixthPin.setEt(fifthPin);
 
         intentReceived = ((LoginActivity) context).getIntent();
-        if(intentReceived!=null){
+        if (intentReceived != null) {
             action = intentReceived.getAction();
-            if(action!=null) {
-                logDebug("action is: " + action);
+            if (action != null) {
+                Timber.d("action is: %s", action);
                 if (ACTION_CONFIRM.equals(action)) {
                     handleConfirmationIntent(intentReceived);
                     return v;
                 } else if (action.equals(ACTION_RESET_PASS)) {
                     String link = intentReceived.getDataString();
                     if (link != null) {
-                        logDebug("Link to resetPass: " + link);
+                        Timber.d("Link to resetPass: %s", link);
                         showDialogInsertMKToChangePass(link);
                         return v;
                     }
@@ -711,24 +738,24 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     int result = intentReceived.getIntExtra(RESULT, MegaError.API_OK);
                     switch (result) {
                         case MegaError.API_OK:
-                            ((LoginActivity)context).showSnackbar(getString(R.string.pass_changed_alert));
+                            ((LoginActivity) context).showSnackbar(getString(R.string.pass_changed_alert));
                             break;
 
                         case MegaError.API_EKEY:
-                            ((LoginActivity)context).showAlertIncorrectRK();
+                            ((LoginActivity) context).showAlertIncorrectRK();
                             break;
 
                         case MegaError.API_EBLOCKED:
-                            ((LoginActivity)context).showSnackbar(getString(R.string.error_reset_account_blocked));
+                            ((LoginActivity) context).showSnackbar(getString(R.string.error_reset_account_blocked));
                             break;
 
                         default:
-                            ((LoginActivity)context).showSnackbar(getString(R.string.general_text_error));
+                            ((LoginActivity) context).showSnackbar(getString(R.string.general_text_error));
                     }
 
                     return v;
                 } else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
-                    ((LoginActivity)context).showConfirmationCancelAllTransfers();
+                    ((LoginActivity) context).showConfirmationCancelAllTransfers();
 
                 } else if (action.equals(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)) {
                     String accountBlockedString = intentReceived.getStringExtra(ACCOUNT_BLOCKED_STRING);
@@ -736,25 +763,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         showErrorAlertDialog(accountBlockedString, false, getActivity());
                     }
                 }
+            } else {
+                Timber.w("ACTION NULL");
             }
-            else{
-                logWarning("ACTION NULL");
-            }
-        }
-        else{
-            logWarning("No INTENT");
+        } else {
+            Timber.w("No INTENT");
         }
 
-        logDebug("et_user.getText(): " + et_user.getText());
-        if (credentials != null && !((LoginActivity) context).isBackFromLoginPage){
-            logDebug("Credentials NOT null");
-            if ((intentReceived != null) && (action != null)){
-                if (action.equals(ACTION_REFRESH)){
+        Timber.d("et_user.getText(): %s", et_user.getText());
+        if (credentials != null && !((LoginActivity) context).isBackFromLoginPage) {
+            Timber.d("Credentials NOT null");
+            if ((intentReceived != null) && (action != null)) {
+                if (action.equals(ACTION_REFRESH)) {
                     MegaApplication.setLoggingIn(true);
                     startLoginInProcess();
                     return v;
-                }
-                else if (action.equals(ACTION_REFRESH_API_SERVER)){
+                } else if (action.equals(ACTION_REFRESH_API_SERVER)) {
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
@@ -763,45 +787,36 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     startFastLogin();
                     return v;
                 } else {
-                    if(action.equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+                    if (action.equals(ACTION_OPEN_MEGA_FOLDER_LINK)) {
                         url = intentReceived.getDataString();
-                    }
-                    else if(action.equals(ACTION_IMPORT_LINK_FETCH_NODES)){
+                    } else if (action.equals(ACTION_IMPORT_LINK_FETCH_NODES)) {
                         url = intentReceived.getDataString();
-                    }
-                    else if(action.equals(ACTION_CHANGE_MAIL)){
-                        logDebug("intent received ACTION_CHANGE_MAIL");
+                    } else if (action.equals(ACTION_CHANGE_MAIL)) {
+                        Timber.d("intent received ACTION_CHANGE_MAIL");
                         url = intentReceived.getDataString();
-                    }
-                    else if(action.equals(ACTION_CANCEL_ACCOUNT)){
-                        logDebug("intent received ACTION_CANCEL_ACCOUNT");
+                    } else if (action.equals(ACTION_CANCEL_ACCOUNT)) {
+                        Timber.d("intent received ACTION_CANCEL_ACCOUNT");
                         url = intentReceived.getDataString();
-                    }
-                    else if (action.equals(ACTION_FILE_PROVIDER)){
+                    } else if (action.equals(ACTION_FILE_PROVIDER)) {
                         uriData = intentReceived.getData();
                         extras = intentReceived.getExtras();
                         url = null;
-                    }
-                    else if(action.equals(ACTION_OPEN_HANDLE_NODE)){
+                    } else if (action.equals(ACTION_OPEN_HANDLE_NODE)) {
                         url = intentReceived.getDataString();
-                    }
-                    else if(action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                    } else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)) {
                         uriData = intentReceived.getData();
-                    }
-                    else if(action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                    } else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)) {
                         uriData = intentReceived.getData();
-                    }
-                    else if(action.equals(ACTION_OPEN_CHAT_LINK)) {
+                    } else if (action.equals(ACTION_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                    }
-                    else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                    } else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
                     }
 
                     MegaNode rootNode = megaApi.getRootNode();
-                    if (rootNode != null){
+                    if (rootNode != null) {
                         Intent intent = new Intent(context, ManagerActivity.class);
-                        if (action != null){
+                        if (action != null) {
                             switch (action) {
                                 case ACTION_FILE_PROVIDER:
                                     intent = new Intent(context, FileProviderActivity.class);
@@ -832,7 +847,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                             }
 
                             intent.setAction(action);
-                            if (url != null){
+                            if (url != null) {
                                 intent.setData(Uri.parse(url));
                             }
                         }
@@ -844,60 +859,53 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
                         this.startActivity(intent);
                         ((LoginActivity) context).finish();
-                    }
-                    else{
+                    } else {
                         startFastLogin();
                         return v;
                     }
                 }
-            }
-            else{
+            } else {
                 MegaNode rootNode = megaApi.getRootNode();
                 boolean isHeartBeatAlive = MegaApplication.isIsHeartBeatAlive();
-                if (rootNode != null && !((LoginActivity)context).isFetchingNodes && !isHeartBeatAlive){
+                if (rootNode != null && !((LoginActivity) context).isFetchingNodes && !isHeartBeatAlive) {
 
-                    logDebug("rootNode != null");
+                    Timber.d("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivity.class);
-                    if (action != null){
+                    if (action != null) {
 
-                        if (action.equals(ACTION_FILE_PROVIDER)){
+                        if (action.equals(ACTION_FILE_PROVIDER)) {
                             intent = new Intent(context, FileProviderActivity.class);
-                            if(extras != null)
-                            {
+                            if (extras != null) {
                                 intent.putExtras(extras);
                             }
                             intent.setData(uriData);
-                        }
-                        else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                        } else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)) {
                             intent = new Intent(context, FileLinkActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             action = ACTION_OPEN_MEGA_LINK;
                             intent.setData(uriData);
-                        }
-                        else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                        } else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)) {
                             intent = new Intent(context, FolderLinkActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             action = ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
-                        }
-                        else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
+                        } else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)) {
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            if(intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1){
+                            if (intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1) {
                                 intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                             }
                         }
                         intent.setAction(action);
-                        if (url != null){
+                        if (url != null) {
                             intent.setData(Uri.parse(url));
                         }
                     }
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                     MegaPreferences prefs = dbH.getPreferences();
-                    if(prefs!=null)
-                    {
-                        if (prefs.getCamSyncEnabled() != null){
-                            if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+                    if (prefs != null) {
+                        if (prefs.getCamSyncEnabled() != null) {
+                            if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                     ((LoginActivity) context).startCameraUploadService(false, 30 * 1000);
                                 }
@@ -907,21 +915,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
                     this.startActivity(intent);
                     ((LoginActivity) context).finish();
-                }
-                else{
-                    logDebug("rootNode is null or heart beat is alive -> do fast login");
+                } else {
+                    Timber.d("rootNode is null or heart beat is alive -> do fast login");
                     MegaApplication.setHeartBeatAlive(false);
                     startFastLogin();
                     return v;
                 }
             }
-        }
-        else {
-            logDebug("Credentials IS NULL");
+        } else {
+            Timber.d("Credentials IS NULL");
             if ((intentReceived != null)) {
-                logDebug("INTENT NOT NULL");
+                Timber.d("INTENT NOT NULL");
                 if (action != null) {
-                    logDebug("ACTION NOT NULL");
+                    Timber.d("ACTION NOT NULL");
                     Intent intent;
                     if (action.equals(ACTION_FILE_PROVIDER)) {
                         intent = new Intent(context, FileProviderActivity.class);
@@ -930,22 +936,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         }
                         intent.setData(uriData);
                         intent.setAction(action);
-                    }
-                    else if (action.equals(ACTION_FILE_EXPLORER_UPLOAD)) {
-                        ((LoginActivity)context).showSnackbar(getString(R.string.login_before_share));
-                    }
-                    else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                    } else if (action.equals(ACTION_FILE_EXPLORER_UPLOAD)) {
+                        ((LoginActivity) context).showSnackbar(getString(R.string.login_before_share));
+                    } else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
                     }
                 }
             }
         }
 
-        if ((passwdTemp != null) && (emailTemp != null)){
+        if ((passwdTemp != null) && (emailTemp != null)) {
             submitForm(true);
         }
 
-        logDebug("END onCreateView");
+        Timber.d("END onCreateView");
         return v;
     }
 
@@ -970,37 +974,37 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         switch (v.getId()) {
-            case R.id.pin_first_login:{
+            case R.id.pin_first_login: {
                 if (hasFocus) {
                     firstPin.setText("");
                 }
                 break;
             }
-            case R.id.pin_second_login:{
+            case R.id.pin_second_login: {
                 if (hasFocus) {
                     secondPin.setText("");
                 }
                 break;
             }
-            case R.id.pin_third_login:{
+            case R.id.pin_third_login: {
                 if (hasFocus) {
                     thirdPin.setText("");
                 }
                 break;
             }
-            case R.id.pin_fourth_login:{
+            case R.id.pin_fourth_login: {
                 if (hasFocus) {
                     fourthPin.setText("");
                 }
                 break;
             }
-            case R.id.pin_fifth_login:{
+            case R.id.pin_fifth_login: {
                 if (hasFocus) {
                     fifthPin.setText("");
                 }
                 break;
             }
-            case R.id.pin_sixth_login:{
+            case R.id.pin_sixth_login: {
                 if (hasFocus) {
                     sixthPin.setText("");
                 }
@@ -1009,7 +1013,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         }
     }
 
-    void verifyQuitError(){
+    void verifyQuitError() {
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
         firstPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
@@ -1020,7 +1024,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         sixthPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
     }
 
-    void verifyShowError(){
+    void verifyShowError() {
         isFirstTime = false;
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
@@ -1033,11 +1037,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         sixthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
     }
 
-    void permitVerify(){
-        logDebug("permitVerify");
-        if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-            hideKeyboard((LoginActivity)context, 0);
-            if (sb.length()>0) {
+    void permitVerify() {
+        Timber.d("permitVerify");
+        if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1) {
+            hideKeyboard((LoginActivity) context, 0);
+            if (sb.length() > 0) {
                 sb.delete(0, sb.length());
             }
             sb.append(firstPin.getText());
@@ -1048,8 +1052,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             sb.append(sixthPin.getText());
             pin = sb.toString();
 
-            if (!isErrorShown && pin != null){
-                logDebug("Login with factor login");
+            if (!isErrorShown && pin != null) {
+                Timber.d("Login with factor login");
                 verify2faProgressBar.setVisibility(View.VISIBLE);
                 MegaApplication.setLoggingIn(true);
                 megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
@@ -1057,12 +1061,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         }
     }
 
-    public void startLoginInProcess(){
-        logDebug("startLoginInProcess");
+    public void startLoginInProcess() {
+        Timber.d("startLoginInProcess");
 
         UserCredentials credentials = dbH.getCredentials();
         lastEmail = credentials.getEmail();
-		gSession = credentials.getSession();
+        gSession = credentials.getSession();
 
         loginLogin.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
@@ -1079,8 +1083,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         megaApi.fetchNodes(this);
     }
 
-    public void startFastLogin(){
-        logDebug("startFastLogin");
+    public void startFastLogin() {
+        Timber.d("startFastLogin");
         UserCredentials credentials = dbH.getCredentials();
         lastEmail = credentials.getEmail();
         gSession = credentials.getSession();
@@ -1098,7 +1102,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         serversBusyText.setVisibility(View.GONE);
         resumeSesion = true;
 
-        if (!MegaApplication.isLoggingIn()){
+        if (!MegaApplication.isLoggingIn()) {
 
             MegaApplication.setLoggingIn(true);
 
@@ -1106,36 +1110,33 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(requireActivity()));
+            ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(requireActivity(), loggingSettings));
 
             disableLoginButton();
 
             // Primitive type directly set value, atomic operation. Don't allow background login.
-            PushMessageHandler.allowBackgroundLogin = false;
-            IncomingCallService.allowBackgroundLogin = false;
+            loginRepository.setAllowBackgroundLogin(false);
 
             megaApi.fastLogin(gSession, this);
 
-            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_API_SERVER))  {
-                logDebug("megaChatApi.refreshUrl()");
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_API_SERVER)) {
+                Timber.d("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
             }
-        }
-        else{
-            logWarning("Another login is proccessing");
+        } else {
+            Timber.w("Another login is proccessing");
         }
     }
 
     private void submitForm(boolean fromConfirmAccount) {
-        logDebug("fromConfirmAccount - " + fromConfirmAccount + " email: " + this.emailTemp + "__" + this.passwdTemp);
+        Timber.d("fromConfirmAccount - %s email: %s__%s", fromConfirmAccount, this.emailTemp, this.passwdTemp);
 
         lastEmail = this.emailTemp;
         lastPassword = this.passwdTemp;
 
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
-        if(!isOnline(context))
-        {
+        if (!isOnline(context)) {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -1148,7 +1149,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -1161,7 +1162,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
 
-        logDebug("Generating keys");
+        Timber.d("Generating keys");
 
         onKeysGenerated(lastEmail, lastPassword);
     }
@@ -1178,8 +1179,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
-        if(!isOnline(context))
-        {
+        if (!isOnline(context)) {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -1192,7 +1192,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -1209,23 +1209,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
         lastPassword = et_password.getText().toString();
 
-        logDebug("Generating keys");
+        Timber.d("Generating keys");
 
         onKeysGenerated(lastEmail, lastPassword);
     }
 
     private void onKeysGenerated(String email, String password) {
-        logDebug("onKeysGenerated");
+        Timber.d("onKeysGenerated");
 
         this.lastEmail = email;
         this.lastPassword = password;
 
         if (confirmLink == null) {
             onKeysGeneratedLogin(email, password);
-        }
-        else{
-            if(!isOnline(context)){
-                ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+        } else {
+            if (!isOnline(context)) {
+                ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
                 return;
             }
 
@@ -1241,7 +1240,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            logDebug("fastConfirm");
+            Timber.d("fastConfirm");
             megaApi.confirmAccount(confirmLink, lastPassword, this);
         }
     }
@@ -1278,9 +1277,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     private void onKeysGeneratedLogin(final String email, final String password) {
-        logDebug("onKeysGeneratedLogin");
+        Timber.d("onKeysGeneratedLogin");
 
-        if(!isOnline(context)){
+        if (!isOnline(context)) {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -1293,7 +1292,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -1305,7 +1304,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            logDebug("fastLogin with publicKey & privateKey");
+            Timber.d("fastLogin with publicKey & privateKey");
             resumeSesion = false;
 
             if (megaChatApi == null) {
@@ -1313,18 +1312,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             }
 
             int initState = megaChatApi.getInitState();
-            logDebug("INIT STATE: " + initState);
+            Timber.d("INIT STATE: %s", initState);
             if (initState == MegaChatApi.INIT_NOT_DONE || initState == MegaChatApi.INIT_ERROR) {
                 int ret = megaChatApi.init(null);
-                logDebug("result of init ---> " + ret);
+                Timber.d("result of init ---> %s", ret);
                 switch (ret) {
                     case MegaChatApi.INIT_WAITING_NEW_SESSION:
                         disableLoginButton();
                         megaApi.login(email, password, this);
                         break;
                     case MegaChatApi.INIT_ERROR:
-                        logWarning("ERROR INIT CHAT: " + ret);
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
+                        Timber.w("ERROR INIT CHAT: %s", ret);
+                        megaChatApi.logout(new ChatLogoutListener(getContext(), loggingSettings));
                         disableLoginButton();
                         megaApi.login(email, password, this);
                         break;
@@ -1357,7 +1356,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     private void disableLoginButton() {
-        logDebug("Disable login button");
+        Timber.d("Disable login button");
         //disable login button
         bLogin.setEnabled(false);
         //display login info
@@ -1367,19 +1366,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     private void enableLoginButton() {
-        logDebug("Enable login button");
+        Timber.d("Enable login button");
         bLogin.setEnabled(true);
         loginInProgressPb.setVisibility(View.GONE);
         loginInProgressInfo.setVisibility(View.GONE);
     }
 
-    public void onLoginClick(View v){
+    public void onLoginClick(View v) {
         submitForm();
     }
 
-    public void onRegisterClick(View v){
+    public void onRegisterClick(View v) {
         //Change fragmentVisible in the activity
-        ((LoginActivity)context).showFragment(CREATE_ACCOUNT_FRAGMENT);
+        ((LoginActivity) context).showFragment(CREATE_ACCOUNT_FRAGMENT);
     }
 
     /*
@@ -1410,9 +1409,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.button_login_login: {
-                logDebug("Click on button_login_login");
+                Timber.d("Click on button_login_login");
                 loginClicked = true;
                 backWhileLogin = false;
                 LoginActivity.isBackFromLoginPage = false;
@@ -1420,13 +1419,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 onLoginClick(v);
                 break;
             }
-            case R.id.button_create_account_login:{
-                logDebug("Click on button_create_account_login");
+            case R.id.button_create_account_login: {
+                Timber.d("Click on button_create_account_login");
                 onRegisterClick(v);
                 break;
             }
-            case R.id.button_forgot_pass:{
-                logDebug("Click on button_forgot_pass");
+            case R.id.button_forgot_pass: {
+                Timber.d("Click on button_forgot_pass");
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1441,8 +1440,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     }
 
                     startActivity(openTermsIntent);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                     viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
@@ -1453,9 +1451,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 numberOfClicksKarere++;
 
                 if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
-                    if (areKarereLogsEnabled()) {
+                    if (loggingSettings.areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
-                        setStatusLoggerKarere(context, false);
+                        loggingSettings.setStatusLoggerKarere(requireContext(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsKarere();
                     }
@@ -1467,9 +1465,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 numberOfClicksSDK++;
 
                 if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
-                    if (areSDKLogsEnabled()) {
+                    if (loggingSettings.areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
-                        setStatusLoggerSDK(context, false);
+                        loggingSettings.setStatusLoggerSDK(requireContext(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsSDK();
                     }
@@ -1483,8 +1481,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(openTermsIntent);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                     viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
@@ -1498,8 +1495,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
      * Get email address from confirmation code and set to emailView
      */
     private void updateConfirmEmail(String link) {
-        if(!isOnline(context)){
-            ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+        if (!isOnline(context)) {
+            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -1513,13 +1510,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         prepareNodesText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         loginProgressBar.setVisibility(View.VISIBLE);
-        logDebug("querySignupLink");
+        Timber.d("querySignupLink");
         megaApi.querySignupLink(link, this);
     }
 
     /*
- * Handle intent from confirmation email
- */
+     * Handle intent from confirmation email
+     */
     public void handleConfirmationIntent(Intent intent) {
         confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
         loginTitle.setText(StringResourcesUtils.getString(R.string.login_confirm_account));
@@ -1529,18 +1526,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     @Override
     public void onAttach(@NotNull Context context) {
-        logDebug("onAttach");
+        Timber.d("onAttach");
         super.onAttach(context);
         this.context = context;
 
         dbH = DatabaseHandler.getDbHandler(context);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        if (megaApiFolder == null){
-            megaApiFolder = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+        if (megaApiFolder == null) {
+            megaApiFolder = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
         }
 
         if (megaChatApi == null) {
@@ -1551,70 +1548,67 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 
-        try{
-            if(timer!=null){
+        try {
+            if (timer != null) {
                 timer.cancel();
                 serversBusyText.setVisibility(View.GONE);
             }
+        } catch (Exception e) {
+            Timber.e(e, "TIMER EXCEPTION");
         }
-        catch(Exception e){
-            logError("TIMER EXCEPTION", e);
-        }
-        if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-            if (firstRequestUpdate){
+        if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
+            if (firstRequestUpdate) {
                 loginProgressBar.setVisibility(View.GONE);
                 firstRequestUpdate = false;
             }
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
-            if (request.getTotalBytes() > 0){
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250 * scaleW), outMetrics);
+            if (request.getTotalBytes() > 0) {
                 double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
-                if ((progressValue > 99) || (progressValue < 0)){
+                if ((progressValue > 99) || (progressValue < 0)) {
                     progressValue = 100;
                     prepareNodesText.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.VISIBLE);
                 }
-                loginFetchNodesProgressBar.setProgress((int)progressValue);
+                loginFetchNodesProgressBar.setProgress((int) progressValue);
             }
         }
     }
 
-    public void readyToManager(){
+    public void readyToManager() {
         closeCancelDialog();
 
         LoginActivity loginActivity = ((LoginActivity) context);
 
-        if(confirmLink==null && !accountConfirmed){
+        if (confirmLink == null && !accountConfirmed) {
             if (MegaApplication.getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false;
                 MegaApplication.getChatManagement().setPendingJoinLink(null);
             }
 
-            logDebug("confirmLink==null");
+            Timber.d("confirmLink==null");
 
-            logDebug("OK fetch nodes");
-            logDebug("value of resumeSession: " + resumeSesion);
+            Timber.d("OK fetch nodes");
+            Timber.d("value of resumeSession: %s", resumeSesion);
 
-            if((action!=null)&&(url!=null)) {
+            if ((action != null) && (url != null)) {
 
                 if (action.equals(ACTION_CHANGE_MAIL)) {
-                    logDebug("Action change mail after fetch nodes");
+                    Timber.d("Action change mail after fetch nodes");
                     Intent changeMailIntent = new Intent(context, ManagerActivity.class);
                     changeMailIntent.setAction(ACTION_CHANGE_MAIL);
                     changeMailIntent.setData(Uri.parse(url));
                     loginActivity.startActivity(changeMailIntent);
                     loginActivity.finish();
-                }
-                else if(action.equals(ACTION_RESET_PASS)) {
-                    logDebug("Action reset pass after fetch nodes");
+                } else if (action.equals(ACTION_RESET_PASS)) {
+                    Timber.d("Action reset pass after fetch nodes");
                     Intent resetPassIntent = new Intent(context, ManagerActivity.class);
                     resetPassIntent.setAction(ACTION_RESET_PASS);
                     resetPassIntent.setData(Uri.parse(url));
                     loginActivity.startActivity(resetPassIntent);
                     loginActivity.finish();
-                }
-                else if(action.equals(ACTION_CANCEL_ACCOUNT)) {
-                    logDebug("Action cancel Account after fetch nodes");
+                } else if (action.equals(ACTION_CANCEL_ACCOUNT)) {
+                    Timber.d("Action cancel Account after fetch nodes");
                     Intent cancelAccountIntent = new Intent(context, ManagerActivity.class);
                     cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
                     cancelAccountIntent.setData(Uri.parse(url));
@@ -1623,64 +1617,59 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 }
             }
 
-            if (!backWhileLogin){
-                logDebug("NOT backWhileLogin");
-                if (parentHandle != -1){
+            if (!backWhileLogin) {
+                Timber.d("NOT backWhileLogin");
+                if (parentHandle != -1) {
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
                     loginActivity.setResult(RESULT_OK, intent);
                     loginActivity.finish();
-                }
-                else{
+                } else {
                     Intent intent = null;
-                    if (firstTime){
-                        logDebug("First time");
+                    if (firstTime) {
+                        Timber.d("First time");
                         intent = new Intent(context, ManagerActivity.class);
                         intent.putExtra(EXTRA_FIRST_LOGIN, true);
                         setStartScreenTimeStamp(requireContext());
 
-                        if (action != null){
-                            logDebug("Action not NULL");
-                            if (action.equals(ACTION_EXPORT_MASTER_KEY)){
-                                logDebug("ACTION_EXPORT_MK");
+                        if (action != null) {
+                            Timber.d("Action not NULL");
+                            if (action.equals(ACTION_EXPORT_MASTER_KEY)) {
+                                Timber.d("ACTION_EXPORT_MK");
                                 intent.setAction(action);
-                            }
-                            else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
+                            } else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
                                 intent.setAction(action);
                                 intent.setData(Uri.parse(url));
                             }
                         }
-                    }
-                    else{
+                    } else {
                         boolean initialCam = false;
                         MegaPreferences prefs = dbH.getPreferences();
-                        if (prefs != null){
-                            if (prefs.getCamSyncEnabled() != null){
-                                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+                        if (prefs != null) {
+                            if (prefs.getCamSyncEnabled() != null) {
+                                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                         loginActivity.startCameraUploadService(false, 30 * 1000);
                                     }
                                 }
-                            }
-                            else{
+                            } else {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                                     loginActivity.startCameraUploadService(true, 30 * 1000);
                                 }
                                 initialCam = true;
                             }
-                        }
-                        else{
+                        } else {
                             intent = new Intent(context, ManagerActivity.class);
                             intent.putExtra(EXTRA_FIRST_LOGIN, true);
                             initialCam = true;
                             setStartScreenTimeStamp(requireContext());
                         }
 
-                        if (!initialCam){
-                            logDebug("NOT initialCam");
+                        if (!initialCam) {
+                            Timber.d("NOT initialCam");
                             intent = new Intent(context, ManagerActivity.class);
-                            if (action != null){
-                                logDebug("The action is: " + action);
+                            if (action != null) {
+                                Timber.d("The action is: %s", action);
                                 switch (action) {
                                     case ACTION_FILE_PROVIDER:
                                         intent = new Intent(context, FileProviderActivity.class);
@@ -1708,33 +1697,31 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                                 }
 
                                 intent.setAction(action);
-                                if (url != null){
+                                if (url != null) {
                                     intent.setData(Uri.parse(url));
                                 }
+                            } else {
+                                Timber.w("The intent action is NULL");
                             }
-                            else{
-                                logWarning("The intent action is NULL");
-                            }
-                        }
-                        else{
-                            logDebug("initialCam YESSSS");
+                        } else {
+                            Timber.d("initialCam YESSSS");
                             intent = new Intent(context, ManagerActivity.class);
-                            if (action != null){
-                                logDebug("The action is: " + action);
+                            if (action != null) {
+                                Timber.d("The action is: %s", action);
                                 intent.setAction(action);
                             }
-                            if (url != null){
+                            if (url != null) {
                                 intent.setData(Uri.parse(url));
                             }
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
 
-                    if (twoFA){
+                    if (twoFA) {
                         intent.setAction(ACTION_REFRESH_API_SERVER);
                         twoFA = false;
                     }
-                    
+
                     if (action != null && action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
                         intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
@@ -1747,9 +1734,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     loginActivity.finish();
                 }
             }
-        }
-        else{
-            logDebug("Go to ChooseAccountFragment");
+        } else {
+            Timber.d("Go to ChooseAccountFragment");
             accountConfirmed = false;
 
             if (MegaApplication.getChatManagement().isPendingJoinLink()) {
@@ -1770,15 +1756,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request)
-    {
-        logDebug("onRequestStart: " + request.getRequestString());
-        if(request.getType() == MegaRequest.TYPE_LOGIN) {
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        Timber.d("onRequestStart: %s", request.getRequestString());
+        if (request.getType() == MegaRequest.TYPE_LOGIN) {
             disableLoginButton();
         }
-        if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+        if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250 * scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivity.isFetchingNodes = true;
             disableLoginButton();
@@ -1789,40 +1774,37 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @SuppressWarnings("unchecked")
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
         enableLoginButton();
-        try{
-            if(timer!=null){
+        try {
+            if (timer != null) {
                 timer.cancel();
                 serversBusyText.setVisibility(View.GONE);
             }
-        }
-        catch(Exception e){
-            logError("TIMER EXCEPTION", e);
+        } catch (Exception e) {
+            Timber.e(e, "TIMER EXCEPTION");
         }
 
-        logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
-        if (request.getType() == MegaRequest.TYPE_LOGIN){
-            PushMessageHandler.allowBackgroundLogin = true;
-            IncomingCallService.allowBackgroundLogin = true;
+        Timber.d("onRequestFinish: %s,error code: %d", request.getRequestString(), error.getErrorCode());
+        if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            loginRepository.setAllowBackgroundLogin(true);
 
             //cancel login process by press back.
-            if(!MegaApplication.isLoggingIn()) {
-                logWarning("Terminate login process when login");
+            if (!MegaApplication.isLoggingIn()) {
+                Timber.w("Terminate login process when login");
                 return;
             }
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
-                if(confirmLogoutDialog != null) {
+                if (confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
                 }
                 enableLoginButton();
                 String errorMessage = "";
 
-                if (error.getErrorCode() == MegaError.API_ESID){
-                    logWarning("MegaError.API_ESID " + getString(R.string.error_server_expired_session));
-                    ((LoginActivity)context).showAlertLoggedOut();
-                }
-                else if (error.getErrorCode() == MegaError.API_EMFAREQUIRED){
-                    logDebug("require 2fa");
+                if (error.getErrorCode() == MegaError.API_ESID) {
+                    Timber.w("MegaError.API_ESID %s", getString(R.string.error_server_expired_session));
+                    ((LoginActivity) context).showAlertLoggedOut();
+                } else if (error.getErrorCode() == MegaError.API_EMFAREQUIRED) {
+                    Timber.d("require 2fa");
                     is2FAEnabled = true;
                     ((LoginActivity) context).showAB(tB);
                     loginLogin.setVisibility(View.GONE);
@@ -1841,47 +1823,42 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     firstPin.requestFocus();
                     firstPin.setCursorVisible(true);
                     return;
-                }
-                else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
+                } else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
                     if (verify2faProgressBar != null) {
                         verify2faProgressBar.setVisibility(View.GONE);
                     }
                     verifyShowError();
                     return;
-                }
-                else{
+                } else {
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
                         errorMessage = getString(R.string.error_incorrect_email_or_password);
-                    }
-                    else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+                    } else if (error.getErrorCode() == MegaError.API_ETOOMANY) {
                         errorMessage = getString(R.string.too_many_attempts_login);
-                    }
-                    else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                    } else if (error.getErrorCode() == MegaError.API_EINCOMPLETE) {
                         errorMessage = getString(R.string.account_not_validated_login);
-                    }
-                    else if(error.getErrorCode() == MegaError.API_EACCESS) {
+                    } else if (error.getErrorCode() == MegaError.API_EACCESS) {
                         errorMessage = error.getErrorString();
                     } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
                         //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        Timber.w("Suspended account - Reason: %s", request.getNumber());
                         return;
                     } else {
                         errorMessage = error.getErrorString();
                     }
-                    logError("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
+                    Timber.e("LOGIN_ERROR: %d %s", error.getErrorCode(), error.getErrorString());
 
                     if (megaChatApi != null) {
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
+                        megaChatApi.logout(new ChatLogoutListener(getContext(), loggingSettings));
                     }
 
-                    if(!errorMessage.isEmpty()){
-                        if(!backWhileLogin) {
-                            ((LoginActivity)context).showSnackbar(errorMessage);
+                    if (!errorMessage.isEmpty()) {
+                        if (!backWhileLogin) {
+                            ((LoginActivity) context).showSnackbar(errorMessage);
                         }
                     }
 
-                    if(chatSettings==null) {
-                        logDebug("Reset chat setting enable");
+                    if (chatSettings == null) {
+                        Timber.d("Reset chat setting enable");
                         chatSettings = new ChatSettings();
                         dbH.setChatSettings(chatSettings);
                     }
@@ -1889,10 +1866,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
                 returnToLogin();
             } else {
-                logDebug("Logged in. Setting account auth token for folder links.");
+                Timber.d("Logged in. Setting account auth token for folder links.");
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 
-                if (is2FAEnabled){
+                if (is2FAEnabled) {
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivity) context).hideAB();
                 }
@@ -1907,7 +1884,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 serversBusyText.setVisibility(View.GONE);
                 saveCredentials();
 
-                logDebug("Logged in with session");
+                Timber.d("Logged in with session");
 
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 dbH.clearEphemeral();
@@ -1917,39 +1894,34 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 // Get cookies settings after login.
                 MegaApplication.getInstance().checkEnabledCookies();
             }
-        } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
-            logDebug("TYPE_LOGOUT");
-            if (error.getErrorCode() == MegaError.API_OK){
+        } else if (request.getType() == MegaRequest.TYPE_LOGOUT) {
+            Timber.d("TYPE_LOGOUT");
+            if (error.getErrorCode() == MegaError.API_OK) {
                 AccountController.localLogoutApp(context.getApplicationContext(), sharingScope);
             }
-        }
-        else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
-            logDebug("TYPE_GET_RECOVERY_LINK");
-            if (error.getErrorCode() == MegaError.API_OK){
-                logDebug("The recovery link has been sent");
+        } else if (request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK) {
+            Timber.d("TYPE_GET_RECOVERY_LINK");
+            if (error.getErrorCode() == MegaError.API_OK) {
+                Timber.d("The recovery link has been sent");
                 showAlert(context, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
-            }
-            else if (error.getErrorCode() == MegaError.API_ENOENT){
-                logError("No account with this mail: "+error.getErrorString()+" "+error.getErrorCode());
+            } else if (error.getErrorCode() == MegaError.API_ENOENT) {
+                Timber.e("No account with this mail: %s %d", error.getErrorString(), error.getErrorCode());
                 showAlert(context, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+            } else {
+                Timber.e("Error when asking for recovery pass link \n %s__%d", error.getErrorString(), error.getErrorCode());
+                showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
             }
-            else{
-                logError("Error when asking for recovery pass link");
-                logError(error.getErrorString() + "___" + error.getErrorCode());
-                showAlert(context,getString(R.string.general_text_error), getString(R.string.general_error_word));
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             //cancel login process by press back.
-            if(!MegaApplication.isLoggingIn()) {
-                logDebug("Terminate login process when fetch nodes");
+            if (!MegaApplication.isLoggingIn()) {
+                Timber.d("Terminate login process when fetch nodes");
                 return;
             }
 
             LoginActivity.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 
-            if (error.getErrorCode() == MegaError.API_OK){
+            if (error.getErrorCode() == MegaError.API_OK) {
                 receivedIntent = ((LoginActivity) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS);
@@ -1986,22 +1958,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
                 readyToManager();
             } else {
-                if(confirmLogoutDialog != null) {
+                if (confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
                 }
                 enableLoginButton();
-                logError("Error fetch nodes: " + error.getErrorCode());
+                Timber.e("Error fetch nodes: %s", error.getErrorCode());
                 String errorMessage;
-                if (error.getErrorCode() == MegaError.API_ESID){
+                if (error.getErrorCode() == MegaError.API_ESID) {
                     errorMessage = getString(R.string.error_server_expired_session);
-                }
-                else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+                } else if (error.getErrorCode() == MegaError.API_ETOOMANY) {
                     errorMessage = getString(R.string.too_many_attempts_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                } else if (error.getErrorCode() == MegaError.API_EINCOMPLETE) {
                     errorMessage = getString(R.string.account_not_validated_login);
-                }
-                else{
+                } else {
                     errorMessage = error.getErrorString();
                 }
                 loginLoggingIn.setVisibility(View.GONE);
@@ -2016,35 +1985,32 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_EACCESS){
-                    logError("Error API_EACCESS");
-                    if(((LoginActivity)context).accountBlocked!=null){
-                        logError("Account blocked");
-                    }
-                    else{
+                if (error.getErrorCode() == MegaError.API_EACCESS) {
+                    Timber.e("Error API_EACCESS");
+                    if (((LoginActivity) context).accountBlocked != null) {
+                        Timber.e("Account blocked");
+                    } else {
                         errorMessage = error.getErrorString();
-                        if(!backWhileLogin) {
-                            ((LoginActivity)context).showSnackbar(errorMessage);
+                        if (!backWhileLogin) {
+                            ((LoginActivity) context).showSnackbar(errorMessage);
                         }
                     }
-                }
-                else{
-                    if(error.getErrorCode() != MegaError.API_EBLOCKED) {
+                } else {
+                    if (error.getErrorCode() != MegaError.API_EBLOCKED) {
                         //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        Timber.w("Suspended account - Reason: %s", request.getNumber());
                         return;
                     }
                 }
 
-                if(chatSettings==null) {
-                    logDebug("Reset chat setting enable");
+                if (chatSettings == null) {
+                    Timber.d("Reset chat setting enable");
                     chatSettings = new ChatSettings();
                     dbH.setChatSettings(chatSettings);
                 }
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
-            logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
+        } else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK) {
+            Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
@@ -2058,8 +2024,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            if(error.getErrorCode() == MegaError.API_OK){
-                logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK");
+            if (error.getErrorCode() == MegaError.API_OK) {
+                Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK");
                 if (request.getFlag()) {
                     bForgotPass.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.GONE);
@@ -2067,19 +2033,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     loginTitle.setText(StringResourcesUtils.getString(R.string.login_to_mega));
                     bLogin.setText(StringResourcesUtils.getString(R.string.login_text));
                     confirmLink = null;
-                    ((LoginActivity)context).showSnackbar(getString(R.string.account_confirmed));
+                    ((LoginActivity) context).showSnackbar(getString(R.string.account_confirmed));
                     accountConfirmed = true;
-                }
-                else {
+                } else {
                     accountConfirmed = false;
-                    ((LoginActivity)context).showSnackbar(getString(R.string.confirm_account));
+                    ((LoginActivity) context).showSnackbar(getString(R.string.confirm_account));
                 }
                 s = request.getEmail();
                 et_user.setText(s);
                 et_password.requestFocus();
-            }
-            else{
-                logWarning("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK " + error.getErrorCode());
+            } else {
+                Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK %s", error.getErrorCode());
                 LoginActivity loginActivity = (LoginActivity) context;
                 if (error.getErrorCode() == MegaError.API_ENOENT) {
                     loginActivity.showSnackbar(getString(R.string.reg_link_expired));
@@ -2088,13 +2052,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 }
                 confirmLink = null;
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT){
-            if (error.getErrorCode() == MegaError.API_OK){
-                logDebug("fastConfirm finished - OK");
+        } else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT) {
+            if (error.getErrorCode() == MegaError.API_OK) {
+                Timber.d("fastConfirm finished - OK");
                 onKeysGeneratedLogin(lastEmail, lastPassword);
-            }
-            else{
+            } else {
                 loginLogin.setVisibility(View.VISIBLE);
                 closeCancelDialog();
                 loginCreateAccount.setVisibility(View.VISIBLE);
@@ -2106,11 +2068,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY){
-                    ((LoginActivity)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
-                }
-                else{
-                    ((LoginActivity)context).showSnackbar(error.getErrorString());
+                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY) {
+                    ((LoginActivity) context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
+                } else {
+                    ((LoginActivity) context).showSnackbar(error.getErrorString());
                 }
             }
         }
@@ -2118,7 +2079,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == READ_MEDIA_PERMISSION) {
+        if (requestCode == READ_MEDIA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 toSharePage();
             } else {
@@ -2129,7 +2090,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     private void toSharePage() {
         Intent shareIntent = new Intent(context, FileExplorerActivity.class);
-        shareIntent.putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS,shareInfos);
+        shareIntent.putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, shareInfos);
         shareIntent.setAction(receivedIntent.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION));
         shareIntent.setType(receivedIntent.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE));
         startActivity(shareIntent);
@@ -2156,56 +2117,50 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
-    {
-        logWarning("onRequestTemporaryError: " + request.getRequestString() + e.getErrorCode());
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        Timber.w("onRequestTemporaryError: %s%d", request.getRequestString(), e.getErrorCode());
 
         final MegaError error = e;
-        try{
+        try {
             timer = new CountDownTimer(10000, 2000) {
 
                 public void onTick(long millisUntilFinished) {
-                    logDebug("TemporaryError one more");
+                    Timber.d("TemporaryError one more");
                 }
 
                 public void onFinish() {
-                    logDebug("The timer finished, message shown");
+                    Timber.d("The timer finished, message shown");
                     try {
                         serversBusyText.setVisibility(View.VISIBLE);
-                        if(error.getErrorCode()==MegaError.API_EAGAIN){
-                            logWarning("onRequestTemporaryError:onFinish:API_EAGAIN: :value: " + error.getValue());
-                            if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
+                        if (error.getErrorCode() == MegaError.API_EAGAIN) {
+                            Timber.w("onRequestTemporaryError:onFinish:API_EAGAIN: :value: %s", error.getValue());
+                            if (error.getValue() == MegaApiJava.RETRY_CONNECTIVITY) {
                                 serversBusyText.setText(getString(R.string.login_connectivity_issues));
                                 loginInProgressInfo.setText(getString(R.string.login_connectivity_issues));
-                            }
-                            else if(error.getValue() == MegaApiJava.RETRY_SERVERS_BUSY){
+                            } else if (error.getValue() == MegaApiJava.RETRY_SERVERS_BUSY) {
                                 serversBusyText.setText(getString(R.string.login_servers_busy));
                                 loginInProgressInfo.setText(getString(R.string.login_servers_busy));
-                            }
-                            else if(error.getValue() == MegaApiJava.RETRY_API_LOCK){
+                            } else if (error.getValue() == MegaApiJava.RETRY_API_LOCK) {
                                 serversBusyText.setText(getString(R.string.login_API_lock));
                                 loginInProgressInfo.setText(getString(R.string.login_API_lock));
-                            }
-                            else if(error.getValue() == MegaApiJava.RETRY_RATE_LIMIT){
+                            } else if (error.getValue() == MegaApiJava.RETRY_RATE_LIMIT) {
                                 serversBusyText.setText(getString(R.string.login_API_rate));
                                 loginInProgressInfo.setText(getString(R.string.login_API_rate));
-                            }
-                            else{
+                            } else {
                                 serversBusyText.setText(getString(R.string.servers_busy));
                                 loginInProgressInfo.setText(getString(R.string.servers_busy));
                             }
-                        }
-                        else{
+                        } else {
                             serversBusyText.setText(getString(R.string.servers_busy));
                             loginInProgressInfo.setText(getString(R.string.servers_busy));
                         }
+                    } catch (Exception e) {
                     }
-                    catch (Exception e){}
 
                 }
             }.start();
-        }catch (Exception exception){
-            logError("EXCEPTION when starting count", exception);
+        } catch (Exception exception) {
+            Timber.e(exception, "EXCEPTION when starting count");
         }
     }
 
@@ -2213,7 +2168,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
      * Display keyboard
      */
     private void showKeyboardDelayed(final View view) {
-        logDebug("showKeyboardDelayed");
+        Timber.d("showKeyboardDelayed");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -2223,7 +2178,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     private void hideKeyboardDelayed(final View view) {
-        logDebug("showKeyboardDelayed");
+        Timber.d("showKeyboardDelayed");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -2234,8 +2189,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         }, 50);
     }
 
-    public void showDialogInsertMKToChangePass(String link){
-        logDebug("link: " + link);
+    public void showDialogInsertMKToChangePass(String link) {
+        Timber.d("link: %s", link);
 
         final String linkUrl = link;
 
@@ -2255,18 +2210,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    logDebug("IME OK BTTN PASSWORD");
+                    Timber.d("IME OK BTTN PASSWORD");
                     String value = input.getText().toString().trim();
-                    if(value.equals("")||value.isEmpty()){
-                        logWarning("Input is empty");
+                    if (value.equals("") || value.isEmpty()) {
+                        Timber.w("Input is empty");
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
-                    }
-                    else {
+                    } else {
 
-                        logDebug("Positive button pressed - reset pass");
+                        Timber.d("Positive button pressed - reset pass");
                         Intent intent = new Intent(context, ChangePasswordActivity.class);
                         intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                         intent.setData(Uri.parse(linkUrl));
@@ -2274,14 +2228,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         startActivity(intent);
                         insertMKDialog.dismiss();
                     }
-                }
-                else{
-                    logDebug("Other IME" + actionId);
+                } else {
+                    Timber.d("Other IME%s", actionId);
                 }
                 return false;
             }
         });
-        input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
+        input.setImeActionLabel(getString(R.string.general_add), EditorInfo.IME_ACTION_DONE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getString(R.string.title_dialog_insert_MK));
@@ -2295,7 +2248,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                hideKeyboard((LoginActivity)context, InputMethodManager.HIDE_NOT_ALWAYS);
+                hideKeyboard((LoginActivity) context, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -2306,15 +2259,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             @Override
             public void onClick(View v) {
 
-                logDebug("OK BTTN PASSWORD");
+                Timber.d("OK BTTN PASSWORD");
                 String value = input.getText().toString().trim();
-                if(value.equals("")||value.isEmpty()){
-                    logWarning("Input is empty");
+                if (value.equals("") || value.isEmpty()) {
+                    Timber.w("Input is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
-                }
-                else {
-                    logDebug("Positive button pressed - reset pass");
+                } else {
+                    Timber.d("Positive button pressed - reset pass");
                     Intent intent = new Intent(context, ChangePasswordActivity.class);
                     intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                     intent.setData(Uri.parse(linkUrl));
@@ -2338,6 +2290,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     private AlertDialog confirmLogoutDialog;
+
     private void showConfirmLogoutDialog() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
@@ -2349,10 +2302,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     LoginActivity.isFetchingNodes = false;
                     loginClicked = false;
                     firstTime = true;
-                    if (megaChatApi == null){
-                        megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                    if (megaChatApi == null) {
+                        megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
                     }
-                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+                    megaChatApi.logout(new ChatLogoutListener(getContext(), loggingSettings));
                     megaApi.localLogout(LoginFragment.this);
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
@@ -2360,8 +2313,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     break;
             }
         };
-        String message= getString(R.string.confirm_cancel_login);
-        confirmLogoutDialog =  builder.setCancelable(true)
+        String message = getString(R.string.confirm_cancel_login);
+        confirmLogoutDialog = builder.setCancelable(true)
                 .setMessage(message)
                 .setPositiveButton(getString(R.string.general_positive_button), dialogClickListener)
                 .setNegativeButton(getString(R.string.general_negative_button), dialogClickListener)
@@ -2369,9 +2322,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     public int onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         //refresh, point to staging server, enable chat. block the back button
-        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_API_SERVER.equals(action)){
+        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_API_SERVER.equals(action)) {
             return -1;
         }
         //login is in process
@@ -2380,10 +2333,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         if ((MegaApplication.isLoggingIn() || LoginActivity.isFetchingNodes) && !onLoginPage && !on2faPage) {
             showConfirmLogoutDialog();
             return 2;
-        }
-        else{
-            if(on2faPage) {
-                logDebug("Back from 2fa page");
+        } else {
+            if (on2faPage) {
+                Timber.d("Back from 2fa page");
                 showConfirmLogoutDialog();
                 return 2;
             }
@@ -2394,34 +2346,34 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         }
     }
 
-    public void setPasswdTemp(String passwdTemp){
+    public void setPasswdTemp(String passwdTemp) {
         this.passwdTemp = passwdTemp;
     }
 
-    public String getPasswdTemp(){
+    public String getPasswdTemp() {
         return this.passwdTemp;
     }
 
-    public void setEmailTemp(String emailTemp){
+    public void setEmailTemp(String emailTemp) {
         this.emailTemp = emailTemp;
     }
 
-    public String getEmailTemp(){
+    public String getEmailTemp() {
         return this.emailTemp;
     }
 
-    private void setError(final EditText editText, String error){
-        if(error == null || error.equals("")){
+    private void setError(final EditText editText, String error) {
+        if (error == null || error.equals("")) {
             return;
         }
-        switch (editText.getId()){
-            case R.id.login_email_text:{
+        switch (editText.getId()) {
+            case R.id.login_email_text: {
                 et_userLayout.setError(error);
                 et_userLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_userError.setVisibility(View.VISIBLE);
                 break;
             }
-            case R.id.login_password_text:{
+            case R.id.login_password_text: {
                 et_passwordLayout.setError(error);
                 et_passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_passwordError.setVisibility(View.VISIBLE);
@@ -2430,15 +2382,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         }
     }
 
-    private void quitError(EditText editText){
-        switch (editText.getId()){
-            case R.id.login_email_text:{
+    private void quitError(EditText editText) {
+        switch (editText.getId()) {
+            case R.id.login_email_text: {
                 et_userLayout.setError(null);
                 et_userLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 et_userError.setVisibility(View.GONE);
                 break;
             }
-            case R.id.login_password_text:{
+            case R.id.login_password_text: {
                 et_passwordLayout.setError(null);
                 et_passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 et_passwordError.setVisibility(View.GONE);
@@ -2448,30 +2400,29 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     }
 
     void pasteClipboard() {
-        logDebug("pasteClipboard");
+        Timber.d("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
         if (clipData != null) {
             String code = clipData.getItemAt(0).getText().toString();
-            logDebug("code: " + code);
+            Timber.d("code: %s", code);
             if (code != null && code.length() == 6) {
                 boolean areDigits = true;
-                for (int i=0; i<6; i++) {
+                for (int i = 0; i < 6; i++) {
                     if (!Character.isDigit(code.charAt(i))) {
                         areDigits = false;
                         break;
                     }
                 }
                 if (areDigits) {
-                    firstPin.setText(""+code.charAt(0));
-                    secondPin.setText(""+code.charAt(1));
-                    thirdPin.setText(""+code.charAt(2));
-                    fourthPin.setText(""+code.charAt(3));
-                    fifthPin.setText(""+code.charAt(4));
-                    sixthPin.setText(""+code.charAt(5));
-                }
-                else {
+                    firstPin.setText("" + code.charAt(0));
+                    secondPin.setText("" + code.charAt(1));
+                    thirdPin.setText("" + code.charAt(2));
+                    fourthPin.setText("" + code.charAt(3));
+                    fifthPin.setText("" + code.charAt(4));
+                    sixthPin.setText("" + code.charAt(5));
+                } else {
                     firstPin.setText("");
                     secondPin.setText("");
                     thirdPin.setText("");
@@ -2485,7 +2436,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     @Override
     public boolean onLongClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.pin_first_login:
             case R.id.pin_second_login:
             case R.id.pin_third_login:

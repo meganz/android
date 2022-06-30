@@ -24,25 +24,52 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.*
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.isInternalIntent
+import mega.privacy.android.app.utils.FileUtil.isLocalFile
+import mega.privacy.android.app.utils.FileUtil.isOpusFile
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,7 +99,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAudioBinding.inflate(inflater, container, false).apply {
             viewModel = this@AudioFragment.viewModel
@@ -262,7 +289,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (paramsSetSuccessfully) {
             startActivity(intent)
         } else {
-            logWarning("itemClick:noAvailableIntent")
+            Timber.w("itemClick:noAvailableIntent")
             showSnackbar(
                 activity, SNACKBAR_TYPE,
                 StringResourcesUtils.getString(R.string.intent_not_available),
@@ -363,17 +390,17 @@ class AudioFragment : Fragment(), HomepageSearchable {
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     updateUi()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 

@@ -196,7 +196,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         private const val EXTRA_IS_GUEST = "extra_is_guest"
         private const val EXTRA_IS_MODERATOR = "extra_is_moderator"
         private const val EXTRA_IS_SPEAKER_MODE = "extra_is_speaker_mode"
-        const val EXTRA_FROM_MEETING = "extra_from_meeting"
 
         /**
          * Get the participant object

@@ -1,5 +1,15 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.main.FileExplorerActivity.COPY;
+import static mega.privacy.android.app.main.FileExplorerActivity.INCOMING_FRAGMENT;
+import static mega.privacy.android.app.main.FileExplorerActivity.MOVE;
+import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_INCOMING_EXPLORER;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
+import static mega.privacy.android.app.utils.Util.getPreferences;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -56,12 +66,12 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.search.callback.SearchCallback;
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.search.callback.SearchCallback;
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -69,914 +79,880 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-
-import static mega.privacy.android.app.main.FileExplorerActivity.COPY;
-import static mega.privacy.android.app.main.FileExplorerActivity.INCOMING_FRAGMENT;
-import static mega.privacy.android.app.main.FileExplorerActivity.MOVE;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_INCOMING_EXPLORER;
-import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
-import static mega.privacy.android.app.utils.Util.getPreferences;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class IncomingSharesExplorerFragment extends RotatableFragment
-		implements OnClickListener, CheckScrollInterface, SearchCallback.View, SearchCallback.Data {
+        implements OnClickListener, CheckScrollInterface, SearchCallback.View, SearchCallback.Data {
 
-	@Inject
-	SortOrderManagement sortOrderManagement;
-	@Inject
-	SearchNodesUseCase searchNodesUseCase;
+    @Inject
+    SortOrderManagement sortOrderManagement;
+    @Inject
+    SearchNodesUseCase searchNodesUseCase;
 
-	private DisplayMetrics outMetrics;
-	private Context context;
-	private MegaApiAndroid megaApi;
-	private ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
-	private ArrayList<MegaNode> searchNodes = null;
+    private DisplayMetrics outMetrics;
+    private Context context;
+    private MegaApiAndroid megaApi;
+    private ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+    private ArrayList<MegaNode> searchNodes = null;
 
-	private long parentHandle = -1;
+    private long parentHandle = -1;
 
-	private MegaExplorerAdapter adapter;
+    private MegaExplorerAdapter adapter;
     private FastScroller fastScroller;
 
-	private int modeCloud;
-	private boolean selectFile;
+    private int modeCloud;
+    private boolean selectFile;
 
-	private RelativeLayout contentLayout;
-	private RecyclerView recyclerView;
-	private LinearLayoutManager mLayoutManager;
-	private CustomizedGridLayoutManager gridLayoutManager;
+    private RelativeLayout contentLayout;
+    private RecyclerView recyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private CustomizedGridLayoutManager gridLayoutManager;
 
-	private ImageView emptyImageView;
-	private LinearLayout emptyTextView;
-	private TextView emptyTextViewFirst;
+    private ImageView emptyImageView;
+    private LinearLayout emptyTextView;
+    private TextView emptyTextViewFirst;
 
-	private Button optionButton;
-	private Button cancelButton;
-	private LinearLayout optionsBar;
-	private FloatingActionButton fabSelect;
+    private Button optionButton;
+    private Button cancelButton;
+    private LinearLayout optionsBar;
+    private FloatingActionButton fabSelect;
 
-	private Stack<Integer> lastPositionStack;
+    private Stack<Integer> lastPositionStack;
 
-	private Handler handler;
-	private ActionMode actionMode;
+    private Handler handler;
+    private ActionMode actionMode;
 
-	private int orderParent = megaApi.ORDER_DEFAULT_ASC;
-	private int order = megaApi.ORDER_DEFAULT_ASC;
+    private int orderParent = megaApi.ORDER_DEFAULT_ASC;
+    private int order = megaApi.ORDER_DEFAULT_ASC;
 
-	private MegaCancelToken searchCancelToken;
-	private ProgressBar searchProgressBar;
-	private boolean shouldResetNodes = true;
-	private boolean hasWritePermissions = true;
+    private MegaCancelToken searchCancelToken;
+    private ProgressBar searchProgressBar;
+    private boolean shouldResetNodes = true;
+    private boolean hasWritePermissions = true;
 
-	private Spanned emptyRootText;
-	private Spanned emptyGeneralText;
+    private Spanned emptyRootText;
+    private Spanned emptyGeneralText;
 
-	@Override
-	protected RotatableAdapter getAdapter() {
-		return adapter;
-	}
+    @Override
+    protected RotatableAdapter getAdapter() {
+        return adapter;
+    }
 
-	@Override
-	public void activateActionMode(){
-		if (!adapter.isMultipleSelect()){
-			adapter.setMultipleSelect(true);
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+    @Override
+    public void activateActionMode() {
+        if (!adapter.isMultipleSelect()) {
+            adapter.setMultipleSelect(true);
+            actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
 
-			if(isMultiselect()){
-				activateButton(true);
-			}
-		}
-	}
+            if (isMultiselect()) {
+                activateButton(true);
+            }
+        }
+    }
 
-	@Override
-	public void multipleItemClick(int position) {
-		adapter.toggleSelection(position);
-	}
+    @Override
+    public void multipleItemClick(int position) {
+        adapter.toggleSelection(position);
+    }
 
-	@Override
-	public void reselectUnHandledSingleItem(int position) {
-	}
+    @Override
+    public void reselectUnHandledSingleItem(int position) {
+    }
 
-	private class ActionBarCallBack implements ActionMode.Callback {
+    private class ActionBarCallBack implements ActionMode.Callback {
 
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = adapter.getSelectedNodes();
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            List<MegaNode> documents = adapter.getSelectedNodes();
 
-			switch(item.getItemId()){
+            switch (item.getItemId()) {
 
-				case R.id.cab_menu_select_all:{
-					selectAll();
-					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-			}
-			return false;
-		}
+                case R.id.cab_menu_select_all: {
+                    selectAll();
+                    break;
+                }
+                case R.id.cab_menu_unselect_all: {
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+                }
+            }
+            return false;
+        }
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_explorer_multiaction, menu);
-			((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
-			checkScroll();
-			return true;
-		}
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.file_explorer_multiaction, menu);
+            ((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
+            checkScroll();
+            return true;
+        }
 
-		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
-			if (!((FileExplorerActivity) context).shouldReopenSearch()) {
-				((FileExplorerActivity) context).hideTabs(false, INCOMING_FRAGMENT);
-				((FileExplorerActivity) context).clearQuerySearch();
-				getNodes();
-				setNodes(nodes);
-			}
-			clearSelections();
-			adapter.setMultipleSelect(false);
-			checkScroll();
-		}
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+            if (!((FileExplorerActivity) context).shouldReopenSearch()) {
+                ((FileExplorerActivity) context).hideTabs(false, INCOMING_FRAGMENT);
+                ((FileExplorerActivity) context).clearQuerySearch();
+                getNodes();
+                setNodes(nodes);
+            }
+            clearSelections();
+            adapter.setMultipleSelect(false);
+            checkScroll();
+        }
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = adapter.getSelectedNodes();
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            List<MegaNode> selected = adapter.getSelectedNodes();
 
-			if (selected.size() != 0) {
-				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-				MegaNode node = megaApi.getNodeByHandle(parentHandle);
+            if (selected.size() != 0) {
+                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+                MegaNode node = megaApi.getNodeByHandle(parentHandle);
 
-				if(selected.size() == megaApi.getNumChildFiles(node)){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                if (selected.size() == megaApi.getNumChildFiles(node)) {
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 
-				}else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				}
+                } else {
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                }
 
-				unselect.setTitle(getString(R.string.action_unselect_all));
-				unselect.setVisible(true);
-			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			}
+                unselect.setTitle(getString(R.string.action_unselect_all));
+                unselect.setVisible(true);
+            } else {
+                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+            }
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
-	public static IncomingSharesExplorerFragment newInstance() {
-		logDebug("newInstance");
-		IncomingSharesExplorerFragment fragment = new IncomingSharesExplorerFragment();
-		return fragment;
-	}
+    public static IncomingSharesExplorerFragment newInstance() {
+        Timber.d("newInstance");
+        IncomingSharesExplorerFragment fragment = new IncomingSharesExplorerFragment();
+        return fragment;
+    }
 
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		if (megaApi.getRootNode() == null){
-			return;
-		}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
 
-		parentHandle = -1;
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        }
 
-		lastPositionStack = new Stack<>();
+        if (megaApi.getRootNode() == null) {
+            return;
+        }
 
-		handler = new Handler();
-	}
+        parentHandle = -1;
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		handler.removeCallbacksAndMessages(null);
-	}
+        lastPositionStack = new Stack<>();
 
-	@Override
-	public void checkScroll() {
-		if (recyclerView == null) return;
+        handler = new Handler();
+    }
 
-		((FileExplorerActivity) context).changeActionBarElevation(
-				recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
-						|| (adapter != null && adapter.isMultipleSelect()),
-				FileExplorerActivity.INCOMING_FRAGMENT);
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
+    }
 
-	/**
-	 * Shows the Sort by panel.
-	 *
-	 * @param unit Unit event.
-	 * @return Null.
-	 */
-	private Unit showSortByPanel(Unit unit) {
-		((FileExplorerActivity) context).showSortByPanel();
-		return null;
-	}
+    @Override
+    public void checkScroll() {
+        if (recyclerView == null) return;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		logDebug("onCreateView");
+        ((FileExplorerActivity) context).changeActionBarElevation(
+                recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
+                        || (adapter != null && adapter.isMultipleSelect()),
+                FileExplorerActivity.INCOMING_FRAGMENT);
+    }
 
-		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
-				.get(SortByHeaderViewModel.class);
+    /**
+     * Shows the Sort by panel.
+     *
+     * @param unit Unit event.
+     * @return Null.
+     */
+    private Unit showSortByPanel(Unit unit) {
+        ((FileExplorerActivity) context).showSortByPanel();
+        return null;
+    }
 
-		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
-				new EventObserver<>(this::showSortByPanel));
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Timber.d("onCreateView");
 
-		Display display = getActivity().getWindowManager().getDefaultDisplay();
-		
-		outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
+        SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
+                .get(SortByHeaderViewModel.class);
 
-		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
+        sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+                new EventObserver<>(this::showSortByPanel));
 
-		contentLayout = v.findViewById(R.id.content_layout);
-		searchProgressBar = v.findViewById(R.id.progressbar);
-		
-		optionsBar = v.findViewById(R.id.options_explorer_layout);
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
 
-		optionButton = v.findViewById(R.id.action_text);
-		optionButton.setOnClickListener(this);
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
 
-		cancelButton = v.findViewById(R.id.cancel_text);
-		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+        View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 
-		fabSelect = v.findViewById(R.id.fab_select);
-		fabSelect.setOnClickListener(this);
+        contentLayout = v.findViewById(R.id.content_layout);
+        searchProgressBar = v.findViewById(R.id.progressbar);
 
-		fastScroller = v.findViewById(R.id.fastscroll);
-		if (((FileExplorerActivity) context).isList()) {
-			recyclerView = v.findViewById(R.id.file_list_view_browser);
-			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
-			mLayoutManager = new LinearLayoutManager(context);
-			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
-		}
-		else {
-			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
-			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
-			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-		}
+        optionsBar = v.findViewById(R.id.options_explorer_layout);
 
-		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				checkScroll();
-			}
-		});
+        optionButton = v.findViewById(R.id.action_text);
+        optionButton.setOnClickListener(this);
 
-		emptyImageView = v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = v.findViewById(R.id.file_list_empty_text);
-		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
-		parentHandle = ((FileExplorerActivity)context).getParentHandleIncoming();
+        cancelButton = v.findViewById(R.id.cancel_text);
+        cancelButton.setOnClickListener(this);
+        cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		if (parentHandle != INVALID_HANDLE) {
-			((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
-		}
+        fabSelect = v.findViewById(R.id.fab_select);
+        fabSelect.setOnClickListener(this);
 
-		modeCloud = ((FileExplorerActivity)context).getMode();
-		selectFile = ((FileExplorerActivity)context).isSelectFile();
+        fastScroller = v.findViewById(R.id.fastscroll);
+        if (((FileExplorerActivity) context).isList()) {
+            recyclerView = v.findViewById(R.id.file_list_view_browser);
+            v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
+            mLayoutManager = new LinearLayoutManager(context);
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+        } else {
+            recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+            v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
+            gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+        }
 
-		MegaPreferences prefs = getPreferences(context);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
 
-		if(prefs != null) {
-			if (prefs.getPreferredSortOthers()!=null) {
-				orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
-			}
-			if (prefs.getPreferredSortCloud() != null) {
-				order = Integer.parseInt(prefs.getPreferredSortCloud());
-			}
-		}
+        emptyImageView = v.findViewById(R.id.file_list_empty_image);
+        emptyTextView = v.findViewById(R.id.file_list_empty_text);
+        emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
+        parentHandle = ((FileExplorerActivity) context).getParentHandleIncoming();
 
-		getNodes();
+        if (parentHandle != INVALID_HANDLE) {
+            ((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
+        }
 
-		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, this, nodes, parentHandle,
-					recyclerView, selectFile, sortByHeaderViewModel);
-		}
-		else{
-			adapter.setListFragment(recyclerView);
-			adapter.setParentHandle(parentHandle);
-			adapter.setSelectFile(selectFile);
-		}
+        modeCloud = ((FileExplorerActivity) context).getMode();
+        selectFile = ((FileExplorerActivity) context).isSelectFile();
 
-		if (gridLayoutManager != null) {
-			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
-		}
+        MegaPreferences prefs = getPreferences(context);
+
+        if (prefs != null) {
+            if (prefs.getPreferredSortOthers() != null) {
+                orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
+            }
+            if (prefs.getPreferredSortCloud() != null) {
+                order = Integer.parseInt(prefs.getPreferredSortCloud());
+            }
+        }
+
+        getNodes();
+
+        if (adapter == null) {
+            adapter = new MegaExplorerAdapter(context, this, nodes, parentHandle,
+                    recyclerView, selectFile, sortByHeaderViewModel);
+        } else {
+            adapter.setListFragment(recyclerView);
+            adapter.setParentHandle(parentHandle);
+            adapter.setSelectFile(selectFile);
+        }
+
+        if (gridLayoutManager != null) {
+            gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
+        }
 
         recyclerView.setAdapter(adapter);
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
 
 
-		if (modeCloud == MOVE || modeCloud == COPY) {
-			optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE ? R.string.context_move
-					: R.string.context_copy).toUpperCase(Locale.getDefault()));
+        if (modeCloud == MOVE || modeCloud == COPY) {
+            optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE ? R.string.context_move
+                    : R.string.context_copy).toUpperCase(Locale.getDefault()));
 
-			if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
-				checkCopyMoveButton();
-			}
-		} else if (modeCloud == FileExplorerActivity.UPLOAD) {
-			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-		}
-		else if (modeCloud == FileExplorerActivity.IMPORT){
-			optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
-		}
-		else if (isMultiselect()) {
-			optionButton.setText(getString(R.string.context_send));
-			if (adapter != null && adapter.getSelectedItemCount() > 0){
-				activateButton(true);
-			}
-			else {
-				activateButton(false);
-			}
-		}
-		else if (modeCloud == FileExplorerActivity.SELECT) {
-			optionsBar.setVisibility(View.GONE);
-		} else if (modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER) {
-			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		} else {
-			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}
+            if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
+                checkCopyMoveButton();
+            }
+        } else if (modeCloud == FileExplorerActivity.UPLOAD) {
+            optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+        } else if (modeCloud == FileExplorerActivity.IMPORT) {
+            optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+        } else if (isMultiselect()) {
+            optionButton.setText(getString(R.string.context_send));
+            if (adapter != null && adapter.getSelectedItemCount() > 0) {
+                activateButton(true);
+            } else {
+                activateButton(false);
+            }
+        } else if (modeCloud == FileExplorerActivity.SELECT) {
+            optionsBar.setVisibility(View.GONE);
+        } else if (modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER) {
+            optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+        } else {
+            optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+        }
 
-		logDebug("deepBrowserTree value: "+((FileExplorerActivity)context).getDeepBrowserTree());
-		setOptionsBarVisibility();
+        Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
+        setOptionsBarVisibility();
 
         if (((FileExplorerActivity) context).shouldRestartSearch()) {
-        	setWaitingForSearchedNodes(true);
+            setWaitingForSearchedNodes(true);
             search(((FileExplorerActivity) context).getQuerySearch());
         }
-		return v;
-	}
+        return v;
+    }
 
-	@Override
-	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-				StringResourcesUtils.getString(R.string.context_empty_incoming)),
-				HtmlCompat.FROM_HTML_MODE_LEGACY);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.context_empty_incoming)),
+                HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-				StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
-				HtmlCompat.FROM_HTML_MODE_LEGACY);
+        emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+                HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		updateEmptyScreen();
-		super.onViewCreated(view, savedInstanceState);
-	}
+        updateEmptyScreen();
+        super.onViewCreated(view, savedInstanceState);
+    }
 
-	private void setOptionsBarVisibility() {
-		if (optionsBar == null) {
-			return;
-		}
+    private void setOptionsBarVisibility() {
+        if (optionsBar == null) {
+            return;
+        }
 
-		if (modeCloud == FileExplorerActivity.SELECT ||
-				(!isMultiselect() && (((FileExplorerActivity) context).getDeepBrowserTree() <= 0 || selectFile))) {
-			optionsBar.setVisibility(View.GONE);
-		}
-		else{
-			optionsBar.setVisibility(View.VISIBLE);
-		}
-	}
+        if (modeCloud == FileExplorerActivity.SELECT ||
+                (!isMultiselect() && (((FileExplorerActivity) context).getDeepBrowserTree() <= 0 || selectFile))) {
+            optionsBar.setVisibility(View.GONE);
+        } else {
+            optionsBar.setVisibility(View.VISIBLE);
+        }
+    }
 
-	private void getNodes() {
-		if (parentHandle == -1){
-			findNodes();
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode, order);
-		}
-	}
+    private void getNodes() {
+        if (parentHandle == -1) {
+            findNodes();
+        } else {
+            MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+            nodes = megaApi.getChildren(parentNode, order);
+        }
+    }
 
-	private void showEmptyScreen() {
-		if (adapter == null) {
-			return;
-		}
+    private void showEmptyScreen() {
+        if (adapter == null) {
+            return;
+        }
 
-		if (adapter.getItemCount() != 0) {
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			recyclerView.setVisibility(View.VISIBLE);
-		} else {
-			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.GONE);
-			updateEmptyScreen();
-		}
-	}
+        if (adapter.getItemCount() != 0) {
+            emptyImageView.setVisibility(View.GONE);
+            emptyTextView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        } else {
+            emptyImageView.setVisibility(View.VISIBLE);
+            emptyTextView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            updateEmptyScreen();
+        }
+    }
 
-	private void updateEmptyScreen() {
-		if (parentHandle == INVALID_HANDLE) {
-			emptyImageView.setImageResource(isScreenInPortrait(context)
-					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
+    private void updateEmptyScreen() {
+        if (parentHandle == INVALID_HANDLE) {
+            emptyImageView.setImageResource(isScreenInPortrait(context)
+                    ? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
 
-			emptyTextViewFirst.setText(emptyRootText);
-		} else {
-			emptyImageView.setImageResource(isScreenInPortrait(context)
-					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+            emptyTextViewFirst.setText(emptyRootText);
+        } else {
+            emptyImageView.setImageResource(isScreenInPortrait(context)
+                    ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 
-			emptyTextViewFirst.setText(emptyGeneralText);
-		}
+            emptyTextViewFirst.setText(emptyGeneralText);
+        }
 
-		ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
-	}
+        ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+    }
 
-	private void findNodes(){
-		logDebug("findNodes");
-		((FileExplorerActivity)context).setDeepBrowserTree(0);
+    private void findNodes() {
+        Timber.d("findNodes");
+        ((FileExplorerActivity) context).setDeepBrowserTree(0);
 
-		setOptionsBarVisibility();
-		nodes = megaApi.getInShares();
+        setOptionsBarVisibility();
+        nodes = megaApi.getInShares();
 
-		if (orderParent  == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByMailDescending(nodes);
-		}
-	}
+        if (orderParent == MegaApiJava.ORDER_DEFAULT_DESC) {
+            sortByMailDescending(nodes);
+        }
+    }
 
 
-	private void sortByMailDescending(ArrayList<MegaNode> nodes){
-		logDebug("sortByNameDescending");
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+    private void sortByMailDescending(ArrayList<MegaNode> nodes) {
+        Timber.d("sortByNameDescending");
+        ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+        ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 
-		for (int i=0;i<nodes.size();i++){
-			if(nodes.get(i) == null) {
-				continue;
-			}
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) == null) {
+                continue;
+            }
+            if (nodes.get(i).isFolder()) {
+                folderNodes.add(nodes.get(i));
+            } else {
+                fileNodes.add(nodes.get(i));
+            }
+        }
 
-		Collections.reverse(folderNodes);
-		Collections.reverse(fileNodes);
+        Collections.reverse(folderNodes);
+        Collections.reverse(fileNodes);
 
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
-	}
+        nodes.clear();
+        nodes.addAll(folderNodes);
+        nodes.addAll(fileNodes);
+    }
 
-	private void checkWritePermissions() {
-		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+    private void checkWritePermissions() {
+        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-		if (parentNode == null) {
-			hasWritePermissions = false;
-		} else {
-			int accessLevel = megaApi.getAccess(parentNode);
-			hasWritePermissions = accessLevel >= MegaShare.ACCESS_READWRITE;
-		}
+        if (parentNode == null) {
+            hasWritePermissions = false;
+        } else {
+            int accessLevel = megaApi.getAccess(parentNode);
+            hasWritePermissions = accessLevel >= MegaShare.ACCESS_READWRITE;
+        }
 
-		activateButton(hasWritePermissions);
-	}
+        activateButton(hasWritePermissions);
+    }
 
-	@Override
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
     }
-	
-	@Override
-	public void onClick(View v) {
 
-		switch(v.getId()){
-			case R.id.fab_select:
-			case R.id.action_text:{
-				if(((FileExplorerActivity)context).isMultiselect()){
-					if(adapter.getSelectedItemCount()>0){
-						long handles[] = adapter.getSelectedHandles();
-						((FileExplorerActivity) context).buttonClick(handles);
-					}
-					else{
-						((FileExplorerActivity) context).showSnackbar(getString(R.string.no_files_selected_warning));
-					}
+    @Override
+    public void onClick(View v) {
 
-				}
-				else{
-					((FileExplorerActivity) context).buttonClick(parentHandle);
-				}
-				break;
-			}
-			case R.id.cancel_text:{
-				((FileExplorerActivity) context).finishActivity();
-				break;
-			}
-		}
-	}
+        switch (v.getId()) {
+            case R.id.fab_select:
+            case R.id.action_text: {
+                if (((FileExplorerActivity) context).isMultiselect()) {
+                    if (adapter.getSelectedItemCount() > 0) {
+                        long handles[] = adapter.getSelectedHandles();
+                        ((FileExplorerActivity) context).buttonClick(handles);
+                    } else {
+                        ((FileExplorerActivity) context).showSnackbar(getString(R.string.no_files_selected_warning));
+                    }
 
-	public void navigateToFolder(long handle) {
-		logDebug("navigateToFolder");
+                } else {
+                    ((FileExplorerActivity) context).buttonClick(parentHandle);
+                }
+                break;
+            }
+            case R.id.cancel_text: {
+                ((FileExplorerActivity) context).finishActivity();
+                break;
+            }
+        }
+    }
 
-		((FileExplorerActivity)context).increaseDeepBrowserTree();
-		logDebug("((FileExplorerActivity)context).deepBrowserTree value: "+((FileExplorerActivity)context).getDeepBrowserTree());
-		setOptionsBarVisibility();
+    public void navigateToFolder(long handle) {
+        Timber.d("navigateToFolder");
 
-		int lastFirstVisiblePosition = 0;
-		if (((FileExplorerActivity) context).isList()) {
-			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-		}
-		else {
-			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
-		}
+        ((FileExplorerActivity) context).increaseDeepBrowserTree();
+        Timber.d("((FileExplorerActivity)context).deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
+        setOptionsBarVisibility();
 
-		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-		lastPositionStack.push(lastFirstVisiblePosition);
+        int lastFirstVisiblePosition = 0;
+        if (((FileExplorerActivity) context).isList()) {
+            lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+        } else {
+            lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+        }
 
-		setParentHandle(handle);
-		nodes.clear();
-		setNodes(nodes);
+        Timber.d("Push to stack %d position", lastFirstVisiblePosition);
+        lastPositionStack.push(lastFirstVisiblePosition);
 
-		recyclerView.scrollToPosition(0);
+        setParentHandle(handle);
+        nodes.clear();
+        setNodes(nodes);
 
-		if (modeCloud == COPY || modeCloud == MOVE){
-			activateButton(true);
-		}
-	}
+        recyclerView.scrollToPosition(0);
+
+        if (modeCloud == COPY || modeCloud == MOVE) {
+            activateButton(true);
+        }
+    }
 
     public void itemClick(View view, int position) {
-		ArrayList<MegaNode> clickNodes;
+        ArrayList<MegaNode> clickNodes;
 
-		if (searchNodes != null) {
-			clickNodes = searchNodes;
-			shouldResetNodes = false;
-			((FileExplorerActivity) context).setQueryAfterSearch();
-			((FileExplorerActivity) context).collapseSearchView();
-		}
-		else {
-			clickNodes = nodes;
-		}
+        if (searchNodes != null) {
+            clickNodes = searchNodes;
+            shouldResetNodes = false;
+            ((FileExplorerActivity) context).setQueryAfterSearch();
+            ((FileExplorerActivity) context).collapseSearchView();
+        } else {
+            clickNodes = nodes;
+        }
 
-		MegaNode n = clickNodes.get(position);
+        MegaNode n = clickNodes.get(position);
 
-		if (n.isFolder()){
-		    searchNodes = null;
-			((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
-		    ((FileExplorerActivity) context).setShouldRestartSearch(false);
+        if (n.isFolder()) {
+            searchNodes = null;
+            ((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
+            ((FileExplorerActivity) context).setShouldRestartSearch(false);
 
-			if(selectFile && ((FileExplorerActivity)context).isMultiselect() && adapter.isMultipleSelect()){
-				hideMultipleSelect();
-			}
-			((FileExplorerActivity)context).increaseDeepBrowserTree();
-			logDebug("deepBrowserTree value: "+((FileExplorerActivity)context).getDeepBrowserTree());
-			setOptionsBarVisibility();
+            if (selectFile && ((FileExplorerActivity) context).isMultiselect() && adapter.isMultipleSelect()) {
+                hideMultipleSelect();
+            }
+            ((FileExplorerActivity) context).increaseDeepBrowserTree();
+            Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
+            setOptionsBarVisibility();
 
-			int lastFirstVisiblePosition = 0;
-			if (((FileExplorerActivity) context).isList()) {
-				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-			}
-			else {
-				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
-			}
+            int lastFirstVisiblePosition = 0;
+            if (((FileExplorerActivity) context).isList()) {
+                lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+            } else {
+                lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+            }
 
-			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-			lastPositionStack.push(lastFirstVisiblePosition);
+            Timber.d("Push to stack %d position", lastFirstVisiblePosition);
+            lastPositionStack.push(lastFirstVisiblePosition);
 
-			setParentHandle(n.getHandle());
-			((FileExplorerActivity)context).supportInvalidateOptionsMenu();
+            setParentHandle(n.getHandle());
+            ((FileExplorerActivity) context).supportInvalidateOptionsMenu();
 
-			setNodes(megaApi.getChildren(nodes.get(position), order));
-			recyclerView.scrollToPosition(0);
+            setNodes(megaApi.getChildren(nodes.get(position), order));
+            recyclerView.scrollToPosition(0);
 
-			if (modeCloud == COPY || modeCloud == MOVE) {
-				if (adapter.getItemCount() == 0) {
-					activateButton(true);
-				} else if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
-					checkCopyMoveButton();
-				}
-			}
-		}
-		else if(selectFile) {
-			if(((FileExplorerActivity)context).isMultiselect()){
-				if (adapter.getSelectedItemCount() == 0) {
-					activateActionMode();
-					adapter.toggleSelection(position);
-					updateActionModeTitle();
-				}
-				else {
-					adapter.toggleSelection(position);
+            if (modeCloud == COPY || modeCloud == MOVE) {
+                if (adapter.getItemCount() == 0) {
+                    activateButton(true);
+                } else if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
+                    checkCopyMoveButton();
+                }
+            }
+        } else if (selectFile) {
+            if (((FileExplorerActivity) context).isMultiselect()) {
+                if (adapter.getSelectedItemCount() == 0) {
+                    activateActionMode();
+                    adapter.toggleSelection(position);
+                    updateActionModeTitle();
+                } else {
+                    adapter.toggleSelection(position);
 
-					List<MegaNode> selectedNodes = adapter.getSelectedNodes();
-					if (selectedNodes.size() > 0){
-						updateActionModeTitle();
-					}
-				}
-			}
-			else{
-				((FileExplorerActivity) context).buttonClick(n.getHandle());
+                    List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+                    if (selectedNodes.size() > 0) {
+                        updateActionModeTitle();
+                    }
+                }
+            } else {
+                ((FileExplorerActivity) context).buttonClick(n.getHandle());
 
-			}
-		}
-		((FileExplorerActivity) context).supportInvalidateOptionsMenu();
-		shouldResetNodes = true;
-	}
+            }
+        }
+        ((FileExplorerActivity) context).supportInvalidateOptionsMenu();
+        shouldResetNodes = true;
+    }
 
-	public int onBackPressed(){
-		logDebug("deepBrowserTree "+((FileExplorerActivity)context).getDeepBrowserTree());
-		((FileExplorerActivity)context).decreaseDeepBrowserTree();
+    public int onBackPressed() {
+        Timber.d("deepBrowserTree %s", ((FileExplorerActivity) context).getDeepBrowserTree());
+        ((FileExplorerActivity) context).decreaseDeepBrowserTree();
 
-		if(((FileExplorerActivity)context).getDeepBrowserTree()==0){
-			setParentHandle(INVALID_HANDLE);
-			((FileExplorerActivity) context).hideTabs(false, INCOMING_FRAGMENT);
-			findNodes();
+        if (((FileExplorerActivity) context).getDeepBrowserTree() == 0) {
+            setParentHandle(INVALID_HANDLE);
+            ((FileExplorerActivity) context).hideTabs(false, INCOMING_FRAGMENT);
+            findNodes();
 
-			setNodes(nodes);
+            setNodes(nodes);
 
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				logDebug("Pop of the stack " + lastVisiblePosition + " position");
-			}
-			logDebug("Scroll to " + lastVisiblePosition + " position");
+            int lastVisiblePosition = 0;
+            if (!lastPositionStack.empty()) {
+                lastVisiblePosition = lastPositionStack.pop();
+                Timber.d("Pop of the stack %d position", lastVisiblePosition);
+            }
+            Timber.d("Scroll to %d position", lastVisiblePosition);
 
-			if(lastVisiblePosition>=0){
-				if (((FileExplorerActivity) context).isList()) {
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else {
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
-			setOptionsBarVisibility();
-			((FileExplorerActivity) context).supportInvalidateOptionsMenu();
-			return 3;
-		}
-		else if (((FileExplorerActivity)context).getDeepBrowserTree()>0){
-			parentHandle = adapter.getParentHandle();
+            if (lastVisiblePosition >= 0) {
+                if (((FileExplorerActivity) context).isList()) {
+                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                } else {
+                    gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                }
+            }
+            setOptionsBarVisibility();
+            ((FileExplorerActivity) context).supportInvalidateOptionsMenu();
+            return 3;
+        } else if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
+            parentHandle = adapter.getParentHandle();
 
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
+            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 
-			if (parentNode != null){
+            if (parentNode != null) {
 
-				setParentHandle(parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, order);
-				setNodes(nodes);
+                setParentHandle(parentNode.getHandle());
+                nodes = megaApi.getChildren(parentNode, order);
+                setNodes(nodes);
 
-				if (modeCloud == COPY || modeCloud == MOVE) {
-					checkCopyMoveButton();
-				}
+                if (modeCloud == COPY || modeCloud == MOVE) {
+                    checkCopyMoveButton();
+                }
 
-				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
-					lastVisiblePosition = lastPositionStack.pop();
-					logDebug("Pop of the stack " + lastVisiblePosition + " position");
-				}
-				logDebug("Scroll to " + lastVisiblePosition + " position");
+                int lastVisiblePosition = 0;
+                if (!lastPositionStack.empty()) {
+                    lastVisiblePosition = lastPositionStack.pop();
+                    Timber.d("Pop of the stack %d position", lastVisiblePosition);
+                }
+                Timber.d("Scroll to %d position", lastVisiblePosition);
 
-				if(lastVisiblePosition>=0){
-					if (((FileExplorerActivity) context).isList()) {
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else {
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
+                if (lastVisiblePosition >= 0) {
+                    if (((FileExplorerActivity) context).isList()) {
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    } else {
+                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    }
+                }
 
-				((FileExplorerActivity) context).supportInvalidateOptionsMenu();
-				return 2;
-			}
+                ((FileExplorerActivity) context).supportInvalidateOptionsMenu();
+                return 2;
+            }
 
-			setOptionsBarVisibility();
+            setOptionsBarVisibility();
 
-			return 2;
-		}
-		else{
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			optionsBar.setVisibility(View.GONE);
-			activateButton(false);
-			((FileExplorerActivity)context).setDeepBrowserTree(0);
-			((FileExplorerActivity) context).supportInvalidateOptionsMenu();
-			return 0;
-		}
-	}
+            return 2;
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyImageView.setVisibility(View.GONE);
+            emptyTextView.setVisibility(View.GONE);
+            optionsBar.setVisibility(View.GONE);
+            activateButton(false);
+            ((FileExplorerActivity) context).setDeepBrowserTree(0);
+            ((FileExplorerActivity) context).supportInvalidateOptionsMenu();
+            return 0;
+        }
+    }
 
-	public long getParentHandle() {
-		return parentHandle;
-	}
-	
-	private void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-		if (adapter != null){
-			adapter.setParentHandle(parentHandle);
-		}
-		((FileExplorerActivity)context).setParentHandleIncoming(parentHandle);
-		((FileExplorerActivity) context).changeTitle();
-	}
-	
-	private void setNodes(ArrayList<MegaNode> nodes){
-		this.nodes = nodes;
-		if (adapter != null){
-			adapter.setNodes(nodes);
-			showEmptyScreen();
-		}
+    public long getParentHandle() {
+        return parentHandle;
+    }
 
-		checkWritePermissions();
-	}
-	
-	private RecyclerView getRecyclerView(){
-		return recyclerView;
-	}
+    private void setParentHandle(long parentHandle) {
+        this.parentHandle = parentHandle;
+        if (adapter != null) {
+            adapter.setParentHandle(parentHandle);
+        }
+        ((FileExplorerActivity) context).setParentHandleIncoming(parentHandle);
+        ((FileExplorerActivity) context).changeTitle();
+    }
 
-	private void activateButton(boolean show) {
+    private void setNodes(ArrayList<MegaNode> nodes) {
+        this.nodes = nodes;
+        if (adapter != null) {
+            adapter.setNodes(nodes);
+            showEmptyScreen();
+        }
+
+        checkWritePermissions();
+    }
+
+    private RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    private void activateButton(boolean show) {
         if (modeCloud == FileExplorerActivity.SELECT) {
             fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
         } else {
             boolean shouldShowButton = hasWritePermissions && show;
             optionButton.setEnabled(shouldShowButton);
-		}
-	}
-
-	private void selectAll(){
-		if (adapter != null){
-			adapter.selectAll();
-
-			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
-		}
-	}
-
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-		if (modeCloud == FileExplorerActivity.SELECT) {
-			activateButton(false);
-		}
-	}
-
-	@Override
-	protected void updateActionModeTitle() {
-		if (actionMode == null || getActivity() == null) {
-			return;
-		}
-
-		List<MegaNode> documents = adapter.getSelectedNodes();
-		int files = 0;
-		int folders = 0;
-		for (MegaNode document : documents) {
-			if (document.isFile()) {
-				files++;
-			} else if (document.isFolder()) {
-				folders++;
-			}
-		}
-
-
-		Resources res = getActivity().getResources();
-
-		String title;
-		int sum=files+folders;
-
-		if (files == 0 && folders == 0) {
-			title = Integer.toString(sum);
-		} else if (files == 0) {
-			title = Integer.toString(folders);
-		} else if (folders == 0) {
-			title = Integer.toString(files);
-		} else {
-			title = Integer.toString(sum);
-		}
-		actionMode.setTitle(title);
-		actionMode.invalidate();
-	}
-
-	/*
-	 * Disable selection
-	 */
-	public void hideMultipleSelect() {
-		adapter.setMultipleSelect(false);
-		adapter.clearSelections();
-		if (actionMode != null) {
-			actionMode.finish();
-		}
-
-		if(isMultiselect()){
-			activateButton(false);
-		}
-
-	}
-
-	public void orderNodes (int order) {
-		if (parentHandle == -1) {
-			this.orderParent = order;
-			findNodes();
-		}
-		else {
-			this.order = order;
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
-		}
-
-		setNodes(nodes);
-	}
-
-	boolean isMultiselect() {
-		return modeCloud == FileExplorerActivity.SELECT && selectFile && ((FileExplorerActivity) context).isMultiselect();
-	}
-
-	public void search (String s) {
-		if (megaApi == null || s == null || !shouldResetNodes) {
-			return;
-		}
-
-		searchCancelToken = initNewSearch();
-		searchNodesUseCase.get(s, INVALID_HANDLE, getParentHandle(), TYPE_INCOMING_EXPLORER, searchCancelToken)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe((searchedNodes, throwable) -> {
-					if (throwable == null) {
-						finishSearch(searchedNodes);
-					}
-				});
-	}
-
-	@NonNull
-	@Override
-	public MegaCancelToken initNewSearch() {
-		updateSearchProgressView(true);
-		cancelSearch();
-		return Objects.requireNonNull(MegaCancelToken.createInstance());
-	}
-
-	@Override
-	public void updateSearchProgressView(boolean inProgress) {
-		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
-			logWarning("Cannot set search progress view, one or more parameters are NULL.");
-			return;
-		}
-
-		contentLayout.setEnabled(!inProgress);
-		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
-		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
-		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
-	}
-
-	@Override
-	public void cancelSearch() {
-		if (searchCancelToken != null) {
-			searchCancelToken.cancel();
-		}
-	}
-
-	@Override
-	public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
-		updateSearchProgressView(false);
-		setSearchNodes(searchedNodes);
-	}
-
-	public void setSearchNodes(ArrayList<MegaNode> nodes) {
-		if (adapter == null) return;
-
-		searchNodes = nodes;
-		((FileExplorerActivity) context).setShouldRestartSearch(true);
-		adapter.setNodes(searchNodes);
-		showEmptyScreen();
-
-		if (isWaitingForSearchedNodes()) {
-			reDoTheSelectionAfterRotation();
-		}
-	}
-
-	public void closeSearch(boolean collapsedByClick) {
-		updateSearchProgressView(false);
-		cancelSearch();
-		if (!collapsedByClick) {
-            searchNodes = null;
         }
-		if (shouldResetNodes) {
-			getNodes();
-			setNodes(nodes);
-		}
-	}
-
-	public FastScroller getFastScroller() {
-	    return fastScroller;
     }
 
-	public boolean isFolderEmpty() {
-		return adapter == null || adapter.getItemCount() <= 0;
-	}
+    private void selectAll() {
+        if (adapter != null) {
+            adapter.selectAll();
 
-	/**
-	 * Checks if copy or move button should be shown or hidden depending on the current navigation level.
-	 * Shows it if the current navigation level is not the parent of moving/copying nodes.
-	 * Hides it otherwise.
-	 */
-	private void checkCopyMoveButton() {
-		MegaNode parentMove = ((FileExplorerActivity) context).parentMoveCopy();
-		activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
-	}
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
+        }
+    }
+
+    private void clearSelections() {
+        if (adapter.isMultipleSelect()) {
+            adapter.clearSelections();
+        }
+        if (modeCloud == FileExplorerActivity.SELECT) {
+            activateButton(false);
+        }
+    }
+
+    @Override
+    protected void updateActionModeTitle() {
+        if (actionMode == null || getActivity() == null) {
+            return;
+        }
+
+        List<MegaNode> documents = adapter.getSelectedNodes();
+        int files = 0;
+        int folders = 0;
+        for (MegaNode document : documents) {
+            if (document.isFile()) {
+                files++;
+            } else if (document.isFolder()) {
+                folders++;
+            }
+        }
+
+
+        Resources res = getActivity().getResources();
+
+        String title;
+        int sum = files + folders;
+
+        if (files == 0 && folders == 0) {
+            title = Integer.toString(sum);
+        } else if (files == 0) {
+            title = Integer.toString(folders);
+        } else if (folders == 0) {
+            title = Integer.toString(files);
+        } else {
+            title = Integer.toString(sum);
+        }
+        actionMode.setTitle(title);
+        actionMode.invalidate();
+    }
+
+    /*
+     * Disable selection
+     */
+    public void hideMultipleSelect() {
+        adapter.setMultipleSelect(false);
+        adapter.clearSelections();
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+
+        if (isMultiselect()) {
+            activateButton(false);
+        }
+
+    }
+
+    public void orderNodes(int order) {
+        if (parentHandle == -1) {
+            this.orderParent = order;
+            findNodes();
+        } else {
+            this.order = order;
+            nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
+        }
+
+        setNodes(nodes);
+    }
+
+    boolean isMultiselect() {
+        return modeCloud == FileExplorerActivity.SELECT && selectFile && ((FileExplorerActivity) context).isMultiselect();
+    }
+
+    public void search(String s) {
+        if (megaApi == null || s == null || !shouldResetNodes) {
+            return;
+        }
+
+        searchCancelToken = initNewSearch();
+        searchNodesUseCase.get(s, INVALID_HANDLE, getParentHandle(), TYPE_INCOMING_EXPLORER, searchCancelToken)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((searchedNodes, throwable) -> {
+                    if (throwable == null) {
+                        finishSearch(searchedNodes);
+                    }
+                });
+    }
+
+    @NonNull
+    @Override
+    public MegaCancelToken initNewSearch() {
+        updateSearchProgressView(true);
+        cancelSearch();
+        return Objects.requireNonNull(MegaCancelToken.createInstance());
+    }
+
+    @Override
+    public void updateSearchProgressView(boolean inProgress) {
+        if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
+            Timber.w("Cannot set search progress view, one or more parameters are NULL.");
+            return;
+        }
+
+        contentLayout.setEnabled(!inProgress);
+        contentLayout.setAlpha(inProgress ? 0.4f : 1f);
+        searchProgressBar.setVisibility(inProgress ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    public void cancelSearch() {
+        if (searchCancelToken != null) {
+            searchCancelToken.cancel();
+        }
+    }
+
+    @Override
+    public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
+        updateSearchProgressView(false);
+        setSearchNodes(searchedNodes);
+    }
+
+    public void setSearchNodes(ArrayList<MegaNode> nodes) {
+        if (adapter == null) return;
+
+        searchNodes = nodes;
+        ((FileExplorerActivity) context).setShouldRestartSearch(true);
+        adapter.setNodes(searchNodes);
+        showEmptyScreen();
+
+        if (isWaitingForSearchedNodes()) {
+            reDoTheSelectionAfterRotation();
+        }
+    }
+
+    public void closeSearch(boolean collapsedByClick) {
+        updateSearchProgressView(false);
+        cancelSearch();
+        if (!collapsedByClick) {
+            searchNodes = null;
+        }
+        if (shouldResetNodes) {
+            getNodes();
+            setNodes(nodes);
+        }
+    }
+
+    public FastScroller getFastScroller() {
+        return fastScroller;
+    }
+
+    public boolean isFolderEmpty() {
+        return adapter == null || adapter.getItemCount() <= 0;
+    }
+
+    /**
+     * Checks if copy or move button should be shown or hidden depending on the current navigation level.
+     * Shows it if the current navigation level is not the parent of moving/copying nodes.
+     * Hides it otherwise.
+     */
+    private void checkCopyMoveButton() {
+        MegaNode parentMove = ((FileExplorerActivity) context).parentMoveCopy();
+        activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
+    }
 }

@@ -7,9 +7,6 @@ import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ResendVerificationEmailListener extends BaseListener {
 

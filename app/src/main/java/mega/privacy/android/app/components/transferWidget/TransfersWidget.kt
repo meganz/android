@@ -2,7 +2,6 @@ package mega.privacy.android.app.components.transferWidget
 
 import android.content.Context
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import android.widget.RelativeLayout
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import nz.mega.sdk.MegaApiAndroid
@@ -20,6 +19,7 @@ import android.widget.ImageView
 import androidx.core.view.isVisible
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.entity.TransfersInfo
 import mega.privacy.android.app.utils.Util
 import kotlin.math.roundToInt
 
@@ -36,7 +36,7 @@ class TransfersWidget(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersWidget: RelativeLayout,
-    private val transfersManagement: TransfersManagement
+    private val transfersManagement: TransfersManagement,
 ) {
     private val button: ImageButton
     private val progressBar: ProgressBar
@@ -53,11 +53,12 @@ class TransfersWidget(
      * Updates the view of the widget taking into account the type of the transfer.
      *
      * @param transferType  type of the transfer:
-     * - NO_TYPE if no type
-     * - MegaTransfer.TYPE_DOWNLOAD if download transfer
-     * - MegaTransfer.TYPE_UPLOAD if upload transfer
+     *                          - NO_TYPE if no type
+     *                          - MegaTransfer.TYPE_DOWNLOAD if download transfer
+     *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
+     * @param transfersInfo Transfers info.
      */
-    fun update(transferType: Int = NO_TYPE) {
+    fun update(transferType: Int, transfersInfo: TransfersInfo) {
         if (context is ManagerActivity) {
             if (context.drawerItem === DrawerItem.TRANSFERS) {
                 transfersManagement.setAreFailedTransfers(false)
@@ -70,13 +71,17 @@ class TransfersWidget(
         }
 
         when {
-            pendingTransfers > 0 && !transfersManagement.shouldShowNetworkWarning -> {
-                setProgress(getProgress(), transferType)
+            transfersInfo.numPendingTransfers > 0 && !transfersManagement.shouldShowNetworkWarning -> {
+                setProgress(
+                    transfersInfo = transfersInfo,
+                    progress = getProgress(),
+                    typeTransfer = transferType)
+
                 updateState()
             }
-            (pendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
+            (transfersInfo.numPendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
                     || transfersManagement.getAreFailedTransfers() -> {
-                setFailedTransfers()
+                setFailedTransfers(transfersInfo)
             }
             else -> {
                 hide()
@@ -167,15 +172,17 @@ class TransfersWidget(
 
     /**
      * Sets the state of the widget as failed.
+     *
+     * @param transfersInfo Transfers info.
      */
-    private fun setFailedTransfers() {
+    private fun setFailedTransfers(transfersInfo: TransfersInfo) {
         if (isOverQuota) return
 
         if (transfersWidget.visibility != View.VISIBLE) {
             transfersWidget.visibility = View.VISIBLE
         }
 
-        setProgress(getProgress(), NO_TYPE)
+        setProgress(transfersInfo = transfersInfo, progress = getProgress(), typeTransfer = NO_TYPE)
         progressBar.progressDrawable = getDrawable(R.drawable.thin_circular_warning_progress_bar)
         updateStatus(getDrawable(R.drawable.ic_transfers_error))
     }
@@ -195,19 +202,17 @@ class TransfersWidget(
     /**
      * Sets the progress of the transfers in the progress bar taking into account the type of transfer.
      *
+     * @param transfersInfo Transfers info.
      * @param progress      the progress of the transfers
      * @param typeTransfer  type of the transfer:
      * - NO_TYPE if no type
      * - MegaTransfer.TYPE_DOWNLOAD if download transfer
      * - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
-    fun setProgress(progress: Int, typeTransfer: Int) {
+    fun setProgress(transfersInfo: TransfersInfo, progress: Int, typeTransfer: Int) {
         setProgress(progress)
-        val numPendingDownloads = megaApi.getNumPendingDownloadsNonBackground()
-        @Suppress("DEPRECATION")
-        val numPendingUploads = megaApi.numPendingUploads
-        val pendingDownloads = numPendingDownloads > 0
-        val pendingUploads = numPendingUploads > 0
+        val pendingDownloads = transfersInfo.numPendingDownloadsNonBackground > 0
+        val pendingUploads = transfersInfo.numPendingUploads > 0
 
         val downloadIcon: Boolean =
             if (typeTransfer == MegaTransfer.TYPE_UPLOAD && pendingUploads) {
@@ -215,7 +220,7 @@ class TransfersWidget(
             } else {
                 (typeTransfer == MegaTransfer.TYPE_DOWNLOAD && pendingDownloads)
                         || (pendingDownloads && !pendingUploads)
-                        || numPendingDownloads > numPendingUploads
+                        || transfersInfo.numPendingDownloadsNonBackground > transfersInfo.numPendingUploads
             }
 
         button.setImageDrawable(
@@ -233,15 +238,6 @@ class TransfersWidget(
      * @return  The Drawable which has the drawable value as identifier.
      */
     private fun getDrawable(drawable: Int): Drawable? = ContextCompat.getDrawable(context, drawable)
-
-    /**
-     * Gets the number of pending transfers.
-     *
-     * @return The number of pending transfers.
-     */
-    @Suppress("DEPRECATION")
-    val pendingTransfers: Int
-        get() = megaApi.getNumPendingDownloadsNonBackground() + megaApi.numPendingUploads
 
     /**
      * Gets the progress of the transfers.

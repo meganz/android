@@ -1,5 +1,10 @@
 package mega.privacy.android.app.service.map;
 
+import static mega.privacy.android.app.main.megachat.MapsActivity.REQUEST_INTERVAL;
+import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
+
+import timber.log.Timber;
+
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
@@ -27,12 +32,8 @@ import mega.privacy.android.app.main.megachat.MapAddress;
 import mega.privacy.android.app.main.megachat.MapsActivity;
 import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.main.megachat.MapsActivity.REQUEST_INTERVAL;
-import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, HuaweiMap.OnMyLocationClickListener, HuaweiMap.OnMyLocationButtonClickListener, HuaweiMap.OnCameraMoveStartedListener, HuaweiMap.OnCameraIdleListener, HuaweiMap.OnMarkerClickListener, HuaweiMap.OnInfoWindowClickListener {
 
@@ -65,7 +66,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null || locationResult.getLastLocation() == null) {
-                    logWarning("locationResult is null");
+                    Timber.w("locationResult is null");
                     return;
                 }
 
@@ -111,12 +112,12 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             int w = snapshot.getWidth();
             int h = snapshot.getHeight();
 
-            if(w > SNAPSHOT_SIZE) {
+            if (w > SNAPSHOT_SIZE) {
                 x = (w - SNAPSHOT_SIZE) / 2;
                 w = SNAPSHOT_SIZE;
             }
 
-            if(h > SNAPSHOT_SIZE) {
+            if (h > SNAPSHOT_SIZE) {
                 y = (h - SNAPSHOT_SIZE) / 2;
                 h = SNAPSHOT_SIZE;
             }
@@ -127,7 +128,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             int quality = 100;
             snapshot.compress(Bitmap.CompressFormat.JPEG, quality, stream);
             byte[] byteArray = stream.toByteArray();
-            logDebug("The bitmaps has " + byteArray.length + " initial size");
+            Timber.d("The bitmaps has %d initial size", byteArray.length);
             while (byteArray.length > MAX_SIZE) {
                 stream = new ByteArrayOutputStream();
                 quality -= 10;
@@ -135,7 +136,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                 byteArray = stream.toByteArray();
             }
             snapshot.recycle();
-            logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
+            Timber.d("The bitmaps has %d final size with quality: %d", byteArray.length, quality);
             sendSnapshot(byteArray, latitude, longitude);
         }));
     }
@@ -174,7 +175,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void setMyLocation(boolean animateCamera) {
         if (mMap == null || lastLocation == null) {
-            logWarning("mMap or lastLocation is null");
+            Timber.w("mMap or lastLocation is null");
             return;
         }
 
@@ -192,7 +193,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                 fullScreenMarker.remove();
             }
         } catch (Exception e) {
-            logError(e.getMessage(), e);
+            Timber.e(e);
             e.printStackTrace();
         }
 

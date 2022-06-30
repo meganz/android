@@ -18,7 +18,8 @@ class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface {
             MegaApiAndroid.LOG_LEVEL_INFO -> Timber.i(message)
             MegaApiAndroid.LOG_LEVEL_WARNING -> Timber.w(message)
             MegaApiAndroid.LOG_LEVEL_ERROR,
-            MegaApiAndroid.LOG_LEVEL_FATAL -> Timber.e(message)
+            MegaApiAndroid.LOG_LEVEL_FATAL,
+            -> Timber.e(message)
         }
     }
 }

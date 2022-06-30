@@ -13,8 +13,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE;
 import static mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logInfo;
 import static mega.privacy.android.app.utils.Util.isOffline;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
@@ -47,6 +45,7 @@ import mega.privacy.android.app.presentation.settings.filesettings.FilePreferenc
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class SettingsFileManagementFragment extends SettingsBaseFragment {
@@ -252,7 +251,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for enable or disable the file versions.
      */
     public void updateEnabledFileVersions() {
-        logDebug("updateEnabledFileVersions: " + MegaApplication.isDisableFileVersions());
+Timber.d("updateEnabledFileVersions: %s",  MegaApplication.isDisableFileVersions());
         enableVersionsSwitch.setOnPreferenceClickListener(null);
 
         if (MegaApplication.isDisableFileVersions() == 1) {
@@ -291,7 +290,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for updating rubbish bin Scheduler.
      */
     public void updateRBScheduler(long daysCount) {
-        logDebug("updateRBScheduler: " + daysCount);
+        Timber.d("updateRBScheduler: %s", daysCount);
 
         if (daysCount < 1) {
             enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
@@ -325,7 +324,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for reset the rubbish bin Scheduler.
      */
     public void resetRubbishInfo() {
-        logInfo("Updating size after clean the Rubbish Bin");
+        Timber.i("Updating size after clean the Rubbish Bin");
         String emptyString = getString(R.string.label_file_size_byte, INITIAL_VALUE);
         rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
         myAccountInfo.setFormattedUsedRubbish(emptyString);

@@ -1,5 +1,8 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,10 +11,7 @@ import mega.privacy.android.app.OpenLinkActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class SessionTransferURLListener extends BaseListener {
 
@@ -37,9 +37,9 @@ public class SessionTransferURLListener extends BaseListener {
                 }
             }
 
-            logError("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: link is NULL");
+            Timber.e("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: link is NULL");
         } else {
-            logError("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: " + e.getErrorString());
+            Timber.e("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: %s", e.getErrorString());
             showSnackbar(context, getTranslatedErrorString(e));
         }
     }

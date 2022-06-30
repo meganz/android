@@ -7,25 +7,28 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.domain.exception.EmptySearchException
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
-import mega.privacy.android.app.domain.exception.EmptySearchException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.security.InvalidParameterException
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Use case to manage the content of a folder which is going to be uploaded.
@@ -39,7 +42,7 @@ class GetFolderContentUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val createFolderUseCase: CreateFolderUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val uploadUseCase: UploadUseCase
+    private val uploadUseCase: UploadUseCase,
 ) {
 
     /**
@@ -77,7 +80,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun get(
         currentFolder: FolderContent.Data,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             get(currentFolder).blockingSubscribeBy(
@@ -104,7 +107,7 @@ class GetFolderContentUseCase @Inject constructor(
         context: Context,
         parentNode: MegaNode,
         folderItem: FolderContent.Data,
-        renameName: String? = null
+        renameName: String? = null,
     ): Single<ArrayList<UploadFolderResult>> =
         Single.create { emitter ->
             if (folderItem.isFolder) {
@@ -126,7 +129,10 @@ class GetFolderContentUseCase @Inject constructor(
                         folderContent.forEach { item ->
                             getContentToUpload(context, newParentNode, item)
                                 .blockingSubscribeBy(
-                                    onError = { error -> logWarning("Ignored error", error) },
+                                    onError = { error ->
+                                        Timber.w(error,
+                                            "Ignored error")
+                                    },
                                     onSuccess = { urisResult ->
                                         results.addAll(urisResult)
                                     })
@@ -164,7 +170,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun getRootContentToUpload(
         currentFolder: FolderContent.Data,
         selectedItems: List<Int>,
-        folderItems: MutableList<FolderContent>?
+        folderItems: MutableList<FolderContent>?,
     ): Single<MutableList<FolderContent.Data>> =
         Single.create { emitter ->
             if (folderItems == null) {
@@ -206,7 +212,7 @@ class GetFolderContentUseCase @Inject constructor(
         context: Context,
         parentNodeHandle: Long,
         pendingUploads: List<FolderContent.Data>,
-        collisionsResolution: List<NameCollisionResult>?
+        collisionsResolution: List<NameCollisionResult>?,
     ): Single<Int> =
         Single.create { emitter ->
             val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
@@ -229,7 +235,7 @@ class GetFolderContentUseCase @Inject constructor(
                         parentNode = parentNode,
                         folderItem = upload
                     ).blockingSubscribeBy(
-                        onError = { error -> logWarning("Ignored error", error) },
+                        onError = { error -> Timber.w(error, "Ignored error") },
                         onSuccess = { result -> uploadResults.addAll(result) }
                     )
                 }
@@ -263,7 +269,7 @@ class GetFolderContentUseCase @Inject constructor(
                                     renameName
                                 ).blockingSubscribeBy(
                                     onError = { error ->
-                                        logWarning("Ignored error", error)
+                                        Timber.w(error, "Ignored error")
                                     },
                                     onSuccess = { result -> uploadResults.addAll(result) }
                                 )
@@ -308,7 +314,7 @@ class GetFolderContentUseCase @Inject constructor(
     private fun completeAndReorder(
         folderItems: List<FolderContent.Data>,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             val results = mutableListOf<FolderContent>().apply {
@@ -334,7 +340,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun reorder(
         folderItems: MutableList<FolderContent>,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
@@ -405,7 +411,7 @@ class GetFolderContentUseCase @Inject constructor(
         folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
         currentFolder: FolderContent.Data?,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
@@ -416,7 +422,7 @@ class GetFolderContentUseCase @Inject constructor(
             folderContent.forEach { item ->
                 if (currentFolder != null && item.key != currentFolder) {
                     reorder(item.value, order, isList).blockingSubscribeBy(
-                        onError = { error -> logWarning("Ignored error", error) },
+                        onError = { error -> Timber.w(error, "Ignored error") },
                         onSuccess = { finalContentList ->
                             folderContent[item.key] = finalContentList
                         }
@@ -437,7 +443,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     fun switchView(
         folderItems: MutableList<FolderContent>,
-        isList: Boolean
+        isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderItems.isEmpty()) {
@@ -494,7 +500,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun switchView(
         folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
         currentFolder: FolderContent.Data?,
-        isList: Boolean
+        isList: Boolean,
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
@@ -505,7 +511,7 @@ class GetFolderContentUseCase @Inject constructor(
             folderContent.forEach { item ->
                 if (currentFolder != null && item.key != currentFolder) {
                     switchView(item.value, isList).blockingSubscribeBy(
-                        onError = { error -> logWarning("Ignored error", error) },
+                        onError = { error -> Timber.w(error, "Ignored error") },
                         onSuccess = { finalContentList ->
                             folderContent[item.key] = finalContentList
                         }
@@ -525,7 +531,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     private fun search(
         query: String,
-        currentFolder: FolderContent.Data
+        currentFolder: FolderContent.Data,
     ): Single<MutableList<FolderContent.Data>> =
         Single.create { emitter ->
             val searchResults = mutableListOf<FolderContent.Data>()
@@ -536,7 +542,7 @@ class GetFolderContentUseCase @Inject constructor(
                     folderContentList.forEach { item ->
                         if (item.isFolder) {
                             search(query, item).blockingSubscribeBy(
-                                onError = { error -> logWarning("Ignored error", error) },
+                                onError = { error -> Timber.w(error, "Ignored error") },
                                 onSuccess = { results -> searchResults.addAll(results) }
                             )
                         }
@@ -569,7 +575,7 @@ class GetFolderContentUseCase @Inject constructor(
         query: String,
         currentFolder: FolderContent.Data,
         order: Int,
-        isList: Boolean
+        isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             search(query, currentFolder).blockingSubscribeBy(

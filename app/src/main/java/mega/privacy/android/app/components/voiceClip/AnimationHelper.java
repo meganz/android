@@ -1,12 +1,13 @@
 package mega.privacy.android.app.components.voiceClip;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
-import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -15,11 +16,11 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import mega.privacy.android.app.R;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import mega.privacy.android.app.R;
+import timber.log.Timber;
 
 public class AnimationHelper {
     private final static int DURATION_BLINK_MICRO = 500;
@@ -46,7 +47,7 @@ public class AnimationHelper {
 
     @SuppressLint("RestrictedApi")
     public void animateBasket(float basketInitialX) {
-        logDebug("animateBasket");
+        Timber.d("animateBasket");
         isBasketAnimating = true;
         clearAlphaAnimation(false);
 
@@ -164,7 +165,7 @@ public class AnimationHelper {
      * Stop the current animation and revert views back to default state
      */
     public void resetBasketAnimation() {
-        logDebug("resetBasketAnimation()");
+        Timber.d("resetBasketAnimation()");
         if (!isBasketAnimating) return;
 
         resetAnimation(translateAnimation1);
@@ -184,7 +185,7 @@ public class AnimationHelper {
     }
 
     public void clearAlphaAnimation(boolean hideView) {
-        logDebug("clearAlphaAnimation()");
+        Timber.d("clearAlphaAnimation()");
         resetAnimation(alphaAnimation);
         clearAnimation(smallBlinkingMic);
         if (hideView) {
@@ -193,7 +194,7 @@ public class AnimationHelper {
     }
 
     public void animateSmallMicAlpha() {
-        logDebug("animateSmallMicAlpha()");
+        Timber.d("animateSmallMicAlpha()");
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(DURATION_BLINK_MICRO);
         alphaAnimation.setRepeatMode(Animation.REVERSE);

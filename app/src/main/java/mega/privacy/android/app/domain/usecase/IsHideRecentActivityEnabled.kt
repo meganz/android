@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
  * Is hide recent activity enabled
  *
  */
-interface IsHideRecentActivityEnabled {
+fun interface IsHideRecentActivityEnabled {
     /**
      * Invoke
      *

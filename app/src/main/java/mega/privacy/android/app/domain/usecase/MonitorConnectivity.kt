@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
  * Monitor connectivity
  *
  */
-interface MonitorConnectivity {
+fun interface MonitorConnectivity {
     /**
      * Invoke
      *

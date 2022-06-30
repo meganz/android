@@ -2,15 +2,15 @@ package mega.privacy.android.app.components.voiceClip;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import mega.privacy.android.app.R;
+import androidx.appcompat.widget.AppCompatImageView;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import mega.privacy.android.app.R;
+import timber.log.Timber;
 
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
     private RecordView recordView;
@@ -63,27 +63,27 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                logDebug("onTouch() - ACTION_DOWN");
+                Timber.d("onTouch() - ACTION_DOWN");
                 recordView.onActionDown((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
-                logDebug("onTouch() - ACTION_MOVE");
+                Timber.d("onTouch() - ACTION_MOVE");
                 recordView.onActionMove((RelativeLayout) v.getParent(), event);
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                logDebug("onTouch() - ACTION_UP");
+                Timber.d("onTouch() - ACTION_UP");
                 recordView.onActionUp((RelativeLayout) v.getParent());
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
-                logDebug("onTouch() - ACTION_CANCEL");
+                Timber.d("onTouch() - ACTION_CANCEL");
                 recordView.onActionCancel((RelativeLayout) v.getParent());
                 break;
             }
             default: {
-                logDebug("onTouch() - default");
+                Timber.d("onTouch() - default");
                 break;
             }
         }
@@ -91,7 +91,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
-        logDebug("setOnRecordClickListener");
+        Timber.d("setOnRecordClickListener");
         this.onRecordClickListener = onRecordClickListener;
     }
 

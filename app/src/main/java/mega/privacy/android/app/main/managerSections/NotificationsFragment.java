@@ -1,8 +1,5 @@
 package mega.privacy.android.app.main.managerSections;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -43,6 +40,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+import timber.log.Timber;
 
 public class NotificationsFragment extends Fragment implements View.OnClickListener {
 
@@ -77,10 +75,10 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
         if (megaChatApi == null) {
@@ -94,8 +92,7 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
         if (listView != null) {
             if (listView.canScrollVertically(-1)) {
                 ((ManagerActivity) context).changeAppBarElevation(true);
-            }
-            else {
+            } else {
                 ((ManagerActivity) context).changeAppBarElevation(false);
             }
         }
@@ -103,7 +100,7 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -143,25 +140,24 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
     }
 
     public static NotificationsFragment newInstance() {
-        logDebug("newInstance");
+        Timber.d("newInstance");
         NotificationsFragment fragment = new NotificationsFragment();
         return fragment;
     }
 
-    public void setNotifications(){
-        logDebug("setNotifications");
+    public void setNotifications() {
+        Timber.d("setNotifications");
 
         notifications = megaApi.getUserAlerts();
 
         Collections.reverse(notifications);
 
-        if(isAdded()) {
-            if (adapterList == null){
-                logWarning("adapterList is NULL");
+        if (isAdded()) {
+            if (adapterList == null) {
+                Timber.w("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
 
-            }
-            else{
+            } else {
                 adapterList.setNotifications(notifications);
             }
 
@@ -172,14 +168,14 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
-                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.empty_notification_landscape);
-                }else{
+                } else {
                     emptyImageView.setImageResource(R.drawable.empty_notification_portrait);
                 }
 
                 String textToShow = String.format(getString(R.string.context_empty_notifications));
-                try{
+                try {
                     textToShow = textToShow.replace("[A]", "<font color=\'"
                             + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                             + "\'>");
@@ -188,56 +184,56 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
                             + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
+                } catch (Exception e) {
                 }
-                catch (Exception e){}
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 } else {
                     result = Html.fromHtml(textToShow);
                 }
                 emptyTextView.setText(result);
 
             } else {
-                logDebug("Number of notifications: " + notifications.size());
+Timber.d("Number of notifications: %s",  notifications.size());
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
 
-            ((ManagerActivity)context).markNotificationsSeen(false);
+            ((ManagerActivity) context).markNotificationsSeen(false);
         }
     }
 
-    public void addNotification(MegaUserAlert newAlert){
-        logDebug("addNotification");
+    public void addNotification(MegaUserAlert newAlert) {
+        Timber.d("addNotification");
         //Check scroll position
         boolean shouldScroll = false;
-        if (!listView.canScrollVertically(-1)){
+        if (!listView.canScrollVertically(-1)) {
             shouldScroll = true;
         }
 
         notifications.add(0, newAlert);
-        if(adapterList!=null){
+        if (adapterList != null) {
             adapterList.notifyItemInserted(0);
         }
 
         //Before scrolling be sure it was on the first
-        if(shouldScroll){
+        if (shouldScroll) {
             listView.smoothScrollToPosition(0);
         }
 
-        ((ManagerActivity)context).markNotificationsSeen(false);
+        ((ManagerActivity) context).markNotificationsSeen(false);
     }
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         switch (v.getId()) {
-            case R.id.empty_image_view_chat:{
+            case R.id.empty_image_view_chat: {
                 numberOfClicks++;
-                logDebug("Number of clicks: " + numberOfClicks);
-                if (numberOfClicks >= 5){
+                Timber.d("Number of clicks: %s", numberOfClicks);
+                if (numberOfClicks >= 5) {
                     numberOfClicks = 0;
 
                 }
@@ -248,7 +244,7 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
     }
 
     public void itemClick(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         MegaUserAlert notif = notifications.get(position);
 
         int alertType = notif.getType();
@@ -258,33 +254,32 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
             case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:
             case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
-            case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
-            {
+            case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER: {
                 MegaUser contact = megaApi.getContact(notif.getEmail());
-                if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                    logDebug("Go to contact info");
+                if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                    Timber.d("Go to contact info");
                     ContactUtil.openContactInfoActivity(context, notif.getEmail());
-                }
-                else{ ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
-                    if(contacts!=null){
-                        for(int i = 0; i<contacts.size();i++){
+                } else {
+                    ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
+                    if (contacts != null) {
+                        for (int i = 0; i < contacts.size(); i++) {
                             MegaContactRequest c = contacts.get(i);
-                            if(c.getSourceEmail().equals(notif.getEmail())){
-                                logDebug("Go to Received requests");
-                                ((ManagerActivity)context).navigateToContactRequests();
+                            if (c.getSourceEmail().equals(notif.getEmail())) {
+                                Timber.d("Go to Received requests");
+                                ((ManagerActivity) context).navigateToContactRequests();
                                 break;
                             }
                         }
                     }
 
                 }
-                logWarning("Request not found");
+                Timber.w("Request not found");
                 break;
             }
-            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED: {
                 MegaUser contact = megaApi.getContact(notif.getEmail());
-                if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                    logDebug("Go to contact info");
+                if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                    Timber.d("Go to contact info");
                     ContactUtil.openContactInfoActivity(context, notif.getEmail());
                 }
                 break;
@@ -295,39 +290,52 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:
             case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
             case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
-            case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
-                logDebug("Do not navigate");
+            case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU: {
+                Timber.d("Do not navigate");
                 break;
             }
             case MegaUserAlert.TYPE_PAYMENT_SUCCEEDED:
             case MegaUserAlert.TYPE_PAYMENT_FAILED:
-            case MegaUserAlert.TYPE_PAYMENTREMINDER:{
-                logDebug("Go to My Account");
-                ((ManagerActivity)context).navigateToMyAccount();
+            case MegaUserAlert.TYPE_PAYMENTREMINDER: {
+                Timber.d("Go to My Account");
+                ((ManagerActivity) context).navigateToMyAccount();
                 break;
             }
             case MegaUserAlert.TYPE_TAKEDOWN:
-            case MegaUserAlert.TYPE_TAKEDOWN_REINSTATED:{
-                if(notif.getNodeHandle()!=-1){
-                    MegaNode node =  megaApi.getNodeByHandle(notif.getNodeHandle());
-                    if(node!=null){
-                        if(node.isFile()){
-                            ((ManagerActivity)context).openLocation(node.getParentHandle());
-                        }
-                        else{
-                            ((ManagerActivity)context).openLocation(notif.getNodeHandle());
+            case MegaUserAlert.TYPE_TAKEDOWN_REINSTATED: {
+                if (notif.getNodeHandle() != -1) {
+                    MegaNode node = megaApi.getNodeByHandle(notif.getNodeHandle());
+                    if (node != null) {
+                        if (node.isFile()) {
+                            ((ManagerActivity) context).openLocation(node.getParentHandle(), null);
+                        } else {
+                            ((ManagerActivity) context).openLocation(notif.getNodeHandle(), null);
                         }
                     }
                 }
                 break;
             }
             case MegaUserAlert.TYPE_NEWSHARE:
-            case MegaUserAlert.TYPE_NEWSHAREDNODES:
             case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
-            case MegaUserAlert.TYPE_DELETEDSHARE:{
-                logDebug("Go to open corresponding location");
-                if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
-                    ((ManagerActivity)context).openLocation(notif.getNodeHandle());
+            case MegaUserAlert.TYPE_DELETEDSHARE: {
+                Timber.d("Go to open corresponding location");
+                if (notif.getNodeHandle() != -1 && megaApi.getNodeByHandle(notif.getNodeHandle()) != null) {
+                    ((ManagerActivity) context).openLocation(notif.getNodeHandle(), null);
+                }
+                break;
+            }
+            case MegaUserAlert.TYPE_NEWSHAREDNODES: {
+                Timber.d("Go to open corresponding location");
+                int numOfFolders = (int) notif.getNumber(0);
+                int numOfFiles = (int) notif.getNumber(1);
+                int childNodeHandleCount = numOfFolders + numOfFiles;
+
+                long[] childNodeHandleList = new long[childNodeHandleCount];
+                for (int i = 0; i < childNodeHandleCount; i++) {
+                    childNodeHandleList[i] = notif.getHandle(i);
+                }
+                if (notif.getNodeHandle() != -1 && megaApi.getNodeByHandle(notif.getNodeHandle()) != null) {
+                    ((ManagerActivity) context).openLocation(notif.getNodeHandle(), childNodeHandleList);
                 }
                 break;
             }
@@ -338,7 +346,7 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
+        aB = ((AppCompatActivity) activity).getSupportActionBar();
     }
 
 
@@ -346,25 +354,24 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        aB = ((AppCompatActivity)context).getSupportActionBar();
+        aB = ((AppCompatActivity) context).getSupportActionBar();
     }
 
     public void updateNotifications(List<MegaUserAlert> updatedUserAlerts) {
-        logDebug("updateNotifications");
+        Timber.d("updateNotifications");
 
-        if(!isAdded()){
-            logDebug("return!");
+        if (!isAdded()) {
+            Timber.d("return!");
             return;
         }
 
-        for(int i = 0;i<updatedUserAlerts.size();i++){
+        for (int i = 0; i < updatedUserAlerts.size(); i++) {
 
-            if(updatedUserAlerts.get(i).isOwnChange()){
-                logDebug("isOwnChange");
+            if (updatedUserAlerts.get(i).isOwnChange()) {
+                Timber.d("isOwnChange");
                 continue;
             }
-
-            logDebug("User alert type: " + updatedUserAlerts.get(i).getType());
+Timber.d("User alert type: %s",  updatedUserAlerts.get(i).getType());
             long idToUpdate = updatedUserAlerts.get(i).getId();
             int indexToReplace = -1;
 
@@ -372,35 +379,33 @@ public class NotificationsFragment extends Fragment implements View.OnClickListe
             while (itrReplace.hasNext()) {
                 MegaUserAlert notification = itrReplace.next();
 
-                if(notification!=null){
-                    if(notification.getId()==idToUpdate){
-                        indexToReplace = itrReplace.nextIndex()-1;
+                if (notification != null) {
+                    if (notification.getId() == idToUpdate) {
+                        indexToReplace = itrReplace.nextIndex() - 1;
                         break;
                     }
-                }
-                else{
+                } else {
                     break;
                 }
             }
-            if(indexToReplace!=-1){
-                logDebug("Index to replace: " + indexToReplace);
+            if (indexToReplace != -1) {
+                Timber.d("Index to replace: %s", indexToReplace);
 
                 notifications.set(indexToReplace, updatedUserAlerts.get(i));
-                if(adapterList!=null){
+                if (adapterList != null) {
                     adapterList.notifyItemChanged(indexToReplace);
                 }
 
-                ((ManagerActivity)context).markNotificationsSeen(false);
-            }
-            else{
+                ((ManagerActivity) context).markNotificationsSeen(false);
+            } else {
                 addNotification(updatedUserAlerts.get(i));
             }
 
         }
     }
 
-    public int getItemCount(){
-        if(adapterList != null){
+    public int getItemCount() {
+        if (adapterList != null) {
             return adapterList.getItemCount();
         }
         return 0;

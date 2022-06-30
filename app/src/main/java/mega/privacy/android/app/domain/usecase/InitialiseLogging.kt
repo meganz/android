@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Initialise logging
  *
  */
-interface InitialiseLogging {
+fun interface InitialiseLogging {
     /**
      * Invoke
      *

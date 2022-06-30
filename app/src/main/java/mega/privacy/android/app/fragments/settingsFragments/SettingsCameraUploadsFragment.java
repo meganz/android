@@ -46,9 +46,6 @@ import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
@@ -101,7 +98,6 @@ import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
@@ -318,7 +314,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     camSyncLocalPath = pickedDirName;
                     localCameraUploadFolder.setSummary(pickedDirName);
                 } else {
-                    logWarning("The Dir name is NULL");
+                    Timber.w("The Dir name is NULL");
                 }
             }
 
@@ -327,14 +323,14 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 secondaryUpload = false;
             } else {
                 secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-                logDebug("Secondary is: " + secondaryUpload);
+                Timber.d("Secondary is: %s", secondaryUpload);
             }
 
             isExternalSDCardMU = dbH.getMediaFolderExternalSdCard();
         }
 
         if (cameraUpload) {
-            logDebug("Camera Uploads ON");
+            Timber.d("Camera Uploads ON");
             cameraUploadOnOff.setChecked(true);
             cameraUploadHow.setSummary(wifi);
             localCameraUploadFolder.setSummary(camSyncLocalPath);
@@ -356,7 +352,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             checkSecondaryMediaFolder();
 
         } else {
-            logDebug("Camera Uploads Off");
+            Timber.d("Camera Uploads Off");
             cameraUploadOnOff.setChecked(false);
             cameraUploadHow.setSummary("");
             localCameraUploadFolder.setSummary("");
@@ -475,10 +471,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
         if (cuEnabled) {
-            logDebug("Disable CU.");
+            Timber.d("Disable CU.");
             disableCameraUpload();
         } else {
-            logDebug("Enable CU.");
+            Timber.d("Enable CU.");
             String[] PERMISSIONS = {
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
             };
@@ -580,7 +576,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 secondaryUpload = !secondaryUpload;
                 if (secondaryUpload) {
-                    logDebug("Enable MU.");
+                    Timber.d("Enable MU.");
                     //If there is any possible secondary folder, set it as the default one
                     long setSecondaryFolderHandle = getSecondaryFolderHandle();
                     long possibleSecondaryFolderHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
@@ -603,7 +599,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     prefs = dbH.getPreferences();
                     checkMediaUploadsPath();
                 } else {
-                    logDebug("Disable MU.");
+                    Timber.d("Disable MU.");
                     resetMUTimestampsAndCache();
                     dbH.setSecondaryUploadEnabled(false);
                 }
@@ -639,7 +635,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 
         if (isTextEmpty(localSecondaryFolderPath) || localSecondaryFolderPath.equals(INVALID_NON_NULL_VALUE) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
-            logWarning("Secondary ON: invalid localSecondaryFolderPath");
+            Timber.w("Secondary ON: invalid localSecondaryFolderPath");
             localSecondaryFolderPath = getString(R.string.settings_empty_folder);
             Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
             if (!isFileAvailable(new File(localSecondaryFolderPath))) {
@@ -697,7 +693,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 resetSizeInput(input);
             }
         } catch (Exception e) {
-            logError("Exception " + e);
+            Timber.e(e);
             resetSizeInput(input);
         }
     }
@@ -1053,7 +1049,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //set camera upload enabled
         dbH.setCamSyncEnabled(true);
         cameraUploadSettingsChanged = true;
-        logDebug("Camera Uploads ON");
+        Timber.d("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
         getPreferenceScreen().addPreference(cameraUploadHow);
@@ -1087,7 +1083,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * Disable MediaUpload UI related process
      */
     public void disableMediaUploadUIProcess() {
-        logDebug("changes to sec folder only");
+        Timber.d("changes to sec folder only");
         secondaryUpload = false;
         secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
         getPreferenceScreen().removePreference(localSecondaryFolder);
@@ -1098,7 +1094,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * Disable CameraUpload UI related process
      */
     public void disableCameraUploadUIProcess() {
-        logDebug("Camera Uploads OFF");
+        Timber.d("Camera Uploads OFF");
         cameraUpload = false;
         cameraUploadOnOff.setChecked(false);
         getPreferenceScreen().removePreference(cameraUploadHow);
@@ -1129,7 +1125,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 File checkFile = new File(camSyncLocalPath);
 
                 if (!checkFile.exists()) {
-                    logWarning("Local path not exist, use default camera folder path");
+                    Timber.w("Local path not exist, use default camera folder path");
                     camSyncLocalPath = cameraFolderLocation;
                 }
 
@@ -1140,11 +1136,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 if (pickedDirName != null) {
                     camSyncLocalPath = pickedDirName;
                 } else {
-                    logError("pickedDirName is NULL");
+                    Timber.e("pickedDirName is NULL");
                 }
             }
         } else {
-            logError("Local path is NULL");
+            Timber.e("Local path is NULL");
             dbH.setCameraFolderExternalSDCard(false);
             isExternalSDCardCU = false;
             camSyncLocalPath = cameraFolderLocation;
@@ -1198,7 +1194,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             return;
 
         prefs = dbH.getPreferences();
-        logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
+        Timber.d("REQUEST CODE: %d___RESULT CODE: %d", requestCode, resultCode);
         switch (requestCode) {
             case REQUEST_CAMERA_FOLDER:
                 String cameraPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
@@ -1229,10 +1225,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 if (handle != INVALID_HANDLE) {
                     //set primary only
-                    logDebug("Set CU primary attribute: " + handle);
+                    Timber.d("Set CU primary attribute: %s", handle);
                     megaApi.setCameraUploadsFolders(handle, INVALID_HANDLE, setAttrUserListener);
                 } else {
-                    logError("Error choosing the Mega folder to sync the Camera");
+                    Timber.e("Error choosing the Mega folder to sync the Camera");
                 }
                 break;
 
@@ -1266,10 +1262,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 }
 
                 if (secondaryHandle != INVALID_HANDLE) {
-                    logDebug("Set CU secondary attribute: " + secondaryHandle);
+                    Timber.d("Set CU secondary attribute: %s", secondaryHandle);
                     megaApi.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, setAttrUserListener);
                 } else {
-                    logError("Error choosing the Mega folder to sync the Camera");
+                    Timber.e("Error choosing the Mega folder to sync the Camera");
                 }
                 break;
         }

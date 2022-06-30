@@ -117,6 +117,14 @@
             android:name="fontProviderRequests"
             android:value="Noto Color Emoji Compat" />
 
+        <meta-data
+            android:name="google_analytics_default_allow_ad_personalization_signals"
+            android:value="false" />
+
+        <meta-data
+            android:name="google_analytics_ssaid_collection_enabled"
+            android:value="false" />
+
         <activity
             android:name=".main.LoginActivity"
             android:label="@string/login_text"
@@ -497,13 +505,6 @@
             android:name=".jobservices.CameraUploadsService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
-        <service
-            android:name=".fcm.IncomingCallService"
-            android:exported="true" />
-        <service
-            android:name=".fcm.KeepAliveService"
-            android:exported="true" />
-
         <receiver
             android:name=".receivers.CustomInstallReferrerReceiver"
             android:exported="true">

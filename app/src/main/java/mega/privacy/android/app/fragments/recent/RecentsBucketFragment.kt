@@ -24,17 +24,31 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 
 @AndroidEntryPoint
 class RecentsBucketFragment : BaseFragment() {
@@ -54,7 +68,7 @@ class RecentsBucketFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
         listView = binding.multipleBucketView
@@ -158,13 +172,14 @@ class RecentsBucketFragment : BaseFragment() {
         (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? = viewModel.items.value?.filter {
-        if (isImageViewerValid) {
-            it.isValidForImageViewer()
-        } else {
-            FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
-        }
-    }?.map { it.handle }?.toLongArray()
+    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
+        viewModel.items.value?.filter {
+            if (isImageViewerValid) {
+                it.isValidForImageViewer()
+            } else {
+                FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
+            }
+        }?.map { it.handle }?.toLongArray()
 
     fun openFile(
         index: Int,
@@ -174,7 +189,7 @@ class RecentsBucketFragment : BaseFragment() {
         val mime = MimeTypeList.typeForName(node.name)
         val localPath =
             FileUtil.getLocalFile(node)
-        logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
+        Timber.d("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
 
         when {
             mime.isImage -> {
@@ -209,7 +224,7 @@ class RecentsBucketFragment : BaseFragment() {
     private fun openPdf(
         index: Int,
         node: MegaNode,
-        localPath: String?
+        localPath: String?,
     ) {
         val intent = Intent(context, PdfViewerActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
@@ -234,7 +249,7 @@ class RecentsBucketFragment : BaseFragment() {
         index: Int,
         node: MegaNode,
         isMedia: Boolean,
-        localPath: String?
+        localPath: String?,
     ) {
         val intent = if (FileUtil.isInternalIntent(node)) {
             getMediaIntent(activity, node.name)
@@ -278,7 +293,7 @@ class RecentsBucketFragment : BaseFragment() {
     private fun openOrDownload(
         intent: Intent,
         paramsSetSuccessfully: Boolean,
-        handle: Long
+        handle: Long,
     ) {
         if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(activity, intent)) {
             activity?.startActivity(intent)
@@ -295,7 +310,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun openImage(
         index: Int,
-        node: MegaNode
+        node: MegaNode,
     ) {
         val handles = getNodesHandles(true)
         val intent = if (handles != null && handles.isNotEmpty()) {

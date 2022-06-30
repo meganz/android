@@ -1,6 +1,10 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.ChatActivity;
@@ -9,9 +13,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import timber.log.Timber;
 
 public class TruncateHistoryListener extends ChatBaseListener {
 
@@ -20,17 +22,17 @@ public class TruncateHistoryListener extends ChatBaseListener {
     }
 
     @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    public void onRequestFinish(@NonNull MegaChatApiJava api, MegaChatRequest request, @NonNull MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_TRUNCATE_HISTORY) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
             Util.showSnackbar(context, getString(R.string.clear_history_success));
             if (context instanceof ChatActivity) {
-                ((ChatActivity) context).hideMessageJump();
+                ((ChatActivity) context).hideScrollToLastMsgButton();
             }
         } else {
             Util.showSnackbar(context, getString(R.string.clear_history_error));
-            logError("Error clearing history: " + e.getErrorString());
+            Timber.e("Error clearing history: %s", e.getErrorString());
         }
     }
 }

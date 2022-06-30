@@ -1,6 +1,10 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +23,7 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaTransfer;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -45,7 +46,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             messageId = ((ChatActivity) requireActivity()).selectedMessageId;
         }
 
-        logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
+        Timber.d("Chat ID: %dMessage ID: %d", chatId, messageId);
         selectedChat = megaChatApi.getChatRoom(chatId);
 
         return contentView;

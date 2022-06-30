@@ -4,7 +4,7 @@ package mega.privacy.android.app.domain.usecase
  * Reset sdk logger
  *
  */
-interface ResetSdkLogger {
+fun interface ResetSdkLogger {
     /**
      * Invoke
      *

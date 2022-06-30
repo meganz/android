@@ -8,4 +8,4 @@ import com.airbnb.android.showkase.annotation.ShowkaseRootModule
  *
  */
 @ShowkaseRoot
-class MegaRootModule: ShowkaseRootModule
+class MegaRootModule : ShowkaseRootModule

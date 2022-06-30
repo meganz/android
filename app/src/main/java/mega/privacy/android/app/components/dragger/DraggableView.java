@@ -2,19 +2,20 @@ package mega.privacy.android.app.components.dragger;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.core.view.GestureDetectorCompat;
-import androidx.core.view.MotionEventCompat;
-import androidx.core.view.ViewCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
+
+import timber.log.Timber;
 
 @SuppressLint("ViewConstructor")
-public class DraggableView extends FrameLayout{
+public class DraggableView extends FrameLayout {
 
     boolean animate = false;
     private int[] screenPosition;
@@ -72,7 +73,7 @@ public class DraggableView extends FrameLayout{
         this.viewAnimator = viewAnimator;
     }
 
-    public void setNormalizedScale (float scale){
+    public void setNormalizedScale(float scale) {
         normalizedScale = scale;
     }
 
@@ -82,7 +83,7 @@ public class DraggableView extends FrameLayout{
         }
     }
 
-    public void setDraggableListener (DraggableListener draggableListener){
+    public void setDraggableListener(DraggableListener draggableListener) {
         this.draggableListener = draggableListener;
     }
 
@@ -223,21 +224,21 @@ public class DraggableView extends FrameLayout{
     }
 
     public void setScreenPosition(int[] screenPosition) {
-        if (screenPosition != null){
+        if (screenPosition != null) {
             this.screenPosition = screenPosition;
         }
     }
 
-    public void setCurrentView (View v) {
+    public void setCurrentView(View v) {
         currentView = v;
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        logDebug("onInterceptTouchEvent");
+        Timber.d("onInterceptTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
 
-        if (draggable){
+        if (draggable) {
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
                     motionXOrigin = event.getRawX();
@@ -263,14 +264,14 @@ public class DraggableView extends FrameLayout{
     }
 
     public void update() {
-        logDebug("update()");
+        Timber.d("update()");
         float percentX = getPercentX();
         float percentY = getPercentY();
         update(percentX, percentY);
     }
 
     public void update(float percentX, float percentY) {
-        logDebug("update");
+        Timber.d("update");
         if (rotationEnabled) {
             ViewCompat.setRotation(this, percentX * rotationValue);
         }
@@ -337,7 +338,7 @@ public class DraggableView extends FrameLayout{
     }
 
     public boolean animateExit(Direction direction) {
-        logDebug("animateExit");
+        Timber.d("animateExit");
         boolean animateExit = false;
         if (viewAnimator != null) {
             if (direction == Direction.NONE) {
@@ -345,16 +346,16 @@ public class DraggableView extends FrameLayout{
                 ViewCompat.animate(this).scaleX(1f).setDuration(200);
                 ViewCompat.animate(this).scaleY(1f).setDuration(200);
                 animate = false;
-                if (draggableListener != null){
+                if (draggableListener != null) {
                     draggableListener.onDragActivated(animate);
                 }
 
             } else {
                 animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection,
                         animatorListener, screenPosition, currentView,
-                        selfInitialLocationOnWindow == null ? new int[] {0, 0} : selfInitialLocationOnWindow);
+                        selfInitialLocationOnWindow == null ? new int[]{0, 0} : selfInitialLocationOnWindow);
 
-                if (draggableListener != null){
+                if (draggableListener != null) {
                     draggableListener.onDragActivated(true);
                 }
 
@@ -370,7 +371,7 @@ public class DraggableView extends FrameLayout{
     }
 
     boolean handleTouch(MotionEvent event) {
-        logDebug("handleTouch");
+        Timber.d("handleTouch");
         if (draggable && !animating) {
             boolean handledByDetector = this.detector.onTouchEvent(event);
             if (!handledByDetector) {
@@ -380,11 +381,11 @@ public class DraggableView extends FrameLayout{
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         actionUp();
-                        animate  = false;
+                        animate = false;
 //                        draggableListener.onDragActivated(animate);
                         break;
                     case MotionEvent.ACTION_MOVE: {
-                        if (!animate){
+                        if (!animate) {
                             animate = true;
                             draggableListener.onDragActivated(animate);
                             ViewCompat.animate(this).scaleX(0.5f).setDuration(200);
@@ -396,7 +397,7 @@ public class DraggableView extends FrameLayout{
                         float diffMotionX = newMotionX - motionXOrigin;
                         float diffMotionY = newMotionY - motionYOrigin;
 
-                        if (draggableListener != null){
+                        if (draggableListener != null) {
                             draggableListener.onViewPositionChanged(Math.abs(getPercentY()));
                         }
                         if (vertical) {
@@ -422,16 +423,16 @@ public class DraggableView extends FrameLayout{
     }
 
     void actionUp() {
-        logDebug("actionUp");
+        Timber.d("actionUp");
         float percentX = getPercentX();
         float percentY = getPercentY();
 
         if (viewAnimator != null) {
             boolean animated =
-                (!vertical && percentX > maxDragPercentageX && animateExit(Direction.RIGHT)) ||
-                    (!vertical && percentX < -maxDragPercentageX && animateExit(Direction.LEFT)) ||
-                    (vertical && percentY > maxDragPercentageY && animateExit(Direction.BOTTOM)) ||
-                    (vertical && percentY < -maxDragPercentageY && animateExit(Direction.TOP));
+                    (!vertical && percentX > maxDragPercentageX && animateExit(Direction.RIGHT)) ||
+                            (!vertical && percentX < -maxDragPercentageX && animateExit(Direction.LEFT)) ||
+                            (vertical && percentY > maxDragPercentageY && animateExit(Direction.BOTTOM)) ||
+                            (vertical && percentY < -maxDragPercentageY && animateExit(Direction.TOP));
             if (!animated) {
                 animateExit(Direction.NONE);
             }
@@ -439,7 +440,7 @@ public class DraggableView extends FrameLayout{
     }
 
     float getParentWidth() {
-        logDebug("getParentWidth");
+        Timber.d("getParentWidth");
         if (parentWidth == 0) {
             parentWidth = ((View) getParent()).getWidth();
         }
@@ -447,7 +448,7 @@ public class DraggableView extends FrameLayout{
     }
 
     float getParentHeight() {
-        logDebug("getParentHeight");
+        Timber.d("getParentHeight");
         if (parentHeight == 0) {
             parentHeight = ((View) getParent()).getHeight();
         }
@@ -458,7 +459,7 @@ public class DraggableView extends FrameLayout{
         detector = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(@Nullable MotionEvent event1, @Nullable MotionEvent event2, float velocityX, float velocityY) {
-                logDebug("onFling");
+                Timber.d("onFling");
                 boolean animated = false;
                 if (listenVelocity && !animating && viewAnimator != null && event1 != null && event2 != null) {
                     if (vertical) {
@@ -526,7 +527,7 @@ public class DraggableView extends FrameLayout{
 
         void onViewPositionChanged(float fractionScreen);
 
-        void onDragActivated (boolean activated);
+        void onDragActivated(boolean activated);
     }
 
 }

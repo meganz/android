@@ -32,16 +32,15 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.hideKeyboard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
-import kotlin.collections.ArrayList
+import timber.log.Timber
+import java.util.Locale
 
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
@@ -125,12 +124,14 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         var emptyTextSearch = getString(R.string.empty_search_giphy)
 
         try {
-            endOfList = endOfList.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.grey_300_grey_600)}'>")
+            endOfList = endOfList.replace("[A]",
+                "<font color='${ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)}'>")
             endOfList = endOfList.replace("[/A]", "</font>")
-            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.black_white)}'>")
+            emptyTextSearch = emptyTextSearch.replace("[A]",
+                "<font color='${ColorUtils.getColorHexString(this, R.color.black_white)}'>")
             emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
         } catch (e: Exception) {
-            logWarning("Exception formatting string", e)
+            Timber.w(e, "Exception formatting string")
         }
 
         binding.giphyEndList.text = HtmlCompat.fromHtml(endOfList, HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -337,7 +338,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                         updateAdapter(searchData[query], false)
                     }
                 } else {
-                    logError("GiphyResponse failed.")
+                    Timber.e("GiphyResponse failed.")
                     checkIfShouldShowDownServerState()
                 }
             }
@@ -345,7 +346,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
             override fun onFailure(call: Call<GiphyResponse>, t: Throwable) {
                 if (call.isCanceled) return
 
-                logError("GiphyResponse failed: " + t.message)
+                Timber.e("GiphyResponse failed: ${t.message}")
                 checkIfShouldShowDownServerState()
             }
         })
@@ -415,11 +416,11 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 return true
             }
 
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                 requestTrendingData(false)
                 return true
             }

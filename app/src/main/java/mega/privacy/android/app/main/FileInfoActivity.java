@@ -1,5 +1,79 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE;
+import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CameraUploadUtil.getPrimaryFolderHandle;
+import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.ColorUtils.getColorForElevation;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN;
+import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
+import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
+import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getNodeLocationInfo;
+import static mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.findIncomingParentHandle;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFile;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
+import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
+import static mega.privacy.android.app.utils.Util.changeViewElevation;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getExternalCardPath;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isDarkMode;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,21 +89,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.switchmaterial.SwitchMaterial;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Looper;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
@@ -49,6 +108,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +131,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -67,29 +143,29 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.listeners.ShareListener;
+import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter;
+import mega.privacy.android.app.main.controllers.ContactController;
+import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.attacher.MegaAttacher;
-import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.interfaces.ActionNodeCallback;
-import mega.privacy.android.app.listeners.ShareListener;
-import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter;
-import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.utils.LocationInfo;
+import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -104,37 +180,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.ColorUtils.getColorForElevation;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @SuppressLint("NewApi")
 @AndroidEntryPoint
@@ -149,20 +195,20 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     @Inject
     CopyNodeUseCase copyNodeUseCase;
 
-	public static int MAX_WIDTH_FILENAME_LAND=400;
-	public static int MAX_WIDTH_FILENAME_LAND_2=400;
+    public static int MAX_WIDTH_FILENAME_LAND = 400;
+    public static int MAX_WIDTH_FILENAME_LAND_2 = 400;
 
-	public static int MAX_WIDTH_FILENAME_PORT=170;
-	public static int MAX_WIDTH_FILENAME_PORT_2=200;
+    public static int MAX_WIDTH_FILENAME_PORT = 170;
+    public static int MAX_WIDTH_FILENAME_PORT_2 = 200;
 
-	public static String NODE_HANDLE = "NODE_HANDLE";
+    public static String NODE_HANDLE = "NODE_HANDLE";
 
-	static int TYPE_EXPORT_GET = 0;
-	static int TYPE_EXPORT_REMOVE = 1;
-	static int TYPE_EXPORT_MANAGE = 2;
-	static int FROM_FILE_BROWSER = 13;
+    static int TYPE_EXPORT_GET = 0;
+    static int TYPE_EXPORT_REMOVE = 1;
+    static int TYPE_EXPORT_MANAGE = 2;
+    static int FROM_FILE_BROWSER = 13;
     FileInfoActivity fileInfoActivity = this;
-	boolean firstIncomingLevel=true;
+    boolean firstIncomingLevel = true;
 
     private final static String KEY_SELECTED_SHARE_HANDLE = "KEY_SELECTED_SHARE_HANDLE";
 
@@ -172,12 +218,12 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     NodeController nC;
 
-	ArrayList<MegaNode> nodeVersions;
+    ArrayList<MegaNode> nodeVersions;
 
-	NestedScrollView nestedScrollView;
+    NestedScrollView nestedScrollView;
 
-	RelativeLayout iconToolbarLayout;
-	ImageView iconToolbarView;
+    RelativeLayout iconToolbarLayout;
+    ImageView iconToolbarView;
 
     Drawable upArrow;
     Drawable drawableRemoveLink;
@@ -189,34 +235,34 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     Drawable drawableCopy;
     Drawable drawableChat;
 
-	RelativeLayout imageToolbarLayout;
-	ImageView imageToolbarView;
+    RelativeLayout imageToolbarLayout;
+    ImageView imageToolbarView;
 
-	CoordinatorLayout fragmentContainer;
-	CollapsingToolbarLayout collapsingToolbar;
+    CoordinatorLayout fragmentContainer;
+    CollapsingToolbarLayout collapsingToolbar;
 
-	Toolbar toolbar;
-	ActionBar aB;
+    Toolbar toolbar;
+    ActionBar aB;
 
-	private boolean isShareContactExpanded = false;
+    private boolean isShareContactExpanded = false;
 
-	float scaleText;
+    float scaleText;
 
-	LinearLayout availableOfflineLayout;
+    LinearLayout availableOfflineLayout;
 
-	RelativeLayout sizeLayout;
-	RelativeLayout locationLayout;
-	RelativeLayout contentLayout;
-	RelativeLayout addedLayout;
-	RelativeLayout modifiedLayout;
-	RelativeLayout publicLinkLayout;
-	RelativeLayout publicLinkCopyLayout;
-	TextView publicLinkText;
-	private TextView publicLinkDate;
-	RelativeLayout sharedLayout;
-	Button usersSharedWithTextButton;
-	View dividerSharedLayout;
-	View dividerLinkLayout;
+    RelativeLayout sizeLayout;
+    RelativeLayout locationLayout;
+    RelativeLayout contentLayout;
+    RelativeLayout addedLayout;
+    RelativeLayout modifiedLayout;
+    RelativeLayout publicLinkLayout;
+    RelativeLayout publicLinkCopyLayout;
+    TextView publicLinkText;
+    private TextView publicLinkDate;
+    RelativeLayout sharedLayout;
+    Button usersSharedWithTextButton;
+    View dividerSharedLayout;
+    View dividerLinkLayout;
 
     RelativeLayout folderVersionsLayout;
     RelativeLayout folderCurrentVersionsLayout;
@@ -225,92 +271,92 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     TextView folderCurrentVersionsText;
     TextView folderPreviousVersionsText;
 
-	TextView availableOfflineView;
+    TextView availableOfflineView;
 
-	Button publicLinkButton;
+    Button publicLinkButton;
 
-	RelativeLayout versionsLayout;
-	Button versionsButton;
-	View separatorVersions;
+    RelativeLayout versionsLayout;
+    Button versionsButton;
+    View separatorVersions;
     SwitchMaterial offlineSwitch;
 
-	TextView sizeTextView;
-	TextView sizeTitleTextView;
+    TextView sizeTextView;
+    TextView sizeTitleTextView;
 
     TextView locationTextView;
 
-	TextView contentTextView;
-	TextView contentTitleTextView;
+    TextView contentTextView;
+    TextView contentTitleTextView;
 
-	TextView addedTextView;
-	TextView modifiedTextView;
-	AppBarLayout appBarLayout;
-	TextView permissionInfo;
+    TextView addedTextView;
+    TextView modifiedTextView;
+    AppBarLayout appBarLayout;
+    TextView permissionInfo;
 
-	boolean owner= true;
-	int typeExport = -1;
+    boolean owner = true;
+    int typeExport = -1;
 
-	ArrayList<MegaShare> sl;
-	MegaOffline mOffDelete;
+    ArrayList<MegaShare> sl;
+    MegaOffline mOffDelete;
 
-	RelativeLayout ownerLayout;
-	LinearLayout ownerLinear;
-	EmojiTextView ownerLabel;
-	TextView ownerLabelowner;
-	TextView ownerInfo;
-	ImageView ownerRoundeImage;
-	ImageView ownerState;
+    RelativeLayout ownerLayout;
+    LinearLayout ownerLinear;
+    EmojiTextView ownerLabel;
+    TextView ownerLabelowner;
+    TextView ownerInfo;
+    ImageView ownerRoundeImage;
+    ImageView ownerState;
 
-	MenuItem downloadMenuItem;
-	MenuItem shareMenuItem;
-	MenuItem getLinkMenuItem;
-	MenuItem editLinkMenuItem;
-	MenuItem removeLinkMenuItem;
-	MenuItem renameMenuItem;
-	MenuItem moveMenuItem;
-	MenuItem copyMenuItem;
-	MenuItem rubbishMenuItem;
-	MenuItem deleteMenuItem;
-	MenuItem leaveMenuItem;
-	MenuItem sendToChatMenuItem;
+    MenuItem downloadMenuItem;
+    MenuItem shareMenuItem;
+    MenuItem getLinkMenuItem;
+    MenuItem editLinkMenuItem;
+    MenuItem removeLinkMenuItem;
+    MenuItem renameMenuItem;
+    MenuItem moveMenuItem;
+    MenuItem copyMenuItem;
+    MenuItem rubbishMenuItem;
+    MenuItem deleteMenuItem;
+    MenuItem leaveMenuItem;
+    MenuItem sendToChatMenuItem;
 
-	MegaNode node;
+    MegaNode node;
 
-	boolean availableOfflineBoolean = false;
+    boolean availableOfflineBoolean = false;
 
-	private ContactController cC;
+    private ContactController cC;
 
     AlertDialog statusDialog;
-	boolean publicLink=false;
+    boolean publicLink = false;
 
-	private Handler handler;
+    private Handler handler;
 
-	boolean moveToRubbish = false;
+    boolean moveToRubbish = false;
 
-	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
-	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
+    public static int REQUEST_CODE_SELECT_CONTACT = 1000;
+    public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
+    public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 
-	Display display;
-	DisplayMetrics outMetrics;
-	float density;
-	float scaleW;
-	float scaleH;
+    Display display;
+    DisplayMetrics outMetrics;
+    float density;
+    float scaleW;
+    float scaleH;
 
-	boolean shareIt = true;
-	int from;
+    boolean shareIt = true;
+    int from;
 
-	DatabaseHandler dbH = null;
+    DatabaseHandler dbH = null;
 
-	AlertDialog permissionsDialog;
+    AlertDialog permissionsDialog;
 
-	String contactMail;
+    String contactMail;
     boolean isRemoveOffline;
     long handle;
 
     private int adapterType;
 
- 	private MegaShare selectedShare;
+    private MegaShare selectedShare;
     final int MAX_NUMBER_OF_CONTACTS_IN_LIST = 5;
     private ArrayList<MegaShare> listContacts;
     private ArrayList<MegaShare> fullListContacts;
@@ -355,17 +401,17 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             if (intent == null || intent.getAction() == null) return;
 
             if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
-                || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
-                || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
-                || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+                    || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+                    || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
+                    || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
                 updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
             }
         }
     };
 
-    public void activateActionMode(){
-        logDebug("activateActionMode");
-        if (!adapter.isMultipleSelect()){
+    public void activateActionMode() {
+        Timber.d("activateActionMode");
+        if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new ActionBarCallBack());
         }
@@ -396,14 +442,14 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     }
 
     private class ActionBarCallBack implements ActionMode.Callback {
-        
+
         @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            logDebug("onActionItemClicked");
+            Timber.d("onActionItemClicked");
             final ArrayList<MegaShare> shares = adapter.getSelectedShares();
-            switch(item.getItemId()){
-                case R.id.action_file_contact_list_permissions:{
+            switch (item.getItemId()) {
+                case R.id.action_file_contact_list_permissions: {
 
                     //Change permissions
                     MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(fileInfoActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
@@ -413,7 +459,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
                             clearSelections();
-                            if(permissionsDialog != null){
+                            if (permissionsDialog != null) {
                                 permissionsDialog.dismiss();
                             }
                             statusDialog = createProgressDialog(fileInfoActivity, getString(R.string.context_permissions_changing_folder));
@@ -425,25 +471,25 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     permissionsDialog.show();
                     break;
                 }
-                case R.id.action_file_contact_list_delete:{
-                    if(shares!=null){
-                        if(shares.size()!=0){
+                case R.id.action_file_contact_list_delete: {
+                    if (shares != null) {
+                        if (shares.size() != 0) {
                             if (shares.size() > 1) {
-                                logDebug("Remove multiple contacts");
+                                Timber.d("Remove multiple contacts");
                                 showConfirmationRemoveMultipleContactFromShare(shares);
                             } else {
-                                logDebug("Remove one contact");
+                                Timber.d("Remove one contact");
                                 showConfirmationRemoveContactFromShare(shares.get(0).getUser());
                             }
                         }
                     }
                     break;
                 }
-                case R.id.cab_menu_select_all:{
+                case R.id.cab_menu_select_all: {
                     selectAll();
                     break;
                 }
-                case R.id.cab_menu_unselect_all:{
+                case R.id.cab_menu_unselect_all: {
                     clearSelections();
                     break;
                 }
@@ -453,7 +499,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            logDebug("onCreateActionMode");
+            Timber.d("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
             return true;
@@ -461,7 +507,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            logDebug("onDestroyActionMode");
+            Timber.d("onDestroyActionMode");
             adapter.clearSelections();
             adapter.setMultipleSelect(false);
             supportInvalidateOptionsMenu();
@@ -469,7 +515,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            logDebug("onPrepareActionMode");
+            Timber.d("onPrepareActionMode");
             List<MegaShare> selected = adapter.getSelectedShares();
             boolean deleteShare = false;
             boolean permissions = false;
@@ -482,24 +528,23 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 menu.findItem(R.id.cab_menu_select_all).setVisible(selected.size() != adapter.getItemCount());
                 unselect.setTitle(getString(R.string.action_unselect_all));
                 unselect.setVisible(true);
-            }
-            else{
+            } else {
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                 menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
             }
 
             menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
-            if(permissions == true){
+            if (permissions == true) {
                 menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }else{
+            } else {
                 menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
             }
 
             menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
-            if(deleteShare == true){
+            if (deleteShare == true) {
                 menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }else{
+            } else {
                 menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
             }
@@ -509,29 +554,28 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
 
-        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
         fileInfoActivity = this;
         handler = new Handler();
         display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        density  = getResources().getDisplayMetrics().density;
+        density = getResources().getDisplayMetrics().density;
 
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
 
-        if (scaleH < scaleW){
+        if (scaleH < scaleW) {
             scaleText = scaleH;
-        }
-        else{
+        } else {
             scaleText = scaleW;
         }
 
@@ -589,18 +633,18 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         //Owner Layout
         ownerLayout = findViewById(R.id.file_properties_owner_layout);
-        ownerRoundeImage= findViewById(R.id.contact_list_thumbnail);
+        ownerRoundeImage = findViewById(R.id.contact_list_thumbnail);
         ownerLinear = findViewById(R.id.file_properties_owner_linear);
-        ownerLabel =  findViewById(R.id.file_properties_owner_label);
+        ownerLabel = findViewById(R.id.file_properties_owner_label);
         ownerLabelowner = findViewById(R.id.file_properties_owner_label_owner);
-        String ownerString = "("+getString(R.string.file_properties_owner)+")";
+        String ownerString = "(" + getString(R.string.file_properties_owner) + ")";
         ownerLabelowner.setText(ownerString);
         ownerInfo = findViewById(R.id.file_properties_owner_info);
         ownerState = findViewById(R.id.file_properties_owner_state_icon);
-        if(!isScreenInPortrait(this)){
+        if (!isScreenInPortrait(this)) {
             ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_LAND, outMetrics));
             ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
-        }else{
+        } else {
             ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
             ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
@@ -610,7 +654,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         //Size Layout
         sizeLayout = findViewById(R.id.file_properties_size_layout);
-        sizeTitleTextView  = findViewById(R.id.file_properties_info_menu_size);
+        sizeTitleTextView = findViewById(R.id.file_properties_info_menu_size);
         sizeTextView = findViewById(R.id.file_properties_info_data_size);
 
         //Folder Versions Layout
@@ -628,7 +672,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         //Content Layout
         contentLayout = findViewById(R.id.file_properties_content_layout);
-        contentTitleTextView  = findViewById(R.id.file_properties_info_menu_content);
+        contentTitleTextView = findViewById(R.id.file_properties_info_menu_content);
         contentTextView = findViewById(R.id.file_properties_info_data_content);
 
         dividerLinkLayout = findViewById(R.id.divider_link_layout);
@@ -657,17 +701,17 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         megaApi.addGlobalListener(this);
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null){
+        if (extras != null) {
             from = extras.getInt("from");
-            if(from==FROM_INCOMING_SHARES){
+            if (from == FROM_INCOMING_SHARES) {
                 firstIncomingLevel = extras.getBoolean(INTENT_EXTRA_KEY_FIRST_LEVEL);
             }
 
             long handleNode = extras.getLong("handle", -1);
-            logDebug("Handle of the selected node: " + handleNode);
+            Timber.d("Handle of the selected node: %s", handleNode);
             node = megaApi.getNodeByHandle(handleNode);
-            if (node == null){
-                logWarning("Node is NULL");
+            if (node == null) {
+                Timber.w("Node is NULL");
                 finish();
                 return;
             }
@@ -694,7 +738,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 nC = new NodeController(this);
             }
 
-            if(megaApi.hasVersions(node)){
+            if (megaApi.hasVersions(node)) {
                 versionsLayout.setVisibility(View.VISIBLE);
 
                 String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
@@ -703,14 +747,12 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 separatorVersions.setVisibility(View.VISIBLE);
 
                 nodeVersions = megaApi.getVersions(node);
-            }
-            else{
+            } else {
                 versionsLayout.setVisibility(View.GONE);
                 separatorVersions.setVisibility(View.GONE);
             }
-        }
-        else{
-            logWarning("Extras is NULL");
+        } else {
+            Timber.w("Extras is NULL");
         }
 
         RecyclerView listView = findViewById(R.id.file_info_contact_list_view);
@@ -727,7 +769,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         setMoreButtonText();
 
         //setup adapter
-        adapter = new MegaFileInfoSharedContactAdapter(this,node,listContacts, listView);
+        adapter = new MegaFileInfoSharedContactAdapter(this, node, listContacts, listView);
         adapter.setShareList(listContacts);
         adapter.setPositionClicked(-1);
         adapter.setMultipleSelect(false);
@@ -762,7 +804,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         int statusBarColor = getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation));
         collapsingToolbar.setStatusBarScrimColor(statusBarColor);
 
-        if(isDarkMode(this)) {
+        if (isDarkMode(this)) {
             collapsingToolbar.setContentScrimColor(statusBarColor);
         }
 
@@ -797,14 +839,14 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             locationLayout.setVisibility(View.GONE);
         }
 
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
-            if(handle == INVALID_HANDLE || node == null){
+            if (handle == INVALID_HANDLE || node == null) {
                 return;
             }
             ArrayList<MegaShare> list = megaApi.getOutShares(node);
-            for (MegaShare share: list) {
-                if(handle == share.getNodeHandle()){
+            for (MegaShare share : list) {
+                if (handle == share.getNodeHandle()) {
                     selectedShare = share;
                     break;
                 }
@@ -813,7 +855,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
         }
-	}
+    }
 
     private void getActionBarDrawables() {
         drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
@@ -867,7 +909,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     }
 
     @Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.file_info_action, menu);
 
         downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download);
@@ -949,7 +991,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
 
         return super.onCreateOptionsMenu(menu);
-	}
+    }
 
     /**
      * Changes the drawables color in ActionBar depending on the color received.
@@ -1005,253 +1047,257 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         sendToChatMenuItem.setIcon(drawableChat);
     }
 
-	@SuppressLint("NonConstantResourceId")
+    @SuppressLint("NonConstantResourceId")
     @Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Timber.d("onOptionsItemSelected");
 
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home: {
                 onBackPressed();
-				break;
-			}
-			case R.id.cab_menu_file_info_download: {
-			    nodeSaver.saveNode(node, false, false, false, false);
-				break;
-			}
-			case R.id.cab_menu_file_info_share_folder: {
-				Intent intent = new Intent();
-				intent.setClass(this, AddContactActivity.class);
-				intent.putExtra("contactType", CONTACT_TYPE_BOTH);
+                break;
+            }
+            case R.id.cab_menu_file_info_download: {
+                nodeSaver.saveNode(node, false, false, false, false);
+                break;
+            }
+            case R.id.cab_menu_file_info_share_folder: {
+                Intent intent = new Intent();
+                intent.setClass(this, AddContactActivity.class);
+                intent.putExtra("contactType", CONTACT_TYPE_BOTH);
                 intent.putExtra("MULTISELECT", 0);
-				intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.getHandle());
-				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-				break;
-			}
-			case R.id.cab_menu_file_info_get_link:
-			case R.id.cab_menu_file_info_edit_link:{
+                intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.getHandle());
+                startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+                break;
+            }
+            case R.id.cab_menu_file_info_get_link:
+            case R.id.cab_menu_file_info_edit_link: {
                 if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
                     return false;
                 }
 
                 showGetLinkActivity(this, node.getHandle());
-				break;
-			}
-			case R.id.cab_menu_file_info_remove_link: {
-			    if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
-			        return false;
+                break;
+            }
+            case R.id.cab_menu_file_info_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                    return false;
                 }
-				shareIt = false;
-				AlertDialog removeLinkDialog;
+                shareIt = false;
+                AlertDialog removeLinkDialog;
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
-				LayoutInflater inflater = getLayoutInflater();
-				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				TextView url = dialoglayout.findViewById(R.id.dialog_link_link_url);
-				TextView key = dialoglayout.findViewById(R.id.dialog_link_link_key);
-				TextView symbol = dialoglayout.findViewById(R.id.dialog_link_symbol);
-				TextView removeText = dialoglayout.findViewById(R.id.dialog_link_text_remove);
+                LayoutInflater inflater = getLayoutInflater();
+                View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+                TextView url = dialoglayout.findViewById(R.id.dialog_link_link_url);
+                TextView key = dialoglayout.findViewById(R.id.dialog_link_link_key);
+                TextView symbol = dialoglayout.findViewById(R.id.dialog_link_symbol);
+                TextView removeText = dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
-				((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(10, outMetrics), 0);
+                ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(10, outMetrics), 0);
 
-				url.setVisibility(View.GONE);
-				key.setVisibility(View.GONE);
-				symbol.setVisibility(View.GONE);
-				removeText.setVisibility(View.VISIBLE);
+                url.setVisibility(View.GONE);
+                key.setVisibility(View.GONE);
+                symbol.setVisibility(View.GONE);
+                removeText.setVisibility(View.VISIBLE);
 
-				removeText.setText(getString(R.string.context_remove_link_warning_text));
+                removeText.setText(getString(R.string.context_remove_link_warning_text));
 
-				Display display = getWindowManager().getDefaultDisplay();
-				DisplayMetrics outMetrics = new DisplayMetrics();
-				display.getMetrics(outMetrics);
-				float density = getResources().getDisplayMetrics().density;
+                Display display = getWindowManager().getDefaultDisplay();
+                DisplayMetrics outMetrics = new DisplayMetrics();
+                display.getMetrics(outMetrics);
+                float density = getResources().getDisplayMetrics().density;
 
-				float scaleW = getScaleW(outMetrics, density);
-				float scaleH = getScaleH(outMetrics, density);
+                float scaleW = getScaleW(outMetrics, density);
+                float scaleH = getScaleH(outMetrics, density);
 
 
-				if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-					removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
+                    removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10 * scaleW));
 
-				}else{
-					removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleW));
+                } else {
+                    removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15 * scaleW));
 
-				}
+                }
 
-				builder.setView(dialoglayout);
+                builder.setView(dialoglayout);
 
-				builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
-                    typeExport=TYPE_EXPORT_REMOVE;
+                builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+                    typeExport = TYPE_EXPORT_REMOVE;
                     megaApi.disableExport(node, fileInfoActivity);
                 });
 
-				builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> {
+                builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> {
 
                 });
 
-				removeLinkDialog = builder.create();
-				removeLinkDialog.show();
-				break;
-			}
-			case R.id.cab_menu_file_info_copy: {
-				showCopy();
-				break;
-			}
-			case R.id.cab_menu_file_info_move: {
-				showMove();
-				break;
-			}
-			case R.id.cab_menu_file_info_rename: {
-			    showRenameNodeDialog(this, node, this, this);
-				break;
-			}
-			case R.id.cab_menu_file_info_leave:
-				showConfirmationLeaveIncomingShare(this, this, node);
-				break;
+                removeLinkDialog = builder.create();
+                removeLinkDialog.show();
+                break;
+            }
+            case R.id.cab_menu_file_info_copy: {
+                showCopy();
+                break;
+            }
+            case R.id.cab_menu_file_info_move: {
+                showMove();
+                break;
+            }
+            case R.id.cab_menu_file_info_rename: {
+                showRenameNodeDialog(this, node, this, this);
+                break;
+            }
+            case R.id.cab_menu_file_info_leave:
+                showConfirmationLeaveIncomingShare(this, this, node);
+                break;
 
-			case R.id.cab_menu_file_info_rubbish:
-			case R.id.cab_menu_file_info_delete: {
-				moveToTrash();
-				break;
-			}
+            case R.id.cab_menu_file_info_rubbish:
+            case R.id.cab_menu_file_info_delete: {
+                moveToTrash();
+                break;
+            }
             case R.id.cab_menu_file_info_send_to_chat: {
-                logDebug("Send chat option");
+                Timber.d("Send chat option");
 
                 if (node != null) {
                     nodeAttacher.attachNode(node);
                 }
                 break;
             }
-		}
-		return super.onOptionsItemSelected(item);
-	}
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-	private void refreshProperties(){
-        logDebug("refreshProperties");
+    private void refreshProperties() {
+        Timber.d("refreshProperties");
 
-		if(node==null){
-			finish();
-		}
+        if (node == null) {
+            finish();
+        }
 
-		boolean result=true;
+        boolean result = true;
 
-		if(!node.isTakenDown() && node.isExported()){
-			publicLink=true;
+        if (!node.isTakenDown() && node.isExported()) {
+            publicLink = true;
             dividerLinkLayout.setVisibility(View.VISIBLE);
-			publicLinkLayout.setVisibility(View.VISIBLE);
-			publicLinkCopyLayout.setVisibility(View.VISIBLE);
-			publicLinkText.setText(node.getPublicLink());
-			publicLinkDate.setText(getString(R.string.general_date_label, formatLongDateTime(node.getPublicLinkCreationTime())));
-		}
-		else{
-			publicLink=false;
+            publicLinkLayout.setVisibility(View.VISIBLE);
+            publicLinkCopyLayout.setVisibility(View.VISIBLE);
+            publicLinkText.setText(node.getPublicLink());
+            publicLinkDate.setText(getString(R.string.general_date_label, formatLongDateTime(node.getPublicLinkCreationTime())));
+        } else {
+            publicLink = false;
             dividerLinkLayout.setVisibility(View.GONE);
-			publicLinkLayout.setVisibility(View.GONE);
-			publicLinkCopyLayout.setVisibility(View.GONE);
-		}
+            publicLinkLayout.setVisibility(View.GONE);
+            publicLinkCopyLayout.setVisibility(View.GONE);
+        }
 
-		if (node.isFile()){
-            logDebug("Node is FILE");
-			sharedLayout.setVisibility(View.GONE);
-			dividerSharedLayout.setVisibility(View.GONE);
-			sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
-			sizeTextView.setText(getSizeString(node.getSize()));
+        if (node.isFile()) {
+            Timber.d("Node is FILE");
+            sharedLayout.setVisibility(View.GONE);
+            dividerSharedLayout.setVisibility(View.GONE);
+            sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
+            sizeTextView.setText(getSizeString(node.getSize()));
 
-			contentLayout.setVisibility(View.GONE);
+            contentLayout.setVisibility(View.GONE);
 
-			if (node.getCreationTime() != 0){
+            if (node.getCreationTime() != 0) {
 
-				try {addedTextView.setText(formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{addedTextView.setText("");}
+                try {
+                    addedTextView.setText(formatLongDateTime(node.getCreationTime()));
+                } catch (Exception ex) {
+                    addedTextView.setText("");
+                }
 
-				if (node.getModificationTime() != 0){
-					try {modifiedTextView.setText(formatLongDateTime(node.getModificationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
-				}
-				else{
-					try {modifiedTextView.setText(formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
-				}
-			}
-			else{
-				addedTextView.setText("");
-				modifiedTextView.setText("");
-			}
+                if (node.getModificationTime() != 0) {
+                    try {
+                        modifiedTextView.setText(formatLongDateTime(node.getModificationTime()));
+                    } catch (Exception ex) {
+                        modifiedTextView.setText("");
+                    }
+                } else {
+                    try {
+                        modifiedTextView.setText(formatLongDateTime(node.getCreationTime()));
+                    } catch (Exception ex) {
+                        modifiedTextView.setText("");
+                    }
+                }
+            } else {
+                addedTextView.setText("");
+                modifiedTextView.setText("");
+            }
 
-			Bitmap thumb;
-			Bitmap preview;
-			thumb = getThumbnailFromCache(node);
-			if (thumb != null){
-				imageToolbarView.setImageBitmap(thumb);
-				imageToolbarLayout.setVisibility(View.VISIBLE);
-				iconToolbarLayout.setVisibility(View.GONE);
-			}
-			else{
-				thumb = getThumbnailFromFolder(node, this);
-				if (thumb != null){
-					imageToolbarView.setImageBitmap(thumb);
-					imageToolbarLayout.setVisibility(View.VISIBLE);
-					iconToolbarLayout.setVisibility(View.GONE);
-				}
-			}
-			preview = getPreviewFromCache(node);
-			if (preview != null){
-				previewCache.put(node.getHandle(), preview);
-				imageToolbarView.setImageBitmap(preview);
-				imageToolbarLayout.setVisibility(View.VISIBLE);
-				iconToolbarLayout.setVisibility(View.GONE);
-			}
-			else{
-				preview = getPreviewFromFolder(node, this);
-				if (preview != null){
-					previewCache.put(node.getHandle(), preview);
-					imageToolbarView.setImageBitmap(preview);
-					imageToolbarLayout.setVisibility(View.VISIBLE);
-					iconToolbarLayout.setVisibility(View.GONE);
-				}
-				else{
-					if (node.hasPreview()){
-						File previewFile = new File(getPreviewFolder(this), node.getBase64Handle()+".jpg");
-						megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
-					}
-				}
-			}
+            Bitmap thumb;
+            Bitmap preview;
+            thumb = getThumbnailFromCache(node);
+            if (thumb != null) {
+                imageToolbarView.setImageBitmap(thumb);
+                imageToolbarLayout.setVisibility(View.VISIBLE);
+                iconToolbarLayout.setVisibility(View.GONE);
+            } else {
+                thumb = getThumbnailFromFolder(node, this);
+                if (thumb != null) {
+                    imageToolbarView.setImageBitmap(thumb);
+                    imageToolbarLayout.setVisibility(View.VISIBLE);
+                    iconToolbarLayout.setVisibility(View.GONE);
+                }
+            }
+            preview = getPreviewFromCache(node);
+            if (preview != null) {
+                previewCache.put(node.getHandle(), preview);
+                imageToolbarView.setImageBitmap(preview);
+                imageToolbarLayout.setVisibility(View.VISIBLE);
+                iconToolbarLayout.setVisibility(View.GONE);
+            } else {
+                preview = getPreviewFromFolder(node, this);
+                if (preview != null) {
+                    previewCache.put(node.getHandle(), preview);
+                    imageToolbarView.setImageBitmap(preview);
+                    imageToolbarLayout.setVisibility(View.VISIBLE);
+                    iconToolbarLayout.setVisibility(View.GONE);
+                } else {
+                    if (node.hasPreview()) {
+                        File previewFile = new File(getPreviewFolder(this), node.getBase64Handle() + ".jpg");
+                        megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
+                    }
+                }
+            }
 
-			if(megaApi.hasVersions(node)){
-				versionsLayout.setVisibility(View.VISIBLE);
+            if (megaApi.hasVersions(node)) {
+                versionsLayout.setVisibility(View.VISIBLE);
                 String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
                 versionsButton.setText(text);
-				versionsButton.setOnClickListener(this);
-				separatorVersions.setVisibility(View.VISIBLE);
+                versionsButton.setOnClickListener(this);
+                separatorVersions.setVisibility(View.VISIBLE);
 
-				nodeVersions = megaApi.getVersions(node);
-			}
-			else{
-				versionsLayout.setVisibility(View.GONE);
-				separatorVersions.setVisibility(View.GONE);
-			}
-		}
-		else{ //Folder
+                nodeVersions = megaApi.getVersions(node);
+            } else {
+                versionsLayout.setVisibility(View.GONE);
+                separatorVersions.setVisibility(View.GONE);
+            }
+        } else { //Folder
 
             megaApi.getFolderInfo(node, this);
-			contentTextView.setVisibility(View.VISIBLE);
-			contentTitleTextView.setVisibility(View.VISIBLE);
+            contentTextView.setVisibility(View.VISIBLE);
+            contentTitleTextView.setVisibility(View.VISIBLE);
 
-			contentTextView.setText(getMegaNodeFolderInfo(node));
+            contentTextView.setText(getMegaNodeFolderInfo(node));
 
-			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(getSizeString(sizeFile));
-			setIconResource();
+            long sizeFile = megaApi.getSize(node);
+            sizeTextView.setText(getSizeString(sizeFile));
+            setIconResource();
 
-			if(from==FROM_INCOMING_SHARES){
-				//Show who is the owner
-				ownerRoundeImage.setImageBitmap(null);
-				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-				for(int j=0; j<sharesIncoming.size();j++){
-					MegaShare mS = sharesIncoming.get(j);
-					if(mS.getNodeHandle()==node.getHandle()){
-						MegaUser user= megaApi.getContact(mS.getUser());
-						contactMail=user.getEmail();
-						if(user!=null){
+            if (from == FROM_INCOMING_SHARES) {
+                //Show who is the owner
+                ownerRoundeImage.setImageBitmap(null);
+                ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+                for (int j = 0; j < sharesIncoming.size(); j++) {
+                    MegaShare mS = sharesIncoming.get(j);
+                    if (mS.getNodeHandle() == node.getHandle()) {
+                        MegaUser user = megaApi.getContact(mS.getUser());
+                        contactMail = user.getEmail();
+                        if (user != null) {
                             String name = getMegaUserNameDB(user);
                             if (name == null) {
                                 name = user.getEmail();
@@ -1260,113 +1306,116 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                             ownerInfo.setText(user.getEmail());
                             setOwnerState(user.getHandle());
                             createDefaultAvatar(ownerRoundeImage, user, name);
-						}
-						else{
-							ownerLabel.setText(mS.getUser());
-							ownerInfo.setText(mS.getUser());
+                        } else {
+                            ownerLabel.setText(mS.getUser());
+                            ownerInfo.setText(mS.getUser());
                             setOwnerState(-1);
-							createDefaultAvatar(ownerRoundeImage, user, mS.getUser());
-						}
+                            createDefaultAvatar(ownerRoundeImage, user, mS.getUser());
+                        }
 
 
-						File avatar = buildAvatarFile(this, contactMail + ".jpg");
-						Bitmap bitmap = null;
-						if (isFileAvailable(avatar)){
-							if (avatar.length() > 0){
-								BitmapFactory.Options bOpts = new BitmapFactory.Options();
-								bOpts.inPurgeable = true;
-								bOpts.inInputShareable = true;
-								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-								if (bitmap == null) {
-									avatar.delete();
-                                    megaApi.getUserAvatar(user,buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
+                        File avatar = buildAvatarFile(this, contactMail + ".jpg");
+                        Bitmap bitmap = null;
+                        if (isFileAvailable(avatar)) {
+                            if (avatar.length() > 0) {
+                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                                bOpts.inPurgeable = true;
+                                bOpts.inInputShareable = true;
+                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                                if (bitmap == null) {
+                                    avatar.delete();
+                                    megaApi.getUserAvatar(user, buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
+                                } else {
+                                    ownerRoundeImage.setImageBitmap(bitmap);
                                 }
-								else{
-									ownerRoundeImage.setImageBitmap(bitmap);
-								}
-							}
-							else{
-                                megaApi.getUserAvatar(user,buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
-							}
-						}
-						else{
-                            megaApi.getUserAvatar(user,buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
-						}
-						ownerLayout.setVisibility(View.VISIBLE);
-					}
-				}
-			}
+                            } else {
+                                megaApi.getUserAvatar(user, buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
+                            }
+                        } else {
+                            megaApi.getUserAvatar(user, buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
+                        }
+                        ownerLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
 
 
-			sl = megaApi.getOutShares(node);
+            sl = megaApi.getOutShares(node);
 
-			if (sl != null){
+            if (sl != null) {
 
-				if (sl.size() == 0){
+                if (sl.size() == 0) {
 
-					sharedLayout.setVisibility(View.GONE);
-					dividerSharedLayout.setVisibility(View.GONE);
-					//If I am the owner
-					if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-						permissionInfo.setVisibility(View.GONE);
-					}
-					else{
+                    sharedLayout.setVisibility(View.GONE);
+                    dividerSharedLayout.setVisibility(View.GONE);
+                    //If I am the owner
+                    if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
+                        permissionInfo.setVisibility(View.GONE);
+                    } else {
 
-						owner = false;
-						//If I am not the owner
-						permissionInfo.setVisibility(View.VISIBLE);
+                        owner = false;
+                        //If I am not the owner
+                        permissionInfo.setVisibility(View.VISIBLE);
 
-						int accessLevel= megaApi.getAccess(node);
-                        logDebug("Node: " + node.getHandle());
+                        int accessLevel = megaApi.getAccess(node);
+                        Timber.d("Node: %s", node.getHandle());
 
-						switch(accessLevel){
-							case MegaShare.ACCESS_OWNER:
-							case MegaShare.ACCESS_FULL:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
-								break;
-							}
-							case MegaShare.ACCESS_READ:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only).toUpperCase(Locale.getDefault()));
-								break;
-							}
-							case MegaShare.ACCESS_READWRITE:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write).toUpperCase(Locale.getDefault()));
-								break;
-							}
-						}
-					}
-				}
-				else{
-					sharedLayout.setVisibility(View.VISIBLE);
-					dividerSharedLayout.setVisibility(View.VISIBLE);
+                        switch (accessLevel) {
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_FULL: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
+                                break;
+                            }
+                            case MegaShare.ACCESS_READ: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only).toUpperCase(Locale.getDefault()));
+                                break;
+                            }
+                            case MegaShare.ACCESS_READWRITE: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write).toUpperCase(Locale.getDefault()));
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    sharedLayout.setVisibility(View.VISIBLE);
+                    dividerSharedLayout.setVisibility(View.VISIBLE);
                     usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
-                                    sl.size(), sl.size()));
+                            sl.size(), sl.size()));
 
-				}
+                }
 
-				if (node.getCreationTime() != 0){
-					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+                if (node.getCreationTime() != 0) {
+                    try {
+                        addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
+                    } catch (Exception ex) {
+                        addedTextView.setText("");
+                    }
 
-					if (node.getModificationTime() != 0){
-						try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-					}
-					else{
-						try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-					}
-				}
-				else{
-					addedTextView.setText("");
-					modifiedTextView.setText("");
-				}
-			}
-			else{
+                    if (node.getModificationTime() != 0) {
+                        try {
+                            modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));
+                        } catch (Exception ex) {
+                            modifiedTextView.setText("");
+                        }
+                    } else {
+                        try {
+                            modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
+                        } catch (Exception ex) {
+                            modifiedTextView.setText("");
+                        }
+                    }
+                } else {
+                    addedTextView.setText("");
+                    modifiedTextView.setText("");
+                }
+            } else {
 
-				sharedLayout.setVisibility(View.GONE);
-				dividerSharedLayout.setVisibility(View.GONE);
-			}
-		}
+                sharedLayout.setVisibility(View.GONE);
+                dividerSharedLayout.setVisibility(View.GONE);
+            }
+        }
 
-		//Choose the button offlineSwitch
+        //Choose the button offlineSwitch
         if (availableOffline(this, node)) {
             availableOfflineBoolean = true;
             offlineSwitch.setChecked(true);
@@ -1375,19 +1424,19 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         availableOfflineBoolean = false;
         offlineSwitch.setChecked(false);
-	}
+    }
 
-	private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
-		ownerRoundeImage.setImageBitmap(getDefaultAvatar(getColorAvatar(user), name, AVATAR_SIZE, true));
-	}
+    private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name) {
+        ownerRoundeImage.setImageBitmap(getDefaultAvatar(getColorAvatar(user), name, AVATAR_SIZE, true));
+    }
 
 
     private void sharedContactClicked() {
-        FrameLayout sharedContactLayout = (FrameLayout)findViewById(R.id.shared_contact_list_container);
+        FrameLayout sharedContactLayout = (FrameLayout) findViewById(R.id.shared_contact_list_container);
         if (isShareContactExpanded) {
             if (sl != null) {
                 usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
-                                sl.size(), sl.size()));
+                        sl.size(), sl.size()));
             }
             sharedContactLayout.setVisibility(View.GONE);
         } else {
@@ -1398,37 +1447,37 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         isShareContactExpanded = !isShareContactExpanded;
     }
 
-	@SuppressLint("NonConstantResourceId")
+    @SuppressLint("NonConstantResourceId")
     @Override
-	public void onClick(View v) {
+    public void onClick(View v) {
 
         hideMultipleSelect();
-		switch (v.getId()) {
-			case R.id.file_properties_text_number_versions:{
+        switch (v.getId()) {
+            case R.id.file_properties_text_number_versions: {
                 Intent i = new Intent(this, VersionsFileActivity.class);
                 i.putExtra("handle", node.getHandle());
                 startActivityForResult(i, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
-				break;
-			}
-			case R.id.file_properties_link_button:{
-                logDebug("Copy link button");
+                break;
+            }
+            case R.id.file_properties_link_button: {
+                Timber.d("Copy link button");
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", node.getPublicLink());
                 clipboard.setPrimaryClip(clip);
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.file_properties_get_link), -1);
-				break;
-			}
-			case R.id.file_properties_shared_layout:
-			case R.id.file_properties_shared_info_button:{
+                break;
+            }
+            case R.id.file_properties_shared_layout:
+            case R.id.file_properties_shared_info_button: {
                 sharedContactClicked();
-				break;
-			}
+                break;
+            }
             case R.id.more_button:
                 Intent i = new Intent(this, FileContactListActivity.class);
                 i.putExtra(NAME, node.getHandle());
                 startActivity(i);
                 break;
-			case R.id.file_properties_switch:{
+            case R.id.file_properties_switch: {
                 boolean isChecked = offlineSwitch.isChecked();
 
                 if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1437,163 +1486,156 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     return;
                 }
 
-				if(owner){
-                    logDebug("Owner: me");
-					if (!isChecked){
-                        logDebug("isChecked");
+                if (owner) {
+                    Timber.d("Owner: me");
+                    if (!isChecked) {
+                        Timber.d("isChecked");
                         isRemoveOffline = true;
                         handle = node.getHandle();
-						availableOfflineBoolean = false;
-						offlineSwitch.setChecked(false);
-						mOffDelete = dbH.findByHandle(handle);
+                        availableOfflineBoolean = false;
+                        offlineSwitch.setChecked(false);
+                        mOffDelete = dbH.findByHandle(handle);
                         removeOffline(mOffDelete, dbH, this);
                         Util.showSnackbar(this,
                                 getResources().getString(R.string.file_removed_offline));
-                    }
-					else{
-                        logDebug("NOT Checked");
+                    } else {
+                        Timber.d("NOT Checked");
                         isRemoveOffline = false;
                         handle = -1;
-						availableOfflineBoolean = true;
-						offlineSwitch.setChecked(true);
+                        availableOfflineBoolean = true;
+                        offlineSwitch.setChecked(true);
 
-						File destination = getOfflineParentFile(this, from, node, megaApi);
-                        logDebug("Path destination: " + destination);
+                        File destination = getOfflineParentFile(this, from, node, megaApi);
+                        Timber.d("Path destination: %s", destination);
 
-						if (isFileAvailable(destination) && destination.isDirectory()){
-							File offlineFile = new File(destination, node.getName());
+                        if (isFileAvailable(destination) && destination.isDirectory()) {
+                            File offlineFile = new File(destination, node.getName());
                             if (isFileAvailable(offlineFile)
                                     && node.getSize() == offlineFile.length()
                                     && offlineFile.getName().equals(node.getName())) {
                                 //This means that is already available offline
                                 return;
                             }
-						}
+                        }
 
-                        logDebug("Handle to save for offline : " + node.getHandle());
+                        Timber.d("Handle to save for offline : %s", node.getHandle());
                         saveOffline(destination, node, fileInfoActivity);
 
                     }
                     supportInvalidateOptionsMenu();
-                }
-				else{
-                    logDebug("Not owner");
-					if (!isChecked){
-						availableOfflineBoolean = false;
-						offlineSwitch.setChecked(false);
-						mOffDelete = dbH.findByHandle(node.getHandle());
+                } else {
+                    Timber.d("Not owner");
+                    if (!isChecked) {
+                        availableOfflineBoolean = false;
+                        offlineSwitch.setChecked(false);
+                        mOffDelete = dbH.findByHandle(node.getHandle());
                         removeOffline(mOffDelete, dbH, this);
-						supportInvalidateOptionsMenu();
-					}
-					else{
-						availableOfflineBoolean = true;
-						offlineSwitch.setChecked(true);
+                        supportInvalidateOptionsMenu();
+                    } else {
+                        availableOfflineBoolean = true;
+                        offlineSwitch.setChecked(true);
 
-						supportInvalidateOptionsMenu();
+                        supportInvalidateOptionsMenu();
 
-                        logDebug("Checking the node" + node.getHandle());
+                        Timber.d("Checking the node%s", node.getHandle());
 
-						//check the parent
-						long result = -1;
-						result = findIncomingParentHandle(node, megaApi);
-                        logDebug("IncomingParentHandle: " + result);
-						if(result!=-1){
-							File destination = getOfflineParentFile(this, FROM_INCOMING_SHARES, node, megaApi);
+                        //check the parent
+                        long result = -1;
+                        result = findIncomingParentHandle(node, megaApi);
+                        Timber.d("IncomingParentHandle: %s", result);
+                        if (result != -1) {
+                            File destination = getOfflineParentFile(this, FROM_INCOMING_SHARES, node, megaApi);
 
-							if (isFileAvailable(destination) && destination.isDirectory()){
-								File offlineFile = new File(destination, node.getName());
-								if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-									return;
-								}
-							}
-							saveOffline(destination, node, fileInfoActivity);
-						}
-						else{
-                            logWarning("result=findIncomingParentHandle NOT result!");
-						}
-					}
-				}
-				break;
-			}
-		}
-	}
+                            if (isFileAvailable(destination) && destination.isDirectory()) {
+                                File offlineFile = new File(destination, node.getName());
+                                if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())) { //This means that is already available offline
+                                    return;
+                                }
+                            }
+                            saveOffline(destination, node, fileInfoActivity);
+                        } else {
+                            Timber.w("result=findIncomingParentHandle NOT result!");
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
 
-	public void showCopy(){
+    public void showCopy() {
 
-		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(node.getHandle());
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
-	}
+        Intent intent = new Intent(this, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+        long[] longArray = new long[handleList.size()];
+        for (int i = 0; i < handleList.size(); i++) {
+            longArray[i] = handleList.get(i);
+        }
+        intent.putExtra("COPY_FROM", longArray);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+    }
 
-	public void showMove(){
+    public void showMove() {
 
-		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(node.getHandle());
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
-	}
+        Intent intent = new Intent(this, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+        long[] longArray = new long[handleList.size()];
+        for (int i = 0; i < handleList.size(); i++) {
+            longArray[i] = handleList.get(i);
+        }
+        intent.putExtra("MOVE_FROM", longArray);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+    }
 
-	public void moveToTrash(){
-        logDebug("moveToTrash");
+    public void moveToTrash() {
+        Timber.d("moveToTrash");
 
-		final long handle = node.getHandle();
-		moveToRubbish = false;
-		if (!isOnline(this)){
-			showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-			return;
-		}
+        final long handle = node.getHandle();
+        moveToRubbish = false;
+        if (!isOnline(this)) {
+            showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+            return;
+        }
 
-		if(isFinishing()){
-			return;
-		}
+        if (isFinishing()) {
+            return;
+        }
 
-		final MegaNode rubbishNode = megaApi.getRubbishNode();
+        final MegaNode rubbishNode = megaApi.getRubbishNode();
 
-		MegaNode parent = nC.getParent(node);
+        MegaNode parent = nC.getParent(node);
 
         moveToRubbish = parent.getHandle() != megaApi.getRubbishNode().getHandle();
 
-		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     //TODO remove the outgoing shares
                     //Check if the node is not yet in the rubbish bin (if so, remove it)
 
-                    if (moveToRubbish){
+                    if (moveToRubbish) {
                         megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivity);
                         AlertDialog temp;
-                        try{
+                        try {
                             temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivity, getString(R.string.context_move_to_trash));
                             temp.show();
-                        }
-                        catch(Exception e){
+                        } catch (Exception e) {
                             return;
                         }
                         statusDialog = temp;
-                    }
-                    else{
+                    } else {
                         megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivity);
                         AlertDialog temp;
-                        try{
+                        try {
                             temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivity, getString(R.string.context_delete_from_mega));
                             temp.show();
-                        }
-                        catch(Exception e){
+                        } catch (Exception e) {
                             return;
                         }
                         statusDialog = temp;
@@ -1604,12 +1646,12 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 case DialogInterface.BUTTON_NEGATIVE:
                     //No button clicked
                     break;
-                }
+            }
         };
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		if (moveToRubbish){
-			int stringMessageID;
+        if (moveToRubbish) {
+            int stringMessageID;
             if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
                 stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
             } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
@@ -1617,104 +1659,98 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             } else {
                 stringMessageID = R.string.confirmation_move_to_rubbish;
             }
-			String message= getResources().getString(stringMessageID);
-			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
-		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
-		else{
-            String message= getResources().getString(R.string.confirmation_delete_from_mega);
-			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
-	}
+            String message = getResources().getString(stringMessageID);
+            builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        } else {
+            String message = getResources().getString(R.string.confirmation_delete_from_mega);
+            builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        }
+    }
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart: " + request.getName());
-	}
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        Timber.d("onRequestStart: %s", request.getName());
+    }
 
-	@SuppressLint("NewApi")
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+    @SuppressLint("NewApi")
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-        if(adapter!=null){
-            if(adapter.isMultipleSelect()){
+        if (adapter != null) {
+            if (adapter.isMultipleSelect()) {
                 adapter.clearSelections();
                 hideMultipleSelect();
             }
         }
 
-        logDebug("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
+        Timber.d("onRequestFinish: %d__%s", request.getType(), request.getRequestString());
 
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
-			if (e.getErrorCode() == MegaError.API_OK){
-				File previewDir = getPreviewFolder(this);
-				File preview = new File(previewDir, node.getBase64Handle()+".jpg");
-				if (preview.exists()) {
-					if (preview.length() > 0) {
-						Bitmap bitmap = getBitmapForCache(preview, this);
-						previewCache.put(node.getHandle(), bitmap);
-						if (iconToolbarView != null){
-							imageToolbarView.setImageBitmap(bitmap);
-							imageToolbarLayout.setVisibility(View.VISIBLE);
-							iconToolbarLayout.setVisibility(View.GONE);
-						}
-					}
-				}
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO){
-            if (e.getErrorCode() == MegaError.API_OK){
+        if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                File previewDir = getPreviewFolder(this);
+                File preview = new File(previewDir, node.getBase64Handle() + ".jpg");
+                if (preview.exists()) {
+                    if (preview.length() > 0) {
+                        Bitmap bitmap = getBitmapForCache(preview, this);
+                        previewCache.put(node.getHandle(), bitmap);
+                        if (iconToolbarView != null) {
+                            imageToolbarView.setImageBitmap(bitmap);
+                            imageToolbarLayout.setVisibility(View.VISIBLE);
+                            iconToolbarLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            }
+        } else if (request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
+            if (e.getErrorCode() == MegaError.API_OK) {
                 MegaFolderInfo info = request.getMegaFolderInfo();
                 int numVersions = info.getNumVersions();
-                logDebug("Num versions: " + numVersions);
-                if(numVersions>0){
+                Timber.d("Num versions: %s", numVersions);
+                if (numVersions > 0) {
                     folderVersionsLayout.setVisibility(View.VISIBLE);
                     String text = getQuantityString(R.plurals.number_of_versions_inside_folder, numVersions, numVersions);
                     folderVersionsText.setText(text);
 
                     long currentVersions = info.getCurrentSize();
-                    logDebug("Current versions: " + currentVersions);
-                    if(currentVersions>0){
+                    Timber.d("Current versions: %s", currentVersions);
+                    if (currentVersions > 0) {
                         folderCurrentVersionsText.setText(getSizeString(currentVersions));
                         folderCurrentVersionsLayout.setVisibility(View.VISIBLE);
                     }
 
-                }
-                else{
+                } else {
                     folderVersionsLayout.setVisibility(View.GONE);
                     folderCurrentVersionsLayout.setVisibility(View.GONE);
                 }
 
                 long previousVersions = info.getVersionsSize();
-                logDebug("Previous versions: " + previousVersions);
-                if(previousVersions>0){
+                Timber.d("Previous versions: %s", previousVersions);
+                if (previousVersions > 0) {
                     folderPreviousVersionsText.setText(getSizeString(previousVersions));
                     folderPreviousVersionsLayout.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     folderPreviousVersionsLayout.setVisibility(View.GONE);
                 }
-            }
-            else{
+            } else {
                 folderPreviousVersionsLayout.setVisibility(View.GONE);
                 folderVersionsLayout.setVisibility(View.GONE);
                 folderCurrentVersionsLayout.setVisibility(View.GONE);
             }
-        } else if (request.getType() == MegaRequest.TYPE_MOVE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {
-                logDebug(ex.getMessage());
+        } else if (request.getType() == MegaRequest.TYPE_MOVE) {
+            try {
+                statusDialog.dismiss();
+            } catch (Exception ex) {
+                Timber.d(ex.getMessage());
             }
 
-			if (moveToRubbish){
-				moveToRubbish = false;
-                logDebug("Move to rubbish request finished");
-			} else {
-			    logDebug("Move nodes request finished");
-			}
+            if (moveToRubbish) {
+                moveToRubbish = false;
+                Timber.d("Move to rubbish request finished");
+            } else {
+                Timber.d("Move nodes request finished");
+            }
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
@@ -1723,22 +1759,20 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 finish();
             } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
                 showForeignStorageOverQuotaWarningDialog(this);
-            } else{
+            } else {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
             }
 
-		}
-		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-			if (versionsToRemove > 0) {
-                logDebug("Remove request finished");
-                if (e.getErrorCode() == MegaError.API_OK){
+        } else if (request.getType() == MegaRequest.TYPE_REMOVE) {
+            if (versionsToRemove > 0) {
+                Timber.d("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK) {
                     versionsRemoved++;
-                }
-                else{
+                } else {
                     errorVersionRemove++;
                 }
 
-                if (versionsRemoved+errorVersionRemove == versionsToRemove) {
+                if (versionsRemoved + errorVersionRemove == versionsToRemove) {
                     if (versionsRemoved == versionsToRemove) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted), -1);
                     } else {
@@ -1751,56 +1785,54 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     versionsRemoved = 0;
                     errorVersionRemove = 0;
                 }
-            }
-            else {
-                logDebug("Remove request finished");
-                if (e.getErrorCode() == MegaError.API_OK){
+            } else {
+                Timber.d("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK) {
                     finish();
                 } else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
                     showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
-                } else{
+                } else {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
                 }
             }
         } else if (request.getType() == MegaApiJava.USER_ATTR_AVATAR) {
-			try{
-				statusDialog.dismiss();
-			}catch (Exception ex){
-			    logError(ex.getMessage());
+            try {
+                statusDialog.dismiss();
+            } catch (Exception ex) {
+                Timber.e(ex);
             }
 
-			if (e.getErrorCode() == MegaError.API_OK){
-				boolean avatarExists = false;
-				if (contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = buildAvatarFile(this, contactMail + ".jpg");
-					Bitmap bitmap = null;
-					if (isFileAvailable(avatar)){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
-							}
-							else{
-								avatarExists = true;
-								ownerRoundeImage.setImageBitmap(bitmap);
-								ownerRoundeImage.setVisibility(View.VISIBLE);
-							}
-						}
-					}
-				}
-			}
-		}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                boolean avatarExists = false;
+                if (contactMail.compareTo(request.getEmail()) == 0) {
+                    File avatar = buildAvatarFile(this, contactMail + ".jpg");
+                    Bitmap bitmap = null;
+                    if (isFileAvailable(avatar)) {
+                        if (avatar.length() > 0) {
+                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                            bOpts.inPurgeable = true;
+                            bOpts.inInputShareable = true;
+                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                            if (bitmap == null) {
+                                avatar.delete();
+                            } else {
+                                avatarExists = true;
+                                ownerRoundeImage.setImageBitmap(bitmap);
+                                ownerRoundeImage.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-	}
+    }
 
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-        logWarning("onRequestTemporaryError: " + request.getName());
-	}
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+                                        MegaError e) {
+        Timber.w("onRequestTemporaryError: %s", request.getName());
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -1883,10 +1915,10 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 );
     }
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-	    super.onActivityResult(requestCode, resultCode, intent);
-        logDebug("onActivityResult " + requestCode + "____" + resultCode);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        Timber.d("onActivityResult %d____%d", requestCode, resultCode);
 
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return;
@@ -1896,9 +1928,9 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             return;
         }
 
-		if (intent == null) {
-			return;
-		}
+        if (intent == null) {
+            return;
+        }
 
         if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
             if (!isOnline(this)) {
@@ -1939,14 +1971,14 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
             checkCollision(toHandle, NameCollisionType.COPY);
         } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
 
-            if (node.isFolder()){
+            if (node.isFolder()) {
                 MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(fileInfoActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -1959,47 +1991,45 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 });
                 permissionsDialog = dialogBuilder.create();
                 permissionsDialog.show();
+            } else {
+                Timber.w("ERROR, the file is not folder");
             }
-            else{
-                logWarning("ERROR, the file is not folder");
-            }
-		}
-		else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
-            if(!isOnline(this)){
+        } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
             if (intent.getBooleanExtra("deleteVersionHistory", false)) {
                 ArrayList<MegaNode> versions = megaApi.getVersions(node);
-                versionsToRemove = versions.size() -1;
-                for (int i=1; i<versions.size(); i++) {
+                versionsToRemove = versions.size() - 1;
+                for (int i = 1; i < versions.size(); i++) {
                     megaApi.removeVersion(versions.get(i), this);
                 }
             }
         }
-	}
-
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        logDebug("onUsersUpdate");
-	}
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
     }
 
     @Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-        logDebug("onNodesUpdate");
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+        Timber.d("onUsersUpdate");
+    }
 
-		boolean thisNode = false;
-		boolean anyChild = false;
-		boolean updateContentFoder = false;
-		if(nodes==null){
-			return;
-		}
-		MegaNode n = null;
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        Timber.d("onUserAlertsUpdate");
+    }
+
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
+        Timber.d("onNodesUpdate");
+
+        boolean thisNode = false;
+        boolean anyChild = false;
+        boolean updateContentFoder = false;
+        if (nodes == null) {
+            return;
+        }
+        MegaNode n = null;
         for (MegaNode nodeToCheck : nodes) {
             if (nodeToCheck != null) {
                 if (nodeToCheck.getHandle() == node.getHandle()) {
@@ -2032,223 +2062,215 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             }
         }
 
-		if(updateContentFoder){
-		    megaApi.getFolderInfo(node, this);
+        if (updateContentFoder) {
+            megaApi.getFolderInfo(node, this);
         }
 
-		if ((!thisNode)&&(!anyChild)){
-            logDebug("Not related to this node");
-			return;
-		}
+        if ((!thisNode) && (!anyChild)) {
+            Timber.d("Not related to this node");
+            return;
+        }
 
-		//Check if the parent handle has changed
-		if(n!=null){
-			if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
-				MegaNode oldParent = megaApi.getParentNode(node);
-				MegaNode newParent = megaApi.getParentNode(n);
-				if(oldParent.getHandle()==newParent.getHandle()){
-                    logDebug("Parents match");
-					if(newParent.isFile()){
-                        logDebug("New version added");
-						node = newParent;
-					}
-					else{
+        //Check if the parent handle has changed
+        if (n != null) {
+            if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)) {
+                MegaNode oldParent = megaApi.getParentNode(node);
+                MegaNode newParent = megaApi.getParentNode(n);
+                if (oldParent.getHandle() == newParent.getHandle()) {
+                    Timber.d("Parents match");
+                    if (newParent.isFile()) {
+                        Timber.d("New version added");
+                        node = newParent;
+                    } else {
                         node = n;
-					}
-				}
-				else{
-					node = n;
-				}
-				if(megaApi.hasVersions(node)){
-					nodeVersions = megaApi.getVersions(node);
-				}
-				else{
-					nodeVersions = null;
-				}
-			}
-			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
-				if(thisNode){
-					if(nodeVersions!=null){
-						long nodeHandle = nodeVersions.get(1).getHandle();
-						if(megaApi.getNodeByHandle(nodeHandle)!=null){
-							node = megaApi.getNodeByHandle(nodeHandle);
-							if(megaApi.hasVersions(node)){
-								nodeVersions = megaApi.getVersions(node);
-							}
-							else{
-								nodeVersions = null;
-							}
-						}
-						else{
-							finish();
-						}
-					}
-					else{
-						finish();
-					}
-				}
-				else if(anyChild){
-					if(megaApi.hasVersions(n)){
-						nodeVersions = megaApi.getVersions(n);
-					}
-					else{
-						nodeVersions = null;
-					}
-				}
+                    }
+                } else {
+                    node = n;
+                }
+                if (megaApi.hasVersions(node)) {
+                    nodeVersions = megaApi.getVersions(node);
+                } else {
+                    nodeVersions = null;
+                }
+            } else if (n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)) {
+                if (thisNode) {
+                    if (nodeVersions != null) {
+                        long nodeHandle = nodeVersions.get(1).getHandle();
+                        if (megaApi.getNodeByHandle(nodeHandle) != null) {
+                            node = megaApi.getNodeByHandle(nodeHandle);
+                            if (megaApi.hasVersions(node)) {
+                                nodeVersions = megaApi.getVersions(node);
+                            } else {
+                                nodeVersions = null;
+                            }
+                        } else {
+                            finish();
+                        }
+                    } else {
+                        finish();
+                    }
+                } else if (anyChild) {
+                    if (megaApi.hasVersions(n)) {
+                        nodeVersions = megaApi.getVersions(n);
+                    } else {
+                        nodeVersions = null;
+                    }
+                }
 
-			}
-			else{
-				node = n;
-				if(megaApi.hasVersions(node)){
-					nodeVersions = megaApi.getVersions(node);
-				}
-				else{
-					nodeVersions = null;
-				}
-			}
-		}
-		else{
-			if(anyChild){
-				if(megaApi.hasVersions(node)){
-					nodeVersions = megaApi.getVersions(node);
-				}
-				else{
-					nodeVersions = null;
-				}
-			}
-		}
+            } else {
+                node = n;
+                if (megaApi.hasVersions(node)) {
+                    nodeVersions = megaApi.getVersions(node);
+                } else {
+                    nodeVersions = null;
+                }
+            }
+        } else {
+            if (anyChild) {
+                if (megaApi.hasVersions(node)) {
+                    nodeVersions = megaApi.getVersions(node);
+                } else {
+                    nodeVersions = null;
+                }
+            }
+        }
 
-		if (moveToRubbish){
-			supportInvalidateOptionsMenu();
-		}
+        if (moveToRubbish) {
+            supportInvalidateOptionsMenu();
+        }
 
-		if (node == null){
-			return;
-		}
+        if (node == null) {
+            return;
+        }
 
-		if(!node.isTakenDown() && node.isExported()){
-            logDebug("Node HAS public link");
-			publicLink=true;
+        if (!node.isTakenDown() && node.isExported()) {
+            Timber.d("Node HAS public link");
+            publicLink = true;
             dividerLinkLayout.setVisibility(View.VISIBLE);
-			publicLinkLayout.setVisibility(View.VISIBLE);
-			publicLinkCopyLayout.setVisibility(View.VISIBLE);
-			publicLinkText.setText(node.getPublicLink());
-			supportInvalidateOptionsMenu();
+            publicLinkLayout.setVisibility(View.VISIBLE);
+            publicLinkCopyLayout.setVisibility(View.VISIBLE);
+            publicLinkText.setText(node.getPublicLink());
+            supportInvalidateOptionsMenu();
 
 
-		}else{
-            logDebug("Node NOT public link");
-			publicLink=false;
+        } else {
+            Timber.d("Node NOT public link");
+            publicLink = false;
             dividerLinkLayout.setVisibility(View.GONE);
-			publicLinkLayout.setVisibility(View.GONE);
-			publicLinkCopyLayout.setVisibility(View.GONE);
-			supportInvalidateOptionsMenu();
+            publicLinkLayout.setVisibility(View.GONE);
+            publicLinkCopyLayout.setVisibility(View.GONE);
+            supportInvalidateOptionsMenu();
 
-		}
+        }
 
-		if (node.isFolder()){
-			long sizeFile=megaApi.getSize(node);
-			sizeTextView.setText(getSizeString(sizeFile));
+        if (node.isFolder()) {
+            long sizeFile = megaApi.getSize(node);
+            sizeTextView.setText(getSizeString(sizeFile));
 
-			contentTextView.setText(getMegaNodeFolderInfo(node));
-			setIconResource();
-			sl = megaApi.getOutShares(node);
-			if (sl != null){
-				if (sl.size() == 0){
-                    logDebug("sl.size == 0");
-					sharedLayout.setVisibility(View.GONE);
-					dividerSharedLayout.setVisibility(View.GONE);
+            contentTextView.setText(getMegaNodeFolderInfo(node));
+            setIconResource();
+            sl = megaApi.getOutShares(node);
+            if (sl != null) {
+                if (sl.size() == 0) {
+                    Timber.d("sl.size == 0");
+                    sharedLayout.setVisibility(View.GONE);
+                    dividerSharedLayout.setVisibility(View.GONE);
 
-					//If I am the owner
-					if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-						permissionInfo.setVisibility(View.GONE);
-					}
-					else{
+                    //If I am the owner
+                    if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
+                        permissionInfo.setVisibility(View.GONE);
+                    } else {
 
-						//If I am not the owner
-						owner = false;
-						permissionInfo.setVisibility(View.VISIBLE);
-						int accessLevel= megaApi.getAccess(node);
-                        logDebug("Node: " + node.getHandle());
+                        //If I am not the owner
+                        owner = false;
+                        permissionInfo.setVisibility(View.VISIBLE);
+                        int accessLevel = megaApi.getAccess(node);
+                        Timber.d("Node: %s", node.getHandle());
 
-						switch(accessLevel){
-							case MegaShare.ACCESS_OWNER:
-							case MegaShare.ACCESS_FULL:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
-								break;
-							}
-							case MegaShare.ACCESS_READ:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only).toUpperCase(Locale.getDefault()));
+                        switch (accessLevel) {
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_FULL: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
+                                break;
+                            }
+                            case MegaShare.ACCESS_READ: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only).toUpperCase(Locale.getDefault()));
 
-								break;
-							}
-							case MegaShare.ACCESS_READWRITE:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write).toUpperCase(Locale.getDefault()));
-								break;
-							}
-						}
-					}
-				}
-				else{
-					sharedLayout.setVisibility(View.VISIBLE);
-					dividerSharedLayout.setVisibility(View.VISIBLE);
+                                break;
+                            }
+                            case MegaShare.ACCESS_READWRITE: {
+                                permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write).toUpperCase(Locale.getDefault()));
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    sharedLayout.setVisibility(View.VISIBLE);
+                    dividerSharedLayout.setVisibility(View.VISIBLE);
                     usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
-                                    sl.size(), sl.size()));
-				}
-			}
-		}
-		else{
+                            sl.size(), sl.size()));
+                }
+            }
+        } else {
 
-			sizeTextView.setText(getSizeString(node.getSize()));
-		}
+            sizeTextView.setText(getSizeString(node.getSize()));
+        }
 
-		if (node.getCreationTime() != 0){
-			try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+        if (node.getCreationTime() != 0) {
+            try {
+                addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
+            } catch (Exception ex) {
+                addedTextView.setText("");
+            }
 
-			if (node.getModificationTime() != 0){
-				try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-			}
-			else{
-				try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-			}
-		}
-		else{
-			addedTextView.setText("");
-			modifiedTextView.setText("");
-		}
+            if (node.getModificationTime() != 0) {
+                try {
+                    modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));
+                } catch (Exception ex) {
+                    modifiedTextView.setText("");
+                }
+            } else {
+                try {
+                    modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));
+                } catch (Exception ex) {
+                    modifiedTextView.setText("");
+                }
+            }
+        } else {
+            addedTextView.setText("");
+            modifiedTextView.setText("");
+        }
 
-		if(megaApi.hasVersions(node)){
-			versionsLayout.setVisibility(View.VISIBLE);
+        if (megaApi.hasVersions(node)) {
+            versionsLayout.setVisibility(View.VISIBLE);
             String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
             versionsButton.setText(text);
-			versionsButton.setOnClickListener(this);
-			separatorVersions.setVisibility(View.VISIBLE);
-		}
-		else{
-			versionsLayout.setVisibility(View.GONE);
-			separatorVersions.setVisibility(View.GONE);
-		}
+            versionsButton.setOnClickListener(this);
+            separatorVersions.setVisibility(View.VISIBLE);
+        } else {
+            versionsLayout.setVisibility(View.GONE);
+            separatorVersions.setVisibility(View.GONE);
+        }
 
         refresh();
-	}
+    }
 
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {
-        logDebug("onReloadNeeded");
-	}
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
+        Timber.d("onReloadNeeded");
+    }
 
-	@Override
-	protected void onDestroy(){
-    	super.onDestroy();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-    	if(megaApi != null)
-    	{
-    		megaApi.removeGlobalListener(this);
-    		megaApi.removeRequestListener(this);
-    	}
+        if (megaApi != null) {
+            megaApi.removeGlobalListener(this);
+            megaApi.removeRequestListener(this);
+        }
 
-    	if (upArrow != null) upArrow.setColorFilter(null);
-    	if (drawableRemoveLink != null) drawableRemoveLink.setColorFilter(null);
+        if (upArrow != null) upArrow.setColorFilter(null);
+        if (drawableRemoveLink != null) drawableRemoveLink.setColorFilter(null);
         if (drawableLink != null) drawableLink.setColorFilter(null);
         if (drawableShare != null) drawableShare.setColorFilter(null);
         if (drawableDots != null) drawableDots.setColorFilter(null);
@@ -2262,16 +2284,16 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         nodeSaver.destroy();
     }
 
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-	    super.onSaveInstanceState(outState);
-	    if(selectedShare != null && node != null){
+        super.onSaveInstanceState(outState);
+        if (selectedShare != null && node != null) {
             outState.putLong(KEY_SELECTED_SHARE_HANDLE, selectedShare.getNodeHandle());
         }
 
@@ -2279,47 +2301,47 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         nodeSaver.saveState(outState);
     }
 
-	@Override
-	public void onAccountUpdate(MegaApiJava api) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 
-	}
+    }
 
-	@Override
-	public void onEvent(MegaApiJava api, MegaEvent event) {
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
 
-	}
+    }
 
-	@Override
-	public void onBackPressed() {
+    @Override
+    public void onBackPressed() {
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
-        if(isRemoveOffline){
+        if (isRemoveOffline) {
             Intent intent = new Intent();
             intent.putExtra(NODE_HANDLE, handle);
             setResult(RESULT_OK, intent);
         }
 
         super.onBackPressed();
-	}
+    }
 
     public void openAdvancedDevices(long handleToDownload, boolean highPriority) {
-        logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
+        Timber.d("handleToDownload: %d, highPriority: %s", handleToDownload, highPriority);
         String externalPath = getExternalCardPath();
 
-        if(externalPath!=null){
-            logDebug("ExternalPath for advancedDevices: " + externalPath);
+        if (externalPath != null) {
+            Timber.d("ExternalPath for advancedDevices: %s", externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
-            if(node!=null){
+            if (node != null) {
 
-                File newFile =  new File(node.getName());
-                logDebug("File: " + newFile.getPath());
+                File newFile = new File(node.getName());
+                Timber.d("File: %s", newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
                 // Filter to only show results that can be "opened", such as
@@ -2328,24 +2350,22 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
                 // Create a file with the requested MIME type.
                 String mimeType = MimeTypeList.getMimeType(newFile);
-                logDebug("Mimetype: " + mimeType);
+                Timber.d("Mimetype: %s", mimeType);
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
                 intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
-                try{
+                try {
                     startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
-                }
-                catch(Exception e){
-                    logError("Exception in External SDCARD", e);
+                } catch (Exception e) {
+                    Timber.e(e, "Exception in External SDCARD");
                     Environment.getExternalStorageDirectory();
                     Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
-        }
-        else{
-            logWarning("No external SD card");
+        } else {
+            Timber.w("No external SD card");
             Environment.getExternalStorageDirectory();
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
@@ -2353,7 +2373,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     }
 
     public void itemClick(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
 
         if (adapter.isMultipleSelect()) {
             adapter.toggleSelection(position);
@@ -2367,10 +2387,11 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
     }
 
-    public void showOptionsPanel(MegaShare sShare){
-        logDebug("showNodeOptionsPanel");
+    public void showOptionsPanel(MegaShare sShare) {
+        Timber.d("showNodeOptionsPanel");
 
-        if (node == null ||sShare == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+        if (node == null || sShare == null || isBottomSheetDialogShown(bottomSheetDialogFragment))
+            return;
 
         selectedShare = sShare;
         bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
@@ -2379,7 +2400,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
 
     public void hideMultipleSelect() {
-	    if(adapter != null){
+        if (adapter != null) {
             adapter.setMultipleSelect(false);
         }
 
@@ -2397,8 +2418,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         return selectedShare;
     }
 
-    public void changePermissions(){
-        logDebug("changePermissions");
+    public void changePermissions() {
+        Timber.d("changePermissions");
         MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -2413,7 +2434,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         permissionsDialog.show();
     }
 
-    public void removeFileContactShare(){
+    public void removeFileContactShare() {
         showConfirmationRemoveContactFromShare(selectedShare.getUser());
     }
 
@@ -2422,7 +2443,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         String message = getResources().getString(R.string.remove_contact_shared_folder, email);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+                })
                 .show();
     }
 
@@ -2431,7 +2453,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         nC.removeShare(new ShareListener(fileInfoActivity, ShareListener.REMOVE_SHARE_LISTENER, 1), node, email);
     }
 
-    public void refresh(){
+    public void refresh() {
         setContactList();
         setMoreButtonText();
 
@@ -2446,7 +2468,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         if (node != null) {
             fullListContacts = megaApi.getOutShares(node);
             if (fullListContacts.size() > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
-                listContacts = new ArrayList<>(fullListContacts.subList(0,MAX_NUMBER_OF_CONTACTS_IN_LIST));
+                listContacts = new ArrayList<>(fullListContacts.subList(0, MAX_NUMBER_OF_CONTACTS_IN_LIST));
             } else {
                 listContacts = fullListContacts;
             }
@@ -2463,38 +2485,38 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
     }
 
-    public void showConfirmationRemoveMultipleContactFromShare (final ArrayList<MegaShare> contacts){
+    public void showConfirmationRemoveMultipleContactFromShare(final ArrayList<MegaShare> contacts) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
+        String message = getResources().getString(R.string.remove_multiple_contacts_shared_folder, contacts.size());
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeMultipleShares(contacts))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+                })
                 .show();
     }
 
-    public void removeMultipleShares(ArrayList<MegaShare> shares){
-        logDebug("removeMultipleShares");
+    public void removeMultipleShares(ArrayList<MegaShare> shares) {
+        Timber.d("removeMultipleShares");
         statusDialog = createProgressDialog(fileInfoActivity, getString(R.string.context_removing_contact_folder));
         nC.removeShares(shares, node);
     }
-    
+
     // Clear all selected items
     private void clearSelections() {
-        if(adapter.isMultipleSelect()){
+        if (adapter.isMultipleSelect()) {
             adapter.clearSelections();
         }
     }
-    
-    public void selectAll(){
-        logDebug("selectAll");
-        if (adapter != null){
-            if(adapter.isMultipleSelect()){
+
+    public void selectAll() {
+        Timber.d("selectAll");
+        if (adapter != null) {
+            if (adapter.isMultipleSelect()) {
                 adapter.selectAll();
-            }
-            else{
+            } else {
                 adapter.setMultipleSelect(true);
                 adapter.selectAll();
-                
+
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
             new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
@@ -2514,24 +2536,23 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             }
         }
     }
-    
+
     private void updateActionModeTitle() {
-        logDebug("updateActionModeTitle");
+        Timber.d("updateActionModeTitle");
         if (actionMode == null) {
             return;
         }
         List<MegaShare> contacts = adapter.getSelectedShares();
-        if(contacts!=null){
-            logDebug("Contacts selected: " + contacts.size());
+        if (contacts != null) {
+            Timber.d("Contacts selected: %s", contacts.size());
         }
-        
+
         actionMode.setTitle(getQuantityString(R.plurals.general_selection_num_contacts,
-                        contacts.size(), contacts.size()));
+                contacts.size(), contacts.size()));
         try {
             actionMode.invalidate();
         } catch (NullPointerException e) {
-            logError("Invalidate error", e);
-            e.printStackTrace();
+            Timber.e(e, "Invalidate error");
         }
     }
 

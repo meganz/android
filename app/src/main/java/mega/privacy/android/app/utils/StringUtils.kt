@@ -5,10 +5,9 @@ import android.text.Spanned
 import android.util.Base64
 import androidx.annotation.ColorRes
 import androidx.core.text.HtmlCompat
-import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaStringMap
+import timber.log.Timber
 
 object StringUtils {
 
@@ -63,7 +62,7 @@ object StringUtils {
             try {
                 aliases[handle] = get(base64Handle).decodeBase64()
             } catch (error: IllegalArgumentException) {
-                logWarning(error.stackTraceToString())
+                Timber.w(error)
             }
         }
 

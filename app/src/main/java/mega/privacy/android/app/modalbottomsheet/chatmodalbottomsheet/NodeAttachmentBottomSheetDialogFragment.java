@@ -1,5 +1,20 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
+import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.IMPORT_ONLY_OPTION;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -29,19 +47,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
-import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -84,7 +90,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             messageId = ((NodeAttachmentHistoryActivity) requireActivity()).selectedMessageId;
         }
 
-        logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
+        Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId);
         messageMega = getMegaChatMessage(requireActivity(), megaChatApi, chatId, messageId);
         if (messageMega != null) {
             message = new AndroidMegaChatMessage(messageMega);
@@ -100,14 +106,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (message == null || message.getMessage() == null) {
-            logWarning("Message is null");
+            Timber.w("Message is null");
             return;
         }
 
         nodeList = message.getMessage().getMegaNodeList();
 
         if (nodeList == null || nodeList.size() == 0) {
-            logWarning("Error: nodeList is NULL or empty");
+            Timber.w("Error: nodeList is NULL or empty");
             return;
         }
 
@@ -143,7 +149,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         if (node == null) {
-            logWarning("Node is NULL");
+            Timber.w("Node is NULL");
             return;
         }
 
@@ -218,9 +224,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         switch (v.getId()) {
             case R.id.option_download_layout:
-                logDebug("Download option");
+                Timber.d("Download option");
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
                 ((NodeAttachmentHistoryActivity) requireActivity()).downloadNodeList(nodeList);
@@ -228,7 +234,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
             case R.id.option_import_layout:
                 if (node == null) {
-                    logWarning("The selected node is NULL");
+                    Timber.w("The selected node is NULL");
                     return;
                 }
                 chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
@@ -237,7 +243,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             case R.id.option_save_offline_switch:
             case R.id.option_save_offline_layout:
                 if (message == null) {
-                    logWarning("Message is NULL");
+                    Timber.w("Message is NULL");
                     return;
                 }
 

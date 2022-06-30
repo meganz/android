@@ -5,12 +5,12 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import timber.log.Timber
 
 /**
  * FavouriteAlbumFetcher helps FavouriteAlbumRepository gets data, like megaNodes.
@@ -229,7 +229,7 @@ class FavouriteAlbumFetcher(
         try {
             longHandle = stringHandle.toLong()
         } catch (e: NumberFormatException) {
-            LogUtil.logError(errorMsg + e.toString())
+            Timber.e(e, errorMsg)
         }
         return longHandle
     }
