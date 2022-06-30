@@ -392,7 +392,12 @@ class TextEditorViewModel @Inject constructor(
         val localFile: File = localFileUri?.let { File(it) } ?: return false
 
         return if (localFile.exists()) {
-            readFile(BufferedReader(FileReader(localFile)))
+            kotlin.runCatching {
+                readFile(BufferedReader(FileReader(localFile)))
+            }.onFailure {
+                Timber.e(it, "Exception while reading text file.")
+            }
+
             true
         } else {
             false
@@ -425,10 +430,14 @@ class TextEditorViewModel @Inject constructor(
      */
     private suspend fun createConnectionAndRead() {
         withContext(ioDispatcher) {
-            val connection: HttpURLConnection =
-                streamingFileURL?.openConnection() as HttpURLConnection
+            kotlin.runCatching {
+                val connection: HttpURLConnection =
+                    streamingFileURL?.openConnection() as HttpURLConnection
 
-            readFile(BufferedReader(InputStreamReader(connection.inputStream)))
+                readFile(BufferedReader(InputStreamReader(connection.inputStream)))
+            }.onFailure {
+                Timber.e(it, "Exception while reading text file through streaming.")
+            }
         }
     }
 
@@ -441,7 +450,7 @@ class TextEditorViewModel @Inject constructor(
         withContext(ioDispatcher) {
             val sb = StringBuilder()
 
-            try {
+            kotlin.runCatching {
                 var line: String?
 
                 while (br.readLine().also { line = it } != null) {
@@ -449,8 +458,8 @@ class TextEditorViewModel @Inject constructor(
                 }
 
                 br.close()
-            } catch (e: IOException) {
-                Timber.e(e, "Exception while reading text file.")
+            }.onFailure {
+                Timber.e(it, "Exception while reading text file.")
             }
 
             checkIfNeedsStopHttpServer()
