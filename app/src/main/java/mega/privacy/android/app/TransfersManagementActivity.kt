@@ -93,16 +93,23 @@ open class TransfersManagementActivity : PasscodeActivity() {
             .observe(this, ::updateTransfersWidget)
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .observe(this) { show ->
-                when {
-                    show && transfersManagement.shouldShowScanningTransfersDialog() -> {
-                        showScanningTransfersDialog()
-                    }
-                    !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
-                        scanningTransfersDialog?.dismiss()
-                    }
-                }
+            .observeForever(::onShowScanningTransfersDialog)
+    }
+
+    /**
+     * Shows or hides the scanning dialog.
+     *
+     * @param show  True if should show the dialog, false if should hide it.
+     */
+    private fun onShowScanningTransfersDialog(show: Boolean) {
+        when {
+            show && transfersManagement.shouldShowScanningTransfersDialog() -> {
+                showScanningTransfersDialog()
             }
+            !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
+                scanningTransfersDialog?.dismiss()
+            }
+        }
     }
 
     /**
@@ -226,6 +233,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
             }
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+            .removeObserver(::onShowScanningTransfersDialog)
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -234,6 +248,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         transfersWidget?.update()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+
+        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+            .observeForever(::onShowScanningTransfersDialog)
     }
 
     override fun onDestroy() {
