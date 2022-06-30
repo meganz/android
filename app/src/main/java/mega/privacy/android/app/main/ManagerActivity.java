@@ -179,14 +179,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.Html;
@@ -942,11 +939,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private int versionsToRemove = 0;
     private int versionsRemoved = 0;
     private int errorVersionRemove = 0;
-
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    @Inject
-    ShakeDetector shakeDetector;
 
     /**
      * Broadcast to update the completed transfers tab.
@@ -2605,18 +2597,6 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
-
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        shakeDetector.setOnShakeListener(count -> {
-            Timber.e("@@ Shaked .. %s", count);
-            /*getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.settings, new FeatureFlagActivity())
-                    .commit();*/
-            startActivity(new Intent(ManagerActivity.this, FeatureFlagActivity.class));
-        });
-        mSensorManager.registerListener(shakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
     }
 
     /**

@@ -12,6 +12,9 @@ import mega.privacy.android.app.di.EntryPointsModule
 import timber.log.Timber
 import kotlin.math.sqrt
 
+/**
+ * Class to detect shake device gesture
+ */
 class ShakeDetector : SensorEventListener {
     private var shakeListener: OnShakeListener? = null
     private var mShakeTimestamp: Long = 0
@@ -21,18 +24,39 @@ class ShakeDetector : SensorEventListener {
             EntryPointsModule.VibratorGateway::class.java).vibrator
     }
 
+    /**
+     * Initializes shake listener
+     */
     fun setOnShakeListener(listener: OnShakeListener?) {
         shakeListener = listener
     }
 
+    /**
+     * Shake listener interfce
+     */
     interface OnShakeListener {
+        /**
+         * Passes shake count
+         * @param count : Shake count
+         */
         fun onShake(count: Int)
     }
 
+    /**
+     * detects sensor accuracy change
+     *
+     * @param sensor : @Sensor object
+     * @param accuracy: Accuracy
+     */
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
         // ignore
     }
 
+    /**
+     * Detects sensor change
+     *
+     * @param event: SensorEvent
+     */
     override fun onSensorChanged(event: SensorEvent) {
         shakeListener?.let {
             val x = event.values[0]

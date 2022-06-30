@@ -16,6 +16,9 @@ import java.util.concurrent.ThreadPoolExecutor
 
 @Module
 @InstallIn(SingletonComponent::class)
+/**
+ * Module to define custom entry points
+ */
 class EntryPointsModule {
 
     @Provides
@@ -40,15 +43,29 @@ class EntryPointsModule {
         }
     }
 
+    /**
+     * Entry point gateway for @Vibrator object
+     */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface VibratorGateway {
+
+        /**
+         * Vibrator object
+         */
         val vibrator: Vibrator
     }
 
+    /**
+     * Entry point gateway for ThreadPoolExecutor
+     */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface MegaThreadPoolExecutorEntryPoint {
+
+        /**
+         * ThreadPoolExecutor
+         */
         val megaThreadPoolExecutor: ThreadPoolExecutor
     }
 }
