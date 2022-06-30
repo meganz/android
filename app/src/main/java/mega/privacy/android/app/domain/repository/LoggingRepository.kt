@@ -1,9 +1,8 @@
 package mega.privacy.android.app.domain.repository
 
-import java.io.File
-
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.logging.loggers.FileLogMessage
+import mega.privacy.android.app.domain.entity.logging.LogEntry
+import java.io.File
 
 /**
  * Logging repository
@@ -27,27 +26,27 @@ interface LoggingRepository {
      * Get sdk logging flow
      *
      */
-    fun getSdkLoggingFlow(): Flow<FileLogMessage>
+    fun getSdkLoggingFlow(): Flow<LogEntry>
 
     /**
      * Get chat logging flow
      *
      */
-    fun getChatLoggingFlow(): Flow<FileLogMessage>
+    fun getChatLoggingFlow(): Flow<LogEntry>
 
     /**
      * Log to sdk file
      *
      * @param logMessage
      */
-    fun logToSdkFile(logMessage: FileLogMessage)
+    suspend fun logToSdkFile(logMessage: LogEntry)
 
     /**
      * Log to chat file
      *
      * @param logMessage
      */
-    fun logToChatFile(logMessage: FileLogMessage)
+    suspend fun logToChatFile(logMessage: LogEntry)
 
     /**
      * Compress logs

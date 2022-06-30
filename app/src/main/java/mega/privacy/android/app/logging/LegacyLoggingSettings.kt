@@ -2,7 +2,11 @@ package mega.privacy.android.app.logging
 
 import android.content.Context
 
-interface LegacyLoggingSettings{
+/**
+ * Legacy logging settings
+ *
+ */
+interface LegacyLoggingSettings {
 
     /**
      * Enables or disables the SDK logs depending on the "enabled" parameter.

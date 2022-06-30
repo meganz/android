@@ -5,15 +5,27 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import mega.privacy.android.app.data.gateway.FileLogWriter
+import mega.privacy.android.app.data.gateway.LogWriterGateway
+import mega.privacy.android.app.data.gateway.TimberChatLogger
+import mega.privacy.android.app.data.gateway.TimberMegaLogger
 import mega.privacy.android.app.domain.repository.LoggingRepository
+import mega.privacy.android.app.domain.usecase.CreateChatLogEntry
+import mega.privacy.android.app.domain.usecase.CreateLogEntry
+import mega.privacy.android.app.domain.usecase.CreateSdkLogEntry
+import mega.privacy.android.app.domain.usecase.CreateTraceString
+import mega.privacy.android.app.domain.usecase.DefaultCreateTraceString
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
+import mega.privacy.android.app.domain.usecase.GetCurrentTimeString
+import mega.privacy.android.app.domain.usecase.GetCurrentTimeStringFromCalendar
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
 import mega.privacy.android.app.domain.usecase.ResetSdkLogger
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
-import mega.privacy.android.app.logging.loggers.FileLogger
-import mega.privacy.android.app.logging.loggers.TimberChatLogger
-import mega.privacy.android.app.logging.loggers.TimberMegaLogger
+import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaLoggerInterface
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
@@ -31,23 +43,58 @@ abstract class LoggingModule {
     @Binds
     abstract fun bindInitialiseLogging(useCase: DefaultInitialiseLogging): InitialiseLogging
 
+    @Binds
+    abstract fun bindMegaChatLoggerInterface(implementation: TimberChatLogger): MegaChatLoggerInterface
+
+    @Binds
+    abstract fun bindMegaLoggerInterface(implementation: TimberMegaLogger): MegaLoggerInterface
+
+    @Binds
+    @SdkLogger
+    abstract fun bindCreateSdkLogEntry(implementation: CreateSdkLogEntry): CreateLogEntry
+
+    @Binds
+    @ChatLogger
+    abstract fun bindCreateChatLogEntry(implementation: CreateChatLogEntry): CreateLogEntry
+
+    @Binds
+    abstract fun bindCreateTraceString(implementation: DefaultCreateTraceString): CreateTraceString
+
+    @Binds
+    abstract fun bindGetCurrentTimeString(implementation: GetCurrentTimeStringFromCalendar): GetCurrentTimeString
+
+
     companion object {
 
         @Singleton
         @SdkLogger
         @Provides
-        fun provideSdkFileLogger(): FileLogger =
-            FileLogger(LoggerFactory.getLogger(TimberMegaLogger::class.java))
+        fun provideSdkFileLogger(): LogWriterGateway =
+            FileLogWriter(LoggerFactory.getLogger(TimberMegaLogger::class.java))
 
         @Singleton
         @ChatLogger
         @Provides
-        fun provideChatFileLogger(): FileLogger =
-            FileLogger(LoggerFactory.getLogger(TimberChatLogger::class.java))
+        fun provideChatFileLogger(): LogWriterGateway =
+            FileLogWriter(LoggerFactory.getLogger(TimberChatLogger::class.java))
 
         @Provides
         fun provideResetSdkLogger(loggingRepository: LoggingRepository): ResetSdkLogger =
             ResetSdkLogger(loggingRepository::resetSdkLogging)
+
+        @SdkLogger
+        @Provides
+        fun provideSdkLogFlowTree(
+            @SdkLogger useCase: CreateLogEntry,
+            @IoDispatcher dispatcher: CoroutineDispatcher,
+        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
+
+        @ChatLogger
+        @Provides
+        fun provideChatLogFlowTree(
+            @ChatLogger useCase: CreateLogEntry,
+            @IoDispatcher dispatcher: CoroutineDispatcher,
+        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
 
     }
 }

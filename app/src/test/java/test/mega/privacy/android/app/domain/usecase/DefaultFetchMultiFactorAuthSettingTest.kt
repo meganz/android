@@ -12,7 +12,6 @@ import mega.privacy.android.app.domain.usecase.DefaultFetchMultiFactorAuthSettin
 import mega.privacy.android.app.domain.usecase.FetchMultiFactorAuthSetting
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -52,14 +51,16 @@ class DefaultFetchMultiFactorAuthSettingTest {
     }
 
     @Test
-    fun `test that subsequent changes are returned when an exception from the api is thrown`() = runTest {
-        whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(null, null))
-        whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf(true))
+    fun `test that subsequent changes are returned when an exception from the api is thrown`() =
+        runTest {
+            whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(null,
+                null))
+            whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf(true))
 
-        underTest().test {
-            assertThat(awaitItem()).isFalse()
-            assertThat(awaitItem()).isTrue()
-            awaitComplete()
+            underTest().test {
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+                awaitComplete()
+            }
         }
-    }
 }
