@@ -2420,7 +2420,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             return;
 
         selectedShare = sShare;
-        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment(selectedShare, getSelectedContact(), node);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

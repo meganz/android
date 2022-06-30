@@ -470,7 +470,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             return;
 
         selectedShare = sShare;
-        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment(selectedShare, getSelectedContact(), node);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
