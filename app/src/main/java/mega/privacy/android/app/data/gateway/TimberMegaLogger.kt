@@ -1,4 +1,4 @@
-package mega.privacy.android.app.logging.loggers
+package mega.privacy.android.app.data.gateway
 
 import android.util.Log
 import nz.mega.sdk.MegaApiAndroid
@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     override fun log(time: String?, loglevel: Int, source: String?, message: String?) {
-        Timber.tag("[$time][sdk][ ${getLogLevelString(loglevel)} ]")
+        Timber.tag("[sdk]")
         Timber.log(
             priority = getPriority(loglevel),
             message = "$message ${getSource(source)}",
@@ -31,18 +31,6 @@ class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
             MegaApiAndroid.LOG_LEVEL_MAX -> Log.VERBOSE
             MegaApiAndroid.LOG_LEVEL_WARNING -> Log.WARN
             else -> Log.INFO
-        }
-    }
-
-    private fun getLogLevelString(logLevel: Int): String {
-        return when (logLevel) {
-            MegaApiAndroid.LOG_LEVEL_DEBUG -> "DEB"
-            MegaApiAndroid.LOG_LEVEL_ERROR -> "ERR"
-            MegaApiAndroid.LOG_LEVEL_FATAL -> "FAT"
-            MegaApiAndroid.LOG_LEVEL_INFO -> "INF"
-            MegaApiAndroid.LOG_LEVEL_MAX -> "MAX"
-            MegaApiAndroid.LOG_LEVEL_WARNING -> "WRN"
-            else -> "NON"
         }
     }
 
