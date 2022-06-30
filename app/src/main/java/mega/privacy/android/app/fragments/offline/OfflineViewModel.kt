@@ -37,7 +37,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
 import mega.privacy.android.app.utils.FileUtil.getFileInfo
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -152,14 +151,6 @@ class OfflineViewModel @Inject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
-
-        viewModelScope.launch {
-            updateNodes =
-                monitorNodeUpdates()
-                    .also { Timber.d("onNodesUpdate") }
-                    .filterNot { it.isEmpty() }
-                    .stateIn(viewModelScope)
-        }
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
@@ -326,7 +317,7 @@ class OfflineViewModel @Inject constructor(
 
         // has active search, should exit search mode
         if (query != null) {
-            logDebug("navigateOut exit search mode")
+            Timber.d("navigateOut exit search mode")
             navigateTo(path, titleFromPath(path), 0)
             return BACK_PRESS_HANDLED
         }
@@ -339,7 +330,7 @@ class OfflineViewModel @Inject constructor(
             // and if back stack is empty, then should re-enter search mode
             if (navigationDepthInSearch == 0) {
                 searchQuery = historySearchQuery
-                logDebug("navigateOut from searchPath")
+                Timber.d("navigateOut from searchPath")
                 path = searchPath
                 historySearchQuery = null
                 historySearchPath = null
@@ -418,9 +409,9 @@ class OfflineViewModel @Inject constructor(
         isList: Boolean,
         spanCount: Int,
         path: String,
-        order: Int
+        order: Int,
     ) {
-        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
+        Timber.d("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList

@@ -2,9 +2,8 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
+import timber.log.Timber
 
 class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(context) {
 
@@ -12,7 +11,7 @@ class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(contex
 
     constructor(
         context: Context?,
-        callback: OnDisableAudioVideoCallback
+        callback: OnDisableAudioVideoCallback,
     ) : this(context) {
         this.callback = callback
     }
@@ -29,15 +28,15 @@ class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(contex
                 when (typeChange) {
                     MegaChatRequest.AUDIO -> {
                         when {
-                            isEnable -> logDebug("Audio enabled")
-                            else -> logDebug("Audio disabled")
+                            isEnable -> Timber.d("Audio enabled")
+                            else -> Timber.d("Audio disabled")
                         }
                         callback?.onDisableAudioVideo(request.chatHandle, typeChange, isEnable)
                     }
                     MegaChatRequest.VIDEO -> {
                         when {
-                            isEnable -> logDebug("Video enabled")
-                            else -> logDebug("Video disabled")
+                            isEnable -> Timber.d("Video enabled")
+                            else -> Timber.d("Video disabled")
 
                         }
                         callback?.onDisableAudioVideo(request.chatHandle, typeChange, isEnable)
@@ -46,11 +45,11 @@ class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(contex
             }
             MegaChatError.ERROR_TOOMANY -> {
                 when (typeChange) {
-                    MegaChatRequest.AUDIO -> LogUtil.logError("There are too many participants in the call sending audio")
-                    else -> LogUtil.logError("There are too many participants in the call sending video.")
+                    MegaChatRequest.AUDIO -> Timber.e("There are too many participants in the call sending audio")
+                    else -> Timber.e("There are too many participants in the call sending video.")
                 }
             }
-            else -> LogUtil.logError("Error disabling audio or video, errorCode " + e.errorCode)
+            else -> Timber.e("Error disabling audio or video, errorCode ${e.errorCode}")
         }
     }
 

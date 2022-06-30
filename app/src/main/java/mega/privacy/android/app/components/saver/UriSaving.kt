@@ -9,13 +9,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.FileUtil.copyUriToFile
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
+import timber.log.Timber
 import java.io.File
 
 @Parcelize
@@ -23,7 +22,7 @@ class UriSaving(
     private val uri: Uri,
     private val name: String,
     private val size: Long,
-    private val fromMediaViewer: Boolean
+    private val fromMediaViewer: Boolean,
 ) : Saving() {
 
     override fun totalSize() = size
@@ -35,7 +34,7 @@ class UriSaving(
         try {
             !MegaApiUtils.isIntentAvailable(context, checkIntent)
         } catch (e: Exception) {
-            LogUtil.logWarning("isIntentAvailable error", e)
+            Timber.w(e, "isIntentAvailable error")
             return true
         }
 
@@ -56,7 +55,7 @@ class UriSaving(
             try {
                 sdCardOperator.copyUri(parentPath, uri, name)
             } catch (e: Exception) {
-                logError("Error copy uri to the sd card path with exception", e);
+                Timber.e(e, "Error copy uri to the sd card path with exception");
             }
         } else {
             copyUriToFile(uri, File(parentPath, name))

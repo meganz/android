@@ -1,14 +1,19 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.utils.Constants.CONFIRM_EMAIL_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.EMAIL;
+import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.URL_E2EE;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -28,6 +33,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -43,12 +54,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 public class CreateAccountFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
 
@@ -96,12 +102,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     private boolean passwdValid;
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
+    public void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
-        if(context==null){
-            logWarning("context is null");
+        if (context == null) {
+            Timber.w("context is null");
             return;
         }
 
@@ -111,15 +117,15 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
         View v = inflater.inflate(R.layout.fragment_create_account, container, false);
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
 
         createAccountLayout = v.findViewById(R.id.create_account_create_layout);
         createAccountAndAcceptLayout = v.findViewById(R.id.create_account_and_accept_layout);
@@ -223,7 +229,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+                Timber.d("Text changed: %s_ %d__%d__%d", s.toString(), start, before, count);
                 if (s.length() > 0) {
                     containerPasswdElements.setVisibility(View.VISIBLE);
 
@@ -264,18 +270,18 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
         userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> userPasswordConfirmLayout.setEndIconVisible(hasFocus));
 
-        TextView tos = (TextView)v.findViewById(R.id.tos);
+        TextView tos = (TextView) v.findViewById(R.id.tos);
 
         String textToShow = context.getString(R.string.tos);
-        try{
+        try {
             textToShow = textToShow.replace("[A]", "<u>");
             textToShow = textToShow.replace("[/A]", "</u>");
+        } catch (Exception e) {
         }
-        catch (Exception e){}
 
         Spanned result = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         } else {
             result = Html.fromHtml(textToShow);
         }
@@ -293,12 +299,12 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     .replace("[A]", "<u>")
                     .replace("[/A]", "</u>");
         } catch (Exception e) {
-            logError("Exception formatting string", e);
+            Timber.e(e, "Exception formatting string");
         }
 
         Spanned resultTOP;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultTOP = Html.fromHtml(textToShowTOP,Html.FROM_HTML_MODE_LEGACY);
+            resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY);
         } else {
             resultTOP = Html.fromHtml(textToShowTOP);
         }
@@ -345,7 +351,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     public void checkPasswordStrength(String s) {
 
-        if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
+        if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4) {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_very_weak));
             secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
             tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
@@ -361,8 +367,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.red_600_red_300);
-        }
-        else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
+        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK) {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
             secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
             tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
@@ -378,8 +383,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.yellow_600_yellow_300);
-        }
-        else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
+        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM) {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
             secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
             tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
@@ -395,8 +399,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.green_500_green_400);
-        }
-        else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
+        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD) {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
             secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
             tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
@@ -412,8 +415,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.lime_green_500_200);
-        }
-        else {
+        } else {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
             secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
             tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
@@ -436,7 +438,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
@@ -452,7 +454,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                 break;
 
             case R.id.tos:
-                logDebug("Show ToS");
+                Timber.d("Show ToS");
 
                 try {
                     String url = "https://mega.nz/terms";
@@ -460,8 +462,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                     viewIntent.setData(Uri.parse("https://mega.nz/terms"));
                     startActivity(viewIntent);
@@ -469,14 +470,13 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
                 break;
             case R.id.top:
-                logDebug("Show terms of password");
+                Timber.d("Show terms of password");
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                     viewIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(viewIntent);
@@ -487,10 +487,10 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     }
 
     /*
-	 * Registration form submit
-	 */
+     * Registration form submit
+     */
     private void submitForm() {
-        logDebug("submit form!");
+        Timber.d("submit form!");
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         dbH.clearCredentials();
@@ -502,8 +502,8 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(userEmail.getWindowToken(), 0);
 
-        if(!isOnline(context)){
-            ((LoginActivity)context).showSnackbar(getString(R.string.error_server_connection_problem));
+        if (!isOnline(context)) {
+            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -547,10 +547,10 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         if (usernameError != null) {
             userName.requestFocus();
             return false;
-        } else if(userLastnameError != null){
+        } else if (userLastnameError != null) {
             userLastName.requestFocus();
             return false;
-        }else if (emailError != null) {
+        } else if (emailError != null) {
             userEmail.requestFocus();
             return false;
         } else if (passwordError != null) {
@@ -560,10 +560,10 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             userPasswordConfirm.requestFocus();
             return false;
         } else if (!chkTOS.isChecked()) {
-            ((LoginActivity)context).showSnackbar(getString(R.string.create_account_no_terms));
+            ((LoginActivity) context).showSnackbar(getString(R.string.create_account_no_terms));
             return false;
         } else if (!chkTOP.isChecked()) {
-            ((LoginActivity)context).showSnackbar(getString(R.string.create_account_no_top));
+            ((LoginActivity) context).showSnackbar(getString(R.string.create_account_no_top));
             return false;
         }
         return true;
@@ -600,8 +600,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         String value = userPassword.getText().toString();
         if (value.isEmpty()) {
             return getString(R.string.error_enter_password);
-        }
-        else if (!passwdValid){
+        } else if (!passwdValid) {
             containerPasswdElements.setVisibility(View.GONE);
             return getString(R.string.error_password);
         }
@@ -621,17 +620,17 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart" + request.getRequestString());
+        Timber.d("onRequestStart%s", request.getRequestString());
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request,
                                 MegaError e) {
-        logDebug("onRequestFinish");
+        Timber.d("onRequestFinish");
 
         if (isAdded()) {
             if (e.getErrorCode() != MegaError.API_OK) {
-                logWarning("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
+                Timber.w("ERROR CODE: %d_ ERROR MESSAGE: %s", e.getErrorCode(), e.getErrorString());
 
                 if (e.getErrorCode() == MegaError.API_EEXIST) {
                     try {
@@ -640,11 +639,10 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                         creatingAccountLayout.setVisibility(View.GONE);
                         creatingAccountTextView.setVisibility(View.GONE);
                         createAccountProgressBar.setVisibility(View.GONE);
+                    } catch (Exception ex) {
                     }
-                    catch(Exception ex){}
                     return;
-                }
-                else{
+                } else {
                     try {
                         String message = e.getErrorString();
                         ((LoginActivity) context).showSnackbar(message);
@@ -653,20 +651,19 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                         creatingAccountLayout.setVisibility(View.GONE);
                         creatingAccountTextView.setVisibility(View.GONE);
                         createAccountProgressBar.setVisibility(View.GONE);
+                    } catch (Exception ex) {
                     }
-                    catch (Exception ex){}
                     return;
                 }
-            }
-            else{
-                ((LoginActivity)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-                ((LoginActivity)context).setFirstNameTemp(userName.getText().toString());
-                ((LoginActivity)context).setLastNameTemp(userLastName.getText().toString());
-                ((LoginActivity)context).setPasswdTemp(userPassword.getText().toString());
-                ((LoginActivity)context).setWaitingForConfirmAccount(true);
+            } else {
+                ((LoginActivity) context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
+                ((LoginActivity) context).setFirstNameTemp(userName.getText().toString());
+                ((LoginActivity) context).setLastNameTemp(userLastName.getText().toString());
+                ((LoginActivity) context).setPasswdTemp(userPassword.getText().toString());
+                ((LoginActivity) context).setWaitingForConfirmAccount(true);
 
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                if (dbH != null){
+                if (dbH != null) {
                     dbH.clearEphemeral();
 
                     EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
@@ -674,14 +671,14 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     dbH.saveEphemeral(ephemeral);
                 }
 
-                ((LoginActivity)context).showFragment(CONFIRM_EMAIL_FRAGMENT);
+                ((LoginActivity) context).showFragment(CONFIRM_EMAIL_FRAGMENT);
             }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporaryError");
+        Timber.w("onRequestTemporaryError");
     }
 
 
@@ -693,57 +690,57 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onAttach(Context context) {
-        logDebug("onAttach");
+        Timber.d("onAttach");
         super.onAttach(context);
         this.context = context;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
     @Override
     public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
+        Timber.d("onAttach Activity");
         super.onAttach(context);
         this.context = context;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
-    private void setError(final EditText editText, String error){
-        if(error == null || error.equals("")){
+    private void setError(final EditText editText, String error) {
+        if (error == null || error.equals("")) {
             return;
         }
 
-        switch (editText.getId()){
-            case R.id.create_account_email_text:{
+        switch (editText.getId()) {
+            case R.id.create_account_email_text: {
                 userEmailLayout.setError(error);
                 userEmailLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userEmailError.setVisibility(View.VISIBLE);
                 break;
             }
-            case R.id.create_account_password_text_confirm:{
+            case R.id.create_account_password_text_confirm: {
                 userPasswordConfirmLayout.setError(error);
                 userPasswordConfirmLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordConfirmError.setVisibility(View.VISIBLE);
                 break;
             }
-            case R.id.create_account_name_text:{
+            case R.id.create_account_name_text: {
                 userNameLayout.setError(error);
                 userNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userNameError.setVisibility(View.VISIBLE);
                 break;
             }
-            case R.id.create_account_last_name_text:{
+            case R.id.create_account_last_name_text: {
                 userLastNameLayout.setError(error);
                 userLastNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userLastNameError.setVisibility(View.VISIBLE);
                 break;
             }
-            case R.id.create_account_password_text:{
+            case R.id.create_account_password_text: {
                 userPasswordLayout.setError(error);
                 userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
@@ -753,33 +750,33 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    private void quitError(EditText editText){
-        switch (editText.getId()){
-            case R.id.create_account_email_text:{
+    private void quitError(EditText editText) {
+        switch (editText.getId()) {
+            case R.id.create_account_email_text: {
                 userEmailLayout.setError(null);
                 userEmailLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 userEmailError.setVisibility(View.GONE);
                 break;
             }
-            case R.id.create_account_password_text_confirm:{
+            case R.id.create_account_password_text_confirm: {
                 userPasswordConfirmLayout.setError(null);
                 userPasswordConfirmLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 userPasswordConfirmError.setVisibility(View.GONE);
                 break;
             }
-            case R.id.create_account_name_text:{
+            case R.id.create_account_name_text: {
                 userNameLayout.setError(null);
                 userNameLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 userNameError.setVisibility(View.GONE);
                 break;
             }
-            case R.id.create_account_last_name_text:{
+            case R.id.create_account_last_name_text: {
                 userLastNameLayout.setError(null);
                 userLastNameLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 userLastNameError.setVisibility(View.GONE);
                 break;
             }
-            case R.id.create_account_password_text:{
+            case R.id.create_account_password_text: {
                 userPasswordLayout.setError(null);
                 userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
                 userPasswordError.setVisibility(View.GONE);

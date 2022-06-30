@@ -10,7 +10,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.view.ActionMode
@@ -38,29 +42,50 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.main.*
+import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_OFFLINE
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.getMediaIntent
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.Util.scaleHeightPx
+import mega.privacy.android.app.utils.autoCleared
+import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -141,7 +166,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentOfflineBinding.inflate(inflater, container, false)
         return binding.root
@@ -149,7 +174,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -267,7 +292,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             ).replace("[/B]", "</font>")
         } catch (e: Exception) {
             e.printStackTrace()
-            logError("Exception formatting string", e)
+            Timber.e(e, "Exception formatting string")
         }
 
         binding.emptyHintText.text = textToShow.toSpannedHtmlText()
@@ -345,7 +370,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         })
 
         viewModel.urlFileOpenAsUrl.observe(viewLifecycleOwner, EventObserver {
-            logDebug("Is URL - launch browser intent")
+            Timber.d("Is URL - launch browser intent")
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(it)
             startActivity(intent)
@@ -406,7 +431,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.closeSearchView.observe(viewLifecycleOwner) {
             callManager { manager ->
-                manager.textSubmitted = true
                 manager.closeSearchView()
             }
         }
@@ -546,7 +570,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         when {
             mime.isZip -> {
-                logDebug("MimeTypeList ZIP")
+                Timber.d("MimeTypeList ZIP")
                 ZipBrowserActivity.start(requireActivity(), file.path)
             }
             mime.isImage -> {
@@ -556,12 +580,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     handles,
                     node.node.handle.toLongOrNull()
                 )
-                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
+                putThumbnailLocation(intent,
+                    recyclerView!!,
+                    position,
+                    VIEWER_FROM_OFFLINE,
+                    adapter!!)
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }
             mime.isVideoReproducible || mime.isAudio -> {
-                logDebug("Video/Audio file")
+                Timber.d("Video/Audio file")
 
                 val mediaIntent: Intent
                 val internalIntent: Boolean
@@ -586,7 +614,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
-                putThumbnailLocation(mediaIntent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
+                putThumbnailLocation(mediaIntent,
+                    recyclerView!!,
+                    position,
+                    VIEWER_FROM_OFFLINE,
+                    adapter!!)
 
                 mediaIntent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
@@ -627,14 +659,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                            logDebug("Call to startActivity(intentShare)")
+                            Timber.d("Call to startActivity(intentShare)")
                             startActivity(intentShare)
                         }
                     }
                 }
             }
             mime.isPdf -> {
-                logDebug("PDF file")
+                Timber.d("PDF file")
 
                 val pdfIntent = Intent(context, PdfViewerActivity::class.java)
 
@@ -644,7 +676,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
-                putThumbnailLocation(pdfIntent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
+                putThumbnailLocation(pdfIntent,
+                    recyclerView!!,
+                    position,
+                    VIEWER_FROM_OFFLINE,
+                    adapter!!)
 
                 if (setLocalIntentParams(
                         context, node.node, pdfIntent, file.absolutePath, false,
@@ -657,7 +693,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
             }
             mime.isURL -> {
-                logDebug("Is URL file")
+                Timber.d("Is URL file")
                 viewModel.processUrlFile(file)
             }
             mime.isOpenableTextFile(file.length()) -> {
@@ -675,7 +711,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     private fun openFile(file: File) {
-        logDebug("openFile")
+        Timber.d("openFile")
         val viewIntent = Intent(Intent.ACTION_VIEW)
 
         if (!setLocalIntentParams(
@@ -782,7 +818,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        logDebug("ActionBarCallBack::onActionItemClicked")
+        Timber.d("ActionBarCallBack::onActionItemClicked")
 
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
@@ -812,7 +848,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        logDebug("ActionBarCallBack::onCreateActionMode")
+        Timber.d("ActionBarCallBack::onCreateActionMode")
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.offline_browser_action, menu)
@@ -822,7 +858,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        logDebug("ActionBarCallBack::onPrepareActionMode")
+        Timber.d("ActionBarCallBack::onPrepareActionMode")
 
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
             (viewModel.getSelectedNodesCount()
@@ -832,7 +868,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-        logDebug("ActionBarCallBack::onDestroyActionMode")
+        Timber.d("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
         checkScroll()

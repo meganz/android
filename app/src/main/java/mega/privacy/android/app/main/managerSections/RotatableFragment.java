@@ -1,5 +1,7 @@
 package mega.privacy.android.app.main.managerSections;
 
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -8,9 +10,7 @@ import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import timber.log.Timber;
 
 public abstract class RotatableFragment extends BaseFragment {
 
@@ -24,7 +24,9 @@ public abstract class RotatableFragment extends BaseFragment {
 
     public abstract void multipleItemClick(int position);
 
-    /** Reselect the unhandled item after rotation
+    /**
+     * Reselect the unhandled item after rotation
+     *
      * @param position the index of unhandled item
      */
     public abstract void reselectUnHandledSingleItem(int position);
@@ -40,7 +42,7 @@ public abstract class RotatableFragment extends BaseFragment {
     private boolean waitingForSearchedNodes;
 
     protected void reDoTheSelectionAfterRotation() {
-        logDebug("Reselect items");
+        Timber.d("Reselect items");
         setWaitingForSearchedNodes(false);
 
         if (selectedItems == null) return;
@@ -73,7 +75,7 @@ public abstract class RotatableFragment extends BaseFragment {
 
     /**
      * @param originalPosition original position before rotation
-     * @param adapter the adapter where rotation happens
+     * @param adapter          the adapter where rotation happens
      * @return the list position after rotation of adapter
      */
     private int transferPosition(int originalPosition, RotatableAdapter adapter) {
@@ -105,7 +107,7 @@ public abstract class RotatableFragment extends BaseFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         RotatableAdapter currentAdapter = getAdapter();
-        if(currentAdapter != null){
+        if (currentAdapter != null) {
             ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
             outState.putSerializable(SELECTED_ITEMS, selectedItems);
             outState.putInt(LAST_PLACE_HOLDER_COUNT, currentAdapter.getPlaceholderCount());

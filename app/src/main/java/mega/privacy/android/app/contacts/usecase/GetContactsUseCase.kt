@@ -23,7 +23,6 @@ import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.*
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
@@ -34,6 +33,7 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -108,11 +108,11 @@ class GetContactsUseCase @Inject constructor(
                             emitter.onNext(contacts.sortedAlphabetically())
                         }
                     } else {
-                        logError(error.toThrowable().stackTraceToString())
+                        Timber.e(error.toThrowable())
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    logError(error.toThrowable().stackTraceToString())
+                    Timber.e(error.toThrowable())
                 }
             )
 
@@ -173,9 +173,7 @@ class GetContactsUseCase @Inject constructor(
                             }
                         }
                     },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                    onError = Timber::e
                 ).addTo(disposable)
 
             getGlobalChangesUseCase.get()
@@ -214,9 +212,7 @@ class GetContactsUseCase @Inject constructor(
                             }
                         }
                     },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
+                    onError = Timber::e
                 ).addTo(disposable)
 
             contacts.forEach { it.requestMissingFields(userAttrsListener) }

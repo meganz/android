@@ -1,20 +1,23 @@
 package mega.privacy.android.app.activities.settingsActivities
 
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.view.MenuItem
-import android.view.inputmethod.EditorInfo.*
+import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
+import android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.*
+import androidx.biometric.BiometricPrompt.AuthenticationResult
+import androidx.biometric.BiometricPrompt.CryptoObject
+import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
+import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -29,13 +32,19 @@ import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.PIN_4
+import mega.privacy.android.app.utils.Constants.PIN_6
+import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.PasscodeUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
+import timber.log.Timber
 import java.security.KeyStore
-import java.util.*
+import java.util.Locale
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -71,6 +80,7 @@ class PasscodeLockActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
     private lateinit var binding: ActivityPasscodeBinding
@@ -663,7 +673,7 @@ class PasscodeLockActivity : BaseActivity() {
      * Opens the bottom sheet dialog to change the passcode type.
      */
     private fun showPasscodeOptions() {
-        if (isBottomSheetDialogShown(passcodeOptionsBottomSheetDialogFragment)) return
+        if (passcodeOptionsBottomSheetDialogFragment.isBottomSheetDialogShown()) return
 
         passcodeOptionsBottomSheetDialogFragment =
             PasscodeOptionsBottomSheetDialogFragment.newInstance(passcodeType)
@@ -761,10 +771,10 @@ class PasscodeLockActivity : BaseActivity() {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(
                     errorCode: Int,
-                    errString: CharSequence
+                    errString: CharSequence,
                 ) {
                     super.onAuthenticationError(errorCode, errString)
-                    LogUtil.logWarning("Error: $errString")
+                    Timber.w("Error: $errString")
 
                     when (errorCode) {
                         ERROR_USER_CANCELED -> {
@@ -779,17 +789,17 @@ class PasscodeLockActivity : BaseActivity() {
                 }
 
                 override fun onAuthenticationSucceeded(
-                    result: AuthenticationResult
+                    result: AuthenticationResult,
                 ) {
                     super.onAuthenticationSucceeded(result)
-                    LogUtil.logDebug("Fingerprint unlocked")
+                    Timber.d("Fingerprint unlocked")
                     passcodeUtil.pauseUpdate()
                     finish()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    LogUtil.logWarning("Authentication failed")
+                    Timber.w("Authentication failed")
                 }
             })
 

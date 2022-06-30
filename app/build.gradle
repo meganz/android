@@ -381,7 +381,6 @@ dependencies {
     gmsImplementation platform("com.google.firebase:firebase-bom:$firebaseBom")
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ndk'
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ktx'
-    gmsImplementation 'com.google.firebase:firebase-analytics-ktx'
     gmsImplementation 'com.google.firebase:firebase-messaging-ktx'
     gmsImplementation 'com.google.firebase:firebase-perf-ktx'
     //HMS

@@ -9,8 +9,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRE
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
 import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
@@ -86,6 +88,8 @@ import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -126,8 +130,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -336,7 +338,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d("Starting CameraUpload service (flags: " + flags + ", startId: " + startId + ")");
+        Timber.d("Starting CameraUpload service (flags: %d, startId: %d)", flags, startId);
         isServiceRunning = true;
         startForegroundNotification();
         initService();
@@ -455,7 +457,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void extractMedia(Cursor cursor, boolean isSecondary, boolean isVideo) {
         try {
-            Timber.d("Extract " + cursor.getCount() + " media from cursor, is video: " + isVideo + ", is secondary: " + isSecondary);
+            Timber.d("Extract %d media from cursor, is video: %s, is secondary: %s", cursor.getCount(), isVideo, isSecondary);
             String parentPath = isSecondary ? localPathSecondary : localPath;
 
             int dataColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
@@ -474,7 +476,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 long addedTime = cursor.getLong(addedColumn) * 1000;
                 long modifiedTime = cursor.getLong(modifiedColumn) * 1000;
                 media.timestamp = Math.max(addedTime, modifiedTime);
-                Timber.d("Extract from cursor, add time: " + addedTime + ", modify time: " + modifiedTime + ", chosen time: " + media.timestamp);
+                Timber.d("Extract from cursor, add time: %d, modify time: %d, chosen time: %d", addedTime, modifiedTime, media.timestamp);
 
                 //Check files of the Camera Uploads
                 if (checkFile(media, parentPath)) {
@@ -673,10 +675,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void prepareUpload(Queue<Media> primaryList, Queue<Media> secondaryList, Queue<Media> primaryVideoList, Queue<Media> secondaryVideoList) {
-        Timber.d("\nPrimary photo count from media store database: " + primaryList.size() + "\n"
-                + "Secondary photo count from media store database: " + secondaryList.size() + "\n"
-                + "Primary video count from media store database: " + primaryVideoList.size() + "\n"
-                + "Secondary video count from media store database: " + secondaryVideoList.size());
+        Timber.d("\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d", primaryList.size(), secondaryList.size(), primaryVideoList.size(), secondaryVideoList.size());
 
         List<SyncRecord> pendingUploadsList = getPendingList(primaryList, false, false);
         Timber.d("Primary photo pending list size: %s", pendingUploadsList.size());
@@ -725,7 +724,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 purgeDirectory(new File(tempRoot));
             }
         } else {
-            Timber.d("Start to upload " + finalList.size() + " files.");
+            Timber.d("Start to upload %d files.", finalList.size());
             startParallelUpload(finalList, false);
         }
     }
@@ -802,7 +801,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     //compare size
                     MegaNode node = checkExsitBySize(parent, toUpload.length());
                     if (node != null && node.getOriginalFingerprint() == null) {
-                        Timber.d("Node with handle: " + node.getHandle() + " already exists, delete record from database.");
+                        Timber.d("Node with handle: %d already exists, delete record from database.", node.getHandle());
                         dbH.deleteSyncRecordByPath(path, isSec);
                     } else {
                         totalToUpload++;
@@ -931,7 +930,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private List<SyncRecord> getPendingList(Queue<Media> mediaList, boolean isSecondary, boolean isVideo) {
-        Timber.d("Get pending list, is secondary upload: " + isSecondary + ", is video: " + isVideo);
+        Timber.d("Get pending list, is secondary upload: %s, is video: %s", isSecondary, isVideo);
         ArrayList<SyncRecord> pendingList = new ArrayList<>();
 
         long parentNodeHandle = (isSecondary) ? secondaryUploadHandle : cameraUploadHandle;
@@ -979,7 +978,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                         null,
                         false,
                         isSecondary);
-                Timber.d("Add local file with timestamp: " + record.getTimestamp() + " to pending list, for upload.");
+                Timber.d("Add local file with timestamp: %d to pending list, for upload.", record.getTimestamp());
                 pendingList.add(record);
             } else {
                 Timber.d("Possible node with same fingerprint which handle is: %s", nodeExists.getHandle());
@@ -998,7 +997,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             nodeExists.getHandle(),
                             true,
                             isSecondary);
-                    Timber.d("Add local file with handle: " + record.getNodeHandle() + " to pending list, for copy.");
+                    Timber.d("Add local file with handle: %d to pending list, for copy.", record.getNodeHandle());
                     pendingList.add(record);
                 } else {
                     if (!isSecondary) {
@@ -1294,7 +1293,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (needToSetPrimary || needToSetSecondary) {
-            Timber.d("Set CU attribute: " + primaryToSet + " " + secondaryToSet);
+            Timber.d("Set CU attribute: %d %d", primaryToSet, secondaryToSet);
             megaApi.setCameraUploadsFolders(primaryToSet, secondaryToSet, setAttrUserListener);
             return SETTING_USER_ATTRIBUTE;
         }
@@ -1582,7 +1581,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
         cuTransfers.add(transfer);
-        launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
     }
 
     @Override
@@ -1621,10 +1620,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        Timber.d("Image sync finished, error code: " + e.getErrorCode() + ", handle: " + transfer.getNodeHandle() + ", size: " + transfer.getTransferredBytes());
+        Timber.d("Image sync finished, error code: %d, handle: %d, size: %d", e.getErrorCode(), transfer.getNodeHandle(), transfer.getTransferredBytes());
 
         try {
-            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
             transferFinished(transfer, e);
         } catch (Throwable th) {
             Timber.e(th);
@@ -1697,7 +1696,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             isOverQuota = true;
             cancel();
         } else {
-            Timber.w("Image Sync FAIL: " + transfer.getNodeHandle() + "___" + e.getErrorString());
+            Timber.w("Image Sync FAIL: %d___%s", transfer.getNodeHandle(), e.getErrorString());
         }
         if (canceled) {
             Timber.w("Image sync cancelled: %s", transfer.getNodeHandle());
@@ -1712,7 +1711,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         totalUploaded++;
-        Timber.d("Total to upload is " + totalToUpload + " totalUploaded " + totalUploaded + " pendings are " + megaApi.getNumPendingUploads());
+        Timber.d("Total to upload is %d totalUploaded %d pendings are %d", totalToUpload, totalUploaded, megaApi.getNumPendingUploads());
         if (totalToUpload == totalUploaded) {
             Timber.d("Photo upload finished, now checking videos");
             if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
@@ -1827,7 +1826,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
-        Timber.d("Total videos count are " + fullList.size() + ", " + totalPendingSizeInMB + " mb to Conversion");
+        Timber.d("Total videos count are %d, %d mb to Conversion", fullList.size(), totalPendingSizeInMB);
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
             Thread t = new Thread(() -> {
@@ -1920,7 +1919,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Timber.d("Preparing to upload compressed video.");
             ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(SyncStatus.STATUS_PENDING.getValue()));
             if (compressedList.size() > 0) {
-                Timber.d("Start to upload " + compressedList.size() + " compressed videos.");
+                Timber.d("Start to upload %d compressed videos.", compressedList.size());
                 startParallelUpload(compressedList, true);
             } else {
                 onQueueComplete();
@@ -2196,14 +2195,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, parentNode);
         preferNode = getFirstNodeFromList(possibleNodeListFPO);
         if (preferNode != null) {
-            Timber.d("Found node by original fingerprint with the same local fingerprint in node with handle: " + parentNode.getHandle() + ", node handle: " + preferNode.getHandle());
+            Timber.d("Found node by original fingerprint with the same local fingerprint in node with handle: %d, node handle: %d", parentNode.getHandle(), preferNode.getHandle());
             return preferNode;
         }
 
         // Try to find the node by fingerprint from the selected parent folder.
         preferNode = megaApi.getNodeByFingerprint(localFingerPrint, parentNode);
         if (preferNode != null) {
-            Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: " + parentNode.getHandle() + ", node handle: " + preferNode.getHandle());
+            Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: %d, node handle: %d", parentNode.getHandle(), preferNode.getHandle());
             return preferNode;
         }
 
@@ -2255,12 +2254,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (Boolean.parseBoolean(preferences.getConversionOnCharging())) {
                 int queueSizeLimit = Integer.parseInt(preferences.getChargingOnSize());
                 if (queueSize > queueSizeLimit) {
-                    Timber.d("isChargingRequired " + true + ", queue size is " + queueSize + ", limit size is " + queueSizeLimit);
+                    Timber.d("isChargingRequired %s, queue size is %d, limit size is %d", true, queueSize, queueSizeLimit);
                     return true;
                 }
             }
         }
-        Timber.d("isChargingRequired " + false);
+        Timber.d("isChargingRequired %s", false);
         return false;
     }
 

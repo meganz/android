@@ -34,9 +34,11 @@ class DefaultAccountRepositoryTest {
         underTest = DefaultAccountRepository(
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
+            megaChatApiGateway = mock(),
             monitorMultiFactorAuth = MonitorMultiFactorAuth(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            userUpdateMapper = { UserUpdate(emptyMap()) }
+            userUpdateMapper = { UserUpdate(emptyMap()) },
+            dbH = mock()
         )
     }
 

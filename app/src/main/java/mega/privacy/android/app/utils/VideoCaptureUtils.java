@@ -11,10 +11,9 @@ import org.webrtc.VideoCapturer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import nz.mega.sdk.MegaChatApiAndroid;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-
-public class VideoCaptureUtils{
+public class VideoCaptureUtils {
 
     static private VideoCapturer videoCapturer = null;
 
@@ -28,8 +27,8 @@ public class VideoCaptureUtils{
     /**
      * Check if show video is allowed.
      *
-     * @see VideoCaptureUtils#isVideoAllowed
      * @return TRUE if show video is allowed or FALSE in other case.
+     * @see VideoCaptureUtils#isVideoAllowed
      */
     public static boolean isVideoAllowed() {
         return isVideoAllowed;
@@ -38,39 +37,41 @@ public class VideoCaptureUtils{
     /**
      * Set if show video is allowed.
      *
-     * @see VideoCaptureUtils#isVideoAllowed
      * @param isVideoAllowed Value to indicate if show video is allowed.
+     * @see VideoCaptureUtils#isVideoAllowed
      */
     public static void setIsVideoAllowed(boolean isVideoAllowed) {
         VideoCaptureUtils.isVideoAllowed = isVideoAllowed;
     }
 
     static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
-        logDebug("createCameraCapturer: " + deviceName);
+        Timber.d("createCameraCapturer: %s", deviceName);
         return enumerator.createCapturer(deviceName, null);
     }
 
     /**
      * Get the video capture devices list.
+     *
      * @return The video capture devices list.
      */
     static private String[] deviceList() {
-        logDebug("DeviceList");
+        Timber.d("DeviceList");
         CameraEnumerator enumerator = new Camera1Enumerator(true);
         return enumerator.getDeviceNames();
     }
 
     /**
      * Swap the current camera device to the opposite camera device.
+     *
      * @param listener Camera swap listener.
      */
     public static void swapCamera(ChatChangeVideoStreamListener listener) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         String currentCamera = megaChatApi.getVideoDeviceSelected();
         String newCamera;
-        if(isFrontCamera(currentCamera)){
+        if (isFrontCamera(currentCamera)) {
             newCamera = getBackCamera();
-        }else {
+        } else {
             newCamera = getFrontCamera();
         }
         if (newCamera != null) {
@@ -81,6 +82,7 @@ public class VideoCaptureUtils{
 
     /**
      * Get the front camera device.
+     *
      * @return Front camera device.
      */
     static public String getFrontCamera() {
@@ -89,6 +91,7 @@ public class VideoCaptureUtils{
 
     /**
      * Get the back camera device.
+     *
      * @return Back camera device.
      */
     static public String getBackCamera() {
@@ -97,6 +100,7 @@ public class VideoCaptureUtils{
 
     /**
      * Get a camera device (front or back).
+     *
      * @param front Value to indicate the camera device to get (true: front / false: back).
      * @return The camera device (front or back) requested. NULL if the requested device does not exist.
      */
@@ -113,6 +117,7 @@ public class VideoCaptureUtils{
 
     /**
      * Check if the camera device is the front camera.
+     *
      * @param device Camera device to check.
      * @return True if device is front camera or false in other case.
      */
@@ -123,6 +128,7 @@ public class VideoCaptureUtils{
 
     /**
      * Check if the camera device is the back camera.
+     *
      * @param device Camera device to check.
      * @return True if device is back camera or false in other case.
      */
@@ -133,19 +139,21 @@ public class VideoCaptureUtils{
 
     /**
      * Check if the front camera is the current video device in use.
+     *
      * @return True if the front camera is in use or false in other case.
      */
     static public boolean isFrontCameraInUse() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         String deviceName = megaChatApi.getVideoDeviceSelected();
 
-        if(deviceName == null) return false;
+        if (deviceName == null) return false;
 
         return isFrontCamera(deviceName);
     }
 
     /**
      * Check if the back camera is the current video device in use.
+     *
      * @return True if the back camera is in use or false in other case.
      */
     static public boolean isBackCameraInUse() {
@@ -154,7 +162,7 @@ public class VideoCaptureUtils{
     }
 
     static public void stopVideoCapture() {
-        logDebug("stopVideoCapture");
+        Timber.d("stopVideoCapture");
 
         if (videoCapturer != null) {
             try {
@@ -167,7 +175,7 @@ public class VideoCaptureUtils{
     }
 
     static public void startVideoCapture(int videoWidth, int videoHeight, int videoFps, SurfaceTextureHelper surfaceTextureHelper, CapturerObserver nativeAndroidVideoTrackSource, String deviceName) {
-        logDebug("startVideoCapture: " + deviceName);
+        Timber.d("startVideoCapture: %s", deviceName);
 
         stopVideoCapture();
         Context context = MegaApplication.getInstance().getApplicationContext();
@@ -175,7 +183,7 @@ public class VideoCaptureUtils{
         videoCapturer = createCameraCapturer(new Camera1Enumerator(true), deviceName);
 
         if (videoCapturer == null) {
-            logError("Unable to create video capturer");
+            Timber.e("Unable to create video capturer");
             return;
         }
 
@@ -183,6 +191,6 @@ public class VideoCaptureUtils{
 
         // Start the capture!
         videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
-        logDebug("Start Capture");
+        Timber.d("Start Capture");
     }
 }

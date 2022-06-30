@@ -1,22 +1,22 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
+import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
+import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.text.Spanned;
+
 import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
-import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class TextUtil {
 
@@ -48,7 +48,7 @@ public class TextUtil {
             text = text.replace("[C]", "");
             text = text.replace("[/C]", "");
         } catch (Exception e) {
-            logWarning("Error replacing text. ", e);
+            Timber.w(e, "Error replacing text. ");
         }
         return text;
     }
@@ -56,7 +56,7 @@ public class TextUtil {
     /**
      * Add the appropriate format in the chat messages.
      *
-     * @param context Current Context object, to get a resource(for example, color) should not use application context, need to pass it from the caller.
+     * @param context      Current Context object, to get a resource(for example, color) should not use application context, need to pass it from the caller.
      * @param textToShow   The message text
      * @param isOwnMessage If it is a sent or received message
      * @return The formatted text
@@ -68,6 +68,27 @@ public class TextUtil {
                 ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary);
 
         return replaceFormatText(textToShow, colorStart, colorEnd);
+    }
+
+    /**
+     * Add the appropriate format in the call ended chat messages.
+     *
+     * @param textToShow The message text
+     * @return The formatted text
+     */
+    public static Spanned replaceFormatCallEndedMessage(String textToShow) {
+        try {
+            textToShow = textToShow.replace("[A]", "");
+            textToShow = textToShow.replace("[/A]", "");
+            textToShow = textToShow.replace("[B]", "<font face=\'sans-serif-medium\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[C]", "");
+            textToShow = textToShow.replace("[/C]", "");
+        } catch (Exception e) {
+            Timber.e(e.getStackTrace().toString());
+        }
+
+        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     /**
@@ -115,7 +136,7 @@ public class TextUtil {
 
             text = text.replace("[/B]", "</font>");
         } catch (Exception e) {
-            logWarning("Error replacing text. ", e);
+            Timber.w(e, "Error replacing text. ");
         }
 
         return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
@@ -159,28 +180,28 @@ public class TextUtil {
     /**
      * Formats a String of an empty screen.
      *
-     * @param context     Current Context object, to get a resource(for example, color)
-     *                    should not use application context, need to pass it from the caller.
+     * @param context    Current Context object, to get a resource(for example, color)
+     *                   should not use application context, need to pass it from the caller.
      * @param textToShow The text to format.
      * @return The string formatted.
      */
     public static String formatEmptyScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
-        String colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
+        String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
         return replaceFormatText(textToShow, colorStart, colorEnd).toString();
     }
 
     /**
      * Formats a String of recent chats empty screen.
      *
-     * @param context     Current Context object, to get a resource(for example, color)
-     *                    should not use application context, need to pass it from the caller.
+     * @param context    Current Context object, to get a resource(for example, color)
+     *                   should not use application context, need to pass it from the caller.
      * @param textToShow The text to format.
      * @return The string formatted.
      */
     public static Spanned formatEmptyRecentChatsScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
-        String colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
+        String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 

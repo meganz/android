@@ -76,6 +76,16 @@ interface MegaApiGateway {
     val isMasterBusinessAccount: Boolean
 
     /**
+     * Is ephemeral plus plus account.
+     */
+    val isEphemeralPlusPlus: Boolean
+
+    /**
+     * Authentication token that can be used to identify the user account.
+     */
+    val accountAuth: String
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
@@ -273,4 +283,47 @@ interface MegaApiGateway {
      * @return True if the node has children, false otherwise.
      */
     suspend fun hasChildren(node: MegaNode): Boolean
+
+    /**
+     * Registers push notifications.
+     *
+     * @param deviceType    Type of device.
+     * @param newToken      New push token.
+     * @param listener      Listener.
+     */
+    fun registerPushNotifications(
+        deviceType: Int,
+        newToken: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Performs a fast login.
+     *
+     * @param session   Required for fast login.
+     * @param listener  Listener.
+     */
+    fun fastLogin(session: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Performs fetch nodes.
+     *
+     * @param listener  Listener.
+     */
+    fun fetchNodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Retries all pending requests.
+     */
+    fun retryPendingConnections()
+
+    /**
+     * Gets all transfers of a specific type (downloads or uploads).
+     * If the parameter isn't MegaTransfer::TYPE_DOWNLOAD or MegaTransfer::TYPE_UPLOAD
+     * this function returns an empty list.
+     *
+     * @param type MegaTransfer::TYPE_DOWNLOAD or MegaTransfer::TYPE_UPLOAD
+     * @return List with transfers of the desired type.
+     */
+    suspend fun getTransfers(type: Int): List<MegaTransfer>
 }

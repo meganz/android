@@ -3,173 +3,158 @@ package mega.privacy.android.app.utils;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class DBUtil {
 
     private static DatabaseHandler dbH;
     private static MegaAttributes attributes;
 
-    public static boolean callToPricing (){
-        logDebug("callToPricing");
+    public static boolean callToPricing() {
+        Timber.d("callToPricing");
         dbH = MegaApplication.getInstance().getDbH();
 
-        if(dbH!=null){
+        if (dbH != null) {
             attributes = dbH.getAttributes();
-            if(attributes!=null){
+            if (attributes != null) {
                 String oldTimestamp = attributes.getPricingTimeStamp();
-                if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
-                    if(oldTimestamp.equals("-1")){
-                        logDebug("First call!! - API call getPricing");
+                if ((oldTimestamp != null) && (oldTimestamp.trim() != "") && (!oldTimestamp.isEmpty())) {
+                    if (oldTimestamp.equals("-1")) {
+                        Timber.d("First call!! - API call getPricing");
                         return true;
-                    }
-                    else{
+                    } else {
                         long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                        logDebug("Last call made: "+ timestampMinDifference + " min ago");
-                        if(timestampMinDifference > Constants.PRICING_MIN_DIFFERENCE){
-                            logDebug("API call getPricing");
+                        Timber.d("Last call made: %d min ago", timestampMinDifference);
+                        if (timestampMinDifference > Constants.PRICING_MIN_DIFFERENCE) {
+                            Timber.d("API call getPricing");
                             return true;
-                        }
-                        else{
-                            logDebug("NOT call getPricing");
+                        } else {
+                            Timber.d("NOT call getPricing");
                             return false;
                         }
                     }
-                }
-                else{
-                    logDebug("Not valid value - API call getPricing");
+                } else {
+                    Timber.d("Not valid value - API call getPricing");
                     return true;
                 }
-            }
-            else{
-                logDebug("Attributes is NULL - API call getPricing");
+            } else {
+                Timber.d("Attributes is NULL - API call getPricing");
                 return true;
             }
 
-        }else{
-            logDebug("DatabaseHandler is NULL - API call getPricing");
+        } else {
+            Timber.d("DatabaseHandler is NULL - API call getPricing");
             return true;
         }
     }
 
-    public static boolean callToPaymentMethods () {
-        logDebug("callToPaymentMethods");
+    public static boolean callToPaymentMethods() {
+        Timber.d("callToPaymentMethods");
         dbH = MegaApplication.getInstance().getDbH();
 
-        if(dbH!=null){
+        if (dbH != null) {
             attributes = dbH.getAttributes();
-            if(attributes!=null){
+            if (attributes != null) {
                 String oldTimestamp = attributes.getPaymentMethodsTimeStamp();
-                if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
+                if ((oldTimestamp != null) && (oldTimestamp.trim() != "") && (!oldTimestamp.isEmpty())) {
                     long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                    logDebug("Last call made: "+ timestampMinDifference + " min ago");
-                    if(timestampMinDifference > Constants.PAYMENT_METHODS_MIN_DIFFERENCE){
-                        logDebug("API call getPaymentMethods");
+                    Timber.d("Last call made: %d min ago", timestampMinDifference);
+                    if (timestampMinDifference > Constants.PAYMENT_METHODS_MIN_DIFFERENCE) {
+                        Timber.d("API call getPaymentMethods");
                         return true;
-                    }
-                    else{
-                        logDebug("NOT call getPaymentMethods");
+                    } else {
+                        Timber.d("NOT call getPaymentMethods");
                         return false;
                     }
-                }
-                else{
-                    logDebug("Not valid value - API call getPaymentMethods");
+                } else {
+                    Timber.d("Not valid value - API call getPaymentMethods");
                     return true;
                 }
-            }
-            else{
-                logDebug("Attributes is NULL - API call getPaymentMethods");
+            } else {
+                Timber.d("Attributes is NULL - API call getPaymentMethods");
                 return true;
             }
 
-        }else{
-            logDebug("DatabaseHandler is NULL - API call getPaymentMethods");
+        } else {
+            Timber.d("DatabaseHandler is NULL - API call getPaymentMethods");
             return true;
         }
     }
 
-    public static boolean callToAccountDetails () {
-        logDebug("callToAccountDetails");
+    public static boolean callToAccountDetails() {
+        Timber.d("callToAccountDetails");
         dbH = MegaApplication.getInstance().getDbH();
 
-        if(dbH!=null){
+        if (dbH != null) {
             attributes = dbH.getAttributes();
-            if(attributes!=null){
+            if (attributes != null) {
                 String oldTimestamp = attributes.getAccountDetailsTimeStamp();
-                if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
+                if ((oldTimestamp != null) && (oldTimestamp.trim() != "") && (!oldTimestamp.isEmpty())) {
                     long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                    logDebug("Last call made: "+ timestampMinDifference + " min ago");
-                    if(timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE){
-                        logDebug("API call getAccountDetails");
+                    Timber.d("Last call made: %d min ago", timestampMinDifference);
+                    if (timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE) {
+                        Timber.d("API call getAccountDetails");
                         return true;
-                    }
-                    else{
-                        logDebug("NOT call getAccountDetails");
+                    } else {
+                        Timber.d("NOT call getAccountDetails");
                         return false;
                     }
-                }
-                else{
-                    logDebug("Not valid value - API call getAccountDetails");
+                } else {
+                    Timber.d("Not valid value - API call getAccountDetails");
                     return true;
                 }
-            }
-            else{
-                logDebug("Attributes is NULL - API call getAccountDetails");
+            } else {
+                Timber.d("Attributes is NULL - API call getAccountDetails");
                 return true;
             }
 
-        }else{
-            logDebug("DatabaseHandler is NULL - API call getAccountDetails");
+        } else {
+            Timber.d("DatabaseHandler is NULL - API call getAccountDetails");
             return true;
         }
     }
 
     public static void resetAccountDetailsTimeStamp() {
-        logDebug("resetAccountDetailsTimeStamp");
+        Timber.d("resetAccountDetailsTimeStamp");
         dbH = MegaApplication.getInstance().getDbH();
-        if(dbH == null) return;
+        if (dbH == null) return;
         dbH.resetAccountDetailsTimeStamp();
     }
 
-    public static boolean callToExtendedAccountDetails () {
-        logDebug("callToExtendedAccountDetails");
+    public static boolean callToExtendedAccountDetails() {
+        Timber.d("callToExtendedAccountDetails");
         dbH = MegaApplication.getInstance().getDbH();
 
-        if(dbH!=null){
+        if (dbH != null) {
             attributes = dbH.getAttributes();
-            if(attributes!=null){
+            if (attributes != null) {
                 String oldTimestamp = attributes.getExtendedAccountDetailsTimeStamp();
-                if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
-                    if(oldTimestamp.equals("-1")){
-                        logDebug("First call!! - API call getExtendedAccountDetails");
+                if ((oldTimestamp != null) && (oldTimestamp.trim() != "") && (!oldTimestamp.isEmpty())) {
+                    if (oldTimestamp.equals("-1")) {
+                        Timber.d("First call!! - API call getExtendedAccountDetails");
                         return true;
-                    }
-                    else{
+                    } else {
                         long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                        logDebug("Last call made: "+ timestampMinDifference + " min ago");
-                        if(timestampMinDifference > Constants.EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE){
-                            logDebug("API call getExtendedAccountDetails");
+                        Timber.d("Last call made: %d min ago", timestampMinDifference);
+                        if (timestampMinDifference > Constants.EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE) {
+                            Timber.d("API call getExtendedAccountDetails");
                             return true;
-                        }
-                        else{
-                            logDebug("NOT call getExtendedAccountDetails");
+                        } else {
+                            Timber.d("NOT call getExtendedAccountDetails");
                             return false;
                         }
                     }
-                }
-                else{
-                    logDebug("Not valid value - API call getExtendedAccountDetails");
+                } else {
+                    Timber.d("Not valid value - API call getExtendedAccountDetails");
                     return true;
                 }
-            }
-            else{
-                logDebug("Attributes is NULL - API call getExtendedAccountDetails");
+            } else {
+                Timber.d("Attributes is NULL - API call getExtendedAccountDetails");
                 return true;
             }
 
-        }else{
-            logDebug("DatabaseHandler is NULL - API call getExtendedAccountDetails");
+        } else {
+            Timber.d("DatabaseHandler is NULL - API call getExtendedAccountDetails");
             return true;
         }
     }

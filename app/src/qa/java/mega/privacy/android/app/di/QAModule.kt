@@ -6,6 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.repository.FeatureFlagRepository
+import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
+import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.data.gateway.DistributionGateway
 import mega.privacy.android.app.data.gateway.FirebaseDistributionGateway
 import mega.privacy.android.app.data.repository.DefaultQARepository
@@ -28,6 +31,20 @@ class QAModule {
     @IntoSet
     fun bindPreferenceResource(): PreferenceResource =
         PreferenceResource(R.xml.preferences_qa_entry)
+
+    /**
+     * Provide SetFeatureFlag use case
+     */
+    @Provides
+    fun provideSetFeatureFlag(repository: FeatureFlagRepository): SetFeatureFlag =
+        SetFeatureFlag(repository::setFeature)
+
+    /**
+     * Provide GetAllFeatureFlags use case
+     */
+    @Provides
+    fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
+        GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
 
     /**
      * Provide distribution gateway for QA builds

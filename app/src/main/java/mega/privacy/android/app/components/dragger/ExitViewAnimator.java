@@ -1,5 +1,8 @@
 package mega.privacy.android.app.components.dragger;
 
+import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
+import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
+
 import android.graphics.RectF;
 import android.view.SurfaceView;
 import android.view.View;
@@ -13,17 +16,15 @@ import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
 
-import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
-import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import timber.log.Timber;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
     @Override
     public boolean animateExit(@NonNull final D draggableView, final Direction direction,
-        int duration, final Listener listener, final int[] screenPosition, final View currentView,
-        final int[] draggableViewLocationOnScreen) {
-        logDebug("animateExit");
+                               int duration, final Listener listener, final int[] screenPosition, final View currentView,
+                               final int[] draggableViewLocationOnScreen) {
+        Timber.d("animateExit");
         draggableView.setAnimating(true);
 
         float scaleX;
@@ -39,35 +40,32 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     zoomableDraweeView.getHierarchy().getActualImageBounds(bounds);
                     scaleX = ((float) screenPosition[2]) / (bounds.right - bounds.left);
                     scaleY = ((float) screenPosition[3]) / (bounds.bottom - bounds.top);
-                    logDebug("ZoomableDraweeView scale: " + scaleX + " " + scaleY);
-                }
-                else if (currentView instanceof SimpleDraweeView){
+                    Timber.d("ZoomableDraweeView scale: %s %s", scaleX, scaleY);
+                } else if (currentView instanceof SimpleDraweeView) {
                     SimpleDraweeView simpleDraweeView = (SimpleDraweeView) currentView;
                     RectF bounds = new RectF();
                     simpleDraweeView.getHierarchy().getActualImageBounds(bounds);
-                    scaleX = ((float)screenPosition[2]) / (bounds.right - bounds.left);
-                    scaleY = ((float)screenPosition[3]) / (bounds.bottom - bounds.top);
-                    logDebug("SimpleDraweeView scale: " + scaleX + " " + scaleY);
-                }
-                else if (currentView instanceof ImageView){
+                    scaleX = ((float) screenPosition[2]) / (bounds.right - bounds.left);
+                    scaleY = ((float) screenPosition[3]) / (bounds.bottom - bounds.top);
+                    Timber.d("SimpleDraweeView scale: %s %s", scaleX, scaleY);
+                } else if (currentView instanceof ImageView) {
                     imageView = (ImageView) currentView;
-                    scaleX = ((float)screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
-                    scaleY = ((float)screenPosition[3]) / imageView.getDrawable().getIntrinsicHeight();
-                    logDebug("Scale: "+scaleX+" "+scaleY+" dimensions: "+imageView.getWidth()+" "+imageView.getHeight()+ " position: "+screenPosition[0]+" "+screenPosition[1]);
-                }
-                else {
+                    scaleX = ((float) screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
+                    scaleY = ((float) screenPosition[3]) / imageView.getDrawable().getIntrinsicHeight();
+                    Timber.d("Scale: %s %s dimensions: %d %d position: %d %d", scaleX, scaleY, imageView.getWidth(), imageView.getHeight(), screenPosition[0], screenPosition[1]);
+                } else {
                     surfaceView = (SurfaceView) currentView;
                     scaleX = ((float) screenPosition[2]) / ((float) surfaceView.getWidth());
                     scaleY = ((float) screenPosition[3]) / ((float) surfaceView.getHeight());
-                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
+                    Timber.d("Scale: %s %s dimensions: %d %d position: %d %d", scaleX, scaleY, surfaceView.getWidth(), surfaceView.getHeight(), screenPosition[0], screenPosition[1]);
                 }
 
                 ViewCompat.animate(draggableView)
                         .withLayer()
                         .translationX(screenPosition[LOCATION_INDEX_LEFT]
-                            - (draggableViewLocationOnScreen[LOCATION_INDEX_LEFT] + draggableView.getWidth() / 2))
+                                - (draggableViewLocationOnScreen[LOCATION_INDEX_LEFT] + draggableView.getWidth() / 2))
                         .translationY(screenPosition[LOCATION_INDEX_TOP]
-                            - (draggableViewLocationOnScreen[LOCATION_INDEX_TOP] + draggableView.getHeight() / 2))
+                                - (draggableViewLocationOnScreen[LOCATION_INDEX_TOP] + draggableView.getHeight() / 2))
                         .scaleX(scaleX)
                         .scaleY(scaleY)
                         .rotation(0f)
@@ -99,8 +97,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                                 ViewCompat.animate(draggableView).setListener(null);
                             }
                         });
-            }
-            else {
+            } else {
                 ViewCompat.animate(draggableView)
                         .withLayer()
                         .translationX(0.5f)
@@ -137,8 +134,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             }
                         });
             }
-        }
-        else {
+        } else {
             ViewCompat.animate(draggableView)
                     .withLayer()
                     .translationX(0.5f)

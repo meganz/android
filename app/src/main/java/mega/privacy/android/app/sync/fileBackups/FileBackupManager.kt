@@ -21,7 +21,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.Constants.NAME
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE
@@ -43,14 +42,14 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isOutShare
 import mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaNode
-import java.util.*
+import timber.log.Timber
 
 /**
  * Manager class used to process actions related to Backup nodes.
  */
 class FileBackupManager(
     val activity: Activity,
-    val actionBackupListener: ActionBackupListener?
+    val actionBackupListener: ActionBackupListener?,
 ) {
 
     object BackupDialogState {
@@ -107,7 +106,7 @@ class FileBackupManager(
         nC: NodeController,
         nodeHandles: LongArray,
         contactsData: ArrayList<String>,
-        accessType: Int
+        accessType: Int,
     ): Boolean {
         val handleList = ArrayList<Long>()
         nodeHandles.toCollection(handleList)
@@ -115,7 +114,7 @@ class FileBackupManager(
         val nodeType = checkBackupNodeTypeInList(megaApi, handleList)
 
         if (nodeType != BACKUP_NONE || pNode != null) {
-            logDebug("shareFolder with accessType = $accessType")
+            Timber.d("shareFolder with accessType = $accessType")
             nC.shareFolders(nodeHandles, contactsData, accessType)
             return true
         }
@@ -138,7 +137,7 @@ class FileBackupManager(
             // for empty folder
             return if (currentParentHandle != null) {
                 val nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle)
-                logDebug("nodeType = $nodeType")
+                Timber.d("nodeType = $nodeType")
                 return when (nodeType) {
                     BACKUP_ROOT -> BACKUP_DEVICE
                     BACKUP_DEVICE -> BACKUP_FOLDER
@@ -157,7 +156,7 @@ class FileBackupManager(
      */
     fun getSubBackupParentNode(
         megaNodes: List<MegaNode?>?,
-        currentParentHandle: MegaNode?
+        currentParentHandle: MegaNode?,
     ): MegaNode? = megaNodes?.firstNotNullOfOrNull { it?.let { megaApi.getParentNode(it) } }
         ?: currentParentHandle
 
@@ -192,7 +191,7 @@ class FileBackupManager(
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         nodeType: Int,
-        actionType: Int
+        actionType: Int,
     ) {
         backupHandleList = handleList
         backupNodeHandle = pNodeBackup.handle
@@ -200,7 +199,7 @@ class FileBackupManager(
         backupActionType = actionType
         backupDialogType = BACKUP_DIALOG_SHOW_WARNING
 
-        val actionBackupNodeCallback = object: ActionBackupNodeCallback {
+        val actionBackupNodeCallback = object : ActionBackupNodeCallback {
             override fun actionCancel(dialog: DialogInterface?, actionType: Int) {
                 initBackupWarningState()
                 actionBackupListener?.actionBackupResult(actionType, OPERATION_CANCEL)
@@ -210,7 +209,7 @@ class FileBackupManager(
                 handleList: ArrayList<Long>?,
                 pNodeBackup: MegaNode,
                 nodeType: Int,
-                actionType: Int
+                actionType: Int,
             ) {
                 initBackupWarningState()
                 when (actionType) {
@@ -254,7 +253,8 @@ class FileBackupManager(
                     )
 
                     ACTION_BACKUP_FAB -> {
-                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB, OPERATION_EXECUTE)
+                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB,
+                            OPERATION_EXECUTE)
                     }
                     else -> {}
                 }
@@ -264,7 +264,7 @@ class FileBackupManager(
                 handleList: ArrayList<Long>?,
                 pNodeBackup: MegaNode,
                 nodeType: Int,
-                actionType: Int
+                actionType: Int,
             ) {
                 confirmationActionForBackup(handleList, pNodeBackup, nodeType, actionType)
             }
@@ -308,7 +308,7 @@ class FileBackupManager(
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         nodeType: Int,
-        actionType: Int
+        actionType: Int,
     ) {
         backupHandleList = handleList
         backupNodeHandle = pNodeBackup.handle
@@ -326,7 +326,7 @@ class FileBackupManager(
                 handleList: ArrayList<Long>?,
                 pNodeBackup: MegaNode,
                 nodeType: Int,
-                actionType: Int
+                actionType: Int,
             ) {
                 initBackupWarningState()
                 when (actionType) {
@@ -336,7 +336,7 @@ class FileBackupManager(
                     }
 
                     ACTION_BACKUP_REMOVE -> if (handleList != null) {
-                        moveNodeUseCase?.let { userCase->
+                        moveNodeUseCase?.let { userCase ->
                             userCase.moveToRubbishBin(handleList)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -353,7 +353,7 @@ class FileBackupManager(
 
                     ACTION_MOVE_TO_BACKUP -> if (handleList != null) {
                         val handles = Util.getHandleArray(handleList)
-                        moveNodeUseCase?.let { userCase->
+                        moveNodeUseCase?.let { userCase ->
                             userCase.move(handles, pNodeBackup.handle)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -378,7 +378,8 @@ class FileBackupManager(
                         ).post(true)
                     }
                     ACTION_BACKUP_FAB -> {
-                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB, OPERATION_EXECUTE)
+                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB,
+                            OPERATION_EXECUTE)
                     }
                     else -> {}
                 }
@@ -388,7 +389,7 @@ class FileBackupManager(
                 handleList: ArrayList<Long>?,
                 pNodeBackup: MegaNode,
                 nodeType: Int,
-                actionType: Int
+                actionType: Int,
             ) {
             }
         }
@@ -413,7 +414,7 @@ class FileBackupManager(
     fun copyNodesToBackups(
         nC: NodeController,
         copyHandles: LongArray,
-        toHandle: Long
+        toHandle: Long,
     ): Boolean {
         nodeController = nC
 
@@ -476,7 +477,7 @@ class FileBackupManager(
     fun moveToBackup(
         moveNodeUseCase: MoveNodeUseCase,
         moveHandles: LongArray,
-        toHandle: Long
+        toHandle: Long,
     ): Boolean {
         this.moveNodeUseCase = moveNodeUseCase
 
@@ -517,7 +518,7 @@ class FileBackupManager(
      */
     fun moveBackup(
         nC: NodeController,
-        handleList: ArrayList<Long>
+        handleList: ArrayList<Long>,
     ): Boolean {
         nodeController = nC
         if (handleList.size > 0) {
@@ -538,7 +539,7 @@ class FileBackupManager(
                 )
                 return true
             } else {
-                logDebug("MyBackup + chooseLocationToPutNodes nodeType = $nodeType")
+                Timber.d("MyBackup + chooseLocationToPutNodes nodeType = $nodeType")
             }
         }
         return false
@@ -578,7 +579,7 @@ class FileBackupManager(
         nC: NodeController,
         p: MegaNode,
         nodeType: Int,
-        actionType: Int
+        actionType: Int,
     ) {
         nodeController = nC
         actWithBackupTips(null, p, nodeType, actionType)
@@ -594,7 +595,7 @@ class FileBackupManager(
     fun fabForBackup(
         nodeList: List<MegaNode?>,
         currentParentHandle: MegaNode?,
-        actionType: Int
+        actionType: Int,
     ): Boolean {
         // isInBackup Indicates if the current node is under "My backup"
         val nodeType: Int = checkSubBackupNode(nodeList, currentParentHandle)

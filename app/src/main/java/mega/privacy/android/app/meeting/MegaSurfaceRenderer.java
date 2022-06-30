@@ -13,10 +13,13 @@ package mega.privacy.android.app.meeting;
 // The following four imports are needed saveBitmapToJPEG which
 // is for debug only
 
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.isFrontCameraInUse;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -32,10 +35,7 @@ import android.view.TextureView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import timber.log.Timber;
 
 public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTextureListener {
 
@@ -159,7 +159,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
             changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
         }
 
-        logDebug("Surface created");
+        Timber.d("Surface created");
         surfaceHolder.unlockCanvasAndPost(canvas);
     }
 
@@ -168,7 +168,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        logDebug("Surface destroyed");
+        Timber.d("Surface destroyed");
         bitmap = null;
         surfaceWidth = 0;
         surfaceHeight = 0;
@@ -179,7 +179,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
             try {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
             } catch (Exception e) {
-                logError("Exception "+e);
+                Timber.e(e);
             }
         }
 
@@ -198,7 +198,8 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
      * @param isLocal Indicates if the frames are from the local camera.
      */
     public void drawBitmap(boolean isLocal, boolean isGroup) {
-        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null)) return;
+        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null))
+            return;
 
         Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
 
@@ -250,7 +251,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         Bitmap textureViewBitmap = myTexture.getBitmap();
         if (textureViewBitmap == null) return;
 
-        logDebug("TextureView Available");
+        Timber.d("TextureView Available");
         notifyStateToAll();
         changeDestRect(in_width, in_height);
     }
@@ -262,7 +263,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        logDebug("TextureView destroyed");
+        Timber.d("TextureView destroyed");
         bitmap = null;
         surfaceWidth = 0;
         surfaceHeight = 0;

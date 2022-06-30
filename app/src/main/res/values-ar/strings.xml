@@ -12,18 +12,12 @@
     <string name="general_cancel">إلغاء</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">نقل إلى</string>
-    <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_copy_to">نسخ إلى</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select">تحديد</string>
-    <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="general_select_to_upload">حدد الملفات</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">حدد المجلد</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">إنشاء</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">تنزيل</string>
     <!-- button -->
     <string name="general_add">إضافة</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -42,8 +36,6 @@
     <string name="general_ok">حسناً</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">تخطى</string>
-    <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
-    <string name="general_stop">إيقاف</string>
     <!-- option shown when a message could not be sent -->
     <string name="general_retry">إعادة المحاولة</string>
     <!-- Button to open the default web browser -->
@@ -56,24 +48,12 @@
     <string name="general_forwarding">إعادة توجيه</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">استيراد</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="general_storage">مساحة التخزين</string>
-    <!-- Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer. -->
-    <string name="general_bandwidth">حصة تراسل المعطيات</string>
-    <!-- Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan -->
-    <string name="general_subscribe">اشترك</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">خطأ</string>
-    <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">لم تنفذ بعد</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">تم تنزيلها بالفعل</string>
-    <!-- when trying to upload a file that is already uploaded in the folder -->
-    <string name="general_already_uploaded">تم الرفع بالفعل</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
     <string name="general_file_info">معلومات الملف</string>
-    <!-- Label of the option menu. When clicking this button, the app shows the info of the folder -->
-    <string name="general_folder_info">معلومات المجلد</string>
     <!-- Hint how to cancel the download -->
     <string name="general_show_info">أظهر المعلومات</string>
     <!-- Error getting the root node -->
@@ -84,12 +64,6 @@
     <string name="secondary_media_service_error_local_folder">مجلد الوسائط الثانوي غير موجود، الرجاء اختيار مجلد جديد</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">لم يتم العثور على وحدة تخزين خارجية</string>
-    <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">هذا المجلد للقراءة فقط. ليس لديك إذن بالترفيع</string>
-    <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">أنت تقوم بإزالة ملف مفتاح الإستعادة الذي تم تصديره مسبقاً</string>
-    <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">هل تريد إرسال دعوة إلى %s؟</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">تسجيل&#160;خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -116,16 +90,12 @@
     <string name="action_help">المساعدة</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">ترقية الحساب</string>
-    <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">ترقية الحساب</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">اختر الكل</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">عدم التحديد</string>
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">عرض الصور مصغرة</string>
-    <!-- Menu item to change from grid view to list view -->
-    <string name="action_list">طريقة عرض القائمة</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">نسخ مفتاح الإستعادة احتياطياً</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -208,24 +178,8 @@
     <string name="login_before_share">الرجاء تسجيل الدخول للمشاركة مع ميغا MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد خاصتك لم يعد صالحاً. قد يكون حسابك مفعلاً مسبقاً أو قد تكون قد ألغيت تسجيل حسابك.</string>
-    <!--  -->
-    <string name="tour_space_title">مساحة تخزين على ميغا MEGA</string>
-    <!--  -->
-    <string name="tour_speed_title">السرعة على ميغا MEGA</string>
-    <!--  -->
-    <string name="tour_privacy_title">الخصوصية على ميغا MEGA</string>
-    <!--  -->
-    <string name="tour_access_title">صلاحية الوصول على ميغا MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
     <string name="tour_space_text">سجل الآن واحصل على 20 غيغابايت من مساحة التخزين المجانية</string>
-    <!--  -->
-    <string name="tour_speed_text">عملية الترفيع سريعة. شارك ملفاتك بسرعة مع الجميع</string>
-    <!--  -->
-    <string name="tour_privacy_text">احتفظ بكل ملفاتك في آمان مع تشفير ميغا MEGA من طرف إلى طرف</string>
-    <!--  -->
-    <string name="tour_access_text">احصل على تشفير كامل مع امكانية الوصول من أي مكان وفي أي وقت</string>
-    <!-- button that allows the user to create an account -->
-    <string name="create_account_text">إنشاء حساب</string>
     <!-- category in sort by action -->
     <string name="name_text">الاسم</string>
     <!-- First Name of the user -->
@@ -236,8 +190,6 @@
     <string name="tos">أنا أوافق على [A]شروط الخدمة[/A] الخاص بMEGA</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">أدرك أنه[B] إذا فقدت كلمة المرور الخاصة بي، قد أفقد بياناتي[/B]. اقرأ المزيد حول [A]تشفير ميغا MEGA من طرف إلى طرف[/A].</string>
-    <!-- Does the user already have a MEGA account -->
-    <string name="already_account">هل لديك حساب؟</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">يجب عليك أن تقبل شروط الخدمة</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -247,15 +199,11 @@
     <!-- Warning dialog -->
     <string name="error_enter_userlastname">يرجى إدخال اسم العائلة.</string>
     <!-- when creating the account -->
-    <string name="error_short_password">كلمة المرور قصيرة جدا ً</string>
-    <!-- when creating the account -->
     <string name="error_passwords_dont_match">كلمات المرور غير متطابقة</string>
     <!-- when creating the account -->
     <string name="error_email_registered">هذا البريد الإلكتروني لديه حساب مسجل بالفعل لدى ميغا MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">جاري الاتصال بالمخدم: جاري إنشاء حساب</string>
-    <!--  -->
-    <string name="cancel_transfer_confirmation">إلغاء عملية التراسل؟</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">إلغاء جميع عمليات التراسل؟</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -277,16 +225,12 @@
     <string name="section_secondary_media_uploads">ترفيعات الوسائط</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
     <string name="section_inbox">صندوق الوارد</string>
-    <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">حفظ الملفات للعمل دون اتصال</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">غير متصل بالانترنت</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">العناصر المشاركة</string>
-    <!-- title of the screen that shows all the shared items -->
-    <string name="section_shared_items">المجلدات المشاركة</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">سلة المحذوفات</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -327,8 +271,6 @@
     <string name="file_properties_info_last_modified">آخر تعديل</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">أُضِيف</string>
-    <!-- the label when a folder can be accesed by public users -->
-    <string name="file_properties_shared_folder_public_link">رابط عام</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">الإذونات</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -337,8 +279,6 @@
     <string name="file_properties_shared_folder_change_permissions">تغيير  الإذونات</string>
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">مشاركة مع</string>
-    <!-- send a file to a MEGA user -->
-    <string name="file_properties_send_file_select_contact">أرسل إلى</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">المالك</string>
     <!-- positive button on dialog to invite a contact -->
@@ -355,12 +295,8 @@
     <string name="contact_properties_activity">معلومات جهة الاتصال</string>
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">إضافة جهات اتصال جديدة باستخدام الزر أدناه</string>
-    <!-- Add new contacts before sharing. -->
-    <string name="contacts_explorer_list_empty_text">إضافة جهة اتصال جديدة للمشاركة</string>
     <!-- Error message -->
     <string name="error_not_enough_free_space">لا توجد مساحة فارغة كافية على جهازك</string>
-    <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
-    <string name="option_link_without_key">رابط بدون مفتاح</string>
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">مفتاح فك التشفير</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
@@ -422,14 +358,10 @@
     <string name="intent_not_available_location">لا توجد تطبيقات متاحة على جهازك لفتح هذا الموقع</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">قد لا يكون لديك أي تطبيقات مثبتة تدعم هذا النوع من الملفات</string>
-    <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">مشاركة الصورة باستخدام</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">مشاركة الرابط</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">حذف الرابط</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">غادر</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">مغادرة المشاركة</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -449,14 +381,8 @@
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">إعادة التسمية</string>
-    <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">إعادة تسمية %1$s</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="context_open_link_title">فتح الرابط</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">فتح</string>
-    <!-- while renaming a file or folder -->
-    <string name="context_renaming">جاري اعادة التسمية</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">تجهيز الملف</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -477,20 +403,14 @@
     <string name="context_delete_from_mega">إزالة من ميغا MEGA</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">إسم المجلد</string>
-    <!-- when adding a new contact. in the dialog -->
-    <string name="context_new_contact_name">عنوان البريد الإلكتروني</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">إنشاء مجلد</string>
-    <!-- Menu item -->
-    <string name="context_download_to">حفظ إلى</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">افراغ سلة المحذوفات</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">أنت على وشك حذف كافة العناصر من سلة المحذوفات بشكل دائم.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">إرسال</string>
-    <!-- send the file to inbox -->
-    <string name="context_send_file_inbox">إرسال إلى جهة الاتصال</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">حذف</string>
     <!-- Menu option to delete selected items of the offline state -->
@@ -501,8 +421,6 @@
     <string name="context_send_file">ارسل الملف الى المحادثة</string>
     <!-- menu item -->
     <string name="context_send_contact">مشاركة جهة الاتصال إلى المحادثات</string>
-    <!-- open a shared folder -->
-    <string name="context_view_shared_folders">عرض الملفات المشاركة</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">مشاركة</string>
     <!-- Menu option to manage a shared folder. -->
@@ -521,14 +439,10 @@
     <string name="context_contact_not_removed">خطأ. لم يتم حذف جهة الإتصال</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">تم تغيير الإذونات</string>
-    <!-- error message -->
-    <string name="context_permissions_not_changed">خطأ. لم يتم تغيير الإذونات</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">المجلد موجود مسبقاً</string>
     <!-- message when trying to create a invite a contact already that is already added -->
     <string name="context_contact_already_exists">%s موجود كجهة اتصال بالفعل</string>
-    <!-- message when trying to send a file without full access -->
-    <string name="context_send_no_permission">ليس لديك إذن بإرسال هذا الملف</string>
     <!-- success message when creating a folder -->
     <string name="context_folder_created">تم إنشاء المجلد</string>
     <!-- error message when creating a folder -->
@@ -539,8 +453,6 @@
     <string name="context_no_renamed">خطأ. لم يتم إعادة التسمية</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">تم النسخ بنجاح</string>
-    <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">تم الإرسال إلى صندوق الوارد</string>
     <!-- error message when sending a node to Inbox -->
     <string name="context_no_sent_node">خطأ، لم يتم الإرسال إلى صندوق الوارد</string>
     <!-- error message -->
@@ -561,18 +473,8 @@
     <string name="context_correctly_shared">تمت المشاركة بنجاح</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">خطأ. %d مشاركات لم تكتمل.</string>
-    <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared_removed">تمت إزالة المشاركات بنجاح</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number_removed">خطأ. %d لم تكتمل عملية إزالة المشاركات</string>
-    <!-- error message -->
-    <string name="context_no_shared">خطأ. لم تتم المشاركة</string>
     <!-- error message -->
     <string name="context_no_removed_shared">خطأ. فشل في إزالة المشاركة</string>
-    <!-- success message when removing a sharing -->
-    <string name="context_remove_sharing">تمت إزالة مشاركة المجلد</string>
-    <!-- error message -->
-    <string name="context_no_link">فشل إنشاء الرابط</string>
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">تم الحذف بنجاح من MEGA</string>
     <!-- error message -->
@@ -603,20 +505,8 @@
     <string name="number_contact_removed">%d جهات اتصال تمت إزالتها بنجاح</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d جهات اتصال لم يتم إزالتها</string>
-    <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">تم مشاركة المجلد مع جهة الاتصال %d بنجاح</string>
-    <!-- success message when sharing multiple files -->
-    <string name="number_correctly_shared">%d مجلدات تمت مشاركتها بنجاح</string>
-    <!-- error message when sharing multiple files -->
-    <string name="number_no_shared">%d مجلدات لم تتم مشاركتها</string>
     <!-- success message when sending a file to a contact -->
     <string name="context_correctly_copied_contact">تم الإرسال بنجاح إلى:</string>
-    <!-- success message when removing all the contacts of a shared folder -->
-    <string name="context_correctly_removed_sharing_contacts">لم يعد هذا المجلد مشارك</string>
-    <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">حدث خطأ. لا يزال المجلد مشتركًا مع جهة اتصال أخرى</string>
-    <!-- option available for just one file -->
-    <string name="context_select_one_file">اختر ملف واحد فقط</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">تم إفراغ سلة المحذوفات بنجاح</string>
     <!-- error message when emptying the RB -->
@@ -631,8 +521,6 @@
     <string name="confirmation_cancel_subscriptions">شكرا لك على ملاحظاتك. هل أنت متأكد أنك تريد إلغاء اشتراك ميغا MEGA الخاص بك؟</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">لم يتم إلغاء اشتراكك. يرجى تقديم سبب لإلغائه</string>
-    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">شكراً. دفعتك قيد المعالجة. يرجى مراسلتنا عبر البريد الإلكتروني على support&#64;mega.co.nz إذا لم تستلم ترقيتك في غضون 24 ساعة.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">سيصبح اشتراكك الجديد سارياً بمجرد انتهاء الاشتراك الحالي، وسيتم تحصيل السعر الجديد في ذلك الوقت.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -641,30 +529,22 @@
     <string name="subscription_type_monthly">شهرياً</string>
     <!--  -->
     <string name="subscription_type_yearly">سنويًا</string>
-    <!-- success message after removing the public link of a folder -->
-    <string name="context_node_private">المجلد الآن خاص</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">تم حذف المشاركة بنجاح</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">مجلد جديد</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">إضافة جهة اتصال</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_add_contact_and_share">إضافة و مشاركة جهة اتصال</string>
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">مفتاح فك التشفير</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">الرجاء إدخال مفتاح فك التشفير للرابط</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">مفتاح فك التشفير غير صالح</string>
-    <!-- upload to. Then choose an Image file -->
-    <string name="upload_to_image">صورة</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">صوتي</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">فيديو</string>
-    <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
-    <string name="upload_uploaded">تم الرفع</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="zero">لا يوجد أي ملف جاري المعالجة</item>
@@ -684,10 +564,6 @@
     <string name="error_io_problem">مشكلة نظام الملفات</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">حدث خطأ أثناء تنفيذ الإجراء</string>
-    <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">عارض الصور</string>
-    <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">مساحة التخزين المستخدمة</string>
     <!-- menu item -->
     <string name="my_account_change_password">تغيير كلمة المرور</string>
     <!-- Dialog text overquota error -->
@@ -696,34 +572,16 @@
     <string name="my_account_last_session">آخر جلسة</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">تغيير كلمة المرور</string>
-    <!-- when changing the password, the first edittext is to enter the current password -->
-    <string name="my_account_change_password_oldPassword">كلمة المرور الحالية</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">كلمة المرور جديدة</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">تأكيد كلمة المرور الجديدة</string>
-    <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">كلمات المرور غير متطابقة</string>
-    <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">اختر باقة</string>
-    <!-- the user has to decide the way of payment -->
-    <string name="select_membership_1">متكرر شهرياً أو سنوياً</string>
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">لا توجد طريقة دفع محددة لهذه الباقة حاليًا. يرجى اختيار واحدة.</string>
-    <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">شهرياً*</string>
-    <!-- button to decide annually payment. The asterisk is needed -->
-    <string name="upgrade_per_year">سنوياً*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">تم نسخ الرابط إلى الحافظة</string>
-    <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">لم يتم تنزيل العرض المسبق بعد، الرجاء الانتظار</string>
-    <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">لا توجد ذاكرة خالية كافية لإظهار العرض. الرجاء معاودة المحاولة في وقت لاحق.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">يرجى تسجيل الخروج قبل إنشاء الحساب</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">لا توجد عمليات تراسل نشطة</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">تم إيقاف عمليات التراسل مؤقتاً</string>
     <!-- menu item -->
@@ -754,8 +612,6 @@
     <string name="camera_notif_primary_local_unavailable">تم تعطيل ترفيعات الكاميرا. المجلد المحلي الخاص بك غير متوفر.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">تم تعطيل ترفيعات الوسائط. المجلد المحلي الخاص بك غير متوفر.</string>
-    <!-- notification camera uploads complete -->
-    <string name="settings_camera_notif_complete">اكتملت ترفيعات الكاميرا</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">المظهر</string>
     <!-- settings of the Features section -->
@@ -786,16 +642,12 @@
     <string name="settings_storage_download_location">موقع افتراضي للتنزيل</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">إسأل دائماً عن مكان التنزيل</string>
-    <!-- Whether to enable the storage in advanced devices -->
-    <string name="settings_storage_advanced_devices">عرض الأجهزة المتقدمة (كرت الذاكرة الخارجية SD)</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">إضافة رقم هاتف</string>
     <!-- enter verification code page title -->
     <string name="verify_account_title">التحقق من حسابك</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
     <string name="verify_account_helper_locked">تم قفل حسابك مؤقتاً بسبب سوء استخدام محتمل. يرجى التحقق من رقم هاتفك لفتح حسابك.</string>
-    <!-- Hint text of the country edittext for billing purposes -->
-    <string name="general_country_label">الدولة</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">المنطقة</string>
     <!-- place holder for enter mobile number field -->
@@ -839,10 +691,6 @@
         <item>ذاكرة داخلية</item>
         <item>ذاكرة خارجية</item>
     </string-array>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option -->
-    <string name="internal_storage_label">ذاكرة داخلية</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string name="external_storage_label">ذاكرة خارجية</string>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
         <item>اكتب بريد المستخدم الالكتروني</item>
@@ -850,10 +698,6 @@
     </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">تفعيل ترفيعات الكاميرا</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">تشغيل ترفيعات الكاميرا</string>
-    <!-- settings option -->
-    <string name="settings_camera_upload_off">تعطيل ترفيعات الكاميرا</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">كيفية الترفيع</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -875,8 +719,6 @@
         <item>ملفات فيديو فقط</item>
         <item>الصور و ملفات الفيديو</item>
     </string-array>
-    <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">فقط خلال الشحن</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">تشمل علامات الموقع</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -897,8 +739,6 @@
     <string name="settings_camera_upload_only_videos">فيديو فقط</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">الصور والفيديوهات</string>
-    <!-- status text when no custom photo sync folder has been set -->
-    <string name="settings_pin_lock_code_not_set">لم يتم التعيين</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">قفل رمز المرور</string>
     <!-- Settings option to change Passcode. -->
@@ -922,17 +762,6 @@
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">سيتم تسجيل خروجك وسيتم حذف ملفاتك غير المتصلة بالانترنت بعد 10 محاولات فاشلة</string>
-    <!-- error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_incorrect">رمز غير صحيح</string>
-    <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
-    <plurals name="pin_lock_incorrect_alert">
-        <item quantity="zero">رمز مرور خاطئ، يرجى إعادة المحاولة. لديك %2d محاولة باقية</item>
-        <item quantity="one">رمز المرور خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
-        <item quantity="two">رمز مرور خاطئ، يرجى إعادة المحاولة. لديك %2d محاولتان باقيتان</item>
-        <item quantity="few">رمز مرور خاطئ، يرجى إعادة المحاولة. لديك %2d محاولات باقية</item>
-        <item quantity="many">رمز مرور خاطئ، يرجى إعادة المحاولة. لديك %2d محاولة باقية</item>
-        <item quantity="other">رمز مرور خاطئ، يرجى إعادة المحاولة. لديك %2d محاولة باقية</item>
-    </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">رموز المرور غير متطابقة. حاول مرة أخرى.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
@@ -943,8 +772,6 @@
     <string name="reset_pin_title">أدخل رمز المرور الجديد</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="reset_pin_title_2">إعادة إدخال رمز المرور الجديد</string>
-    <!-- Text of the screen after 10 attemps with a wrong Passcode -->
-    <string name="incorrect_pin_activity">سيتم حذف جميع بياناتك المحلية وسيتم تسجيل خروجك خلال %1d ثواني</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">حول</string>
     <!-- Preference screen item action button -->
@@ -959,38 +786,10 @@
     <string name="settings_about_karere_version">نسخة محادثة ميغا MEGA لحزمة أدوات تطوير البرمجيات SDK</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">عرض الرماز المصدري</string>
-    <!--  -->
-    <string name="january">كانون الثاني</string>
-    <!--  -->
-    <string name="february">شباط</string>
-    <!--  -->
-    <string name="march">آذار</string>
-    <!--  -->
-    <string name="april">نيسان</string>
-    <!--  -->
-    <string name="may">آيار</string>
-    <!--  -->
-    <string name="june">حزيران</string>
-    <!--  -->
-    <string name="july">تموز</string>
-    <!--  -->
-    <string name="august">آب</string>
-    <!--  -->
-    <string name="september">أيلول</string>
-    <!--  -->
-    <string name="october">تشرين الأول</string>
-    <!--  -->
-    <string name="november">تشرين الثاني</string>
-    <!--  -->
-    <string name="december">كانون الأول</string>
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">متصفح مضغوط</string>
-    <!-- title of the My Account screen -->
-    <string name="my_account_title">نوع الحساب</string>
     <!--  -->
     <string name="free_account">مجاناً</string>
-    <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">تم انشاء مجلد ترفيعات الكاميرا</string>
     <!-- category in sort by action -->
     <string name="sortby_name">الإسم</string>
     <!-- sort files alphabetically ascending -->
@@ -999,12 +798,6 @@
     <string name="sortby_name_descending">تنازلي</string>
     <!-- category in sort by action -->
     <string name="sortby_date">التاريخ</string>
-    <!-- category in sort by action -->
-    <string name="sortby_creation_date">تاريخ الإنشاء</string>
-    <!-- category in sort by action -->
-    <string name="sortby_modification_date">تاريخ التعديل</string>
-    <!-- category in sort by action -->
-    <string name="sortby_link_creation_date">تاريخ إنشاء الرابط</string>
     <!-- sort files by date newest first -->
     <string name="sortby_date_newest">الأحدث</string>
     <!-- sort files by date oldest first -->
@@ -1015,14 +808,10 @@
     <string name="sortby_size_largest_first">الأكبر</string>
     <!-- sort files by size smallest first -->
     <string name="sortby_size_smallest_first">الاصغر</string>
-    <!-- Title of sort by media type options -->
-    <string name="sortby_type">نوع الوسائط</string>
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">صور</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">مقاطع الفيديو</string>
-    <!-- Title to choose the type of Passcode -->
-    <string name="pin_lock_type">نوع رمز المرور</string>
     <!-- Passcode with 4 digits -->
     <string name="four_pin_lock">4 محارف</string>
     <!-- Passcode with 6 digits -->
@@ -1033,16 +822,12 @@
     <string name="settings_enable_logs">السجلات ممكنة الآن</string>
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">السجلات معطلة الآن</string>
-    <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">تعذر إعداد مجلد ميغا MEGA لترفيعات الكاميرا</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">فتح الموقع</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">هذه العملية تستغرق وقتا أطول من المتوقع. أرجو الإنتظار.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">حساب مجاني</string>
-    <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">حساب برو لايت Pro Lite</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">حساب برو 1 Pro I</string>
     <!-- Label in My Account section to show user account type -->
@@ -1073,22 +858,8 @@
     <string name="general_positive_button">نعم</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">كلا</string>
-    <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">نسيت كلمة المرور؟</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">نسيت كلمة المرور؟</string>
-    <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">إذا كان لديك نسخة احتياطية من مفتاح الاستعادة، يمكنك إعادة تعيين كلمة المرور عن طريق اختيار نعم. لن تفقد أية بيانات.</string>
-    <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">لا يزال بإمكانك تصدير مفتاح الاستعادة الآن إذا كان لديك جلسة ميغا MEGA نشطة في متصفح آخر على هذا الكمبيوتر أو أي جهاز آخر. في حال عدم وجود ذلك، فلن تتمكن من فك تشفير حسابك الحالي، ولكن يمكنك بدء حساب جديد تحت عنوان البريد الإلكتروني نفسه من خلال اختيار لا.</string>
-    <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">هل لديك نسخة احتياطية من مفتاح الاستعادة الخاص بك؟</string>
-    <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">عظيم!</string>
-    <!-- Hint of the text where the user can write his e-mail -->
-    <string name="edit_text_insert_mail">أدخل بريدك الإلكتروني هنا</string>
-    <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">يرجى إدخال عنوان البريد الإلكتروني الخاص بك أدناه. سوف تتلقى رابط الاستعادة الذي سيسمح لك أن تقدم مفتاح الاستعادة وإعادة تعيين كلمة المرور الخاصة بك.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">مفتاح الاستعادة الخاص بك يوجد هنا</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1125,14 +896,6 @@
     <string name="park_account_dialog_title">ركن الحساب</string>
     <!-- Button to park an account -->
     <string name="park_account_button">ركن</string>
-    <!-- Title of the screen to park an account -->
-    <string name="park_account_title">عفوا!</string>
-    <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">نظرا لنموذج التشفير من طرف إلى طرف، لن تتمكن من الوصول إلى بياناتك بدون كلمة المرور أو نسخة احتياطية من مفتاح الاستعادة.</string>
-    <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">يمكنك ركن حسابك الحالي وبدء حساب جديد تحت نفس عنوان البريد الإلكتروني. سيتم الاحتفاظ بالبيانات الخاصة بك لمدة 60 يوماً على الأقل. إذا كنت لا تتذكر كلمة مرور حسابك المركون، يرجى التواصل على support&#64;mega.nz</string>
-    <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">الرجاء إدخال عنوان البريد الإلكتروني أدناه. سوف تتلقى رابط الاستعادة الذي سيسمح لك بركن حسابك.</string>
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">هذه هي الخطوة الأخيرة لحجز حسابك، يرجى إدخال كلمة المرور الجديدة. سيتم الاحتفاظ ببياناتك لمدة 60 يوماً على الأقل. إذا كنت تتذكر كلمة مرور حسابك المتوقف، يرجى التواصل معنا عبر البريد الالكتروني support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
@@ -1141,16 +904,12 @@
     <string name="recovery_link_expired">لقد انتهت صلاحية هذا الرابط ، يرجى المحاولة مرة أخرى.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">سيتم استخدام مفتاح الإستعادة الخاص بك لإعادة تعيين كلمة المرور الخاصة بك. الرجاء إدخال كلمة المرور الجديدة.</string>
-    <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
-    <string name="email_verification_text_change_pass">ستتلقى رابط الاستعادة يتيح لك إعادة تعيين كلمة المرور.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">الترقية</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">رق حسابك الآن</string>
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">قم بتوسيع السحابة الخاصة بك.[A]احصل على مساحة تخزين و حصص تراسل معطيات أكبر باستخدام حساب برو Pro.</string>
-    <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">تم حفظ مفتاح استعادة حساب ميغا MEGA في:%1s.[A]يمكنك العثور على ملف مفتاح الاستعادة الخاص بك في قسم الحفظ بدون اتصال بالإنترنت.[/A] ملاحظة: حيث سيتم حذف الملف الذي يحتوي على مفتاح الاستعادة الخاص بك عند تسجيل الخروج، يرجى تخزينه في مكان آمن خارج حساب ميغا MEGA الخاص بك.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">البريد الالكتروني مستخدم مسبقاً. يرجى ادخال عنوان بريد الكتروني آخر.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1161,12 +920,6 @@
     <string name="change_mail_text_last_step">هذه هي الخطوة الأخيرة لتغيير البريد الإلكتروني الخاص بك. يرجى إدخال كلمة المرور أدناه.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">تغيير البريد الإلكتروني</string>
-    <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">مساحة التخزين على وشك النفاد.</string>
-    <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">الاستفادة الكاملة من حساب ميغا MEGA عن طريق الترقية إلى برو Pro.</string>
-    <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">تعديل صورتك الشخصية</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">التقاط</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1177,8 +930,6 @@
     <string name="incorrect_MK">لا يتطابق المفتاح الذي أدخلته مع هذا الحساب. الرجاء التأكد من استخدام مفتاح الاستعادة الصحيح والمحاولة مرة أخرى.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">مفتاح الاستعادة غير صالح</string>
-    <!-- Alert Dialog to get link -->
-    <string name="option_full_link">الرابط مع المفتاح</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">جاري الحصول على المعلومات&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1211,23 +962,10 @@
     <string name="number_correctly_delete_contact_request">%d طلبات تم حذفهم بنجاح.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d طلبات حذفت بنجاح لكن هناك %2$d طلبات لم تحذف.</string>
-    <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">هل تريد إزالة طلب الدعوة إلى %s؟</string>
-    <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">هل تريد إزالة %d طلبات الدعوة هذه؟</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">%d طلب رد تم إرساله.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d طلب رد تم إرسالهم بنجاح ولكن %2$d لم يتم إرسالهم.</string>
-    <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
-    <plurals name="general_num_request">
-        <item quantity="zero">%1$d طلب</item>
-        <item quantity="one">1 طلب</item>
-        <item quantity="two">%1$d طلبان</item>
-        <item quantity="few">%1$d طلبات</item>
-        <item quantity="many">%1$d طلباً</item>
-        <item quantity="other">%1$d طلب</item>
-    </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="zero">هذا المجلد مشارك من قبل %1$d جهة اتصال. هل تود إزالة كل المشاركات؟</item>
@@ -1272,18 +1010,12 @@
     <string name="file_link_unavaible_delete_account">تم إنهاء حساب المستخدم المرتبط بسبب الانتهاكات المتعددة لشروط الخدمة الخاصة بنا.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">مفتاح فك التشفير الذي تم توفيره لرابط المجلد غير صالح.</string>
-    <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
-    <string name="my_account_my_credentials">بيانات الاعتماد الخاصة بي</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
     <string name="limited_bandwith">محدود</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">المحادثة</string>
-    <!-- Item of the navigation title for the chat section when there is any unread message -->
-    <string name="section_chat_with_notification">محادثة [A](%1$d)[/A]</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">الأرشيف</string>
-    <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">ادع أصدقائك للانضمام الى المحادثة وتمتعوا بمنصة محادثات مشفرة لدينا مع الحفاظ على الخصوصية والأمن.</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">ساعة</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1296,12 +1028,6 @@
     <string name="remove_contact_shared_folder">سيتم إزالة جهة الاتصال %s من المجلد المشارك.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <string name="remove_multiple_contacts_shared_folder">يتم إزالة جهة الاتصال %d من المجلد المشارك.</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_correctly_removed_from_shared">تمت إزالة جهة الاتصال %d من المجلد المشارك</string>
-    <!-- success message when removing a contact from a shared folder -->
-    <string name="number_incorrectly_removed_from_shared">لم تتم إزالة جهات الاتصال %d بنجاح</string>
-    <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
-    <string name="number_permission_correctly_changed_from_shared">تم تحديث الأذونات بنجاح لجهات الاتصال %d</string>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">أخفق تحديث الأذونات لجهات الاتصال %d</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
@@ -1314,8 +1040,6 @@
     <string name="number_no_invite_contact_request">%1$d طلبات دعوة أرسلت بنجاح ولكن  %2$d طلبات دعوة لم ترسل.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (أنا)</string>
-    <!-- Hint shown in the field to write a message in the chat screen -->
-    <string name="type_message_hint">اكتب رسالتك</string>
     <!-- button -->
     <string name="general_mute">كتم</string>
     <!-- button -->
@@ -1373,12 +1097,8 @@
     <string name="title_properties_chat_contact_notifications">الإشعارات</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">نغمة الرسالة</string>
-    <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">حذف المحادثة</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">مشاركة جهة اتصال</string>
-    <!-- Title of the screen to select the ringtone of the calls -->
-    <string name="call_ringtone_title">نغمة الاتصال</string>
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">نغمة الاشعارات</string>
     <!-- Button to clear the chat history -->
@@ -1417,8 +1137,6 @@
     <string name="away_status">بعيد</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="busy_status">مشغول</string>
-    <!-- Info label about the status of the user -->
-    <string name="invalid_status">لا يوجد اتصال</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">هذه الرسالة قد تم حذفها</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1477,8 +1195,6 @@
     <string name="manual_resume_alert">تم إيقاف عمليات تراسل المعطيات مؤقتًا. انقر للاستئناف.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">خطأ. لم يتم تغيير حالتك</string>
-    <!-- message shown when a user couldn’t leave chat -->
-    <string name="leave_chat_error">حدث خطأ أثناء مغادرة المحادثة</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">حدث خطأ أثناء إنشاء المحادثة</string>
     <!-- settings of the chat to choose the status -->
@@ -1509,8 +1225,6 @@
     <string name="chat_error_open_title">خطأ في المحادثة</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">تعذر فتح المحادثة بنجاح</string>
-    <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">اختر جهة اتصال</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="zero">%1$d جهة اتصال</item>
@@ -1561,32 +1275,12 @@
     <string name="more_users_typing">%1$s [A]وأكثر يكتبون&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">المزيد</string>
-    <!-- Text button -->
-    <string name="label_close">إغلاق</string>
-    <!-- Title of the general tab in My Account Section -->
-    <string name="tab_my_account_general">عام</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="tab_my_account_storage">التخزين</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="label_storage_upgrade_account">التخزين</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
     <string name="label_transfer_quota_upgrade_account">حجم التراسل المتاح</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_achievements">حجم التراسل المتاح</string>
-    <!-- Title of the section about the plan in the storage tab in My Account Section -->
-    <string name="account_plan">الباقة</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">مساحة التخزين</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="transfer_quota">حجم التراسل المتاح</string>
-    <!-- Label in section the storage tab in My Account Section -->
-    <string name="available_space">متوفر</string>
-    <!-- Label in section the storage tab in My Account Section when no info info is received -->
-    <string name="not_available">غير متوفر</string>
-    <!-- Label in section the storage tab when the account is Free -->
-    <string name="no_bylling_cycle">لا توجد دورة فوترة</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="my_account_of_string">%1$s [A]من %2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">إزالة من “غير متصل“؟</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1595,14 +1289,6 @@
     <string name="set_color_theme_label">لون النمط</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">رفض</string>
-    <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="general_not_available">غير متوفر</string>
-    <!-- Accepted request invitacion alert -->
-    <string name="context_invitacion_reply_accepted">تم قبول الدعوة</string>
-    <!-- Declined request invitacion alert -->
-    <string name="context_invitacion_reply_declined">تم رفض الدعوة</string>
-    <!-- Ignored request invitacion alert -->
-    <string name="context_invitacion_reply_ignored">تم تجاهل الدعوة</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">تعذر التعرف على الرسالة</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
@@ -1628,8 +1314,6 @@
         <item>مشغول</item>
         <item>غير متصل بالانترنت</item>
     </string-array>
-    <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">لا توجد ملفات محفوظة دون اتصال</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">تمكين</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1638,35 +1322,12 @@
     <string name="enable_log_text_dialog">يمكن أن تحتوي السجلات على معلومات ذات صلة بحسابك</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">تم استرداد اتصال الشبكة. هل تريد الاتصال بميغا MEGA؟</string>
-    <!-- Message shown meanwhile the app is waiting for a the chat status -->
-    <string name="loading_status">جاري تحميل الحالة&#8230;</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">لا يمكن تعديل هذه الرسالة</string>
-    <!-- Label to show the number of transfers in progress, Plural -->
-    <plurals name="text_number_transfers">
-        <item quantity="zero">%1$d من %2$d ملف</item>
-        <item quantity="one">%1$d من %2$d ملف</item>
-        <item quantity="two">%1$d من %2$d ملفين</item>
-        <item quantity="few">%1$d من %2$d ملفات</item>
-        <item quantity="many">%1$d من %2$d ملف</item>
-        <item quantity="other">%1$d من %2$d ملف</item>
-    </plurals>
-    <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">العملية تنتهي&#8230;</string>
-    <!-- positive button on dialog to view a contact -->
-    <string name="option_to_transfer_manager">عرض</string>
-    <!-- Label of the modal bottom sheet to pause all transfers -->
-    <string name="option_to_pause_transfers">إيقاف جميع عمليات تراسل المعطيات</string>
-    <!-- Label of the modal bottom sheet to resume all transfers -->
-    <string name="option_to_resume_transfers">استئناف جميع عمليات تراسل المعطيات</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
     <string name="option_to_clear_transfers">مسح جميع عمليات تراسل المعطيات</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">أعد محاولة جميع عمليات تراسل المعطيات</string>
-    <!-- Dialog to confirm the action of pausing one transfer -->
-    <string name="menu_pause_individual_transfer">هل تود إيقاف عملية تراسل المعطيات مؤقتا؟</string>
-    <!-- Dialog to confirm the action of restarting one transfer -->
-    <string name="menu_resume_individual_transfer">هل ترغب باستئناف عملية تراسل المعطيات؟</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">استئناف</string>
     <!-- Dialog to confirm before removing completed transfers -->
@@ -1687,10 +1348,6 @@
     <string name="transfer_cancelled">ملغى</string>
     <!-- Possible state of a transfer -->
     <string name="transfer_unknown">غير معروف</string>
-    <!-- Title of the panel where the progress of the transfers is shown -->
-    <string name="paused_transfers_title">تم إيقاف عمليات التراسل مؤقتاً</string>
-    <!-- message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty">لا يوجد عمليات تراسل معطيات مكتملة</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">جاري ترفيع الملفات: %1$d من %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1723,15 +1380,6 @@
         <item quantity="few">%1$d ملفات لم يتم ترفيعهم</item>
         <item quantity="many">%1$d ملفاً لم يتم ترفيعهم</item>
         <item quantity="other">%1$d ملف لم يتم ترفيعهم</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
-    <plurals name="copied_service_upload">
-        <item quantity="zero">%1$d ملف تم نسخه</item>
-        <item quantity="one">%1$d ملف تم نسخه</item>
-        <item quantity="two">%1$d ملفان تم نسخهما</item>
-        <item quantity="few">%1$d ملفات تم نسخهم</item>
-        <item quantity="many">%1$d ملفاً تم نسخهم</item>
-        <item quantity="other">%1$d ملف تم نسخهم</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
@@ -1853,12 +1501,6 @@
         <item quantity="many">تمت إزالة الروابط بنجاح.</item>
         <item quantity="other">تمت إزالة الروابط بنجاح.</item>
     </plurals>
-    <!-- error message -->
-    <string name="context_link_action_error">فشل عملية الرابط، يرجى إعادة المحاولة لاحقاً.</string>
-    <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">اكتب بريد المستخدم الالكتروني</string>
-    <!-- title of the screen to see the details of several node attachments -->
-    <string name="activity_title_files_attached">ملفات مرفقة</string>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">جهات اتصال مرفقة</string>
     <!--  -->
@@ -1923,28 +1565,16 @@
     <string name="attachment_uploading_state_compressing">جاري الضغط&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">خطأ. لم ترسل.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d ملفات تم تنزيلهم بالفعل.</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
-    <string name="pending_multiple">%d ملفات بالانتظار.</string>
     <!--  -->
     <string name="contact_is_me">لا توجد خيارات متاحة. لقد اخترت نفسك</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">إزالة المرفقات؟</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">عرض الملفات (%1$d حذفت)</string>
-    <!-- Success message when the attachment has been sent to a chat -->
-    <string name="success_attaching_node_from_cloud">تم إرسال الملف  إلى %1$s</string>
-    <!-- Success message when the attachment has been sent to a many chats -->
-    <string name="success_attaching_node_from_cloud_chats">تم إرسال الملف إلى %1$d محادثات</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">خطأ. لم يتم إرسال الملف</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_attaching_node_from_cloud_chats">خطأ. لم يتم إرسال الملف لأي من المحادثات المحددة</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">خطأ. المرفقات لم تتم إزالتها</string>
-    <!-- settings option -->
-    <string name="settings_set_up_automatic_uploads">إعداد الترفيعات التلقائية</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">صامت</string>
     <!-- messages string in chat notification -->
@@ -1963,8 +1593,6 @@
     <string name="title_properties_chat_notifications_contact">إشعارات المحادثة</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] مسح سجلات المحادثة[/B]</string>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <string name="number_messages_chat_notification">%1$d محادثات غير مقروءة</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_permissions_changing_folder">تغيير الأذونات</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -1979,8 +1607,6 @@
     <string name="confirmation_move_to_rubbish_plural">نقل إلى سلة المحذوفات؟</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">حذف من ميغا MEGA؟</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state">جاري الرفع&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">إشعارات المحادثة</string>
     <!-- title of the section for achievements -->
@@ -2005,8 +1631,6 @@
     <string name="title_regitration">مكافآت التسجيل</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">احصل علىMEGA Desktop App</string>
-    <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
-    <string name="camera_uploads_empty">لا توجد ملفات في قسم ترفيعات الكاميرا</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d يوم متبقي</string>
     <!-- State to indicate an achievement has expired -->
@@ -2021,14 +1645,8 @@
     <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك لإنشاء حساب مجاني على ميغا MEGA ولتثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile. سوف تتلقى مساحة تخزين مجانية كمكافأة لكل عملية تسجيل وتثبيت تطبيق ناجح.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">تنطبق مكافأة التخزين المجانية على الدعوات الجديدة فقط وحين يتم تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile أو تطبيق ميغا للحاسب المكتبي MEGA Desktop App.</string>
-    <!-- explanation of screen to invite friends and get an achievement -->
-    <string name="card_title_invite_friends">حدد جهات الاتصال من قائمة جهات اتصال هاتفك أو أدخل العديد من عناوين البريد الإلكتروني.</string>
-    <!-- title of the dialog to confirm the contact request -->
-    <string name="title_confirmation_invite_friends">ادع أصدقائك إلى ميغا MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">تم ارسال الدعوة</string>
-    <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">شجع أصدقائك على تسجيل وتثبيت تطبيق ميغا MEGA. طالما أن صديقك يستخدم عنوان البريد الإلكتروني نفسه الذي أدخلته، فستتلقى مكافأة حجم تراسل معطيات مجاني.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">البريد الإلكتروني غير صحيح</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -2065,8 +1683,6 @@
         <item quantity="many">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
         <item quantity="other">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
     </plurals>
-    <!-- Info of a contact if there is no folders shared with him -->
-    <string name="no_folders_shared">لا يوجد أي مجلدات مشاركة</string>
     <!-- Menu item -->
     <string name="settings_help">المساعدة</string>
     <!-- Settings preference title for help centre -->
@@ -2083,8 +1699,6 @@
     <string name="settings_feedback_body_android_version">نسخة الأندرويد</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">ملف نصي جديد</string>
-    <!-- Title of the dialog to create a new file by inserting the name -->
-    <string name="dialog_title_new_file">ملف جديد</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">اسم الملف</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -2093,32 +1707,12 @@
     <string name="context_new_link_name">الرابط الالكتروني URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">الموضوع</string>
-    <!-- Title of the field content when a new file is created to upload -->
-    <string name="new_file_content_when_uploading">المحتوى</string>
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">البريد الإلكتروني</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">إعادة توجيه</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">إرفاق</string>
-    <!-- when add or share a file with a new contact, it can type by name or mail -->
-    <string name="type_contact">اسم جهة الاتصال أو بريده الالكتروني</string>
-    <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">لا يمكن إضافة المزيد من جهات الاتصال في هذا الوقت</string>
-    <!-- when changing the password , the old password and new password are equals -->
-    <string name="old_and_new_passwords_equals">لا يمكن أن تكون كلمة المرور الجديدة هي نفس كلمة المرور القديمة</string>
-    <!-- Menu item -->
-    <string name="action_search_by_date">بحث بالتاريخ</string>
-    <!-- title of a button to apply search by date -->
-    <string name="general_apply">تطبيق</string>
-    <!-- title of a button to apply search by month -->
-    <string name="general_search_month">الشهر الماضي</string>
-    <!-- title of a button to apply search by year -->
-    <string name="general_search_year">السنة الماضية</string>
-    <!-- title of a Search by date tag -->
-    <string name="label_set_day">حدد يوم</string>
-    <!-- the user can’t choose this date -->
-    <string name="snackbar_search_by_date">التاريخ المختار غير متوفر</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">اسم غير صالح</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
@@ -2136,8 +1730,6 @@
         <item quantity="many">لا يمكن أن تكون أسماء الملفات فارغة.</item>
         <item quantity="other">لا يمكن أن تكون أسماء الملفات فارغة.</item>
     </plurals>
-    <!-- Label shown when audio file is playing -->
-    <string name="audio_play">ملف صوتي</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">خطأ: ملف pdf غير صالح أو غير موجود.</string>
     <!-- Label to include info of the user email in the feedback form -->
@@ -2146,10 +1738,6 @@
     <string name="save_to_mega">احفظ إلى \nالسواقة السحابية الخاصة بي</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">المحادثة موجودة مسبقاً</string>
-    <!-- before sharing a file, has to be downloaded -->
-    <string name="not_download">لم يتم تنزيل الملف بعد</string>
-    <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">يمكن إضافة جهات اتصال ميغا MEGA فقط</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">إعادة الاتصال بالمحادثة</string>
     <!-- Message show when a call cannot be established -->
@@ -2160,14 +1748,10 @@
     <string name="rate_the_app_panel">نعم، قم بتقييم التطبيق</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">لا، أرسل الرأي</string>
-    <!-- title of the section advanced options on the get link screen -->
-    <string name="link_advanced_options">خيارات متقدمة</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">يحتاج ميغا MEGA إلى أذونات القراءة والكتابة إلى وحدة التخزين الخارجية لتنزيل الملفات هناك.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">بطاقة الذاكرة SD القديمة غير متاحة، يُرجى تعيين موقع تنزيل جديد.</string>
-    <!-- Dialog title to ask download to internal storage or external storage. -->
-    <string name="title_select_download_location">اختيار موقع التنزيل</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">لا توجد لديك صلاحيات ممنوحة لجهات الاتصال</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -2186,12 +1770,8 @@
     <string name="section_my_code">الرمز الخاص بي</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">ارسال الرمز</string>
-    <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">قبول تلقائي</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">مستخدمو ميغا MEGA الذين يقومون بمسح رمز الاستجابة السريعة QR الخاص بك، سيتم إضافتهم إلى قائمة الاتصال الخاصة بك تلقائياً.</string>
-    <!-- Subtitle of QR code settings that reset the code -->
-    <string name="setting_subtitle_qrcode_reset">رمز الاستجابة السريعة QR السابق سيصبح غير صالح</string>
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">تم نسخ الرابط الى الحافظة</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
@@ -2242,12 +1822,6 @@
     <string name="external_play">فتح باستخدام</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">شارك باستخدام</string>
-    <!-- Message shown if the user choose enable button and he is not logged in -->
-    <string name="error_enable_chat_before_login">يرجى تسجيل الدخول قبل تمكين المحادثة</string>
-    <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
-    <string name="label_set_period">تحديد المدة</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]ادعي الأصدقاء الى [/B][A]المحادثة[/A][B] و استمتع باستخدام منصتنا المشفرة بخصوصية و أمان [/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]إفراغ[/B][A]سلة المحذوفات[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2364,8 +1938,6 @@
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">عودة</string>
-    <!-- option menu to clear all the previous versions -->
-    <string name="menu_item_clear_versions">مسح النسخ السابقة</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="zero">حذف النسخة؟</item>
@@ -2413,8 +1985,6 @@
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <string name="messages_forwarded_success">تمت إعادة توجيه الرسائل</string>
-    <!-- Error message after forwarding one or several messages to several chats -->
-    <string name="messages_forwarded_error">خطأ. لم تتم إعادة التوجيه بشكل صحيح</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="zero">خطأ. فشل إعادة توجيه %1$d رسالة</item>
@@ -2470,34 +2040,24 @@
     <string name="general_do_not_show">لا تظهر مرة أخرى</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
     <string name="remember_pwd_dialog_button_test">تحقق من كلمة المرور</string>
-    <!-- Title of the activity that permits user test his password -->
-    <string name="test_pwd_title">التحقق من كلمة المرور</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">تم قبول كلمة المرور</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
     <string name="test_pwd_wrong">كلمة مرور خاطئة.\nقم بعمل نسخة احتياطية من مفتاح الاستعادة في أسرع وقت ممكن!</string>
-    <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="recovery_key_exported_dialog_text_logout">انت بصدد تسجيل الخروج، يرجى التحقق من كلمة المرور خاصتك للتأكد من تذكرك لها\nفقدان كلمة المرور سيؤدي الى فقدان صلاحية الدخول للبيانات الخاصة بك على ميغا MEGA.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">النسخ الى الحافظة</string>
-    <!-- Option that permits user export his recovery key -->
-    <string name="option_export_recovery_key">تصدير مفتاح الاستعادة</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">متابعة تسجيل الخروج</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">مفتاح الإستعادة</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">حفظ على نظام الملفات</string>
-    <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">تم النسخ إلى الحافظة</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">اذهب للأحدث</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
     <string name="message_new_messages">رسائل جديدة</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">مكالمة واردة</string>
-    <!-- Text for the notification action to launch the incoming call page -->
-    <string name="notification_incoming_action">اذهب إلى المكالمة</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
     <string name="notification_enable_display">تم تعطيل النوافذ المنبثقة من ميغا MEGA.\nانقر لتغيير الإعدادات.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
@@ -2520,10 +2080,6 @@
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]جاري تحميل[/A] [B]الرسائل &#8230; [/B]</string>
-    <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_internal_node_not_found">الملف أو المجلد غير موجود. هل قمت بتسجيل الدخول بحساب مختلف في متصفح الانترنت؟ يمكنك فقط الولوج الى الملفات والمجلدات الموجودة بحسابك الذي سجلت به الدخول في التطبيق</string>
-    <!-- menu option to loop video or audio file -->
-    <string name="context_loop_video">تكرار</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">أمن</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2540,16 +2096,8 @@
     <string name="login_API_rate">طلبات كثيرة جداً. يرجى الانتظار.</string>
     <!-- Message when previous login is being cancelled -->
     <string name="login_in_progress">إلغاء عملية تسجيل الدخول. أرجو الإنتظار&#8230;</string>
-    <!-- when open audio video player, the file that it try to open is not supported -->
-    <string name="unsupported_file_type">نوع الملف غير مدعوم.</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">حدث خطأ، الملف معطوب او غير موجود.</string>
-    <!-- Title of the screen Playlist -->
-    <string name="section_playlist">قائمة الاستماع</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing -->
-    <string name="playlist_state_playing">جاري الاستماع</string>
-    <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
-    <string name="playlist_state_paused">متوقف مؤقتاً</string>
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">اطبع</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
@@ -2568,8 +2116,6 @@
     <string name="title_enable_rich_links">تمكين الروابط الإلكترونية المعززة URL</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">تعزيز تجربة المحادثات MEGAchat من خلال إظهار محتوى الرابط دون تشفير من طرف الى طرف</string>
-    <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">انقر لإدخال مفتاح فك التشفير</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">يرجى ادخال كلمة مرور قوية</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2585,8 +2131,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">طلب جهة اتصال جديد</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">اكتب رسالة إلى “%s” &#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]لا يوجد[/B][A] عمليات تراسل جارية[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2617,8 +2161,6 @@
     <string name="general_verify">تحقق</string>
     <!-- Text button -->
     <string name="general_next">التالي</string>
-    <!-- Text button -->
-    <string name="general_previous">السابق</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">حدث خطأ اثناء عملية توليد رمز الاستجابة السريعة QR، يرجى إعادة المحاولة.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2641,8 +2183,6 @@
     <string name="verify_2fa_subtitle_delete_account">حذف الحساب</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">تعطيل</string>
-    <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">هل أضعت الجهاز الذي تستخدمه للمصادقة؟</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">حدث خطأ أثناء عملية تعطيل المصادقة المزدوجة 2FA. يرجى إعادة المحاولة</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2704,8 +2244,6 @@
     <string name="call_failed_messages">[A]فشل الاتصال[/A]</string>
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]لم تتم الإجابة على الاتصال[/A]</string>
-    <!-- Indicates that can type a contact email -->
-    <string name="contact_email">عنوان البريد الإلكتروني</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">لقد قمت بإضافة جهة الاتصال مسبقاً.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2722,8 +2260,6 @@
     <string name="context_no_restored">حدث خطأ. لم تتم استعادة العنصر.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">أرسل رسالة</string>
-    <!-- Error message on opening a MEGAdrop folder link -->
-    <string name="error_MEGAdrop_not_supported">مجلدات MEGAdrop ليست مدعومة</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">لا يمكن إتمام العملية لأنها ستؤدي الى تجاوز مساحة التخزين المتاحة لك. هل تريد ترقية حسابك؟</string>
     <!-- Title of the section Archived chats -->
@@ -2746,8 +2282,6 @@
     <string name="success_unarchive_chat">تم إعادة المحادثة %s من الأرشيف.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">خطأ. فشل عملية استرجاع المحادثة %s من الأرشيف.</string>
-    <!-- Message shown when the user has no archived chats -->
-    <string name="archived_chats_empty">[A]لا يوجد[/A] [B]محادثات مؤرشفة [/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">المحادثات الغير نشطة</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2795,8 +2329,6 @@
     <string name="settings_enable_file_versioning_title">النسخ المعدلة للملفات</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">تفعيل أو تعطيل النسخ المعدلة للملفات لكامل حسابك.\nتعطيل ميزة النسخ المعدلة للملفات لا تمنع جهات الاتصال الخاصة بك من إنشاء نسخ جديدة في الملفات المشاركة.</string>
-    <!-- section title to select a chat to send a file -->
-    <string name="choose_chat">اختر المحادثة</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">انقر على ادخال الاسم او البريد الالكتروني</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2874,26 +2406,18 @@
     <string name="title_share_folder_explorer">اختر مجلد</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">سيتم إيقاف كل عمليات التراسل الجارية، هل تريد تسجيل الدخول؟</string>
-    <!-- Popup message shown if an user try to login while there is still living transfer -->
-    <string name="logout_warning_abort_transfers">سيتم إيقاف كل عمليات التراسل الجارية، هل تريد تسجيل الخروج؟</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">للقراءة فقط</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]من %2$s مستهلك[/B]</string>
-    <!-- title of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_title">التغيير الى مخدم الاختبارات؟</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">هل أنت متأكد أنك تريد التغيير إلى المخدم التجريبي؟ من الممكن ان يتعرض حسابك لمشاكل غير قابلة للإصلاح.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">فتح الكاميرا؟</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">إذا قمت بفتح الكاميرا، فإن الفيديو سيتوقف موقتاً في المكالمة الجارية.</string>
-    <!-- Title of the notification when there is unknown activity on the Chat -->
-    <string name="notification_chat_undefined_title">نشاط المحادثة</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">قد يكون لديك رسائل جديدة</string>
-    <!-- When app is retrieving push message -->
-    <string name="retrieving_message_title">استرجاع الرسالة</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">جدولة افراغ سلة المحذوفات</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
@@ -2918,8 +2442,6 @@
     <string name="hint_days">أيام</string>
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">استخرج رابط المحادثة</string>
-    <!-- Title of the option to manage a public chat link -->
-    <string name="manage_chat_link_option">إدارة رابط المحادثة</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">تمكين تدوير مفتاح التشفير</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -2952,8 +2474,6 @@
     <string name="error_chat_link">حدث خطأ أثناء تحميل رابط المحادثة.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">خطأ في بدء المحادثة عند تحميل رابط المحادثة.</string>
-    <!-- Message on the alert to preview a chat link if the user is already a participant -->
-    <string name="alert_already_participant_chat_link">أنت تشارك بالفعل في هذه المحادثة.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">عرض هذه المحادثة لم يعد متاحاً. إذا غادرت العرض، فلن تتمكن من إعادة فتحه.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2970,8 +2490,6 @@
     <string name="invite_not_sent_already_sent">تم إرسال الدعوة لجهة الاتصال %s من قبل و يمكنك مراجعتها في صفحة الطلبات المرسلة.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">جاري حفظ %s على السواقة السحابية&#8230;</string>
-    <!-- General label for folders -->
-    <string name="general_folders">مجلدات</string>
     <!-- General label for files -->
     <string name="general_files">ملفات</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -3065,10 +2583,6 @@
     <string name="payment_method">طريقة الدفع</string>
     <!-- title of billing period -->
     <string name="billing_period_title">فترة الفاتورة</string>
-    <!-- Option of one-off (month) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_month">[A]لمرة واحدة (لشهر)[/A] %s</string>
-    <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
-    <string name="billed_one_off_year">[A]لمرة واحدة (لسنة)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
     <string name="billed_monthly_text">[A]الفوترة شهرياً[/A] %s/شهر</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
@@ -3253,8 +2767,6 @@
         <item quantity="many">[B]%1$d ثانية[/B]</item>
         <item quantity="other">[B]%1$d ثانية[/B]</item>
     </plurals>
-    <!-- Message to indicate a call has ended without indicate the call duration. -->
-    <string name="call_ended_no_duration_message">[A]انتهت المكالمة[/A]</string>
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
     <string name="group_call_ended_no_duration_message">[A]تم إنهاء المكالمة الجماعية[/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
@@ -3271,24 +2783,12 @@
     <string name="label_tomorrow">غداً</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]لا يوجد [/B][A]ملفات مشاركة[/A]</string>
-    <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s انضم إلى المكالمة</string>
-    <!-- Text to indicate that a contact has left a group call -->
-    <string name="contact_left_the_call">%1$s غادر المكالمة</string>
-    <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">لا يمكن بدء المكالمة بسبب تجاوز الحد الأقصى لعدد المشاركين.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">لا يمكن الانضمام إلى المكالمة حيث تم تجاوز الحد الأقصى لعدد المشاركين.</string>
-    <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">تعذر الانضمام إلى المكالمة الجماعية بسبب الوصول إلى الحد الأقصى لعدد المشاركين</string>
-    <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">لا يمكن الانضمام إلى مكالمة الفيديو حيث تم تجاوز الحد الأقصى لعدد المشاركين.</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">لا يمكن تعليق المكالمة.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">حدث خطأ ولا يمكن فتح الملف باستخدام هذا التطبيق.</string>
-    <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">مكالمة واردة&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">جار الاتصال</string>
     <!-- Content of a invalid meta message -->
@@ -3305,8 +2805,6 @@
     <string name="explanation_send_location">سيتم فتح هذا الموقع باستخدام طرف ثالث مزود خرائط من خارج منصة ميغا MEGA المشفرة من طرف إلى طرف.</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">إرسال هذا الموقع</string>
-    <!-- Label shown when after a maps search and no places were found -->
-    <string name="no_places_found">لم يتم العثور على أية أماكن</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">تم تعطيل نظام تحديد المواقع GPS</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -3380,8 +2878,6 @@
     <string name="preparing_chats">جاري تحضير الملفات</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">إرسال كرسالة.</string>
-    <!-- Error message when the attachment cannot be sent to any of the selected chats -->
-    <string name="error_sent_as_message">خطأ. لم يرسل الملف لأي من المحادثات المحددة</string>
     <!-- Action delete all file versions -->
     <string name="delete_versions">حذف النسخ القديمة</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
@@ -3434,12 +2930,8 @@
     <string name="title_pdf_password">أدخل كلمة المرور الخاصة بك</string>
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s ملف PDF محمي بكلمة مرور. يرجى إدخال كلمة المرور لفتح هذا الملف.</string>
-    <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
-    <string name="error_pdf_password">لقد قمت بإدخال كلمة مرور خاطئة، يرجى المحاولة مرة آخرى.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">كلمة المرور التي أدخلتها غير صالحة.</string>
-    <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
-    <string name="unknownn_file">لا يمكن فتح الملف. إنه نوع ملف غير معروف أو أنه لم يكن من الممكن فك ضغط الملف بنجاح.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">لا يمكن تشغيل ملفات الوسائط أثناء وجود مكالمة جارية.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -3448,8 +2940,6 @@
     <string name="join_call_layout_in_group_call">انقر للانضمام إلى مكالمة المجموعة الحالية.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">انقر للعودة الى المكالمة</string>
-    <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
-    <string name="not_allowed_to_start_call">أنت حاليا في مكالمة</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]انضم إلى المحادثة الجماعية.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -3460,8 +2950,6 @@
     <string name="context_create_chat_link_question_text">هل ترغب في إنشاء محادثة جماعية جديدة والحصول على رابط محادثة؟</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">يعد تدوير مفتاح التشفير أكثر أمانًا إلى حد ما، ولكنه لا يسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
-    <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">لقد انضممت إلى المحادثة بنجاح.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d من %2$d</string>
     <!-- Hint of the Search view -->
@@ -3476,8 +2964,6 @@
     <string name="muted_own_micro">تم الكتم</string>
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">مكالمة قيد الانتظار</string>
-    <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
-    <string name="session_on_hold">%s قيد الانتظار</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">تعليق و إجابة</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
@@ -3512,22 +2998,10 @@
     <string name="no_chat_link_available">لا يوجد رابط محادثة متاح.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">تم حذف رابط المحادثة بنجاح.</string>
-    <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
-    <string name="contact_request_status_accepted">%1$s (تم قبول الطلب)</string>
-    <!-- The status of pending contact request (DELETED), placeholder is contact request creation time -->
-    <string name="contact_request_status_deleted">%1$s (تم حذف الطلب)</string>
-    <!-- The status of pending contact request (DENIED), placeholder is contact request creation time -->
-    <string name="contact_request_status_denied">%1$s (تم رفض الطلب)</string>
-    <!-- The status of pending contact request (IGNORED), placeholder is contact request creation time -->
-    <string name="contact_request_status_ignored">%1$s (تم تجاهل الطلب)</string>
-    <!-- The status of pending contact request (REMINDED), placeholder is contact request creation time -->
-    <string name="contact_request_status_reminded">%1$s (تم التذكير)</string>
-    <!-- The status of pending contact request (PENDING), placeholder is contact request creation time -->
-    <string name="contact_request_status_pending">%1$s (بالانتظار)</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">تم استعادة النسخة بنجاح.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">انقر مطولاً للتسجيل، ثم حرر للإرسال.</string>
+    <string name="recording_less_than_second">انقر مع الاستمرار للتسجيل</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">اسحب  للإلغاء</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -3590,22 +3064,16 @@
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">أضف رقم هاتفك إلى ميغا MEGA. هذا يسهل على جهات الاتصال الخاصة بك العثور عليك على ميغا MEGA.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
     <string name="not_allowed_recording_voice_clip">لا يمكن تسجيل الرسائل الصوتية أثناء وجود مكالمة جارية.</string>
-    <!-- Text shown when it tries to upload a voice message and occurs an error to process the action -->
-    <string name="error_upload_voice_clip">حدث خطأ أثناء محاولة ترفيع الرسالة الصوتية.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">مكالمة واردة</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
     <string name="title_notification_incoming_group_call">مكالمة جماعية واردة</string>
-    <!-- Title of the notification shown on the action bar when there is an individual incoming video call -->
-    <string name="title_notification_incoming_individual_video_call">مكالمة فيديو واردة</string>
     <!-- Title of the notification shown on the action bar when there is an individual incoming audio call -->
     <string name="title_notification_incoming_individual_audio_call">مكالمة صوت واردة</string>
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">جاري التحميل</string>
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">يُرجى الانتظار&#8230;</string>
-    <!-- Head label to show the business account type -->
-    <string name="account_label">نوع الحساب</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">الأعمال Business</string>
     <!-- Business user role -->
@@ -3614,20 +3082,14 @@
     <string name="user_label">مستخدم</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">الحالة</string>
-    <!-- State to indicate something is active (business status account for instance) -->
-    <string name="active_label">نشط</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">الدفعة المالية مستحقة</string>
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">متأخر بالدفع</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">إدارة المستخدم متاحة فقط من متصفح سطح المكتب.</string>
-    <!-- Title of the usage tab in My Account Section -->
-    <string name="tab_my_account_usage">الاستخدام</string>
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">تفاصيل توزيع استخدام مساحة التخزين</string>
-    <!-- Title of overall usage section in Storage -->
-    <string name="overall_usage_label">الإستخدام الكلي</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">تراسل المعطيات</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -3690,18 +3152,12 @@
     <string name="snackbar_nickname_added">تمت إضافة الاسم المستعار</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">تمت إزالة الاسم المستعار</string>
-    <!-- Label showing that a nickname has not been added -->
-    <string name="error_snackbar_nickname_added">حدث خطأ أثناء محاولة إضافة الاسم المستعار</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">الاسم المستعار</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">رقم الهاتف</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">إعادة الاتصال</string>
-    <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
-    <string name="connected_message">لقد عدت.</string>
-    <!-- Text shown in a call when the own internet connection is of low quality -->
-    <string name="poor_internet_connection_message">اتصال ضعيف بالإنترنت</string>
     <!-- Text is displayed while a voice clip is being recorded -->
     <string name="recording_layout">تسجيل&#8230;</string>
     <!-- Text shown for the action create new file -->
@@ -3732,8 +3188,6 @@
     <string name="inactive_chat_title">تم إنشاء المحادثة في %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">حدد الرسالة</string>
-    <!-- Storage root label -->
-    <string name="storage_root_label">جذر التخزين</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">فشل</string>
     <!-- Text warning of transfer over quota -->
@@ -3804,8 +3258,6 @@
     <string name="joining_label">انضمام&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">مغادرة&#8230;</string>
-    <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
-    <string name="remove_phone_number">هل تريد إزالة رقم هاتفك؟</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">تمت إزالة رقم هاتفك بنجاح.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3814,8 +3266,6 @@
     <string name="search_hint">البحث في ميغا MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">الحساب الذي تحاول أعادة تشغيله محظور .</string>
-    <!-- Error message when trying to login and the account is blocked -->
-    <string name="error_account_blocked">تم حظر حسابك. يرجى التواصل مع support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">تم إلغاء تفعيل حسابك من قبل مديرك. يرجى الاتصال مع مدير حساب الاعمال خاصتك للحصول على مزيد من التفاصيل.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -4045,8 +3495,6 @@
     <string name="audio_player_now_playing_paused">جاري الاستماع  (متوقف مؤقتاً)</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">معلومات التسجيل الموسيقي</string>
-    <!-- Action to get more information -->
-    <string name="action_more_information">معلومات اكثر</string>
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">سياسة ملفات تعريف الارتباط Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
@@ -4083,16 +3531,12 @@
     <string name="theme_system_default">افتراضي النظام</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">اضبط حسب موفر البطارية</string>
-    <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">الرجاء تحديد جذر بطاقة الذاكرة SD.</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">اختر الوجهة</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">تجاهل التغييرات وأغلق المحرر؟</string>
     <!-- Action discard -->
     <string name="discard_close_action">تجاهل وأغلق</string>
-    <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">جارٍ حفظ الملف&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">تم إنشاء الملف</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -4142,7 +3586,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]، %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="zero">جاري الترفيع، %1$d ملف معلق</item>
@@ -4258,8 +3702,8 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
-    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
-    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
+    <string name="used_storage_transfer">[A]%1$s[/A]/%2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4637,10 +4081,6 @@
     <string name="action_do_not_cancel">لا تلغي</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">إزالة مشرف</string>
-    <!-- Title of DCIM folder warning dialog -->
-    <string name="title_dcim_folder_dialog">مجلد DCIM</string>
-    <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">تقوم ميغا MEGA بترفيع صورك من المعرض. لتغيير موقع الترفيع يرجى الانتقال إلى إعدادات ترفيعات الكاميرا.</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">شراء اشتراك جديد؟</string>
     <!-- Text of buy new subscription button -->
@@ -4657,8 +4097,6 @@
     <string name="upgrade_billing_warning">نحن غير قادرين على المضي قدماً في الفواتير. إذا كنت تستخدم تطبيقًا مزدوجًا ، فالرجاء تسجيل الدخول إلى ميغا MEGA بدونه. إذا لم يكن كذلك، فحاول الترقية من خلال متصفح الويب الخاص بك.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">اشتراك %1s</string>
-    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">اشتراك مفعل</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">لديك اشتراك ميغا MEGA مفعل مع %1$s. يجب عليك إلغاؤه بشكل منفصل في %2$s، لأن ميغا MEGA غير قادرة على إلغائه لك. تفضل بزيارة مركز المساعدة لدينا لمزيد من المعلومات.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
@@ -4755,4 +4193,162 @@
     <string name="account_info_renews_on">[A]يتجدد في[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_expires_on">[A]ينتهي في[/A] [B]%s[/B]</string>
+    <!-- Title of favourite category. -->
+    <string name="favourites_category_title">المفضلة</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">نسيت رمز المرور الخاص بك؟</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">أدخل كلمة السر الخاصة بك</string>
+    <!-- Resume to paused transfers snack bar description text -->
+    <string name="resume_paused_transfers_text">تم إيقاف عمليات التحويل مؤقتاً. قم بالاستئناف لمتابعة التنزيل.</string>
+    <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
+    <string name="warning_scanning_transfers">من فضلك لا تغلق التطبيق.</string>
+    <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
+    <string name="scanning_transfers">جاري الفحص&#8230;</string>
+    <!-- Label cancel transfers. -->
+    <string name="cancel_transfers">إلغاء عمليات التراسل</string>
+    <!-- Warning informing what will happen if proceed on cancelling transfers. -->
+    <string name="warning_cancel_transfers">سيتم إلغاء التحويلات التي لم تتم معالجتها بعد.</string>
+    <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
+    <string name="button_proceed">تابع</string>
+    <!-- Warning informing transfers were cancelled. -->
+    <string name="transfers_cancelled">تم الغاء عمليات التراسلé</string>
+    <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
+    <string name="title_duplicated_items">عناصر مكررة</string>
+    <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
+    <string name="file_already_exists_in_location">يوجد ملف اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
+    <string name="choose_file">اختر الملف الذي تريد أن تحتفظ به</string>
+    <!-- Header giving more context about a name collision, informing there are different option to choose. -->
+    <string name="choose_folder">حدد ما إذا كنت تريد دمج المجلدات</string>
+    <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_upload_and_replace">سيتم استبدال الإصدار الحالي من الملف بالملف الذي تحمله.</string>
+    <!-- Upload and replace action button for a name collision. -->
+    <string name="upload_and_replace">ارفع واستبدل</string>
+    <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
+    <string name="warning_versioning_upload_and_update">سيتم تحديث الملف بالنسخة المحفوظة:</string>
+    <!-- Upload and update action button for a name collision. -->
+    <string name="upload_and_update">رفع التحديث</string>
+    <!-- Don’t upload action button for a name collision. -->
+    <string name="do_not_upload">لا ترفع</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
+    <string name="warning_upload_and_rename">الملف الذي ترفع سيتم تسميته إلى:</string>
+    <!-- Upload and rename action button for a name collision. -->
+    <string name="upload_and_rename">ارفع وغير الاسم</string>
+    <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_move_and_replace">استبدل الملف في المجلد الوجهة بالملف الذي تقوم بنقله.</string>
+    <!-- Move and replace action button for a name collision. -->
+    <string name="move_and_replace">نقل واستبدال</string>
+    <!-- Don’t move action button for a name collision. -->
+    <string name="do_not_move">لا تنقل</string>
+    <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
+    <string name="warning_move_and_rename">الملف الذي نقلته سيتم إعادة تسميته إلى:</string>
+    <!-- Move and rename action button for a name collision. -->
+    <string name="move_and_rename">انقل وغير الاسم</string>
+    <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
+    <string name="warning_copy_and_replace">استبدل الملف الموجود في المجلد الوجهة بالملف الذي تنسخه.</string>
+    <!-- Copy and replace action button for a name collision. -->
+    <string name="copy_and_replace">نسخ واستبدال</string>
+    <!-- Don’t copy action button for a name collision. -->
+    <string name="do_not_copy">لا تنسخ</string>
+    <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
+    <string name="warning_copy_and_rename">الملف الذي نسخته سيتم إعادة تسميته إلى:</string>
+    <!-- Copy and rename action button for a name collision. -->
+    <string name="copy_and_rename">انسخ وغير الاسم</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <string name="file_apply_for_all">قم بتطبيق هذا الخيار على %1$d التعارضات التالية</string>
+    <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
+    <string name="warning_copy_and_merge">ادمج المجلد الموجود في الوجهة مع المجلد الذي تنسخه.</string>
+    <!-- Copy and merge action button for a name collision. -->
+    <string name="copy_and_merge">انسخ وادمج</string>
+    <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
+    <string name="warning_move_and_merge">ادمج المجلد الموجود في الوجهة مع المجلد الذي تنقله.</string>
+    <!-- Move and merge action button for a name collision. -->
+    <string name="move_and_merge">انقل وادمج</string>
+    <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
+    <string name="warning_upload_and_merge">ادمج المجلد الموجود في الوجهة مع المجلد الذي تقوم بترفيعه.</string>
+    <!-- Upload and merge action button for a name collision. -->
+    <string name="upload_and_merge">ارفع وادمج</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
+    <string name="skip_file">لن يتم تغيير أي ملفات. ستحتفظ بالملف أدناه:</string>
+    <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
+    <string name="skip_folder">تخطي هذا المجلد</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">يوجد مجلد اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
+    <!-- Banner text to indicate poor network quality -->
+    <string name="calls_call_screen_poor_network_quality">اتصال سيء</string>
+    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] بايت</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] كيلوبايت</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] ميغابايت</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] غيغابايت</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] تيرابايت</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] بيتابايت</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] إكسابايت</string>
+    <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
+    <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">انت الوحيد هنا</string>
+    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
+    <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">ستنتهي المكالمة تلقائيًا في غضون 2 دقيقتين ما لم ترغب في الاستمرار فيها.</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
+    <string name="calls_call_screen_button_to_end_call">انهاء الاتصال</string>
+    <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
+    <string name="calls_call_screen_button_to_stay_alone_in_call">البقاء في اتصال</string>
+    <!-- Report issue setting name-->
+    <string name="settings_help_report_issue">بلغ عن مشكلة</string>
+    <!-- Report issue fragment instructions-->
+    <string name="settings_help_report_issue_instructions">تساعدنا ملاحظاتك على تحسين ميغا MEGA. يرجى وصف المشكلة التي واجهتها بوضوح. كلما زادت التفاصيل التي تقدمها ، كان من الأسهل علينا حلها.</string>
+    <!-- Hint text for the description field on the report issue screen-->
+    <string name="settings_help_report_issue_description_label">اشرح المشكلة</string>
+    <!-- Label for the switch to enable attaching logs when reporting an issue-->
+    <string name="settings_help_report_issue_attach_logs_label">إرسال ملف السجل</string>
+    <!-- Error message when there is no connectivity when reporting an issue-->
+    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <!-- Accessibility Label for the submit button on the report issue screen-->
+    <string name="settings_help_report_issue_submit_menu_action">إرسال</string>
+    <!-- Error message when submit issue failed-->
+    <string name="settings_help_report_issue_error">هناك خطأ ما. الرجاء المحاولة في وقت لاحق. إذا كنت لا تزال غير قادر على إرسال المشكلة، فتواصل مع %s للحصول على المساعدة.</string>
+    <!-- Success message when submit issue succeeded-->
+    <string name="settings_help_report_issue_success">لقد تلقينا تقريرك. سننظر في المشكلة ونعود إليك.</string>
+    <!-- Message shown during log file upload-->
+    <string name="settings_help_report_issue_uploading_log_file">تحميل ملف السجل</string>
+    <!-- Message shown if user tries to leave report screen without submitting their report-->
+    <string name="settings_help_report_issue_discard_dialog_title">تجاهل التقرير؟</string>
+    <!-- Button text for discard dialog option-->
+    <string name="settings_help_report_issue_discard_button">تجاهل</string>
+    <!-- Text shown when editing a chatroom message -->
+    <string name="edit_chat_message">تعديل الرسالة</string>
+    <!-- Title of the gallery option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gallery_option">المعرض</string>
+    <!-- Title of the voice call option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_call_option">صوت</string>
+    <!-- Title of the scan option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_scan_option">مسح ضوئي</string>
+    <!-- Title of the voice clip option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_voice_clip_option">مقطع صوتي</string>
+    <!-- Title of the gif option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_gif_option">GIF</string>
+    <!-- Text of the empty screen when there are not chat conversations -->
+    <string name="context_empty_chat_recent">[B]ادعي الأصدقاء الى [/B][A]المحادثة[/A][B] و استمتع باستخدام منصتنا المشفرة بخصوصية و أمان [/B]</string>
+    <!-- Filter option on Photos/Timeline -->
+    <string name="photos_action_filter">فلتر</string>
+    <!-- Filter option to show all photos -->
+    <string name="photos_filter_all_photos"></string>
+    <!-- Filter option to show only photos from Cloud Drive -->
+    <string name="photos_filter_cloud_drive">من السواقة السحابية</string>
+    <!-- Filter option to show only photos and videos from Camera Uploads folder -->
+    <string name="photos_filter_camera_uploads">ترفيعات الكاميرا</string>
+    <!-- Filter option to show only videos from Camera Uploads -->
+    <string name="photos_filter_videos_only">فيديو فقط</string>
 </resources>

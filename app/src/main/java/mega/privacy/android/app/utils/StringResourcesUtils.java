@@ -1,5 +1,47 @@
 package mega.privacy.android.app.utils;
 
+import static nz.mega.sdk.MegaChatError.ERROR_ACCESS;
+import static nz.mega.sdk.MegaChatError.ERROR_ARGS;
+import static nz.mega.sdk.MegaChatError.ERROR_EXIST;
+import static nz.mega.sdk.MegaChatError.ERROR_NOENT;
+import static nz.mega.sdk.MegaChatError.ERROR_OK;
+import static nz.mega.sdk.MegaChatError.ERROR_TOOMANY;
+import static nz.mega.sdk.MegaChatError.ERROR_UNKNOWN;
+import static nz.mega.sdk.MegaError.API_EACCESS;
+import static nz.mega.sdk.MegaError.API_EAGAIN;
+import static nz.mega.sdk.MegaError.API_EAPPKEY;
+import static nz.mega.sdk.MegaError.API_EARGS;
+import static nz.mega.sdk.MegaError.API_EBLOCKED;
+import static nz.mega.sdk.MegaError.API_EBUSINESSPASTDUE;
+import static nz.mega.sdk.MegaError.API_ECIRCULAR;
+import static nz.mega.sdk.MegaError.API_EEXIST;
+import static nz.mega.sdk.MegaError.API_EEXPIRED;
+import static nz.mega.sdk.MegaError.API_EFAILED;
+import static nz.mega.sdk.MegaError.API_EGOINGOVERQUOTA;
+import static nz.mega.sdk.MegaError.API_EINCOMPLETE;
+import static nz.mega.sdk.MegaError.API_EINTERNAL;
+import static nz.mega.sdk.MegaError.API_EKEY;
+import static nz.mega.sdk.MegaError.API_EMASTERONLY;
+import static nz.mega.sdk.MegaError.API_EMFAREQUIRED;
+import static nz.mega.sdk.MegaError.API_ENOENT;
+import static nz.mega.sdk.MegaError.API_EOVERQUOTA;
+import static nz.mega.sdk.MegaError.API_ERANGE;
+import static nz.mega.sdk.MegaError.API_ERATELIMIT;
+import static nz.mega.sdk.MegaError.API_EREAD;
+import static nz.mega.sdk.MegaError.API_ESID;
+import static nz.mega.sdk.MegaError.API_ESSL;
+import static nz.mega.sdk.MegaError.API_ETEMPUNAVAIL;
+import static nz.mega.sdk.MegaError.API_ETOOMANY;
+import static nz.mega.sdk.MegaError.API_ETOOMANYCONNECTIONS;
+import static nz.mega.sdk.MegaError.API_EWRITE;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaError.PAYMENT_EBALANCE;
+import static nz.mega.sdk.MegaError.PAYMENT_EBILLING;
+import static nz.mega.sdk.MegaError.PAYMENT_ECARD;
+import static nz.mega.sdk.MegaError.PAYMENT_EFRAUD;
+import static nz.mega.sdk.MegaError.PAYMENT_EGENERIC;
+import static nz.mega.sdk.MegaError.PAYMENT_ETOOMANY;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -10,10 +52,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaError;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaChatError.*;
-import static nz.mega.sdk.MegaError.*;
+import timber.log.Timber;
 
 public class StringResourcesUtils {
 
@@ -22,6 +61,7 @@ public class StringResourcesUtils {
 
     /**
      * Get the English locale resources
+     *
      * @param context The current context.
      * @return The English locale resources.
      */
@@ -48,9 +88,9 @@ public class StringResourcesUtils {
         try {
             return app.getString(resId);
         } catch (Exception e) {
-            logWarning("Error getting a translated string.", e);
+            Timber.w(e, "Error getting a translated string.");
             String originalString = getENResource(app).getString(resId);
-            logInfo("Using the original English string: " + originalString);
+            Timber.i("Using the original English string: %s", originalString);
             return originalString;
         }
     }
@@ -71,9 +111,9 @@ public class StringResourcesUtils {
         try {
             return app.getString(resId, formatArgs);
         } catch (Exception e) {
-            logWarning("Error getting a translated and formatted string.", e);
+            Timber.w(e, "Error getting a translated and formatted string.");
             String originalString = getENResource(app).getString(resId, formatArgs);
-            logInfo("Using the original English string: " + originalString);
+            Timber.i("Using the original English string: %s", originalString);
             return originalString;
         }
     }
@@ -94,9 +134,9 @@ public class StringResourcesUtils {
         try {
             return app.getResources().getQuantityString(resId, quantity);
         } catch (Exception e) {
-            logWarning("Error getting a translated string with quantity modifier.", e);
+            Timber.w(e, "Error getting a translated string with quantity modifier.");
             String originalString = getENResource(app).getQuantityString(resId, quantity);
-            logInfo("Using the original English string: " + originalString);
+            Timber.i("Using the original English string: %s", originalString);
             return originalString;
         }
     }
@@ -119,9 +159,9 @@ public class StringResourcesUtils {
         try {
             return app.getResources().getQuantityString(resId, quantity, formatArgs);
         } catch (Exception e) {
-            logWarning("Error getting a translated and formatted string with quantity modifier.", e);
+            Timber.w(e, "Error getting a translated and formatted string with quantity modifier.");
             String originalString = getENResource(app).getQuantityString(resId, quantity, formatArgs);
-            logInfo("Using the original English string: " + originalString);
+            Timber.i("Using the original English string: %s", originalString);
             return originalString;
         }
     }
@@ -144,8 +184,8 @@ public class StringResourcesUtils {
     /**
      * Gets the translated string of a Mega error.
      *
-     * @param   errorCode MegaChat error code
-     * @return  The translated string
+     * @param errorCode MegaChat error code
+     * @return The translated string
      */
     public static String getTranslatedErrorString(int errorCode, String errorString) {
         switch (errorCode) {
@@ -164,7 +204,7 @@ public class StringResourcesUtils {
             case API_ETOOMANY:
                 if (errorString.equals("Terms of Service breached")) {
                     return getString(R.string.api_etoomany_ec_download);
-                } else if (errorString.equals("Too many concurrent connections or transfers")){
+                } else if (errorString.equals("Too many concurrent connections or transfers")) {
                     return getString(R.string.api_etoomay);
                 } else {
                     return errorString;
@@ -178,7 +218,7 @@ public class StringResourcesUtils {
             case API_ECIRCULAR:
                 if (errorString.equals("Upload produces recursivity")) {
                     return getString(R.string.api_ecircular_ec_upload);
-                } else if (errorString.equals("Circular linkage detected")){
+                } else if (errorString.equals("Circular linkage detected")) {
                     return getString(R.string.api_ecircular);
                 } else {
                     return errorString;
@@ -259,8 +299,8 @@ public class StringResourcesUtils {
     /**
      * Gets the translated string of a MegaChat error code.
      *
-     * @param   errorCode MegaChat error code
-     * @return  The translated string
+     * @param errorCode MegaChat error code
+     * @return The translated string
      */
     public static String getTranslatedChatErrorString(int errorCode) {
         switch (errorCode) {

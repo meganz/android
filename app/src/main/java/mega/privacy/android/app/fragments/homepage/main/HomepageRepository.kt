@@ -23,9 +23,14 @@ import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaBanner
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaUtilsAndroid
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,7 +38,7 @@ import javax.inject.Singleton
 class HomepageRepository @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     private val bannerList = MutableLiveData<MutableList<MegaBanner>?>()
@@ -111,7 +116,7 @@ class HomepageRepository @Inject constructor(
                 override fun onRequestFinish(
                     api: MegaApiJava,
                     request: MegaRequest,
-                    e: MegaError
+                    e: MegaError,
                 ) {
                     if (e.errorCode == MegaError.API_OK) {
                         MegaUtilsAndroid.bannersToArray(request.megaBannerList)?.also {
@@ -154,7 +159,7 @@ class HomepageRepository @Inject constructor(
                 }
 
                 override fun onFailureImpl(dataSource: DataSource<Void>) {
-                    logWarning("Get banner image failed")
+                    Timber.w("Get banner image failed")
                 }
 
             }, UiThreadImmediateExecutorService.getInstance())

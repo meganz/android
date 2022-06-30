@@ -14,6 +14,15 @@ import javax.inject.Inject
 class MegaChatApiFacade @Inject constructor(
     private val chatApi: MegaChatApiAndroid
 ) : MegaChatApiGateway {
+
+    override val initState: Int
+        get() = chatApi.initState
+
+    override fun init(session: String): Int =
+        chatApi.init(session)
+
+    override fun logout() = chatApi.logout()
+
     override fun setLogger(logger: MegaChatLoggerInterface) =
         MegaChatApiAndroid.setLoggerObject(logger)
 
@@ -24,4 +33,10 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun removeChatRequestListener(listener: MegaChatRequestListenerInterface) =
         chatApi.removeChatRequestListener(listener)
+
+    override fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface) =
+        chatApi.pushReceived(beep, listener)
+
+    override fun retryPendingConnections(disconnect: Boolean) =
+        chatApi.retryPendingConnections(disconnect, null)
 }

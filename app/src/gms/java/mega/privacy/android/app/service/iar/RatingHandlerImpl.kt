@@ -8,7 +8,7 @@ import com.google.android.play.core.tasks.Task
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.middlelayer.iar.RatingHandler
-import mega.privacy.android.app.utils.LogUtil
+import timber.log.Timber
 
 /**
  * Implement rating feature for Google play store using google APIs
@@ -26,12 +26,12 @@ class RatingHandlerImpl(context: Context) : RatingHandler(context) {
                 MegaApplication.getInstance().currentActivity?.let {
                     val flow: Task<Void> = manager.launchReviewFlow(it, reviewInfo)
                     flow.addOnCompleteListener {
-                        LogUtil.logDebug("Rating Task Complete")
+                        Timber.d("Rating Task Complete")
                         listener.onComplete()
                     }
                 }
             } else {
-                LogUtil.logError("RatingTask is failed")
+                Timber.e("RatingTask is failed")
             }
         }
     }

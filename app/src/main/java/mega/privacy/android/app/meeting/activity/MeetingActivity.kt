@@ -3,7 +3,11 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.KeyEvent
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowInsets
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -16,13 +20,18 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.CallNotificationIntentService
-import mega.privacy.android.app.meeting.fragments.*
+import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment
+import mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment
+import mega.privacy.android.app.meeting.fragments.JoinMeetingFragment
+import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
+import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -106,7 +115,11 @@ class MeetingActivity : BaseActivity() {
         lifecycleScope.launchWhenStarted {
             meetingViewModel.finishMeetingActivity.collect { shouldFinish ->
                 if (shouldFinish) {
-                    finish()
+                    if (meetingViewModel.amIAGuest()) {
+                        meetingViewModel.logOutTheGuest(this@MeetingActivity)
+                    } else {
+                        finish()
+                    }
                 }
             }
         }
@@ -114,7 +127,7 @@ class MeetingActivity : BaseActivity() {
         lifecycleScope.launchWhenStarted {
             meetingViewModel.switchCall.collect { chatId ->
                 if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
-                    logDebug("Switch call")
+                    Timber.d("Switch call")
                     passcodeManagement.showPasscodeScreen = true
                     MegaApplication.getInstance().openCallService(chatId)
                     startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
@@ -123,17 +136,18 @@ class MeetingActivity : BaseActivity() {
         }
     }
 
-    private fun initIntent(){
+    private fun initIntent() {
         intent?.let { it ->
-            if(it.action == CallNotificationIntentService.ANSWER){
-                it.extras?.let { extra->
+            if (it.action == CallNotificationIntentService.ANSWER) {
+                it.extras?.let { extra ->
                     val chatIdIncomingCall = extra.getLong(
                         Constants.CHAT_ID_OF_INCOMING_CALL,
                         MEGACHAT_INVALID_HANDLE
                     )
 
                     val answerIntent = Intent(this, CallNotificationIntentService::class.java)
-                    answerIntent.putExtra(Constants.CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE)
+                    answerIntent.putExtra(Constants.CHAT_ID_OF_CURRENT_CALL,
+                        MEGACHAT_INVALID_HANDLE)
                     answerIntent.putExtra(Constants.CHAT_ID_OF_INCOMING_CALL, chatIdIncomingCall)
                     answerIntent.action = it.action
                     startService(answerIntent)
@@ -142,7 +156,8 @@ class MeetingActivity : BaseActivity() {
                 }
             }
 
-            meetingViewModel.updateChatRoomId(it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE))
+            meetingViewModel.updateChatRoomId(it.getLongExtra(MEETING_CHAT_ID,
+                MEGACHAT_INVALID_HANDLE))
 
             isGuest = it.getBooleanExtra(
                 MEETING_IS_GUEST,
@@ -209,7 +224,8 @@ class MeetingActivity : BaseActivity() {
      * according to the meeting action
      */
     private fun initNavigation() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         navGraph?.clear()
         navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)

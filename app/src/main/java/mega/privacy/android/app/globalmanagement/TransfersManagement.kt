@@ -19,16 +19,24 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.*
+import mega.privacy.android.app.AndroidCompletedTransfer
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.DownloadService
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
+import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
+import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
+import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
@@ -37,7 +45,12 @@ import nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.*
+import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
+import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
+import nz.mega.sdk.MegaTransfer.STATE_PAUSED
+import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
+import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,7 +63,7 @@ import javax.inject.Singleton
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
 ) {
 
     companion object {
@@ -81,19 +94,6 @@ class TransfersManagement @Inject constructor(
         }
 
         /**
-         * Sends a broadcast to update the transfer widget where needed.
-         *
-         * @param transferType  the transfer type.
-         */
-        @JvmStatic
-        fun launchTransferUpdateIntent(transferType: Int) {
-            MegaApplication.getInstance().sendBroadcast(
-                Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
-                    .putExtra(TRANSFER_TYPE, transferType)
-            )
-        }
-
-        /**
          * Adds the completed transfer to the DB and
          * sends a broadcast to update the completed transfers tab.
          *
@@ -103,7 +103,7 @@ class TransfersManagement @Inject constructor(
         @JvmStatic
         fun addCompletedTransfer(
             completedTransfer: AndroidCompletedTransfer,
-            dbH: DatabaseHandler
+            dbH: DatabaseHandler,
         ) {
             Completable.create { emitter ->
                 completedTransfer.id = dbH.setCompletedTransfer(completedTransfer)
@@ -117,9 +117,7 @@ class TransfersManagement @Inject constructor(
                                 .putExtra(COMPLETED_TRANSFER, completedTransfer)
                         )
                     },
-                    onError = { error ->
-                        LogUtil.logError(error.message)
-                    }
+                    onError = Timber::e
                 )
                 .addTo(CompositeDisposable())
         }
@@ -139,7 +137,7 @@ class TransfersManagement @Inject constructor(
             notificationChannelName: String?,
             mNotificationManager: NotificationManager,
             mBuilderCompat: NotificationCompat.Builder,
-            mBuilder: Notification.Builder
+            mBuilder: Notification.Builder,
         ): Notification =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
@@ -179,7 +177,7 @@ class TransfersManagement @Inject constructor(
     private var hasNotToBeShowDueToTransferOverQuota = false
     var isCurrentTransferOverQuota = false
     var isOnTransfersSection = false
-    var areFailedTransfers = false
+    private var areFailedTransfers = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
     var hasResumeTransfersWarningAlreadyBeenShown = false
@@ -361,7 +359,7 @@ class TransfersManagement @Inject constructor(
                 }
 
                 shouldShowNetworkWarning = true
-                launchTransferUpdateIntent(NO_TYPE)
+                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
             }
         }.start()
     }
@@ -373,7 +371,7 @@ class TransfersManagement @Inject constructor(
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false
-            launchTransferUpdateIntent(NO_TYPE)
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
         }
     }
 
@@ -428,7 +426,7 @@ class TransfersManagement @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                LogUtil.logWarning("Exception checking pending transfers", e)
+                Timber.w(e, "Exception checking pending transfers")
             }
         }, WAIT_TIME_TO_RESTART_SERVICES)
     }
@@ -450,7 +448,7 @@ class TransfersManagement @Inject constructor(
         type: Int,
         localPath: String,
         node: MegaNode,
-        isFolder: Boolean
+        isFolder: Boolean,
     ): MegaCancelToken? {
         if (shouldBreakTransfersProcessing()) {
             return null
@@ -498,11 +496,14 @@ class TransfersManagement @Inject constructor(
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    if (isFolder) {
+                    val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
+                    if (!isFolder || updatedTransfer == null
+                        || updatedTransfer.state == STATE_COMPLETED
+                    ) {
+                        removeProcessedScanningTransfer()
+                    } else {
                         transferTag = transfer.tag
                         transferStage = transfer.stage
-                    } else {
-                        removeProcessedScanningTransfer()
                     }
                 }
 
@@ -519,18 +520,31 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
-        if (!transfer.isFolderTransfer) {
-            return
-        }
-
         for (data in scanningTransfers) {
-            if (data.isTheSameFolderTransfer(transfer)) {
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES) {
+            if (data.isTheSameTransfer(transfer)) {
+                val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
+                if (transfer.stage >= STAGE_TRANSFERRING_FILES
+                    || updatedTransfer == null || updatedTransfer.state == STATE_COMPLETED
+                ) {
                     data.removeProcessedScanningTransfer()
                 } else {
                     data.transferStage = transfer.stage
                 }
 
+                break
+            }
+        }
+    }
+
+    /**
+     * If the transfer is a folder removes it from scanningTransfers as is already processed.
+     *
+     * @param transfer  Transfer to check.
+     */
+    fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
+        for (data in scanningTransfers) {
+            if (data.isTheSameTransfer(transfer)) {
+                data.removeProcessedScanningTransfer()
                 break
             }
         }
@@ -625,4 +639,11 @@ class TransfersManagement @Inject constructor(
         } else {
             false
         }
+
+    fun setAreFailedTransfers(failed: Boolean) {
+        areFailedTransfers = failed
+        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean::class.java).post(false)
+    }
+
+    fun getAreFailedTransfers(): Boolean = areFailedTransfers
 }

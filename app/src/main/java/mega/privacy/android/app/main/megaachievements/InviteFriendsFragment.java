@@ -1,5 +1,11 @@
 package mega.privacy.android.app.main.megaachievements;
 
+import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.INVALID_TYPE;
+import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Locale;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
@@ -21,97 +29,91 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
-
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-
-import java.util.Locale;
+import timber.log.Timber;
 
 public class InviteFriendsFragment extends BaseFragment implements OnClickListener
-		, GetAchievementsListener.DataCallback{
-	Button inviteContactsBtn;
-	TextView titleCard;
+        , GetAchievementsListener.DataCallback {
+    Button inviteContactsBtn;
+    TextView titleCard;
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		logDebug("onCreateView");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Timber.d("onCreateView");
 
-		boolean enabledAchievements = megaApi.isAchievementsEnabled();
-		logDebug("The achievements are: " + enabledAchievements);
+        boolean enabledAchievements = megaApi.isAchievementsEnabled();
+        Timber.d("The achievements are: %s", enabledAchievements);
 
-		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
+        View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
         inviteContactsBtn = v.findViewById(R.id.invite_contacts_button);
         inviteContactsBtn.setOnClickListener(this);
-		titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
+        titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
 
-		if (Util.isDarkMode(context)) {
-			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
-			v.findViewById(R.id.invite_contacts_layout).setBackgroundColor(backgroundColor);
-			v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
-		}
+        if (Util.isDarkMode(context)) {
+            int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+            v.findViewById(R.id.invite_contacts_layout).setBackgroundColor(backgroundColor);
+            v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
+        }
 
-		return v;
-	}
+        return v;
+    }
 
-	@Override
-	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		// Activity actionbar has been created which might be accessed by UpdateUI().
-		if (mActivity != null) {
-			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
-			if (actionBar != null) {
-				actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
-						.toUpperCase(Locale.getDefault()));
-			}
-		}
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Activity actionbar has been created which might be accessed by UpdateUI().
+        if (mActivity != null) {
+            ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
+                        .toUpperCase(Locale.getDefault()));
+            }
+        }
 
-		// The root view has been created, fill it with the data when data ready
-		if (sFetcher != null) {
-			sFetcher.setDataCallback(this);
-		}
-	}
+        // The root view has been created, fill it with the data when data ready
+        if (sFetcher != null) {
+            sFetcher.setDataCallback(this);
+        }
+    }
 
-	@Override
-	public void onClick(View v) {
-		if(v.getId() == R.id.invite_contacts_button) {
-		    logDebug("To InviteContactActivity.");
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.invite_contacts_button) {
+            Timber.d("To InviteContactActivity.");
             Intent intent = new Intent(context, InviteContactActivity.class);
             intent.putExtra(InviteContactActivity.KEY_FROM, true);
             if (mActivity != null) {
-				mActivity.startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
-			}
+                mActivity.startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
+            }
         }
-	}
+    }
 
-	public int onBackPressed(){
-		logDebug("onBackPressed");
+    public int onBackPressed() {
+        Timber.d("onBackPressed");
 
-		if (mActivity != null) {
-			((AchievementsActivity)mActivity).showFragment(ACHIEVEMENTS_FRAGMENT, INVALID_TYPE);
-		}
-		return 0;
-	}
+        if (mActivity != null) {
+            ((AchievementsActivity) mActivity).showFragment(ACHIEVEMENTS_FRAGMENT, INVALID_TYPE);
+        }
+        return 0;
+    }
 
-	private void updateUI() {
-		if (sFetcher == null) return;
-		MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
-		if (details == null || getContext() == null) return;
+    private void updateUI() {
+        if (sFetcher == null) return;
+        MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
+        if (details == null || getContext() == null) return;
 
-		long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-		long referralsTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+        long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+        long referralsTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 
-		titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
-	}
+        titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
+    }
 
-	@Override
-	public void onAchievementsReceived() {
-		updateUI();
-	}
+    @Override
+    public void onAchievementsReceived() {
+        updateUI();
+    }
 }

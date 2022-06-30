@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.di
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -12,7 +13,7 @@ import mega.privacy.android.app.domain.usecase.RootNodeExists
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
-    components = [ViewModelComponent::class],
+    components = [ViewModelComponent::class, SingletonComponent::class],
     replaces = [InitialiseUseCases::class]
 )
 @Module

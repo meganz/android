@@ -5,12 +5,18 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
@@ -18,12 +24,17 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.permission.*
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN
+import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN_WITH_KEYBOARD
+import mega.privacy.android.app.utils.Constants.MEETING_NAME_MARGIN_TOP
+import mega.privacy.android.app.utils.Constants.MIN_MEETING_HEIGHT_CHANGE
+import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 
 /**
  * The abstract class of Join/JoinAsGuest/Create Meeting Fragments
@@ -104,7 +115,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         initBinding()
         initMetaData()
@@ -146,13 +157,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        logDebug("addOnGlobalLayoutListener: keyboardLayoutListener")
+        Timber.d("addOnGlobalLayoutListener: keyboardLayoutListener")
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardLayoutListener)
     }
 
     override fun onPause() {
         super.onPause()
-        logDebug("removeOnGlobalLayoutListener: keyboardLayoutListener")
+        Timber.d("removeOnGlobalLayoutListener: keyboardLayoutListener")
         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardLayoutListener)
     }
 
@@ -235,7 +246,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
-                        AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
+                        AppRTCAudioManager.AudioDevice.BLUETOOTH,
+                        -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = true
                             binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
@@ -255,7 +267,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                     showToast(binding.fabTipLocation, it, Toast.LENGTH_SHORT)
                 }
                 notificationNetworkState.observe(viewLifecycleOwner) {
-                    logDebug("Network state changed, Online :$it")
+                    Timber.d("Network state changed, Online :$it")
                 }
 
                 sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
@@ -308,7 +320,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)
             || permissions.contains(Manifest.permission.CAMERA)
         ) {
-            logDebug("user denies the permission")
+            Timber.d("user denies the permission")
             showSnackBar()
         }
     }
@@ -376,7 +388,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Get Avatar and display
      */
     open fun setProfileAvatar() {
-        logDebug("setProfileAvatar")
+        Timber.d("setProfileAvatar")
         sharedModel.avatarLiveData.observe(viewLifecycleOwner) {
             binding.meetingThumbnail.setImageBitmap(it)
         }
@@ -419,7 +431,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * @param visibility View.GONE / View.VISIBLE / View.INVISIBLE
      */
     private fun triggerAvatar(visibility: Int) {
-        logDebug("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
+        Timber.d("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
         if (bCameraOpen) {
             if (binding.meetingThumbnail.visibility == View.GONE)
                 return
@@ -443,7 +455,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     private fun activateVideo() {
         if (binding.localSurfaceView.visibility == View.VISIBLE) {
-            logError("Error activating video")
+            Timber.e("Error activating video")
             setViewEnable(binding.onOffFab.fabCam, true)
             return
         }
@@ -503,12 +515,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     private fun deactivateVideo() {
         if (videoListener == null || binding.localSurfaceView.visibility == View.GONE) {
-            logError("Error deactivating video")
+            Timber.e("Error deactivating video")
             setViewEnable(binding.onOffFab.fabCam, true)
             return
         }
 
-        logDebug("Removing surface view")
+        Timber.d("Removing surface view")
         binding.localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
         setViewEnable(binding.onOffFab.fabCam, true)
@@ -520,7 +532,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun removeChatVideoListener() {
         if (videoListener == null) return
 
-        logDebug("Removing remote video listener")
+        Timber.d("Removing remote video listener")
         sharedModel.removeLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
         videoListener = null
     }

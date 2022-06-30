@@ -1,9 +1,16 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.utils.Constants.ACTION_REMOVE_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHARE_MSG;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHARE_NODE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaRequest.TYPE_EXPORT;
+
 import android.content.Context;
-
-import mega.privacy.android.app.R;
-
 import android.content.Intent;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,21 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-import static nz.mega.sdk.MegaError.*;
-import static nz.mega.sdk.MegaRequest.*;
+import timber.log.Timber;
 
 public class ExportListener extends BaseListener {
     private Intent shareIntent;
@@ -168,7 +168,7 @@ public class ExportListener extends BaseListener {
         numberError++;
         pendingExport--;
         if (pendingExport == 0) {
-            logError(numberExport + " errors exporting nodes");
+            Timber.e("%s errors exporting nodes", numberExport);
             showSnackbar(context, getQuantityString(R.plurals.context_link_export_error, numberExport));
         }
     }
@@ -206,7 +206,7 @@ public class ExportListener extends BaseListener {
 
                 if (pendingRemove == 0) {
                     if (numberError > 0) {
-                        logError("Removing link error");
+                        Timber.e("Removing link error");
                         showSnackbar(context, getQuantityString(R.plurals.context_link_removal_error, numberRemove));
                     } else {
                         if (onExportFinishedListener != null) {
@@ -224,26 +224,26 @@ public class ExportListener extends BaseListener {
                 if (request.getLink() == null) {
                     if (action.equals(ACTION_SHARE_MSG)) {
                         // It is necessary to import the node into the cloud to create a new link from that node.
-                        logError("Error exporting node: " + e.getErrorString() + ", it is necessary to import the node");
+                        Timber.e("Error exporting node: %s, it is necessary to import the node", e.getErrorString());
                         ChatController chatC = new ChatController(context);
                         if (messages == null || messages.isEmpty()) {
-                            logDebug("One node to import to MEGA and then share");
+                            Timber.d("One node to import to MEGA and then share");
                         } else {
                             if (msgIdNodeHandle == null || msgIdNodeHandle.isEmpty()) {
                                 return;
                             }
 
                             messageId = msgIdNodeHandle.get(request.getNodeHandle());
-                            logDebug("Several nodes to import to MEGA and then share the links");
+                            Timber.d("Several nodes to import to MEGA and then share the links");
                             chatC.setExportListener(this);
                         }
 
                         chatC.importNode(messageId, chatId, Constants.IMPORT_TO_SHARE_OPTION);
                     } else {
-                        logError("Error exporting node: " + e.getErrorString());
+                        Timber.e("Error exporting node: %s", e.getErrorString());
                     }
                 } else {
-                    logDebug("The link is created");
+                    Timber.d("The link is created");
                     if (e.getErrorCode() != API_OK) {
                         numberError++;
                     } else if (exportedLinks != null) {
@@ -252,7 +252,7 @@ public class ExportListener extends BaseListener {
                     }
 
                     if (exportedLinks == null && numberError == 0) {
-                        logDebug("Start share one item");
+                        Timber.d("Start share one item");
                         if (shareIntent != null) {
                             startShareIntent(context, shareIntent, request.getLink());
 
@@ -270,7 +270,7 @@ public class ExportListener extends BaseListener {
                         }
 
                         if (numberError > 0) {
-                            logError(numberError + " errors exporting nodes");
+                            Timber.e("%s errors exporting nodes", numberError);
                             showSnackbar(context, context.getResources()
                                     .getQuantityString(R.plurals.context_link_export_error, numberExport));
                             return;

@@ -26,8 +26,8 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extra
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
+import timber.log.Timber
 
 /**
  * Image Viewer page that shows an individual image within a list of image items
@@ -227,7 +227,7 @@ class ImageViewerPageFragment : Fragment() {
         }
 
         override fun onFailure(id: String, throwable: Throwable) {
-            logError(throwable.stackTraceToString())
+            Timber.e(throwable)
             if (throwable is BasePool.PoolSizeViolationException) activity?.onLowMemory()
 
             val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
