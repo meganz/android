@@ -1,5 +1,28 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
+import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
+import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
+import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
+import static mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR;
+import static mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX;
+import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -13,17 +36,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.lifecycle.Observer;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -47,6 +59,18 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -75,16 +99,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.main.InvitationContactInfo.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import timber.log.Timber;
 
 public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
@@ -140,8 +155,8 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private InvitationContactInfo currentSelected;
 
-    private final Observer<Boolean> fabChangeObserver  = isShow -> {
-        if(isShow){
+    private final Observer<Boolean> fabChangeObserver = isShow -> {
+        if (isShow) {
             showFabButton();
         } else {
             hideFabButton();
@@ -160,7 +175,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             try {
                 super.onLayoutChildren(recycler, state);
             } catch (IndexOutOfBoundsException e) {
-                logDebug("IndexOutOfBoundsException in RecyclerView happens");
+                Timber.d("IndexOutOfBoundsException in RecyclerView happens");
             }
         }
     }
@@ -255,7 +270,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         } else {
             fromAchievement = getIntent().getBooleanExtra(KEY_FROM, false);
         }
-        logDebug("Request by Achievement: " + fromAchievement);
+        Timber.d("Request by Achievement: %s", fromAchievement);
         if (isGetContactCompleted) {
             if (savedInstanceState != null) {
                 phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
@@ -281,16 +296,16 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 noPermissionHeader.setVisibility(View.VISIBLE);
             }
 
-            if(currentSelected != null) {
+            if (currentSelected != null) {
                 listDialog = new ContactInfoListDialog(this, currentSelected, this);
                 if (savedInstanceState != null) {
                     listDialog.setCheckedIndex(savedInstanceState.getIntegerArrayList(CHECKED_INDEX));
                     ArrayList<InvitationContactInfo> selectedList = savedInstanceState.getParcelableArrayList(SELECTED_CONTACT_INFO);
-                    if(selectedList != null) {
+                    if (selectedList != null) {
                         listDialog.setSelected(new HashSet<>(selectedList));
                     }
                     ArrayList<InvitationContactInfo> unSelectedList = savedInstanceState.getParcelableArrayList(UNSELECTED);
-                    if(unSelectedList != null) {
+                    if (unSelectedList != null) {
                         listDialog.setUnSelected(new HashSet<>(unSelectedList));
                     }
                 }
@@ -316,14 +331,14 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE && e.getErrorCode() == MegaError.API_OK) {
                     contactLink = CONTACT_LINK_BASE_URL + MegaApiAndroid.handleToBase64(request.getNodeHandle());
                 } else {
-                    logWarning("Create contact link failed.");
+                    Timber.w("Create contact link failed.");
                     contactLink = "";
                 }
             }
 
             @Override
             public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-                logWarning("Create contact link temp error.");
+                Timber.w("Create contact link temp error.");
                 contactLink = "";
             }
         };
@@ -344,7 +359,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        logDebug("onCreateOptionsMenu");
+        Timber.d("onCreateOptionsMenu");
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_invite_contact, menu);
@@ -364,7 +379,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 break;
             }
             case R.id.action_more: {
-                logInfo("more button clicked - share invitation through other app");
+                Timber.i("more button clicked - share invitation through other app");
                 String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -403,7 +418,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_PHONE_CONTACTS, phoneContacts);
         outState.putParcelableArrayList(KEY_MEGA_CONTACTS, megaContacts);
@@ -414,7 +429,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted);
         outState.putBoolean(KEY_FROM, fromAchievement);
         outState.putParcelable(CURRENT_SELECTED_CONTACT, currentSelected);
-        if(listDialog != null) {
+        if (listDialog != null) {
             outState.putIntegerArrayList(CHECKED_INDEX, listDialog.getCheckedIndex());
             outState.putParcelableArrayList(SELECTED_CONTACT_INFO, new ArrayList<Parcelable>(listDialog.getSelected()));
             outState.putParcelableArrayList(UNSELECTED, new ArrayList<Parcelable>(listDialog.getUnSelected()));
@@ -423,7 +438,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
+        Timber.d("onBackPressed");
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         finish();
     }
@@ -431,17 +446,17 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(listDialog != null) {
+        if (listDialog != null) {
             listDialog.recycle();
         }
     }
 
     private void setTitleAB() {
-        logDebug("setTitleAB");
+        Timber.d("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
                 aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
-                                addedContacts.size(), addedContacts.size()));
+                        addedContacts.size(), addedContacts.size()));
             } else {
                 aB.setSubtitle(null);
             }
@@ -449,7 +464,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void setRecyclersVisibility() {
-        logDebug("setRecyclersVisibility " + totalContacts.size());
+        Timber.d("setRecyclersVisibility %s", totalContacts.size());
         if (totalContacts.size() > 0) {
             containerContacts.setVisibility(View.VISIBLE);
         } else {
@@ -458,7 +473,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void queryIfHasReadContactsPermissions() {
-        logDebug("queryIfHasReadContactsPermissions");
+        Timber.d("queryIfHasReadContactsPermissions");
         boolean hasReadContactsPermission = hasPermissions(this, Manifest.permission.READ_CONTACTS);
         if (hasReadContactsPermission) {
             isPermissionGranted = true;
@@ -469,14 +484,14 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void prepareToGetContacts() {
-        logDebug("prepareToGetContacts");
+        Timber.d("prepareToGetContacts");
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
         new GetPhoneContactsTask().execute();
     }
 
     private void visibilityFastScroller() {
-        logDebug("visibilityFastScroller");
+        Timber.d("visibilityFastScroller");
         fastScroller.setRecyclerView(recyclerViewList);
         if (totalContacts.size() < MIN_LIST_SIZE_FOR_FAST_SCROLLER) {
             fastScroller.setVisibility(View.GONE);
@@ -486,13 +501,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void setPhoneAdapterContacts(ArrayList<InvitationContactInfo> contacts) {
-        logDebug("setPhoneAdapterContacts");
+        Timber.d("setPhoneAdapterContacts");
         invitationContactsAdapter.setContactData(contacts);
         invitationContactsAdapter.notifyDataSetChanged();
     }
 
     private void showEmptyTextView() {
-        logDebug("showEmptyTextView");
+        Timber.d("showEmptyTextView");
         String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
         try {
             textToShow = textToShow.replace(
@@ -505,7 +520,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                             + "\'>"
             ).replace("[/B]", "</font>");
         } catch (Exception e) {
-            logError(e.toString());
+            Timber.e(e);
         }
 
         Spanned result;
@@ -518,7 +533,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void setEmptyStateVisibility(boolean visible) {
-        logDebug("setEmptyStateVisibility");
+        Timber.d("setEmptyStateVisibility");
         if (visible) {
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
@@ -531,7 +546,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     public void initScanQR() {
-        logDebug("initScanQR");
+        Timber.d("initScanQR");
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra(OPEN_SCAN_QR, true);
         startQRActivity(intent);
@@ -547,7 +562,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void refreshKeyboard() {
-        logDebug("refreshKeyboard");
+        Timber.d("refreshKeyboard");
         int imeOptions = typeContactEditText.getImeOptions();
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -565,13 +580,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private boolean isValidEmail(CharSequence target) {
         boolean result = target != null && Constants.EMAIL_ADDRESS.matcher(target).matches();
-        logDebug("isValidEmail" + result);
+        Timber.d("isValidEmail%s", result);
         return result;
     }
 
     private boolean isValidPhone(CharSequence target) {
         boolean result = target != null && PHONE_NUMBER_REGEX.matcher(target).matches();
-        logDebug("isValidPhone" + result);
+        Timber.d("isValidPhone%s", result);
         return result;
     }
 
@@ -582,7 +597,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        logDebug("onTextChanged: s is " + s.toString() + "start: " + start + " before: " + before + " count: " + count);
+        Timber.d("onTextChanged: s is %sstart: %d before: %d count: %d", s.toString(), start, before, count);
         if (!TextUtils.isEmpty(s)) {
             String temp = s.toString();
             char last = s.charAt(s.length() - 1);
@@ -602,7 +617,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                     hideKeyboard(this, 0);
                 }
             } else {
-                logDebug("Last character is: " + last);
+                Timber.d("Last character is: %s", last);
             }
         }
 
@@ -687,7 +702,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
-                logDebug("Scan QR code pressed");
+                Timber.d("Scan QR code pressed");
                 if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
                     showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
                     break;
@@ -697,7 +712,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             }
             case R.id.fab_button_next: {
                 enableFabButton(false);
-                logDebug("invite Contacts");
+                Timber.d("invite Contacts");
                 inviteContacts(addedContacts);
                 hideKeyboard(this, 0);
                 break;
@@ -707,16 +722,16 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
+        Timber.d("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                logDebug("Permission granted");
+                Timber.d("Permission granted");
                 isPermissionGranted = true;
                 prepareToGetContacts();
                 noPermissionHeader.setVisibility(View.GONE);
             } else {
-                logDebug("Permission denied");
+                Timber.d("Permission denied");
                 setEmptyStateVisibility(true);
                 emptyTextView.setText(R.string.no_contacts_permissions);
                 emptyImageView.setVisibility(View.VISIBLE);
@@ -730,13 +745,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     public void onSelect(@NonNull Set<InvitationContactInfo> selected, @NonNull Set<InvitationContactInfo> toRemove) {
         long id = -1;
         cancel();
-        for(InvitationContactInfo select : selected) {
+        for (InvitationContactInfo select : selected) {
             id = select.getId();
             if (!isContactAdded(select)) {
                 addedContacts.add(select);
             }
         }
-        for(InvitationContactInfo select : toRemove) {
+        for (InvitationContactInfo select : toRemove) {
             id = select.getId();
             addedContacts.remove(select);
         }
@@ -760,7 +775,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public void onItemClick(int position) {
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
-        logDebug("on Item click at " + position + " name is " + invitationContactInfo.getName());
+        Timber.d("on Item click at %d name is %s", position, invitationContactInfo.getName());
         if (invitationContactInfo.hasMultipleContactInfos()) {
             this.currentSelected = invitationContactInfo;
             listDialog = new ContactInfoListDialog(this, invitationContactInfo, this);
@@ -783,7 +798,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
-        logDebug("megaContactToContactInfo " + megaContacts.size());
+        Timber.d("megaContactToContactInfo %s", megaContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (megaContacts.size() > 0) {
             InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER);
@@ -806,7 +821,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private ArrayList<InvitationContactInfo> localContactToContactInfo(List<ContactsUtil.LocalContact> localContacts) {
-        logDebug("megaContactToContactInfo " + localContacts.size());
+        Timber.d("megaContactToContactInfo %s", localContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (localContacts.size() > 0) {
             InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER);
@@ -825,7 +840,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             ContactsFilter.filterOutMegaUsers(this, megaContacts, phoneNumberList);
             ContactsFilter.filterOutMegaUsers(this, megaContacts, emailList);
             // if the local contact has any phone number or email found on MEGA, ignore it.
-            if(phoneNumberList.size() < phoneCount || emailList.size() < emailCount) {
+            if (phoneNumberList.size() < phoneCount || emailList.size() < emailCount) {
                 continue;
             }
 
@@ -833,7 +848,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             ContactsFilter.filterOutContacts(megaApi, emailList);
             ContactsFilter.filterOutPendingContacts(megaApi, emailList);
             phoneNumberList.addAll(emailList);
-            if(phoneNumberList.size() > 0) {
+            if (phoneNumberList.size() > 0) {
                 InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_PHONE_CONTACT, phoneNumberList, phoneNumberList.get(0), defaultLocalContactAvatarColor);
                 result.add(info);
             }
@@ -869,7 +884,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         @Override
         protected Void doInBackground(Void... voids) {
-            logDebug("GetPhoneContactsTask doInBackground");
+            Timber.d("GetPhoneContactsTask doInBackground");
 
             isGettingLocalContact = true;
 
@@ -886,7 +901,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         @Override
         protected void onPostExecute(Void avoid) {
-            logDebug("onPostExecute GetPhoneContactsTask");
+            Timber.d("onPostExecute GetPhoneContactsTask");
             isGettingLocalContact = false;
             onGetContactCompleted();
             // no need to invite the contacts that has already been on MEGA to get invitation bonus.
@@ -903,7 +918,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         @Override
         protected Void doInBackground(Void... voids) {
-            logDebug("FilterContactsTask doInBackground");
+            Timber.d("FilterContactsTask doInBackground");
             String query = inputString == null ? null : inputString.toLowerCase();
             ArrayList<InvitationContactInfo> megaContacts = new ArrayList<>();
             ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
@@ -945,21 +960,21 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         @Override
         protected void onPostExecute(Void voids) {
-            logDebug("onPostExecute FilterContactsTask");
+            Timber.d("onPostExecute FilterContactsTask");
             refreshList();
             visibilityFastScroller();
         }
     }
 
     private void startFilterTask() {
-        logDebug("startFilterTask");
+        Timber.d("startFilterTask");
         inputString = typeContactEditText.getText().toString();
         filterContactsTask = new FilterContactsTask();
         filterContactsTask.execute();
     }
 
     private View createContactTextView(String name, final int id) {
-        logDebug("createTextView contact name is " + name);
+        Timber.d("createTextView contact name is %s", name);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -995,21 +1010,21 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void controlHighlited(long id) {
         boolean shouldHighlited = false;
-        for(InvitationContactInfo added : addedContacts) {
-            if(added.getId() == id) {
+        for (InvitationContactInfo added : addedContacts) {
+            if (added.getId() == id) {
                 shouldHighlited = true;
                 break;
             }
         }
-        for(InvitationContactInfo temp : invitationContactsAdapter.getData()) {
-            if(temp.getId() == id) {
+        for (InvitationContactInfo temp : invitationContactsAdapter.getData()) {
+            if (temp.getId() == id) {
                 temp.setHighlighted(shouldHighlited);
             }
         }
     }
 
     private void refreshAddedContactsView(boolean shouldScroll) {
-        logDebug("refreshAddedContactsView");
+        Timber.d("refreshAddedContactsView");
         itemContainer.removeAllViews();
         for (int i = 0; i < addedContacts.size(); i++) {
             InvitationContactInfo invitationContactInfo = addedContacts.get(i);
@@ -1031,7 +1046,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void refreshInviteContactButton() {
-        logDebug("refreshInviteContactButton");
+        Timber.d("refreshInviteContactButton");
         String stringInEditText = typeContactEditText.getText().toString();
         boolean isStringValidNow = stringInEditText.length() == 0
                 || isValidEmail(stringInEditText)
@@ -1040,7 +1055,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private boolean isContactAdded(InvitationContactInfo invitationContactInfo) {
-        logDebug("isContactAdded contact name is " + invitationContactInfo.getName());
+        Timber.d("isContactAdded contact name is %s", invitationContactInfo.getName());
         for (InvitationContactInfo addedContact : addedContacts) {
             if (addedContact.getId() == invitationContactInfo.getId() &&
                     addedContact.getDisplayInfo().equalsIgnoreCase(invitationContactInfo.getDisplayInfo())) {
@@ -1051,7 +1066,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void refreshList() {
-        logDebug("refresh list");
+        Timber.d("refresh list");
         setPhoneAdapterContacts(filteredContacts);
     }
 
@@ -1083,12 +1098,12 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void invitePhoneContacts(ArrayList<String> phoneNumbers) {
-        logDebug("invitePhoneContacts");
+        Timber.d("invitePhoneContacts");
         StringBuilder recipents = new StringBuilder("smsto:");
         for (String phone : phoneNumbers) {
             recipents.append(phone);
             recipents.append(";");
-            logDebug("setResultPhoneContacts: " + phone);
+            Timber.d("setResultPhoneContacts: %s", phone);
         }
         String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents.toString()));
@@ -1113,19 +1128,19 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
-            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
+            Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.getNumber());
             if (e.getErrorCode() == MegaError.API_OK) {
                 numberSent++;
-                logDebug("OK INVITE CONTACT: " + request.getEmail());
+                Timber.d("OK INVITE CONTACT: %s", request.getEmail());
             } else {
                 numberNotSent++;
-                logDebug("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                Timber.d("ERROR: %d___%s", e.getErrorCode(), e.getErrorString());
             }
             if (numberSent + numberNotSent == numberToSend) {
                 final Intent result = new Intent();
                 if (numberToSend == 1) {
                     if (numberSent == 1) {
-                        if(!fromAchievement) {
+                        if (!fromAchievement) {
                             showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
                         } else {
                             result.putExtra(KEY_SENT_EMAIL, request.getEmail());
@@ -1133,11 +1148,11 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                     }
                 } else {
                     if (numberNotSent > 0) {
-                        if(!fromAchievement) {
+                        if (!fromAchievement) {
                             showSnackbar(getString(R.string.number_no_invite_contact_request, numberSent, numberNotSent));
                         }
                     } else {
-                        if(!fromAchievement) {
+                        if (!fromAchievement) {
                             showSnackbar(getString(R.string.number_correctly_invite_contact_request, numberToSend));
                         } else {
                             result.putExtra(KEY_SENT_NUMBER, numberSent);
@@ -1168,7 +1183,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private void inviteEmailContacts(ArrayList<String> emails) {
         numberToSend = emails.size();
         for (String email : emails) {
-            logDebug("setResultEmailContacts: " + email);
+            Timber.d("setResultEmailContacts: %s", email);
             megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
         }
     }
@@ -1178,7 +1193,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void addContactInfo(String inputString, int type) {
-        logDebug("addContactInfo inputString is " + inputString + " type is " + type);
+        Timber.d("addContactInfo inputString is %s type is %d", inputString, type);
         InvitationContactInfo info = null;
         if (type == TYPE_MANUAL_INPUT_EMAIL) {
             info = InvitationContactInfo.createManualInputEmail(inputString, defaultLocalContactAvatarColor);
@@ -1188,7 +1203,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         if (info != null) {
             int index = isUserEnteredContactExistInList(info);
             RecyclerView.ViewHolder holder = recyclerViewList.findViewHolderForAdapterPosition(index);
-            if (index >= 0 &&  holder != null) {
+            if (index >= 0 && holder != null) {
                 holder.itemView.performClick();
             } else if (!isContactAdded(info)) {
                 addedContacts.add(info);
@@ -1210,7 +1225,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void enableFabButton(Boolean enableFabButton) {
-        logDebug("enableFabButton: " + enableFabButton);
+        Timber.d("enableFabButton: %s", enableFabButton);
         fabButton.setEnabled(enableFabButton);
     }
 
@@ -1230,7 +1245,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
      * Shows the fabButton
      */
     private void showFabButton() {
-        if (fabButton != null){
+        if (fabButton != null) {
             fabButton.show();
         }
     }
@@ -1239,7 +1254,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
      * Hides the fabButton
      */
     private void hideFabButton() {
-        if (fabButton != null){
+        if (fabButton != null) {
             fabButton.hide();
         }
     }

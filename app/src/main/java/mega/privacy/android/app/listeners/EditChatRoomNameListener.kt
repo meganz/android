@@ -1,15 +1,18 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.utils.LogUtil
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import timber.log.Timber
 
 class EditChatRoomNameListener(context: Context?) : ChatBaseListener(context) {
     private var callback: OnEditedChatRoomNameCallback? = null
 
     constructor(
         context: Context?,
-        callback: OnEditedChatRoomNameCallback
+        callback: OnEditedChatRoomNameCallback,
     ) : this(context) {
         this.callback = callback
     }
@@ -21,11 +24,11 @@ class EditChatRoomNameListener(context: Context?) : ChatBaseListener(context) {
 
         when (e.errorCode) {
             MegaError.API_OK -> {
-                LogUtil.logDebug("ChatRoom name edited")
+                Timber.d("ChatRoom name edited")
                 callback?.onEditedChatRoomName(request.chatHandle, request.text)
             }
             else -> {
-                LogUtil.logError("Error Editing ChatRoom name")
+                Timber.e("Error Editing ChatRoom name")
             }
         }
     }

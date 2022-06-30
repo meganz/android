@@ -2,13 +2,13 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.interfaces.MoveTransferInterface
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_MOVE_TRANSFER
+import timber.log.Timber
 
 class MoveTransferListener(
     context: Context,
@@ -21,7 +21,7 @@ class MoveTransferListener(
         }
 
         if (e.errorCode != API_OK) {
-            logError("Error changing transfer priority: " + getTranslatedErrorString(e))
+            Timber.e("Error changing transfer priority: ${getTranslatedErrorString(e)}")
             moveTransferInterface.movementFailed(request.transferTag)
         } else {
             moveTransferInterface.movementSuccess(request.transferTag)

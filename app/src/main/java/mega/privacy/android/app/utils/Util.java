@@ -1,5 +1,27 @@
 package mega.privacy.android.app.utils;
 
+import static android.content.Context.ACTIVITY_SERVICE;
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
+import static com.google.android.material.textfield.TextInputLayout.END_ICON_NONE;
+import static com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
+import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
+import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
+import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PICTURE;
+import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PROFILE_PICTURE;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
+import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -31,31 +53,10 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.provider.MediaStore;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.ColorRes;
-import androidx.annotation.Nullable;
-
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputLayout;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-
 import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
-import androidx.core.content.FileProvider;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -71,6 +72,23 @@ import android.view.WindowInsetsController;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,41 +131,27 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-
-import static android.content.Context.ACTIVITY_SERVICE;
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
-import static com.google.android.material.textfield.TextInputLayout.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import timber.log.Timber;
 
 public class Util {
 
     public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
     public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
-	
-	public static float dpWidthAbs = 360;
-	public static float dpHeightAbs = 592;
-	
-	public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
-	
-	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
 
-	public static HashMap<String, String> countryCodeDisplay;
+    public static float dpWidthAbs = 360;
+    public static float dpHeightAbs = 592;
 
-	private static long lastClickTime;
+    public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
 
-	// 150ms, a smaller value may cause the keyboard to fail to open
-	public final static long SHOW_IM_DELAY = 150;
+    // Debug flag to enable logging and some other things
+    public static boolean DEBUG = false;
+
+    public static HashMap<String, String> countryCodeDisplay;
+
+    private static long lastClickTime;
+
+    // 150ms, a smaller value may cause the keyboard to fail to open
+    public final static long SHOW_IM_DELAY = 150;
 
     /**
      * Language tag for simplified Chinese.
@@ -165,143 +169,137 @@ public class Util {
         return false;
     }
 
-	/*
-	 * Build error dialog
-	 * @param message Message to display
-	 * @param finish Should activity finish after dialog dismis
-	 * @param activity Source activity
-	 */
-	public static void showErrorAlertDialog(String message, final boolean finish, final Activity activity){
-		if(activity == null){
-			return;
-		}
+    /*
+     * Build error dialog
+     * @param message Message to display
+     * @param finish Should activity finish after dialog dismis
+     * @param activity Source activity
+     */
+    public static void showErrorAlertDialog(String message, final boolean finish, final Activity activity) {
+        if (activity == null) {
+            return;
+        }
 
-		try{
-			MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
-				dialog.dismiss();
-				if (finish) {
-					activity.finish();
-				}
-			});
-			dialogBuilder.setOnCancelListener(dialog -> {
-				if (finish) {
-					activity.finish();
-				}
-			});
+        try {
+            MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+            dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
+                dialog.dismiss();
+                if (finish) {
+                    activity.finish();
+                }
+            });
+            dialogBuilder.setOnCancelListener(dialog -> {
+                if (finish) {
+                    activity.finish();
+                }
+            });
 
-			AlertDialog dialog = dialogBuilder.create();
-			dialog.setCanceledOnTouchOutside(false);
-			dialog.setCancelable(false);
-			dialog.show();
-			brandAlertDialog(dialog);
-		}
-		catch(Exception ex){
-			Util.showToast(activity, message);
-		}
-	}
-	
-	public static void showErrorAlertDialog(MegaError error, Activity activity) {
-		showErrorAlertDialog(error.getErrorString(), false, activity);
-	}
-	
-	public static void showErrorAlertDialog(int errorCode, Activity activity) {
-		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
-	}
+            AlertDialog dialog = dialogBuilder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+            brandAlertDialog(dialog);
+        } catch (Exception ex) {
+            Util.showToast(activity, message);
+        }
+    }
 
-	public static String getCountryCodeByNetwork(Context context) {
-		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		if (tm != null) {
-			return tm.getNetworkCountryIso();
-		}
-		return null;
-	}
+    public static void showErrorAlertDialog(MegaError error, Activity activity) {
+        showErrorAlertDialog(error.getErrorString(), false, activity);
+    }
 
-	public static boolean isRoaming(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if (cm != null) {
-			NetworkInfo ni = cm.getActiveNetworkInfo();
-			if(ni != null) {
+    public static void showErrorAlertDialog(int errorCode, Activity activity) {
+        showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+    }
+
+    public static String getCountryCodeByNetwork(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (tm != null) {
+            return tm.getNetworkCountryIso();
+        }
+        return null;
+    }
+
+    public static boolean isRoaming(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkInfo ni = cm.getActiveNetworkInfo();
+            if (ni != null) {
                 return ni.isRoaming();
             }
-		}
-		return true;
-	}
+        }
+        return true;
+    }
 
-	public static int countMatches(Pattern pattern, String string)
-	{
-		Matcher matcher = pattern.matcher(string);
+    public static int countMatches(Pattern pattern, String string) {
+        Matcher matcher = pattern.matcher(string);
 
-		int count = 0;
-		int pos = 0;
-		while (matcher.find(pos))
-		{
-			count++;
-			pos = matcher.start() + 1;
-		}
+        int count = 0;
+        int pos = 0;
+        while (matcher.find(pos)) {
+            count++;
+            pos = matcher.start() + 1;
+        }
 
-		return count;
-	}
-	
-	public static boolean showMessageRandom(){
-		Random r = new Random(System.currentTimeMillis());
-		int randomInt = r.nextInt(100) + 1;
-		
-		if(randomInt<5){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
+        return count;
+    }
+
+    public static boolean showMessageRandom() {
+        Random r = new Random(System.currentTimeMillis());
+        int randomInt = r.nextInt(100) + 1;
+
+        if (randomInt < 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public static String toCDATA(String src) {
         if (src != null) {
             //solution from web client
-            src = src.replaceAll("&","&amp;")
-                    .replaceAll("\"","&quot;")
-                    .replaceAll("'","&#39;")
-                    .replaceAll("<","&lt;")
-                    .replaceAll(">","&gt;");
+            src = src.replaceAll("&", "&amp;")
+                    .replaceAll("\"", "&quot;")
+                    .replaceAll("'", "&#39;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;");
             //another solution
         }
         src = converterShortCodes(src);
         return src;
     }
 
-	public static String getExternalCardPath() {
+    public static String getExternalCardPath() {
 
         String secStore = System.getenv("SECONDARY_STORAGE");
-        if (secStore == null){
-        	return null;
-        }
-        else{
-        	if (secStore.compareTo("") == 0){
-        		return null;
-        	}
-			logDebug("secStore: " + secStore);
-	        File path = new File(secStore);
-			logDebug("getFreeSize: " + path.getUsableSpace());
-	        if(path.getUsableSpace()>0)
-	        {
-	        	return path.getAbsolutePath();
-	        }
+        if (secStore == null) {
+            return null;
+        } else {
+            if (secStore.compareTo("") == 0) {
+                return null;
+            }
+            Timber.d("secStore: %s", secStore);
+            File path = new File(secStore);
+            Timber.d("getFreeSize: %s", path.getUsableSpace());
+            if (path.getUsableSpace() > 0) {
+                return path.getAbsolutePath();
+            }
         }
 
         return null;
-	}
+    }
 
-	public static String getNumberItemChildren(File file){
-		File[] list = file.listFiles();
-		int count = 0;
-		if(list!=null){
-			count =  list.length;
-		}
+    public static String getNumberItemChildren(File file) {
+        File[] list = file.listFiles();
+        int count = 0;
+        if (list != null) {
+            count = list.length;
+        }
 
-		return getQuantityString(R.plurals.general_num_items, count, count);
-	}
-	
-	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        return getQuantityString(R.plurals.general_num_items, count, count);
+    }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
 
         Matrix matrix = new Matrix();
         switch (orientation) {
@@ -321,392 +319,393 @@ public class Util {
                 matrix.setRotate(90);
                 matrix.postScale(-1, 1);
                 break;
-           case ExifInterface.ORIENTATION_ROTATE_90:
-               matrix.setRotate(90);
-               break;
-           case ExifInterface.ORIENTATION_TRANSVERSE:
-               matrix.setRotate(-90);
-               matrix.postScale(-1, 1);
-               break;
-           case ExifInterface.ORIENTATION_ROTATE_270:
-               matrix.setRotate(-90);
-               break;
-           default:
-               return bitmap;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
         }
 
-		try {
-			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-			if (bitmap != null && !bitmap.isRecycled()) {
-				bitmap.recycle();
-				bitmap = null;
-				System.gc();
-			}
-			return bmRotated;
-		} catch (Exception e) {
-			logError("Exception creating rotated bitmap", e);
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-		// Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    
-	    int inSampleSize = 1;
-	    
-	    if (height > reqHeight || width > reqWidth) {
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            if (bitmap != null && !bitmap.isRecycled()) {
+                bitmap.recycle();
+                bitmap = null;
+                System.gc();
+            }
+            return bmRotated;
+        } catch (Exception e) {
+            Timber.e(e, "Exception creating rotated bitmap");
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
 
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
+        int inSampleSize = 1;
 
-	    return inSampleSize;
-	}
-	
-	/*
-	 * Build custom dialog
-	 * @param activity Source activity
-	 * @param title Dialog title
-	 * @param message To display, could be null
-	 * @param view Custom view to display in the dialog
-	 */
-	public static MaterialAlertDialogBuilder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
-		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
-		ViewGroup customView = getCustomAlertView(activity, title, message);
-		if (view != null) {
-			customView.addView(view);
-		}
-		dialogBuilder.setView(customView);
-		dialogBuilder.setInverseBackgroundForced(true);
-		return dialogBuilder;
-	}
+        if (height > reqHeight || width > reqWidth) {
 
-	/*
-	 * Create custom alert dialog view
-	 */
-	private static ViewGroup getCustomAlertView(Activity activity, String title, String message) {
-		View customView = activity.getLayoutInflater().inflate(R.layout.alert_dialog, null);
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
 
-		TextView titleView = (TextView)customView.findViewById(R.id.dialog_title);
-		titleView.setText(title);
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
 
-		TextView messageView = (TextView)customView.findViewById(R.id.message);
-		if (message == null) {
-			messageView.setVisibility(View.GONE);
-		} else {
-			messageView.setText(message);
-		}
-		return (ViewGroup)customView;
-	}
+        return inSampleSize;
+    }
 
-	/*
-	 * Show Toast message with String
-	 */
-	public static void showToast(Context context, String message) {
-		try { Toast.makeText(context, message, Toast.LENGTH_LONG).show(); } catch(Exception ex) {};
-	}
-	
-	public static float getScaleW(DisplayMetrics outMetrics, float density){
-		
-		float scale = 0;
-		
-		float dpWidth  = outMetrics.widthPixels / density;		
-	    scale = dpWidth / dpWidthAbs;	    
-		
-	    return scale;
-	}
-	
-	public static float getScaleH(DisplayMetrics outMetrics, float density){
-		
-		float scale = 0;
-		
-		float dpHeight  = outMetrics.heightPixels / density;		
-	    scale = dpHeight / dpHeightAbs;	    
-		
-	    return scale;
-	}
+    /*
+     * Build custom dialog
+     * @param activity Source activity
+     * @param title Dialog title
+     * @param message To display, could be null
+     * @param view Custom view to display in the dialog
+     */
+    public static MaterialAlertDialogBuilder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
+        ViewGroup customView = getCustomAlertView(activity, title, message);
+        if (view != null) {
+            customView.addView(view);
+        }
+        dialogBuilder.setView(customView);
+        dialogBuilder.setInverseBackgroundForced(true);
+        return dialogBuilder;
+    }
 
-	/**
-	 * Convert dp to px.
-	 *
-	 * @param dp dp value
-	 * @param outMetrics display metrics
-	 * @return corresponding dp value
-	 */
-	public static int dp2px(float dp, DisplayMetrics outMetrics) {
-		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
-	}
+    /*
+     * Create custom alert dialog view
+     */
+    private static ViewGroup getCustomAlertView(Activity activity, String title, String message) {
+        View customView = activity.getLayoutInflater().inflate(R.layout.alert_dialog, null);
 
-	public static int dp2px(float dp) {
-		return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				Resources.getSystem().getDisplayMetrics()));
-	}
+        TextView titleView = (TextView) customView.findViewById(R.id.dialog_title);
+        titleView.setText(title);
 
-	/*
-	 * AES encryption
-	 */
-	public static byte[] aes_encrypt(byte[] raw, byte[] clear) throws Exception {
-		SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-		byte[] encrypted = cipher.doFinal(clear);
-		return encrypted;
-	}
-	
-	/*
-	 * AES decryption
-	 */
-	public static byte[] aes_decrypt(byte[] raw, byte[] encrypted)
-			throws Exception {
-		SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-		byte[] decrypted = cipher.doFinal(encrypted);
-		return decrypted;
-	}
-	
-	/**
-	 * Checks if device is on WiFi.
-	 */
-	public static boolean isOnWifi(Context context) {
-		return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
-	}
+        TextView messageView = (TextView) customView.findViewById(R.id.message);
+        if (message == null) {
+            messageView.setVisibility(View.GONE);
+        } else {
+            messageView.setText(message);
+        }
+        return (ViewGroup) customView;
+    }
 
-	/**
-	 * Checks if device is on Mobile Data.
-	 */
-	public static boolean isOnMobileData(Context context) {
-		return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
-	}
+    /*
+     * Show Toast message with String
+     */
+    public static void showToast(Context context, String message) {
+        try {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+        }
+        ;
+    }
 
-	/**
-	 * Checks if device is on specific network.
-	 *
-	 * @param networkType The type of network,
-	 * @see ConnectivityManager to check the available network types available.
-	 * @return True if device is on specified network, false otherwise.
-	 */
-	private static boolean isOnNetwork(Context context, int networkType) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static float getScaleW(DisplayMetrics outMetrics, float density) {
 
-		NetworkInfo networkInfo = null;
+        float scale = 0;
 
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager.getNetworkInfo(networkType);
-		}
+        float dpWidth = outMetrics.widthPixels / density;
+        scale = dpWidth / dpWidthAbs;
 
-		return networkInfo != null && networkInfo.isConnected();
-	}
+        return scale;
+    }
 
-	static public boolean isOnline(Context context) {
-	    if(context == null) return true;
-		
-		ConnectivityManager cm =
-	        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-	        return true;
-	    }
-	    return false;
-	}
+    public static float getScaleH(DisplayMetrics outMetrics, float density) {
 
-	/**
-	 * Gets a speed or size string.
-	 *
-	 * @param unit		the unit to show in the string
-	 * @param isSpeed	true if the string is a speed, false if it is a size
-	 * @return The speed or size string.
-	 */
-	private static String getUnitString(long unit, boolean isSpeed) {
-		DecimalFormat df = new DecimalFormat("#.##");
+        float scale = 0;
 
-		float KB = 1024;
-		float MB = KB * 1024;
-		float GB = MB * 1024;
-		float TB = GB * 1024;
-		float PB = TB * 1024;
-		float EB = PB * 1024;
+        float dpHeight = outMetrics.heightPixels / density;
+        scale = dpHeight / dpHeightAbs;
 
-		if (unit < KB) {
-			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
-		} else if (unit < MB) {
-			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
-		} else if (unit < GB) {
-			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
-		} else if (unit < TB) {
-			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
-		} else if (unit < PB) {
-			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
-		} else if (unit < EB) {
-			return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
-		} else {
-			return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
-		}
-	}
+        return scale;
+    }
 
-	/**
-	 * Gets a speed string.
-	 *
-	 * @param speed	the speed to show in the string
-	 * @return The speed string.
-	 */
-	public static String getSpeedString (long speed){
-		return getUnitString(speed, true);
-	}
+    /**
+     * Convert dp to px.
+     *
+     * @param dp         dp value
+     * @param outMetrics display metrics
+     * @return corresponding dp value
+     */
+    public static int dp2px(float dp, DisplayMetrics outMetrics) {
+        return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
+    }
 
-	/**
-	 * Gets a size string.
-	 *
-	 * @param size	the size to show in the string
-	 * @return The size string.
-	 */
-	public static String getSizeString(long size){
-		return getUnitString(size, false);
-	}
+    public static int dp2px(float dp) {
+        return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                Resources.getSystem().getDisplayMetrics()));
+    }
 
-    public static String getSizeStringGBBased(long gbSize){
+    /*
+     * AES encryption
+     */
+    public static byte[] aes_encrypt(byte[] raw, byte[] clear) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+        byte[] encrypted = cipher.doFinal(clear);
+        return encrypted;
+    }
+
+    /*
+     * AES decryption
+     */
+    public static byte[] aes_decrypt(byte[] raw, byte[] encrypted)
+            throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+        byte[] decrypted = cipher.doFinal(encrypted);
+        return decrypted;
+    }
+
+    /**
+     * Checks if device is on WiFi.
+     */
+    public static boolean isOnWifi(Context context) {
+        return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
+    }
+
+    /**
+     * Checks if device is on Mobile Data.
+     */
+    public static boolean isOnMobileData(Context context) {
+        return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
+    }
+
+    /**
+     * Checks if device is on specific network.
+     *
+     * @param networkType The type of network,
+     * @return True if device is on specified network, false otherwise.
+     * @see ConnectivityManager to check the available network types available.
+     */
+    private static boolean isOnNetwork(Context context, int networkType) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = null;
+
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getNetworkInfo(networkType);
+        }
+
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    static public boolean isOnline(Context context) {
+        if (context == null) return true;
+
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets a speed or size string.
+     *
+     * @param unit    the unit to show in the string
+     * @param isSpeed true if the string is a speed, false if it is a size
+     * @return The speed or size string.
+     */
+    private static String getUnitString(long unit, boolean isSpeed) {
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        float KB = 1024;
+        float MB = KB * 1024;
+        float GB = MB * 1024;
+        float TB = GB * 1024;
+        float PB = TB * 1024;
+        float EB = PB * 1024;
+
+        if (unit < KB) {
+            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+        } else if (unit < MB) {
+            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+        } else if (unit < GB) {
+            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+        } else if (unit < TB) {
+            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+        } else if (unit < PB) {
+            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+        } else if (unit < EB) {
+            return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
+        } else {
+            return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
+        }
+    }
+
+    /**
+     * Gets a speed string.
+     *
+     * @param speed the speed to show in the string
+     * @return The speed string.
+     */
+    public static String getSpeedString(long speed) {
+        return getUnitString(speed, true);
+    }
+
+    /**
+     * Gets a size string.
+     *
+     * @param size the size to show in the string
+     * @return The size string.
+     */
+    public static String getSizeString(long size) {
+        return getUnitString(size, false);
+    }
+
+    public static String getSizeStringGBBased(long gbSize) {
         String sizeString = "";
         DecimalFormat decf = new DecimalFormat("###.##");
 
         float TB = 1024;
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-        if (gbSize < TB){
+        Context context = MegaApplication.getInstance().getApplicationContext();
+        if (gbSize < TB) {
             sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(gbSize));
-        }
-        else{
-            sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(gbSize/TB));
+        } else {
+            sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(gbSize / TB));
         }
 
         return sizeString;
     }
 
-	public static void brandAlertDialog(AlertDialog dialog) {
-	    try {
-	        Resources resources = dialog.getContext().getResources();
+    public static void brandAlertDialog(AlertDialog dialog) {
+        try {
+            Resources resources = dialog.getContext().getResources();
 
-	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+            int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 
-	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
-	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change title text color
-	        }
+            TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
+            if (alertTitle != null) {
+                alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change title text color
+            }
 
-	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
-	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change divider color
-	        }
-	    } catch (Exception ex) {
-	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-	        ex.printStackTrace();
-	    }
-	}
+            int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+            View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
+            if (titleDivider != null) {
+                titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change divider color
+            }
+        } catch (Exception ex) {
+            Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
+    }
 
-	/*
-	 * Get localized progress size
-	 */
-	public static String getProgressSize(Context context, long progress,
-			long size) {
-		return String.format("%s/%s",
-				getSizeString(progress),
-				getSizeString(size));
-	}
-	
-	/*
-	 * Set alpha transparency for view
-	 */
-	@SuppressLint("NewApi")
-	public static void setViewAlpha(View view, float alpha) {
-		view.setAlpha(alpha);
-	}
-	
-	/*
-	 * Make part of the string bold
-	 */
-	public static SpannableStringBuilder makeBold(String text, String boldText) {
-		SpannableStringBuilder sb = new SpannableStringBuilder(text);
-		StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
-		sb.setSpan(bss, text.length() - boldText.length(), text.length(),
-				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-		return sb;
-	}
+    /*
+     * Get localized progress size
+     */
+    public static String getProgressSize(Context context, long progress,
+                                         long size) {
+        return String.format("%s/%s",
+                getSizeString(progress),
+                getSizeString(size));
+    }
 
-	public static String getPhotoSyncName (long timeStamp, String fileName){
-        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+    /*
+     * Set alpha transparency for view
+     */
+    @SuppressLint("NewApi")
+    public static void setViewAlpha(View view, float alpha) {
+        view.setAlpha(alpha);
+    }
+
+    /*
+     * Make part of the string bold
+     */
+    public static SpannableStringBuilder makeBold(String text, String boldText) {
+        SpannableStringBuilder sb = new SpannableStringBuilder(text);
+        StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
+        sb.setSpan(bss, text.length() - boldText.length(), text.length(),
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        return sb;
+    }
+
+    public static String getPhotoSyncName(long timeStamp, String fileName) {
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
-	}
-	
-	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
-        if(photoIndex == 0) {
+    }
+
+    public static String getPhotoSyncNameWithIndex(long timeStamp, String fileName, int photoIndex) {
+        if (photoIndex == 0) {
             return getPhotoSyncName(timeStamp, fileName);
         }
-        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
-	}
-	
-	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
-		int numberOfNodes = 0;
-		
-		ArrayList<MegaNode> children = megaApi.getChildren(parent);
-		for (int i=0; i<children.size(); i++){
-			if (children.get(i).isFile()){
-				numberOfNodes++;
-			}
-			else{
-				numberOfNodes = numberOfNodes + getNumberOfNodes(children.get(i), megaApi);
-			}
-		}
-		
-		return numberOfNodes;
-	}
-	
-	public static String getLocalIpAddress(Context context)
-  {
-		  try {
-			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-				  NetworkInterface intf = en.nextElement();
-				  String interfaceName = intf.getName();
+    }
 
-				  // Ensure get the IP from the current active network interface
-				  ConnectivityManager cm =
-						  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-				  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
-				  if (interfaceName.compareTo(activeInterfaceName) != 0) {
-					  continue;
-				  }
+    public static int getNumberOfNodes(MegaNode parent, MegaApiAndroid megaApi) {
+        int numberOfNodes = 0;
 
-				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-					  InetAddress inetAddress = enumIpAddr.nextElement();
-					  if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
-					  	return inetAddress.getHostAddress();
-					  }
-				  }
-			  }
-		  } catch (Exception ex) {
-			  logError("Error getting local IP address", ex);
-		  }
-		  return null;
-   }
-	
-	@SuppressLint("InlinedApi") 
-	public static boolean isCharging(Context context) {
-		final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-		int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        ArrayList<MegaNode> children = megaApi.getChildren(parent);
+        for (int i = 0; i < children.size(); i++) {
+            if (children.get(i).isFile()) {
+                numberOfNodes++;
+            } else {
+                numberOfNodes = numberOfNodes + getNumberOfNodes(children.get(i), megaApi);
+            }
+        }
 
-		return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
-	}
+        return numberOfNodes;
+    }
+
+    public static String getLocalIpAddress(Context context) {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                String interfaceName = intf.getName();
+
+                // Ensure get the IP from the current active network interface
+                ConnectivityManager cm =
+                        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
+                if (interfaceName.compareTo(activeInterfaceName) != 0) {
+                    continue;
+                }
+
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Timber.e(ex, "Error getting local IP address");
+        }
+        return null;
+    }
+
+    @SuppressLint("InlinedApi")
+    public static boolean isCharging(Context context) {
+        final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+
+        return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+    }
 
     /**
      * Returns the consumer friendly device name.
@@ -734,88 +733,89 @@ public class Util {
         }
     }
 
-	public static BitSet convertToBitSet(long value) {
-	    BitSet bits = new BitSet();
-	    int index = 0;
-	    while (value != 0L) {
-	      if (value % 2L != 0) {
-	        bits.set(index);
-	      }
-	      ++index;
-	      value = value >>> 1;
-	    }
-	    return bits;
-	}
+    public static BitSet convertToBitSet(long value) {
+        BitSet bits = new BitSet();
+        int index = 0;
+        while (value != 0L) {
+            if (value % 2L != 0) {
+                bits.set(index);
+            }
+            ++index;
+            value = value >>> 1;
+        }
+        return bits;
+    }
 
-	/**
-	 * Method to check if a payment method is available.
-	 * @param paymentBitSet Bit set of payment methods.
-	 * @param paymentMethod Payment method bit position to check (e.g. MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)
-	 * @see nz.mega.sdk.MegaApiJava
-	 * @return TRUE if the payment method is available or FALSE otherwise.
-	 */
-	public static boolean isPaymentMethodAvailable(BitSet paymentBitSet, int paymentMethod){
-		if (paymentBitSet == null) {
-			return false;
-		}
+    /**
+     * Method to check if a payment method is available.
+     *
+     * @param paymentBitSet Bit set of payment methods.
+     * @param paymentMethod Payment method bit position to check (e.g. MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)
+     * @return TRUE if the payment method is available or FALSE otherwise.
+     * @see nz.mega.sdk.MegaApiJava
+     */
+    public static boolean isPaymentMethodAvailable(BitSet paymentBitSet, int paymentMethod) {
+        if (paymentBitSet == null) {
+            return false;
+        }
 
-		return paymentBitSet.get(paymentMethod);
-	}
-	
-	public static int scaleHeightPx(int px, DisplayMetrics metrics){
-		int myHeightPx = metrics.heightPixels;
-		
-		return px*myHeightPx/548; //Based on Eduardo's measurements				
-	}
-	
-	public static int scaleWidthPx(int px, DisplayMetrics metrics){
-		int myWidthPx = metrics.widthPixels;
-		
-		return px*myWidthPx/360; //Based on Eduardo's measurements		
-		
-	}
+        return paymentBitSet.get(paymentMethod);
+    }
 
-	/*
-	 * Validate email
-	 */
-	public static String getEmailError(String value, Context context) {
-		logDebug("getEmailError");
-		if (value.length() == 0) {
-			return context.getString(R.string.error_enter_email);
-		}
-		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
-			return context.getString(R.string.error_invalid_email);
-		}
-		return null;
-	}
+    public static int scaleHeightPx(int px, DisplayMetrics metrics) {
+        int myHeightPx = metrics.heightPixels;
 
-	/*
-	 * compare the current mail to newly changed email
-	 */
-	public static String comparedToCurrentEmail(String value, Context context) {
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		if (value.equals(dbH.getCredentials().getEmail())) {
-			return context.getString(R.string.mail_same_as_old);
-		}
-		return null;
-	}
+        return px * myHeightPx / 548; //Based on Eduardo's measurements
+    }
+
+    public static int scaleWidthPx(int px, DisplayMetrics metrics) {
+        int myWidthPx = metrics.widthPixels;
+
+        return px * myWidthPx / 360; //Based on Eduardo's measurements
+
+    }
+
+    /*
+     * Validate email
+     */
+    public static String getEmailError(String value, Context context) {
+        Timber.d("getEmailError");
+        if (value.length() == 0) {
+            return context.getString(R.string.error_enter_email);
+        }
+        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
+            return context.getString(R.string.error_invalid_email);
+        }
+        return null;
+    }
+
+    /*
+     * compare the current mail to newly changed email
+     */
+    public static String comparedToCurrentEmail(String value, Context context) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        if (value.equals(dbH.getCredentials().getEmail())) {
+            return context.getString(R.string.mail_same_as_old);
+        }
+        return null;
+    }
 
     public static AlertDialog showAlert(Context context, String message, String title) {
-        logDebug("showAlert");
+        Timber.d("showAlert");
         return showAlert(context, message, title, null);
     }
 
     /**
      * Show a simple alert dialog with a 'OK' button to dismiss itself.
      *
-     * @param context Context
-     * @param message the text content.
-     * @param title the title of the dialog, optional.
+     * @param context  Context
+     * @param message  the text content.
+     * @param title    the title of the dialog, optional.
      * @param listener callback when press 'OK' button, optional.
      * @return the created alert dialog, the caller should cancel the dialog when the context destoried, otherwise window will leak.
      */
     public static AlertDialog showAlert(Context context, String message, @Nullable String title, @Nullable DialogInterface.OnDismissListener listener) {
-        logDebug("showAlert");
+        Timber.d("showAlert");
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         if (title != null) {
             builder.setTitle(title);
@@ -828,177 +828,173 @@ public class Util {
         return builder.show();
     }
 
-	public static long calculateTimestampMinDifference(String timeStamp) {
-		logDebug("calculateTimestampDifference");
+    public static long calculateTimestampMinDifference(String timeStamp) {
+        Timber.d("calculateTimestampDifference");
 
-		Long actualTimestamp = System.currentTimeMillis()/1000;
+        Long actualTimestamp = System.currentTimeMillis() / 1000;
 
-		Long oldTimestamp = Long.parseLong(timeStamp);
+        Long oldTimestamp = Long.parseLong(timeStamp);
 
-		Long difference = actualTimestamp - oldTimestamp;
+        Long difference = actualTimestamp - oldTimestamp;
 
-		difference = difference/60;
+        difference = difference / 60;
 
-		return difference;
-	}
-
-	public static int getVersion() {
-		try {
-			Context context = MegaApplication.getInstance().getApplicationContext();
-			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-			return pInfo.versionCode;
-		} catch (PackageManager.NameNotFoundException e) {
-			return 0;
-		}
-	}
-
-	/**
-	 * Checks if the app has been upgraded and store the new version code.
-	 */
-	public static void checkAppUpgrade() {
-		final String APP_INFO_FILE = "APP_INFO";
-		final String APP_VERSION_CODE_KEY = "APP_VERSION_CODE";
-
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		SharedPreferences preferences = context.getSharedPreferences(APP_INFO_FILE, Context.MODE_PRIVATE);
-
-		int oldVersionCode = preferences.getInt(APP_VERSION_CODE_KEY, 0);
-		int newVersionCode = getVersion();
-		if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
-			if (oldVersionCode == 0) {
-				logInfo("App Version: " + newVersionCode);
-			} else {
-				logInfo("App upgraded from " + oldVersionCode + " to " + newVersionCode);
-			}
-			preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
-		} else {
-			logInfo("App Version: " + newVersionCode);
-		}
-	}
-
-	public static long calculateTimestamp(String time)
-	{
-		logDebug("calculateTimestamp: " + time);
-		long unixtime;
-		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
-		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
-		try
-		{
-			unixtime = dfm.parse(time).getTime();
-			unixtime=unixtime/1000;
-			return unixtime;
-		}
-		catch (ParseException e)
-		{
-			logError("ParseException!!!", e);
-		}
-		return 0;
-	}
-
-	public static Calendar calculateDateFromTimestamp (long timestamp){
-		logDebug("calculateTimestamp: " + timestamp);
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timestamp*1000);
-		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
-		return cal;
-	}
-
-	public static boolean canVoluntaryVerifyPhoneNumber() {
-		// If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
-		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-			return false;
-		}
-
-        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
-	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
-	    boolean allowVerify = api.smsAllowedState() == 2;
-	    return hasNotVerified && allowVerify;
+        return difference;
     }
 
-	public static Bitmap getCircleBitmap(Bitmap bitmap) {
-		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-		final Canvas canvas = new Canvas(output);
+    public static int getVersion() {
+        try {
+            Context context = MegaApplication.getInstance().getApplicationContext();
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
 
-		final int color = Color.RED;
-		final Paint paint = new Paint();
-		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		final RectF rectF = new RectF(rect);
+    /**
+     * Checks if the app has been upgraded and store the new version code.
+     */
+    public static void checkAppUpgrade() {
+        final String APP_INFO_FILE = "APP_INFO";
+        final String APP_VERSION_CODE_KEY = "APP_VERSION_CODE";
 
-		paint.setAntiAlias(true);
-		canvas.drawARGB(0, 0, 0, 0);
-		paint.setColor(color);
-		canvas.drawOval(rectF, paint);
+        Context context = MegaApplication.getInstance().getApplicationContext();
+        SharedPreferences preferences = context.getSharedPreferences(APP_INFO_FILE, Context.MODE_PRIVATE);
 
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(bitmap, rect, rect, paint);
+        int oldVersionCode = preferences.getInt(APP_VERSION_CODE_KEY, 0);
+        int newVersionCode = getVersion();
+        if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
+            if (oldVersionCode == 0) {
+                Timber.i("App Version: %d", newVersionCode);
+            } else {
+                Timber.i("App upgraded from %d to %d", oldVersionCode, newVersionCode);
+            }
+            preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
+        } else {
+            Timber.i("App Version: %s", newVersionCode);
+        }
+    }
 
-		bitmap.recycle();
+    public static long calculateTimestamp(String time) {
+        Timber.d("calculateTimestamp: %s", time);
+        long unixtime;
+        DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
+        dfm.setTimeZone(TimeZone.getDefault());//Specify your timezone
+        try {
+            unixtime = dfm.parse(time).getTime();
+            unixtime = unixtime / 1000;
+            return unixtime;
+        } catch (ParseException e) {
+            Timber.e(e);
+        }
+        return 0;
+    }
 
-		return output;
-	}
+    public static Calendar calculateDateFromTimestamp(long timestamp) {
+        Timber.d("calculateTimestamp: %s", timestamp);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp * 1000);
+        Timber.d("Calendar: %d %d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH));
+        return cal;
+    }
 
-	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
-	public static void setAppFontSize(Activity activity) {
-		float scale = activity.getResources().getConfiguration().fontScale;
-		logDebug("System font size scale is " + scale);
+    public static boolean canVoluntaryVerifyPhoneNumber() {
+        // If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            return false;
+        }
 
-		float newScale;
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+        boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
+        boolean allowVerify = api.smsAllowedState() == 2;
+        return hasNotVerified && allowVerify;
+    }
 
-		if (scale <= 1.1) {
-			newScale = scale;
-		} else {
-			newScale = (float) 1.1;
-		}
+    public static Bitmap getCircleBitmap(Bitmap bitmap) {
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
 
-		logDebug("New font size new scale is " + newScale);
-		Configuration configuration = activity.getResources().getConfiguration();
-		configuration.fontScale = newScale;
+        final int color = Color.RED;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
 
-		DisplayMetrics metrics = new DisplayMetrics();
-		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		metrics.scaledDensity = configuration.fontScale * metrics.density;
-		activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
-	}
-    
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        bitmap.recycle();
+
+        return output;
+    }
+
+    //restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
+    public static void setAppFontSize(Activity activity) {
+        float scale = activity.getResources().getConfiguration().fontScale;
+        Timber.d("System font size scale is %s", scale);
+
+        float newScale;
+
+        if (scale <= 1.1) {
+            newScale = scale;
+        } else {
+            newScale = (float) 1.1;
+        }
+
+        Timber.d("New font size new scale is %s", newScale);
+        Configuration configuration = activity.getResources().getConfiguration();
+        configuration.fontScale = newScale;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        metrics.scaledDensity = configuration.fontScale * metrics.density;
+        activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
+    }
+
     //reduce font size for scale mode to prevent title and subtitle overlap
     public static SpannableString adjustForLargeFont(String original) {
-		Context context = MegaApplication.getInstance().getApplicationContext();
+        Context context = MegaApplication.getInstance().getApplicationContext();
         float scale = context.getResources().getConfiguration().fontScale;
-        if(scale > 1){
-            scale = (float)0.9;
+        if (scale > 1) {
+            scale = (float) 0.9;
         }
         SpannableString spannableString = new SpannableString(original);
-        spannableString.setSpan(new RelativeSizeSpan(scale),0, original.length(),0);
+        spannableString.setSpan(new RelativeSizeSpan(scale), 0, original.length(), 0);
         return spannableString;
     }
 
-	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
+    public static Drawable mutateIcon(Context context, int idDrawable, int idColor) {
 
-		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
-		icon = icon.mutate();
-		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
+        Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+        icon = icon.mutate();
+        icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
 
-		return icon;
-	}
+        return icon;
+    }
 
-	public static Drawable mutateIconSecondary(Context context, int idDrawable, int idColor) {
-		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
-		icon = icon.mutate();
-		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
+    public static Drawable mutateIconSecondary(Context context, int idDrawable, int idColor) {
+        Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+        icon = icon.mutate();
+        icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
 
-		return icon;
-	}
+        return icon;
+    }
 
-	/**
-	 *Check if exist ongoing transfers
-	 *
-	 * @param megaApi
-	 * @return true if exist ongoing transfers, false otherwise
-	 */
-	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
-		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
-	}
+    /**
+     * Check if exist ongoing transfers
+     *
+     * @param megaApi
+     * @return true if exist ongoing transfers, false otherwise
+     */
+    public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
+        return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
+    }
 
     public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -1011,111 +1007,113 @@ public class Util {
         return circle;
     }
 
-	/**
-	 * Draw activity content under status bar.
-	 * @param activity the activity
-	 * @param drawUnderStatusBar whether draw under status bar
-	 */
-	public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
-		Window window = activity.getWindow();
-		if (window == null) {
-			return;
-		}
+    /**
+     * Draw activity content under status bar.
+     *
+     * @param activity           the activity
+     * @param drawUnderStatusBar whether draw under status bar
+     */
+    public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
+        Window window = activity.getWindow();
+        if (window == null) {
+            return;
+        }
 
-		if (drawUnderStatusBar) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				window.setDecorFitsSystemWindows(false);
-				if (!Util.isDarkMode(activity)) {
-					WindowInsetsController wic = window.getDecorView().getWindowInsetsController();
-					wic.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
-					wic.setSystemBarsAppearance(APPEARANCE_LIGHT_NAVIGATION_BARS, APPEARANCE_LIGHT_NAVIGATION_BARS);
-				}
-			} else {
-				int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        if (drawUnderStatusBar) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.setDecorFitsSystemWindows(false);
+                if (!Util.isDarkMode(activity)) {
+                    WindowInsetsController wic = window.getDecorView().getWindowInsetsController();
+                    wic.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
+                    wic.setSystemBarsAppearance(APPEARANCE_LIGHT_NAVIGATION_BARS, APPEARANCE_LIGHT_NAVIGATION_BARS);
+                }
+            } else {
+                int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 
-				if (Util.isDarkMode(activity)) {
-					visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-				} else {
-					// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-					visibility |= 0x00002000 | 0x00000010;
-				}
+                if (Util.isDarkMode(activity)) {
+                    visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                } else {
+                    // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    visibility |= 0x00002000 | 0x00000010;
+                }
 
-				window.getDecorView().setSystemUiVisibility(visibility);
-				window.setStatusBarColor(Color.TRANSPARENT);
-			}
-		} else {
-			ColorUtils.setStatusBarTextColor(activity);
-		}
-	}
+                window.getDecorView().setSystemUiVisibility(visibility);
+                window.setStatusBarColor(Color.TRANSPARENT);
+            }
+        } else {
+            ColorUtils.setStatusBarTextColor(activity);
+        }
+    }
 
-	/**
-	 * Set status bar color.
-	 * @param activity the activity
-	 * @param color color of the status bar
-	 */
-	public static void setStatusBarColor(Activity activity, @ColorRes int color) {
-		Window window = activity.getWindow();
-		if (window == null) {
-			return;
-		}
+    /**
+     * Set status bar color.
+     *
+     * @param activity the activity
+     * @param color    color of the status bar
+     */
+    public static void setStatusBarColor(Activity activity, @ColorRes int color) {
+        Window window = activity.getWindow();
+        if (window == null) {
+            return;
+        }
 
-		window.setStatusBarColor(ContextCompat.getColor(activity, color));
-	}
+        window.setStatusBarColor(ContextCompat.getColor(activity, color));
+    }
 
-	/**
-	 * Gets the status bar height if available.
-	 *
-	 * @return The status bar height if available.
-	 */
-	public static int getStatusBarHeight() {
-		return getSystemBarHeight("status_bar_height");
-	}
+    /**
+     * Gets the status bar height if available.
+     *
+     * @return The status bar height if available.
+     */
+    public static int getStatusBarHeight() {
+        return getSystemBarHeight("status_bar_height");
+    }
 
-	/**
-	 * Gets the navigation bar height if available.
-	 *
-	 * @return The status bar height if available.
-	 */
-	public static int getNavigationBarHeight() {
-		return getSystemBarHeight("navigation_bar_height");
-	}
+    /**
+     * Gets the navigation bar height if available.
+     *
+     * @return The status bar height if available.
+     */
+    public static int getNavigationBarHeight() {
+        return getSystemBarHeight("navigation_bar_height");
+    }
 
-	/**
-	 * Gets a system bar height if available.
-	 *
-	 * @param systemBarName The system bar name.
-	 * @return The system bar height if available.
-	 */
-	public static int getSystemBarHeight(String systemBarName) {
-		Context context = MegaApplication.getInstance().getBaseContext();
-		int resourceId = context.getResources().getIdentifier(systemBarName, "dimen",
-				"android");
+    /**
+     * Gets a system bar height if available.
+     *
+     * @param systemBarName The system bar name.
+     * @return The system bar height if available.
+     */
+    public static int getSystemBarHeight(String systemBarName) {
+        Context context = MegaApplication.getInstance().getBaseContext();
+        int resourceId = context.getResources().getIdentifier(systemBarName, "dimen",
+                "android");
 
-		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: 0;
-	}
+        return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
+                : 0;
+    }
 
-	public static MegaPreferences getPreferences (Context context) {
-		return DatabaseHandler.getDbHandler(context).getPreferences();
-	}
+    public static MegaPreferences getPreferences(Context context) {
+        return DatabaseHandler.getDbHandler(context).getPreferences();
+    }
 
-	/**
-	 * Checks if should ask for download location.
-	 *
-	 * @return True if should ask for download location, false otherwise.
-	 */
-	public static boolean askMe() {
-		MegaPreferences prefs = DatabaseHandler.getDbHandler(MegaApplication.getInstance())
-				.getPreferences();
+    /**
+     * Checks if should ask for download location.
+     *
+     * @return True if should ask for download location, false otherwise.
+     */
+    public static boolean askMe() {
+        MegaPreferences prefs = DatabaseHandler.getDbHandler(MegaApplication.getInstance())
+                .getPreferences();
 
-		if (prefs != null && prefs.getStorageAskAlways() != null
-				&& !Boolean.parseBoolean(prefs.getStorageAskAlways())
-				&& prefs.getStorageDownloadLocation() != null) {
-			return TextUtil.isTextEmpty(prefs.getStorageDownloadLocation());
-		}
+        if (prefs != null && prefs.getStorageAskAlways() != null
+                && !Boolean.parseBoolean(prefs.getStorageAskAlways())
+                && prefs.getStorageDownloadLocation() != null) {
+            return TextUtil.isTextEmpty(prefs.getStorageDownloadLocation());
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -1130,48 +1128,48 @@ public class Util {
 
     /**
      * Method to display a NOT_SPACE_SNACKBAR_TYPE Snackbar
-     *
+     * <p>
      * Use this method only from controllers or services or when ut does not know what the context is.
      *
      * @param context Class where the Snackbar has to be shown
      */
-	public static void showNotEnoughSpaceSnackbar(Context context) {
-		showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
-	}
+    public static void showNotEnoughSpaceSnackbar(Context context) {
+        showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
+    }
 
     /**
      * Method to display a simple Snackbar
-     *
+     * <p>
      * Use this method only from controllers or services or when ut does not know what the context is.
      *
      * @param context Class where the Snackbar has to be shown
      * @param message Text to shown in the snackbar
      */
-	public static void showSnackbar(Context context, String message) {
-		showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
-	}
+    public static void showSnackbar(Context context, String message) {
+        showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
+    }
 
     /**
      * Method to display a simple or action Snackbar.
-     *
+     * <p>
      * Use this method only from controllers or services or when ut does not know what the context is.
      *
-     * @param context Class where the Snackbar has to be shown
+     * @param context      Class where the Snackbar has to be shown
      * @param snackbarType specifies the type of the Snackbar.
      *                     It can be SNACKBAR_TYPE, MESSAGE_SNACKBAR_TYPE or NOT_SPACE_SNACKBAR_TYPE
-     * @param message Text to shown in the snackbar
-     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     * @param message      Text to shown in the snackbar
+     * @param idChat       Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
      */
-	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
-		if (context instanceof SnackbarShower) {
-			((SnackbarShower) context).showSnackbar(snackbarType, message, idChat);
-		} else {
-			logWarning("Unable to show snack bar, view does not exist or context is not instance of SnackbarShower");
-		}
-	}
+    public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
+        if (context instanceof SnackbarShower) {
+            ((SnackbarShower) context).showSnackbar(snackbarType, message, idChat);
+        } else {
+            Timber.w("Unable to show snack bar, view does not exist or context is not instance of SnackbarShower");
+        }
+    }
 
     public static View getRootViewFromContext(Context context) {
-        BaseActivity activity = (BaseActivity)context;
+        BaseActivity activity = (BaseActivity) context;
         View rootView = null;
         try {
             rootView = activity.findViewById(android.R.id.content);
@@ -1179,45 +1177,45 @@ public class Util {
                 rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
             }
             if (rootView == null) {
-                rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
+                rootView = ((ViewGroup) ((BaseActivity) context).findViewById(android.R.id.content)).getChildAt(0);//get first view
             }
         } catch (Exception e) {
-			logError("ERROR", e);
+            Timber.e(e);
         }
         return rootView;
     }
 
-    public static String normalizePhoneNumber(String phoneNumber,String countryCode) {
+    public static String normalizePhoneNumber(String phoneNumber, String countryCode) {
         return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
     }
 
-    public static String normalizePhoneNumberByNetwork(Context context,String phoneNumber) {
+    public static String normalizePhoneNumberByNetwork(Context context, String phoneNumber) {
         String countryCode = getCountryCodeByNetwork(context);
-        if(countryCode == null) {
+        if (countryCode == null) {
             return null;
         }
         return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
     }
 
-	/**
-	 * This method formats the coordinates of a location in degrees, minutes and seconds
-	 * and returns a string with it
-	 *
-	 * @param latitude latitude of the location to format
-	 * @param longitude longitude of the location to format
-	 * @return string with the location formatted in degrees, minutes and seconds
-	 */
-	public static String convertToDegrees(float latitude, float longitude) {
+    /**
+     * This method formats the coordinates of a location in degrees, minutes and seconds
+     * and returns a string with it
+     *
+     * @param latitude  latitude of the location to format
+     * @param longitude longitude of the location to format
+     * @return string with the location formatted in degrees, minutes and seconds
+     */
+    public static String convertToDegrees(float latitude, float longitude) {
         StringBuilder builder = new StringBuilder();
 
-		formatCoordinate(builder, latitude);
+        formatCoordinate(builder, latitude);
         if (latitude < 0) {
             builder.append("S ");
         } else {
             builder.append("N ");
         }
 
-		formatCoordinate(builder, longitude);
+        formatCoordinate(builder, longitude);
         if (longitude < 0) {
             builder.append("W");
         } else {
@@ -1227,120 +1225,121 @@ public class Util {
         return builder.toString();
     }
 
-	/**
-	 * This method formats a coordinate in degrees, minutes and seconds
-	 *
-	 * @param builder StringBuilder where the string formatted it's going to be built
-	 * @param coordinate coordinate to format
-	 */
-	private static void formatCoordinate (StringBuilder builder, float coordinate) {
-		String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
-		String[] degreesSplit = degrees.split(":");
-		builder.append(degreesSplit[0]);
-		builder.append("°");
-		builder.append(degreesSplit[1]);
-		builder.append("'");
+    /**
+     * This method formats a coordinate in degrees, minutes and seconds
+     *
+     * @param builder    StringBuilder where the string formatted it's going to be built
+     * @param coordinate coordinate to format
+     */
+    private static void formatCoordinate(StringBuilder builder, float coordinate) {
+        String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
+        String[] degreesSplit = degrees.split(":");
+        builder.append(degreesSplit[0]);
+        builder.append("°");
+        builder.append(degreesSplit[1]);
+        builder.append("'");
 
-		try {
-			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
-		} catch (Exception e) {
-			logWarning("Error rounding seconds in coordinates", e);
-			builder.append(degreesSplit[2]);
-		}
+        try {
+            builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
+        } catch (Exception e) {
+            Timber.w(e, "Error rounding seconds in coordinates");
+            builder.append(degreesSplit[2]);
+        }
 
-		builder.append("''");
-	}
+        builder.append("''");
+    }
 
-	public static void hideKeyboard(Activity activity, int flag){
-		View v = activity.getCurrentFocus();
-		if (v != null){
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
-		}
-	}
+    public static void hideKeyboard(Activity activity, int flag) {
+        View v = activity.getCurrentFocus();
+        if (v != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+        }
+    }
 
-	public static void hideKeyboardView(Context context, View v, int flag){
-		if (v != null){
-			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
-		}
+    public static void hideKeyboardView(Context context, View v, int flag) {
+        if (v != null) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+        }
 
-	}
+    }
 
-	public static boolean isScreenInPortrait(Context context) {
-		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public static boolean isScreenInPortrait(Context context) {
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * This method detects whether the android device is tablet
-	 *
-	 * @param context the passed Activity to be detected
-	 */
-	public static boolean isTablet(Context context) {
-		return (context.getResources().getConfiguration().screenLayout
-				& Configuration.SCREENLAYOUT_SIZE_MASK)
-				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
-	}
+    /**
+     * This method detects whether the android device is tablet
+     *
+     * @param context the passed Activity to be detected
+     */
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
 
-	/**
-	 * This method detects whether the url matches certain URL regular expressions
-	 * @param url the passed url to be detected
-	 * @param regexs the array of URL regular expressions
-	 */
+    /**
+     * This method detects whether the url matches certain URL regular expressions
+     *
+     * @param url    the passed url to be detected
+     * @param regexs the array of URL regular expressions
+     */
 
-	public static boolean matchRegexs(String url, String[] regexs) {
-		if (url == null) {
-			return false;
-		}
-		for (String regex : regexs) {
-			if (url.matches(regex)) {
-				return true;
-			}
-		}
-		return false;
+    public static boolean matchRegexs(String url, String[] regexs) {
+        if (url == null) {
+            return false;
+        }
+        for (String regex : regexs) {
+            if (url.matches(regex)) {
+                return true;
+            }
+        }
+        return false;
 
-	}
+    }
 
-	/**
-	 * This method decodes a url and formats it before its treatment
-	 *
-	 * @param url the passed url to be decoded
-	 */
-	public static String decodeURL(String url) {
-		try {
-			url = URLDecoder.decode(url, "UTF-8");
-		} catch (Exception e) {
-			logDebug("Exception decoding url: "+url);
-			e.printStackTrace();
-		}
+    /**
+     * This method decodes a url and formats it before its treatment
+     *
+     * @param url the passed url to be decoded
+     */
+    public static String decodeURL(String url) {
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        } catch (Exception e) {
+            Timber.d("Exception decoding url: %s", url);
+            e.printStackTrace();
+        }
 
-		url = url.replace(' ', '+');
+        url = url.replace(' ', '+');
 
-		if (url.startsWith("mega://")) {
-			url = url.replaceFirst("mega://", "https://mega.nz/");
-		} else if (url.startsWith("mega.")) {
-			url = url.replaceFirst("mega.", "https://mega.");
-		}
+        if (url.startsWith("mega://")) {
+            url = url.replaceFirst("mega://", "https://mega.nz/");
+        } else if (url.startsWith("mega.")) {
+            url = url.replaceFirst("mega.", "https://mega.");
+        }
 
-		if (url.startsWith("https://www.mega.co.nz")) {
-			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
-		}
+        if (url.startsWith("https://www.mega.co.nz")) {
+            url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+        }
 
-		if (url.startsWith("https://www.mega.nz")) {
-			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
-		}
+        if (url.startsWith("https://www.mega.nz")) {
+            url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+        }
 
-		if (url.endsWith("/")) {
-			url = url.substring(0, url.length() - 1);
-		}
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 1);
+        }
 
-		logDebug("URL decoded: " + url);
-		return url;
-	}
+        Timber.d("URL decoded: %s", url);
+        return url;
+    }
 
     /**
      * Convert color integer to corresponding string in hex format.
@@ -1348,189 +1347,191 @@ public class Util {
      * @param color An integer which represents a color.
      * @return The color string in hex format, e.g., #FFABCDEF.
      */
-	public static String getHexValue(int color){
-		return String.format("#%06X", 0xFFFFFF & color);
-	}
-
-	//TODO Use ViewUtils.showSoftKeyboardDelayed(View) instead
-    public static void showKeyboardDelayed(final View view) {
-		if (view == null) return;
-
-		Handler handler = new Handler();
-        handler.postDelayed(() -> {
-			// The view needs to request the focus or the keyboard may not pops up
-			if (view.requestFocus()) {
-				InputMethodManager imm = (InputMethodManager)
-						MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, SHOW_IM_DELAY);
+    public static String getHexValue(int color) {
+        return String.format("#%06X", 0xFFFFFF & color);
     }
 
-	public static void checkTakePicture(Activity activity, int option) {
-		if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
-			if(option == TAKE_PHOTO_CODE) {
-				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
-			}else if(option == TAKE_PICTURE_PROFILE_CODE){
-				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE, false);
-			}
-			return;
-		}
-		takePicture(activity, option);
-	}
+    //TODO Use ViewUtils.showSoftKeyboardDelayed(View) instead
+    public static void showKeyboardDelayed(final View view) {
+        if (view == null) return;
 
-	/**
-	 * This method is to start camera from Activity
-	 *
-	 * @param activity the activity the camera would start from
-	 */
-	public static void takePicture(Activity activity, int option) {
-		logDebug("takePicture");
-		File newFile = buildTempFile(activity, "picture.jpg");
-		try {
-			newFile.createNewFile();
-		} catch (IOException e) {}
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            // The view needs to request the focus or the keyboard may not pops up
+            if (view.requestFocus()) {
+                InputMethodManager imm = (InputMethodManager)
+                        MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, SHOW_IM_DELAY);
+    }
 
-		//This method is in the v4 support library, so can be applied to all devices
-		Uri outputFileUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-				? FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile)
-				: Uri.fromFile(newFile);
+    public static void checkTakePicture(Activity activity, int option) {
+        if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
+            if (option == TAKE_PHOTO_CODE) {
+                showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
+            } else if (option == TAKE_PICTURE_PROFILE_CODE) {
+                showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE, false);
+            }
+            return;
+        }
+        takePicture(activity, option);
+    }
 
-		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		cameraIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-		activity.startActivityForResult(cameraIntent, option);
-	}
+    /**
+     * This method is to start camera from Activity
+     *
+     * @param activity the activity the camera would start from
+     */
+    public static void takePicture(Activity activity, int option) {
+        Timber.d("takePicture");
+        File newFile = buildTempFile(activity, "picture.jpg");
+        try {
+            newFile.createNewFile();
+        } catch (IOException e) {
+        }
 
-	/**
-	 * Get an Intent to play audio or video node.
-	 *
-	 * @param context Android context
-	 * @param nodeName the node name (not needed when New Video Player is implemented)
-	 * @return the Intent with corresponding target activity class
-	 */
-	public static Intent getMediaIntent(Context context, String nodeName) {
-		if (MimeTypeList.typeForName(nodeName).isAudio()) {
-			return new Intent(context, AudioPlayerActivity.class);
-		} else {
-			return new Intent(context, VideoPlayerActivity.class);
-		}
-	}
+        //This method is in the v4 support library, so can be applied to all devices
+        Uri outputFileUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                ? FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile)
+                : Uri.fromFile(newFile);
 
-	public static void resetActionBar(ActionBar aB) {
-		if (aB != null) {
-			View customView = aB.getCustomView();
-			if(customView != null){
-				ViewParent parent = customView.getParent();
-				if(parent != null){
-					((ViewGroup) parent).removeView(customView);
-				}
-			}
-			aB.setDisplayShowCustomEnabled(false);
-			aB.setDisplayShowTitleEnabled(true);
-		}
-	}
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        cameraIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        activity.startActivityForResult(cameraIntent, option);
+    }
 
-	/**
-	 * Checks if the current Android version is Android 11 or upper.
-	 *
-	 * @return True if the current Android version is Android 11 or upper, false otherwise.
-	 */
-	public static boolean isAndroid11OrUpper() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
-	}
+    /**
+     * Get an Intent to play audio or video node.
+     *
+     * @param context  Android context
+     * @param nodeName the node name (not needed when New Video Player is implemented)
+     * @return the Intent with corresponding target activity class
+     */
+    public static Intent getMediaIntent(Context context, String nodeName) {
+        if (MimeTypeList.typeForName(nodeName).isAudio()) {
+            return new Intent(context, AudioPlayerActivity.class);
+        } else {
+            return new Intent(context, VideoPlayerActivity.class);
+        }
+    }
 
-	public static boolean isAndroid10() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
-	}
+    public static void resetActionBar(ActionBar aB) {
+        if (aB != null) {
+            View customView = aB.getCustomView();
+            if (customView != null) {
+                ViewParent parent = customView.getParent();
+                if (parent != null) {
+                    ((ViewGroup) parent).removeView(customView);
+                }
+            }
+            aB.setDisplayShowCustomEnabled(false);
+            aB.setDisplayShowTitleEnabled(true);
+        }
+    }
 
-	public static boolean isAndroidOreoOrUpper() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-	}
+    /**
+     * Checks if the current Android version is Android 11 or upper.
+     *
+     * @return True if the current Android version is Android 11 or upper, false otherwise.
+     */
+    public static boolean isAndroid11OrUpper() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
+    }
 
-	public static boolean isAndroidNougatOrUpper() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
-	}
+    public static boolean isAndroid10() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
+    }
 
-	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
-		if (focus) {
-			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
-			textInputLayout.setEndIconDrawable(R.drawable.password_toggle);
-		} else {
-			textInputLayout.setEndIconMode(END_ICON_NONE);
-		}
-	}
+    public static boolean isAndroidOreoOrUpper() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
 
-	public static boolean isFastDoubleClick() {
-		long time = System.currentTimeMillis();
-		long timeD = time - lastClickTime;
-		if (0 <= timeD && timeD < 500) {
-			return true;
-		}
+    public static boolean isAndroidNougatOrUpper() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+    }
 
-		lastClickTime = time;
-		return false;
-	}
+    public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus) {
+        if (focus) {
+            textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
+            textInputLayout.setEndIconDrawable(R.drawable.password_toggle);
+        } else {
+            textInputLayout.setEndIconMode(END_ICON_NONE);
+        }
+    }
 
-	/**
-	 * Changes the elevation of the the ActionBar passed as parameter.
-	 *
-	 * @param aB				ActionBar in which the elevation has to be applied.
-	 * @param withElevation	true if should apply elevation, false otherwise.
-	 * @param outMetrics	DisplayMetrics of the current device.
-	 */
-	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
-		float elevation = dp2px(4, outMetrics);
+    public static boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        if (0 <= timeD && timeD < 500) {
+            return true;
+        }
 
-		if (withElevation) {
-			aB.setElevation(elevation);
-		} else {
-			aB.setElevation(0);
-		}
-	}
+        lastClickTime = time;
+        return false;
+    }
 
-	/**
-	 * Gets a reference to a given drawable and prepares it for use with tinting through.
-	 *
-	 * @param resId the resource id for the given drawable
-	 * @return a wrapped drawable ready fo use
-	 * with {@link DrawableCompat}'s tinting methods
-	 * @throws Resources.NotFoundException
-	 */
-	public static Drawable getWrappedDrawable(Context context, @DrawableRes int resId)
-			throws Resources.NotFoundException {
-		return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
-				resId, null));
-	}
+    /**
+     * Changes the elevation of the the ActionBar passed as parameter.
+     *
+     * @param aB            ActionBar in which the elevation has to be applied.
+     * @param withElevation true if should apply elevation, false otherwise.
+     * @param outMetrics    DisplayMetrics of the current device.
+     */
+    public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
+        float elevation = dp2px(4, outMetrics);
 
-	public static LocalDate fromEpoch(long seconds) {
-		return LocalDate.from(
-				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
-	}
+        if (withElevation) {
+            aB.setElevation(elevation);
+        } else {
+            aB.setElevation(0);
+        }
+    }
 
-	/**
-	 * Judge if current mode is Dark mode
-	 * @param context the Context
-	 * @return true if it is dark mode, false for light mode
-	 */
-	public static boolean isDarkMode(Context context) {
-		int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
-	}
+    /**
+     * Gets a reference to a given drawable and prepares it for use with tinting through.
+     *
+     * @param resId the resource id for the given drawable
+     * @return a wrapped drawable ready fo use
+     * with {@link DrawableCompat}'s tinting methods
+     * @throws Resources.NotFoundException
+     */
+    public static Drawable getWrappedDrawable(Context context, @DrawableRes int resId)
+            throws Resources.NotFoundException {
+        return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
+                resId, null));
+    }
 
-	/**
-	 * Method for displaying a snack bar when is Offline.
-	 *
-	 * @return True, is is Offline. False it is Online.
-	 */
-	public static boolean isOffline(Context context) {
-		if (!isOnline(context)) {
-			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
-			return true;
-		}
-		return false;
-	}
+    public static LocalDate fromEpoch(long seconds) {
+        return LocalDate.from(
+                LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
+    }
+
+    /**
+     * Judge if current mode is Dark mode
+     *
+     * @param context the Context
+     * @return true if it is dark mode, false for light mode
+     */
+    public static boolean isDarkMode(Context context) {
+        int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    /**
+     * Method for displaying a snack bar when is Offline.
+     *
+     * @return True, is is Offline. False it is Online.
+     */
+    public static boolean isOffline(Context context) {
+        if (!isOnline(context)) {
+            Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Store the selected download location if user unticket "Always ask for download location",
@@ -1555,29 +1556,29 @@ public class Util {
     }
 
     /**
-	 * Create a RecyclerView.ItemAnimator that doesn't support change animation.
-	 *
-	 * @return the RecyclerView.ItemAnimator
-	 */
+     * Create a RecyclerView.ItemAnimator that doesn't support change animation.
+     *
+     * @return the RecyclerView.ItemAnimator
+     */
     public static RecyclerView.ItemAnimator noChangeRecyclerViewItemAnimator() {
-		DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
-		itemAnimator.setSupportsChangeAnimations(false);
-		return itemAnimator;
-	}
+        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setSupportsChangeAnimations(false);
+        return itemAnimator;
+    }
 
     /**
      * Apply elevation effect by controlling AppBarLayout's elevation only, regardless of whether on dark mode.
      *
-     * @param activity Current activity.
-     * @param abL AppBarLayout in the activity.
+     * @param activity      Current activity.
+     * @param abL           AppBarLayout in the activity.
      * @param withElevation true should show elevation, false otherwise.
      */
     public static void changeActionBarElevation(Activity activity, AppBarLayout abL, boolean withElevation) {
         ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
 
-		abL.setElevation(withElevation
-				? activity.getResources().getDimension(R.dimen.toolbar_elevation)
-				: 0);
+        abL.setElevation(withElevation
+                ? activity.getResources().getDimension(R.dimen.toolbar_elevation)
+                : 0);
     }
 
     /**
@@ -1585,8 +1586,8 @@ public class Util {
      * It's done by changing ToolBar's background color on dark mode.
      * On light mode, no need to do anything here, the elevation effect is applied on the AppBarLayout.
      *
-     * @param activity Current activity.
-     * @param tB Toolbar in the activity.
+     * @param activity      Current activity.
+     * @param tB            Toolbar in the activity.
      * @param withElevation true should show elevation, false otherwise.
      */
     public static void changeToolBarElevationForDarkMode(Activity activity, Toolbar tB, boolean withElevation) {
@@ -1604,8 +1605,8 @@ public class Util {
      * On dark mode, it's done by changing ToolBar's background.
      * On light mode, it's done by setting elevation on ToolBar.
      *
-     * @param activity Current activity.
-     * @param tB Toolbar in the activity.
+     * @param activity      Current activity.
+     * @param tB            Toolbar in the activity.
      * @param withElevation true should show elevation, false otherwise.
      */
     public static void changeToolBarElevation(Activity activity, Toolbar tB, boolean withElevation) {
@@ -1623,60 +1624,62 @@ public class Util {
     /**
      * Apply elevation effect for ToolBar on dark mode by setting its background.
      *
-     * @param activity Current activity.
-     * @param tB Toolbar in the activity.
-     * @param elevation Elevation height.
+     * @param activity      Current activity.
+     * @param tB            Toolbar in the activity.
+     * @param elevation     Elevation height.
      * @param withElevation true should show elevation, false otherwise.
      */
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
 
-	/**
-	 * Judge if an activity is on the top of the running app task
-	 * @param className the class name of the activity
-	 * @param context the Context
-	 * @return true if the activity is on the task top, false otherwise
-	 */
-	public static boolean isTopActivity(String className, Context context) {
-		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+    /**
+     * Judge if an activity is on the top of the running app task
+     *
+     * @param className the class name of the activity
+     * @param context   the Context
+     * @return true if the activity is on the task top, false otherwise
+     */
+    public static boolean isTopActivity(String className, Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
 
-		List<ActivityManager.AppTask> tasks = am.getAppTasks();
-		for (ActivityManager.AppTask task : tasks) {
-			ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
-			if (taskInfo.id != -1) {  // Task is running
-				return taskInfo.topActivity.getClassName().contains(className);
-			}
-		}
+        List<ActivityManager.AppTask> tasks = am.getAppTasks();
+        for (ActivityManager.AppTask task : tasks) {
+            ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+            if (taskInfo.id != -1) {  // Task is running
+                return taskInfo.topActivity.getClassName().contains(className);
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     public static boolean isSimplifiedChinese() {
         return Locale.getDefault().toLanguageTag().contains(HANS);
     }
 
-	/**
-	 * Method to know the current orientation of the device
-	 *
-	 * @return current orientation of the device
-	 */
-	public static int getCurrentOrientation() {
-		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
-	}
+    /**
+     * Method to know the current orientation of the device
+     *
+     * @return current orientation of the device
+     */
+    public static int getCurrentOrientation() {
+        return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
+    }
 
-	/**
-	 * Convert ArrayList type of handleList to Array
-	 * @param handleList handle list of the nodes
-	 * @return new Array
-	 */
-	public static long[] getHandleArray(ArrayList<Long> handleList) {
-		if (handleList == null) return new long[0];
+    /**
+     * Convert ArrayList type of handleList to Array
+     *
+     * @param handleList handle list of the nodes
+     * @return new Array
+     */
+    public static long[] getHandleArray(ArrayList<Long> handleList) {
+        if (handleList == null) return new long[0];
 
-		long[] handles = new long[handleList.size()];
-		for (int i = 0; i < handleList.size(); i++) {
-			handles[i] = handleList.get(i);
-		}
-		return handles;
-	}
+        long[] handles = new long[handleList.size()];
+        for (int i = 0; i < handleList.size(); i++) {
+            handles[i] = handleList.get(i);
+        }
+        return handles;
+    }
 }

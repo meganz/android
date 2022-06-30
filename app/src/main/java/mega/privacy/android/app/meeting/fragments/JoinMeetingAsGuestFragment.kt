@@ -11,9 +11,9 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 
 @AndroidEntryPoint
 class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
@@ -23,7 +23,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onMeetingButtonClick() {
         if (chatId == MEGACHAT_INVALID_HANDLE) {
-            LogUtil.logError("Chat Id is invalid when join meeting")
+            Timber.e("Chat Id is invalid when join meeting")
             return
         }
 
@@ -59,8 +59,9 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.btnStartJoinMeeting.isEnabled = !TextUtils.isEmpty(binding.editFirstName.text)
-                        && !TextUtils.isEmpty(binding.editLastName.text)
+                binding.btnStartJoinMeeting.isEnabled =
+                    !TextUtils.isEmpty(binding.editFirstName.text)
+                            && !TextUtils.isEmpty(binding.editLastName.text)
             }
 
             override fun afterTextChanged(s: Editable?) {}

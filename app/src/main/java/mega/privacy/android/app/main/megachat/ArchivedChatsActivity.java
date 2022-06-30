@@ -1,12 +1,10 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -16,7 +14,17 @@ import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -39,13 +47,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
@@ -79,10 +81,10 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        logDebug("onCreate");
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
-        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -90,7 +92,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         checkChatChanges();
 
         Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics();
 
         display.getMetrics(outMetrics);
 
@@ -104,13 +106,12 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        if(aB!=null){
+        if (aB != null) {
             aB.setTitle(getString(R.string.archived_chats_title_section).toUpperCase());
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-        }
-        else{
-            logWarning("aB is null");
+        } else {
+            Timber.w("aB is null");
         }
 
         badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.red_600_red_300,
@@ -118,7 +119,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
 
         updateNavigationToolbarIcon();
 
-        if (archivedChatsFragment ==null) {
+        if (archivedChatsFragment == null) {
             archivedChatsFragment = RecentChatsFragment.newInstance();
         }
 
@@ -137,9 +138,8 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     }
 
 
-
-    public void showChatPanel(MegaChatListItem chat){
-        logDebug("showChatPanel");
+    public void showChatPanel(MegaChatListItem chat) {
+        Timber.d("showChatPanel");
 
         if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
@@ -158,7 +158,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        logDebug("onOptionsItemSelected");
+        Timber.d("onOptionsItemSelected");
 
         switch (item.getItemId()) {
             case android.R.id.home: {
@@ -184,7 +184,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
-        if (searchView != null){
+        if (searchView != null) {
             searchView.setIconifiedByDefault(true);
         }
 
@@ -208,7 +208,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                logDebug("Query: " + query);
+                Timber.d("Query: %s", query);
                 hideKeyboard(archivedChatsActivity, 0);
                 return true;
             }
@@ -231,29 +231,28 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
         if (archivedChats != null && !archivedChats.isEmpty()) {
             searchMenuItem.setVisible(true);
-        }
-        else {
+        } else {
             searchMenuItem.setVisible(false);
         }
 
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void closeSearchView () {
+    public void closeSearchView() {
         if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
             searchMenuItem.collapseActionView();
         }
     }
 
-    public void showSnackbar(String s){
-        logDebug("showSnackbar: " + s);
+    public void showSnackbar(String s) {
+        Timber.d("showSnackbar: %s", s);
         showSnackbar(fragmentContainer, s);
     }
 
     public void updateNavigationToolbarIcon() {
         int numberUnread = megaChatApi.getUnreadChats();
 
-        if (numberUnread==0) {
+        if (numberUnread == 0) {
             aB.setHomeAsUpIndicator(Util.isDarkMode(this) ? R.drawable.ic_arrow_back_white : R.drawable.ic_arrow_back_black);
         } else {
             badgeDrawable.setProgress(1.0f);
@@ -261,7 +260,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
             if (numberUnread > Constants.MAX_BADGE_NUM) {
                 badgeDrawable.setText(Constants.MAX_BADGE_NUM + "+");
             } else {
-                badgeDrawable.setText(numberUnread+"");
+                badgeDrawable.setText(numberUnread + "");
             }
 
             aB.setHomeAsUpIndicator(badgeDrawable);
@@ -280,42 +279,38 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish(CHAT)");
+        Timber.d("onRequestFinish(CHAT)");
 
-        if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+        if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
 
             String chatTitle = getTitleChat(chat);
 
-            if(chatTitle==null){
+            if (chatTitle == null) {
                 chatTitle = "";
-            }
-            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
-                chatTitle = chatTitle.substring(0,59)+"...";
-            }
-
-            if(!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()){
-                chatTitle = "\""+chatTitle+"\"";
+            } else if (!chatTitle.isEmpty() && chatTitle.length() > 60) {
+                chatTitle = chatTitle.substring(0, 59) + "...";
             }
 
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                if(request.getFlag()){
-                    logDebug("Chat archived");
+            if (!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()) {
+                chatTitle = "\"" + chatTitle + "\"";
+            }
+
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                if (request.getFlag()) {
+                    Timber.d("Chat archived");
                     showSnackbar(getString(R.string.success_archive_chat, chatTitle));
-                }
-                else{
-                    logDebug("Chat unarchived");
+                } else {
+                    Timber.d("Chat unarchived");
                     showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
                 }
-            }
-            else{
-                if(request.getFlag()){
-                    logError("ERROR WHEN ARCHIVING CHAT " + e.getErrorString());
+            } else {
+                if (request.getFlag()) {
+                    Timber.e("ERROR WHEN ARCHIVING CHAT %s", e.getErrorString());
                     showSnackbar(getString(R.string.error_archive_chat, chatTitle));
-                }
-                else{
-                    logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+                } else {
+                    Timber.e("ERROR WHEN UNARCHIVING CHAT %s", e.getErrorString());
                     showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
                 }
             }
@@ -341,18 +336,18 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
             long requestNumber = request.getNumber();
-            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + requestNumber);
+            Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", requestNumber);
             int errorCode = e.getErrorCode();
             if (errorCode == MegaError.API_OK && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
                 showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
             } else if (errorCode == MegaError.API_EEXIST) {
-                logWarning(request.getEmail() + " is already a contact");
+                Timber.w("%s is already a contact", request.getEmail());
                 showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
             } else if (errorCode == MegaError.API_EARGS && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
-                logWarning("No need to add yourself.");
+                Timber.w("No need to add yourself.");
                 showSnackbar(getString(R.string.error_own_email_as_contact));
             } else {
-                logWarning("Invite error.");
+                Timber.w("Invite error.");
                 showSnackbar(getString(R.string.general_error));
             }
         }
@@ -375,7 +370,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
                 .subscribe((next) -> {
                     MegaChatListItem item = next.component1();
                     if (item != null) {
-                        logDebug("Chat ID: " + item.getChatId());
+                        Timber.d("Chat ID: %s", item.getChatId());
                         if (archivedChatsFragment != null && archivedChatsFragment.isAdded()) {
                             archivedChatsFragment.listItemUpdate(item);
                         }
@@ -384,7 +379,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
                             updateNavigationToolbarIcon();
                         }
                     }
-                }, (error) -> logError("Error " + error));
+                }, Timber::e);
 
         composite.add(chatSubscription);
     }

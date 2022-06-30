@@ -25,8 +25,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         contentView.findViewById(R.id.send_attachment_chat_from_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.send_attachment_chat_from_filesystem_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.send_attachment_chat_contact_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.send_attachment_chat_location_layout).setOnClickListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -39,14 +37,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
 
             case R.id.send_attachment_chat_from_filesystem_layout:
                 ((ChatActivity) requireActivity()).sendFromFileSystem();
-                break;
-
-            case R.id.send_attachment_chat_contact_layout:
-                ((ChatActivity) requireActivity()).chooseContactsDialog();
-                break;
-
-            case R.id.send_attachment_chat_location_layout:
-                ((ChatActivity) requireActivity()).sendLocation();
                 break;
         }
 

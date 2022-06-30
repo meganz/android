@@ -1,14 +1,33 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.ICON_SIZE_DP;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
+import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeBackupDeviceInfo;
+import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
+import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -20,6 +39,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,84 +70,69 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
-import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER;
-import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-import org.jetbrains.annotations.NotNull;
+import timber.log.Timber;
 
 public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapter.ViewHolderExplorer> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
-	public static int MAX_WIDTH_FILENAME_LAND=500;
-	public static int MAX_WIDTH_FILENAME_PORT=235;
+    public static int MAX_WIDTH_FILENAME_LAND = 500;
+    public static int MAX_WIDTH_FILENAME_PORT = 235;
 
-	Context context;
-	MegaApiAndroid megaApi;
-	MegaPreferences prefs;
+    Context context;
+    MegaApiAndroid megaApi;
+    MegaPreferences prefs;
 
-	ArrayList<Integer> imageIds;
-	ArrayList<String> names;
-	ArrayList<MegaNode> nodes;
+    ArrayList<Integer> imageIds;
+    ArrayList<String> names;
+    ArrayList<MegaNode> nodes;
 
     DatabaseHandler dbH = null;
 
-	Object fragment;
+    Object fragment;
 
-	long parentHandle = -1;
-	boolean selectFile = false;
+    long parentHandle = -1;
+    boolean selectFile = false;
 
-	boolean multipleSelect;
-	private SparseBooleanArray selectedItems;
+    boolean multipleSelect;
+    private SparseBooleanArray selectedItems;
 
-	RecyclerView listFragment;
+    RecyclerView listFragment;
 
-	private int placeholderCount;
+    private int placeholderCount;
 
-	private DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
 
     private SortByHeaderViewModel sortByViewModel;
 
     /*public static view holder class*/
-    public class ViewHolderExplorer extends RecyclerView.ViewHolder{
-		public RelativeLayout itemLayout;
-		public int currentPosition;
-		public long document;
+    public class ViewHolderExplorer extends RecyclerView.ViewHolder {
+        public RelativeLayout itemLayout;
+        public int currentPosition;
+        public long document;
 
 
-    	public ViewHolderExplorer(View itemView) {
-			super(itemView);
-		}
+        public ViewHolderExplorer(View itemView) {
+            super(itemView);
+        }
     }
 
-	public class ViewHolderListExplorer extends ViewHolderExplorer {
-		public ImageView imageView;
-		public ImageView permissionsIcon;
+    public class ViewHolderListExplorer extends ViewHolderExplorer {
+        public ImageView imageView;
+        public ImageView permissionsIcon;
         public TextView textViewFileName;
-		public TextView textViewFileSize;
-		public ImageView takenDownImage;
+        public TextView textViewFileSize;
+        public ImageView takenDownImage;
 
 
-		public ViewHolderListExplorer(View itemView) {
-			super(itemView);
-		}
-	}
+        public ViewHolderListExplorer(View itemView) {
+            super(itemView);
+        }
+    }
 
-	public class ViewHolderGridExplorer extends ViewHolderExplorer {
-		public RelativeLayout folderLayout;
-		public RelativeLayout thumbnailFolderLayout;
-		public ImageView folderIcon;
-		public TextView folderName;
-		public RelativeLayout fileLayout;
+    public class ViewHolderGridExplorer extends ViewHolderExplorer {
+        public RelativeLayout folderLayout;
+        public RelativeLayout thumbnailFolderLayout;
+        public ImageView folderIcon;
+        public TextView folderName;
+        public RelativeLayout fileLayout;
         public RelativeLayout thumbnailFileLayout;
         public ImageView fileThumbnail;
         public ImageView fileSelectedIcon;
@@ -134,10 +144,10 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         public ImageView takenDownImage;
         public ImageView takenDownImageForFile;
 
-		public ViewHolderGridExplorer(View itemView) {
-			super(itemView);
-		}
-	}
+        public ViewHolderGridExplorer(View itemView) {
+            super(itemView);
+        }
+    }
 
     public class ViewHolderSortBy extends ViewHolderExplorer {
 
@@ -159,42 +169,42 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             binding.enterMediaDiscovery.setVisibility(View.GONE);
         }
     }
-	
-	ViewHolderExplorer holder = null;
 
-	public MegaExplorerAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes,
+    ViewHolderExplorer holder = null;
+
+    public MegaExplorerAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes,
                                long _parentHandle, RecyclerView listView, boolean selectFile,
-                               SortByHeaderViewModel sortByHeaderViewModel){
-		this.context = _context;
-		this.nodes = _nodes;
-		this.parentHandle = _parentHandle;
-		this.listFragment = listView;
-		this.selectFile = selectFile;
-		this.imageIds = new ArrayList<Integer>();
-		this.names = new ArrayList<String>();
-		this.fragment = fragment;
-		this.sortByViewModel = sortByHeaderViewModel;
+                               SortByHeaderViewModel sortByHeaderViewModel) {
+        this.context = _context;
+        this.nodes = _nodes;
+        this.parentHandle = _parentHandle;
+        this.listFragment = listView;
+        this.selectFile = selectFile;
+        this.imageIds = new ArrayList<Integer>();
+        this.names = new ArrayList<String>();
+        this.fragment = fragment;
+        this.sortByViewModel = sortByHeaderViewModel;
 
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+        }
 
-		dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DatabaseHandler.getDbHandler(context);
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-	}
-	
-	@Override
-	public int getItemCount() {
-		if (nodes == null){
-			nodes = new ArrayList<MegaNode>();
-		}
+    }
 
-		return nodes.size();
-	}
+    @Override
+    public int getItemCount() {
+        if (nodes == null) {
+            nodes = new ArrayList<MegaNode>();
+        }
+
+        return nodes.size();
+    }
 
     @Override
     public int getItemViewType(int position) {
@@ -203,65 +213,65 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 ? ITEM_VIEW_TYPE_LIST : ITEM_VIEW_TYPE_GRID;
     }
 
-	public Object getItem(int position) {
-		return nodes.get(position);
-	}
+    public Object getItem(int position) {
+        return nodes.get(position);
+    }
 
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-	
-	@Override
-	public ViewHolderExplorer onCreateViewHolder(ViewGroup parent, int viewType) {
-	    View v;
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
-	    if (viewType == ITEM_VIEW_TYPE_LIST) {
-	        logDebug("onCreateViewHolder list");
-			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
-			ViewHolderListExplorer holder = new ViewHolderListExplorer(v);
+    @Override
+    public ViewHolderExplorer onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v;
 
-			holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
-			holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
-			holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
+        if (viewType == ITEM_VIEW_TYPE_LIST) {
+            Timber.d("onCreateViewHolder list");
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
+            ViewHolderListExplorer holder = new ViewHolderListExplorer(v);
+
+            holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
+            holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
+            holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
             holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
-			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
+            holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
             holder.takenDownImage = v.findViewById(R.id.file_list_taken_down);
-			v.setTag(holder);
-			return holder;
-		} else if (viewType == ITEM_VIEW_TYPE_GRID){
-		    logDebug("onCreateViewHolder grid");
-			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer_grid, parent, false);
-			ViewHolderGridExplorer holder =  new ViewHolderGridExplorer(v);
+            v.setTag(holder);
+            return holder;
+        } else if (viewType == ITEM_VIEW_TYPE_GRID) {
+            Timber.d("onCreateViewHolder grid");
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer_grid, parent, false);
+            ViewHolderGridExplorer holder = new ViewHolderGridExplorer(v);
 
-			holder.itemLayout = v.findViewById(R.id.file_explorer_grid_layout);
+            holder.itemLayout = v.findViewById(R.id.file_explorer_grid_layout);
             holder.folderLayout = v.findViewById(R.id.file_explorer_grid_folder_layout);
             holder.thumbnailFolderLayout = v.findViewById(R.id.file_explorer_grid_folder_thumbnail_layout);
             holder.folderIcon = v.findViewById(R.id.file_explorer_grid_folder_icon);
-            holder.folderName= v.findViewById(R.id.file_explorer_grid_folder_filename);
+            holder.folderName = v.findViewById(R.id.file_explorer_grid_folder_filename);
             holder.fileLayout = v.findViewById(R.id.file_explorer_grid_file_layout);
             holder.thumbnailFileLayout = v.findViewById(R.id.file_explorer_grid_file_thumbnail_layout);
             holder.fileThumbnail = v.findViewById(R.id.file_explorer_grid_file_thumbnail);
             holder.fileSelectedIcon = v.findViewById(R.id.file_explorer_grid_file_selected);
             holder.fileIcon = v.findViewById(R.id.file_explorer_grid_file_icon);
-            holder.fileName= v.findViewById(R.id.file_grid_filename_for_file);
+            holder.fileName = v.findViewById(R.id.file_grid_filename_for_file);
             holder.videoLayout = v.findViewById(R.id.file_explorer_grid_file_videoinfo_layout);
-            holder.videoDuration= v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
+            holder.videoDuration = v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
             holder.videoIcon = v.findViewById(R.id.file_explorer_grid_file_video_icon);
             holder.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
             holder.takenDownImageForFile = v.findViewById(R.id.file_grid_taken_down_for_file);
 
-			v.setTag(holder);
-			return holder;
-		} else {
+            v.setTag(holder);
+            return holder;
+        } else {
             SortByHeaderBinding binding = SortByHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new ViewHolderSortBy(binding);
         }
-	}
+    }
 
-	@Override
-	public void onBindViewHolder(ViewHolderExplorer holder, int position){
-	    switch (getItemViewType(position)) {
+    @Override
+    public void onBindViewHolder(ViewHolderExplorer holder, int position) {
+        switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
                 ((ViewHolderSortBy) holder).bind();
                 break;
@@ -276,9 +286,9 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 onBindViewHolderGrid(holderGrid, position);
                 break;
         }
-	}
+    }
 
-	private void setImageParams (ImageView image, int size, int marginSize) {
+    private void setImageParams(ImageView image, int size, int marginSize) {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) image.getLayoutParams();
         params.width = params.height = dp2px(size);
         int margin = dp2px(marginSize);
@@ -311,11 +321,11 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
-        if (node.isFolder()){
+        if (node.isFolder()) {
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
             holder.itemView.setOnClickListener(this);
             holder.permissionsIcon.setVisibility(View.GONE);
-            if(node.getHandle() == myBackupHandle){
+            if (node.getHandle() == myBackupHandle) {
                 ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
                 if (subBackupNodes != null && subBackupNodes.size() > 0) {
                     int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
@@ -328,25 +338,23 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             }
             holder.imageView.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
 
-            if(node.isInShare()){
-                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (node.isInShare()) {
+                if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(260, outMetrics));
                     holder.textViewFileSize.setMaxWidth(scaleWidthPx(260, outMetrics));
 
-                }
-                else{
+                } else {
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(200, outMetrics));
                     holder.textViewFileSize.setMaxWidth(scaleWidthPx(200, outMetrics));
                 }
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                for(int j=0; j<sharesIncoming.size();j++){
+                for (int j = 0; j < sharesIncoming.size(); j++) {
                     MegaShare mS = sharesIncoming.get(j);
-                    if(mS.getNodeHandle()==node.getHandle()){
-                        MegaUser user= megaApi.getContact(mS.getUser());
-                        if(user!=null){
+                    if (mS.getNodeHandle() == node.getHandle()) {
+                        MegaUser user = megaApi.getContact(mS.getUser());
+                        if (user != null) {
                             holder.textViewFileSize.setText(getMegaUserNameDB(user));
-                        }
-                        else{
+                        } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }
                     }
@@ -355,25 +363,22 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 //Check permissions
                 holder.permissionsIcon.setVisibility(View.VISIBLE);
                 int accessLevel = megaApi.getAccess(node);
-                if(accessLevel== MegaShare.ACCESS_FULL){
+                if (accessLevel == MegaShare.ACCESS_FULL) {
                     holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
-                }
-                else if(accessLevel== MegaShare.ACCESS_READ){
+                } else if (accessLevel == MegaShare.ACCESS_READ) {
                     holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
-                }
-                else{
+                } else {
                     holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
                 }
             }
-        }
-        else{
+        } else {
             holder.permissionsIcon.setVisibility(View.GONE);
 
             holder.textViewFileSize.setText(MegaNodeUtil.getFileInfo(node));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 
-            if(selectFile){
+            if (selectFile) {
                 if (!node.isTakenDown()) {
                     holder.itemView.setOnClickListener(this);
                     holder.itemView.setOnLongClickListener(this);
@@ -381,13 +386,13 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 
                 if (isMultipleSelect() && isItemChecked(position)) {
                     holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    logDebug("Do not show thumb");
+                    Timber.d("Do not show thumb");
                     return;
                 } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     holder.itemLayout.setBackground(null);
                 }
-            } else{
+            } else {
                 holder.imageView.setAlpha(.4f);
                 holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
             }
@@ -400,11 +405,11 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                     try {
                         if (node.hasThumbnail()) {
                             thumb = ThumbnailUtils.getThumbnailFromMegaExplorer(node, context, holder, megaApi, this);
-                        }
-                        else {
+                        } else {
                             ThumbnailUtils.createThumbnailExplorer(context, node, holder, megaApi, this);
                         }
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                    }
                 }
             }
 
@@ -417,7 +422,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
     }
 
     private void onBindViewHolderGrid(ViewHolderGridExplorer holder, int position) {
-	    logDebug("onBindViewHolderGrid");
+        Timber.d("onBindViewHolderGrid");
 
         holder.currentPosition = position;
 
@@ -450,8 +455,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
                 holder.takenDownImage.setVisibility(View.GONE);
             }
-        }
-        else{
+        } else {
             holder.folderLayout.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.fileName.setText(node.getName());
@@ -468,17 +472,15 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
 
             if (isVideoFile(node.getName())) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
-                logDebug(node.getName() + " DURATION: " + node.getDuration());
+                Timber.d("%s DURATION: %d", node.getName(), node.getDuration());
                 String duration = getVideoDuration(node.getDuration());
-                if (duration != null && !duration.isEmpty())  {
+                if (duration != null && !duration.isEmpty()) {
                     holder.videoDuration.setText(duration);
                     holder.videoDuration.setVisibility(View.VISIBLE);
-                }
-                else {
+                } else {
                     holder.videoDuration.setVisibility(View.GONE);
                 }
-            }
-            else {
+            } else {
                 holder.videoLayout.setVisibility(View.GONE);
             }
 
@@ -489,15 +491,15 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                     try {
                         if (node.hasThumbnail()) {
                             thumb = ThumbnailUtils.getThumbnailFromMegaExplorer(node, context, holder, megaApi, this);
-                        }
-                        else {
+                        } else {
                             ThumbnailUtils.createThumbnailExplorer(context, node, holder, megaApi, this);
                         }
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                    }
                 }
             }
             if (thumb != null) {
-                holder.fileThumbnail.setImageBitmap(ThumbnailUtils.getRoundedRectBitmap(context,thumb,2));
+                holder.fileThumbnail.setImageBitmap(ThumbnailUtils.getRoundedRectBitmap(context, thumb, 2));
                 holder.fileThumbnail.setVisibility(View.VISIBLE);
                 holder.fileIcon.setVisibility(View.GONE);
             } else {
@@ -505,7 +507,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 holder.fileIcon.setVisibility(View.VISIBLE);
             }
 
-            if(selectFile){
+            if (selectFile) {
                 holder.fileThumbnail.setAlpha(1.0f);
 
                 if (!node.isTakenDown()) {
@@ -514,32 +516,32 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 }
 
                 if (isMultipleSelect() && isItemChecked(position)) {
-                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
+                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
                     holder.fileSelectedIcon.setImageResource(R.drawable.ic_select_folder);
 
                 } else {
-                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
+                    holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
                     holder.fileSelectedIcon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                 }
-            } else{
+            } else {
                 holder.fileThumbnail.setAlpha(.4f);
             }
         }
     }
 
     public void toggleSelection(int pos) {
-        logDebug("toggleSelection: " + pos);
+        Timber.d("toggleSelection: %s", pos);
         startAnimation(pos, putOrDeletePostion(pos));
     }
 
     private boolean putOrDeletePostion(int pos) {
-        if (selectedItems.get(pos,false)) {
-            logDebug("delete pos: " + pos);
+        if (selectedItems.get(pos, false)) {
+            Timber.d("delete pos: %s", pos);
             selectedItems.delete(pos);
             return true;
         } else {
-            logDebug("PUT pos: " + pos);
-            selectedItems.put(pos,true);
+            Timber.d("PUT pos: %s", pos);
+            selectedItems.put(pos, true);
             return false;
         }
     }
@@ -554,14 +556,14 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         }
     }
 
-    private void startAnimation (final int pos, final boolean delete) {
+    private void startAnimation(final int pos, final boolean delete) {
 
         if (((FileExplorerActivity) context).isList()) {
-            logDebug("adapter type is LIST");
+            Timber.d("adapter type is LIST");
             ViewHolderListExplorer view = (ViewHolderListExplorer) listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
-                logDebug("Start animation: " + pos);
-                Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
+                Timber.d("Start animation: %s", pos);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
@@ -584,18 +586,17 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                     }
                 });
                 view.imageView.startAnimation(flipAnimation);
-            }
-            else {
-                logDebug("view is null - not animation");
+            } else {
+                Timber.d("view is null - not animation");
                 hideMultipleSelect();
                 notifyItemChanged(pos);
             }
         } else {
-            logDebug("adapter type is GRID");
+            Timber.d("adapter type is GRID");
             ViewHolderGridExplorer view = (ViewHolderGridExplorer) listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
-                logDebug("Start animation: " + pos);
-                Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
+                Timber.d("Start animation: %s", pos);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 if (!delete) {
                     notifyItemChanged(pos);
                     flipAnimation.setDuration(250);
@@ -620,9 +621,8 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                     }
                 });
                 view.fileSelectedIcon.startAnimation(flipAnimation);
-            }
-            else {
-                logDebug("view is null - not animation");
+            } else {
+                Timber.d("view is null - not animation");
                 hideMultipleSelect();
                 notifyItemChanged(pos);
             }
@@ -639,30 +639,30 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         }
     }
 
-	public void clearSelections() {
-		logDebug("clearSelections");
-		for (int i= 0; i<this.getItemCount();i++){
-			if(isItemChecked(i)){
-				toggleSelection(i);
-			}
-		}
-	}
-
-	private boolean isItemChecked(int position) {
-	    if (selectedItems == null) {
-	        return false;
+    public void clearSelections() {
+        Timber.d("clearSelections");
+        for (int i = 0; i < this.getItemCount(); i++) {
+            if (isItemChecked(i)) {
+                toggleSelection(i);
+            }
         }
-		return selectedItems.get(position);
-	}
+    }
 
-	public int getSelectedItemCount() {
-		if(selectedItems!=null){
-			return selectedItems.size();
-		}
-		return 0;
-	}
+    private boolean isItemChecked(int position) {
+        if (selectedItems == null) {
+            return false;
+        }
+        return selectedItems.get(position);
+    }
 
-	@Override
+    public int getSelectedItemCount() {
+        if (selectedItems != null) {
+            return selectedItems.size();
+        }
+        return 0;
+    }
+
+    @Override
     public List<Integer> getSelectedItems() {
 
         if (selectedItems != null) {
@@ -692,10 +692,10 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
     }
 
     /*
-	 * Get list of all selected nodes
-	 */
-	public List<MegaNode> getSelectedNodes() {
-	    if (selectedItems != null) {
+     * Get list of all selected nodes
+     */
+    public List<MegaNode> getSelectedNodes() {
+        if (selectedItems != null) {
             ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
 
             for (int i = 0; i < selectedItems.size(); i++) {
@@ -709,102 +709,101 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             return nodes;
         }
 
-	    return null;
-	}
+        return null;
+    }
 
-	public long[] getSelectedHandles() {
+    public long[] getSelectedHandles() {
 
-		long handles[] = new long[selectedItems.size()];
+        long handles[] = new long[selectedItems.size()];
 
-		int k=0;
-		for (int i = 0; i < selectedItems.size(); i++) {
-			if (selectedItems.valueAt(i) == true) {
-				MegaNode document = getNodeAt(selectedItems.keyAt(i));
-				if (document != null){
-					handles[k] = document.getHandle();
-					k++;
-				}
-			}
-		}
-		return handles;
-	}
+        int k = 0;
+        for (int i = 0; i < selectedItems.size(); i++) {
+            if (selectedItems.valueAt(i) == true) {
+                MegaNode document = getNodeAt(selectedItems.keyAt(i));
+                if (document != null) {
+                    handles[k] = document.getHandle();
+                    k++;
+                }
+            }
+        }
+        return handles;
+    }
 
-	/*
-    * Get document at specified position
-    */
+    /*
+     * Get document at specified position
+     */
     private MegaNode getNodeAt(int position) {
-		try {
-			if (nodes != null) {
-				return nodes.get(position);
-			}
-		} catch (IndexOutOfBoundsException e) {
-		}
-		return null;
-	}
+        try {
+            if (nodes != null) {
+                return nodes.get(position);
+            }
+        } catch (IndexOutOfBoundsException e) {
+        }
+        return null;
+    }
 
-	public boolean isMultipleSelect() {
-		return multipleSelect;
-	}
+    public boolean isMultipleSelect() {
+        return multipleSelect;
+    }
 
-	public void setMultipleSelect(boolean multipleSelect) {
-		logDebug("multipleSelect: " + multipleSelect);
-		if (this.multipleSelect != multipleSelect) {
-			this.multipleSelect = multipleSelect;
-		}
-		if(this.multipleSelect){
-			selectedItems = new SparseBooleanArray();
-		}
-	}
+    public void setMultipleSelect(boolean multipleSelect) {
+        Timber.d("multipleSelect: %s", multipleSelect);
+        if (this.multipleSelect != multipleSelect) {
+            this.multipleSelect = multipleSelect;
+        }
+        if (this.multipleSelect) {
+            selectedItems = new SparseBooleanArray();
+        }
+    }
 
-	public void setNodes(ArrayList<MegaNode> nodes){
-		this.nodes = insertPlaceHolderNode(nodes);
-		notifyDataSetChanged();
-		visibilityFastScroller();
-	}
+    public void setNodes(ArrayList<MegaNode> nodes) {
+        this.nodes = insertPlaceHolderNode(nodes);
+        notifyDataSetChanged();
+        visibilityFastScroller();
+    }
 
-	public long getParentHandle(){
-		return parentHandle;
-	}
+    public long getParentHandle() {
+        return parentHandle;
+    }
 
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-	}
+    public void setParentHandle(long parentHandle) {
+        this.parentHandle = parentHandle;
+    }
 
-	public boolean isSelectFile() {
-		return selectFile;
-	}
+    public boolean isSelectFile() {
+        return selectFile;
+    }
 
-	public void setSelectFile(boolean selectFile) {
-		this.selectFile = selectFile;
-	}
+    public void setSelectFile(boolean selectFile) {
+        this.selectFile = selectFile;
+    }
 
-	@Override
-	public void onClick(View v) {
-		clickItem(v);
-	}
+    @Override
+    public void onClick(View v) {
+        clickItem(v);
+    }
 
-	@Override
-	public boolean onLongClick(View v) {
-		clickItem(v);
-		return true;
-	}
+    @Override
+    public boolean onLongClick(View v) {
+        clickItem(v);
+        return true;
+    }
 
     private void clickItem(View v) {
-		ViewHolderExplorer holder = (ViewHolderExplorer) v.getTag();
-		if (holder == null) {
-			return;
-		}
+        ViewHolderExplorer holder = (ViewHolderExplorer) v.getTag();
+        if (holder == null) {
+            return;
+        }
 
-		if (fragment instanceof CloudDriveExplorerFragment)  {
-			((CloudDriveExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
-		}
-		else if (fragment instanceof IncomingSharesExplorerFragment) {
-			((IncomingSharesExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
-		}
-	}
+        if (fragment instanceof CloudDriveExplorerFragment) {
+            ((CloudDriveExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
+        } else if (fragment instanceof IncomingSharesExplorerFragment) {
+            ((IncomingSharesExplorerFragment) fragment).itemClick(v, holder.getAbsoluteAdapterPosition());
+        }
+    }
 
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
-	    if (((FileExplorerActivity) context).isList()) {
+        if (((FileExplorerActivity) context).isList()) {
             if (!nodes.isEmpty()) {
                 placeholderCount = 1;
                 nodes.add(0, null);
@@ -812,25 +811,25 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
                 placeholderCount = 0;
             }
 
-	        return nodes;
+            return nodes;
         }
 
         int folderCount = getNumberOfFolders(nodes);
         int spanCount = 2;
 
         if (listFragment instanceof NewGridRecyclerView) {
-            spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
+            spanCount = ((NewGridRecyclerView) listFragment).getSpanCount();
         }
 
         placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivity) context).isList()) {
             //Add placeholder at folders' end.
-            for (int i = 0;i < placeholderCount;i++) {
+            for (int i = 0; i < placeholderCount; i++) {
                 try {
-                    nodes.add(folderCount + i,null);
+                    nodes.add(folderCount + i, null);
                 } catch (IndexOutOfBoundsException e) {
-                    logError("Inserting placeholders [nodes.size]: " + nodes.size() + " [folderCount+i]: " + (folderCount + i), e);
+                    Timber.e(e, "Inserting placeholders [nodes.size]: %d [folderCount+i]: %d", nodes.size(), folderCount + i);
                 }
             }
         }
@@ -844,28 +843,26 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
     }
 
     private void visibilityFastScroller() {
-	    int visibility;
+        int visibility;
         if (getItemCount() < MIN_ITEMS_SCROLLBAR) {
             visibility = View.GONE;
-        }
-        else {
+        } else {
             visibility = View.VISIBLE;
         }
 
         if (fragment instanceof IncomingSharesExplorerFragment) {
             ((IncomingSharesExplorerFragment) fragment).getFastScroller().setVisibility(visibility);
-        }
-        else if (fragment instanceof CloudDriveExplorerFragment) {
+        } else if (fragment instanceof CloudDriveExplorerFragment) {
             ((CloudDriveExplorerFragment) fragment).getFastScroller().setVisibility(visibility);
         }
     }
 
     @Override
     public String getSectionTitle(int position) {
-	    MegaNode node = (MegaNode) getItem(position);
+        MegaNode node = (MegaNode) getItem(position);
 
         if (node != null && node.getName() != null && !node.getName().isEmpty()) {
-            return node.getName().substring(0,1);
+            return node.getName().substring(0, 1);
         }
         return null;
     }

@@ -16,17 +16,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.logging.KARERE_LOGS
-import mega.privacy.android.app.logging.LOG_PREFERENCES
-import mega.privacy.android.app.logging.SDK_LOGS
+
 import java.io.IOException
 import javax.inject.Inject
 
+private const val logPreferencesFileName = "LOG_PREFERENCES"
 private val Context.loggingDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = LOG_PREFERENCES,
+    name = logPreferencesFileName,
     produceMigrations = {
         listOf(
-            SharedPreferencesMigration(it, LOG_PREFERENCES)
+            SharedPreferencesMigration(it, logPreferencesFileName)
         )
     })
 
@@ -41,8 +40,8 @@ class LoggingPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LoggingPreferencesGateway {
-    private val logPreferenceKey = booleanPreferencesKey(SDK_LOGS)
-    private val chatLogPreferenceKey = booleanPreferencesKey(KARERE_LOGS)
+    private val logPreferenceKey = booleanPreferencesKey("SDK_LOGS")
+    private val chatLogPreferenceKey = booleanPreferencesKey("KARERE_LOGS")
 
     override fun isLoggingPreferenceEnabled(): Flow<Boolean> =
         context.loggingDataStore.data

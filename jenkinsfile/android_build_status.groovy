@@ -4,6 +4,7 @@ MEGACHAT_BRANCH = "develop"
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
+QA_APK_BUILD_LOG = "qa_build.log"
 
 UNIT_TEST_SUMMARY = ""
 UNIT_TEST_REPORT_ARCHIVE = "unit_test_result_${BUILD_NUMBER}.zip"
@@ -150,12 +151,15 @@ pipeline {
                         // upload unit test report if unit test fails
                         String unitTestResult = ""
                         if (BUILD_STEP == "Unit Test") {
-                            archiveUnitTestReport()
-                            final String unitTestUploadReponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-                            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadReponse).markdown
+                            if (archiveUnitTestReport()) {
+                                final String unitTestUploadResponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+                                def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
 
-                            String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                            unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
+                                String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                                unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
+                            } else {
+                                unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+                            }
                         }
 
                         // upload SDK build log if SDK build fails
@@ -329,19 +333,20 @@ pipeline {
                 }
             }
         }
-        stage('Build APK (GMS+HMS)') {
+        stage('Build APK (GMS+HMS+QA)') {
             when {
                 expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Build APK (GMS+HMS)'
+                    BUILD_STEP = 'Build APK (GMS+HMS+QA)'
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
                     sh "./gradlew clean"
                     sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
                     sh "./gradlew app:assembleHmsRelease 2>&1  | tee ${HMS_APK_BUILD_LOG}"
+                    sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
 
                     sh """
                         if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
@@ -352,10 +357,11 @@ pipeline {
                             echo HMS APK build failed. Exitting....
                             exit 1
                         fi
+                        if grep -q -m 1 \"^FAILURE: \" ${QA_APK_BUILD_LOG}; then
+                            echo HMS APK build failed. Exitting....
+                            exit 1
+                        fi
                     """
-
-                    // Archive the APKs so that they can be downloaded from Jenkins
-                    // archiveArtifacts '**/*.apk'
                 }
             }
         }
@@ -438,6 +444,14 @@ String readBuildWarnings() {
         }
     }
 
+    if (fileExists(QA_APK_BUILD_LOG)) {
+        String qaBuildWarnings = sh(script: "cat ${QA_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
+        println("qaGmsBuildWarnings = $qaBuildWarnings")
+        if (!qaBuildWarnings.isEmpty()) {
+            result += "<br/><b>:warning: QA GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(qaBuildWarnings)
+        }
+    }
+
     if (result == "") result = "None"
     println("readBuildWarnings() = ${result}")
     return result
@@ -456,13 +470,19 @@ String wrapBuildWarnings(String rawWarning) {
  * @return summary string of unit test
  */
 String unitTestSummary(String testReportRoot) {
-    return sh(script:  "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
+    return sh(script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
 }
 
 def archiveUnitTestReport() {
-    sh """
-        cd app/build
-        zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
-        mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
-    """
+    sh("rm -f ${WORKSPACE}/${UNIT_TEST_REPORT_ARCHIVE}")
+    if (fileExists(WORKSPACE + "/app/build/reports")) {
+        sh """
+            cd app/build
+            zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
+            mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
+        """
+        return true
+    } else {
+        return false
+    }
 }

@@ -7,7 +7,9 @@ import android.net.Uri
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,6 +20,7 @@ import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.main.LoginActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import timber.log.Timber
 
 object AlertsAndWarnings {
     private const val REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT = 25
@@ -183,8 +186,8 @@ object AlertsAndWarnings {
     }
 
     @JvmStatic
-    fun askForCustomizedPlan(context: Context, myEmail:String, accountType: Int) {
-        LogUtil.logDebug("askForCustomizedPlan")
+    fun askForCustomizedPlan(context: Context, myEmail: String, accountType: Int) {
+        Timber.d("askForCustomizedPlan")
         val body = StringBuilder()
         body.append(getString(R.string.subject_mail_upgrade_plan))
             .append("\n\n\n\n\n\n\n")

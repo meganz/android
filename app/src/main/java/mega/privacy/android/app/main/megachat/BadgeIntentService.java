@@ -5,36 +5,36 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+
 import androidx.annotation.Nullable;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.R;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class BadgeIntentService extends IntentService {
 
-    private  int notificationId = 0;
+    private int notificationId = 0;
     private NotificationManager notificationManager;
 
     public BadgeIntentService() {
         super("BadgeIntentService");
-        logDebug("Constructor");
+        Timber.d("Constructor");
     }
 
     @Override
     public void onStart(@Nullable Intent intent, int startId) {
-        logDebug("onStart");
+        Timber.d("onStart");
         super.onStart(intent, startId);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        logDebug("onHandleIntent");
+        Timber.d("onHandleIntent");
         if (intent != null) {
             int badgeCount = intent.getIntExtra("badgeCount", 0);
-            logDebug("Badge count: " + badgeCount + " abs: " + Math.abs(badgeCount));
+            Timber.d("Badge count: %d abs: %d", badgeCount, Math.abs(badgeCount));
             notificationManager.cancel(notificationId);
             notificationId++;
 

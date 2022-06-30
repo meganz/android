@@ -1,5 +1,14 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -40,19 +49,9 @@ import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
+import timber.log.Timber;
 
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
-import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
-public class TourFragment extends Fragment implements View.OnClickListener{
+public class TourFragment extends Fragment implements View.OnClickListener {
 
     private static final String EXTRA_RECOVERY_KEY_URL = "EXTRA_RECOVERY_KEY_URL";
     private static final String EXTRA_PARK_ACCOUNT_URL = "EXTRA_PARK_ACCOUNT_URL";
@@ -90,12 +89,12 @@ public class TourFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
+    public void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
-        if(context==null){
-            logError("Context is null");
+        if (context == null) {
+            Timber.e("Context is null");
             return;
         }
     }
@@ -118,9 +117,9 @@ public class TourFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
@@ -141,7 +140,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
         bRegister.setOnClickListener(this);
         v.findViewById(R.id.join_meeting_as_guest).setOnClickListener(this);
 
-        adapter = new TourImageAdapter((LoginActivity)context);
+        adapter = new TourImageAdapter((LoginActivity) context);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
 
@@ -151,12 +150,12 @@ public class TourFragment extends Fragment implements View.OnClickListener{
         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
 
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
-            public void onPageSelected (int position){
-                switch(position){
-                    case 0:{
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0: {
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
@@ -164,7 +163,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                         fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
-                    case 1:{
+                    case 1: {
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
@@ -172,7 +171,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                         fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
-                    case 2:{
+                    case 2: {
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
@@ -180,7 +179,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                         fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
-                    case 3:{
+                    case 3: {
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
@@ -188,7 +187,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                         fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
-                    case 4:{
+                    case 4: {
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
@@ -211,12 +210,12 @@ public class TourFragment extends Fragment implements View.OnClickListener{
             String parkAccountUrl = getArguments().getString(EXTRA_PARK_ACCOUNT_URL, null);
 
             if (!TextUtils.isEmpty(recoveryKeyUrl)) {
-                logDebug("Link to resetPass: " + recoveryKeyUrl);
+                Timber.d("Link to resetPass: %s", recoveryKeyUrl);
                 showRecoveryKeyDialog(recoveryKeyUrl);
             }
 
             if (!TextUtils.isEmpty(parkAccountUrl)) {
-                logDebug("Link to parkAccount: " + parkAccountUrl);
+                Timber.d("Link to parkAccount: %s", parkAccountUrl);
                 showParkAccountDialog(parkAccountUrl);
             }
         }
@@ -228,7 +227,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
     }
 
     public void showRecoveryKeyDialog(String recoveryKeyUrl) {
-        logDebug("link: " + recoveryKeyUrl);
+        Timber.d("link: %s", recoveryKeyUrl);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(context)
                 .setView(R.layout.dialog_recovery_key).setTitle(R.string.title_dialog_insert_MK)
@@ -252,7 +251,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                     dialog.dismiss();
                 }
             } else {
-                logDebug("Other IME" + actionId);
+                Timber.d("Other IME%s", actionId);
             }
             return false;
         });
@@ -296,17 +295,17 @@ public class TourFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.button_register_tour:
-                logDebug("onRegisterClick");
-                ((LoginActivity)context).showFragment(CREATE_ACCOUNT_FRAGMENT);
+                Timber.d("onRegisterClick");
+                ((LoginActivity) context).showFragment(CREATE_ACCOUNT_FRAGMENT);
                 break;
             case R.id.button_login_tour:
-                logDebug("onLoginClick");
-                ((LoginActivity)context).showFragment(LOGIN_FRAGMENT);
+                Timber.d("onLoginClick");
+                ((LoginActivity) context).showFragment(LOGIN_FRAGMENT);
                 break;
             case R.id.join_meeting_as_guest:
-                logDebug("onJoinMeetingAsGuestClick");
+                Timber.d("onJoinMeetingAsGuestClick");
                 if (requestBluetoothPermission()) {
                     if (joinMeetingAsGuestLauncher != null) {
                         joinMeetingAsGuestLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
@@ -322,6 +321,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
 
     /**
      * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
+     *
      * @return false : permission granted, needn't request / true: should request permission
      */
     private boolean requestBluetoothPermission() {
@@ -336,7 +336,7 @@ public class TourFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onAttach(Context context) {
-        logDebug("onAttach");
+        Timber.d("onAttach");
         super.onAttach(context);
         this.context = context;
 
@@ -344,20 +344,20 @@ public class TourFragment extends Fragment implements View.OnClickListener{
                 new ActivityResultContracts.RequestPermission(),
                 result -> {
                     if (result) {
-                        logDebug("onActivityResult: PERMISSION GRANTED");
+                        Timber.d("onActivityResult: PERMISSION GRANTED");
                         MegaApplication.setLoggingOut(false);
                         new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
                                 PasteMeetingLinkGuestDialogFragment.TAG);
                     } else {
-                        logDebug("onActivityResult: PERMISSION DENIED");
-                        ((BaseActivity)getActivity()).showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
+                        Timber.d("onActivityResult: PERMISSION DENIED");
+                        ((BaseActivity) getActivity()).showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
                     }
                 });
     }
 
     @Override
     public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
+        Timber.d("onAttach Activity");
         super.onAttach(context);
         this.context = context;
     }

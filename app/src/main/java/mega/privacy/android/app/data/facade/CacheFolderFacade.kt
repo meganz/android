@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class CacheFolderFacade @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val megaThreadPoolExecutor: ThreadPoolExecutor
+    private val megaThreadPoolExecutor: ThreadPoolExecutor,
 ) : CacheFolderGateway {
 
     companion object {
@@ -74,7 +74,7 @@ class CacheFolderFacade @Inject constructor(
         val cacheIntDir = context.cacheDir
         val cacheExtDir = context.externalCacheDir
         cacheIntDir?.let {
-            Timber.d("Path to check internal: " + it.absolutePath)
+            Timber.d("Path to check internal: ${it.absolutePath}")
         }
         FileUtil.getDirSize(cacheIntDir).plus(FileUtil.getDirSize(cacheExtDir))
             .let { totalCacheSize ->
@@ -108,7 +108,7 @@ class CacheFolderFacade @Inject constructor(
                 try {
                     FileUtil.deleteFolderAndSubfolders(context, it)
                 } catch (e: IOException) {
-                    Timber.e("Exception deleting" + it.name + "directory", e)
+                    Timber.e(e, "Exception deleting ${it.name} directory")
                     e.printStackTrace()
                 }
             }

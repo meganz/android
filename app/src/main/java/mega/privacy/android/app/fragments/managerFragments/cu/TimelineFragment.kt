@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
@@ -18,8 +19,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -30,6 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -39,7 +44,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
-import mega.privacy.android.app.gallery.data.MediaCardType
+import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -48,10 +53,13 @@ import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.DAYS_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_ALL_PHOTOS
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_CAMERA_UPLOADS
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_CLOUD_DRIVE
+import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.FILTER_VIDEOS_ONLY
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.MONTHS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel.Companion.SPAN_CARD_LANDSCAPE
@@ -64,6 +72,7 @@ import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.main.ManagerActivity
@@ -84,6 +93,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+
 
 /**
  * TimelineFragment is a sub fragment of PhotosFragment. Its sibling is AlbumsFragment
@@ -392,12 +402,30 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun setupOtherViews() {
         binding.emptyEnableCuButton.setOnClickListener { enableCameraUploadClick() }
         setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
+        setEmptyState()
+    }
+
+    private fun setEmptyState() {
         binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
                 context,
-                StringResourcesUtils.getString(R.string.photos_empty)
+                StringResourcesUtils.getString(when (getCurrentFilter()) {
+                    FILTER_CAMERA_UPLOADS -> R.string.photos_empty
+                    FILTER_CLOUD_DRIVE -> R.string.homepage_empty_hint_photos
+                    FILTER_VIDEOS_ONLY -> R.string.homepage_empty_hint_video
+                    else -> R.string.photos_empty
+                })
             ),
             HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        binding.emptyHintImage.setImageResource(
+            when (getCurrentFilter()) {
+                FILTER_CAMERA_UPLOADS -> R.drawable.ic_zero_data_cu
+                FILTER_CLOUD_DRIVE -> R.drawable.ic_zero_no_images
+                FILTER_VIDEOS_ONLY -> R.drawable.ic_no_videos
+                else -> R.drawable.ic_zero_data_cu
+            }
         )
     }
 
@@ -595,7 +623,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     /**
      * When zoom changes,handle zoom
      */
-    fun handleZoomChange(zoom: Int, needReload: Boolean) {
+    private fun handleZoomChange(zoom: Int, needReload: Boolean) {
         PHOTO_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
@@ -637,7 +665,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             return
         }
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_images_toolbar, menu)
+        if (PhotosFilterAndSortToggle.enabled) {
+            inflater.inflate(R.menu.fragment_photos_toolbar, menu)
+        } else {
+            inflater.inflate(R.menu.fragment_images_toolbar, menu)
+
+        }
         this.menu = menu
         handleOnCreateOptionsMenu()
         handleZoomMenuItemStatus()
@@ -647,15 +680,32 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         return if (!isInPhotosPage()) {
             true
         } else {
-            when (item.itemId) {
-                R.id.action_zoom_in -> {
-                    zoomIn()
+            if (PhotosFilterAndSortToggle.enabled) {
+                when (item.itemId) {
+                    R.id.action_zoom_in -> {
+                        zoomIn()
+                    }
+                    R.id.action_zoom_out -> {
+                        zoomOut()
+                    }
+                    R.id.action_photos_filter -> {
+                        createFilterDialog(mManagerActivity)
+                    }
+                    R.id.action_photos_sortby -> {
+                        createSortByDialog(mManagerActivity)
+                    }
                 }
-                R.id.action_zoom_out -> {
-                    zoomOut()
-                }
-                R.id.action_menu_sort_by -> {
-                    mManagerActivity.showNewSortByPanel(Constants.ORDER_CAMERA)
+            } else {
+                when (item.itemId) {
+                    R.id.action_zoom_in -> {
+                        zoomIn()
+                    }
+                    R.id.action_zoom_out -> {
+                        zoomOut()
+                    }
+                    R.id.action_menu_sort_by -> {
+                        mManagerActivity.showNewSortByPanel(Constants.ORDER_CAMERA)
+                    }
                 }
             }
             return super.onOptionsItemSelected(item)
@@ -932,26 +982,13 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
-                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
                 val childrenNodes = viewModel.getItemsHandle()
-                val intent = when (adapterType) {
-                    Constants.ALBUM_CONTENT_ADAPTER, Constants.PHOTOS_BROWSE_ADAPTER -> {
-                        ImageViewerActivity.getIntentForChildren(
-                            requireContext(),
-                            childrenNodes,
-                            nodeHandle
-                        )
-                    }
-                    else -> {
-                        ImageViewerActivity.getIntentForParentNode(
-                            requireContext(),
-                            parentNodeHandle,
-                            getOrder(),
-                            nodeHandle
-                        )
-                    }
-                }
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    childrenNodes,
+                    nodeHandle
+                )
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
@@ -1030,17 +1067,17 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             val animatorList = mutableListOf<Animator>()
 
             animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     updateUiWhenAnimationEnd()
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                 }
             })
 
@@ -1119,7 +1156,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
-            menuItem.icon,
+            menuItem.icon ?: return,
             colorRes
         )
         menuItem.isEnabled = isEnable
@@ -1129,7 +1166,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (this::menu.isInitialized) {
             menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
             menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-            menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+            if (PhotosFilterAndSortToggle.enabled) {
+                menu.findItem(R.id.action_photos_filter)?.isVisible = shouldShow
+                menu.findItem(R.id.action_photos_sortby)?.isVisible = shouldShow
+            } else {
+                menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+            }
         }
     }
 
@@ -1298,4 +1340,106 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      * @return true in, false not in
      */
     fun isInActionMode() = actionMode != null
+
+    /**
+     * Create the filter dialog
+     */
+    fun createFilterDialog(
+        context: Activity,
+    ) {
+        val filterDialog: AlertDialog
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+
+        val stringsArray: List<String> = listOf(
+            getString(R.string.photos_filter_all_photos),
+            getString(R.string.photos_filter_cloud_drive),
+            getString(R.string.photos_filter_camera_uploads),
+            getString(R.string.photos_filter_videos_only),
+        )
+        val itemsAdapter =
+            ArrayAdapter(context, R.layout.checked_text_view_dialog_button, stringsArray)
+        val listView = ListView(context)
+        listView.adapter = itemsAdapter
+
+        dialogBuilder.setSingleChoiceItems(
+            itemsAdapter,
+            viewModel.getCurrentFilter(),
+            DialogInterface.OnClickListener { dialog, item ->
+                itemsAdapter.getItem(item)?.let {
+                    viewModel.setCurrentFilter(item)
+                    with(photosFragment) {
+                        setActionBarSubtitleText(Util.adjustForLargeFont(
+                            it
+                        ))
+                        showHideABSubtitle(isFilterAllPhotos())
+                        setEmptyState()
+                    }
+                }
+                dialog.dismiss()
+            })
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
+                dialog: DialogInterface,
+                _,
+            ->
+            dialog.dismiss()
+        }
+
+        dialogBuilder.setTitle(R.string.photos_action_filter)
+        filterDialog = dialogBuilder.create()
+        filterDialog.show()
+    }
+
+    /**
+     * Create the sort by dialog
+     */
+    fun createSortByDialog(
+        context: Activity,
+    ) {
+        val sortDialog: AlertDialog
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+
+        val stringsArray: List<String> = listOf(
+            getString(R.string.sortby_date_newest),
+            getString(R.string.sortby_date_oldest),
+        )
+        val itemsAdapter =
+            ArrayAdapter(context, R.layout.checked_text_view_dialog_button, stringsArray)
+        val listView = ListView(context)
+        listView.adapter = itemsAdapter
+
+        dialogBuilder.setSingleChoiceItems(
+            itemsAdapter,
+            viewModel.getCurrentSort(),
+            DialogInterface.OnClickListener { dialog, item ->
+                viewModel.setCurrentSort(item)
+                dialog.dismiss()
+            })
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
+                dialog: DialogInterface,
+                _,
+            ->
+            dialog.dismiss()
+        }
+
+        sortDialog = dialogBuilder.create()
+        sortDialog.setTitle(R.string.action_sort_by)
+        sortDialog.show()
+    }
+
+    /**
+     * Get the current selected filter
+     */
+    fun getCurrentFilterAsString(): String {
+        return viewModel.getCurrentFilterAsString()
+    }
+
+    fun getCurrentFilter(): Int {
+        return viewModel.getCurrentFilter()
+    }
+
+    fun isFilterAllPhotos(): Boolean {
+        return viewModel.getCurrentFilter() == FILTER_ALL_PHOTOS
+    }
 }

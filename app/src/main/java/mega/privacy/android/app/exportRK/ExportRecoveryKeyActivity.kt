@@ -3,23 +3,21 @@ package mega.privacy.android.app.exportRK
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.LinearLayout
 import androidx.activity.viewModels
+import com.google.android.material.button.MaterialButton
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.ERROR_NO_SPACE
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.GENERAL_ERROR
-import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.showAlert
-import android.view.Gravity
-
-import android.widget.LinearLayout
-
-import com.google.android.material.button.MaterialButton
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import timber.log.Timber
 
 class ExportRecoveryKeyActivity : PasscodeActivity() {
 
@@ -43,10 +41,10 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         if (grantResults.isEmpty() || requestCode != WRITE_STORAGE_TO_SAVE_RK) {
-            logWarning("Permissions ${permissions[0]} not granted")
+            Timber.w("Permissions ${permissions[0]} not granted")
         }
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -94,7 +92,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      * @return True if one of those buttons show the content in more than one line, false otherwise.
      */
     private fun isOverOneLine(): Boolean {
-        return  binding.printMKButton.lineCount > 1
+        return binding.printMKButton.lineCount > 1
                 || binding.copyMKButton.lineCount > 1
                 || binding.saveMKButton.lineCount > 1
     }

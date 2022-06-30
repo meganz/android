@@ -24,15 +24,12 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FR
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.showAlert;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
@@ -61,6 +58,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -71,8 +69,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,7 +79,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -110,10 +107,12 @@ import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -124,14 +123,17 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class RecentChatsFragment extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
-    /** DURATION is the time duration of snack bar display
-     *  MAX_LINES is the max line setting of the snack bar */
+    /**
+     * DURATION is the time duration of snack bar display
+     * MAX_LINES is the max line setting of the snack bar
+     */
     public static final int DURATION = 4000;
     public static final int MAX_LINES = 3;
 
@@ -140,6 +142,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Inject
     SearchChatsUseCase searchChatsUseCase;
+
+    private SearchViewModel searchViewModel;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -193,8 +197,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     //Empty screen
     private TextView emptyTextView;
-    private RelativeLayout emptyLayout;
+    private LinearLayout emptyLayout;
     private TextView emptyTextViewInvite;
+    private TextView emptyDescriptionText;
     private ImageView emptyImageView;
 
     Button inviteButton;
@@ -219,7 +224,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
         if (megaChatApi.getNumCalls() == 0 || adapter == null) {
-            logError("Calls not found");
+            Timber.e("Calls not found");
             return;
         }
 
@@ -231,7 +236,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     };
 
     public static RecentChatsFragment newInstance() {
-        logDebug("newInstance");
+        Timber.d("newInstance");
         RecentChatsFragment fragment = new RecentChatsFragment();
         return fragment;
     }
@@ -242,7 +247,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void activateActionMode() {
-        logDebug("activateActionMode");
+        Timber.d("activateActionMode");
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
@@ -262,7 +267,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+        Timber.d("onCreate");
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -289,7 +294,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             return;
         }
         if (megaContacts.size() > 0) {
-            logDebug("get " + megaContacts.size() + " matched contacts.");
+            Timber.d("get %d matched contacts.", megaContacts.size());
             // change the settings, when have new matched contact.
             dbH.setShowInviteBanner("true");
 
@@ -306,7 +311,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             moreContactsTitle.setVisibility(View.GONE);
 
             adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
-            contactsList.setLayoutManager(new LinearLayoutManager(getContext(),  LinearLayoutManager.HORIZONTAL, false));
+            contactsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
             contactsList.setAdapter(adapter);
         } else {
             noContacts();
@@ -329,13 +334,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onException(int errorCode, String requestString) {
-        logWarning(requestString + " failed, with error code: " + errorCode);
+        Timber.w("%s failed, with error code: %d", requestString, errorCode);
         noContacts();
     }
 
     @Override
     public void noContacts() {
-        if(showInviteBanner()) {
+        if (showInviteBanner()) {
             bannerContainer.setVisibility(View.VISIBLE);
             invitationContainer.setVisibility(View.GONE);
             inviteTitle.setText(R.string.no_local_contacts_on_mega);
@@ -366,7 +371,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         }
 
         if (context instanceof ManagerActivity) {
-            if(bannerContainer.getVisibility() == View.GONE) {
+            if (bannerContainer.getVisibility() == View.GONE) {
                 ((ManagerActivity) context).changeAppBarElevation(
                         listView.canScrollVertically(-1)
                                 || (adapterList != null && adapterList.isMultipleSelect()));
@@ -389,15 +394,17 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        Timber.d("onCreateView");
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
         appBarLayout = v.findViewById(R.id.linear_layout_add);
-        if(context instanceof ArchivedChatsActivity) {
+        if (context instanceof ArchivedChatsActivity) {
             appBarLayout.setVisibility(View.GONE);
         } else {
             aB = ((AppCompatActivity) context).getSupportActionBar();
@@ -421,8 +428,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         });
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
+        emptyDescriptionText.setText(TextUtil.formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.context_empty_chat_recent)));
+
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
@@ -440,7 +449,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
         //auto scroll to bottom to show invite button.
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             adjustLandscape();
         } else {
             addMarginTop();
@@ -483,7 +492,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         contactsList = v.findViewById(R.id.contacts_list);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         moreContactsTitle.setOnClickListener(this);
-        if(showInviteBanner()) {
+        if (showInviteBanner()) {
             bannerContainer.setVisibility(View.VISIBLE);
         } else {
             bannerContainer.setVisibility(View.GONE);
@@ -519,7 +528,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private boolean showInviteBanner() {
         String showInviteBannerString = dbH.getPreferences().getShowInviteBanner();
-        if(!TextUtils.isEmpty(showInviteBannerString)) {
+        if (!TextUtils.isEmpty(showInviteBannerString)) {
             return Boolean.parseBoolean(showInviteBannerString);
         } else {
             return true;
@@ -528,7 +537,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private void adjustLandscape() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0,0,0,0);
+        layoutParams.setMargins(0, 0, 0, 0);
         emptyLayoutContainer.setLayoutParams(layoutParams);
 
         new Handler().postDelayed(new Runnable() {
@@ -537,7 +546,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             public void run() {
                 emptyLayoutContainer.fullScroll(View.FOCUS_DOWN);
             }
-        },100);
+        }, 100);
     }
 
     private void showPermissionGrantedView() {
@@ -562,16 +571,16 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void setChats() {
-        logDebug("setChats");
+        Timber.d("setChats");
 
         if (listView == null) {
-            logWarning("listView is null - do not update");
+            Timber.w("listView is null - do not update");
             return;
         }
 
         if (isAdded()) {
             int initState = megaChatApi.getInitState();
-            logDebug("Init state is: " + initState);
+            Timber.d("Init state is: %s", initState);
 
             if (initState == MegaChatApi.INIT_ONLINE_SESSION || initState == MegaChatApi.INIT_OFFLINE_SESSION) {
                 if (chats != null) {
@@ -594,13 +603,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         showNoConnectionScreen();
                     }
                 } else {
-                    logDebug("Chats size: " + chats.size());
+                    Timber.d("Chats size: %s", chats.size());
 
                     //Order by last interaction
                     sortChats(chats);
 
                     if (adapterList == null) {
-                        logWarning("AdapterList is NULL");
+                        Timber.w("AdapterList is NULL");
                         adapterList = new MegaListChatAdapter(context, this, chats,
                                 listView, MegaListChatAdapter.ADAPTER_RECENT_CHATS);
                     } else {
@@ -632,7 +641,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     private void showFab() {
-        if (adapterList == null || adapterList.isMultipleSelect()) {
+        if (adapterList != null && adapterList.isMultipleSelect()) {
             return;
         }
 
@@ -655,77 +664,54 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void showEmptyChatScreen() {
-        logDebug("showEmptyChatScreen");
+        Timber.d("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
+        Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
 
         if (context instanceof ArchivedChatsActivity) {
-            CharSequence result = getSpannedMessageForEmptyChat(
-                    context.getString(R.string.recent_chat_empty).toUpperCase());
-
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyTextView.setVisibility(View.GONE);
-            } else {
-                emptyTextView.setVisibility(View.VISIBLE);
-            }
+            emptyTextView.setVisibility(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
+                    View.GONE : View.VISIBLE);
 
             emptyTextViewInvite.setVisibility(View.GONE);
+            emptyDescriptionText.setVisibility(View.GONE);
             inviteButton.setVisibility(View.GONE);
             emptyTextView.setText(result);
         } else {
-            emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
+            emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
-            inviteButton.setText(getString(R.string.new_chat_link_label));
+            emptyDescriptionText.setVisibility(View.VISIBLE);
             inviteButton.setVisibility(View.VISIBLE);
         }
     }
 
-    private Spanned getSpannedMessageForEmptyChat(String originalMessage) {
-        String textToShow = originalMessage;
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
-                    + ">");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
-                    + ">");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            logError(Arrays.toString(e.getStackTrace()));
-        }
-
-        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
-    }
-
     private void addMarginTop() {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, scaleHeightPx(60, outMetrics), 0, 0);
-        emptyLayoutContainer.setLayoutParams(layoutParams);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(dp2px(108, outMetrics), dp2px(52, outMetrics), dp2px(108, outMetrics), dp2px(12, outMetrics));
+        emptyImageView.setLayoutParams(lp);
     }
 
-    public void showConnectingChatScreen(){
-        logDebug("showConnectingChatScreen");
+    public void showConnectingChatScreen() {
+        Timber.d("showConnectingChatScreen");
 
         listView.setVisibility(View.GONE);
         if (context instanceof ManagerActivity) {
             ((ManagerActivity) context).hideFabButton();
         }
 
-        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
         emptyTextViewInvite.setVisibility(View.INVISIBLE);
+        emptyDescriptionText.setVisibility(View.INVISIBLE);
 
         inviteButton.setVisibility(View.GONE);
 
-        CharSequence result = getSpannedMessageForEmptyChat(
-                context.getString(R.string.recent_chat_loading_conversations));
-        emptyTextView.setText(result);
+        String textToShow = context.getString(R.string.recent_chat_loading_conversations).toUpperCase();
+        emptyTextView.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
         emptyTextView.setVisibility(View.VISIBLE);
     }
 
     public void showNoConnectionScreen() {
-        logDebug("showNoConnectionScreen");
+        Timber.d("showNoConnectionScreen");
 
         listView.setVisibility(View.GONE);
         if (context instanceof ManagerActivity) {
@@ -734,13 +720,14 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
+        emptyDescriptionText.setVisibility(View.GONE);
         inviteButton.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
+        Timber.d("onClick");
 
         switch (v.getId()) {
             case R.id.invite_button: {
@@ -761,7 +748,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
             case R.id.empty_image_view_chat: {
                 numberOfClicks++;
-                logDebug("Number of clicks: " + numberOfClicks);
+                Timber.d("Number of clicks: %s", numberOfClicks);
                 if (numberOfClicks >= 5) {
                     numberOfClicks = 0;
                     showStateInfo();
@@ -770,7 +757,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 break;
             }
             case R.id.call_in_progress_layout: {
-                logDebug("call_in_progress_layout");
+                Timber.d("call_in_progress_layout");
                 if (checkPermissionsCall()) {
                     returnActiveCall(context, passcodeManagement);
                 }
@@ -779,7 +766,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
-                if(moreContactsTitle.getVisibility() == View.VISIBLE) {
+                if (moreContactsTitle.getVisibility() == View.VISIBLE) {
                     startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 } else {
                     if (invitationContainer.getVisibility() == View.VISIBLE) {
@@ -798,11 +785,11 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 bannerContainer.setVisibility(View.GONE);
                 break;
             case R.id.allow_button:
-                logDebug("request contact permission!");
+                Timber.d("request contact permission!");
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
                 break;
             case R.id.more_contacts_title:
-                logDebug("to InviteContactActivity");
+                Timber.d("to InviteContactActivity");
                 startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
         }
@@ -839,7 +826,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
      * Clear all selected items
      */
     public void clearSelections() {
-        logDebug("clearSelections");
+        Timber.d("clearSelections");
         if (adapterList.isMultipleSelect()) {
             adapterList.clearSelections();
         }
@@ -858,7 +845,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             actionMode.invalidate();
         } catch (NullPointerException e) {
             e.printStackTrace();
-            logError("Invalidate error", e);
+            Timber.e(e, "Invalidate error");
         }
     }
 
@@ -866,7 +853,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
      * Disable selection
      */
     public void hideMultipleSelect() {
-        logDebug("hideMultipleSelect");
+        Timber.d("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
 
         if (actionMode != null) {
@@ -891,7 +878,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void itemClick(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -902,13 +889,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 updateActionModeTitle();
             }
         } else {
-            logDebug("Open chat: Position: " + position + ", Chat ID: " + chats.get(position).getChatId());
+            Timber.d("Open chat: Position: %d, Chat ID: %d", position, chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivity.class);
             intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intent.putExtra(CHAT_ID, adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivity) {
-                if (((ManagerActivity) context).getSearchQuery() != null && !((ManagerActivity) context).getSearchQuery().isEmpty()) {
+                if (searchViewModel.isSearchQueryValid()) {
                     closeSearch();
                     ((ManagerActivity) context).closeSearchView();
                 }
@@ -929,51 +916,50 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     public void listItemUpdate(MegaChatListItem item) {
         if (item == null) {
-            logWarning("Item is null");
+            Timber.w("Item is null");
             return;
         }
-
-        logDebug("Chat ID: " + item.getChatId());
+        Timber.d("Chat ID: %s", item.getChatId());
 
         if (!isAdded()) {
-            logDebug("return!");
+            Timber.d("return!");
             return;
         }
 
         if (listView == null) {
-            logWarning("listView is null - do not update");
+            Timber.w("listView is null - do not update");
             return;
         }
 
         if (context instanceof ManagerActivity) {
             if (!(((ManagerActivity) context).getDrawerItem() == DrawerItem.CHAT)) {
-                logWarning("Not CHAT shown!");
+                Timber.w("Not CHAT shown!");
                 return;
             }
         }
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)) {
-            logDebug("Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
+            Timber.d("Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
 
-            logDebug("Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+            Timber.d("Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
 
-            logDebug("Change participants");
+            Timber.d("Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 
-            logDebug(" Change unread count");
+            Timber.d(" Change unread count");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
                 int indexToReplace = getPositionFromChatId(chats, item.getChatId());
                 if (indexToReplace != INVALID_POSITION) {
-                    logDebug("Index to replace: " + indexToReplace);
+                    Timber.d("Index to replace: %s", indexToReplace);
                     chats.set(indexToReplace, item);
                     if (item.getUnreadCount() == 0) {
-                        logDebug("No unread count");
+                        Timber.d("No unread count");
                         onUnreadCountChange(indexToReplace, false);
                         onLastMessageChange(indexToReplace);
                     } else {
@@ -983,10 +969,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)) {
-            logDebug("Change last ts: " + item.getChanges());
+            Timber.d("Change last ts: %s", item.getChanges());
             int indexToReplace = getPositionFromChatId(chats, item.getChatId());
             if (indexToReplace != INVALID_POSITION) {
-                logDebug("Index to replace: " + indexToReplace);
+                Timber.d("Index to replace: %s", indexToReplace);
                 chats.set(indexToReplace, item);
                 if (indexToReplace == 0) {
                     onLastTsChange(indexToReplace, false);
@@ -997,13 +983,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         } else if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))) {
 
-            logDebug("Change title ");
+            Timber.d("Change title ");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
                 int indexToReplace = getPositionFromChatId(chats, item.getChatId());
                 if (indexToReplace != INVALID_POSITION) {
-                    logDebug("Index to replace: " + indexToReplace);
+                    Timber.d("Index to replace: %s", indexToReplace);
                     chats.set(indexToReplace, item);
                     onTitleChange(indexToReplace);
                 }
@@ -1011,13 +997,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)) {
 
-            logDebug("Change last message: ");
+            Timber.d("Change last message: ");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
                 int indexToReplace = getPositionFromChatId(chats, item.getChatId());
                 if (indexToReplace != INVALID_POSITION) {
-                    logDebug("Index to replace: " + indexToReplace);
+                    Timber.d("Index to replace: %s", indexToReplace);
                     chats.set(indexToReplace, item);
                     onLastMessageChange(indexToReplace);
                     onUnreadCountChange(indexToReplace, item.getUnreadCount() == 0);
@@ -1026,19 +1012,19 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
 
-            logDebug("Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
-            logDebug("Own privilege: " + item.getOwnPrivilege());
+            Timber.d("Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
+            Timber.d("Own privilege: %s", item.getOwnPrivilege());
             if (adapterList.getItemCount() != 0) {
                 int indexToRemove = getPositionFromChatId(chats, item.getChatId());
                 if (indexToRemove != INVALID_POSITION) {
-                    logDebug("Index to replace: " + indexToRemove);
+                    Timber.d("Index to replace: %s", indexToRemove);
                     chats.remove(indexToRemove);
 
                     adapterList.removeChat(chats, indexToRemove);
                     adapterList.setPositionClicked(-1);
 
                     if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-                        logDebug("adapterList.getItemCount() == 0");
+                        Timber.d("adapterList.getItemCount() == 0");
                         listView.setVisibility(View.GONE);
                         emptyLayout.setVisibility(View.VISIBLE);
                     } else {
@@ -1049,23 +1035,23 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_ARCHIVE)) {
-            logDebug("Change: MegaChatListItem.CHANGE_TYPE_ARCHIVE");
+            Timber.d("Change: MegaChatListItem.CHANGE_TYPE_ARCHIVE");
             if (context instanceof ManagerActivity) {
                 if (item.isArchived()) {
-                    logDebug("New archived element:remove from list");
-                    if (adapterList == null || adapterList.getItemCount()==0){
+                    Timber.d("New archived element:remove from list");
+                    if (adapterList == null || adapterList.getItemCount() == 0) {
                         setChats();
                     } else {
                         int indexToRemove = getPositionFromChatId(chats, item.getChatId());
                         if (indexToRemove != INVALID_POSITION) {
-                            logDebug("Index to replace: " + indexToRemove);
+                            Timber.d("Index to replace: %s", indexToRemove);
                             chats.remove(indexToRemove);
 
                             adapterList.removeChat(chats, indexToRemove);
                             adapterList.setPositionClicked(-1);
 
                             if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-                                logDebug("adapterList.getItemCount() == 0");
+                                Timber.d("adapterList.getItemCount() == 0");
                                 listView.setVisibility(View.GONE);
                                 emptyLayout.setVisibility(View.VISIBLE);
                             } else {
@@ -1079,7 +1065,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         }
                     }
                 } else {
-                    logDebug("New unarchived element: refresh chat list");
+                    Timber.d("New unarchived element: refresh chat list");
                     setChats();
                     if (chats.size() == 1) {
                         ((ManagerActivity) context).invalidateOptionsMenu();
@@ -1099,21 +1085,21 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 checkScroll();
             } else if (context instanceof ArchivedChatsActivity) {
                 if (item.isArchived()) {
-                    logDebug("New archived element: refresh chat list");
+                    Timber.d("New archived element: refresh chat list");
                     setChats();
                 } else {
-                    logDebug("New unarchived element: remove from Archive list");
+                    Timber.d("New unarchived element: remove from Archive list");
                     if (adapterList.getItemCount() != 0) {
                         int indexToRemove = getPositionFromChatId(chats, item.getChatId());
                         if (indexToRemove != INVALID_POSITION) {
-                            logDebug("Index to replace: " + indexToRemove);
+                            Timber.d("Index to replace: %s", indexToRemove);
                             chats.remove(indexToRemove);
 
                             adapterList.removeChat(chats, indexToRemove);
                             adapterList.setPositionClicked(-1);
 
                             if (adapterList.getItemCount() == 0) {
-                                logDebug("adapterList.getItemCount() == 0");
+                                Timber.d("adapterList.getItemCount() == 0");
                                 showEmptyChatScreen();
                                 ((ArchivedChatsActivity) context).invalidateOptionsMenu();
                             } else {
@@ -1127,27 +1113,27 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CALL) || item.hasChanged(MegaChatListItem.CHANGE_TYPE_CHAT_MODE)) {
-            logDebug("Change: MegaChatListItem.CHANGE_TYPE_CALL or CHANGE_TYPE_CHAT_MODE");
+            Timber.d("Change: MegaChatListItem.CHANGE_TYPE_CALL or CHANGE_TYPE_CHAT_MODE");
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
                 int indexToReplace = getPositionFromChatId(chats, item.getChatId());
                 if (indexToReplace != INVALID_POSITION) {
-                    logDebug("Index to replace: " + indexToReplace);
+                    Timber.d("Index to replace: %s", indexToReplace);
                     chats.set(indexToReplace, item);
                     adapterList.notifyItemChanged(indexToReplace);
                 }
             }
         } else {
-            logDebug("Other change: " + item.getChanges());
+            Timber.d("Other change: %s", item.getChanges());
 
             if (item != null) {
-                logDebug("New chat");
+                Timber.d("New chat");
                 setChats();
                 MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
                 updateCacheForNonContacts(chatToCheck);
             } else {
-                logError("The chat is NULL");
+                Timber.e("The chat is NULL");
             }
         }
     }
@@ -1159,12 +1145,12 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     public void setStatus() {
         chatStatus = megaChatApi.getOnlineStatus();
-        logDebug("Chat status --> getOnlineStatus with megaChatApi: " + chatStatus);
+        Timber.d("Chat status --> getOnlineStatus with megaChatApi: %s", chatStatus);
         onlineStatusUpdate(chatStatus);
     }
 
     public void onlineStatusUpdate(int status) {
-        logDebug("Status: " + status);
+        Timber.d("Status: %s", status);
 
         chatStatus = status;
         int initStatus = megaChatApi.getInitState();
@@ -1226,23 +1212,23 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                     }
                 }
             } else {
-                logWarning("aB is NULL");
+                Timber.w("aB is NULL");
             }
         } else {
-            logWarning("RecentChats not added");
+            Timber.w("RecentChats not added");
         }
     }
 
     public void contactStatusUpdate(long userHandle, int status) {
-        logDebug("User Handle: " + userHandle + ", Status: " + status);
+        Timber.d("User Handle: %d, Status: %d", userHandle, status);
 
         long chatHandleToUpdate = -1;
         MegaChatRoom chatToUpdate = megaChatApi.getChatRoomByUser(userHandle);
         if (chatToUpdate != null) {
             chatHandleToUpdate = chatToUpdate.getChatId();
-            logDebug("Update chat: " + chatHandleToUpdate);
+            Timber.d("Update chat: %s", chatHandleToUpdate);
             if (chatHandleToUpdate != -1) {
-                logDebug("The user has a one to one chat: " + chatHandleToUpdate);
+                Timber.d("The user has a one to one chat: %s", chatHandleToUpdate);
 
                 int indexToReplace = -1;
                 if (chats != null) {
@@ -1259,30 +1245,30 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         }
                     }
                     if (indexToReplace != -1) {
-                        logDebug("Index to replace: " + indexToReplace);
+                        Timber.d("Index to replace: %s", indexToReplace);
                         onStatusChange(indexToReplace, userHandle, status);
                     }
                 } else {
-                    logWarning("No chat list loaded");
+                    Timber.w("No chat list loaded");
                 }
             }
         }
     }
 
     public void onStatusChange(int position, long userHandle, int status) {
-        logDebug("Position: " + position + ", User Handle: " + userHandle + " with new presence: " + status);
+        Timber.d("Position: %d, User Handle: %d with new presence: %d", position, userHandle, status);
 
         adapterList.updateContactStatus(position, userHandle, status);
     }
 
     public void onTitleChange(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         adapterList.setTitle(position, null);
         interactionUpdate(position);
     }
 
     public void onUnreadCountChange(int position, boolean updateOrder) {
-        logDebug("Position: " + position + ", Update order: " + updateOrder);
+        Timber.d("Position: %d, Update order: %s", position, updateOrder);
         adapterList.setPendingMessages(position, null);
 
         if (updateOrder) {
@@ -1291,7 +1277,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void onLastTsChange(int position, boolean updateOrder) {
-        logDebug("Position: " + position + ", Update order: " + updateOrder);
+        Timber.d("Position: %d, Update order: %s", position, updateOrder);
 
         adapterList.setTs(position, null);
 
@@ -1301,11 +1287,11 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void onLastMessageChange(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         adapterList.setLastMessage(position, null);
     }
 
-    public void notifyPushChanged(){
+    public void notifyPushChanged() {
         if (adapterList == null || adapterList.getItemCount() == 0) {
             setChats();
         } else if (chats != null && !chats.isEmpty()) {
@@ -1319,7 +1305,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void refreshNode(MegaChatListItem item) {
-        logDebug("Chat ID: " + item.getChatId());
+        Timber.d("Chat ID: %s", item.getChatId());
 
         //elements of adapter
         long chatHandleToUpdate = item.getChatId();
@@ -1338,7 +1324,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 }
             }
             if (indexToUpdate != -1) {
-                logDebug("Index to replace: " + indexToUpdate);
+                Timber.d("Index to replace: %s", indexToUpdate);
                 if (adapterList != null) {
                     adapterList.notifyItemChanged(indexToUpdate);
                 }
@@ -1347,12 +1333,12 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public void interactionUpdate(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         MegaChatListItem chat = chats.remove(position);
         chats.add(0, chat);
         adapterList.notifyItemMoved(position, 0);
         if (lastFirstVisiblePosition == position) {
-            logDebug("Interaction - change lastFirstVisiblePosition");
+            Timber.d("Interaction - change lastFirstVisiblePosition");
             lastFirstVisiblePosition = 0;
         }
 
@@ -1368,15 +1354,15 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 String fullName = new ChatController(context).getParticipantFullName(chatToCheck.getPeerHandle(i));
                 if (fullName != null) {
                     if (fullName.trim().length() <= 0) {
-                        logDebug("Ask for name!");
+                        Timber.d("Ask for name!");
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
                         megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                         megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                     } else {
-                        logDebug("Exists name!");
+                        Timber.d("Exists name!");
                     }
                 } else {
-                    logDebug("Ask for name!");
+                    Timber.d("Ask for name!");
                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
                     megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                     megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
@@ -1387,7 +1373,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (listView.getLayoutManager() != null) {
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
@@ -1398,7 +1384,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onPause() {
-        logDebug("onPause");
+        Timber.d("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
         super.onPause();
@@ -1409,13 +1395,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         super.onDestroy();
         filterDisposable.clear();
 
-        if(askForDisplayOverDialog != null) {
+        if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
         }
-        if(explanationDialog != null) {
+        if (explanationDialog != null) {
             explanationDialog.cancel();
         }
-        if(adapter != null) {
+        if (adapter != null) {
             adapter.dismissDialog();
         }
         if (context instanceof ManagerActivity) {
@@ -1428,14 +1414,14 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onResume() {
-        logDebug("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
+        Timber.d("onResume: lastFirstVisiblePosition %s", lastFirstVisiblePosition);
         if (lastFirstVisiblePosition > 0) {
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
         } else {
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition = 0;
-        if(aB == null) {
+        if (aB == null) {
             aB = ((AppCompatActivity) context).getSupportActionBar();
 
         }
@@ -1445,12 +1431,12 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         if (context instanceof ManagerActivity) {
             if (((ManagerActivity) context).isSearchOpen()) {
-                filterChats(((ManagerActivity) context).getSearchQuery(), false);
+                filterChats(searchViewModel.getState().getValue().getSearchQuery(), false);
             }
             ((ManagerActivity) context).invalidateOptionsMenu();
         }
         // if in ArchivedChatsActivity or user close the invitation banner, no need to load contacts.
-        if(appBarLayout.getVisibility() != View.GONE) {
+        if (appBarLayout.getVisibility() != View.GONE) {
             refreshMegaContactsList();
         }
         setStatus();
@@ -1466,8 +1452,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         }
     }
 
-    public int getItemCount(){
-        if(adapterList != null){
+    public int getItemCount() {
+        if (adapterList != null) {
             return adapterList.getItemCount();
         }
         return 0;
@@ -1475,14 +1461,14 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        logDebug("onActivityCreated");
+        Timber.d("onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
             isExplanationDialogShowing = savedInstanceState.getBoolean(KEY_DIALOG_IS_SHOWING);
-            if(isExplanationDialogShowing) {
+            if (isExplanationDialogShowing) {
                 showExplanationDialog();
             }
 
@@ -1520,8 +1506,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                             listView.setVisibility(View.GONE);
                             emptyLayout.setVisibility(View.VISIBLE);
                             inviteButton.setVisibility(View.GONE);
-
-                            CharSequence result = getSpannedMessageForEmptyChat(context.getString(R.string.recent_chat_empty).toUpperCase());
+                            Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
                             emptyTextViewInvite.setText(result);
                             emptyTextViewInvite.setVisibility(View.VISIBLE);
                         } else {
@@ -1529,7 +1514,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                             emptyLayout.setVisibility(View.GONE);
                         }
                     } else {
-                        logError(throwable.getMessage());
+                        Timber.e(throwable);
                     }
                 });
 
@@ -1546,11 +1531,11 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         adapterList.setChats(chats);
 
         if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
-            logDebug("adapterList.getItemCount() == 0");
+            Timber.d("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
         } else {
-            logDebug("adapterList.getItemCount() NOT = 0");
+            Timber.d("adapterList.getItemCount() NOT = 0");
             listView.setVisibility(View.VISIBLE);
             emptyLayout.setVisibility(View.GONE);
 
@@ -1558,7 +1543,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     }
 
     public boolean checkPermissionsCall() {
-        logDebug("checkPermissionsCall() ");
+        Timber.d("checkPermissionsCall() ");
 
         boolean hasCameraPermission = hasPermissions(((ManagerActivity) context), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
@@ -1577,13 +1562,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
+        Timber.d("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_CAMERA: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
-                        logDebug("REQUEST_CAMERA -> returnTheCall");
+                        Timber.d("REQUEST_CAMERA -> returnTheCall");
                         returnActiveCall(context, passcodeManagement);
                     }
                 }
@@ -1592,7 +1577,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             case REQUEST_RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
-                        logDebug("RECORD_AUDIO -> returnTheCall");
+                        Timber.d("RECORD_AUDIO -> returnTheCall");
                         returnActiveCall(context, passcodeManagement);
                     }
                 }
@@ -1600,10 +1585,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
             case REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    logDebug("REQUEST_READ_CONTACTS");
+                    Timber.d("REQUEST_READ_CONTACTS");
                     grantedContactPermission = true;
                 } else {
-                    logDebug("read contacts permission denied!");
+                    Timber.d("read contacts permission denied!");
                     showPermissionDeniedView();
                     grantedContactPermission = false;
                     boolean should = PermissionUtils.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_CONTACTS);
@@ -1632,7 +1617,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
-            logDebug("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
+            Timber.d("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
         }
         refreshMegaContactsList();
     }
@@ -1721,7 +1706,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
             checkScroll();
 
-            if(showInviteBanner()) {
+            if (showInviteBanner()) {
                 bannerContainer.setVisibility(View.VISIBLE);
             }
         }
@@ -1763,7 +1748,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         if (chat != null) {
                             if (chat.isGroup() && (chat.getOwnPrivilege() == MegaChatRoom.PRIV_RO || chat.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD
                                     || chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR)) {
-                                logDebug("Chat Group permissions: " + chat.getOwnPrivilege());
+                                Timber.d("Chat Group permissions: %s", chat.getOwnPrivilege());
                                 showLeaveChat = true;
                             } else {
                                 showLeaveChat = false;
@@ -1864,8 +1849,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 @Override
                 public void onClick(View v) {
                     if (context != null && context instanceof ManagerActivity
-                        && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
-                        && isOnline(context)) {
+                            && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                            && isOnline(context)) {
                         ((ManagerActivity) context).showPresenceStatusDialog();
                     }
                 }
@@ -1873,19 +1858,19 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         }
     }
 
-    private void setCustomisedActionBarTitle(SpannableString title){
-        if(actionBarTitle != null){
+    private void setCustomisedActionBarTitle(SpannableString title) {
+        if (actionBarTitle != null) {
             actionBarTitle.setText(title);
         }
     }
 
     private void setCustomisedActionBarSubtitle(SpannableString subtitle) {
-        if(actionBarSubtitle != null) {
+        if (actionBarSubtitle != null) {
             actionBarSubtitle.setText(subtitle);
         }
         if (actionBarSubtitleArrow != null) {
             boolean showArrow = megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
-                && isOnline(context);
+                    && isOnline(context);
             actionBarSubtitleArrow.setVisibility(showArrow ? View.VISIBLE : View.GONE);
         }
     }

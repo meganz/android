@@ -1,5 +1,11 @@
 package mega.privacy.android.app.main.controllers;
 
+import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
+import static mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Util.isOnline;
+
 import android.content.Context;
 import android.content.Intent;
 
@@ -33,12 +39,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
+import timber.log.Timber;
 
 public class ContactController {
 
@@ -48,23 +49,23 @@ public class ContactController {
     DatabaseHandler dbH;
     MegaPreferences prefs = null;
 
-    public ContactController(Context context){
-        logDebug("ContactController created");
+    public ContactController(Context context) {
+        Timber.d("ContactController created");
         this.context = context;
-        if (megaApi == null){
+        if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
-        if (dbH == null){
+        if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
     public static Intent getPickFolderToShareIntent(Context context, List<MegaUser> users) {
-        logDebug("pickFolderToShare");
+        Timber.d("pickFolderToShare");
 
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER_TO_SHARE);
@@ -77,7 +78,7 @@ public class ContactController {
     }
 
     public static Intent getPickFileToSendIntent(Context context, List<MegaUser> users) {
-        logDebug("pickFileToSend");
+        Timber.d("pickFileToSend");
 
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_MULTISELECT_FILE);
@@ -90,12 +91,11 @@ public class ContactController {
     }
 
     /**
-     * @deprecated
-     * Use {@link mega.privacy.android.app.contacts.usecase.RemoveContactUseCase} instead
+     * @deprecated Use {@link mega.privacy.android.app.contacts.usecase.RemoveContactUseCase} instead
      */
     @Deprecated
     public void removeContact(MegaUser c) {
-        logDebug("removeContact");
+        Timber.d("removeContact");
 
         checkRemoveContact(c);
 
@@ -145,218 +145,200 @@ public class ContactController {
         }
     }
 
-    public void reinviteMultipleContacts(final List<MegaContactRequest> requests){
+    public void reinviteMultipleContacts(final List<MegaContactRequest> requests) {
         MultipleRequestListener reinviteMultipleListener = null;
-        if(requests.size()>1){
-            logDebug("Reinvite multiple request");
+        if (requests.size() > 1) {
+            Timber.d("Reinvite multiple request");
             reinviteMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<requests.size();j++){
+            for (int j = 0; j < requests.size(); j++) {
 
-                final MegaContactRequest request= requests.get(j);
+                final MegaContactRequest request = requests.get(j);
 
                 megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, reinviteMultipleListener);
             }
-        }
-        else{
-            logDebug("Reinvite one request");
+        } else {
+            Timber.d("Reinvite one request");
 
-            final MegaContactRequest request= requests.get(0);
+            final MegaContactRequest request = requests.get(0);
 
             reinviteContact(request);
         }
     }
 
-    public void deleteMultipleSentRequestContacts(final List<MegaContactRequest> requests){
+    public void deleteMultipleSentRequestContacts(final List<MegaContactRequest> requests) {
         MultipleRequestListener deleteMultipleListener = null;
-        if(requests.size()>1){
-            logDebug("Delete multiple request");
+        if (requests.size() > 1) {
+            Timber.d("Delete multiple request");
             deleteMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<requests.size();j++){
+            for (int j = 0; j < requests.size(); j++) {
 
-                final MegaContactRequest request= requests.get(j);
+                final MegaContactRequest request = requests.get(j);
 
                 megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, deleteMultipleListener);
             }
-        }
-        else{
-            logDebug("Delete one request");
+        } else {
+            Timber.d("Delete one request");
 
-            final MegaContactRequest request= requests.get(0);
+            final MegaContactRequest request = requests.get(0);
 
             removeInvitationContact(request);
         }
     }
 
-    public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests){
+    public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests) {
         MultipleRequestListener acceptMultipleListener = null;
-        if(requests.size()>1){
-            logDebug("Accept multiple request");
+        if (requests.size() > 1) {
+            Timber.d("Accept multiple request");
             acceptMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<requests.size();j++){
+            for (int j = 0; j < requests.size(); j++) {
 
-                final MegaContactRequest request= requests.get(j);
+                final MegaContactRequest request = requests.get(j);
                 megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_ACCEPT, acceptMultipleListener);
             }
-        }
-        else{
-            logDebug("Accept one request");
+        } else {
+            Timber.d("Accept one request");
 
-            final MegaContactRequest request= requests.get(0);
+            final MegaContactRequest request = requests.get(0);
             acceptInvitationContact(request);
         }
     }
 
-    public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests){
+    public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests) {
         MultipleRequestListener declineMultipleListener = null;
-        if(requests.size()>1){
-            logDebug("Decline multiple request");
+        if (requests.size() > 1) {
+            Timber.d("Decline multiple request");
             declineMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<requests.size();j++){
+            for (int j = 0; j < requests.size(); j++) {
 
-                final MegaContactRequest request= requests.get(j);
+                final MegaContactRequest request = requests.get(j);
                 megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_DENY, declineMultipleListener);
             }
-        }
-        else{
-            logDebug("Decline one request");
+        } else {
+            Timber.d("Decline one request");
 
-            final MegaContactRequest request= requests.get(0);
+            final MegaContactRequest request = requests.get(0);
             declineInvitationContact(request);
         }
     }
 
-    public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests){
+    public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests) {
         MultipleRequestListener ignoreMultipleListener = null;
-        if(requests.size()>1){
-            logDebug("Ignore multiple request");
+        if (requests.size() > 1) {
+            Timber.d("Ignore multiple request");
             ignoreMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<requests.size();j++){
+            for (int j = 0; j < requests.size(); j++) {
 
-                final MegaContactRequest request= requests.get(j);
+                final MegaContactRequest request = requests.get(j);
                 megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_IGNORE, ignoreMultipleListener);
             }
-        }
-        else{
-            logDebug("Ignore one request");
+        } else {
+            Timber.d("Ignore one request");
 
-            final MegaContactRequest request= requests.get(0);
+            final MegaContactRequest request = requests.get(0);
             ignoreInvitationContact(request);
         }
     }
 
-    public void inviteContact(String contactEmail){
-        logDebug("inviteContact");
+    public void inviteContact(String contactEmail) {
+        Timber.d("inviteContact");
 
-        if(context instanceof ManagerActivity){
-            if (!isOnline(context)){
+        if (context instanceof ManagerActivity) {
+            if (!isOnline(context)) {
                 ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            if(((ManagerActivity) context).isFinishing()){
+            if (((ManagerActivity) context).isFinishing()) {
                 return;
             }
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivity) context);
-        }
-        else if(context instanceof GroupChatInfoActivity){
+        } else if (context instanceof GroupChatInfoActivity) {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (GroupChatInfoActivity) context);
-        }
-        else if(context instanceof ChatActivity){
+        } else if (context instanceof ChatActivity) {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ChatActivity) context);
-        }
-        else if(context instanceof ContactAttachmentActivity){
+        } else if (context instanceof ContactAttachmentActivity) {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ContactAttachmentActivity) context);
-        }
-        else {
+        } else {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, null);
         }
     }
 
-    public void inviteMultipleContacts(ArrayList<String> contactEmails){
-        logDebug("inviteMultipleContacts");
+    public void inviteMultipleContacts(ArrayList<String> contactEmails) {
+        Timber.d("inviteMultipleContacts");
 
         MultipleRequestListener inviteMultipleListener = null;
 
-        if(context instanceof ManagerActivity){
-            if (!isOnline(context)){
+        if (context instanceof ManagerActivity) {
+            if (!isOnline(context)) {
                 ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            if(((ManagerActivity) context).isFinishing()){
+            if (((ManagerActivity) context).isFinishing()) {
                 return;
             }
 
-            if (contactEmails.size() == 1){
+            if (contactEmails.size() == 1) {
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivity) context);
-            }
-            else if (contactEmails.size() > 1){
+            } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for(int i=0; i<contactEmails.size();i++) {
+                for (int i = 0; i < contactEmails.size(); i++) {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
-        }
-        else if(context instanceof ChatActivity){
-            if (!isOnline(context)){
+        } else if (context instanceof ChatActivity) {
+            if (!isOnline(context)) {
                 ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            if (contactEmails.size() == 1){
+            if (contactEmails.size() == 1) {
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ChatActivity) context);
-            }
-            else if (contactEmails.size() > 1){
+            } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for(int i=0; i<contactEmails.size();i++) {
+                for (int i = 0; i < contactEmails.size(); i++) {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
-        }
-        else if(context instanceof ContactAttachmentActivity){
-            if (!isOnline(context)){
+        } else if (context instanceof ContactAttachmentActivity) {
+            if (!isOnline(context)) {
                 ((ContactAttachmentActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
 
-            if (contactEmails.size() == 1){
+            if (contactEmails.size() == 1) {
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ContactAttachmentActivity) context);
-            }
-            else if (contactEmails.size() > 1){
+            } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for(int i=0; i<contactEmails.size();i++) {
+                for (int i = 0; i < contactEmails.size(); i++) {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
-        }
-        else if(context instanceof AchievementsActivity){
-            if (!isOnline(context)){
+        } else if (context instanceof AchievementsActivity) {
+            if (!isOnline(context)) {
                 ((AchievementsActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
 
-            if (contactEmails.size() == 1){
+            if (contactEmails.size() == 1) {
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, AchievementsActivity.sFetcher);
-            }
-            else if (contactEmails.size() > 1){
+            } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for(int i=0; i<contactEmails.size();i++) {
+                for (int i = 0; i < contactEmails.size(); i++) {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
-        }
-        else if (context instanceof AddContactActivity) {
-            if (!isOnline(context)){
+        } else if (context instanceof AddContactActivity) {
+            if (!isOnline(context)) {
                 ((AddContactActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
 
-            if (contactEmails.size() == 1){
+            if (contactEmails.size() == 1) {
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (AddContactActivity) context);
-            }
-            else if (contactEmails.size() > 1){
+            } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for(int i=0; i<contactEmails.size();i++) {
+                for (int i = 0; i < contactEmails.size(); i++) {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
@@ -399,60 +381,58 @@ public class ContactController {
         megaApi.getUserAlias(user.getHandle(), listener);
     }
 
-    public void acceptInvitationContact(MegaContactRequest c){
-        logDebug("acceptInvitationContact");
+    public void acceptInvitationContact(MegaContactRequest c) {
+        Timber.d("acceptInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_ACCEPT, (ManagerActivity) context);
     }
 
-    public void declineInvitationContact(MegaContactRequest c){
-        logDebug("declineInvitationContact");
+    public void declineInvitationContact(MegaContactRequest c) {
+        Timber.d("declineInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_DENY, (ManagerActivity) context);
     }
 
-    public void ignoreInvitationContact(MegaContactRequest c){
-        logDebug("ignoreInvitationContact");
+    public void ignoreInvitationContact(MegaContactRequest c) {
+        Timber.d("ignoreInvitationContact");
         megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_IGNORE, (ManagerActivity) context);
     }
 
-    public void reinviteContact(MegaContactRequest c){
-        logDebug("inviteContact");
+    public void reinviteContact(MegaContactRequest c) {
+        Timber.d("inviteContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, (ManagerActivity) context);
     }
 
-    public void removeInvitationContact(MegaContactRequest c){
-        logDebug("removeInvitationContact");
+    public void removeInvitationContact(MegaContactRequest c) {
+        Timber.d("removeInvitationContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivity) context);
     }
 
-    public String getFullName(String name, String lastName, String mail){
+    public String getFullName(String name, String lastName, String mail) {
 
-        if(name==null){
-            name="";
+        if (name == null) {
+            name = "";
         }
-        if(lastName==null){
-            lastName="";
+        if (lastName == null) {
+            lastName = "";
         }
         String fullName = "";
 
-        if (name.trim().length() <= 0){
+        if (name.trim().length() <= 0) {
             fullName = lastName;
-        }
-        else{
+        } else {
             fullName = name + " " + lastName;
         }
 
-        if (fullName.trim().length() <= 0){
-            logWarning("Full name empty");
-            logDebug("Put email as fullname");
+        if (fullName.trim().length() <= 0) {
+            Timber.w("Full name empty");
+            Timber.d("Put email as fullname");
 
-            if(mail==null){
-                mail="";
+            if (mail == null) {
+                mail = "";
             }
 
-            if (mail.trim().length() <= 0){
+            if (mail.trim().length() <= 0) {
                 return "";
-            }
-            else{
+            } else {
                 return mail;
             }
         }

@@ -82,15 +82,15 @@ class SettingsActivity : AppCompatActivity(),
             }
             // Replace the existing Fragment with the new Fragment
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.settings, fragment)
+                    .replace(R.id.settings, fragment, pref.key)
                     .addToBackStack(null)
                     .commit()
 
             if (caller is FragmentResultListener) {
                 supportFragmentManager.setFragmentResultListener(pref.key, this, caller)
 //            In the calling fragment, implement FragmentResultListener to handle results for a specific preference key
-//            In the Called Fragment, setFragmentResult using the preference key to pass back any results
-            }
+//            In the Called Fragment, setFragmentResult using the tag to pass back any results, use the fragment name for the bundle key
+        }
 
             title = pref.title
             true

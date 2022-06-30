@@ -1,11 +1,33 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import static mega.privacy.android.app.utils.AvatarUtil.setImageAvatar;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.EMAIL;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
@@ -23,17 +45,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -74,7 +86,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             message = new AndroidMegaChatMessage(messageMega);
         }
 
-        logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
+        Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId);
         chatC = new ChatController(requireActivity());
 
         return contentView;
@@ -83,7 +95,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (message == null) {
-            logError("Message is null");
+            Timber.e("Message is null");
             return;
         }
 
@@ -123,7 +135,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         long userCount = message.getMessage().getUsersCount();
         if (userCount == 1) {
-            logDebug("One contact attached");
+            Timber.d("One contact attached");
             optionView.setVisibility(View.GONE);
             optionInfo.setVisibility(View.VISIBLE);
 
@@ -196,7 +208,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 String email = StringResourcesUtils.getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 titleNameContactChatPanel.setText(email);
 
-                setImageAvatar(INVALID_HANDLE,null, userCount + "", contactImageView);
+                setImageAvatar(INVALID_HANDLE, null, userCount + "", contactImageView);
             } else {
                 optionView.setVisibility(View.GONE);
 
@@ -204,7 +216,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 position = getPositionByMail(email);
                 if (position == -1) {
-                    logWarning("Error - position -1");
+                    Timber.w("Error - position -1");
                     return;
                 }
 
@@ -257,7 +269,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     @Override
     public void onClick(View v) {
         if (message == null) {
-            logWarning("Error. The message is NULL");
+            Timber.w("Error. The message is NULL");
             return;
         }
 
@@ -281,7 +293,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     contactEmail = message.getMessage().getUserEmail(position);
                     contactHandle = message.getMessage().getUserHandle(position);
                 } else {
-                    logWarning("Error - position -1");
+                    Timber.w("Error - position -1");
                 }
 
                 if (contactHandle != MEGACHAT_INVALID_HANDLE) {
@@ -292,7 +304,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 break;
 
             case R.id.option_view_layout:
-                logDebug("View option");
+                Timber.d("View option");
                 ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
                 break;
 
@@ -309,7 +321,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     if (numUsers == 1) {
                         cC.inviteContact(message.getMessage().getUserEmail(0));
                     } else {
-                        logDebug("Num users to invite: " + numUsers);
+                        Timber.d("Num users to invite: %s", numUsers);
                         contactEmails = new ArrayList<>();
 
                         for (int j = 0; j < numUsers; j++) {
@@ -329,7 +341,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                         ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                         dismissAllowingStateLoss();
                     } else {
-                        logDebug("Num users to invite: " + numUsers);
+                        Timber.d("Num users to invite: %s", numUsers);
                         ArrayList<Long> contactHandles = new ArrayList<>();
 
                         for (int j = 0; j < numUsers; j++) {
@@ -339,8 +351,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                         ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
                     }
                 } else {
-                    logDebug("Instance of ContactAttachmentActivity");
-                    logDebug("position: " + position);
+                    Timber.d("Instance of ContactAttachmentActivity");
+                    Timber.d("position: %s", position);
                     long userHandle = message.getMessage().getUserHandle(position);
                     ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
                 }
