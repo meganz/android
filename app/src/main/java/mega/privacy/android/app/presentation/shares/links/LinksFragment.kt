@@ -78,7 +78,8 @@ class LinksFragment : MegaNodeBaseFragment() {
             Timber.d("ParentHandle to find children: %s",
                 managerViewModel.state.value.linksParentHandle)
             nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(
-                sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel))
+                sortOrderManagement.getOrderCloud(),
+                managerViewModel.state.value.isFirstNavigationLevel))
             adapter.setNodes(nodes)
         }
         adapter.isMultipleSelect = false
@@ -97,8 +98,14 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
 
     private fun findNodes() {
-        setNodes(megaApi.getPublicLinks(getLinksOrderCloud(
-            sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel)))
+        setNodes(
+            megaApi.getPublicLinks(
+                getLinksOrderCloud(
+                    sortOrderManagement.getOrderCloud(),
+                    managerViewModel.state.value.isFirstNavigationLevel
+                )
+            )
+        )
     }
 
     override fun setNodes(nodes: ArrayList<MegaNode>) {
@@ -138,7 +145,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                     managerViewModel.setLinksParentHandle(parentNodeLinks.handle)
                     setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
                         sortOrderManagement.getOrderCloud(),
-                        managerActivity.isFirstNavigationLevel)))
+                        managerViewModel.state.value.isFirstNavigationLevel)))
                 }
             }
         } else {
@@ -180,7 +187,8 @@ class LinksFragment : MegaNodeBaseFragment() {
         managerActivity.invalidateOptionsMenu()
         managerActivity.setToolbarTitle()
         setNodes(megaApi.getChildren(node, getLinksOrderCloud(
-            sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel)))
+            sortOrderManagement.getOrderCloud(),
+            managerViewModel.state.value.isFirstNavigationLevel)))
         recyclerView.scrollToPosition(0)
         checkScroll()
         managerActivity.showFabButton()
@@ -193,9 +201,11 @@ class LinksFragment : MegaNodeBaseFragment() {
         ) {
             findNodes()
         } else {
-            val parentNodeLinks = megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
+            val parentNodeLinks =
+                megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
             setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
-                sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel)))
+                sortOrderManagement.getOrderCloud(),
+                managerViewModel.state.value.isFirstNavigationLevel)))
         }
     }
 

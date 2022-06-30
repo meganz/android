@@ -651,11 +651,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
                 return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
-                        managerActivity.isFirstNavigationLevel());
+                        managerViewModel.getState().getValue().isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
-                if (managerActivity.isFirstNavigationLevel()) {
+                if (managerViewModel.getState().getValue().isFirstNavigationLevel()) {
                     return sortOrderManagement.getOrderOthers();
                 }
 
