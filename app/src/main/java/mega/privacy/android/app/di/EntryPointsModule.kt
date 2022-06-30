@@ -21,17 +21,35 @@ import java.util.concurrent.ThreadPoolExecutor
  */
 class EntryPointsModule {
 
+    /**
+     * Provides @CacheFolderGateway
+     * @param cacheFolderFacade : @CacheFolderFacade
+     * @return CacheFolderGateway : @CacheFolderGateway
+     */
     @Provides
     fun provideCacheFolderGateway(cacheFolderFacade: CacheFolderFacade): CacheFolderGateway {
         return cacheFolderFacade
     }
 
+    /**
+     * Entry point for @CacheFolderGateway
+     */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface CacheFolderManagerEntryPoint {
+
+        /**
+         * @CacheFolderGateway
+         */
         val cacheFolderGateway: CacheFolderGateway
     }
 
+    /**
+     * Provides device vibrator
+     *
+     * @param context: Context
+     * @return Vibrator: Vibrator
+     */
     @Suppress("DEPRECATION")
     @Provides
     fun provideDeviceVibrator(@ApplicationContext context: Context): Vibrator {
@@ -44,7 +62,7 @@ class EntryPointsModule {
     }
 
     /**
-     * Entry point gateway for @Vibrator object
+     * Entry point for @Vibrator
      */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
