@@ -279,7 +279,7 @@ class GetFolderContentUseCase @Inject constructor(
 
             when {
                 emitter.isDisposed -> return@create
-                uploadResults.isEmpty() -> emitter.onError(EmptyFolderException())
+                uploadResults.isEmpty() -> emitter.onSuccess(0)
                 else -> {
                     for (result in uploadResults) {
                         uploadUseCase.upload(context, result).blockingSubscribeBy(
