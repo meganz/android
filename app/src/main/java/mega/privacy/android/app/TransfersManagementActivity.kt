@@ -217,7 +217,11 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     StringResourcesUtils.getString(R.string.transfers_cancelled)
                 )
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+                if (transfersManagement.shouldShowScanningTransfersDialog()) {
+                    showScanningTransfersDialog()
+                }
+            }
             .create()
             .apply {
                 setCancelable(false)
