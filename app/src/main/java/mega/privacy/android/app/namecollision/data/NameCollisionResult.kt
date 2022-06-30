@@ -1,7 +1,8 @@
 package mega.privacy.android.app.namecollision.data
 
 import android.net.Uri
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Data class containing all the required to present a name collision for an upload, copy or movement.
@@ -16,6 +17,7 @@ import java.io.Serializable
  * @property thumbnail              The thumbnail of the item to upload, copy or move if exists.
  * @property choice                 [NameCollisionChoice] with the collision resolution.
  */
+@Parcelize
 data class NameCollisionResult(
     val nameCollision: NameCollision,
     var collisionName: String? = null,
@@ -25,5 +27,5 @@ data class NameCollisionResult(
     var collisionThumbnail: Uri? = null,
     var renameName: String? = null,
     var thumbnail: Uri? = null,
-    var choice: NameCollisionChoice? = null
-) : Serializable
+    var choice: NameCollisionChoice? = null,
+) : Parcelable
