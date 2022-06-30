@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,7 +84,17 @@ class MeetingActivity : BaseActivity() {
     private var isGuest = false
     private var isLockingEnabled = false
 
-    var navGraph: NavGraph? = null
+    private var navController: NavController? = null
+    private var navGraph: NavGraph? = null
+
+    private val destinationChangedListener: NavController.OnDestinationChangedListener by lazy {
+        NavController.OnDestinationChangedListener { _, destination, _ ->
+            binding.bannerMute.elevation = when (destination.id) {
+                R.id.makeModeratorFragment -> 0f
+                else -> 1f
+            }
+        }
+    }
 
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -134,6 +145,11 @@ class MeetingActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        navController?.removeOnDestinationChangedListener(destinationChangedListener)
+        super.onDestroy()
     }
 
     private fun initIntent() {
@@ -226,7 +242,7 @@ class MeetingActivity : BaseActivity() {
     private fun initNavigation() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
         navGraph?.clear()
         navGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
@@ -283,8 +299,10 @@ class MeetingActivity : BaseActivity() {
             }
             setStartDestination(startDestination)
 
-            navController.setGraph(this, bundle)
+            navController?.setGraph(this, bundle)
         }
+
+        navController?.addOnDestinationChangedListener(destinationChangedListener)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
