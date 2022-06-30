@@ -62,8 +62,7 @@
 
     <!-- For apps targeting Android 12 (API level 31) and higher,
     apps must have the Manifest.permission.SCHEDULE_EXACT_ALARM permission
-    in order to use any APIs for setting exact alarms
-    -->
+    in order to use any APIs for setting exact alarms -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
@@ -115,7 +114,7 @@
             android:exported="false"
             android:label="@string/action_settings"
             android:launchMode="singleTop"
-            android:parentActivityName=".main.ManagerActivity" />
+            android:parentActivityName=".main.ManagerActivity"/>
 
         <meta-data
             android:name="fontProviderRequests"
@@ -154,7 +153,8 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".main.megaachievements.AchievementsActivity" />
+        <activity
+            android:name=".main.megaachievements.AchievementsActivity" />
         <activity
             android:name=".OpenLinkActivity"
             android:exported="true"
@@ -166,7 +166,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
-                <!-- Please keep this format, otherwise it will cause web intent verification error -->
+                <!-- Please keep this format, otherwise it will cause web intent verification error-->
                 <data android:host="mega.co.nz" />
                 <data android:scheme="https" />
             </intent-filter>
@@ -186,7 +186,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
-                <!-- Please keep this format, otherwise it will cause web intent verification error -->
+                <!-- Please keep this format, otherwise it will cause web intent verification error-->
                 <data android:host="mega.nz" />
                 <data android:scheme="https" />
             </intent-filter>
@@ -215,6 +215,7 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+
         <activity
             android:name=".main.ContactFileListActivity"
             android:label="@string/contact_properties_activity"
@@ -244,10 +245,14 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-        <activity android:name=".main.megachat.ChatExplorerActivity" />
-        <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
-        <activity android:name=".main.CountryCodePickerActivity" />
-        <activity android:name=".providers.PasscodeFileProviderActivity" />
+        <activity
+            android:name=".main.megachat.ChatExplorerActivity" />
+        <activity
+            android:name=".main.megachat.NodeAttachmentHistoryActivity" />
+        <activity
+            android:name=".main.CountryCodePickerActivity" />
+        <activity
+            android:name=".providers.PasscodeFileProviderActivity" />
         <activity
             android:name=".providers.FileProviderActivity"
             android:exported="false"
@@ -330,14 +335,19 @@
             android:name=".main.megachat.ChatActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity android:name=".main.megachat.ArchivedChatsActivity" />
-        <activity android:name=".main.ContactInfoActivity" />
-        <activity android:name=".main.FileInfoActivity" />
+        <activity
+            android:name=".main.megachat.ArchivedChatsActivity" />
+        <activity
+            android:name=".main.ContactInfoActivity" />
+        <activity
+            android:name=".main.FileInfoActivity" />
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".main.VersionsFileActivity" />
-        <activity android:name=".main.megachat.GroupChatInfoActivity" />
+        <activity
+            android:name=".main.VersionsFileActivity" />
+        <activity
+            android:name=".main.megachat.GroupChatInfoActivity" />
         <activity
             android:name=".main.PdfViewerActivity"
             android:exported="true"
@@ -383,17 +393,22 @@
         </activity>
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
-            android:theme="@style/Theme.Mega.FullScreen.Viewer"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer" />
+
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".main.qrcode.QRCodeActivity" />
-        <activity android:name=".main.TwoFactorAuthenticationActivity" />
-        <activity android:name=".main.VerifyTwoFactorActivity" />
-        <activity android:name=".BusinessExpiredAlertActivity" />
+        <activity
+            android:name=".main.qrcode.QRCodeActivity" />
+        <activity
+            android:name=".main.TwoFactorAuthenticationActivity" />
+        <activity
+            android:name=".main.VerifyTwoFactorActivity" />
+        <activity
+            android:name=".BusinessExpiredAlertActivity" />
         <activity android:name=".smsVerification.SMSVerificationActivity" />
         <activity android:name=".smsVerification.SMSVerificationReceiveTxtActivity" />
         <activity
@@ -464,9 +479,6 @@
             android:name=".meeting.activity.LeftMeetingActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".main.FeatureFlagActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize"/>
 
         <service
             android:name=".main.megachat.ChatUploadService"
@@ -549,12 +561,15 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
-        </provider> <!-- remove default WorkManager initializer -->
+        </provider>
+
+<!--    remove default WorkManager initializer-->
         <provider
+            tools:replace="android:authorities"
             android:name="androidx.startup.InitializationProvider"
             android:authorities="mega.privacy.android.app.androidx-startup"
-            tools:node="remove"
-            tools:replace="android:authorities"/>
+            tools:node="remove">
+        </provider>
 
         <activity
             android:name=".main.megachat.MapsActivity"
@@ -592,14 +607,14 @@
             android:name=".upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
+
         <activity
             android:name="mega.privacy.android.app.upgradeAccount.PaymentActivity"
             android:label="@string/payment"
             android:launchMode="singleTop" />
 
-        <receiver
-            android:name=".psa.AlarmReceiver"
-            android:exported="false">
+        <receiver android:name=".psa.AlarmReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.checking.psa" />
             </intent-filter>
@@ -622,7 +637,8 @@
         <activity
             android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>

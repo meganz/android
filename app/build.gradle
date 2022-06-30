@@ -118,9 +118,6 @@ android {
         resValue("string", "karere_version", "\"${getKarereGitHash()}\"")
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
     }
 
     sourceSets {
@@ -258,11 +255,6 @@ android {
     }
     lint {
         checkReleaseBuilds false
-    }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
     }
 }
 
@@ -460,7 +452,6 @@ dependencies {
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
     debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
-    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
 
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
