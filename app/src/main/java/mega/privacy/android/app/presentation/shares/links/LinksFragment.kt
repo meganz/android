@@ -128,15 +128,18 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     public override fun onBackPressed(): Int {
-        if (adapter == null || managerViewModel.state.value.linksParentHandle == MegaApiJava.INVALID_HANDLE || managerActivity.deepBrowserTreeLinks <= 0) {
+        if (adapter == null
+            || managerViewModel.state.value.linksParentHandle == MegaApiJava.INVALID_HANDLE
+            || managerViewModel.state.value.linksTreeDepth <= 0
+        )
             return 0
-        }
-        managerActivity.decreaseDeepBrowserTreeLinks()
-        if (managerActivity.deepBrowserTreeLinks == 0) {
+
+        managerViewModel.decreaseLinksTreeDepth()
+        if (managerViewModel.state.value.linksTreeDepth == 0) {
             managerViewModel.setLinksParentHandle(MegaApiJava.INVALID_HANDLE)
             managerActivity.hideTabs(false, SharesTab.LINKS_TAB)
             findNodes()
-        } else if (managerActivity.deepBrowserTreeLinks > 0) {
+        } else if (managerViewModel.state.value.linksTreeDepth > 0) {
             var parentNodeLinks =
                 megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
             if (parentNodeLinks != null) {
@@ -149,7 +152,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                 }
             }
         } else {
-            managerActivity.deepBrowserTreeLinks = 0
+            managerViewModel.resetLinksTreeDepth()
         }
         var lastVisiblePosition = 0
         if (!lastPositionStack.empty()) {
@@ -182,7 +185,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     public override fun navigateToFolder(node: MegaNode) {
         lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition())
         managerActivity.hideTabs(true, SharesTab.LINKS_TAB)
-        managerActivity.increaseDeepBrowserTreeLinks()
+        managerViewModel.increaseLinksTreeDepth()
         managerViewModel.setLinksParentHandle(node.handle)
         managerActivity.invalidateOptionsMenu()
         managerActivity.setToolbarTitle()

@@ -158,7 +158,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     public override fun navigateToFolder(node: MegaNode) {
         managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
-        managerActivity.increaseDeepBrowserTreeOutgoing()
+        managerViewModel.increaseOutgoingTreeDepth()
         Timber.d("deepBrowserTree after clicking folder%s", managerActivity.deepBrowserTreeOutgoing)
         var lastFirstVisiblePosition: Int
         if (managerActivity.isList) {
@@ -203,7 +203,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         if (adapter == null) {
             return 0
         }
-        managerActivity.decreaseDeepBrowserTreeOutgoing()
+        managerViewModel.decreaseOutgoingTreeDepth()
         managerActivity.invalidateOptionsMenu()
         return if (managerActivity.deepBrowserTreeOutgoing == 0) {
             Timber.d("deepBrowserTree==0")
@@ -259,7 +259,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             2
         } else {
             Timber.d("Back to Cloud")
-            managerActivity.deepBrowserTreeOutgoing = 0
+            managerViewModel.resetOutgoingTreeDepth()
             0
         }
     }
@@ -320,7 +320,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                         MenuItem.SHOW_AS_ACTION_ALWAYS
                 }
                 control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
+                if (managerViewModel.state.value.outgoingTreeDepth > 0) {
                     if (areAllFileNodesAndNotTakenDown(selected)) {
                         control.sendToChat().setVisible(true).showAsAction =
                             MenuItem.SHOW_AS_ACTION_ALWAYS

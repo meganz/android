@@ -225,6 +225,78 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
     }
 
+    /**
+     * Decrease by 1 the incoming tree depth
+     */
+    fun decreaseIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the incoming tree depth
+     */
+    fun increaseIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth + 1) }
+    }
+
+    /**
+     * Reset incoming tree depth to initial value
+     */
+    fun resetIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = 0) }
+    }
+
+    /**
+     * Set incoming tree depth with given value
+     *
+     * @param depth the tree depth value to set
+     */
+    fun setIncomingTreeDepth(depth: Int) = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = depth) }
+    }
+
+    /**
+     * Decrease by 1 the outgoing tree depth
+     */
+    fun decreaseOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the outgoing tree depth
+     */
+    fun increaseOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth + 1) }
+    }
+
+    /**
+     * Reset outgoing tree depth to initial value
+     */
+    fun resetOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = 0) }
+    }
+
+    /**
+     * Decrease by 1 the links tree depth
+     */
+    fun decreaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the links tree depth
+     */
+    fun increaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth + 1) }
+    }
+
+    /**
+     * Reset links tree depth to initial value
+     */
+    fun resetLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = 0) }
+    }
+
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 
     /**

@@ -99,7 +99,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         visibilityFastScroller()
         setEmptyView()
         selectNewlyAddedNodes()
-        Timber.d("Deep browser tree: %s", managerActivity.deepBrowserTreeIncoming)
+        Timber.d("Deep browser tree: %s", managerViewModel.state.value.incomingTreeDepth)
         return v
     }
 
@@ -146,8 +146,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     public override fun navigateToFolder(node: MegaNode) {
         managerActivity.hideTabs(true, SharesTab.INCOMING_TAB)
-        managerActivity.increaseDeepBrowserTreeIncoming()
-        Timber.d("Is folder deep: %s", managerActivity.deepBrowserTreeIncoming)
+        managerViewModel.increaseIncomingTreeDepth()
+        Timber.d("Is folder deep: %s", managerViewModel.state.value.incomingTreeDepth)
         var lastFirstVisiblePosition: Int
         if (managerActivity.isList) {
             lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition()
@@ -179,17 +179,17 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     public override fun onBackPressed(): Int {
-        Timber.d("deepBrowserTree:%s", managerActivity.deepBrowserTreeIncoming)
+        Timber.d("deepBrowserTree:%s", managerViewModel.state.value.incomingTreeDepth)
         if (adapter == null) {
             return 0
         }
-        return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationsLevel == managerActivity.deepBrowserTreeIncoming) {
+        return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationsLevel == managerViewModel.state.value.incomingTreeDepth) {
             managerActivity.restoreSharesAfterComingFromNotifications()
             4
         } else {
-            managerActivity.decreaseDeepBrowserTreeIncoming()
+            managerViewModel.decreaseIncomingTreeDepth()
             managerActivity.invalidateOptionsMenu()
-            if (managerActivity.deepBrowserTreeIncoming == 0) {
+            if (managerViewModel.state.value.incomingTreeDepth == 0) {
                 //In the beginning of the navigation
                 Timber.d("deepBrowserTree==0")
                 managerViewModel.setIncomingParentHandle(INVALID_HANDLE)
@@ -213,7 +213,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 emptyImageView.visibility = View.GONE
                 emptyLinearLayout.visibility = View.GONE
                 3
-            } else if (managerActivity.deepBrowserTreeIncoming > 0) {
+            } else if (managerViewModel.state.value.incomingTreeDepth > 0) {
                 Timber.d("deepTree>0")
                 val parentNode =
                     megaApi.getParentNode(megaApi.getNodeByHandle(
@@ -244,7 +244,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 2
             } else {
                 Timber.d("ELSE deepTree")
-                managerActivity.deepBrowserTreeIncoming = 0
+                managerViewModel.resetIncomingTreeDepth()
                 0
             }
         }
@@ -305,7 +305,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             super.onPrepareActionMode(mode, menu)
             val control = CloudStorageOptionControlUtil.Control()
-            if (managerActivity.getDeepBrowserTreeIncoming() == 0) {
+            if (managerViewModel.state.value.incomingTreeDepth == 0) {
                 control.leaveShare().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
             } else if (areAllFileNodesAndNotTakenDown(selected)) {
                 control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
@@ -321,7 +321,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     control.rename().showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
                 }
             }
-            if (managerActivity.getDeepBrowserTreeIncoming() > 0 && selected.size > 0 && allHaveFullAccess(
+            if (managerViewModel.state.value.incomingTreeDepth > 0 && selected.size > 0 && allHaveFullAccess(
                     selected)
             ) {
                 control.move().isVisible = true
@@ -342,7 +342,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 control.saveToDevice().isVisible = false
             }
             control.selectAll().isVisible = notAllNodesSelected()
-            control.trash().isVisible = (managerActivity.getDeepBrowserTreeIncoming() > 0
+            control.trash().isVisible = (managerViewModel.state.value.incomingTreeDepth > 0
                     && allHaveFullAccess(selected))
             CloudStorageOptionControlUtil.applyControl(menu, control)
             return true
