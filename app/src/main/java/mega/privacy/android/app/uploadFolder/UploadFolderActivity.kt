@@ -93,8 +93,8 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                     Activity.RESULT_OK -> {
                         @Suppress("UNCHECKED_CAST")
                         val collisionsResult =
-                            result.data?.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
-                                    as List<NameCollisionResult>?
+                            result.data?.getParcelableArrayListExtra<NameCollisionResult>(
+                                INTENT_EXTRA_COLLISION_RESULTS)
                         viewModel.proceedWithUpload(this, collisionsResult)
                     }
                     Activity.RESULT_CANCELED -> {
