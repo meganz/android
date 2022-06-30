@@ -190,6 +190,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
             if (result.shouldFinish) {
                 setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
+                finish()
             }
         }
         viewModel.onExceptionThrown().observe(this) { error ->
