@@ -23,7 +23,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -42,7 +42,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         savedInstanceState: Bundle?,
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        Timber.d("Parent Handle: %s", managerActivity.parentHandleIncoming)
+        Timber.d("Parent Handle: %s", managerViewModel.state.value.incomingParentHandle)
 
         if (megaApi.rootNode == null)
             return null
@@ -56,7 +56,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 adapter = MegaNodeAdapter(context,
                     this,
                     nodes,
-                    managerActivity.parentHandleIncoming,
+                    managerViewModel.state.value.incomingParentHandle,
                     recyclerView,
                     Constants.INCOMING_SHARES_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
@@ -68,7 +68,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 adapter = MegaNodeAdapter(context,
                     this,
                     nodes,
-                    managerActivity.parentHandleIncoming,
+                    managerViewModel.state.value.incomingParentHandle,
                     recyclerView,
                     Constants.INCOMING_SHARES_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -77,16 +77,18 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             gridLayoutManager.spanSizeLookup =
                 adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
         }
-        adapter.parentHandle = managerActivity.parentHandleIncoming
+        adapter.parentHandle = managerViewModel.state.value.incomingParentHandle
         adapter.setListFragment(recyclerView)
 
-        if (managerActivity.parentHandleIncoming == MegaApiJava.INVALID_HANDLE) {
+        if (managerViewModel.state.value.incomingParentHandle == INVALID_HANDLE) {
             Timber.w("ParentHandle -1")
             findNodes()
         } else {
             managerActivity.hideTabs(true, SharesTab.INCOMING_TAB)
-            val parentNode = megaApi.getNodeByHandle(managerActivity.parentHandleIncoming)
-            Timber.d("ParentHandle to find children: %s", managerActivity.parentHandleIncoming)
+            val parentNode =
+                megaApi.getNodeByHandle(managerViewModel.state.value.incomingParentHandle)
+            Timber.d("ParentHandle to find children: %s",
+                managerViewModel.state.value.incomingParentHandle)
             nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
             adapter.setNodes(nodes)
         }
@@ -109,16 +111,16 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun viewerFrom(): Int {
-        return Constants.VIEWER_FROM_INCOMING_SHARES
-    }
+    override fun viewerFrom(): Int = Constants.VIEWER_FROM_INCOMING_SHARES
 
     public override fun refresh() {
         val parentNode: MegaNode
-        if (managerActivity.parentHandleIncoming == -1L || megaApi.getNodeByHandle(managerActivity.parentHandleIncoming) == null) {
+        if (managerViewModel.state.value.incomingParentHandle == -1L || megaApi.getNodeByHandle(
+                managerViewModel.state.value.incomingParentHandle) == null
+        ) {
             findNodes()
         } else {
-            parentNode = megaApi.getNodeByHandle(managerActivity.parentHandleIncoming)
+            parentNode = megaApi.getNodeByHandle(managerViewModel.state.value.incomingParentHandle)
             nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
             adapter.setNodes(nodes)
         }
@@ -158,7 +160,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
         }
         lastPositionStack.push(lastFirstVisiblePosition)
-        managerActivity.parentHandleIncoming = node.handle
+        managerViewModel.setIncomingParentHandle(node.handle)
         managerActivity.invalidateOptionsMenu()
         managerActivity.setToolbarTitle()
         nodes = megaApi.getChildren(node, sortOrderManagement.getOrderCloud())
@@ -190,7 +192,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             if (managerActivity.deepBrowserTreeIncoming == 0) {
                 //In the beginning of the navigation
                 Timber.d("deepBrowserTree==0")
-                managerActivity.parentHandleIncoming = MegaApiJava.INVALID_HANDLE
+                managerViewModel.setIncomingParentHandle(INVALID_HANDLE)
                 managerActivity.hideTabs(false, SharesTab.INCOMING_TAB)
                 managerActivity.setToolbarTitle()
                 findNodes()
@@ -214,12 +216,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             } else if (managerActivity.deepBrowserTreeIncoming > 0) {
                 Timber.d("deepTree>0")
                 val parentNode =
-                    megaApi.getParentNode(megaApi.getNodeByHandle(managerActivity.parentHandleIncoming))
+                    megaApi.getParentNode(megaApi.getNodeByHandle(
+                        managerViewModel.state.value.incomingParentHandle))
                 if (parentNode != null) {
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    managerActivity.parentHandleIncoming = parentNode.handle
+                    managerViewModel.setIncomingParentHandle(parentNode.handle)
                     managerActivity.invalidateOptionsMenu()
                     managerActivity.setToolbarTitle()
                     nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
@@ -254,8 +257,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     override fun setEmptyView() {
         var textToShow: String? = null
-        if (megaApi.rootNode.handle == managerActivity.parentHandleIncoming
-            || managerActivity.parentHandleIncoming == -1L
+        if (megaApi.rootNode.handle == managerViewModel.state.value.incomingParentHandle
+            || managerViewModel.state.value.incomingParentHandle == -1L
         ) {
             setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
             if (Util.isScreenInPortrait(context)) {

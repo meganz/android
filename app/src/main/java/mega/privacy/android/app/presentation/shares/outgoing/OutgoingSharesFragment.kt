@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
 import mega.privacy.android.app.utils.SortUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -52,7 +53,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 adapter = MegaNodeAdapter(context,
                     this,
                     nodes,
-                    managerActivity.parentHandleOutgoing,
+                    managerViewModel.state.value.outgoingParentHandle,
                     recyclerView,
                     Constants.OUTGOING_SHARES_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
@@ -64,7 +65,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 adapter = MegaNodeAdapter(context,
                     this,
                     nodes,
-                    managerActivity.parentHandleOutgoing,
+                    managerViewModel.state.value.outgoingParentHandle,
                     recyclerView,
                     Constants.OUTGOING_SHARES_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -73,16 +74,17 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             gridLayoutManager.spanSizeLookup =
                 adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
         }
-        adapter.parentHandle = managerActivity.parentHandleOutgoing
+        adapter.parentHandle = managerViewModel.state.value.outgoingParentHandle
         adapter.setListFragment(recyclerView)
-        if (managerActivity.parentHandleOutgoing == MegaApiJava.INVALID_HANDLE) {
+        if (managerViewModel.state.value.outgoingParentHandle == INVALID_HANDLE) {
             Timber.w("Parent Handle == -1")
             findNodes()
-            adapter.parentHandle = MegaApiJava.INVALID_HANDLE
+            adapter.parentHandle = INVALID_HANDLE
         } else {
             managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
-            val parentNode = megaApi.getNodeByHandle(managerActivity.parentHandleOutgoing)
-            Timber.d("Parent Handle: %s", managerActivity.parentHandleOutgoing)
+            val parentNode =
+                megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle)
+            Timber.d("Parent Handle: %s", managerViewModel.state.value.outgoingParentHandle)
             nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
             adapter.setNodes(nodes)
         }
@@ -103,16 +105,14 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun viewerFrom(): Int {
-        return Constants.VIEWER_FROM_OUTGOING_SHARES
-    }
+    override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
 
     public override fun refresh() {
-        Timber.d("Parent Handle: %s", managerActivity.parentHandleOutgoing)
-        if (managerActivity.parentHandleOutgoing == -1L) {
+        Timber.d("Parent Handle: %s", managerViewModel.state.value.outgoingParentHandle)
+        if (managerViewModel.state.value.outgoingParentHandle == -1L) {
             findNodes()
         } else {
-            val n = megaApi.getNodeByHandle(managerActivity.parentHandleOutgoing)
+            val n = megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle)
             managerActivity.setToolbarTitle()
             nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud())
             adapter.setNodes(nodes)
@@ -172,7 +172,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
         }
         lastPositionStack.push(lastFirstVisiblePosition)
-        managerActivity.parentHandleOutgoing = node.handle
+        managerViewModel.setOutgoingParentHandle(node.handle)
         managerActivity.invalidateOptionsMenu()
         managerActivity.setToolbarTitle()
         nodes = megaApi.getChildren(node, sortOrderManagement.getOrderCloud())
@@ -208,7 +208,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         return if (managerActivity.deepBrowserTreeOutgoing == 0) {
             Timber.d("deepBrowserTree==0")
             //In the beginning of the navigation
-            managerActivity.parentHandleOutgoing = MegaApiJava.INVALID_HANDLE
+            managerViewModel.setOutgoingParentHandle(INVALID_HANDLE)
             managerActivity.hideTabs(false, SharesTab.OUTGOING_TAB)
             managerActivity.setToolbarTitle()
             findNodes()
@@ -232,12 +232,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         } else if (managerActivity.deepBrowserTreeOutgoing > 0) {
             Timber.d("Keep navigation")
             val parentNode =
-                megaApi.getParentNode(megaApi.getNodeByHandle(managerActivity.parentHandleOutgoing))
+                megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle))
             if (parentNode != null) {
                 recyclerView.visibility = View.VISIBLE
                 emptyImageView.visibility = View.GONE
                 emptyLinearLayout.visibility = View.GONE
-                managerActivity.parentHandleOutgoing = parentNode.handle
+                managerViewModel.setOutgoingParentHandle(parentNode.handle)
                 managerActivity.setToolbarTitle()
                 managerActivity.invalidateOptionsMenu()
                 nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
@@ -267,8 +267,8 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun setEmptyView() {
         var textToShow: String? = null
         val rootNode = megaApi.rootNode
-        if (rootNode != null && rootNode.handle == managerActivity.parentHandleOutgoing
-            || managerActivity.parentHandleOutgoing == -1L
+        if (rootNode != null && rootNode.handle == managerViewModel.state.value.outgoingParentHandle
+            || managerViewModel.state.value.outgoingParentHandle == -1L
         ) {
             if (Util.isScreenInPortrait(context)) {
                 emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait)
@@ -315,7 +315,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             if (areAllNotTakenDown) {
-                if (managerActivity.parentHandleOutgoing == MegaApiJava.INVALID_HANDLE) {
+                if (managerViewModel.state.value.outgoingParentHandle == INVALID_HANDLE) {
                     control.removeShare().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
                 }

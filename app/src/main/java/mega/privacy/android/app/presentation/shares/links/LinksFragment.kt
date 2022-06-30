@@ -58,19 +58,25 @@ class LinksFragment : MegaNodeBaseFragment() {
         }
         val v = getListView(inflater, container)
         if (adapter == null) {
-            adapter = MegaNodeAdapter(context, this, nodes,
-                managerActivity.parentHandleLinks, recyclerView, Constants.LINKS_ADAPTER,
-                MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel)
+            adapter = MegaNodeAdapter(context,
+                this,
+                nodes,
+                managerViewModel.state.value.linksParentHandle,
+                recyclerView,
+                Constants.LINKS_ADAPTER,
+                MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
+                sortByHeaderViewModel)
         }
         adapter.setListFragment(recyclerView)
-        if (managerActivity.parentHandleLinks == MegaApiJava.INVALID_HANDLE) {
+        if (managerViewModel.state.value.linksParentHandle == MegaApiJava.INVALID_HANDLE) {
             Timber.w("ParentHandle -1")
             findNodes()
             adapter.parentHandle = MegaApiJava.INVALID_HANDLE
         } else {
             managerActivity.hideTabs(true, SharesTab.LINKS_TAB)
-            val parentNode = megaApi.getNodeByHandle(managerActivity.parentHandleLinks)
-            Timber.d("ParentHandle to find children: %s", managerActivity.parentHandleLinks)
+            val parentNode = megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
+            Timber.d("ParentHandle to find children: %s",
+                managerViewModel.state.value.linksParentHandle)
             nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(
                 sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel))
             adapter.setNodes(nodes)
@@ -88,9 +94,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun viewerFrom(): Int {
-        return Constants.VIEWER_FROM_LINKS
-    }
+    override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
 
     private fun findNodes() {
         setNodes(megaApi.getPublicLinks(getLinksOrderCloud(
@@ -106,8 +110,8 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     override fun setEmptyView() {
         var textToShow: String? = null
-        if (megaApi.rootNode.handle == managerActivity.parentHandleOutgoing
-            || managerActivity.parentHandleOutgoing == -1L
+        if (megaApi.rootNode.handle == managerViewModel.state.value.linksParentHandle
+            || managerViewModel.state.value.linksParentHandle == -1L
         ) {
             setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links)
@@ -117,20 +121,21 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     public override fun onBackPressed(): Int {
-        if (adapter == null || managerActivity.parentHandleLinks == MegaApiJava.INVALID_HANDLE || managerActivity.deepBrowserTreeLinks <= 0) {
+        if (adapter == null || managerViewModel.state.value.linksParentHandle == MegaApiJava.INVALID_HANDLE || managerActivity.deepBrowserTreeLinks <= 0) {
             return 0
         }
         managerActivity.decreaseDeepBrowserTreeLinks()
         if (managerActivity.deepBrowserTreeLinks == 0) {
-            managerActivity.parentHandleLinks = MegaApiJava.INVALID_HANDLE
+            managerViewModel.setLinksParentHandle(MegaApiJava.INVALID_HANDLE)
             managerActivity.hideTabs(false, SharesTab.LINKS_TAB)
             findNodes()
         } else if (managerActivity.deepBrowserTreeLinks > 0) {
-            var parentNodeLinks = megaApi.getNodeByHandle(managerActivity.parentHandleLinks)
+            var parentNodeLinks =
+                megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
             if (parentNodeLinks != null) {
                 parentNodeLinks = megaApi.getParentNode(parentNodeLinks)
                 if (parentNodeLinks != null) {
-                    managerActivity.parentHandleLinks = parentNodeLinks.handle
+                    managerViewModel.setLinksParentHandle(parentNodeLinks.handle)
                     setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
                         sortOrderManagement.getOrderCloud(),
                         managerActivity.isFirstNavigationLevel)))
@@ -171,7 +176,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition())
         managerActivity.hideTabs(true, SharesTab.LINKS_TAB)
         managerActivity.increaseDeepBrowserTreeLinks()
-        managerActivity.parentHandleLinks = node.handle
+        managerViewModel.setLinksParentHandle(node.handle)
         managerActivity.invalidateOptionsMenu()
         managerActivity.setToolbarTitle()
         setNodes(megaApi.getChildren(node, getLinksOrderCloud(
@@ -183,12 +188,12 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     public override fun refresh() {
         hideActionMode()
-        if (managerActivity.parentHandleLinks == MegaApiJava.INVALID_HANDLE
-            || megaApi.getNodeByHandle(managerActivity.parentHandleLinks) == null
+        if (managerViewModel.state.value.linksParentHandle == MegaApiJava.INVALID_HANDLE
+            || megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle) == null
         ) {
             findNodes()
         } else {
-            val parentNodeLinks = megaApi.getNodeByHandle(managerActivity.parentHandleLinks)
+            val parentNodeLinks = megaApi.getNodeByHandle(managerViewModel.state.value.linksParentHandle)
             setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
                 sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel)))
         }

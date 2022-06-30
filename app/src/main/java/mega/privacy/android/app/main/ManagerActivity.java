@@ -7666,11 +7666,6 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.setInboxParentHandle(parentHandleInbox);
     }
 
-    public void setParentHandleOutgoing(long parentHandleOutgoing) {
-        Timber.d("Outgoing parent handle: %s", parentHandleOutgoing);
-        viewModel.setOutgoingParentHandle(parentHandleOutgoing);
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         Timber.d("onNewIntent");
@@ -10896,22 +10891,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (this.searchView != null) {
             this.searchView.setQuery(searchQuery, false);
         }
-    }
-
-    public long getParentHandleIncoming() {
-        return viewModel.getState().getValue().getIncomingParentHandle();
-    }
-
-    public long getParentHandleOutgoing() {
-        return viewModel.getState().getValue().getOutgoingParentHandle();
-    }
-
-    public long getParentHandleLinks() {
-        return viewModel.getState().getValue().getLinksParentHandle();
-    }
-
-    public void setParentHandleLinks(long parentHandleLinks) {
-        viewModel.setLinksParentHandle(parentHandleLinks);
     }
 
     private SearchFragment getSearchFragment() {

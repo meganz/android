@@ -87,6 +87,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -127,6 +128,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected TextView emptyTextViewFirst;
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
+    protected ManagerViewModel managerViewModel;
 
     protected abstract void setNodes(ArrayList<MegaNode> nodes);
 
@@ -153,6 +155,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        managerViewModel =  new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
@@ -775,14 +778,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private long getParentHandle(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case INCOMING_SHARES_ADAPTER:
-                return managerActivity.getParentHandleIncoming();
+                return managerViewModel.getState().getValue().getIncomingParentHandle();
 
             case OUTGOING_SHARES_ADAPTER:
-                return managerActivity.getParentHandleOutgoing();
+                return managerViewModel.getState().getValue().getOutgoingParentHandle();
 
             case LINKS_ADAPTER:
-                return managerActivity.getParentHandleLinks();
-
+                return managerViewModel.getState().getValue().getLinksParentHandle();
             default:
                 return INVALID_HANDLE;
         }
