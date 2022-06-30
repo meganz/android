@@ -32,7 +32,7 @@ class ShakeDetector : SensorEventListener {
     }
 
     /**
-     * Shake listener interfce
+     * Shake listener interface
      */
     interface OnShakeListener {
         /**
