@@ -239,6 +239,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -251,6 +252,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -326,7 +328,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
-import mega.privacy.android.app.main.adapters.SharesPageAdapter;
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.controllers.ContactController;
@@ -371,6 +372,7 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
+import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
@@ -700,7 +702,7 @@ public class ManagerActivity extends TransfersManagementActivity
     //Tabs in Shares
     private TabLayout tabLayoutShares;
     private SharesPageAdapter sharesPageAdapter;
-    private CustomViewPager viewPagerShares;
+    private ViewPager2 viewPagerShares;
 
     //Tabs in Transfers
     private TabLayout tabLayoutTransfers;
@@ -1874,8 +1876,7 @@ public class ManagerActivity extends TransfersManagementActivity
         viewPagerShares = findViewById(R.id.shares_tabs_pager);
         viewPagerShares.setOffscreenPageLimit(3);
 
-        viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
+        viewPagerShares.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -4099,9 +4100,17 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (sharesPageAdapter == null) {
             Timber.w("sharesPageAdapter is NULL");
-            sharesPageAdapter = new SharesPageAdapter(getSupportFragmentManager(), this);
+            sharesPageAdapter = new SharesPageAdapter(this, this);
             viewPagerShares.setAdapter(sharesPageAdapter);
-            tabLayoutShares.setupWithViewPager(viewPagerShares);
+            new TabLayoutMediator(tabLayoutShares, viewPagerShares, (tab, position) -> {
+                if (position == SharesTab.INCOMING_TAB.getPosition()) {
+                    tab.setText(R.string.tab_incoming_shares);
+                } else if (position == SharesTab.OUTGOING_TAB.getPosition()) {
+                    tab.setText(R.string.tab_outgoing_shares);
+                } else if (position == SharesTab.LINKS_TAB.getPosition()) {
+                    tab.setText(R.string.tab_links_shares);
+                }
+            }).attach();
             setSharesTabIcons(indexShares);
         }
 
@@ -4275,10 +4284,10 @@ public class ManagerActivity extends TransfersManagementActivity
                         || (tabItemShares == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
-                    viewPagerShares.disableSwipe(true);
+                    viewPagerShares.setUserInputEnabled(true);
                 } else {
                     tabLayoutShares.setVisibility(View.VISIBLE);
-                    viewPagerShares.disableSwipe(false);
+                    viewPagerShares.setUserInputEnabled(false);
                 }
 
                 viewPagerShares.setVisibility(View.VISIBLE);
@@ -4342,7 +4351,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 tabLayoutShares.setVisibility(visibility);
-                viewPagerShares.disableSwipe(hide);
+                viewPagerShares.setUserInputEnabled(hide);
                 break;
 
             case TRANSFERS:
@@ -4788,7 +4797,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isIncomingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.instantiateItem(viewPagerShares, SharesTab.INCOMING_TAB.getPosition());
+        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.getPageFragment(SharesTab.INCOMING_TAB.getPosition());
 
         return incomingSharesFragment != null && incomingSharesFragment.isAdded();
     }
@@ -4796,7 +4805,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isOutgoingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.instantiateItem(viewPagerShares, SharesTab.OUTGOING_TAB.getPosition());
+        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.getPageFragment(SharesTab.OUTGOING_TAB.getPosition());
 
         return outgoingSharesFragment != null && outgoingSharesFragment.isAdded();
     }
@@ -4804,7 +4813,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isLinksAdded() {
         if (sharesPageAdapter == null) return false;
 
-        linksFragment = (LinksFragment) sharesPageAdapter.instantiateItem(viewPagerShares, SharesTab.LINKS_TAB.getPosition());
+        linksFragment = (LinksFragment)  sharesPageAdapter.getPageFragment(SharesTab.LINKS_TAB.getPosition());
 
         return linksFragment != null && linksFragment.isAdded();
     }
