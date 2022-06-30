@@ -2400,11 +2400,13 @@ class InMeetingViewModel @Inject constructor(
      * Control when the leave button is clicked
      */
     fun checkClickLeaveButton() {
-        if (shouldAssignModerator()) {
-            _showEndMeetingAsModeratorBottomPanel.value = false
-            _showAssignModeratorBottomPanel.value = true
-        } else {
-            hangCall()
+        getChat()?.let { chat ->
+            if (chat.isMeeting && shouldAssignModerator()) {
+                _showEndMeetingAsModeratorBottomPanel.value = false
+                _showAssignModeratorBottomPanel.value = true
+            } else {
+                hangCall()
+            }
         }
     }
 
