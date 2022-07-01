@@ -86,7 +86,6 @@ class ShakeDetector : SensorEventListener {
                     vibrator.vibrate(VibrationEffect.createOneShot(200,
                         VibrationEffect.DEFAULT_AMPLITUDE))
                 } else {
-                    //deprecated in API 26
                     vibrator.vibrate(200)
                 }
                 it.onShake(mShakeCount)
