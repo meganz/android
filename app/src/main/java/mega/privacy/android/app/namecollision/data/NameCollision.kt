@@ -32,8 +32,7 @@ sealed class NameCollision : Serializable {
      * Data class containing all the required to present an upload name collision.
      *
      * @property collisionHandle    The node handle with which there is a name collision.
-     * @property absolutePath       The absolute path of the file to upload. Null if the upload
-     *                              comes from UploadFolderActivity.
+     * @property absolutePath       The absolute path of the file to upload.
      * @property name               The name of the file to upload.
      * @property size               The size of the item to upload, copy or move if is a file, null otherwise.
      * @property folderContent      The content of the item to upload, copy or move if is a folder, null otherwise.
@@ -43,7 +42,7 @@ sealed class NameCollision : Serializable {
      */
     data class Upload constructor(
         override val collisionHandle: Long,
-        val absolutePath: String? = null,
+        val absolutePath: String,
         override val name: String,
         override val size: Long? = null,
         override val folderContent: String? = null,
@@ -107,6 +106,7 @@ sealed class NameCollision : Serializable {
                 parentHandle: Long
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
+                absolutePath = uploadContent.uri.toString(),
                 name = uploadContent.name!!,
                 size = if (uploadContent.isFolder) null else uploadContent.size,
                 folderContent = if (uploadContent.isFolder) getFileFolderInfo(uploadContent.document) else null,
