@@ -178,6 +178,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -1865,7 +1866,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 supportInvalidateOptionsMenu();
                 checkScrollElevation();
                 SharesTab selectedTab = SharesTab.Companion.fromPosition(position);
-                setSharesTabIcons(selectedTab);
                 switch (selectedTab) {
                     case INCOMING_TAB:
                         if (isOutgoingAdded() && outgoingSharesFragment.isMultipleSelect()) {
@@ -1897,6 +1897,26 @@ public class ManagerActivity extends TransfersManagementActivity
             public void onPageScrollStateChanged(int state) {
             }
         });
+
+        tabLayoutShares.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300);
+                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.grey_300_grey_600);
+                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                    }
+                }
+        );
 
         //Tab section Transfers
         tabLayoutTransfers = (TabLayout) findViewById(R.id.sliding_tabs_transfers);
@@ -4083,46 +4103,21 @@ public class ManagerActivity extends TransfersManagementActivity
             new TabLayoutMediator(tabLayoutShares, viewPagerShares, (tab, position) -> {
                 if (position == SharesTab.INCOMING_TAB.getPosition()) {
                     tab.setText(R.string.tab_incoming_shares);
+                    tab.setIcon(R.drawable.ic_incoming_shares);
                 } else if (position == SharesTab.OUTGOING_TAB.getPosition()) {
                     tab.setText(R.string.tab_outgoing_shares);
+                    tab.setIcon(R.drawable.ic_outgoing_shares);
                 } else if (position == SharesTab.LINKS_TAB.getPosition()) {
                     tab.setText(R.string.tab_links_shares);
+                    tab.setIcon(R.drawable.link_ic);
                 }
             }).attach();
-            setSharesTabIcons(indexShares);
         }
 
         updateSharesTab();
         setToolbarTitle();
 
         drawerLayout.closeDrawer(Gravity.LEFT);
-    }
-
-    private void setSharesTabIcons(SharesTab tabSelected) {
-        if (tabLayoutShares == null
-                || tabLayoutShares.getTabAt(SharesTab.INCOMING_TAB.getPosition()) == null
-                || tabLayoutShares.getTabAt(SharesTab.OUTGOING_TAB.getPosition()) == null
-                || tabLayoutShares.getTabAt(SharesTab.LINKS_TAB.getPosition()) == null) {
-            return;
-        }
-
-        // The TabLayout style sets the default icon tint
-        switch (tabSelected) {
-            case OUTGOING_TAB:
-                tabLayoutShares.getTabAt(SharesTab.INCOMING_TAB.getPosition()).setIcon(R.drawable.ic_incoming_shares);
-                tabLayoutShares.getTabAt(SharesTab.OUTGOING_TAB.getPosition()).setIcon(mutateIconSecondary(this, R.drawable.ic_outgoing_shares, R.color.red_600_red_300));
-                tabLayoutShares.getTabAt(SharesTab.LINKS_TAB.getPosition()).setIcon(R.drawable.link_ic);
-                break;
-            case LINKS_TAB:
-                tabLayoutShares.getTabAt(SharesTab.INCOMING_TAB.getPosition()).setIcon(R.drawable.ic_incoming_shares);
-                tabLayoutShares.getTabAt(SharesTab.OUTGOING_TAB.getPosition()).setIcon(R.drawable.ic_outgoing_shares);
-                tabLayoutShares.getTabAt(SharesTab.LINKS_TAB.getPosition()).setIcon(mutateIconSecondary(this, R.drawable.link_ic, R.color.red_600_red_300));
-                break;
-            default:
-                tabLayoutShares.getTabAt(SharesTab.INCOMING_TAB.getPosition()).setIcon(mutateIconSecondary(this, R.drawable.ic_incoming_shares, R.color.red_600_red_300));
-                tabLayoutShares.getTabAt(SharesTab.OUTGOING_TAB.getPosition()).setIcon(R.drawable.ic_outgoing_shares);
-                tabLayoutShares.getTabAt(SharesTab.LINKS_TAB.getPosition()).setIcon(R.drawable.link_ic);
-        }
     }
 
     public void selectDrawerItemNotifications() {
@@ -6123,13 +6118,16 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
                     if (getTabItemShares() == SharesTab.INCOMING_TAB && viewModel.getState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
                         viewModel.setIncomingParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+                        viewModel.resetIncomingTreeDepth();
+                        refreshIncomingShares();
                     } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
                         viewModel.setOutgoingParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+                        viewModel.resetOutgoingTreeDepth();
+                        refreshOutgoingShares();
                     } else if (getTabItemShares() == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
                         viewModel.setLinksParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.LINKS.getTag());
+                        viewModel.resetLinksTreeDepth();
+                        refreshLinks();
                     }
 
                     refreshSharesPageAdapter();
@@ -7581,7 +7579,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private void refreshSharesPageAdapter() {
         if (sharesPageAdapter != null) {
             sharesPageAdapter.notifyDataSetChanged();
-            setSharesTabIcons(getTabItemShares());
         }
     }
 
