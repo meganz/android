@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.usecase.FastLogin
 import mega.privacy.android.app.domain.usecase.FetchNodes
@@ -24,7 +25,6 @@ import mega.privacy.android.app.domain.usecase.InitMegaChat
 import mega.privacy.android.app.domain.usecase.PushReceived
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 import mega.privacy.android.app.domain.usecase.RootNodeExists
-import mega.privacy.android.app.domain.entity.pushes.PushMessage.Companion.toPushMessage
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import timber.log.Timber
 
@@ -63,7 +63,7 @@ class PushMessageWorker @AssistedInject constructor(
 
             val session = credentials!!.session
 
-            val pushMessage = inputData.toPushMessage()
+            val pushMessage = toPushMessage(inputData)
 
             if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
                 Timber.d("Needs fast login")
@@ -123,7 +123,7 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = when (inputData.toPushMessage().type) {
+        val notification = when (toPushMessage(inputData).type) {
             TYPE_CALL -> getNotification(R.drawable.ic_call_started)
             TYPE_CHAT -> getNotification(R.drawable.ic_stat_notify,
                 R.string.notification_chat_undefined_content)
