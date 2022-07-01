@@ -173,6 +173,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -3531,6 +3532,11 @@ public class ManagerActivity extends TransfersManagementActivity
     public void skipToMediaDiscoveryFragment(Fragment f) {
         mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
+        SharedPreferences sharedPreference = getApplicationContext().getSharedPreferences("MD_CLICK", Context.MODE_PRIVATE);
+        int clickCount = sharedPreference.getInt("ClickCount", 0);
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putInt("ClickCount", (clickCount + 1));
+        editor.apply();
         megaApi.sendEvent(99200, "Media Discovery On");
         isInMDMode = true;
     }
