@@ -57,6 +57,7 @@ class ShakeDetector : SensorEventListener {
      *
      * @param event: SensorEvent
      */
+    @Suppress("DEPRECATION")
     override fun onSensorChanged(event: SensorEvent) {
         shakeListener?.let {
             val x = event.values[0]
