@@ -42,4 +42,27 @@ class EndCallUseCase @Inject constructor(
 
             emitter.onComplete()
         }
+
+    /**
+     * Method to hang a call
+     *
+     * @param callId Chat ID
+     */
+    fun hangCall(
+        callId: Long,
+    ): Completable =
+        Completable.create { emitter ->
+            megaChatApi.hangChatCall(callId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                        when {
+                            emitter.isDisposed -> return@OptionalMegaChatRequestListenerInterface
+                            error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                            else -> emitter.onError(error.toMegaException())
+                        }
+                    })
+            )
+
+            emitter.onComplete()
+        }
 }

@@ -190,6 +190,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
             if (result.shouldFinish) {
                 setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
+                finish()
             }
         }
         viewModel.onExceptionThrown().observe(this) { error ->
@@ -246,8 +247,10 @@ class NameCollisionActivity : PasscodeActivity() {
                         else R.drawable.ic_folder_list
                     )
 
-                    if (isFile && collisionResult.nameCollision is NameCollision.Upload) {
-                        requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                    if (isFile && collisionResult.nameCollision is NameCollision.Upload
+                        && collisionResult.nameCollision.absolutePath != null
+                    ) {
+                        requestFileThumbnail(File(collisionResult.nameCollision.absolutePath))
                     }
                 }
             }
@@ -341,8 +344,10 @@ class NameCollisionActivity : PasscodeActivity() {
                     else -> {
                         thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
 
-                        if (collisionResult.nameCollision is NameCollision.Upload) {
-                            requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                        if (collisionResult.nameCollision is NameCollision.Upload
+                            && collisionResult.nameCollision.absolutePath != null
+                        ) {
+                            requestFileThumbnail(File(collisionResult.nameCollision.absolutePath))
                         }
                     }
                 }
@@ -502,7 +507,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {
         setResult(
             Activity.RESULT_OK,
-            Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
+            Intent().putParcelableArrayListExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
         )
         finish()
     }

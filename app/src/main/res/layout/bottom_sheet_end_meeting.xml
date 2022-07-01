@@ -4,30 +4,32 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/grey_900"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp">
+
 
         <TextView
             android:id="@+id/no_moderator"
-            android:layout_width="113dp"
-            android:layout_height="21dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:text="@string/no_moderator"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:gravity="start"
+            android:text="@string/meeting_call_screen_title_of_bottom_panel_to_assign_another_host"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.20sp.White087"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/explanation"
-            android:layout_width="331dp"
-            android:layout_height="38dp"
-            android:layout_marginTop="15dp"
-            android:gravity="center"
-            android:text="@string/assign_moderator_message"
-            android:textSize="14sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="start"
+            android:text="@string/meeting_call_screen_description_of_bottom_panel_to_assign_another_host"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.White87.16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/no_moderator" />
@@ -35,31 +37,24 @@
 
         <TextView
             android:id="@+id/assign_moderator"
-            style="@style/BottomSheetItem"
-            android:layout_marginTop="1dp"
+            style="@style/BottomSheetCallPositiveItem"
+            android:layout_marginTop="28dp"
             android:gravity="center"
-            android:text="@string/assign_moderator"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/divider"
+            android:text="@string/meeting_call_screen_title_of_bottom_panel_to_assign_another_host"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/explanation" />
-
-        <View
-            android:id="@+id/divider"
-            style="@style/BottomSheetItemDivider"
-            android:layout_marginStart="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/assign_moderator" />
 
         <TextView
             android:id="@+id/leave_anyway"
-            style="@style/BottomSheetItem"
+            style="@style/BottomSheetCallNegativeItem"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="@string/leave_anyway"
-            android:textColor="@color/red_600_red_300"
-            android:textStyle="bold"
+            android:text="@string/calls_call_screen_bottom_panel_leave_call_option"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/assign_moderator" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -101,7 +101,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             inMeetingViewModel.removeIncomingCallNotification(chatId)
 
             if (inMeetingViewModel.isOneToOneCall()) {
-                inMeetingViewModel.leaveMeeting()
+                inMeetingViewModel.checkClickEndButton()
             } else {
                 inMeetingViewModel.ignoreCall()
             }

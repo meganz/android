@@ -29,6 +29,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -255,6 +256,26 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun clickEndCall() {
         checkAnotherCalls(true)
+    }
+
+    /**
+     * Determine if I am a guest
+     *
+     * @return True, if I am a guest. False if not
+     */
+    fun amIAGuest(): Boolean = meetingActivityRepository.amIAGuest()
+
+    /**
+     * Log out the Ephemeral Account PlusPlus
+     *
+     * @param meetingActivity Context
+     */
+    fun logOutTheGuest(meetingActivity: Context) {
+        AccountController.logout(
+            meetingActivity,
+            MegaApplication.getInstance().megaApi,
+            viewModelScope
+        )
     }
 
     /**

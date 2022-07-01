@@ -34,6 +34,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ASK_PERMI
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
+import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
@@ -115,7 +116,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbish;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
-import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
 import static mega.privacy.android.app.utils.OfflineUtils.removeInitialOfflinePath;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
@@ -285,7 +285,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
@@ -641,9 +641,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private boolean isSMSDialogShowing;
     private final static String STATE_KEY_SMS_DIALOG = "isSMSDialogShowing";
-
-    // Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
-    private boolean isFromMeeting = false;
 
     private static final String STATE_KEY_IS_IN_MD_MODE = "isInMDMode";
     // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
@@ -1464,12 +1461,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
         viewModel.onGetNumUnreadUserAlerts().observe(this, this::updateNumUnreadUserAlerts);
 
-        viewModel.onInboxSectionUpdate().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean hasChildren) {
-                updateInboxSectionVisibility(hasChildren);
-            }
-        });
+        viewModel.onInboxSectionUpdate().observe(this, this::updateInboxSectionVisibility);
+
+        getTransfersViewModel().onGetShouldCompletedTab().observe(this, this::updateTransfersTab);
 
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
@@ -2386,10 +2380,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         selectDrawerItemPending = false;
                     } else if (getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)) {
                         Timber.d("Intent from chat - show my account");
-
-                        if (getIntent().hasExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING)) {
-                            isFromMeeting = getIntent().getBooleanExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING, false);
-                        }
 
                         showMyAccount();
                         selectDrawerItemPending = false;
@@ -4206,38 +4196,45 @@ public class ManagerActivity extends TransfersManagementActivity
             tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
         }
 
-        boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getPendingTransfers() <= 0;
-
-        indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
-
-        if (viewPagerTransfers != null) {
-            switch (indexTransfers) {
-                case COMPLETED_TAB:
-                    refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
-                    viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
-                    break;
-
-                default:
-                    refreshFragment(FragmentTag.TRANSFERS.getTag());
-                    viewPagerTransfers.setCurrentItem(PENDING_TAB);
-
-                    if (transfersManagement.getShouldShowNetworkWarning()) {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
-                    }
-
-                    break;
-            }
-
-            if (mTabsAdapterTransfers != null) {
-                mTabsAdapterTransfers.notifyDataSetChanged();
-            }
-
-            indexTransfers = viewPagerTransfers.getCurrentItem();
-        }
-
+        getTransfersViewModel().checkIfShouldShowCompletedTab();
         setToolbarTitle();
         showFabButton();
         drawerLayout.closeDrawer(Gravity.LEFT);
+    }
+
+    /**
+     * Updates the Transfers tab index.
+     * @param showCompleted True if should show the Completed tab, false otherwise.
+     */
+    private void updateTransfersTab(Boolean showCompleted) {
+        if (viewPagerTransfers == null) {
+            return;
+        }
+        indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+
+        switch (indexTransfers) {
+            case COMPLETED_TAB:
+                refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+                viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
+                break;
+
+            default:
+                refreshFragment(FragmentTag.TRANSFERS.getTag());
+                viewPagerTransfers.setCurrentItem(PENDING_TAB);
+
+                if (transfersManagement.getShouldShowNetworkWarning()) {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                }
+
+                break;
+        }
+
+        if (mTabsAdapterTransfers != null) {
+            mTabsAdapterTransfers.notifyDataSetChanged();
+        }
+
+        indexTransfers = viewPagerTransfers.getCurrentItem();
+        setToolbarTitle();
     }
 
     public void selectDrawerItemChat() {
