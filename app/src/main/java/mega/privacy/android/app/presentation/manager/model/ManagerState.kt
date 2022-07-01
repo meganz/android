@@ -14,6 +14,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param outgoingTreeDepth current outgoing tree depth
  * @param linksTreeDepth current links tree depth
  * @param sharesTab current tab in shares screen
+ * @param transfersTab current tab in transfers screen
  */
 data class ManagerState(
     val browserParentHandle: Long = -1L,
@@ -27,4 +28,5 @@ data class ManagerState(
     val outgoingTreeDepth: Int = 0,
     val linksTreeDepth: Int = 0,
     var sharesTab: SharesTab = SharesTab.INCOMING_TAB,
+    var transfersTab: TransfersTab = TransfersTab.NONE,
 )

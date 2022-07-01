@@ -738,8 +738,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private String pathNavigationOffline;
 
-    TransfersTab indexTransfers = TransfersTab.NONE;
-
     // Fragments
     private FileBrowserFragment fileBrowserFragment;
     private RubbishBinFragment rubbishBinFragment;
@@ -2502,7 +2500,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             }
 
                             drawerItem = DrawerItem.TRANSFERS;
-                            indexTransfers = (TransfersTab) intentRec.getSerializableExtra(TRANSFERS_TAB);
+                            viewModel.setTransfersTab((TransfersTab) intentRec.getSerializableExtra(TRANSFERS_TAB));
                             setIntent(null);
                         } else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
                             drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -3195,7 +3193,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
                     drawerItem = DrawerItem.TRANSFERS;
-                    indexTransfers = (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB);
+                    viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
                     selectDrawerItem(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
@@ -3223,7 +3221,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                     drawerItem = DrawerItem.TRANSFERS;
-                    indexTransfers = (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB);
+                    viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
                     selectDrawerItem(drawerItem);
                 } else if (intent.getAction().equals(ACTION_TAKE_SELFIE)) {
                     Timber.d("Intent take selfie");
@@ -4164,9 +4162,11 @@ public class ManagerActivity extends TransfersManagementActivity
         if (viewPagerTransfers == null) {
             return;
         }
-        indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? TransfersTab.COMPLETED_TAB : TransfersTab.PENDING_TAB;
 
-        switch (indexTransfers) {
+
+        viewModel.setTransfersTab(transfersManagement.getAreFailedTransfers() || showCompleted ? TransfersTab.COMPLETED_TAB : TransfersTab.PENDING_TAB);
+
+        switch (viewModel.getState().getValue().getTransfersTab()) {
             case COMPLETED_TAB:
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 viewPagerTransfers.setCurrentItem(TransfersTab.COMPLETED_TAB.getPosition());
@@ -4187,7 +4187,8 @@ public class ManagerActivity extends TransfersManagementActivity
             mTabsAdapterTransfers.notifyDataSetChanged();
         }
 
-        indexTransfers = TransfersTab.Companion.fromPosition(viewPagerTransfers.getCurrentItem());
+        viewModel.setTransfersTab(TransfersTab.Companion.fromPosition(viewPagerTransfers.getCurrentItem()));
+
         setToolbarTitle();
     }
 
@@ -7662,7 +7663,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 drawerItem = DrawerItem.TRANSFERS;
-                indexTransfers = (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB);
+                viewModel.setTransfersTab( (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
                 selectDrawerItem(drawerItem);
                 return;
             }

@@ -24,6 +24,7 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -99,6 +100,7 @@ class ManagerViewModelTest {
             assertThat(initial.outgoingTreeDepth).isEqualTo(0)
             assertThat(initial.linksTreeDepth).isEqualTo(0)
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
+            assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
         }
     }
 
@@ -372,6 +374,19 @@ class ManagerViewModelTest {
                 val newValue = SharesTab.OUTGOING_TAB
                 assertThat(awaitItem()).isEqualTo(SharesTab.INCOMING_TAB)
                 underTest.setSharesTab(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
+
+    @Test
+    fun `test that transfers tab is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.transfersTab }.distinctUntilChanged()
+            .test {
+                val newValue = TransfersTab.PENDING_TAB
+                assertThat(awaitItem()).isEqualTo(TransfersTab.NONE)
+                underTest.setTransfersTab(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
