@@ -2718,8 +2718,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
-        assignModeratorDialog?.dismiss()
-        endMeetingAsModeratorDialog?.dismiss()
     }
 
     /**
