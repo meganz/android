@@ -4262,10 +4262,10 @@ public class ManagerActivity extends TransfersManagementActivity
                         || (tabItemShares == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
-                    viewPagerShares.setUserInputEnabled(true);
+                    viewPagerShares.setUserInputEnabled(false);
                 } else {
                     tabLayoutShares.setVisibility(View.VISIBLE);
-                    viewPagerShares.setUserInputEnabled(false);
+                    viewPagerShares.setUserInputEnabled(true);
                 }
 
                 viewPagerShares.setVisibility(View.VISIBLE);
@@ -4329,7 +4329,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 tabLayoutShares.setVisibility(visibility);
-                viewPagerShares.setUserInputEnabled(hide);
+                viewPagerShares.setUserInputEnabled(!hide);
                 break;
 
             case TRANSFERS:
