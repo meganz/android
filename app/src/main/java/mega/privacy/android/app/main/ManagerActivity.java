@@ -4775,7 +4775,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isIncomingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.getPageFragment(SharesTab.INCOMING_TAB.getPosition());
+        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.getFragment(SharesTab.INCOMING_TAB.getPosition());
 
         return incomingSharesFragment != null && incomingSharesFragment.isAdded();
     }
@@ -4783,7 +4783,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isOutgoingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.getPageFragment(SharesTab.OUTGOING_TAB.getPosition());
+        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.getPosition());
 
         return outgoingSharesFragment != null && outgoingSharesFragment.isAdded();
     }
@@ -4791,7 +4791,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isLinksAdded() {
         if (sharesPageAdapter == null) return false;
 
-        linksFragment = (LinksFragment)  sharesPageAdapter.getPageFragment(SharesTab.LINKS_TAB.getPosition());
+        linksFragment = (LinksFragment)  sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
 
         return linksFragment != null && linksFragment.isAdded();
     }

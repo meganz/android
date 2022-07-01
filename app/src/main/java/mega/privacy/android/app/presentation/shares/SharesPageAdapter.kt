@@ -25,9 +25,7 @@ class SharesPageAdapter(private val fa: FragmentActivity, private val context: C
      *
      * @return the total number of items
      */
-    override fun getItemCount(): Int {
-        return SharesTab.values().size - 1
-    }
+    override fun getItemCount(): Int = SharesTab.values().size - 1
 
     /**
      * Create a new Fragment associated with the specified position.
@@ -37,25 +35,11 @@ class SharesPageAdapter(private val fa: FragmentActivity, private val context: C
      */
     override fun createFragment(position: Int): Fragment {
         Timber.d("Position: %s", position)
-        when (position) {
-            SharesTab.INCOMING_TAB.position -> {
-                val isF = (context as ManagerActivity).supportFragmentManager.findFragmentByTag(
-                    ManagerActivity.FragmentTag.INCOMING_SHARES.tag) as IncomingSharesFragment?
-                return isF ?: IncomingSharesFragment()
-            }
-            SharesTab.OUTGOING_TAB.position -> {
-                val osF = (context as ManagerActivity).supportFragmentManager.findFragmentByTag(
-                    ManagerActivity.FragmentTag.OUTGOING_SHARES.tag) as OutgoingSharesFragment?
-                return osF ?: OutgoingSharesFragment()
-            }
-            SharesTab.LINKS_TAB.position -> {
-                val lF = (context as ManagerActivity).supportFragmentManager.findFragmentByTag(
-                    ManagerActivity.FragmentTag.LINKS.tag) as LinksFragment?
-                return lF ?: LinksFragment()
-            }
-            else -> {
-                throw Exception("Invalid position")
-            }
+        return when (position) {
+            SharesTab.INCOMING_TAB.position -> IncomingSharesFragment()
+            SharesTab.OUTGOING_TAB.position -> OutgoingSharesFragment()
+            SharesTab.LINKS_TAB.position -> LinksFragment()
+            else -> throw Exception("Invalid position")
         }
     }
 
@@ -65,7 +49,6 @@ class SharesPageAdapter(private val fa: FragmentActivity, private val context: C
      * @param position the given position in the adapter
      * @return the fragment at the given position
      */
-    fun getPageFragment(position: Int): Fragment? {
-        return fa.supportFragmentManager.findFragmentByTag("f${getItemId(position)}")
-    }
+    fun getFragment(position: Int): Fragment? =
+        fa.supportFragmentManager.findFragmentByTag("f${getItemId(position)}")
 }
