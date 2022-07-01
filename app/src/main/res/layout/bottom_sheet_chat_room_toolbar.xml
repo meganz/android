@@ -388,7 +388,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/voice_clip_icon"
                         android:layout_centerHorizontal="true"
-                        android:text="@string/chat_room_toolbar_voice_call_option"
+                        android:text="@string/chat_room_toolbar_voice_clip_option"
                         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
