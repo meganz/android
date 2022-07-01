@@ -23,6 +23,7 @@ import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -97,6 +98,7 @@ class ManagerViewModelTest {
             assertThat(initial.incomingTreeDepth).isEqualTo(0)
             assertThat(initial.outgoingTreeDepth).isEqualTo(0)
             assertThat(initial.linksTreeDepth).isEqualTo(0)
+            assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
         }
     }
 
@@ -360,6 +362,19 @@ class ManagerViewModelTest {
                     assertThat(awaitItem()).isEqualTo(0)
                 }
         }
+
+    @Test
+    fun `test that shares tab is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.sharesTab }.distinctUntilChanged()
+            .test {
+                val newValue = SharesTab.OUTGOING_TAB
+                assertThat(awaitItem()).isEqualTo(SharesTab.INCOMING_TAB)
+                underTest.setSharesTab(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
+    }
 
     @Test
     fun `test that get safe browser handle returns INVALID_HANDLE if not set and root folder fails`() =

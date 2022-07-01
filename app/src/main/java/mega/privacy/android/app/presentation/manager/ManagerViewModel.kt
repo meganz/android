@@ -28,6 +28,7 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaContactRequest
@@ -307,6 +308,15 @@ class ManagerViewModel @Inject constructor(
      */
     fun resetLinksTreeDepth() = viewModelScope.launch {
         _state.update { it.copy(linksTreeDepth = 0) }
+    }
+
+    /**
+     * Set the current shares tab to the UI state
+     *
+     * @param tab shares tab to set
+     */
+    fun setSharesTab(tab: SharesTab) = viewModelScope.launch {
+        _state.update { it.copy(sharesTab = tab) }
     }
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
