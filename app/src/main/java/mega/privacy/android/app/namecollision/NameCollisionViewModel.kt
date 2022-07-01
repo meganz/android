@@ -288,6 +288,7 @@ class NameCollisionViewModel @Inject constructor(
             pendingFolderCollisions--
         }
         currentCollision.value = nextCollision
+        updateFileVersioningInfo()
     }
 
     /**
