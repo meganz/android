@@ -4293,6 +4293,7 @@ public class ChatActivity extends PasscodeActivity
         dialogOnlyMeInCall = builder.create();
         dialogOnlyMeInCall.setTitle(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
         dialogOnlyMeInCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
+        dialogOnlyMeInCall.setCancelable(false);
         dialogOnlyMeInCall.show();
 
         dialogOnlyMeInCall.setOnDismissListener(dialog -> {
