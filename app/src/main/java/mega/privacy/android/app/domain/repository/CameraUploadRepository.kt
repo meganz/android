@@ -164,7 +164,7 @@ interface CameraUploadRepository {
      *
      * @return camera upload local path
      */
-    fun getCameraUploadLocalPath(): String?
+    fun getSyncLocalPath(): String?
 
     /**
      * Set camera upload sync local path

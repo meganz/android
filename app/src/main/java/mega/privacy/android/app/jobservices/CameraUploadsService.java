@@ -111,7 +111,9 @@ import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
-import mega.privacy.android.app.domain.usecase.UpdateTimeStamp;
+import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath;
+import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery;
+import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -135,7 +137,16 @@ import timber.log.Timber;
 public class CameraUploadsService extends LifecycleService implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
     @Inject
-    UpdateTimeStamp updateTimeStamp;
+    UpdateCameraUploadTimeStamp updateTimeStamp;
+
+    @Inject
+    GetCameraUploadLocalPath localPath;
+
+    @Inject
+    GetCameraUploadSelectionQuery selectionQuery;
+
+    @Inject
+    IsLocalPrimaryFolderSet isLocalPrimaryFolderSet;
 
     @Inject
     CameraUploadRepository cameraUploadRepository;
@@ -189,7 +200,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private MegaApiAndroid megaApiFolder;
     private MegaApplication app;
 
-    private String localPath = INVALID_NON_NULL_VALUE;
     private long cameraUploadHandle = INVALID_HANDLE;
     private boolean secondaryEnabled;
     private String localPathSecondary = INVALID_NON_NULL_VALUE;
@@ -432,6 +442,23 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                         return;
                     }
 
+                    if (!isOnline(getApplicationContext())) {
+                        Timber.w("Not online");
+                        finish();
+                        return;
+                    }
+
+                    if (isDeviceLowOnBattery(batteryIntent)) {
+                        finish();
+                        return;
+                    }
+
+                    if (isTextEmpty(localPath.invoke())) {
+                        Timber.w("LocalPath is not defined, so not enabled");
+                        finish();
+                        return;
+                    }
+
                     int result = shouldRun();
                     Timber.d("Should run result: %s", result);
                     switch (result) {
@@ -466,7 +493,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private void extractMedia(Cursor cursor, boolean isSecondary, boolean isVideo) {
         try {
             Timber.d("Extract %d media from cursor, is video: %s, is secondary: %s", cursor.getCount(), isVideo, isSecondary);
-            String parentPath = isSecondary ? localPathSecondary : localPath;
+            String parentPath = isSecondary ? localPathSecondary : localPath.invoke();
 
             int dataColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
             int modifiedColumn = 0, addedColumn = 0;
@@ -523,36 +550,14 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 MediaStore.MediaColumns.DATE_MODIFIED
         };
 
-        String selectionCamera;
-        String selectionCameraVideo;
-        String selectionSecondary = null;
-        String selectionSecondaryVideo = null;
-
-        long currentTimeStamp = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.PRIMARY);
-        Timber.d("Primary photo timestamp is: %s", currentTimeStamp);
-
-        selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-
-        long currentVideoTimeStamp = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.PRIMARY_VIDEO);
-        Timber.d("Primary video timestamp is: %s", currentVideoTimeStamp);
-
-        selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+        String selectionCamera = selectionQuery.invoke(SyncTimeStamp.PRIMARY_PHOTO);
+        String selectionCameraVideo = selectionQuery.invoke(SyncTimeStamp.PRIMARY_VIDEO);
+        String selectionSecondary = selectionQuery.invoke(SyncTimeStamp.SECONDARY_PHOTO);
+        String selectionSecondaryVideo = selectionQuery.invoke(SyncTimeStamp.SECONDARY_VIDEO);
 
         if (secondaryEnabled) {
             Timber.d("Secondary upload is enabled.");
             secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
-
-            long secondaryTime = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.SECONDARY);
-            if (secondaryTime != 0) {
-                Timber.d("Secondary photo timestamp is: %s", secondaryTime);
-                selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTime + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTime + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-            }
-
-            long secondaryVideoTime = cameraUploadRepository.getSyncTimeStamp(SyncTimeStamp.SECONDARY_VIDEO);
-            if (secondaryVideoTime != 0) {
-                Timber.d("Secondary video timestamp is: %s", secondaryVideoTime);
-                selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTime + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTime + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-            }
         }
 
         ArrayList<Uri> uris = new ArrayList<>();
@@ -587,6 +592,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             return Unit.INSTANCE;
         });
 
+        String cameraLocalPath = localPath.invoke();
         for (int i = 0; i < uris.size(); i++) {
             Uri uri = uris.get(i);
             boolean isVideo = uri.equals(MediaStore.Video.Media.EXTERNAL_CONTENT_URI) || uri.equals(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
@@ -597,7 +603,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             String orderImage = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
 
             // Only paging for files in internal storage, because files on SD card usually have same timestamp(the time when the SD is loaded).
-            boolean shouldPagingPrimary = !isLocalFolderOnSDCard(this, localPath);
+            boolean shouldPagingPrimary = !isLocalFolderOnSDCard(this, cameraLocalPath);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingPrimary) {
                 Bundle args = new Bundle();
@@ -1003,13 +1009,13 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                         if (isVideo) {
                             updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_VIDEO);
                         } else {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY);
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_PHOTO);
                         }
                     } else {
                         if (isVideo) {
                             updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_VIDEO);
                         } else {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY);
+                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_PHOTO);
                         }
                     }
                 }
@@ -1023,25 +1029,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     private int shouldRun() {
-
-        if (!isOnline(this)) {
-            Timber.w("Not online");
-            return SHOULD_RUN_STATE_FAILED;
-        }
-
-        if (isDeviceLowOnBattery(batteryIntent)) {
-            return BATTERY_STATE_LOW;
-        }
-
-        localPath = cameraUploadRepository.getCameraUploadLocalPath();
-
-        if (isTextEmpty(localPath)) {
-            Timber.w("localPath is not defined, so not enabled");
-            finish();
-            return SHOULD_RUN_STATE_FAILED;
-        }
-
-        if (!checkPrimaryLocalFolder()) {
+        if (!isLocalPrimaryFolderSet.invoke()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable, LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
             cameraUploadRepository.setSyncLocalPath(INVALID_NON_NULL_VALUE);
@@ -1062,10 +1050,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY);
-        }
-
-        if (!localPath.endsWith(SEPARATOR)) {
-            localPath += SEPARATOR;
         }
 
         if (cameraUploadRepository.isSyncByWifiDefault()) {
@@ -1113,29 +1097,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         if (!isShowing) {
             mNotification = createNotification(getString(R.string.section_photo_sync), getString(resId), null, false);
             mNotificationManager.notify(notiId, mNotification);
-        }
-    }
-
-    /**
-     * Check the availability of primary local folder.
-     * If it's a path in internal storage, just check its existence.
-     * If it's a path in SD card, check the corresponding DocumentFile's existence.
-     *
-     * @return true, if primary local folder is available. false， when it's unavailable.
-     */
-    private boolean checkPrimaryLocalFolder() {
-        // check primary local folder
-        if (cameraUploadRepository.isFolderExternalSd()) {
-            Uri uri = Uri.parse(cameraUploadRepository.getUriExternalSd());
-            DocumentFile file = DocumentFile.fromTreeUri(this, uri);
-            if (file == null) {
-                Timber.d("Local folder on sd card is unavailable.");
-                return false;
-            }
-
-            return file.exists();
-        } else {
-            return new File(localPath).exists();
         }
     }
 
@@ -1673,10 +1634,10 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     private void updateTimeStamp() {
-        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY);
+        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_PHOTO);
         updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_VIDEO);
         if (secondaryEnabled) {
-            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY);
+            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_PHOTO);
             updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_VIDEO);
         }
     }

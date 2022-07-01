@@ -4,9 +4,8 @@ import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.Sy
 
 /**
  * Update camera upload primary/secondary photos/videos time stamp
- *
  */
-interface UpdateTimeStamp {
+interface UpdateCameraUploadTimeStamp {
     /**
      * Invoke
      *

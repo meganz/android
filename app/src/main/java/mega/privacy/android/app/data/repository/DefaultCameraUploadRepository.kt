@@ -1,7 +1,6 @@
 package mega.privacy.android.app.data.repository
 
 import android.content.Context
-import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.AndroidCompletedTransfer
@@ -14,7 +13,6 @@ import mega.privacy.android.app.domain.entity.SyncRecord
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
@@ -45,7 +43,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         /**
          * only primary photos
          */
-        PRIMARY,
+        PRIMARY_PHOTO,
 
         /**
          * primary videos
@@ -55,7 +53,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         /**
          * only secondary photos
          */
-        SECONDARY,
+        SECONDARY_PHOTO,
 
         /**
          * secondary videos
@@ -134,11 +132,11 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     override fun getSyncTimeStamp(type: SyncTimeStamp): Long {
         return when (type) {
-            SyncTimeStamp.PRIMARY ->
+            SyncTimeStamp.PRIMARY_PHOTO ->
                 databaseHandler.preferences.camSyncTimeStamp?.toLongOrNull() ?: 0
             SyncTimeStamp.PRIMARY_VIDEO ->
                 databaseHandler.preferences.camVideoSyncTimeStamp?.toLongOrNull() ?: 0
-            SyncTimeStamp.SECONDARY ->
+            SyncTimeStamp.SECONDARY_PHOTO ->
                 databaseHandler.preferences.secSyncTimeStamp?.toLongOrNull() ?: 0
             SyncTimeStamp.SECONDARY_VIDEO ->
                 databaseHandler.preferences.secVideoSyncTimeStamp?.toLongOrNull() ?: 0
@@ -147,9 +145,9 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     override fun setSyncTimeStamp(timestamp: Long, type: SyncTimeStamp) {
         when (type) {
-            SyncTimeStamp.PRIMARY -> databaseHandler.setCamSyncTimeStamp(timestamp)
+            SyncTimeStamp.PRIMARY_PHOTO -> databaseHandler.setCamSyncTimeStamp(timestamp)
             SyncTimeStamp.PRIMARY_VIDEO -> databaseHandler.setCamVideoSyncTimeStamp(timestamp)
-            SyncTimeStamp.SECONDARY -> databaseHandler.setSecSyncTimeStamp(timestamp)
+            SyncTimeStamp.SECONDARY_PHOTO -> databaseHandler.setSecSyncTimeStamp(timestamp)
             SyncTimeStamp.SECONDARY_VIDEO -> databaseHandler.setSecVideoSyncTimeStamp(timestamp)
         }
     }
@@ -161,13 +159,8 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun isSyncEnabled() =
         databaseHandler.preferences.camSyncEnabled.toBoolean()
 
-    override fun getCameraUploadLocalPath(): String? =
-        if (databaseHandler.preferences.cameraFolderExternalSDCard.toBoolean()) {
-            val sdUri = Uri.parse(databaseHandler.preferences.uriExternalSDCard)
-            FileUtil.getFullPathFromTreeUri(sdUri, context)
-        } else {
-            databaseHandler.preferences.camSyncLocalPath
-        }
+    override fun getSyncLocalPath(): String? =
+        databaseHandler.preferences.camSyncLocalPath
 
     override fun setSyncLocalPath(localPath: String) =
         databaseHandler.setCamSyncLocalPath(localPath)
