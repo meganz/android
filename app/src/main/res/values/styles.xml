@@ -590,6 +590,30 @@
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="BottomSheetCallPositiveItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.White.14spBold</item>
+        <item name="android:background">@drawable/border_button_in_bottom_panel</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="BottomSheetCallNegativeItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle2.Normal.DarkGrey.14spBold</item>
+        <item name="android:background">@color/red_600</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <style name="BottomSheetItemDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>

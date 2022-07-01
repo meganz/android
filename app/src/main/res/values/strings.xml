@@ -2572,7 +2572,7 @@
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
     <!-- Title of the location marker set by the user -->
-    <string name="title_marker_maps">Send This Location</string>
+    <string name="title_marker_maps">Send this Location</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">The GPS is disabled</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -3840,7 +3840,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Duplicated items</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists in this location.</string>
+    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists at this destination.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Select the file you want to keep</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3898,7 +3898,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Skip this folder</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists in this location.</string>
+    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Bad connection</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3991,4 +3991,12 @@
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Yes</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">No</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_leave_call_option">Leave</string>
+    <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">End for all</string>
+    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make moderator</string>
+    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
 </resources>

@@ -217,6 +217,8 @@ class MegaApiFacade @Inject constructor(
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
 
+    override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }

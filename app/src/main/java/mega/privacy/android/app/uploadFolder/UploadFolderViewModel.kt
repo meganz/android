@@ -435,11 +435,13 @@ class UploadFolderViewModel @Inject constructor(
                 },
                 onSuccess = { uploadResults ->
                     transfersManagement.setIsProcessingFolders(false)
-                    actionResult.value = getQuantityString(
-                        R.plurals.upload_began,
-                        uploadResults,
-                        uploadResults
-                    )
+                    actionResult.value =
+                        if (uploadResults == 0) null
+                        else getQuantityString(
+                            R.plurals.upload_began,
+                            uploadResults,
+                            uploadResults
+                        )
                 }
             )
             .addTo(composite)

@@ -71,6 +71,13 @@ class MeetingActivityRepository @Inject constructor(
     }
 
     /**
+     * Determine if I am a guest
+     *
+     * @return True, if my account is an ephemeral account. False otherwise
+     */
+    fun amIAGuest(): Boolean = megaApi.isEphemeralPlusPlus
+
+    /**
      * Enable or disable Mic
      *
      * @param chatId Chat ID

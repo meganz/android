@@ -1,4 +1,4 @@
-package mega.privacy.android.app.logging.loggers
+package mega.privacy.android.app.domain.entity.logging
 
 /**
  * File log message
@@ -9,7 +9,7 @@ package mega.privacy.android.app.logging.loggers
  * @property priority
  * @property throwable
  */
-data class FileLogMessage(
+data class LogEntry(
     val tag: String? = null,
     val message: String,
     val stackTrace: String? = null,

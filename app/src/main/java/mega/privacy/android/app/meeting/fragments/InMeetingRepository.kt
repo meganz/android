@@ -177,18 +177,6 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method for leave a meeting
-     *
-     * @param callId call ID
-     */
-    fun leaveMeeting(callId: Long, listener: MegaChatRequestListenerInterface) {
-        if (callId == MEGACHAT_INVALID_HANDLE)
-            return
-
-        megaChatApi.hangChatCall(callId, listener)
-    }
-
-    /**
      * Method for getting a participant's email
      *
      * @param peerId user handle of participant
