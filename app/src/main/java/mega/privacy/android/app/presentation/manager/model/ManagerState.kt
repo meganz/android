@@ -10,9 +10,9 @@ package mega.privacy.android.app.presentation.manager.model
  * @param linksParentHandle current links parent handle
  * @param inboxParentHandle current inbox parent handle
  * @param isFirstNavigationLevel true if the navigation level is the first level
- * @param incomingTreeDepth
- * @param outgoingTreeDepth
- * @param linksTreeDepth
+ * @param incomingTreeDepth current incoming tree depth
+ * @param outgoingTreeDepth current outgoing tree depth
+ * @param linksTreeDepth current links tree depth
  */
 data class ManagerState(
     val browserParentHandle: Long = -1L,
