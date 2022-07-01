@@ -6782,13 +6782,22 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
                 drawerItem == DrawerItem.HOMEPAGE);
     }
 
