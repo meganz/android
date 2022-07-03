@@ -297,13 +297,15 @@ class DefaultGetAlbumsTest {
             parentId = parentId,
             base64Id = "",
             modificationTime = lastModified,
-            node = node,
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
             isImage = isImage,
             isVideo = isVideo,
-            isFolder = true
+            isFolder = true,
+            isFavourite = true,
+            isExported = false,
+            isTakenDown = false,
         )
     }
 
