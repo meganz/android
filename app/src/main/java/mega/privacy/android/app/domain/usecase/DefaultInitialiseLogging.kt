@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import javax.inject.Inject
 
@@ -23,7 +22,7 @@ class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
-    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
+    private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
 
     override suspend fun invoke(isDebug: Boolean) {
