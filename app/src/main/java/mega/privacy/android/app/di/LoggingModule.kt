@@ -11,6 +11,8 @@ import mega.privacy.android.app.data.gateway.LogWriterGateway
 import mega.privacy.android.app.data.gateway.TimberChatLogger
 import mega.privacy.android.app.data.gateway.TimberMegaLogger
 import mega.privacy.android.app.domain.repository.LoggingRepository
+import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.CreateChatLogEntry
 import mega.privacy.android.app.domain.usecase.CreateLogEntry
 import mega.privacy.android.app.domain.usecase.CreateSdkLogEntry
@@ -38,10 +40,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class LoggingModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindInitialiseLogging(useCase: DefaultInitialiseLogging): InitialiseLogging
 
     @Binds
     abstract fun bindMegaChatLoggerInterface(implementation: TimberChatLogger): MegaChatLoggerInterface
@@ -96,5 +94,17 @@ abstract class LoggingModule {
             @IoDispatcher dispatcher: CoroutineDispatcher,
         ): LogFlowTree = LogFlowTree(dispatcher, useCase)
 
+        @Provides
+        fun provideInitialiseLogging(
+            loggingRepository: LoggingRepository,
+            areSdkLogsEnabled: AreSdkLogsEnabled,
+            areChatLogsEnabled: AreChatLogsEnabled,
+            @IoDispatcher coroutineDispatcher: CoroutineDispatcher,
+        ): InitialiseLogging = DefaultInitialiseLogging(
+            loggingRepository = loggingRepository,
+            areSdkLogsEnabled = areSdkLogsEnabled,
+            areChatLogsEnabled = areChatLogsEnabled,
+            coroutineDispatcher = coroutineDispatcher,
+        )
     }
 }
