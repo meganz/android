@@ -107,7 +107,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.domain.entity.user.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;

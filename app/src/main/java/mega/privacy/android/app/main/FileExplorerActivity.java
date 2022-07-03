@@ -110,7 +110,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.domain.entity.user.UserCredentials;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
