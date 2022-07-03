@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.UserCredentials
+import mega.privacy.android.app.domain.entity.user.UserCredentials
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
@@ -719,7 +719,12 @@ object CameraUploadSyncManager {
             lastEmail = megaApi.myUser.email
             myUserHandle = megaApi.myUser.handle.toString() + ""
         }
-        val credentials = UserCredentials(lastEmail, fastLoginSession, "", "", myUserHandle)
+        val credentials =
+            UserCredentials(lastEmail,
+                fastLoginSession,
+                "",
+                "",
+                myUserHandle)
         val dbH = DatabaseHandler.getDbHandler(megaApplication)
         dbH.saveCredentials(credentials)
     }
