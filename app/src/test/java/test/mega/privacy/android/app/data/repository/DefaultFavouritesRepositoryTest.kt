@@ -53,10 +53,15 @@ class DefaultFavouritesRepositoryTest {
         parentId = 0,
         base64Id = "",
         modificationTime = 0L,
-        node = node,
         hasVersion = true,
         numChildFiles = 0,
-        numChildFolders = 0
+        numChildFolders = 0,
+        isImage = false,
+        isVideo = false,
+        isFolder = true,
+        isFavourite = true,
+        isExported = false,
+        isTakenDown = false,
     )
 
     @Before
@@ -173,10 +178,15 @@ class DefaultFavouritesRepositoryTest {
                 parentId = 0,
                 base64Id = "",
                 modificationTime = 0L,
-                node = node,
                 hasVersion = true,
                 numChildFiles = 0,
-                numChildFolders = 0
+                numChildFolders = 0,
+                isImage = false,
+                isVideo = false,
+                isFolder = true,
+                isFavourite = true,
+                isExported = false,
+                isTakenDown = false,
             )
 
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)

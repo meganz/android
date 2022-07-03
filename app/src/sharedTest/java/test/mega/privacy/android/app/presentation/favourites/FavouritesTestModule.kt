@@ -37,6 +37,7 @@ object FavouritesTestModule {
     private val getCameraSortOrder = mock<GetCameraSortOrder>()
     val favouriteMapper = mock<FavouriteMapper>()
     val getThumbnail = mock<GetThumbnail>()
+    val megaUtilWrapper = mock<MegaUtilWrapper>()
 
     @Provides
     fun provideGetAllFavorites(): GetAllFavorites = getAllFavourites
@@ -47,8 +48,9 @@ object FavouritesTestModule {
     @Provides
     fun provideGetFavouriteFolderInfo(): GetFavouriteFolderInfo = getFavouriteFolderInfo
 
+
     @Provides
-    fun provideMegaUtilWrapper(): MegaUtilWrapper = mock()
+    fun provideMegaUtilWrapper(): MegaUtilWrapper = megaUtilWrapper
 
     @Provides
     fun provideOpenFileWrapper(): OpenFileWrapper = mock()
