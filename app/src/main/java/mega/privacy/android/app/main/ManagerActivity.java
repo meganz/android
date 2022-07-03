@@ -2614,9 +2614,21 @@ public class ManagerActivity extends TransfersManagementActivity
 
         // Show backup dialog
         if (backupDialogType == BACKUP_DIALOG_SHOW_WARNING) {
-            fileBackupManager.actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+            fileBackupManager.actWithBackupTips(
+                    backupHandleList,
+                    megaApi.getNodeByHandle(backupNodeHandle),
+                    backupNodeType,
+                    backupActionType,
+                    fileBackupManager.getActionBackupNodeCallback()
+            );
         } else if (backupDialogType == BACKUP_DIALOG_SHOW_CONFIRM) {
-            fileBackupManager.confirmationActionForBackup(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+            fileBackupManager.confirmationActionForBackup(
+                    backupHandleList,
+                    megaApi.getNodeByHandle(backupNodeHandle),
+                    backupNodeType,
+                    backupActionType,
+                    fileBackupManager.getDefaultActionBackupNodeCallback()
+            );
         } else {
             Timber.d("Backup warning dialog is not show");
         }
@@ -6468,7 +6480,13 @@ public class ManagerActivity extends TransfersManagementActivity
     public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType) {
         Timber.d("showWarningDialogOfShareFolder");
         if (actionType == ACTION_BACKUP_SHARE_FOLDER) {
-            fileBackupManager.shareBackupFolder(nC, p, nodeType, actionType);
+            fileBackupManager.shareBackupFolder(
+                    nC,
+                    p,
+                    nodeType,
+                    actionType,
+                    fileBackupManager.getActionBackupNodeCallback()
+            );
         }
     }
 
@@ -7562,7 +7580,12 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         // isInBackup Indicates if the current node is under "My backup"
-        if (fileBackupManager.fabForBackup(fileBrowserFragment.getNodeList(), getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), actionType)) {
+        if (fileBackupManager.fabForBackup(
+                fileBrowserFragment.getNodeList(),
+                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE),
+                actionType,
+                fileBackupManager.getActionBackupNodeCallback()
+        )) {
             return;
         }
 

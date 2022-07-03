@@ -919,13 +919,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.share_folder_option:
                 nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-                if (nodeType != BACKUP_NONE) {
-                    ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
+                if (isOutShare(node)) {
+                    i = new Intent(requireContext(), FileContactListActivity.class);
+                    i.putExtra(NAME, node.getHandle());
+                    startActivity(i);
                 } else {
-                    if (isOutShare(node)) {
-                        i = new Intent(requireContext(), FileContactListActivity.class);
-                        i.putExtra(NAME, node.getHandle());
-                        startActivity(i);
+                    if (nodeType != BACKUP_NONE) {
+                        ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
                     } else {
                         nC.selectContactToShareFolder(node);
                     }

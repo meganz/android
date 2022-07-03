@@ -261,7 +261,10 @@ public class FileBrowserFragment extends RotatableFragment {
 					}
 
                     NodeController nC = new NodeController(context);
-                    if (!fileBackupManager.shareBackupFolderInMenu(nC, handleList)) {
+                    if (!fileBackupManager.shareBackupFolderInMenu(
+                            nC,
+                            handleList, fileBackupManager.getActionBackupNodeCallback()
+                    )) {
                         nC.selectContactToShareFolders(handleList);
                     }
 
@@ -1414,9 +1417,21 @@ public class FileBrowserFragment extends RotatableFragment {
             backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
             backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, -1);
             if (backupDialogType == 0) {
-                fileBackupManager.actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+                fileBackupManager.actWithBackupTips(
+                        backupHandleList,
+                        megaApi.getNodeByHandle(backupNodeHandle),
+                        backupNodeType,
+                        backupActionType,
+                        fileBackupManager.getActionBackupNodeCallback()
+                );
             } else if (backupDialogType == 1) {
-                fileBackupManager.confirmationActionForBackup(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+                fileBackupManager.confirmationActionForBackup(
+                        backupHandleList,
+                        megaApi.getNodeByHandle(backupNodeHandle),
+                        backupNodeType,
+                        backupActionType,
+                        fileBackupManager.getDefaultActionBackupNodeCallback()
+                );
             } else {
                 Timber.d("Backup warning dialog is not show");
             }

@@ -10,11 +10,13 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_H
 import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
 import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
 import static mega.privacy.android.app.utils.ContactUtil.openContactInfoActivity;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
@@ -25,6 +27,7 @@ import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimat
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -69,7 +72,6 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -81,6 +83,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -103,8 +106,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     @Inject
     UploadUseCase uploadUseCase;
 
-    private ContactController cC;
-    private NodeController nC;
+    private ContactController contactController;
+    private NodeController nodeController;
     ActionBar aB;
     Toolbar tB;
     FileContactListActivity fileContactListActivity = this;
@@ -126,7 +129,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     ArrayList<MegaShare> listContacts;
     ArrayList<MegaShare> tempListContacts;
 
-//	ArrayList<MegaUser> listContactsArray = new ArrayList<MegaUser>();
 
     long nodeHandle;
     MegaNode node;
@@ -136,18 +138,14 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     long parentHandle = -1;
 
-    Stack<Long> parentHandleStack = new Stack<Long>();
+    Stack<Long> parentHandleStack = new Stack<>();
 
     private ActionMode actionMode;
 
     AlertDialog statusDialog;
     AlertDialog permissionsDialog;
 
-    private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-
     private List<ShareInfo> filePreparedInfos;
-
-    MegaPreferences prefs = null;
 
     MenuItem addSharingContact;
     MenuItem selectMenuItem;
@@ -159,6 +157,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     private MaterialAlertDialogBuilder dialogBuilder;
 
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private FileBackupManager fileBackupManager;
 
     private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
@@ -226,7 +226,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                                 permissionsDialog.dismiss();
                             }
                             statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
-                            cC.changePermissions(cC.getEmailShares(shares), item, node);
+                            contactController.changePermissions(contactController.getEmailShares(shares), item, node);
                         }
                     });
 
@@ -303,12 +303,20 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
             }
 
-            menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
-            if (permissions) {
-                menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            MenuItem changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions);
+            if (node != null && megaApi.isInInbox(node)) {
+                // If the node came from Backups, hide the Change Permissions option from the Action Bar
+                changePermissionsMenuItem.setVisible(false);
+                changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             } else {
-                menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
+                // Otherwise, change Change Permissions visibility depending on whether there are
+                // selected contacts or none
+                changePermissionsMenuItem.setVisible(permissions);
+                if (permissions) {
+                    changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                }
             }
 
             menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
@@ -328,6 +336,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
+
+        initFileBackupManager();
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
@@ -371,7 +381,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             contactLayout = findViewById(R.id.file_contact_list_layout);
             contactLayout.setVisibility(View.GONE);
             findViewById(R.id.separator_file_contact_list).setVisibility(View.GONE);
-//			contactLayout.setOnClickListener(this);
 
             fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
             fab.setOnClickListener(this);
@@ -428,13 +437,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             }
 
             if (adapter == null) {
-
                 adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
                 listView.setAdapter(adapter);
                 adapter.setShareList(listContacts);
             } else {
                 adapter.setShareList(listContacts);
-                //adapter.setParentHandle(-1);
             }
 
             adapter.setPositionClicked(-1);
@@ -443,8 +450,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             listView.setAdapter(adapter);
         }
 
-        cC = new ContactController(this);
-        nC = new NodeController(this);
+        contactController = new ContactController(this);
+        nodeController = new NodeController(this);
 
         registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
@@ -454,6 +461,17 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
         registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+    }
+
+    /**
+     * Initializes the FileBackupManager
+     */
+    private void initFileBackupManager() {
+        fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
+            if (actionType == ACTION_BACKUP_SHARE_FOLDER && operationType == OPERATION_EXECUTE) {
+                shareFolder();
+            }
+        });
     }
 
     public void checkScroll() {
@@ -522,7 +540,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 return true;
             }
             case R.id.action_folder_contacts_list_share_folder: {
-                shareOption();
+                handleShareFolder();
                 return true;
             }
             default: {
@@ -531,7 +549,34 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
     }
 
-    void shareOption() {
+    /**
+     * Handle the process of sharing the Folder to contacts
+     *
+     * If the Folder is a Backup folder, a warning dialog is displayed and the shared folder can only be
+     * configured in read-only mode.
+     *
+     * Otherwise, no warning dialog is displayed and the shared folder can be configured in different
+     * access modes (read-only, read and write, full access)
+     */
+    private void handleShareFolder() {
+        int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+        if (nodeType != BACKUP_NONE) {
+            fileBackupManager.shareBackupFolder(
+                    nodeController,
+                    node,
+                    nodeType,
+                    ACTION_BACKUP_SHARE_FOLDER,
+                    fileBackupManager.getDefaultActionBackupNodeCallback()
+            );
+        } else {
+            shareFolder();
+        }
+    }
+
+    /**
+     * Starts a new Intent to share the folder to different contacts
+     */
+    private void shareFolder() {
         Intent intent = new Intent();
         intent.setClass(this, AddContactActivity.class);
         intent.putExtra("contactType", CONTACT_TYPE_BOTH);
@@ -651,9 +696,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     @Override
     public void onClick(View v) {
-
         if (v.getId() == R.id.floating_button_file_contact_list) {
-            shareOption();
+            handleShareFolder();
         }
     }
 
@@ -676,7 +720,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), (dialog, item) -> {
             statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
             permissionsDialog.dismiss();
-            cC.changePermission(selectedShare.getUser(), item, node, new ShareListener(getApplicationContext(), CHANGE_PERMISSIONS_LISTENER, 1));
+            contactController.changePermission(selectedShare.getUser(), item, node, new ShareListener(getApplicationContext(), CHANGE_PERMISSIONS_LISTENER, 1));
         });
         permissionsDialog = dialogBuilder.create();
         permissionsDialog.show();
@@ -796,6 +840,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             if (nodeHandle != -1) {
                 node = megaApi.getNodeByHandle(nodeHandle);
             }
+
+            if (fileBackupManager.shareFolder(nodeController, new long[]{nodeHandle}, emails, ACCESS_READ)) {
+                return;
+            }
+
             if (node != null) {
                 if (node.isFolder()) {
                     dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -803,7 +852,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                     dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
                         statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_sharing_folder));
                         permissionsDialog.dismiss();
-                        nC.shareFolder(node, emails, item);
+                        nodeController.shareFolder(node, emails, item);
                     });
                     permissionsDialog = dialogBuilder.create();
                     permissionsDialog.show();
@@ -878,7 +927,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> {
                     statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_removing_contact_folder));
-                    nC.removeShare(new ShareListener(this, REMOVE_SHARE_LISTENER, 1), node, email);
+                    nodeController.removeShare(new ShareListener(this, REMOVE_SHARE_LISTENER, 1), node, email);
                 })
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
                 })
@@ -910,7 +959,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         Timber.d("Number of shared to remove: %s", shares.size());
 
         statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_removing_contact_folder));
-        nC.removeShares(shares, node);
+        nodeController.removeShares(shares, node);
     }
 
     @Override
