@@ -278,6 +278,15 @@ class GetFolderContentUseCase @Inject constructor(
                                 break
                             }
                         }
+                    } else {
+                        getContentToUpload(
+                            context = context,
+                            parentNode = parentNode,
+                            folderItem = upload
+                        ).blockingSubscribeBy(
+                            onError = { error -> Timber.w(error, "Ignored error") },
+                            onSuccess = { result -> uploadResults.addAll(result) }
+                        )
                     }
                 }
             }
