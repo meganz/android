@@ -16,13 +16,13 @@ class CreateSdkLogEntry @Inject constructor(
             isSdkLog(request.tag) -> LogEntry(request.tag,
                 request.message,
                 null,
-                request.priority,
+                request.priority.intValue,
                 request.throwable)
             isNotSdkLog(request.trace, request.sdkLoggers) -> LogEntry(
                 "[clientApp]",
                 request.message,
                 createTraceString(request.trace, request.loggingClasses),
-                request.priority,
+                request.priority.intValue,
                 request.throwable
             )
             else -> null
