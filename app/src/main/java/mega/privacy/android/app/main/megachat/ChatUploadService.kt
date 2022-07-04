@@ -274,6 +274,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         megaApi.removeRequestListener(this)
         megaChatApi.saveCurrentState()
         unregisterReceiver(pauseBroadcastReceiver)
+        rxSubscriptions.clear()
         super.onDestroy()
     }
 
