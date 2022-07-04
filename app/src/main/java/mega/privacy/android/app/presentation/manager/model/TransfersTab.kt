@@ -15,7 +15,7 @@ enum class TransfersTab(override val position: Int) : Tab {
     PENDING_TAB(0),
 
     /**
-     * Outgoing tab
+     * Completed tab
      */
     COMPLETED_TAB(1);
 
