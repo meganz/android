@@ -123,7 +123,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.domain.entity.user.UserCredentials;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;

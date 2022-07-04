@@ -38,7 +38,7 @@ class DefaultAccountRepositoryTest {
             monitorMultiFactorAuth = MonitorMultiFactorAuth(),
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },
-            dbH = mock()
+            localStorageGateway = mock(),
         )
     }
 
