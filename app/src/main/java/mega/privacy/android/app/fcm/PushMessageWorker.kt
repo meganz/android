@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.mapper.toPushMessage
+import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.usecase.FastLogin
 import mega.privacy.android.app.domain.usecase.FetchNodes
@@ -38,6 +38,7 @@ import timber.log.Timber
  * @property initMegaChat                   Required for initializing megaChat.
  * @property pushReceived                   Required for notifying received pushes.
  * @property retryPendingConnections        Required for retrying pending connections.
+ * @property pushMessageMapper              [PushMessageMapper].
  */
 @HiltWorker
 class PushMessageWorker @AssistedInject constructor(
@@ -50,6 +51,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val initMegaChat: InitMegaChat,
     private val pushReceived: PushReceived,
     private val retryPendingConnections: RetryPendingConnections,
+    private val pushMessageMapper: PushMessageMapper,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
@@ -63,7 +65,7 @@ class PushMessageWorker @AssistedInject constructor(
 
             val session = credentials!!.session
 
-            val pushMessage = toPushMessage(inputData)
+            val pushMessage = pushMessageMapper(inputData)
 
             if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
                 Timber.d("Needs fast login")
@@ -123,7 +125,7 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = when (toPushMessage(inputData).type) {
+        val notification = when (pushMessageMapper(inputData).type) {
             TYPE_CALL -> getNotification(R.drawable.ic_call_started)
             TYPE_CHAT -> getNotification(R.drawable.ic_stat_notify,
                 R.string.notification_chat_undefined_content)

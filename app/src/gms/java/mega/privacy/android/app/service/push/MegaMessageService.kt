@@ -6,15 +6,21 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
-import mega.privacy.android.app.data.mapper.toData
+import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.domain.entity.pushes.MegaRemoteMessage
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
 import timber.log.Timber
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MegaMessageService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var dataMapper: DataMapper
 
     override fun onDestroy() {
         Timber.d("onDestroyFCM")
@@ -32,7 +38,7 @@ class MegaMessageService : FirebaseMessagingService() {
         Timber.d("$megaRemoteMessage")
 
         WorkManager.getInstance(this)
-            .enqueuePushMessage(toData(megaRemoteMessage.pushMessage))
+            .enqueuePushMessage(dataMapper(megaRemoteMessage.pushMessage))
     }
 
     override fun onNewToken(s: String) {
