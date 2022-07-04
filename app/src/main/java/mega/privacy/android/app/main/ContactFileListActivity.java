@@ -276,7 +276,8 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        newFolderDialog = MegaNodeDialogUtil
+                .showNewFolderDialog(this, this, megaApi.getNodeByHandle(parentHandle), typedText);
     }
 
     @Override

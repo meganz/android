@@ -1,14 +1,14 @@
 <configuration>
 
-    <property name="LOG_DIR" value="/storage/emulated/0/Android/data/mega.privacy.android.app/files/MEGA Logs" />
-
+    <property name="LOG_DIR"
+        value="/storage/emulated/0/Android/data/mega.privacy.android.app/files/MEGA Logs" />
 
     <!--    SDK Rolling File appender -->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- active log file -->
         <file>${LOG_DIR}/log.txt</file>
         <encoder>
-            <pattern>%msg%n</pattern>
+            <pattern>[%d{dd-MM HH:mm:ss,UTC}][%-5level] %msg %n</pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -24,7 +24,7 @@
         <!-- active log file -->
         <file>${LOG_DIR}/logKarere.txt</file>
         <encoder>
-            <pattern>%msg%n</pattern>
+            <pattern>%msg %n</pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -42,15 +42,15 @@
         </encoder>
     </appender>
 
-    <logger name="mega.privacy.android.app.logging.loggers.TimberMegaLogger" >
+    <logger name="mega.privacy.android.app.data.gateway.TimberMegaLogger">
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="mega.privacy.android.app.logging.loggers.TimberChatLogger" >
+    <logger name="mega.privacy.android.app.data.gateway.TimberChatLogger">
         <appender-ref ref="ROLLING_CHAT" />
     </logger>
 
-    <logger name="mega.privacy.android.app.logging.loggers.LineNumberDebugTree" >
+    <logger name="mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree">
         <appender-ref ref="LOGCAT" />
     </logger>
 

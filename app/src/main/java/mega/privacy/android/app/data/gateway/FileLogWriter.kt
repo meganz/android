@@ -1,6 +1,7 @@
-package mega.privacy.android.app.logging.loggers
+package mega.privacy.android.app.data.gateway
 
 import android.util.Log
+import mega.privacy.android.app.domain.entity.logging.LogEntry
 import org.slf4j.Logger
 
 /**
@@ -10,28 +11,28 @@ import org.slf4j.Logger
  *
  * @property logger
  */
-class FileLogger(
-    private val logger: Logger
-) {
+class FileLogWriter(
+    private val logger: Logger,
+) : LogWriterGateway {
     /**
      * Log to file
      *
-     * @param fileLogMessage
+     * @param logEntry
      */
-    fun logToFile(
-        fileLogMessage: FileLogMessage
+    override fun writeLogEntry(
+        logEntry: LogEntry,
     ) {
-        val logMessage = fileLogMessage.toString()
+        val logMessage = logEntry.toString()
         with(logger) {
-            when (fileLogMessage.priority) {
+            when (logEntry.priority) {
                 Log.VERBOSE -> trace(logMessage)
                 Log.DEBUG -> debug(logMessage)
                 Log.INFO -> info(logMessage)
                 Log.ASSERT -> info(logMessage)
                 Log.WARN -> warn(logMessage)
                 Log.ERROR -> {
-                    if (fileLogMessage.throwable != null) {
-                        error(logMessage, fileLogMessage.throwable)
+                    if (logEntry.throwable != null) {
+                        error(logMessage, logEntry.throwable)
                     } else {
                         error(logMessage)
                     }

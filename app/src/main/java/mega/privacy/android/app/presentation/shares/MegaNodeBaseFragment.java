@@ -461,13 +461,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     public void checkScroll() {
-        if (recyclerView != null) {
-            if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-                managerActivity.changeAppBarElevation(true);
-            } else {
-                managerActivity.changeAppBarElevation(false);
-            }
-        }
+        managerActivity.changeAppBarElevation((recyclerView != null
+                && recyclerView.canScrollVertically(-1)
+                && recyclerView.getVisibility() == View.VISIBLE)
+                || (adapter != null && adapter.isMultipleSelect()));
     }
 
     protected void checkEmptyView() {
@@ -800,5 +797,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
+        checkScroll();
     }
 }

@@ -288,7 +288,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -6744,13 +6744,22 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
                 drawerItem == DrawerItem.HOMEPAGE);
     }
 

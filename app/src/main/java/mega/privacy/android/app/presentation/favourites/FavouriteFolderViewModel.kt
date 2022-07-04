@@ -8,17 +8,28 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.favourites.model.*
+import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
+import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
+import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import javax.inject.Inject
 
 /**
@@ -37,7 +48,8 @@ class FavouriteFolderViewModel @Inject constructor(
     private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
     private val megaUtilWrapper: MegaUtilWrapper,
-    savedStateHandle: SavedStateHandle
+    private val fetchNode: FetchNodeWrapper,
+    savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
 
@@ -52,7 +64,7 @@ class FavouriteFolderViewModel @Inject constructor(
 
     private var currentRootHandle: Long = -1
 
-    private var currentNodeJob : Job? = null
+    private var currentNodeJob: Job? = null
 
     init {
         currentRootHandle = savedStateHandle[KEY_ARGUMENT_PARENT_HANDLE] ?: -1
@@ -78,29 +90,7 @@ class FavouriteFolderViewModel @Inject constructor(
                             children.isEmpty() -> {
                                 ChildrenNodesLoadState.Empty(folderInfo.name)
                             }
-                            children.isNotEmpty() -> {
-                                withContext(ioDispatcher) {
-                                    ChildrenNodesLoadState.Success(
-                                        title = name,
-                                        children = children.map { favouriteInfo ->
-                                            FavouriteListItem(
-                                                favourite = favouriteMapper(
-                                                    favouriteInfo,
-                                                    { node ->
-                                                        megaUtilWrapper.availableOffline(
-                                                            context,
-                                                            node
-                                                        )
-                                                    },
-                                                    stringUtilWrapper,
-                                                    { name ->
-                                                        MimeTypeList.typeForName(name).iconResourceId
-                                                    }
-                                                )
-                                            )
-                                        })
-                                }
-                            }
+                            children.isNotEmpty() -> getData(name, children)
                             else -> {
                                 ChildrenNodesLoadState.Loading
                             }
@@ -110,6 +100,33 @@ class FavouriteFolderViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun getData(
+        name: String,
+        children: List<FavouriteInfo>,
+    ): ChildrenNodesLoadState {
+        return withContext(ioDispatcher) {
+            ChildrenNodesLoadState.Success(
+                title = name,
+                children = children.mapNotNull { favouriteInfo ->
+                    val node = fetchNode(favouriteInfo.id) ?: return@mapNotNull null
+                    FavouriteListItem(
+                        favourite = favouriteMapper(
+                            node,
+                            favouriteInfo,
+                            megaUtilWrapper.availableOffline(
+                                context,
+                                favouriteInfo.id
+                            ),
+                            stringUtilWrapper
+                        ) { name ->
+                            MimeTypeList.typeForName(name).iconResourceId
+                        }
+                    )
+                })
+        }
+    }
+
 
     /**
      * Whether handle back press

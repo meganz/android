@@ -2,7 +2,6 @@ package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.constants.SettingsConstants.KEY_APPEARANCE_COLOR_THEME
 import mega.privacy.android.app.domain.entity.ThemeMode
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import javax.inject.Inject
@@ -25,3 +24,5 @@ class DefaultGetThemeMode @Inject constructor(
     private fun asTheme(preference: String) = ThemeMode.values()
         .find { it.name.equals(preference, true) }
 }
+
+const val KEY_APPEARANCE_COLOR_THEME = "settings_appearance_color_theme"

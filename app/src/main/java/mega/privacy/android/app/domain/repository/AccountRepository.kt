@@ -1,11 +1,10 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.UserCredentials
+import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.entity.user.UserUpdate
 import mega.privacy.android.app.domain.exception.MegaException
-import nz.mega.sdk.MegaNode
 
 /**
  * Account repository
@@ -80,7 +79,7 @@ interface AccountRepository {
      *
      * @return User credentials if exists, null otherwise.
      */
-    suspend fun getCredentials(): UserCredentials?
+    suspend fun getSession(): String?
 
     /**
      * Refreshes DNS servers and retries pending connections.
