@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -103,7 +104,6 @@ class SearchNodesUseCase @Inject constructor(
                             DrawerItem.CLOUD_DRIVE -> parent =
                                 megaApi.getNodeByHandle(parentHandle)
                             DrawerItem.SHARED_ITEMS -> {
-                                @Suppress("DEPRECATION")
                                 when (SharesTab.fromPosition(sharesTab)) {
                                     SharesTab.INCOMING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
@@ -139,6 +139,10 @@ class SearchNodesUseCase @Inject constructor(
                                         }
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
+                                    }
+                                    else -> {
+                                        Timber.w("Unhandled current sharesTab value")
+                                        return@create
                                     }
                                 }
                             }
