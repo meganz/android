@@ -1240,7 +1240,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
             } else {
-                assignModeratorDialog?.dismiss()
+                assignModeratorDialog?.dismissAllowingStateLoss()
             }
         }
 
@@ -1256,7 +1256,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
             } else {
-                endMeetingAsModeratorDialog?.dismiss()
+                endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
             }
         }
     }
@@ -2718,8 +2718,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
-        assignModeratorDialog?.dismiss()
-        endMeetingAsModeratorDialog?.dismiss()
+        assignModeratorDialog?.dismissAllowingStateLoss()
+        endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
 
     /**

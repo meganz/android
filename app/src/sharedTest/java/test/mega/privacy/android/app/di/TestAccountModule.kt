@@ -5,9 +5,9 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.di.AccountModule
-import mega.privacy.android.app.domain.usecase.GetCredentials
+import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.app.domain.usecase.GetSession
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 import org.mockito.kotlin.mock
 
@@ -18,15 +18,15 @@ import org.mockito.kotlin.mock
 @Module
 object TestAccountModule {
 
-    private val getCredentials = mock<GetCredentials> {
-        on { runBlocking { invoke() } }.thenReturn(UserCredentials(""))
+    private val getSession = mock<GetSession> {
+        on { runBlocking { invoke() } }.thenReturn("")
     }
     private val retryPendingConnections = mock<RetryPendingConnections> {
         on { runBlocking { invoke(false) } }
     }
 
     @Provides
-    fun bindGetCredentials() = getCredentials
+    fun bindGetSession() = getSession
 
     @Provides
     fun bindRetryPendingConnections() = retryPendingConnections

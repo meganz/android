@@ -38,6 +38,7 @@ import mega.privacy.android.app.di.LegacyLoggingEntryPoint;
 import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatItemPreferences;

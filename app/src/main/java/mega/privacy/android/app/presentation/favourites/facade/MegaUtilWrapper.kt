@@ -17,10 +17,10 @@ interface MegaUtilWrapper {
     /**
      * Determine the current node whether is available offline
      * @param context Context
-     * @param node current node
+     * @param nodeId current nodeId
      * @return true is available offline
      */
-    fun availableOffline(context: Context, node: MegaNode): Boolean
+    suspend fun availableOffline(context: Context, nodeId: Long): Boolean
 
     /**
      * Opens an URL node.

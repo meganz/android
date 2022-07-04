@@ -2,7 +2,7 @@ package mega.privacy.android.app.constants;
 
 public class SettingsConstants {
     /* General settings */
-    public static final String KEY_APPEARANCE_COLOR_THEME = "settings_appearance_color_theme";
+
     public static final String KEY_FEATURES = "settings_features";
     public static final String KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload";
     public static final String KEY_FEATURES_CHAT = "settings_features_chat";

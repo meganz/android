@@ -1,10 +1,10 @@
 package test.mega.privacy.android.app.domain.usecase
 
-import android.util.Log
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.logging.CreateLogEntryRequest
+import mega.privacy.android.app.domain.entity.logging.LogPriority
 import mega.privacy.android.app.domain.usecase.CreateChatLogEntry
 import mega.privacy.android.app.domain.usecase.CreateLogEntry
 import mega.privacy.android.app.domain.usecase.CreateTraceString
@@ -44,7 +44,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = "Tag",
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),
@@ -60,7 +60,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = listOf(StackTraceElement(loggingClass, "", "", 1)),
             loggingClasses = emptyList(),
@@ -77,7 +77,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = listOf(StackTraceElement(loggingClass, "", "", 1)),
             loggingClasses = emptyList(),
@@ -95,7 +95,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),
@@ -111,7 +111,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),
@@ -125,13 +125,13 @@ class CreateChatLogEntryTest {
     @Test
     fun `test that client app logs have the correct priority string mapping`() = runTest {
         mapOf(
-            Log.VERBOSE to "VERBOSE",
-            Log.DEBUG to "DEBUG",
-            Log.INFO to "INFO",
-            Log.ASSERT to "ASSERT",
-            Log.WARN to "WARN",
-            Log.ERROR to "ERROR",
-            42 to "UNKNOWN",
+            LogPriority.VERBOSE to "VERBOSE",
+            LogPriority.DEBUG to "DEBUG",
+            LogPriority.INFO to "INFO",
+            LogPriority.ASSERT to "ASSERT",
+            LogPriority.WARN to "WARN",
+            LogPriority.ERROR to "ERROR",
+            LogPriority.UNKNOWN to "UNKNOWN",
         ).forEach { (priority, expectedString) ->
             val request = CreateLogEntryRequest(
                 tag = null,
@@ -153,7 +153,7 @@ class CreateChatLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),

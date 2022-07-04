@@ -1,10 +1,10 @@
 package test.mega.privacy.android.app.domain.usecase
 
-import android.util.Log
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.logging.CreateLogEntryRequest
+import mega.privacy.android.app.domain.entity.logging.LogPriority
 import mega.privacy.android.app.domain.usecase.CreateLogEntry
 import mega.privacy.android.app.domain.usecase.CreateSdkLogEntry
 import mega.privacy.android.app.domain.usecase.CreateTraceString
@@ -36,7 +36,7 @@ class CreateSdkLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = tag,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),
@@ -53,7 +53,7 @@ class CreateSdkLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = emptyList(),
             loggingClasses = emptyList(),
@@ -70,7 +70,7 @@ class CreateSdkLogEntryTest {
         val request = CreateLogEntryRequest(
             tag = null,
             message = "message",
-            priority = Log.DEBUG,
+            priority = LogPriority.DEBUG,
             throwable = null,
             trace = listOf(StackTraceElement(loggingClass, "", "", 1)),
             loggingClasses = emptyList(),
@@ -84,7 +84,7 @@ class CreateSdkLogEntryTest {
     @Test
     fun `test that values match`() = runTest {
         val message = "message"
-        val priority = Log.DEBUG
+        val priority = LogPriority.DEBUG
         val throwable = Throwable()
         val request = CreateLogEntryRequest(
             tag = null,
@@ -98,7 +98,7 @@ class CreateSdkLogEntryTest {
         val actual = underTest(request)
 
         assertThat(actual?.message).isEqualTo(message)
-        assertThat(actual?.priority).isEqualTo(priority)
+        assertThat(actual?.priority).isEqualTo(priority.intValue)
         assertThat(actual?.throwable).isEqualTo(throwable)
     }
 

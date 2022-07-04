@@ -131,10 +131,15 @@ class FavouritesFragmentTest {
             parentId = 1234,
             base64Id = "base64Handle",
             modificationTime = 1234567890,
-            node = node,
             hasVersion = false,
             numChildFolders = 0,
-            numChildFiles = 0
+            numChildFiles = 0,
+            isImage = false,
+            isVideo = false,
+            isFolder = true,
+            isFavourite = true,
+            isExported = false,
+            isTakenDown = false,
         )
         val favourite = mock<Favourite>()
         whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)
@@ -146,7 +151,7 @@ class FavouritesFragmentTest {
                 flowOf(list)
             )
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-            whenever(FavouritesTestModule.favouriteMapper(any(), any(), any(), any())).thenReturn(
+            whenever(FavouritesTestModule.favouriteMapper(any(), any(), any(), any(), any())).thenReturn(
                 favourite)
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
         }

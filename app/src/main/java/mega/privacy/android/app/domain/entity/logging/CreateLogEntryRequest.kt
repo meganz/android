@@ -14,7 +14,7 @@ package mega.privacy.android.app.domain.entity.logging
 data class CreateLogEntryRequest(
     val tag: String?,
     val message: String,
-    val priority: Int,
+    val priority: LogPriority,
     val throwable: Throwable?,
     val trace: List<StackTraceElement>,
     val loggingClasses: List<String>,
