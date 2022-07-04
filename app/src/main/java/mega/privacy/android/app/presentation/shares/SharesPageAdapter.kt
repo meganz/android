@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.shares
 
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
 import mega.privacy.android.app.presentation.shares.links.LinksFragment
@@ -16,7 +14,7 @@ import timber.log.Timber
  *
  * @param fa FragmentActivity where the viewPager2 lives
  */
-class SharesPageAdapter(private val fa: FragmentActivity, private val context: Context) :
+class SharesPageAdapter(private val fa: FragmentActivity) :
     FragmentStateAdapter(fa) {
 
     /**

@@ -4087,7 +4087,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (sharesPageAdapter == null) {
             Timber.w("sharesPageAdapter is NULL");
-            sharesPageAdapter = new SharesPageAdapter(this, this);
+            sharesPageAdapter = new SharesPageAdapter(this);
             viewPagerShares.setAdapter(sharesPageAdapter);
             new TabLayoutMediator(tabLayoutShares, viewPagerShares, (tab, position) -> {
                 if (position == SharesTab.INCOMING_TAB.getPosition()) {
