@@ -224,18 +224,6 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that incoming tree depth is not decreased when calling decreaseIncomingTreeDepth and incoming tree depth is already 0`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.incomingTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.decreaseIncomingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
     fun `test that incoming tree depth if if new value provided`() =
         runTest {
             setUnderTest()
@@ -290,18 +278,6 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that outgoing tree depth is not decreased when calling decreaseOutgoingTreeDepth and outgoing tree depth is already 0`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.decreaseOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
     fun `test that outgoing tree depth equals 0 if resetOutgoingTreeDepth`() =
         runTest {
             setUnderTest()
@@ -337,18 +313,6 @@ class ManagerViewModelTest {
                     underTest.increaseOutgoingTreeDepth()
                     assertThat(awaitItem()).isEqualTo(1)
                     underTest.decreaseOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
-    fun `test that links tree depth is not decreased when calling decreaseLinksTreeDepth and links tree depth is already 0`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.decreaseLinksTreeDepth()
                     assertThat(awaitItem()).isEqualTo(0)
                 }
         }

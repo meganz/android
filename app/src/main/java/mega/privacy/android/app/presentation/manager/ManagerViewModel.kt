@@ -231,11 +231,7 @@ class ManagerViewModel @Inject constructor(
      * Decrease by 1 the incoming tree depth
      */
     fun decreaseIncomingTreeDepth() = viewModelScope.launch {
-        if (_state.value.incomingTreeDepth > 0) {
-            _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth - 1) }
-        } else {
-            Timber.w("incomingTreeDepth is already 0, cannot decrease it")
-        }
+        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth - 1) }
     }
 
     /**
@@ -265,11 +261,7 @@ class ManagerViewModel @Inject constructor(
      * Decrease by 1 the outgoing tree depth
      */
     fun decreaseOutgoingTreeDepth() = viewModelScope.launch {
-        if (_state.value.outgoingTreeDepth > 0) {
-            _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
-        } else {
-            Timber.w("outgoingTreeDepth is already 0, cannot decrease it")
-        }
+        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
     }
 
     /**
@@ -290,11 +282,7 @@ class ManagerViewModel @Inject constructor(
      * Decrease by 1 the links tree depth
      */
     fun decreaseLinksTreeDepth() = viewModelScope.launch {
-        if (_state.value.linksTreeDepth > 0) {
-            _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
-        } else {
-            Timber.w("linksTreeDepth is already 0, cannot decrease it")
-        }
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
     }
 
     /**
