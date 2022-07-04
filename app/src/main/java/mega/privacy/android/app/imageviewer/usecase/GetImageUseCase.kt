@@ -292,8 +292,8 @@ class GetImageUseCase @Inject constructor(
                         megaApi.startDownload(
                             node,
                             fullFile.absolutePath,
+                            fullFile.name,
                             Constants.APP_DATA_BACKGROUND_TRANSFER,
-                            null,
                             highPriority,
                             null,
                             listener
