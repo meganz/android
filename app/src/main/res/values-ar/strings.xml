@@ -1164,7 +1164,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">معيار</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">مشرف</string>
+    <string name="administrator_permission_label_participants_panel">Host</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(عُدِّّلَت)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -3827,25 +3827,25 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">إظهار كعرض قائمة</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">التعيين كمشرف</string>
+    <string name="make_moderator">Make host</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">هل تريد مغادرة الاجتماع الآن؟</string>
     <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">لا يوجد مشرف</string>
+    <string name="no_moderator">No host</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">قبل المغادرة، يرجى تعيين مشرف جديد أو أكثر للاجتماع.</string>
+    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">التعيين كمشرف</string>
+    <string name="assign_moderator">Make host</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">غادر على أي حال</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">يرجى تعيين مشرف جديد أو أكثر.</string>
+    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">تغيير اسم الاجتماع</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">المشاركون: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">مشرف:%s</string>
+    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">رابط الاجتماع</string>
     <!-- Subtitle of the meeting screen-->
@@ -3879,7 +3879,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">قم بإعداد اجتماع ميغا MEGA بسرعة باستخدام ميزة الاجتماع المشفرة الجديدة الخاصة بنا</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">أنت المشرف الجديد.</string>
+    <string name="be_new_moderator">You are the new host.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">رابط الاجتماع الذي تم نسخه.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -4080,7 +4080,7 @@
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">لا تلغي</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">إزالة مشرف</string>
+    <string name="remove_moderator">Remove host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">شراء اشتراك جديد؟</string>
     <!-- Text of buy new subscription button -->
@@ -4274,7 +4274,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">تخطي هذا المجلد</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">يوجد مجلد اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
+    <string name="folder_already_exists_in_location">يوجد ملف اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">اتصال سيء</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -4294,11 +4294,11 @@
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] إكسابايت</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
-    <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
+    <string name="calls_call_screen_count_down_timer_to_end_call">ستنتهي المكالمة خلال %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">انت الوحيد هنا</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">أنت لاتزال في مكالمة</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">ستنتهي المكالمة تلقائيًا في غضون 2 دقيقتين ما لم ترغب في الاستمرار فيها.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4314,7 +4314,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">إرسال ملف السجل</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">لا يوجد اتصال بالإنترنت. تحقق من الاتصال وحاول مرة أخرى.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">إرسال</string>
     <!-- Error message when submit issue failed-->
@@ -4352,9 +4352,9 @@
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">فيديو فقط</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_title">Cannot open file</string>
+    <string name="dialog_cannot_open_file_title">لا يمكن فتح الملف</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_text">This file type isn’t supported. To open the file, download it first.</string>
+    <string name="dialog_cannot_open_file_text">نوع الملف هذا غير مدعوم. لفتح الملف قم بتنزيله أولاً.</string>
     <!-- General open action. -->
     <string name="general_confirmation_open">فتح</string>
     <!-- Option in the chat menu to end call for all participants -->
@@ -4362,9 +4362,17 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">إنهاء المكالمة للجميع؟</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">This will end the call for all participants.</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">سيؤدي هذا إلى إنهاء المكالمة لجميع المشاركين.</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">نعم</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">لا</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_leave_call_option">غادر</string>
+    <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">إنهاء المكالمة للجميع</string>
+    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">أنت المضيف الوحيد في المكالمة. هل تريد تعيين واحد آخر قبل المغادرة؟</string>
 </resources>

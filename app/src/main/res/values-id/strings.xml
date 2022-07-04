@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Standar</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Moderator</string>
+    <string name="administrator_permission_label_participants_panel">Host</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(diedit)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -3372,25 +3372,25 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Tampilan di tampilan utama</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Jadikan moderator</string>
+    <string name="make_moderator">Make host</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Tinggalkan pertemuan sekarang?</string>
     <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">Tidak ada moderator</string>
+    <string name="no_moderator">No host</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Sebelum meninggalkan, harap tetapkan satu atau lebih moderator baru untuk pertemuan.</string>
+    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Jadikan moderator</string>
+    <string name="assign_moderator">Make host</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Tetap pergi</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Harap tetapkan satu atau lebih moderator baru.</string>
+    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Ubah nama pertemuan</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">Peserta: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Moderator: %s</string>
+    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link pertemuan</string>
     <!-- Subtitle of the meeting screen-->
@@ -3424,7 +3424,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Siapkan Pertemuan MEGA dengan cepat dengan fitur rapat terenkripsi baru kami</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">Anda adalah moderator baru.</string>
+    <string name="be_new_moderator">You are the new host.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3620,7 +3620,7 @@
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">Jangan batalkan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Hapus moderator</string>
+    <string name="remove_moderator">Remove host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Beli langganan baru?</string>
     <!-- Text of buy new subscription button -->
@@ -3726,7 +3726,7 @@
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">Favorit</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <string name="settings_passcode_forgot_passcode_button">Lupa kode sandi anda?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Masukkan password anda</string>
     <!-- Resume to paused transfers snack bar description text -->
@@ -3746,7 +3746,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Item duplikat</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">Sebuah file bernama [B]%1$s[/B] sudah ada di lokasi ini.</string>
+    <string name="file_already_exists_in_location">Sebuah file bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Pilih file yang ingin anda simpan</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3804,11 +3804,11 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Lewati folder ini</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">Folder bernama [B]%1$s[/B] sudah ada di lokasi ini.</string>
+    <string name="folder_already_exists_in_location">Folder bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Bad connection</string>
+    <string name="calls_call_screen_poor_network_quality">Koneksi buruk</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
+    <string name="calls_chat_screen_unable_to_reconnect_the_call">Tidak dapat menyambung kembali</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3826,11 +3826,11 @@
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Panggilan akan berakhir di %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
-    <string name="calls_call_screen_dialog_title_only_you_in_the_call">You’re the only one here</string>
+    <string name="calls_call_screen_dialog_title_only_you_in_the_call">Anda satu-satunya di sini</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
     <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Anda masih dalam panggilan</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
-    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Call will automatically end in 2 mins unless you want to stay on it.</string>
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Panggilan akan secara otomatis berakhir dalam 2 menit kecuali anda ingin tetap menggunakannya.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
     <string name="calls_call_screen_button_to_end_call">Akhiri panggilan sekarang</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
@@ -3844,7 +3844,7 @@
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">Kirim log file</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">Tidak ada koneksi internet. Periksa koneksi anda dan coba lagi.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Serahkan</string>
     <!-- Error message when submit issue failed-->
@@ -3882,19 +3882,27 @@
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">Hanya video</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_title">Cannot open file</string>
+    <string name="dialog_cannot_open_file_title">Tidak bisa membuka berkas</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_text">This file type isn’t supported. To open the file, download it first.</string>
+    <string name="dialog_cannot_open_file_text">Jenis file ini tidak didukung. Untuk membuka file, unduh terlebih dahulu.</string>
     <!-- General open action. -->
     <string name="general_confirmation_open">Buka</string>
     <!-- Option in the chat menu to end call for all participants -->
-    <string name="meetings_chat_screen_menu_option_end_call_for_all">End call for all</string>
+    <string name="meetings_chat_screen_menu_option_end_call_for_all">Akhiri panggilan untuk semua</string>
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
-    <string name="meetings_chat_screen_dialog_title_end_call_for_all">End call for all?</string>
+    <string name="meetings_chat_screen_dialog_title_end_call_for_all">Akhiri panggilan untuk semua?</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">This will end the call for all participants.</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Ini akan mengakhiri panggilan untuk semua peserta.</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Ya</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">Tidak</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_leave_call_option">Tinggalkan</string>
+    <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Akhiri untuk semua</string>
+    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">Anda adalah satu-satunya tuan rumah yang menelepon. Apakah anda ingin menugaskan yang lain sebelum pergi?</string>
 </resources>
