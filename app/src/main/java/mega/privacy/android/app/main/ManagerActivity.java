@@ -9061,7 +9061,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 data.append(name);
                 if (phone != null) {
                     data.append(", " + phone);
-                    data.append(", " + phone);
                 }
 
                 if (email != null) {
