@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.domain.usecase.GetCredentials
+import mega.privacy.android.app.domain.usecase.GetSession
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 
 /**
@@ -20,8 +20,8 @@ abstract class AccountModule {
 
     companion object {
         @Provides
-        fun provideGetCredentials(accountRepository: AccountRepository): GetCredentials =
-            GetCredentials(accountRepository::getCredentials)
+        fun provideGetSession(accountRepository: AccountRepository): GetSession =
+            GetSession(accountRepository::getSession)
 
         @Provides
         fun provideRetryPendingConnections(accountRepository: AccountRepository): RetryPendingConnections =

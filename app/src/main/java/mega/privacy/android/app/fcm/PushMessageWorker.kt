@@ -16,22 +16,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.entity.pushes.PushMessage.Companion.toPushMessage
 import mega.privacy.android.app.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.app.domain.usecase.FastLogin
 import mega.privacy.android.app.domain.usecase.FetchNodes
-import mega.privacy.android.app.domain.usecase.GetCredentials
+import mega.privacy.android.app.domain.usecase.GetSession
 import mega.privacy.android.app.domain.usecase.InitMegaChat
 import mega.privacy.android.app.domain.usecase.PushReceived
 import mega.privacy.android.app.domain.usecase.RetryPendingConnections
 import mega.privacy.android.app.domain.usecase.RootNodeExists
-import mega.privacy.android.app.domain.entity.pushes.PushMessage.Companion.toPushMessage
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import timber.log.Timber
 
 /**
  * Worker class to manage push notifications.
  *
- * @property getCredentials                 Required for checking credentials.
+ * @property getSession                 Required for checking credentials.
  * @property rootNodeExists                 Required for checking if it is logged in.
  * @property fastLogin                      Required for performing fast login.
  * @property fetchNodes                     Required for fetching nodes.
@@ -43,7 +43,7 @@ import timber.log.Timber
 class PushMessageWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val getCredentials: GetCredentials,
+    private val getSession: GetSession,
     private val rootNodeExists: RootNodeExists,
     private val fastLogin: FastLogin,
     private val fetchNodes: FetchNodes,
@@ -54,14 +54,9 @@ class PushMessageWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
-            val credentials = getCredentials()
-
-            if (credentials == null) {
+            val session = getSession() ?: return@withContext Result.failure().also {
                 Timber.e("No user credentials, process terminates!")
-                Result.failure()
             }
-
-            val session = credentials!!.session
 
             val pushMessage = inputData.toPushMessage()
 
