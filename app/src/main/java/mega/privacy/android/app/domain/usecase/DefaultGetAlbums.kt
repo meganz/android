@@ -19,9 +19,9 @@ import javax.inject.Inject
  * @property albumsRepository
  */
 class DefaultGetAlbums @Inject constructor(
-        private val getAllFavorites: GetAllFavorites,
-        private val getThumbnail: GetThumbnail,
-        private val albumsRepository: AlbumsRepository,
+    private val getAllFavorites: GetAllFavorites,
+    private val getThumbnail: GetThumbnail,
+    private val albumsRepository: AlbumsRepository,
 ) : GetAlbums {
 
     override fun invoke(): Flow<List<Album>> {
@@ -33,14 +33,14 @@ class DefaultGetAlbums @Inject constructor(
      */
     private fun getFavouritesFlow() = flow {
         emit(listOf(
-                getFavouriteAlbum(null)
+            getFavouriteAlbum(null)
         ))
         emitAll(
-                getAllFavorites().map {
-                    listOf(
-                            getFavouriteAlbum(it)
-                    )
-                }
+            getAllFavorites().map {
+                listOf(
+                    getFavouriteAlbum(it)
+                )
+            }
         )
     }
 
@@ -52,8 +52,8 @@ class DefaultGetAlbums @Inject constructor(
             favItem.isImage || (favItem.isVideo && inSyncFolder(favItem.parentId))
         }
         return Album.FavouriteAlbum(
-                thumbnail = getThumbnailOrNull(favouriteList),
-                itemCount = favouriteList?.size ?: 0
+            thumbnail = getThumbnailOrNull(favouriteList),
+            itemCount = favouriteList?.size ?: 0
         )
     }
 
@@ -74,6 +74,6 @@ class DefaultGetAlbums @Inject constructor(
     }
 
     private suspend fun inSyncFolder(parentId: Long): Boolean =
-            parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
+        parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
 
 }

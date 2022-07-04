@@ -26,8 +26,44 @@ interface FilesRepository {
     fun monitorNodeUpdates(): Flow<List<MegaNode>>
 
     /**
+     * Get the root node
+     *
+     * @return A node corresponding to the root node, null if cannot be retrieved
+     */
+    suspend fun getRootNode(): MegaNode?
+
+    /**
+     * Get the rubbish root node
+     *
+     * @return A node corresponding to the rubbish bin node, null if cannot be retrieved
+     */
+    suspend fun getRubbishBinNode(): MegaNode?
+
+    /**
+     * Get children of a parent node
+     *
+     * @param parentNode parent node
+     * @param order order for the returned list
+     * @return Children nodes of a parent node
+     */
+    suspend fun getChildrenNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
+
+    /**
+     * Get the node corresponding to a handle
+     *
+     * @param handle
+     */
+    suspend fun getNodeByHandle(handle: Long): MegaNode?
+
+    /**
      * Get cloud sort order
      * @return cloud sort order
      */
     suspend fun getCloudSortOrder(): Int
+
+    /**
+     * Get camera sort order
+     * @return camera sort order
+     */
+    suspend fun getCameraSortOrder(): Int
 }

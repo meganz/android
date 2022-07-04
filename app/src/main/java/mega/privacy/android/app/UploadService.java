@@ -26,7 +26,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
+import androidx.lifecycle.Observer;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -41,6 +43,8 @@ import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase;
@@ -49,6 +53,7 @@ import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -56,8 +61,12 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import timber.log.Timber;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
@@ -69,6 +78,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -79,17 +89,16 @@ import javax.inject.Inject;
 public class UploadService extends Service {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
-	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
+	public static String EXTRA_FILE_PATH = "MEGA_FILE_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
-	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
-	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
     public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
 
     @Inject
     GetGlobalTransferUseCase getGlobalTransferUseCase;
+    @Inject
+    TransfersManagement transfersManagement;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -125,6 +134,12 @@ public class UploadService extends Service {
 
     // the flag to determine the rating dialog is showed for this upload action
     private boolean isRatingShowed;
+
+    private final Observer<Boolean> stopServiceObserver = finish -> {
+        if (finish && megaApi.getNumPendingUploads() == 0) {
+            stopForeground();
+        }
+    };
 
     @SuppressLint("NewApi")
 	@Override
@@ -165,10 +180,14 @@ public class UploadService extends Service {
             public void onReceive(Context context, Intent intent) {
                 new Handler().postDelayed(() -> {
                     updateProgressNotification();
-                }, 1000);
+                }, WAIT_TIME_BEFORE_UPDATE);
             }
         };
+
         registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
+        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+                .observeForever(stopServiceObserver);
 
         Disposable subscription = getGlobalTransferUseCase.get()
                 .subscribeOn(Schedulers.io())
@@ -242,6 +261,9 @@ public class UploadService extends Service {
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
 
+        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+                .removeObserver(stopServiceObserver);
+
 		super.onDestroy();
 	}
 
@@ -300,7 +322,7 @@ public class UploadService extends Service {
                             continue;
                         }
 
-                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+                        transfersManagement.checkIfTransferIsPaused(transfer);
 
                         if (!transfer.isFolderTransfer() && transfer.getAppData() == null){
                             mapProgressFileTransfers.put(transfer.getTag(), transfer);
@@ -315,7 +337,9 @@ public class UploadService extends Service {
                         mNotificationManager.cancel(NOTIFICATION_UPLOAD);
                     }
 
-                    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+                    LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
+                            .post(MegaTransfer.TYPE_UPLOAD);
+
                     break;
             }
 
@@ -330,7 +354,7 @@ public class UploadService extends Service {
             isOverquota = NOT_OVERQUOTA_STATE;
         }
 
-        String filePath = intent.getStringExtra(EXTRA_FILEPATH);
+        String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
         if (isTextEmpty(filePath)) {
             Timber.w("Error: File path is NULL or EMPTY");
             return;
@@ -346,36 +370,35 @@ public class UploadService extends Service {
         Timber.d("File to manage: " + file.getAbsolutePath());
 
         String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
-        long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-        String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-        String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
+        long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, INVALID_HANDLE);
+        String fileName = intent.getStringExtra(EXTRA_NAME);
         long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
         if (lastModified <= 0) {
-            lastModified = file.lastModified();
+            lastModified = file.lastModified() / 1000;
         }
 
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+        MegaNode parentNode = parentHandle == INVALID_HANDLE
+                ? megaApi.getRootNode()
+                : megaApi.getNodeByHandle(parentHandle);
+
+        long mTime = lastModified == 0 ? INVALID_VALUE : lastModified;
 
         pendingToAddInQueue++;
-        if (!isTextEmpty(textFileMode)) {
-            boolean fromHome = intent.getBooleanExtra(FROM_HOME_PAGE, false);
-            String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
-                    + APP_DATA_INDICATOR + fromHome;
 
-            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, appData, true, nameInMEGA);
-        } else if (nameInMEGAEdited != null) {
-            // File upload with edited name
-            megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGAEdited);
-        } else if (lastModified == 0) {
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode);
-            }
-        } else if (nameInMEGA != null) {
-            megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, lastModified / 1000);
+        if (!isTextEmpty(textFileMode)) {
+            String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
+                    + APP_DATA_INDICATOR + intent.getBooleanExtra(FROM_HOME_PAGE, false);
+
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, appData,
+                    true, true, null);
         } else {
-            megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000);
+            MegaCancelToken cancelToken = transfersManagement
+                    .addScanningTransfer(MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode, file.isDirectory());
+
+            if (cancelToken != null) {
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, null,
+                        false, false, cancelToken);
+            }
         }
     }
 
@@ -661,11 +684,13 @@ public class UploadService extends Service {
     private Completable doOnTransferStart(@Nullable MegaTransfer transfer) {
         return Completable.fromCallable(() -> {
             if (transfer == null) return null;
-            Timber.d("Upload start: " + transfer.getFileName());
+            Timber.d("Upload start: %s", transfer.getFileName());
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
 
-                launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
+                        .post(MegaTransfer.TYPE_UPLOAD);
+
                 String appData = transfer.getAppData();
 
                 if (appData != null) {
@@ -673,6 +698,7 @@ public class UploadService extends Service {
                 }
 
                 pendingToAddInQueue--;
+                transfersManagement.checkScanningTransferOnStart(transfer);
 
                 if (!transfer.isFolderTransfer()) {
                     uploadCount++;
@@ -690,16 +716,14 @@ public class UploadService extends Service {
             Timber.d("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
             if (isCUOrChatTransfer(transfer)) return null;
 
-            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
-
             if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
             }
 
-            if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+            if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (!transfer.isFolderTransfer()) {
                     AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
-                    addCompletedTransfer(completedTransfer);
+                    addCompletedTransfer(completedTransfer, dbH);
 
                     String appData = transfer.getAppData();
 
@@ -709,8 +733,11 @@ public class UploadService extends Service {
                     }
 
                     if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-                        MegaApplication.getTransfersManagement().setFailedTransfers(true);
+                        transfersManagement.setAreFailedTransfers(true);
                     }
+
+                    LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
+                            .post(MegaTransfer.TYPE_UPLOAD);
                 }
 
                 if (transfer.getAppData() != null) {
@@ -766,13 +793,13 @@ public class UploadService extends Service {
                                     Timber.e(ex, "Exception is thrown");
                                 }
 
-                                if(location!=null){
+                                if (location != null) {
                                     Timber.d("Location: " + location);
 
                                     boolean secondTry = false;
-                                    try{
+                                    try {
                                         final int mid = location.length() / 2; //get the middle of the String
-                                        String[] parts = {location.substring(0, mid),location.substring(mid)};
+                                        String[] parts = {location.substring(0, mid), location.substring(mid)};
 
                                         Double lat = Double.parseDouble(parts[0]);
                                         Double lon = Double.parseDouble(parts[1]);
@@ -780,16 +807,15 @@ public class UploadService extends Service {
                                         Timber.d("Long: " + lon); //second part
 
                                         megaApi.setNodeCoordinates(node, lat, lon, null);
-                                    }
-                                    catch (Exception e){
+                                    } catch (Exception e) {
                                         secondTry = true;
                                         Timber.e(e, "Exception, second try to set GPS coordinates");
                                     }
 
-                                    if(secondTry){
-                                        try{
-                                            String latString = location.substring(0,7);
-                                            String lonString = location.substring(8,17);
+                                    if (secondTry) {
+                                        try {
+                                            String latString = location.substring(0, 7);
+                                            String lonString = location.substring(8, 17);
 
                                             Double lat = Double.parseDouble(latString);
                                             Double lon = Double.parseDouble(lonString);
@@ -797,13 +823,11 @@ public class UploadService extends Service {
                                             Timber.d("Long: " + lon); //second part
 
                                             megaApi.setNodeCoordinates(node, lat, lon, null);
-                                        }
-                                        catch (Exception e){
+                                        } catch (Exception e) {
                                             Timber.e(e, "Exception again, no chance to set coordinates of video");
                                         }
                                     }
-                                }
-                                else{
+                                } else {
                                     Timber.d("No location info");
                                 }
                             }
@@ -822,7 +846,9 @@ public class UploadService extends Service {
                                 try {
                                     final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
                                     double[] latLong = exifInterface.getLatLong();
-                                    megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+                                    if (latLong != null) {
+                                        megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+                                    }
                                 } catch (Exception e) {
                                     Timber.w("Couldn't read exif info: " + transfer.getPath(), e);
                                 }
@@ -832,7 +858,7 @@ public class UploadService extends Service {
 
                             try {
                                 createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-                            } catch(Exception e) {
+                            } catch (Exception e) {
                                 Timber.w(e, "Pdf thumbnail could not be created");
                             }
 
@@ -840,17 +866,17 @@ public class UploadService extends Service {
                             FileOutputStream out = null;
 
                             try {
-                            PdfiumCore pdfiumCore = new PdfiumCore(this);
-                            MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                                PdfiumCore pdfiumCore = new PdfiumCore(this);
+                                MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
-                            if (pdfNode == null){
-                                Timber.e("pdf is NULL");
-                                return null;
-                            }
+                                if (pdfNode == null) {
+                                    Timber.e("pdf is NULL");
+                                    return null;
+                                }
 
-                            File previewDir = getPreviewFolder(this);
-                            File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                            File file = new File(transfer.getPath());
+                                File previewDir = getPreviewFolder(this);
+                                File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                                File file = new File(transfer.getPath());
 
                                 PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
                                 pdfiumCore.openPage(pdfDocument, pageNumber);
@@ -861,15 +887,14 @@ public class UploadService extends Service {
                                 Bitmap resizedBitmap = resizeBitmapUpload(bmp, width, height);
                                 out = new FileOutputStream(preview);
                                 boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                                if(result){
+                                if (result) {
                                     Timber.d("Compress OK!");
                                     megaApi.setPreview(pdfNode, preview.getAbsolutePath());
-                                }
-                                else{
+                                } else {
                                     Timber.w("Not Compress");
                                 }
                                 pdfiumCore.closeDocument(pdfDocument);
-                            } catch(Exception e) {
+                            } catch (Exception e) {
                                 Timber.w(e, "Pdf preview could not be created");
                             } finally {
                                 try {
@@ -888,15 +913,14 @@ public class UploadService extends Service {
 
                         if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
                             isOverquota = OVERQUOTA_STORAGE_STATE;
-                        }
-                        else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+                        } else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
                             isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
                         }
                     }
 
                     String qrFileName = megaApi.getMyEmail() + QR_IMAGE_FILE_NAME;
 
-                    File localFile = CacheFolderManager.buildQrFile(getApplicationContext(),transfer.getFileName());
+                    File localFile = CacheFolderManager.buildQrFile(getApplicationContext(), transfer.getFileName());
                     if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
                         Timber.d("Delete file!: " + localFile.getAbsolutePath());
                         localFile.delete();
@@ -920,9 +944,9 @@ public class UploadService extends Service {
                     }
                 }
             }
-                return null;
-            });
-        }
+            return null;
+        });
+    }
 
     private Completable doOnTransferUpdate(@Nullable MegaTransfer transfer) {
         return Completable.fromCallable(() -> {
@@ -931,7 +955,8 @@ public class UploadService extends Service {
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
 
-                launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
+                        .post(MegaTransfer.TYPE_UPLOAD);
 
                 String appData = transfer.getAppData();
 
@@ -947,6 +972,8 @@ public class UploadService extends Service {
                     Timber.d("After cancel");
                     return null;
                 }
+
+                transfersManagement.checkScanningTransferOnUpdate(transfer);
 
                 if (!transfer.isFolderTransfer()) {
                     mapProgressFileTransfers.put(transfer.getTag(), transfer);

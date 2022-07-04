@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -82,7 +81,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.megachat.ChatActivity;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
@@ -90,7 +88,12 @@ import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
@@ -123,6 +126,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATU
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -151,13 +155,18 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivity extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, OnItemClickListener,
-		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.StartChatCallCallback {
+		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower {
 
 	@Inject
 	PasscodeManagement passcodeManagement;
-
 	@Inject
 	GetChatChangesUseCase getChatChangesUseCase;
+	@Inject
+	StartCallUseCase startCallUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -908,9 +917,7 @@ public class ContactInfoActivity extends PasscodeActivity
 				break;
 			}
 			case R.id.action_return_call:
-				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					returnActiveCall(this, passcodeManagement);
-				}
+				returnActiveCall(this, passcodeManagement);
 				return true;
 		}
 		return true;
@@ -972,49 +979,39 @@ public class ContactInfoActivity extends PasscodeActivity
 		}
 	}
 
-	public void startCall() {
-		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-		if (chatRoomTo != null) {
-			logDebug("Chat exists");
-			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
-				logDebug("There is a call, open it");
-				openMeetingInProgress(this, chatRoomTo.getChatId(), true, passcodeManagement);
-			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
-				logDebug("There is no call, start it");
-				startCallWithChatOnline(chatRoomTo);
-			}
-		} else {
-			logDebug("Chat doesn't exist");
-			//Create first the chat
-			ArrayList<MegaChatRoom> chats = new ArrayList<>();
-			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
-			usersNoChat.add(user);
-			CreateChatListener listener;
-
-			if (startVideo) {
-				listener = new CreateChatListener(CreateChatListener.START_VIDEO_CALL, chats,
-						usersNoChat, this, this);
-			} else {
-				listener = new CreateChatListener(CreateChatListener.START_AUDIO_CALL, chats,
-						usersNoChat, this, this);
-			}
-
-			MegaChatPeerList peers = MegaChatPeerList.createInstance();
-			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-			megaChatApi.createChat(false, peers, listener);
-		}
+	/**
+	 * Start call
+	 */
+	private void startCall() {
+		enableCallLayouts(false);
+		startCallUseCase.startCallFromUserHandle(user.getHandle(), startVideo, true)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					enableCallLayouts(true);
+					if (throwable == null) {
+						long chatId = result.component1();
+						boolean videoEnable = result.component2();
+						boolean audioEnable = result.component3();
+						openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+					}
+				});
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (grantResults.length == 0) return;
+
 		switch (requestCode) {
-			case REQUEST_CAMERA:
 			case REQUEST_RECORD_AUDIO:
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-						checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+				if (checkCameraPermission(this)) {
 					startCall();
 				}
+				break;
+
+			case REQUEST_CAMERA:
+				startCall();
 				break;
 		}
 
@@ -1193,9 +1190,7 @@ public class ContactInfoActivity extends PasscodeActivity
 				break;
 
 			case R.id.call_in_progress_layout:
-				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
-					returnActiveCall(this, passcodeManagement);
-				}
+				returnActiveCall(this, passcodeManagement);
 				break;
 		}
 	}
@@ -1349,39 +1344,51 @@ public class ContactInfoActivity extends PasscodeActivity
 
 			megaAttacher.handleSelectFileResult(intent, user, this);
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-                return;
-            }
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+				return;
+			}
 
-            statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
-            
-            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-            final long toHandle = intent.getLongExtra("COPY_TO", 0);
-            final int totalCopy = copyHandles.length;
-            
-            MegaNode parent = megaApi.getNodeByHandle(toHandle);
-            for (int i = 0; i < copyHandles.length; i++) {
-				logDebug("NODE TO COPY: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
-				logDebug("WHERE: " + parent.getName());
-				logDebug("NODES: " + copyHandles[i] + "_" + parent.getHandle());
-                MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                if (cN != null){
-					logDebug("cN != null");
-                    megaApi.copyNode(cN, parent, this);
-                }
-                else{
-					logWarning("cN == null");
-                    try {
-                        statusDialog.dismiss();
-                        if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                            showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_sent_node), -1);
-                        }
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-        }
+			statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
+
+			final long[] copyHandles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES);
+			final long toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, 0);
+
+			checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						if (throwable == null) {
+							ArrayList<NameCollision> collisions = result.getFirst();
+
+							if (!collisions.isEmpty()) {
+								dismissAlertDialogIfExists(statusDialog);
+								nameCollisionActivityContract.launch(collisions);
+							}
+
+							long[] handlesWithoutCollision = result.getSecond();
+
+							if (handlesWithoutCollision.length > 0) {
+								copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe((copyResult, copyThrowable) -> {
+											dismissAlertDialogIfExists(statusDialog);
+
+											if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+												sharedFoldersFragment.clearSelections();
+												sharedFoldersFragment.hideMultipleSelect();
+											}
+											if (copyThrowable == null) {
+												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
+											} else {
+												manageCopyMoveException(copyThrowable);
+											}
+										});
+							}
+						}
+					});
+		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
 	}
@@ -1461,51 +1468,7 @@ public class ContactInfoActivity extends PasscodeActivity
                     sharedFoldersFragment.setNodes();
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_COPY) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-            }
-            
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    sharedFoldersFragment.clearSelections();
-                    sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-                }
-            }
-            else{
-                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					if (api.isForeignNode(request.getParentHandle())) {
-						showForeignStorageOverQuotaWarningDialog(this);
-						return;
-					}
-
-					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-					logDebug("PRE OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-                    }
-                }
-            }
-
-			logDebug("Copy nodes request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_MOVE) {
+        } else if (request.getType() == MegaRequest.TYPE_MOVE) {
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
@@ -1962,10 +1925,20 @@ public class ContactInfoActivity extends PasscodeActivity
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-		addChecksForACall(chatRoom.getChatId(), startVideo);
 		enableCallLayouts(false);
-		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
-		MegaApplication.setIsWaitingForCall(false);
+
+		startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					enableCallLayouts(true);
+					if (throwable == null) {
+						long chatId = result.component1();
+						boolean videoEnable = result.component2();
+						boolean audioEnable = result.component3();
+						openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
+					}
+				});
 	}
 
 	private void enableCallLayouts(Boolean enable) {
@@ -2048,21 +2021,6 @@ public class ContactInfoActivity extends PasscodeActivity
 	@Override
 	public void createFolder(@NotNull String folderName) {
 		//No action needed
-	}
-
-	@Override
-	public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
-		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
-		if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
-			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
-		}
-
-		enableCallLayouts(true);
-	}
-
-	@Override
-	public void onCallFailed(long chatId) {
-		enableCallLayouts(true);
 	}
 
 	/**

@@ -29,15 +29,12 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -47,12 +44,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
-import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.view.View.GONE;
@@ -1077,91 +1072,61 @@ public class CallUtil {
     }
 
     /**
-     * Method to control when a call should be started, whether the chat room should be created or is already created.
+     * Check Camera Permission
      *
-     * @param activity           The Activity.
-     * @param snackbarShower     The interface to show snackbar.
-     * @param user               The mega User.
-     * @param passcodeManagement To disable passcode.
+     * @param activity Current activity
+     * @return True, if granted. False, if not granted
      */
-    public static void startNewCall(Activity activity, SnackbarShower snackbarShower,
-                                    MegaUser user, PasscodeManagement passcodeManagement) {
-        if (user == null)
-            return;
-
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-
-        MegaChatPeerList peers = MegaChatPeerList.createInstance();
-        if (chat == null) {
-            logDebug("Chat doesn't exist");
-            ArrayList<MegaChatRoom> chats = new ArrayList<>();
-            ArrayList<MegaUser> usersNoChat = new ArrayList<>();
-            usersNoChat.add(user);
-            CreateChatListener listener = new CreateChatListener(
-                    CreateChatListener.START_AUDIO_CALL, chats, usersNoChat, activity,
-                    snackbarShower);
-            if (peers != null) {
-                peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                megaChatApi.createChat(false, peers, listener);
-            }
-        } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
-            logDebug("There is a call, open it");
-            openMeetingInProgress(activity, chat.getChatId(), true, passcodeManagement);
-        } else if (isStatusConnected(activity, chat.getChatId())) {
-            logDebug("There is no call, start it");
-            MegaApplication.setUserWaitingForCall(user.getHandle());
-            startCallWithChatOnline(activity, chat);
-        }
-    }
-
-    /**
-     * Method to control if the chat is online in order to start a call.
-     *
-     * @param activity The Activity.
-     * @param chatRoom The chatRoom.
-     */
-    public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
-        if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
-            MegaApplication.getChatManagement().setSpeakerStatus(chatRoom.getChatId(), false);
-            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, true, new StartChatCallListener(activity));
-            MegaApplication.setIsWaitingForCall(false);
-        }
-    }
-
-    /**
-     * Method for obtaining the necessary permissions in one call.
-     *
-     * @param activity       The activity.
-     * @param typePermission The type of permission
-     * @return True, if you have both permits. False, otherwise.
-     */
-    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
+    public static boolean checkCameraPermission(Activity activity) {
         boolean hasCameraPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
             if (activity == null)
                 return false;
 
             if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
+                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
             }
             requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Check Audio Permission
+     *
+     * @param activity Current activity
+     * @return True, if granted. False, if not granted
+     */
+    public static boolean checkAudioPermission(Activity activity) {
         boolean hasRecordAudioPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
             if (activity == null)
                 return false;
 
             if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
+                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
             }
             requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Method for obtaining the necessary permissions in one call.
+     *
+     * @param activity Current activity
+     * @return True, if you have both permits. False, otherwise.
+     */
+    public static boolean checkPermissionsCall(Activity activity) {
+        if(!checkAudioPermission(activity)) {
+            return false;
+        }
+
+        return checkCameraPermission(activity);
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {
@@ -1470,7 +1435,7 @@ public class CallUtil {
             return false;
         }
 
-        return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
+        return checkPermissionsCall(context);
     }
 
     /**

@@ -50,8 +50,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.10.1"
-    versionCode = 442
+    appVersion = "6.11"
+    versionCode = 448
 
     // Sdk and tools
     compileSdkVersion = 31
@@ -100,6 +100,7 @@ ext {
     roomVersion = '2.4.2'
     rxAndroidVersion = '3.0.0'
     rxJavaVersion = '3.0.4'
+    showkaseVersion = '1.0.0-beta13'
     simpleStorageVersion = '1.1.0'
     slf4jVersion = '1.7.25'
     timberVersion = '5.0.1'

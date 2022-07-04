@@ -22,7 +22,6 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.content.Intent
 import android.content.IntentFilter
-import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import nz.mega.sdk.MegaChatApiJava
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.MimeTypeList
@@ -37,13 +36,17 @@ import com.shockwave.pdfium.PdfiumCore
 import android.graphics.Bitmap
 import android.os.*
 import androidx.core.app.NotificationCompat
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.ChatImageQuality
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatError
@@ -56,7 +59,6 @@ import java.lang.Exception
 import java.util.ArrayList
 import java.util.HashMap
 import javax.inject.Inject
-
 
 /**
  * Service which should be only used for chat uploads.
@@ -78,6 +80,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
     @ApplicationScope
     @Inject
     lateinit var sharingScope: CoroutineScope
+
+    @Inject
+    lateinit var transfersManagement: TransfersManagement
 
 
     private var isForeground = false
@@ -161,11 +166,11 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 Constants.NOTIFICATION_CHAT_UPLOAD,
                 TransfersManagement.createInitialServiceNotification(
                     Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, mNotificationManager,
+                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, mNotificationManager!!,
                     NotificationCompat.Builder(
                         this@ChatUploadService,
                         Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
-                    ), mBuilder
+                    ), mBuilder!!
                 )
             )
             true
@@ -248,7 +253,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     if (isVoiceClip(data)) {
                         voiceClipsInProgress++
                     } else {
-                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer)
+                        transfersManagement.checkIfTransferIsPaused(transfer)
                     }
                 }
             }
@@ -262,7 +267,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 stopForeground()
             }
 
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
+
             return
         } else if (Constants.ACTION_CHECK_COMPRESSING_MESSAGE == intent.action) {
             checkCompressingMessage(intent)
@@ -500,7 +507,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     }
 
                     if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        && !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown
+                        && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
                     ) {
                         sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS))
                     }
@@ -547,11 +554,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             data = Constants.APP_DATA_VOICE_CLIP + Constants.APP_DATA_SEPARATOR + data
         }
 
-        if (!TextUtil.isTextEmpty(fileName)) {
-            megaApi.startUploadForChat(localPath, parentNode, data, false, fileName)
-        } else {
-            megaApi.startUploadForChat(localPath, parentNode, data, false)
-        }
+        megaApi.startUploadForChat(localPath, parentNode, data, false, fileName)
     }
 
     /**
@@ -606,7 +609,7 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
         }
 
         Timber.d("Stopping service!!")
-        MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown = false
+        transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = false
         stopForeground()
         Timber.d("After stopSelf")
 
@@ -862,7 +865,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
             val appData = transfer.appData ?: return
 
             if (appData.contains(Constants.APP_DATA_CHAT)) {
-                TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+                LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                    .post(MegaTransfer.TYPE_UPLOAD)
+
                 Timber.d("This is a chat upload: $appData")
 
                 if (!isVoiceClip(appData)) {
@@ -892,7 +897,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
 
     override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
         if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
+
             Timber.d("onTransferUpdate: " + transfer.nodeHandle)
             val appData = transfer.appData
 
@@ -920,7 +927,9 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                 return
             }
 
-            TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+            LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                .post(MegaTransfer.TYPE_UPLOAD)
+
             if (isOverQuota != 0) {
                 Timber.w("After overquota error")
                 isOverQuota = 0
@@ -979,9 +988,11 @@ class ChatUploadService : Service(), MegaTransferListenerInterface, MegaRequestL
                     totalUploadsCompleted++
                 }
 
-                TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error))
+                addCompletedTransfer(AndroidCompletedTransfer(transfer, error), dbH)
                 mapProgressTransfers!![transfer.tag] = transfer
-                TransfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD)
+
+                LiveEventBus.get(EventConstants.EVENT_TRANSFER_UPDATE, Int::class.java)
+                    .post(MegaTransfer.TYPE_UPLOAD)
 
                 if (canceled) {
                     Timber.w("Upload cancelled: " + transfer.nodeHandle)

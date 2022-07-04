@@ -10,7 +10,11 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
@@ -25,19 +29,44 @@ import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
-import mega.privacy.android.app.imageviewer.util.*
+import mega.privacy.android.app.imageviewer.util.shouldShowDownloadOption
+import mega.privacy.android.app.imageviewer.util.shouldShowForwardOption
+import mega.privacy.android.app.imageviewer.util.shouldShowManageLinkOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
+import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.interfaces.showTransfersSnackBar
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.EXTRA_LINK
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FILE_VERSION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
-import mega.privacy.android.app.presentation.security.PasscodeCheck
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -58,15 +87,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
          *
          * @param context       Required to build the Intent.
          * @param nodeHandle    Node handle to request image from.
+         * @param isFileVersion True if is a file version, false otherwise.
          * @return              Image Viewer Intent.
          */
         @JvmStatic
         fun getIntentForSingleNode(
             context: Context,
-            nodeHandle: Long
+            nodeHandle: Long,
+            isFileVersion: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                putExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, isFileVersion)
             }
 
         /**
@@ -79,10 +111,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         @JvmStatic
         fun getIntentForSingleNode(
             context: Context,
-            nodeFileLink: String
+            nodeFileLink: String,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(EXTRA_LINK, nodeFileLink)
+            }
+
+        /**
+         * Get Image Viewer intent for reordering activity back to front.
+         * Caution: Only call this intent if image viewer is already running, otherwise no node handle.
+         *
+         * @param context       Required to build the Intent.
+         * @return              Image Viewer Intent.
+         */
+        @JvmStatic
+        fun getIntentFromBackStack(
+            context: Context,
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             }
 
         /**
@@ -95,7 +142,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         @JvmStatic
         fun getIntentForSingleOfflineNode(
             context: Context,
-            nodeHandle: Long
+            nodeHandle: Long,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, nodeHandle)
@@ -116,7 +163,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             parentNodeHandle: Long,
             childOrder: Int = ORDER_PHOTO_ASC,
-            currentNodeHandle: Long? = null
+            currentNodeHandle: Long? = null,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNodeHandle)
@@ -137,7 +184,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         fun getIntentForChildren(
             context: Context,
             childrenHandles: LongArray,
-            currentNodeHandle: Long? = null
+            currentNodeHandle: Long? = null,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(NODE_HANDLES, childrenHandles)
@@ -159,7 +206,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             chatRoomId: Long,
             messageIds: LongArray,
-            currentNodeHandle: Long? = null
+            currentNodeHandle: Long? = null,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatRoomId)
@@ -179,7 +226,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         fun getIntentForOfflineChildren(
             context: Context,
             childrenHandles: LongArray,
-            currentNodeHandle: Long? = null
+            currentNodeHandle: Long? = null,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
@@ -198,7 +245,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         fun getIntentForFile(
             context: Context,
             imageFileUri: Uri,
-            showNearbyFiles: Boolean = false
+            showNearbyFiles: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_URI, imageFileUri)
@@ -211,7 +258,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
-    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+        INVALID_HANDLE)
     private val nodeFileLink: String? by extra(EXTRA_LINK)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
@@ -220,6 +268,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
     private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
+    private val isFileVersion by lazy {
+        intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION,
+            false)
+    }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
@@ -296,7 +348,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         binding.viewPager.apply {
             isSaveEnabled = false
-            offscreenPageLimit = if (isLowMemory()) OFFSCREEN_PAGE_LIMIT_DEFAULT else IMAGE_OFFSCREEN_PAGE_LIMIT
+            offscreenPageLimit =
+                if (isLowMemory()) OFFSCREEN_PAGE_LIMIT_DEFAULT else IMAGE_OFFSCREEN_PAGE_LIMIT
             setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
             adapter = pagerAdapter
         }
@@ -331,7 +384,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle!!)
                 imageFileUri != null ->
-                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, imageFileUri.hashCode().toLong())
+                    viewModel.retrieveFileImage(imageFileUri!!,
+                        showNearbyFiles,
+                        imageFileUri.hashCode().toLong())
                 else ->
                     error("Invalid params")
             }
@@ -356,24 +411,34 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
         viewModel.onCurrentImageItem().observe(this, ::showCurrentImageInfo)
         viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
-        viewModel.onSnackbarMessage().observe(this) { message ->
+        viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
         }
-        viewModel.onCurrentPosition().observe(this) { positionPair ->
+        viewModel.onCopyMoveException().observe(this) { error ->
+            manageCopyMoveException(error)
+        }
+        viewModel.onCollision().observe(this) { collision ->
+            nameCollisionActivityContract.launch(arrayListOf(collision))
+        }
+        viewModel.onActionBarMessage().observe(this) { message ->
+            bottomSheet?.dismissAllowingStateLoss()
+            showTransfersSnackBar(StringResourcesUtils.getString(message))
+        }
+        viewModel.onCurrentPosition().observe(this) { (first, second) ->
             binding.txtPageCount.apply {
                 text = StringResourcesUtils.getString(
                     R.string.wizard_steps_indicator,
-                    positionPair.first + 1,
-                    positionPair.second
+                    first + 1,
+                    second
                 )
-                isVisible = positionPair.second > 1
+                isVisible = second > 1
             }
 
             binding.viewPager.apply {
                 waitForLayout {
-                    if (currentItem != positionPair.first) {
-                        setCurrentItem(positionPair.first, false)
+                    if (currentItem != first) {
+                        setCurrentItem(first, false)
                     }
 
                     if (!pageCallbackSet) {
@@ -413,12 +478,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         binding.txtTitle.text = imageItem?.name
         if (imageItem?.nodeItem != null) {
             binding.toolbar.menu?.apply {
-                findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
-                findItem(R.id.action_share)?.isVisible = imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption()
+                findItem(R.id.action_forward)?.isVisible =
+                    imageItem.shouldShowForwardOption() && !isFileVersion
+                findItem(R.id.action_share)?.isVisible =
+                    imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption() && !isFileVersion
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
-                findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption()
-                findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn())
-                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null
+                findItem(R.id.action_get_link)?.isVisible =
+                    imageItem.shouldShowManageLinkOption() && !isFileVersion
+                findItem(R.id.action_send_to_chat)?.isVisible =
+                    imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
+                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
             }
         }
     }
@@ -436,12 +505,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 color = R.color.white_black
                 binding.motion.transitionToEnd()
             } else {
-                color = android.R.color.transparent
+                color = android.R.color.black
                 binding.motion.transitionToStart()
             }
-            if (enableTransparency) {
-                binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
-            }
+            binding.motion.setBackgroundColor(ContextCompat.getColor(this,
+                if (enableTransparency && !show) {
+                    android.R.color.transparent
+                } else {
+                    color
+                }))
         }
     }
 
@@ -478,10 +550,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                if (nodeItem.isAvailableOffline) {
-                    saveOfflineNode(nodeItem.handle)
-                } else if (nodeItem.node != null) {
-                    saveNode(nodeItem.node)
+                viewModel.executeTransfer {
+                    if (nodeItem.isAvailableOffline) {
+                        saveOfflineNode(nodeItem.handle)
+                    } else if (nodeItem.node != null) {
+                        saveNode(nodeItem.node)
+                    }
                 }
                 true
             }
@@ -556,7 +630,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         nodeSaver?.handleRequestPermissionsResult(requestCode)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

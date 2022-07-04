@@ -4,13 +4,12 @@ import static android.content.ContentResolver.QUERY_ARG_OFFSET;
 import static android.content.ContentResolver.QUERY_ARG_SQL_LIMIT;
 import static android.content.ContentResolver.QUERY_ARG_SQL_SELECTION;
 import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
@@ -128,6 +127,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -807,7 +808,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        megaApi.startUpload(path, parent, APP_DATA_CU, file.getFileName(), lastModified / 1000, this);
+                        megaApi.startUpload(path, parent, file.getFileName(), lastModified / 1000,
+                                APP_DATA_CU, false, false, null, this);
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.");
@@ -1581,7 +1583,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
         cuTransfers.add(transfer);
-        launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
     }
 
     @Override
@@ -1623,7 +1625,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         Timber.d("Image sync finished, error code: " + e.getErrorCode() + ", handle: " + transfer.getNodeHandle() + ", size: " + transfer.getTransferredBytes());
 
         try {
-            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class).post(MegaTransfer.TYPE_UPLOAD);
             transferFinished(transfer, e);
         } catch (Throwable th) {
             Timber.e(th);
@@ -1638,7 +1640,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
+            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e), dbH);
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {

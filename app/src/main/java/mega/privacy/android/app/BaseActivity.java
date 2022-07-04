@@ -1,11 +1,9 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
@@ -21,12 +19,14 @@ import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAI
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_YEAR;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED;
 import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
@@ -88,6 +88,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
@@ -119,15 +120,18 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -140,6 +144,7 @@ import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
@@ -148,6 +153,9 @@ import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.upgradeAccount.PaymentActivity;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException;
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -185,6 +193,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Inject
     MyAccountInfo myAccountInfo;
+    @Inject
+    public TransfersManagement transfersManagement;
+
+    public ActivityResultLauncher<ArrayList<NameCollision>> nameCollisionActivityContract;
 
     private BillingManager billingManager;
     private List<MegaSku> skuDetailsList;
@@ -280,6 +292,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         super.onCreate(savedInstanceState);
         checkMegaObjects();
 
+        nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+                    }
+                });
+
         registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
 
@@ -298,10 +317,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
-        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
-        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-        registerReceiver(transferOverQuotaReceiver, filterTransfers);
-
         registerReceiver(showSnackbarReceiver,
                 new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
 
@@ -310,6 +325,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         registerReceiver(cookieSettingsReceiver,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
+        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class)
+                .observe(this, overQuota -> showGeneralTransferOverQuotaWarning());
 
         LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, type -> {
             if (this instanceof PaymentActivity) {
@@ -446,6 +464,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         return !isPaused;
     }
 
+    /**
+     * Checks if the current activity is in background.
+     *
+     * @return True if the current activity is in background, false otherwise.
+     */
+    protected boolean isActivityInBackground() {
+        return isPaused;
+    }
+
     @Override
     protected void onDestroy() {
         composite.clear();
@@ -457,7 +484,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
         unregisterReceiver(showSnackbarReceiver);
-        unregisterReceiver(transferOverQuotaReceiver);
         unregisterReceiver(resumeTransfersReceiver);
 
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
@@ -649,22 +675,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     };
 
     /**
-     * Broadcast to show a warning when transfer over quota occurs.
-     */
-    private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null
-                    || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
-                    || !isActivityInForeground()) {
-                return;
-            }
-
-            showGeneralTransferOverQuotaWarning();
-        }
-    };
-
-    /**
      * Broadcast to show a warning when it tries to upload files to a chat conversation
      * and the transfers are paused.
      */
@@ -674,11 +684,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             if (intent == null || intent.getAction() == null
                     || !intent.getAction().equals(BROADCAST_ACTION_RESUME_TRANSFERS)
                     || isResumeTransfersWarningShown()
-                    || !isActivityInForeground()) {
+                    || isActivityInBackground()) {
                 return;
             }
 
-            MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
+            transfersManagement.setHasResumeTransfersWarningAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
         }
     };
@@ -689,7 +699,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isPaused || !isActivityInForeground() || intent == null) {
+            if (isPaused || isActivityInBackground() || intent == null) {
                 return;
             }
 
@@ -971,6 +981,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.setAction(R.string.tab_sent_requests, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
+
+            case RESUME_TRANSFERS_TYPE:
+                snackbar.setAction(R.string.button_resume_individual_transfer, new SnackbarNavigateOption(view.getContext(), type));
+                snackbar.show();
+                break;
         }
     }
 
@@ -1185,7 +1200,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows a warning indicating transfer over quota occurred.
      */
     public void showGeneralTransferOverQuotaWarning() {
-        if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
+        if (isActivityInBackground() ||
+                transfersManagement.isOnTransfersSection()
+                || transferGeneralOverQuotaWarning != null) return;
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
@@ -1193,7 +1210,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 .setOnDismissListener(dialog -> {
                     isGeneralTransferOverQuotaWarningShown = false;
                     transferGeneralOverQuotaWarning = null;
-                    MegaApplication.getTransfersManagement().resetTransferOverQuotaTimestamp();
+                    transfersManagement.resetTransferOverQuotaTimestamp();
                 })
                 .setCancelable(false);
 
@@ -1201,7 +1218,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
 
         TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
-        final int stringResource = MegaApplication.getTransfersManagement().isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
+        final int stringResource = transfersManagement.isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
         text.setText(getString(stringResource, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
 
         Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
@@ -1628,5 +1645,53 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
         upgradeAlert.show();
+    }
+
+    /**
+     * Checks if can process the throwable and if so, launches the corresponding action.
+     *
+     * @param throwable Throwable to check.
+     * @return True if the Throwable has been managed, false otherwise.
+     */
+    protected boolean manageCopyMoveException(Throwable throwable) {
+        if (throwable instanceof ForeignNodeException) {
+            launchForeignNodeError();
+            return true;
+        } else if (throwable instanceof QuotaExceededMegaException) {
+            launchOverQuota();
+            return true;
+        } else if (throwable instanceof NotEnoughQuotaMegaException) {
+            launchPreOverQuota();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Launches ManagerActivity intent to show over quota warning.
+     */
+    protected void launchOverQuota() {
+        startActivity(new Intent(this, ManagerActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_OVERQUOTA_STORAGE));
+        finish();
+    }
+
+    /**
+     * Launches ManagerActivity intent to show pre over quota warning.
+     */
+    protected void launchPreOverQuota() {
+        startActivity(new Intent(this, ManagerActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_PRE_OVERQUOTA_STORAGE));
+        finish();
+    }
+
+    /**
+     * Shows foreign storage over quota warning.
+     */
+    protected void launchForeignNodeError() {
+        showForeignStorageOverQuotaWarningDialog(this);
     }
 }

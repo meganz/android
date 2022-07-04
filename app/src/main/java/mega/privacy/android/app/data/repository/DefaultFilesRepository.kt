@@ -14,6 +14,7 @@ import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -28,14 +29,15 @@ import kotlin.coroutines.suspendCoroutine
 class DefaultFilesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaLocalStorageGateway: MegaLocalStorageGateway
+    private val megaLocalStorageGateway: MegaLocalStorageGateway,
 ) : FilesRepository {
 
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {
+            val rootNode = megaApiGateway.getRootNode()
             suspendCoroutine { continuation ->
-                megaApiGateway.getFolderInfo(megaApiGateway.rootNode,
+                megaApiGateway.getFolderInfo(rootNode,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestFolderInfoCompleted(continuation)
                     ))
@@ -65,5 +67,28 @@ class DefaultFilesRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull { it.nodeList?.toList() }
 
-    override suspend fun getCloudSortOrder(): Int = megaLocalStorageGateway.getCloudSortOrder()
+    override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getRootNode()
+    }
+
+    override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getRubbishBinNode()
+    }
+
+    override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getChildrenByNode(parentNode, order)
+        }
+
+    override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)
+    }
+
+    override suspend fun getCloudSortOrder(): Int = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getCloudSortOrder()
+    }
+
+    override suspend fun getCameraSortOrder(): Int = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getCameraSortOrder()
+    }
 }

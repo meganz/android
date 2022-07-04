@@ -2,8 +2,8 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.entity.user.UserUpdate
+import mega.privacy.android.app.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 
 /**
@@ -29,15 +29,6 @@ interface AccountRepository {
      * Sends a request to update account data asynchronously
      */
     fun requestAccount()
-
-    /**
-     * Get root node
-     *
-     * This method requires some refactoring as MegaNode is not a domain entity and thus violates the architecture
-     *
-     * @return the mega root node.
-     */
-    fun getRootNode(): MegaNode?
 
     /**
      * Is multi factor auth available

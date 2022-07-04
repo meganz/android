@@ -52,13 +52,27 @@ interface MegaApiGateway {
     val isMasterBusinessAccount: Boolean
 
     /**
+     * Are transfers paused (downloads and uploads)
+     */
+    suspend fun areTransfersPaused(): Boolean
+
+    /**
      * Root node of the account
      *
      * All accounts have a root node, therefore if it is null the account has not been logged in or
      * initialised yet for some reason.
      *
      */
-    val rootNode: MegaNode?
+    suspend fun getRootNode(): MegaNode?
+
+    /**
+     * Rubbish bin node of the account
+     *
+     * All accounts have a rubbish bin node, therefore if it is null the account has not been logged in or
+     * initialised yet for some reason.
+     *
+     */
+    suspend fun getRubbishBinNode(): MegaNode?
 
     /**
      * Global updates
@@ -78,7 +92,7 @@ interface MegaApiGateway {
      * @param nodeHandle node handle
      * @return MegaNode
      */
-    fun getMegaNodeByHandle(nodeHandle: Long): MegaNode
+    suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
 
     /**
      * Check the node if has version
@@ -90,9 +104,10 @@ interface MegaApiGateway {
     /**
      * Get children nodes by node
      * @param parentNode parent node
+     * @param order order for the returned list, if null the default order is applied
      * @return children nodes list
      */
-    fun getChildrenByNode(parentNode: MegaNode): ArrayList<MegaNode>
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
 
     /**
      * Get child folder number of current folder
@@ -116,8 +131,8 @@ interface MegaApiGateway {
      * @param listener
      */
     fun setAutoAcceptContactsFromLink(
-            disableAutoAccept: Boolean,
-            listener: MegaRequestListenerInterface
+        disableAutoAccept: Boolean,
+        listener: MegaRequestListenerInterface,
     )
 
     /**
@@ -135,6 +150,14 @@ interface MegaApiGateway {
      * @param listener
      */
     fun getFolderInfo(node: MegaNode?, listener: MegaRequestListenerInterface)
+
+    /**
+     * Set node favourite as a node attribute.
+     *
+     * @param node      Node that will receive the information.
+     * @param favourite if true set node as favourite, otherwise remove the attribute
+     */
+    fun setNodeFavourite(node: MegaNode?, favourite: Boolean)
 
     /**
      * Add logger
@@ -179,7 +202,11 @@ interface MegaApiGateway {
      * @param thumbnailFilePath thumbnail file path
      * @param listener
      */
-    fun getThumbnail(node: MegaNode, thumbnailFilePath: String, listener: MegaRequestListenerInterface)
+    fun getThumbnail(
+        node: MegaNode,
+        thumbnailFilePath: String,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Converts the handle of a node to a Base64-encoded string
