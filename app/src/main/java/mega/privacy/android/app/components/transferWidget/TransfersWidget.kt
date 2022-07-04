@@ -77,7 +77,7 @@ class TransfersWidget(
                     progress = getProgress(),
                     typeTransfer = transferType)
 
-                updateState()
+                updateState(transfersInfo.areTransfersPaused)
             }
             (transfersInfo.numPendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
                     || transfersManagement.getAreFailedTransfers() -> {
@@ -108,10 +108,12 @@ class TransfersWidget(
 
     /**
      * Updates the state of the widget.
+     *
+     * @param areTransfersPaused True if transfers are paused, false otherwise.
      */
-    fun updateState() {
+    fun updateState(areTransfersPaused: Boolean) {
         when {
-            transfersManagement.areTransfersPaused() -> setPausedTransfers()
+            areTransfersPaused -> setPausedTransfers()
             isOverQuota -> setOverQuotaTransfers()
             else -> setProgressTransfers()
         }

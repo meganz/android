@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.entity.TransfersInfo
+import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.app.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.app.domain.usecase.GetNumPendingUploads
@@ -21,6 +22,7 @@ import javax.inject.Inject
  * @property getNumPendingUploads                   [GetNumPendingUploads]
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmpty              [IsCompletedTransfersEmpty]
+ * @property areAllTransfersPaused                  [AreAllTransfersPaused]
  */
 @HiltViewModel
 class TransfersManagementViewModel @Inject constructor(
@@ -28,10 +30,12 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingUploads: GetNumPendingUploads,
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
+    private val areAllTransfersPaused: AreAllTransfersPaused,
 ) : ViewModel() {
 
     private val transfersInfo: MutableLiveData<Pair<Int, TransfersInfo>> = MutableLiveData()
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
+    private val areTransfersPaused = SingleLiveEvent<Boolean>()
 
     /**
      * Notifies about updates on Transfers info.
@@ -44,6 +48,11 @@ class TransfersManagementViewModel @Inject constructor(
     fun onGetShouldCompletedTab(): LiveData<Boolean> = shouldShowCompletedTab
 
     /**
+     * Notifies about the transfers state
+     */
+    fun onGetTransfersState(): LiveData<Boolean> = areTransfersPaused
+
+    /**
      * Checks transfers info.
      */
     fun checkTransfersInfo(transferType: Int) {
@@ -53,7 +62,10 @@ class TransfersManagementViewModel @Inject constructor(
 
             transfersInfo.value = Pair(
                 transferType,
-                TransfersInfo(numPendingDownloadsNonBackground, numPendingUploads)
+                TransfersInfo(
+                    numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
+                    numPendingUploads = numPendingUploads,
+                    areTransfersPaused = areAllTransfersPaused())
             )
         }
     }
@@ -66,5 +78,12 @@ class TransfersManagementViewModel @Inject constructor(
             shouldShowCompletedTab.value =
                 !isCompletedTransfersEmpty() && getNumPendingTransfers() <= 0
         }
+    }
+
+    /**
+     * Checks if transfers are paused.
+     */
+    fun checkTransfersState() {
+        viewModelScope.launch { areTransfersPaused.value = areAllTransfersPaused() }
     }
 }
