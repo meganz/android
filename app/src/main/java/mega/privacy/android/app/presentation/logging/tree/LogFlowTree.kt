@@ -11,6 +11,7 @@ import mega.privacy.android.app.data.gateway.TimberChatLogger
 import mega.privacy.android.app.data.gateway.TimberMegaLogger
 import mega.privacy.android.app.domain.entity.logging.CreateLogEntryRequest
 import mega.privacy.android.app.domain.entity.logging.LogEntry
+import mega.privacy.android.app.domain.entity.logging.LogPriority
 import mega.privacy.android.app.domain.usecase.CreateLogEntry
 import timber.log.Timber
 
@@ -56,7 +57,7 @@ class LogFlowTree(
                 CreateLogEntryRequest(
                     tag = tag,
                     message = message,
-                    priority = priority,
+                    priority = LogPriority.fromInt(priority),
                     throwable = t,
                     trace = trace.asList(),
                     loggingClasses = ignoredClasses,
