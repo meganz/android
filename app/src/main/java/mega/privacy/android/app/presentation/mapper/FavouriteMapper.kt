@@ -13,8 +13,9 @@ import nz.mega.sdk.MegaNode
  * Mapper for FavouriteInfo convert to Favourite
  */
 typealias FavouriteMapper = (
+    @JvmSuppressWildcards MegaNode,
     @JvmSuppressWildcards FavouriteInfo,
-    @JvmSuppressWildcards (MegaNode) -> Boolean,
+    @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards StringUtilWrapper,
     @JvmSuppressWildcards (String) -> Int,
 ) -> @JvmSuppressWildcards Favourite
@@ -28,16 +29,27 @@ typealias FavouriteMapper = (
  * @return Favourite
  */
 internal fun toFavourite(
-    favouriteInfo: FavouriteInfo, isAvailableOffline: (MegaNode) -> Boolean,
-    stringUtil: StringUtilWrapper, getFileIcon: (String) -> Int = { 0 },
+    node: MegaNode,
+    favouriteInfo: FavouriteInfo,
+    isAvailableOffline: Boolean,
+    stringUtil: StringUtilWrapper,
+    getFileIcon: (String) -> Int = { 0 },
 ) =
-    if (favouriteInfo.node.isFolder) {
-        createFolder(favouriteInfo, getFolderInfo(favouriteInfo, stringUtil), isAvailableOffline)
+    if (favouriteInfo.isFolder) {
+        createFolder(
+            node,
+            favouriteInfo,
+            getFolderInfo(favouriteInfo, stringUtil),
+            isAvailableOffline,
+        )
     } else {
-        createFile(favouriteInfo,
+        createFile(
+            node,
+            favouriteInfo,
             getFileInfo(favouriteInfo, stringUtil),
             isAvailableOffline,
-            getFileIcon)
+            getFileIcon,
+        )
     }
 
 /**
@@ -48,25 +60,27 @@ internal fun toFavourite(
  * @return FavouriteFolder
  */
 private fun createFolder(
+    node: MegaNode,
     favouriteInfo: FavouriteInfo,
     folderInfo: String,
-    isAvailableOffline: (MegaNode) -> Boolean,
+    isAvailableOffline: Boolean,
 ) = FavouriteFolder(
     handle = favouriteInfo.id,
-    icon = MegaNodeUtil.getFolderIcon(favouriteInfo.node, DrawerItem.HOMEPAGE),
+    icon = MegaNodeUtil.getFolderIcon(node,
+        DrawerItem.HOMEPAGE),
     name = favouriteInfo.name,
     label = favouriteInfo.label,
     size = favouriteInfo.size,
     modificationTime = favouriteInfo.modificationTime,
     labelColour = MegaNodeUtil.getNodeLabelColor(favouriteInfo.label),
     showLabel = favouriteInfo.label != MegaNode.NODE_LBL_UNKNOWN,
-    node = favouriteInfo.node,
+    node = node,
     hasVersion = favouriteInfo.hasVersion,
     info = folderInfo,
-    isFavourite = favouriteInfo.node.isFavourite,
-    isExported = favouriteInfo.node.isExported,
-    isTakenDown = favouriteInfo.node.isTakenDown,
-    isAvailableOffline = isAvailableOffline(favouriteInfo.node)
+    isFavourite = favouriteInfo.isFavourite,
+    isExported = favouriteInfo.isExported,
+    isTakenDown = favouriteInfo.isTakenDown,
+    isAvailableOffline = isAvailableOffline
 )
 
 /**
@@ -78,26 +92,27 @@ private fun createFolder(
  * @return FavouriteFile
  */
 private fun createFile(
+    node: MegaNode,
     favouriteInfo: FavouriteInfo,
     fileInfo: String,
-    isAvailableOffline: (MegaNode) -> Boolean,
+    isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
     handle = favouriteInfo.id,
     icon = getFileIcon(favouriteInfo.name),
     name = favouriteInfo.name,
     label = favouriteInfo.label,
-    labelColour = MegaNodeUtil.getNodeLabelColor(favouriteInfo.node.label),
+    labelColour = MegaNodeUtil.getNodeLabelColor(favouriteInfo.label),
     showLabel = favouriteInfo.label != MegaNode.NODE_LBL_UNKNOWN,
-    node = favouriteInfo.node,
+    node = node,
     hasVersion = favouriteInfo.hasVersion,
     info = fileInfo,
     size = favouriteInfo.size,
     modificationTime = favouriteInfo.modificationTime,
-    isFavourite = favouriteInfo.node.isFavourite,
-    isExported = favouriteInfo.node.isExported,
-    isTakenDown = favouriteInfo.node.isTakenDown,
-    isAvailableOffline = isAvailableOffline(favouriteInfo.node),
+    isFavourite = favouriteInfo.isFavourite,
+    isExported = favouriteInfo.isExported,
+    isTakenDown = favouriteInfo.isTakenDown,
+    isAvailableOffline = isAvailableOffline,
     thumbnailPath = favouriteInfo.thumbnailPath
 )
 
@@ -111,8 +126,8 @@ private fun createFile(
 private fun getFileInfo(favouriteInfo: FavouriteInfo, stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
-        stringUtil.getSizeString(favouriteInfo.node.size),
-        stringUtil.formatLongDateTime(favouriteInfo.node.modificationTime)
+        stringUtil.getSizeString(favouriteInfo.size),
+        stringUtil.formatLongDateTime(favouriteInfo.modificationTime)
     )
 
 /**

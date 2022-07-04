@@ -5,25 +5,31 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.domain.entity.logging.LogEntry
 import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.app.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.app.domain.usecase.InitialiseLogging
-import mega.privacy.android.app.logging.loggers.FileLogMessage
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class DefaultInitialiseLoggingTest {
     private lateinit var underTest: InitialiseLogging
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
-    private val sdkMessage = FileLogMessage(message = "sdk", priority = 1)
-    private val chatMessage = FileLogMessage(message = "chat", priority = 1)
+    private val sdkMessage = LogEntry(message = "sdk", priority = 1)
+    private val chatMessage = LogEntry(message = "chat", priority = 1)
 
-    private val loggingRepository = mock<LoggingRepository>{
+    private val loggingRepository = mock<LoggingRepository> {
         on { getSdkLoggingFlow() }.thenReturn(flowOf(sdkMessage))
         on { getChatLoggingFlow() }.thenReturn(flowOf(chatMessage))
     }

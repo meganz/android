@@ -14,6 +14,7 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrappe
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
@@ -53,6 +54,10 @@ class UtilWrapperModule {
     @Provides
     fun providePermissionUtilWrapper(): PermissionUtilWrapper =
         object : PermissionUtilWrapper {}
+
+    @Provides
+    fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
+        FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
 
     @Provides
     fun provideGetOfflineThumbnailFileWrapper(megaApiGateway: MegaApiGateway): GetOfflineThumbnailFileWrapper {

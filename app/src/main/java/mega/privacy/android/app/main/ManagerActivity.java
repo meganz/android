@@ -287,7 +287,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -354,7 +354,6 @@ import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -6782,13 +6781,22 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
                 drawerItem == DrawerItem.HOMEPAGE);
     }
 

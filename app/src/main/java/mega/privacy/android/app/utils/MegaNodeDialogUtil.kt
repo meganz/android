@@ -135,6 +135,7 @@ object MegaNodeDialogUtil {
      *
      * @param context            Current context.
      * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
+     * @param parentNode         Required parent node for checking if already exist a folder with that name.
      * @param typedText          Typed text if the dialog has to be shown after a screen rotation.
      * @return The create new folder dialog.
      */
@@ -142,6 +143,7 @@ object MegaNodeDialogUtil {
     fun showNewFolderDialog(
         context: Context,
         actionNodeCallback: ActionNodeCallback?,
+        parentNode: MegaNode,
         typedText: String? = null,
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
@@ -152,7 +154,7 @@ object MegaNodeDialogUtil {
             .setNegativeButton(R.string.general_cancel, null)
 
         val dialog = setFinalValuesAndShowDialog(
-            context, null, actionNodeCallback, null, null, null,
+            context, parentNode, actionNodeCallback, null, null, null,
             false, newFolderDialogBuilder, TYPE_NEW_FOLDER)
 
         if (!typedText.isNullOrEmpty()) {

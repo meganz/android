@@ -1,9 +1,5 @@
 package mega.privacy.android.app.domain.entity
 
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import nz.mega.sdk.MegaNode
-
 /**
  * The entity for favourite info
  * @param id current favourite node handle
@@ -30,12 +26,14 @@ data class FavouriteInfo(
     val size: Long,
     val label: Int,
     val modificationTime: Long,
-    val node: MegaNode,
     val hasVersion: Boolean,
     val numChildFolders: Int,
     val numChildFiles: Int,
-    val isImage: Boolean = node.isImage(),
-    val isVideo: Boolean = node.isVideo(),
-    val isFolder: Boolean = node.isFolder,
+    val isImage: Boolean,
+    val isVideo: Boolean,
+    val isFolder: Boolean,
     val thumbnailPath: String? = null,
+    val isFavourite: Boolean,
+    val isExported: Boolean,
+    val isTakenDown: Boolean,
 )

@@ -187,6 +187,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
+    private var assignModeratorDialog:AssignModeratorBottomSheetDialogFragment? = null
+    private var endMeetingAsModeratorDialog:EndMeetingAsModeratorBottomSheetDialogFragment? = null
+
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
 
@@ -290,13 +293,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED,
+                MegaChatCall.CALL_STATUS_DESTROYED
                 -> {
                     disableCamera()
                     removeUI()
-                    if (inMeetingViewModel.amIAGuest()) {
-                        inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-                    }
                 }
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
@@ -1227,6 +1227,38 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        inMeetingViewModel.showAssignModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
+            if (shouldBeShown) {
+                assignModeratorDialog = AssignModeratorBottomSheetDialogFragment()
+                assignModeratorDialog?.run {
+                    setLeaveMeetingCallBack { inMeetingViewModel.hangCall() }
+                    setAssignModeratorCallBack(showAssignModeratorFragment)
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
+                }
+            } else {
+                assignModeratorDialog?.dismissAllowingStateLoss()
+            }
+        }
+
+        inMeetingViewModel.showEndMeetingAsModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
+            if (shouldBeShown) {
+                endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
+                endMeetingAsModeratorDialog?.run {
+                    setLeaveMeetingCallBack { inMeetingViewModel.checkClickLeaveButton() }
+                    setEndForAllCallBack { inMeetingViewModel.endCallForAll() }
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
+                }
+            } else {
+                endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
+            }
+        }
     }
 
     /**
@@ -1890,8 +1922,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         ).commit()
     }
 
-    private fun removeChildFragment(fragment: Fragment) {
-        childFragmentManager.beginTransaction().remove(fragment).commit()
+    private fun removeChildFragment(fragment: Fragment?) {
+        fragment?.let {
+            childFragmentManager.beginTransaction().remove(it).commit()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -2456,26 +2490,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-        if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
-            Timber.d("End the one to one or group call")
-            leaveMeeting()
-        } else if (inMeetingViewModel.shouldAssignModerator()) {
-            EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
-                .run {
-                    setLeaveMeetingCallBack(leaveMeetingModerator)
-                    setAssignCallBack(showAssignModeratorFragment)
-                    show(
-                        this@InMeetingFragment.childFragmentManager,
-                        tag
-                    )
-                }
-        } else {
-            askConfirmationEndMeetingForUser()
-        }
-    }
-
-    private val leaveMeetingModerator = fun() {
-        leaveMeeting()
+        inMeetingViewModel.checkClickEndButton()
     }
 
     private fun collapsePanel() {
@@ -2492,24 +2507,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private val showAssignModeratorFragment = fun() {
         collapsePanel()
+        inMeetingViewModel.hideBottomPanels()
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )
 
-    }
-
-    /**
-     * Dialog for confirming leave meeting action
-     */
-    private fun askConfirmationEndMeetingForUser() {
-        leaveDialog = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).setMessage(StringResourcesUtils.getString(R.string.title_end_meeting))
-            .setCancelable(false)
-            .setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
     }
 
     /**
@@ -2538,7 +2540,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MegaApplication.getChatManagement().stopCounterToFinishCall()
             dismissDialog(onlyMeDialog)
             hideCallWillEndInBanner()
-            leaveMeeting()
+            inMeetingViewModel.hangCall()
         }
 
         secondButton.setOnClickListener {
@@ -2559,22 +2561,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         onlyMeDialog?.setOnDismissListener {
             MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
             it.dismiss()
-        }
-    }
-
-    /**
-     * Method to control when I leave the call
-     */
-    private fun leaveMeeting() {
-        Timber.d("Leaving meeting")
-        disableCamera()
-        removeUI()
-
-        inMeetingViewModel.leaveMeeting()
-        if (inMeetingViewModel.amIAGuest()) {
-            inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else {
-            sharedModel.clickEndCall()
         }
     }
 
@@ -2697,6 +2683,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         showMuteBanner()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disableCamera()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -2728,6 +2719,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
+        assignModeratorDialog?.dismissAllowingStateLoss()
+        endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
 
     /**
