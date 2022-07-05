@@ -466,7 +466,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 long restoreHandle = node.getRestoreHandle();
                 MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
                 if (restoreHandle == INVALID_HANDLE || !megaApi.isInRubbish(node)
-                        || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                        || restoreNode == null || megaApi.isInRubbish(restoreNode) || megaApi.isInInbox(restoreNode)) {
                     counterModify--;
                     optionRestoreFromRubbish.setVisibility(View.GONE);
                 }
