@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -14,11 +13,11 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.domain.exception.EmptyFolderException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -31,7 +30,7 @@ import javax.inject.Inject
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getChatMessageUseCase: GetChatMessageUseCase
+    private val getChatMessageUseCase: GetChatMessageUseCase,
 ) {
 
     /**
@@ -45,7 +44,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun check(
         node: MegaNode?,
         parentHandle: Long,
-        type: NameCollisionType
+        type: NameCollisionType,
     ): Single<NameCollision> =
         Single.fromCallable {
             check(
@@ -83,7 +82,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun check(
         node: MegaNode?,
         parentNode: MegaNode?,
-        type: NameCollisionType
+        type: NameCollisionType,
     ): Single<NameCollision> =
         Single.create { emitter ->
             if (node == null) {
@@ -172,7 +171,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun checkNodeList(
         nodes: List<MegaNode>,
         parentHandle: Long,
-        type: NameCollisionType
+        type: NameCollisionType,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         Single.create { emitter ->
             if (nodes.isEmpty()) {
@@ -213,7 +212,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun checkHandleList(
         handles: LongArray,
         parentHandle: Long,
-        type: NameCollisionType
+        type: NameCollisionType,
     ): Single<Pair<ArrayList<NameCollision>, LongArray>> =
         Single.create { emitter ->
             if (handles.isEmpty()) {
@@ -307,7 +306,7 @@ class CheckNameCollisionUseCase @Inject constructor(
      */
     fun checkShareInfoList(
         shareInfos: List<ShareInfo>,
-        parentNode: MegaNode?
+        parentNode: MegaNode?,
     ): Single<Pair<ArrayList<NameCollision>, List<ShareInfo>>> =
         Single.create { emitter ->
             if (parentNode == null) {
@@ -359,7 +358,7 @@ class CheckNameCollisionUseCase @Inject constructor(
      */
     fun checkFolderUploadList(
         parentHandle: Long,
-        uploadContent: MutableList<FolderContent.Data>
+        uploadContent: MutableList<FolderContent.Data>,
     ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
         Single.create { emitter ->
             if (uploadContent.isEmpty()) {
@@ -414,7 +413,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun checkMessagesToImport(
         messageIds: LongArray,
         chatId: Long,
-        parentHandle: Long
+        parentHandle: Long,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         Single.create { emitter ->
             val parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull()

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.domain.usecase.RootNodeExists
 import javax.inject.Inject
 
 /**

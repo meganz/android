@@ -17,12 +17,12 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher

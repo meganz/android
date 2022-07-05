@@ -6,24 +6,39 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.Progress
-import mega.privacy.android.app.domain.entity.SubmitIssueRequest
-import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.app.domain.usecase.GetSupportEmail
-import mega.privacy.android.app.domain.usecase.MonitorConnectivity
-import mega.privacy.android.app.domain.usecase.SubmitIssue
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueViewModel
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.SubmitIssue
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ReportIssueViewModelTest {
@@ -48,7 +63,8 @@ class ReportIssueViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
-    private val getSupportEmail = mock<GetSupportEmail>{ onBlocking { invoke() }.thenReturn("Support@Email.address")}
+    private val getSupportEmail =
+        mock<GetSupportEmail> { onBlocking { invoke() }.thenReturn("Support@Email.address") }
 
     @Before
     fun setUp() {

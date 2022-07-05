@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.featureflag.model
 
-import mega.privacy.android.app.domain.entity.FeatureFlag
+import mega.privacy.android.domain.entity.FeatureFlag
 
 /**
  * Data class for Feature flag menu UI state

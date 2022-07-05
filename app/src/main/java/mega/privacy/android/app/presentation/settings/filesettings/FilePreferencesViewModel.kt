@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
+import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import javax.inject.Inject
 
 @HiltViewModel
 class FilePreferencesViewModel @Inject constructor(
-    private val getFolderVersionInfo: GetFolderVersionInfo
+    private val getFolderVersionInfo: GetFolderVersionInfo,
 ) : ViewModel() {
     private val state = MutableStateFlow(FilePreferencesState())
     val filePreferencesState: StateFlow<FilePreferencesState> = state

@@ -9,7 +9,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
-import mega.privacy.android.app.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

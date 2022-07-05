@@ -1,26 +1,26 @@
 package mega.privacy.android.app.components.transferWidget
 
 import android.content.Context
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import android.widget.RelativeLayout
-import mega.privacy.android.app.globalmanagement.TransfersManagement
-import nz.mega.sdk.MegaApiAndroid
-import android.widget.ImageButton
-import android.widget.ProgressBar
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.R
-import nz.mega.sdk.MegaTransfer
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import android.graphics.drawable.GradientDrawable
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.entity.TransfersInfo
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.TransfersInfo
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaTransfer
 import kotlin.math.roundToInt
 
 /**

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.ThemeMode
 
 
 @Composable

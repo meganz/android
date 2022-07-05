@@ -24,11 +24,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ThemeMode
-import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 /**

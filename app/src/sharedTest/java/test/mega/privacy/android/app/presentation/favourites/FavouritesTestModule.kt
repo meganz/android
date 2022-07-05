@@ -10,17 +10,17 @@ import mega.privacy.android.app.di.homepage.favourites.FavouritesUseCases
 import mega.privacy.android.app.di.homepage.favourites.OpenFileModule
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.app.di.sortorder.SortOrderUseCases
-import mega.privacy.android.app.domain.usecase.GetAlbums
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
-import mega.privacy.android.app.domain.usecase.GetThumbnail
-import mega.privacy.android.app.domain.usecase.RemoveFavourites
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.domain.usecase.GetAlbums
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
+import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.RemoveFavourites
 import org.mockito.kotlin.mock
 
 @Module

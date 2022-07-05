@@ -6,9 +6,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.AccountModule
-import mega.privacy.android.app.data.model.UserCredentials
-import mega.privacy.android.app.domain.usecase.GetSession
-import mega.privacy.android.app.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.RetryPendingConnections
 import org.mockito.kotlin.mock
 
 @TestInstallIn(

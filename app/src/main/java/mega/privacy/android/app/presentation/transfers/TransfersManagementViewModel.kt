@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.entity.TransfersInfo
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
-import mega.privacy.android.app.domain.usecase.GetNumPendingDownloadsNonBackground
-import mega.privacy.android.app.domain.usecase.GetNumPendingTransfers
-import mega.privacy.android.app.domain.usecase.GetNumPendingUploads
-import mega.privacy.android.app.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.TransfersInfo
+import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.GetNumPendingTransfers
+import mega.privacy.android.domain.usecase.GetNumPendingUploads
+import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import javax.inject.Inject
 
 /**

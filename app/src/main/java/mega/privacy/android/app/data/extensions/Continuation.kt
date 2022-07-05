@@ -1,6 +1,6 @@
 package mega.privacy.android.app.data.extensions
 
-import mega.privacy.android.app.domain.exception.MegaException
+import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import kotlin.coroutines.Continuation
@@ -14,7 +14,7 @@ import kotlin.coroutines.Continuation
  * @param exception the exception
  */
 fun <T> Continuation<T>.failWithException(
-    exception: MegaException
+    exception: MegaException,
 ) {
     this.resumeWith(
         Result.failure(
@@ -32,7 +32,7 @@ fun <T> Continuation<T>.failWithException(
  * @param error the Mega error
  */
 fun <T> Continuation<T>.failWithError(
-    error: MegaError
+    error: MegaError,
 ) {
     this.failWithException(
         error.toException()
@@ -40,7 +40,7 @@ fun <T> Continuation<T>.failWithError(
 }
 
 fun <T> Continuation<T>.failWithError(
-    error: MegaChatError
+    error: MegaChatError,
 ) {
     this.failWithException(
         MegaException(
