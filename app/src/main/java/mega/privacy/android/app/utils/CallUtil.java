@@ -1372,7 +1372,7 @@ public class CallUtil {
         }
 
         Timber.d("Controlling outgoing/in progress call");
-        if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom.isMeeting()) {
+        if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && (chatRoom.isMeeting() || chatRoom.isGroup())) {
             clearIncomingCallNotification(callId);
             typeAudioManager = AUDIO_MANAGER_CALL_IN_PROGRESS;
         }

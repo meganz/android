@@ -14,6 +14,9 @@ import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import androidx.lifecycle.Observer
+import com.jeremyliao.liveeventbus.LiveEventBus
+import mega.privacy.android.app.constants.EventConstants
 
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -30,7 +33,8 @@ class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
-    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase
+    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val endCallUseCase: EndCallUseCase,
 ) {
 
     companion object {
@@ -51,6 +55,7 @@ class GetCallSoundsUseCase @Inject constructor(
 
     var countDownTimer: CustomCountDownTimer? = null
     val participants = ArrayList<ParticipantInfo>()
+    val disposable = CompositeDisposable()
 
     /**
      * Method to get the appropriate sound
@@ -59,7 +64,18 @@ class GetCallSoundsUseCase @Inject constructor(
      */
     fun get(): Flowable<CallSoundType> =
         Flowable.create({ emitter ->
-            val disposable = CompositeDisposable()
+
+            val outgoingRingingStatusObserver = Observer<MegaChatCall> { call ->
+                if (MegaApplication.getChatManagement().isRequestSent(call.callId)) {
+                    endCallUseCase.hangCall(call.callId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                            onError = { error ->
+                                Timber.e(error.stackTraceToString())
+                            })
+                }
+            }
 
             getCallStatusChangesUseCase.getReconnectingStatus()
                 .subscribeOn(Schedulers.io())
@@ -98,7 +114,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                             isRecoverable?.let { isRecoverableSession ->
                                                 if (isRecoverableSession) {
                                                     Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
-                                                    emitter.startCountDown(
+                                                    startCountDown(
                                                         call,
                                                         participant,
                                                         SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
@@ -185,7 +201,15 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
+            LiveEventBus.get(EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
+                MegaChatCall::class.java)
+                .observeForever(outgoingRingingStatusObserver)
+
             emitter.setCancellable {
+                LiveEventBus.get(EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
+                    MegaChatCall::class.java)
+                    .removeObserver(outgoingRingingStatusObserver)
+
                 disposable.clear()
             }
 
@@ -197,7 +221,7 @@ class GetCallSoundsUseCase @Inject constructor(
      * @param call      MegaChatCall
      * @param seconds   Seconds to wait
      */
-    private fun FlowableEmitter<CallSoundType>.startCountDown(
+    private fun startCountDown(
         call: MegaChatCall,
         participant: ParticipantInfo,
         seconds: Long
@@ -213,16 +237,17 @@ class GetCallSoundsUseCase @Inject constructor(
                         counterState?.let { isFinished ->
                             if (isFinished) {
                                 Timber.d("Count down timer ends. Hang call")
-                                megaChatApi.hangChatCall(call.callId,
-                                    OptionalMegaChatRequestListenerInterface(
-                                        onRequestFinish = { _, error ->
-                                            if (error.errorCode == MegaError.API_OK) {
-                                                removeCountDownTimer()
-                                            } else {
-                                                this.onError(error.toThrowable())
-                                            }
-                                        }
-                                    ))
+                                endCallUseCase.hangCall(call.callId)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribeBy(
+                                        onComplete = {
+                                            removeCountDownTimer()
+                                        },
+                                        onError = { error ->
+                                            Timber.e(error.stackTraceToString())
+                                        })
+                                    .addTo(disposable)
                             }
                         }
                     }

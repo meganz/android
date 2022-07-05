@@ -7,6 +7,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
@@ -69,6 +70,11 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)) {
             Timber.d("Changes in ringing status call. Call is ${call.callId}. Call is Ringing ${call.isRinging}")
             sendCallEvent(EVENT_RINGING_STATUS_CHANGE, call)
+        }
+
+        if(call.hasChanged(MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP)) {
+            Timber.d("Changes in outgoing ringing")
+            sendCallEvent(EVENT_CALL_OUTGOING_RINGING_CHANGE, call)
         }
 
         // Call composition has changed (User added or removed from call)
