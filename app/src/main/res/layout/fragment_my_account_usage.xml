@@ -77,22 +77,22 @@
 
         <!--inbox-->
         <RelativeLayout
-            android:id="@+id/inbox_storage_container"
+            android:id="@+id/backups_storage_container"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/inbox_storage_title"
+                android:id="@+id/backups_storage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/inbox_storage_text"
+                android:layout_toStartOf="@+id/backups_storage_text"
                 android:text="@string/home_side_menu_backups_title"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
 
             <TextView
-                android:id="@+id/inbox_storage_text"
+                android:id="@+id/backups_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -100,7 +100,7 @@
                 tools:text="21.35 GB" />
 
             <View
-                android:id="@+id/inbox_separator"
+                android:id="@+id/backups_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
