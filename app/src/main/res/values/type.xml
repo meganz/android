@@ -679,6 +679,11 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Variant2.Grey54White87" parent="TextAppearance.Mega.Caption.Secondary.Variant2">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey_054_white_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Caption.13sp.Grey87Yellow700">
         <item name="android:textColor">@color/grey_alpha_087_yellow_700</item>
     </style>

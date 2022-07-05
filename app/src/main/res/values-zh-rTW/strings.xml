@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">標準模式</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">主辦人</string>
+    <string name="administrator_permission_label_participants_panel">Host</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">（已編輯）</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -3372,25 +3372,25 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">在主視窗顯示</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">設為主持人</string>
+    <string name="make_moderator">Make host</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">現在離開會議嗎？</string>
     <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">沒有主持人</string>
+    <string name="no_moderator">No host</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">離開之前，請為會議指派一位或多位新的主持人。</string>
+    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">設為主持人</string>
+    <string name="assign_moderator">Make host</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">無論如何還是離開</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">請指定一位或多位新的主持人。</string>
+    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">更改會議名稱</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">與會者：%d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">主持人：%s</string>
+    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
     <!-- Subtitle of the meeting screen-->
@@ -3424,7 +3424,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">使用我們新的加密會議功能快速發起MEGA會議</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">您是新的主持人。</string>
+    <string name="be_new_moderator">You are the new host.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3620,7 +3620,7 @@
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">不要取消</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">移除主持人</string>
+    <string name="remove_moderator">Remove host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -3746,7 +3746,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">重複的項目</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">此位置已存在名為[B]%1$s[/B]的檔案。</string>
+    <string name="file_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的檔案。</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">選擇您要保留的檔案</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3804,7 +3804,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">略過此資料夾</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">此位置已存在名為[B]%1$s[/B]的資料夾。</string>
+    <string name="folder_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的資料夾。</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">連線不穩</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3881,4 +3881,28 @@
     <string name="photos_filter_camera_uploads">相機上傳</string>
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">只有影片</string>
+    <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_title">無法開啟檔案</string>
+    <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_text">不支持此檔案類型。要打開檔案，請先下載它。</string>
+    <!-- General open action. -->
+    <string name="general_confirmation_open">開啟</string>
+    <!-- Option in the chat menu to end call for all participants -->
+    <string name="meetings_chat_screen_menu_option_end_call_for_all">結束所有人的通話</string>
+    <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_title_end_call_for_all">是否結束所有人的通話？</string>
+    <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有參與者的通話。</string>
+    <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">是</string>
+    <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">否</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_leave_call_option">離開</string>
+    <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">結束所有人通話</string>
+    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">您是通話中唯一的主持人。你想在離開前再指派另一個人為主持人嗎？</string>
 </resources>
