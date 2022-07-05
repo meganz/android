@@ -8,10 +8,10 @@ import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
-import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.exception.MegaException
-import mega.privacy.android.app.domain.repository.FavouritesRepository
+import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
@@ -53,10 +53,15 @@ class DefaultFavouritesRepositoryTest {
         parentId = 0,
         base64Id = "",
         modificationTime = 0L,
-        node = node,
         hasVersion = true,
         numChildFiles = 0,
-        numChildFolders = 0
+        numChildFolders = 0,
+        isImage = false,
+        isVideo = false,
+        isFolder = true,
+        isFavourite = true,
+        isExported = false,
+        isTakenDown = false,
     )
 
     @Before
@@ -173,10 +178,15 @@ class DefaultFavouritesRepositoryTest {
                 parentId = 0,
                 base64Id = "",
                 modificationTime = 0L,
-                node = node,
                 hasVersion = true,
                 numChildFiles = 0,
-                numChildFolders = 0
+                numChildFolders = 0,
+                isImage = false,
+                isVideo = false,
+                isFolder = true,
+                isFavourite = true,
+                isExported = false,
+                isTakenDown = false,
             )
 
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)

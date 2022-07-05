@@ -5,10 +5,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.repository.SettingsRepository
-import mega.privacy.android.app.domain.usecase.DefaultSetUseHttps
-import mega.privacy.android.app.domain.usecase.IsUseHttpsEnabled
-import mega.privacy.android.app.domain.usecase.SetUseHttps
+import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.DefaultSetUseHttps
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
+import mega.privacy.android.domain.usecase.SetUseHttps
 
 /**
  * Settings advanced use cases module

@@ -1240,7 +1240,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
             } else {
-                assignModeratorDialog?.dismiss()
+                assignModeratorDialog?.dismissAllowingStateLoss()
             }
         }
 
@@ -1256,7 +1256,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
             } else {
-                endMeetingAsModeratorDialog?.dismiss()
+                endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
             }
         }
     }
@@ -2511,6 +2511,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )
+
     }
 
     /**
@@ -2552,7 +2553,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
             .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
             .setView(dialogLayout)
-            .setCancelable(true)
+            .setCancelable(false)
             .create()
 
         onlyMeDialog?.show()
@@ -2718,8 +2719,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
-        assignModeratorDialog?.dismiss()
-        endMeetingAsModeratorDialog?.dismiss()
+        assignModeratorDialog?.dismissAllowingStateLoss()
+        endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
 
     /**

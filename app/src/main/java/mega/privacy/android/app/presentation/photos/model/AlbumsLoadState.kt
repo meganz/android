@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.photos.model
 
-import mega.privacy.android.app.domain.entity.Album
+import mega.privacy.android.domain.entity.Album
 
 /**
  * The album list load state

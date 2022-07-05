@@ -8,18 +8,21 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
@@ -31,6 +34,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestWrapperModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
@@ -131,10 +135,15 @@ class FavouriteFolderFragmentTest {
             parentId = 1234,
             base64Id = "base64Handle",
             modificationTime = 1234567890,
-            node = node,
             hasVersion = false,
             numChildFolders = 0,
-            numChildFiles = 0
+            numChildFiles = 0,
+            isImage = false,
+            isVideo = false,
+            isFolder = true,
+            isFavourite = true,
+            isExported = false,
+            isTakenDown = false,
         )
         val favourites = listOf(
             favouriteInfo
@@ -150,14 +159,25 @@ class FavouriteFolderFragmentTest {
         whenever(favourite.isFolder).thenReturn(true)
 
         runBlocking {
+            whenever(TestWrapperModule.fetchNodeWrapper(anyOrNull())).thenReturn(node)
+
             whenever(FavouritesTestModule.getFavouriteFolderInfo(anyOrNull())).thenReturn(
                 flowOf(favouriteFolderInfo)
             )
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(any(), any())).thenReturn(
                 "")
-            whenever(FavouritesTestModule.favouriteMapper(any(), any(), any(), any())).thenReturn(
-                favourite)
+            whenever(FavouritesTestModule.favouriteMapper(
+                any<MegaNode>(),
+                any<FavouriteInfo>(),
+                any<Boolean>(),
+                any<StringUtilWrapper>(),
+                any<(String) -> Int>())).thenReturn(
+                favourite
+            )
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
+
+            whenever(FavouritesTestModule.megaUtilWrapper.availableOffline(anyOrNull(),
+                anyOrNull())).thenReturn(true)
         }
     }
 

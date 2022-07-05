@@ -286,9 +286,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -298,6 +296,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
@@ -355,7 +354,6 @@ import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -375,6 +373,7 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -4210,6 +4209,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     /**
      * Updates the Transfers tab index.
+     *
      * @param showCompleted True if should show the Completed tab, false otherwise.
      */
     private void updateTransfersTab(Boolean showCompleted) {
@@ -6789,13 +6789,22 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
                 drawerItem == DrawerItem.HOMEPAGE);
     }
 
@@ -7035,7 +7044,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Showing the full screen mask by adding the mask layout to the window content
      */
     private void addMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
         windowContent.addView(fabMaskLayout);
     }
 
@@ -7043,7 +7051,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Removing the full screen mask
      */
     private void removeMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
         windowContent.removeView(fabMaskLayout);
     }
 

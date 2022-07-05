@@ -10,7 +10,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.AppModule
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock

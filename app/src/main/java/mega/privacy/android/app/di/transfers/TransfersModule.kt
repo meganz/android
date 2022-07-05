@@ -4,13 +4,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
-import mega.privacy.android.app.domain.usecase.AreTransfersPaused
-import mega.privacy.android.app.domain.usecase.GetNumPendingDownloadsNonBackground
-import mega.privacy.android.app.domain.usecase.GetNumPendingTransfers
-import mega.privacy.android.app.domain.usecase.GetNumPendingUploads
-import mega.privacy.android.app.domain.usecase.IsCompletedTransfersEmpty
+import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
+import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.GetNumPendingTransfers
+import mega.privacy.android.domain.usecase.GetNumPendingUploads
+import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 
 /**
  * Use cases to check on transfer status
@@ -20,8 +20,8 @@ import mega.privacy.android.app.domain.usecase.IsCompletedTransfersEmpty
 class TransfersModule {
 
     @Provides
-    fun provideAreTransfersPaused(globalStatesRepository: GlobalStatesRepository):
-            AreTransfersPaused = AreTransfersPaused(globalStatesRepository::areTransfersPaused)
+    fun provideAreTransfersPaused(transfersRepository: TransfersRepository):
+            AreTransfersPaused = AreTransfersPaused(transfersRepository::areTransfersPaused)
 
     @Provides
     fun provideGetNumPendingDownloadsNonBackground(transfersRepository: TransfersRepository):
@@ -39,4 +39,8 @@ class TransfersModule {
     @Provides
     fun provideIsCompletedTransfersEmpty(transfersRepository: TransfersRepository): IsCompletedTransfersEmpty =
         IsCompletedTransfersEmpty(transfersRepository::isCompletedTransfersEmpty)
+
+    @Provides
+    fun provideAreAllTransfersPaused(transfersRepository: TransfersRepository): AreAllTransfersPaused =
+        AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
 }

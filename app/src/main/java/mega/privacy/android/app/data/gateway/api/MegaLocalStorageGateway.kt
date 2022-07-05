@@ -1,5 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
+import mega.privacy.android.app.data.model.UserCredentials
+
 /**
  * MegaDBHandlerGateway gateway
  *
@@ -28,4 +30,11 @@ interface MegaLocalStorageGateway {
      * @return camera sort order
      */
     suspend fun getCameraSortOrder(): Int
+
+    /**
+     * Get user credentials
+     *
+     * @return user credentials or null
+     */
+    suspend fun getUserCredentials(): UserCredentials?
 }

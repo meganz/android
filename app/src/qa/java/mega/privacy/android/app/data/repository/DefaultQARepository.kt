@@ -2,8 +2,8 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.data.gateway.DistributionGateway
-import mega.privacy.android.app.domain.entity.Progress
 import mega.privacy.android.app.domain.repository.QARepository
+import mega.privacy.android.domain.entity.Progress
 import javax.inject.Inject
 
 /**

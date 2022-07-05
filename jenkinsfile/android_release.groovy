@@ -457,9 +457,10 @@ pipeline {
                 script {
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
-                            apkFilesPattern: 'archive/*-gms-release.aab',
+                            filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: '0',
+                            additionalVersionCodes: '429',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}"
                 }
             }

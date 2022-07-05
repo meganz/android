@@ -110,6 +110,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.LoginActivity;

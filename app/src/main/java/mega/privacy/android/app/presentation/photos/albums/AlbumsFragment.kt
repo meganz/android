@@ -15,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAlbumBinding
-import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
@@ -25,6 +24,7 @@ import mega.privacy.android.app.presentation.photos.albums.adapter.AlbumCoverAda
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.entity.Album
 
 /**
  * AlbumsFragment is a sub fragment of PhotosFragment. Its sibling is TimelineFragment
@@ -52,9 +52,9 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAlbumBinding.inflate(inflater, container, false)
         albumList = binding.albumList
@@ -122,17 +122,17 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
      */
     private fun bindAdapter(coverWidth: Int, coverMargin: Int) {
         albumCoverAdapter =
-                AlbumCoverAdapter(coverWidth, coverMargin, object : AlbumCoverAdapter.Listener {
+            AlbumCoverAdapter(coverWidth, coverMargin, object : AlbumCoverAdapter.Listener {
 
-                    override fun onCoverClicked(album: Album) {
-                        when (album) {
-                            is Album.FavouriteAlbum -> {
-                                mManagerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
-                            }
+                override fun onCoverClicked(album: Album) {
+                    when (album) {
+                        is Album.FavouriteAlbum -> {
+                            mManagerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
                         }
-
                     }
-                })
+
+                }
+            })
         albumList.adapter = albumCoverAdapter
     }
 
@@ -140,13 +140,13 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
      * Calculate cover width
      */
     private fun calculateCoverWidth(coverMargin: Int, span: Int) =
-            (outMetrics.widthPixels - coverMargin * span * 2 - coverMargin * 2) / span
+        (outMetrics.widthPixels - coverMargin * span * 2 - coverMargin * 2) / span
 
     /**
      * Calculate cover margin
      */
     private fun calculateCoverMargin() =
-            resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
+        resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
 
     /**
      * Set album list layout params
@@ -161,13 +161,13 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
      * Handle elevate for Toolbar When Scrolling
      */
     private fun elevateToolbarWhenScrolling() =
-            binding.albumList.setOnScrollChangeListener { v: View?, _, _, _, _ ->
-                callManager {
-                    it.changeAppBarElevation(
-                            v!!.canScrollVertically(-1)
-                    )
-                }
+        binding.albumList.setOnScrollChangeListener { v: View?, _, _, _, _ ->
+            callManager {
+                it.changeAppBarElevation(
+                    v!!.canScrollVertically(-1)
+                )
             }
+        }
 
     override fun checkScroll() {
         val isScrolled = albumList.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)

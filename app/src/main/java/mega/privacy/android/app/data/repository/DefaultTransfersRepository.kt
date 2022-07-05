@@ -48,4 +48,25 @@ class DefaultTransfersRepository @Inject constructor(
     override suspend fun isCompletedTransfersEmpty(): Boolean = withContext(ioDispatcher) {
         dbH.completedTransfers.isEmpty()
     }
+
+    override suspend fun areTransfersPaused(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.areTransfersPaused()
+    }
+
+    override suspend fun getNumPendingPausedUploads(): Int = withContext(ioDispatcher) {
+        getUploadTransfers().count { transfer ->
+            !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
+        }
+    }
+
+    override suspend fun getNumPendingNonBackgroundPausedUploads(): Int =
+        withContext(ioDispatcher) {
+            getDownloadTransfers().count { transfer ->
+                !transfer.isFinished && !transfer.isBackgroundTransfer() && transfer.state == MegaTransfer.STATE_PAUSED
+            }
+        }
+
+    override suspend fun areAllTransfersPaused(): Boolean = withContext(ioDispatcher) {
+        areTransfersPaused() || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedUploads() == getNumPendingTransfers()
+    }
 }

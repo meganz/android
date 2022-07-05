@@ -9,8 +9,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.FeatureFlag
-import mega.privacy.android.app.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.entity.FeatureFlag
+import mega.privacy.android.domain.repository.FeatureFlagRepository
 import javax.inject.Inject
 
 /**

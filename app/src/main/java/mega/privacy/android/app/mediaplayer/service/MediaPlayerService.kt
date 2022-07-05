@@ -43,6 +43,7 @@ import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
@@ -75,6 +76,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @Inject
     lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
+
+    @Inject
+    lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
 
     private val binder by lazy { MediaPlayerServiceBinder(this) }
     private var initialized = false
@@ -141,7 +145,8 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
             megaApi,
             megaApiFolder,
             dbHandler,
-            offlineThumbnailFileWrapper
+            offlineThumbnailFileWrapper,
+            getGlobalTransferUseCase
         )
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)

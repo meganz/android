@@ -110,7 +110,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -476,7 +476,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
                 newFolderDialog = showNewFolderDialog(this, this,
-                        savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
+                        getCurrentParentNode(), savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
             }
         } else {
             Timber.d("Bundle is NULL");
@@ -2012,6 +2012,24 @@ public class FileExplorerActivity extends TransfersManagementActivity
         //No update needed
     }
 
+    /**
+     * Get current parent node.
+     *
+     * @return  The current parent node.
+     */
+    private MegaNode getCurrentParentNode() {
+        cDriveExplorer = getCloudExplorerFragment();
+        iSharesExplorer = getIncomingExplorerFragment();
+
+        if (isCloudVisible()) {
+            parentHandle = cDriveExplorer.getParentHandle();
+        } else if (isIncomingVisible()) {
+            parentHandle = iSharesExplorer.getParentHandle();
+        }
+
+        return megaApi.getNodeByHandle(parentHandle);
+    }
+
     @Override
     public void createFolder(@NotNull String title) {
 
@@ -2027,16 +2045,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         long parentHandle = -1;
 
-        cDriveExplorer = getCloudExplorerFragment();
-        iSharesExplorer = getIncomingExplorerFragment();
-
-        if (isCloudVisible()) {
-            parentHandle = cDriveExplorer.getParentHandle();
-        } else if (isIncomingVisible()) {
-            parentHandle = iSharesExplorer.getParentHandle();
-        }
-
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+        MegaNode parentNode = getCurrentParentNode();
 
         if (parentNode != null) {
             Timber.d("parentNode != null: %s", parentNode.getName());
@@ -2284,7 +2293,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
             }
             case R.id.cab_menu_create_folder: {
-                newFolderDialog = showNewFolderDialog(this, this, null);
+                newFolderDialog = showNewFolderDialog(this, this,
+                        getCurrentParentNode(), null);
                 break;
             }
             case R.id.cab_menu_new_chat: {

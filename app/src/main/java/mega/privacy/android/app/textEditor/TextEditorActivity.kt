@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewPropertyAnimator
@@ -187,7 +189,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             if (viewModel.isCreateMode()) {
                 viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
             } else if (viewModel.isReadingContent()) {
-                viewModel.checkIfNeedsStopHttpServer()
+                viewModel.finishBeforeClosing()
             }
 
             super.onBackPressed()
@@ -476,6 +478,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             nameCollisionActivityContract.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
+        viewModel.onFatalError().observe(this) {
+            showFatalErrorWarningAndFinish()
+        }
 
         LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
             .observeForever(performScrollObserver)
@@ -877,5 +882,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             showSnackbar(throwable.message!!)
         }
+    }
+
+    /**
+     * Shows the fatal warning and finishes the activity.
+     */
+    private fun showFatalErrorWarningAndFinish() {
+        showSnackbar(getString(R.string.error_temporary_unavaible))
+        Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
     }
 }

@@ -32,6 +32,7 @@ object EventConstants {
     const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
     const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
     const val EVENT_REMOVE_CALL_NOTIFICATION = "remove_call_notification"
+    const val EVENT_CALL_OUTGOING_RINGING_CHANGE = "call_outgoing_ringing_change"
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 

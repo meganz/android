@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.ChatImageQuality
 
 
 internal val ChatImageQuality.title: Int

@@ -21,15 +21,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.SubmitIssueRequest
-import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.app.domain.usecase.GetSupportEmail
-import mega.privacy.android.app.domain.usecase.MonitorConnectivity
-import mega.privacy.android.app.domain.usecase.SubmitIssue
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
+import mega.privacy.android.domain.entity.SubmitIssueRequest
+import mega.privacy.android.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.SubmitIssue
 import javax.inject.Inject
 
 /**

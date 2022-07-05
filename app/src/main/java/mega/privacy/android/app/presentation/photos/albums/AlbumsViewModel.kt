@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetAlbums
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.domain.usecase.GetAlbums
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,11 +20,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
-        private val getAlbums: GetAlbums
+    private val getAlbums: GetAlbums,
 ) : ViewModel() {
 
     private val _albumsState =
-            MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Empty)
+        MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Empty)
     val albumsState = _albumsState.asStateFlow()
 
     init {
