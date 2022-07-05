@@ -105,6 +105,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
         transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
             transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
         }
+
+        transfersViewModel.onGetTransfersState().observe(this) { areAllTransfersPaused ->
+            transfersWidget?.updateState(areAllTransfersPaused)
+        }
     }
 
     /**
@@ -290,7 +294,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the state of the transfers widget.
      */
     fun updateTransfersWidgetState() {
-        transfersWidget?.updateState()
+        transfersViewModel.checkTransfersState()
     }
 
     /**

@@ -15,9 +15,4 @@ class DefaultGlobalStatesRepository @Inject constructor(
 ) : GlobalStatesRepository {
 
     override fun monitorGlobalUpdates(): Flow<GlobalUpdate> = megaApiGateway.globalUpdates
-
-    override suspend fun areTransfersPaused(): Boolean =
-        withContext(ioDispatcher) {
-            megaApiGateway.areTransfersPaused()
-        }
 }

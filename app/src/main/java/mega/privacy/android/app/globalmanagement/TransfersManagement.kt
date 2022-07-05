@@ -215,16 +215,6 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
-     * Checks if the queue of transfers is paused or all the current in-progress transfers are individually.
-     *
-     * @return True if the queue of transfers or all the current in-progress transfers are paused, false otherwise.
-     */
-    @Suppress("DEPRECATION")
-    fun areTransfersPaused(): Boolean =
-        megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)
-                || megaApi.numPendingDownloads + megaApi.numPendingUploads == pausedTransfers.size
-
-    /**
      * Removes a resumed transfer.
      *
      * @param transferTag   tag of the resumed transfer

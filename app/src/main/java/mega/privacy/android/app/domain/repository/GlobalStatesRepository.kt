@@ -17,11 +17,4 @@ interface GlobalStatesRepository {
 
     @Deprecated("See documentation for individual replacements to use instead.")
     fun monitorGlobalUpdates(): Flow<GlobalUpdate>
-
-    /**
-     * Are transfers paused (downloads and uploads)
-     *
-     * @return true if downloads and uploads are paused
-     */
-    suspend fun areTransfersPaused(): Boolean
 }
