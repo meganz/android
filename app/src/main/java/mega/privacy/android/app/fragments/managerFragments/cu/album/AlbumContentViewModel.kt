@@ -4,10 +4,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.gallery.repository.FavouriteAlbumRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import javax.inject.Inject
 
 /**

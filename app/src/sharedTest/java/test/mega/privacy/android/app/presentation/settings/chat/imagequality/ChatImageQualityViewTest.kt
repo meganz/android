@@ -5,9 +5,9 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ChatImageQuality
 import mega.privacy.android.app.presentation.settings.chat.imagequality.ChatImageQualityView
 import mega.privacy.android.app.presentation.settings.chat.imagequality.model.SettingsChatImageQualityState
+import mega.privacy.android.domain.entity.ChatImageQuality
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,7 +72,7 @@ class ChatImageQualityViewTest {
     }
 
     private fun initComposeRuleContent(
-        state: SettingsChatImageQualityState = SettingsChatImageQualityState()
+        state: SettingsChatImageQualityState = SettingsChatImageQualityState(),
     ) {
         composeRule.setContent {
             ChatImageQualityView(

@@ -4,12 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.extensions.failWithError
@@ -20,17 +16,14 @@ import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
-import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.ChatImageQuality
-import mega.privacy.android.app.domain.exception.SettingNotFoundException
-import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
-
 import mega.privacy.android.app.utils.SharedPreferenceConstants
+import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.exception.SettingNotFoundException
+import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest

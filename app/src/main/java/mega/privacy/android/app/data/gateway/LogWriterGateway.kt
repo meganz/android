@@ -1,6 +1,6 @@
 package mega.privacy.android.app.data.gateway
 
-import mega.privacy.android.app.domain.entity.logging.LogEntry
+import mega.privacy.android.domain.entity.logging.LogEntry
 
 interface LogWriterGateway {
     /**

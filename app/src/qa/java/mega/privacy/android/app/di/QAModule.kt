@@ -6,15 +6,15 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.repository.FeatureFlagRepository
-import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
-import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.data.gateway.DistributionGateway
 import mega.privacy.android.app.data.gateway.FirebaseDistributionGateway
 import mega.privacy.android.app.data.repository.DefaultQARepository
 import mega.privacy.android.app.domain.repository.QARepository
+import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
+import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.domain.repository.FeatureFlagRepository
 
 /**
  * Provides dependencies used in the QA module

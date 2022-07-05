@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.ChatImageQuality
-import mega.privacy.android.app.domain.usecase.GetChatImageQuality
-import mega.privacy.android.app.domain.usecase.SetChatImageQuality
 import mega.privacy.android.app.presentation.settings.chat.imagequality.model.SettingsChatImageQualityState
+import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.usecase.GetChatImageQuality
+import mega.privacy.android.domain.usecase.SetChatImageQuality
 import javax.inject.Inject
 
 /**
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class SettingsChatImageQualityViewModel @Inject constructor(
     private val getChatImageQuality: GetChatImageQuality,
     private val setChatImageQuality: SetChatImageQuality,
-    @IoDispatcher ioDispatcher: CoroutineDispatcher
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsChatImageQualityState())
@@ -45,7 +45,7 @@ class SettingsChatImageQualityViewModel @Inject constructor(
      * @param quality The new quality.
      */
     fun setNewChatImageQuality(
-        quality: ChatImageQuality
+        quality: ChatImageQuality,
     ) {
         viewModelScope.launch {
             kotlin.runCatching {

@@ -6,8 +6,8 @@ import android.os.StatFs;
 import java.io.File;
 import java.util.List;
 
-import mega.privacy.android.app.domain.entity.SyncRecord;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
+import mega.privacy.android.domain.entity.SyncRecord;
 import timber.log.Timber;
 
 public class VideoCompressor extends VideoDownsampling {

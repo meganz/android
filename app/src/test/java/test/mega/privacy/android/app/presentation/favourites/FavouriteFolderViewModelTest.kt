@@ -5,16 +5,20 @@ import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
-import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.usecase.GetFavouriteFolderInfo
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -23,7 +27,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestWrapperModule
 import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi

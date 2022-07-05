@@ -6,7 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.ContactsRepository
 import mega.privacy.android.app.domain.repository.PushesRepository
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.app.domain.usecase.PushReceived
+import mega.privacy.android.domain.usecase.GetPushToken
+import mega.privacy.android.domain.usecase.RegisterPushNotifications
+import mega.privacy.android.domain.usecase.SetPushToken
 
 /**
  * Pushes use cases module.

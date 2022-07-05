@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.AreTransfersPaused
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.domain.usecase.AreTransfersPaused
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

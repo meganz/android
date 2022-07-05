@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ChatImageQuality
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityFragment
+import mega.privacy.android.domain.entity.ChatImageQuality
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

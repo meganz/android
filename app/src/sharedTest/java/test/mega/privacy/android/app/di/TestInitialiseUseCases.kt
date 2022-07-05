@@ -8,8 +8,8 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.InitialiseUseCases
-import mega.privacy.android.app.domain.usecase.MonitorConnectivity
-import mega.privacy.android.app.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.RootNodeExists
 import org.mockito.kotlin.mock
 
 @TestInstallIn(

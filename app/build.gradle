@@ -260,6 +260,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
+    implementation project(':domain')
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"

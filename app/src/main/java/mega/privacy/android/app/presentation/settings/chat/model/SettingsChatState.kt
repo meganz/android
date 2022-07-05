@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.settings.chat.model
 
-import mega.privacy.android.app.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.ChatImageQuality
 
 /**
  * Data class representing the state of the chat settings.

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.logging
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.InitialiseLogging
+import mega.privacy.android.domain.usecase.InitialiseLogging
 
 /**
  * Initialise logging use case java wrapper
