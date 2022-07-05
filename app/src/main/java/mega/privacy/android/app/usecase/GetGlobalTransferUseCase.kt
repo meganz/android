@@ -21,11 +21,13 @@ class GetGlobalTransferUseCase @Inject constructor(
 ) {
 
     sealed class Result {
-        data class OnTransferStart(val transfer: MegaTransfer?) : Result()
-        data class OnTransferFinish(val transfer: MegaTransfer?, val error: MegaError) : Result()
-        data class OnTransferUpdate(val transfer: MegaTransfer?) : Result()
-        data class OnTransferTemporaryError(val transfer: MegaTransfer?, val error: MegaError) : Result()
-        data class OnTransferData(val transfer: MegaTransfer?, val buffer: ByteArray?) : Result()
+        abstract val transfer: MegaTransfer?
+
+        data class OnTransferStart(override val transfer: MegaTransfer?) : Result()
+        data class OnTransferFinish(override val transfer: MegaTransfer?, val error: MegaError) : Result()
+        data class OnTransferUpdate(override val transfer: MegaTransfer?) : Result()
+        data class OnTransferTemporaryError(override val transfer: MegaTransfer?, val error: MegaError, ) : Result()
+        data class OnTransferData(override val transfer: MegaTransfer?, val buffer: ByteArray?) : Result()
     }
 
     fun get(): Flowable<Result> =

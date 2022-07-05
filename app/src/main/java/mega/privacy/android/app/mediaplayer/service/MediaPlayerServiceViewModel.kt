@@ -9,9 +9,12 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +30,8 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_EN
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.search.callback.SearchCallback
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
@@ -80,7 +85,6 @@ import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -90,7 +94,6 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferListenerInterface
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
@@ -109,7 +112,8 @@ class MediaPlayerServiceViewModel(
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
-) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface, SearchCallback.Data {
+    private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
+) : ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
     private val preferences = context.defaultSharedPreferences
@@ -210,7 +214,8 @@ class MediaPlayerServiceViewModel(
                 )
         )
         _itemsSelectedCount.value = 0
-        megaApi.addTransferListener(this)
+
+        setupTransferListener()
     }
 
     /**
@@ -546,6 +551,28 @@ class MediaPlayerServiceViewModel(
         }
 
         return true
+    }
+
+    /**
+     * Setup transfer listener
+     */
+    private fun setupTransferListener() {
+        getGlobalTransferUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .filter { it is Result.OnTransferTemporaryError && it.transfer != null }
+            .subscribeBy(
+                onNext = { event ->
+                    val errorEvent = event as Result.OnTransferTemporaryError
+                    onTransferTemporaryError(errorEvent.transfer!!, errorEvent.error)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(onError = { Timber.e(it) })
+                        .addTo(compositeDisposable)
+                },
+                onError = { Timber.e(it) }
+            )
+            .addTo(compositeDisposable)
     }
 
     /**
@@ -1176,8 +1203,6 @@ class MediaPlayerServiceViewModel(
             megaApi.httpServerStop()
             megaApiFolder.httpServerStop()
         }
-
-        megaApi.removeTransferListener(this)
     }
 
     private fun getApi(type: Int) =
@@ -1253,28 +1278,18 @@ class MediaPlayerServiceViewModel(
         shuffleOrder = newShuffle
     }
 
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
-    }
+    private fun onTransferTemporaryError(transfer: MegaTransfer, e: MegaError): Completable =
+        Completable.fromAction {
+            if (transfer.nodeHandle != playingHandle) {
+                return@fromAction
+            }
 
-    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-    }
-
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
-    }
-
-    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        if (transfer.nodeHandle != playingHandle) {
-            return
+            if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
+                || e.errorCode == MegaError.API_EBLOCKED
+            ) {
+                _error.value = e.errorCode
+            }
         }
-
-        if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
-            || e.errorCode == MegaError.API_EBLOCKED
-        ) {
-            _error.value = e.errorCode
-        }
-    }
-
-    override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
 
     companion object {
         private const val MAX_RETRY = 6
