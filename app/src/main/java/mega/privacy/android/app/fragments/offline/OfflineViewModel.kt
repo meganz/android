@@ -357,10 +357,10 @@ class OfflineViewModel @Inject constructor(
 
         return when {
             query != null -> {
-                context.getString(R.string.action_search).uppercase(Locale.ROOT) + ": " + query
+                context.getString(R.string.action_search) + ": " + query
             }
             path == OFFLINE_ROOT || path == "" -> {
-                context.getString(R.string.section_saved_for_offline_new).uppercase(Locale.ROOT)
+                context.getString(R.string.section_saved_for_offline_new)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)

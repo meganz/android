@@ -212,7 +212,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         if (aB != null) {
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
+            aB.setTitle(getString(R.string.invite_contacts));
             setTitleAB();
         }
 

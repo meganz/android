@@ -202,8 +202,7 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
         }
 
         if (aB != null) {
-            aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code)
-                    .toUpperCase(Locale.getDefault()));
+            aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code));
 
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);

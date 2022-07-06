@@ -113,9 +113,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         actionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = (StringResourcesUtils.getString(R.string.zip_browser_activity).uppercase(
-                Locale.getDefault()
-            ))
+            title = (StringResourcesUtils.getString(R.string.zip_browser_activity))
         }
 
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
@@ -211,10 +209,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun showAlert() {
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
-            .setPositiveButton(
-                StringResourcesUtils.getString(R.string.general_ok)
-                    .uppercase(Locale.getDefault())
-            ) { _: DialogInterface?, _: Int -> }
+            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null)
             .show()
     }
 

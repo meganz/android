@@ -338,7 +338,6 @@ class MediaPlayerServiceViewModel(
                             AUDIO_BROWSE_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.upload_to_audio)
-                                        .uppercase(Locale.getDefault())
                                 )
 
                                 buildPlaylistForAudio(intent, firstPlayHandle)
@@ -346,7 +345,6 @@ class MediaPlayerServiceViewModel(
                             VIDEO_BROWSE_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.sortby_type_video_first)
-                                        .uppercase(Locale.getDefault())
                                 )
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
@@ -371,7 +369,6 @@ class MediaPlayerServiceViewModel(
                                 if (isInRootLinksLevel(type, parentHandle)) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_links_shares)
-                                            .uppercase(Locale.getDefault())
                                     )
 
                                     buildPlaylistFromNodes(
@@ -383,7 +380,6 @@ class MediaPlayerServiceViewModel(
                                 if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_incoming_shares)
-                                            .uppercase(Locale.getDefault())
                                     )
 
                                     buildPlaylistFromNodes(
@@ -395,7 +391,6 @@ class MediaPlayerServiceViewModel(
                                 if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_outgoing_shares)
-                                            .uppercase(Locale.getDefault())
                                     )
 
                                     val nodes = mutableListOf<MegaNode>()
@@ -419,10 +414,8 @@ class MediaPlayerServiceViewModel(
                                     val nodes = megaApi.getInShares(contact)
 
                                     val title =
-                                        getString(R.string.title_incoming_shares_with_explorer)
-                                            .uppercase(Locale.getDefault()) + " " + getMegaUserNameDB(
-                                            contact
-                                        )
+                                        getString(R.string.title_incoming_shares_with_explorer) +
+                                                " " + getMegaUserNameDB(contact)
 
                                     _playlistTitle.postValue(title)
 
@@ -447,7 +440,7 @@ class MediaPlayerServiceViewModel(
                                             INBOX_ADAPTER -> R.string.section_inbox
                                             else -> R.string.section_cloud_drive
                                         }
-                                    ).uppercase(Locale.getDefault())
+                                    )
                                 } else {
                                     parent.name
                                 }
@@ -459,7 +452,6 @@ class MediaPlayerServiceViewModel(
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.section_recents)
-                                        .uppercase(Locale.getDefault())
                                 )
 
                                 val handles =

@@ -117,7 +117,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeButtonEnabled(true)
         actionBar?.title =
-            getString(R.string.title_properties_manage_chat).uppercase(Locale.getDefault())
+            getString(R.string.title_properties_manage_chat)
 
         binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false

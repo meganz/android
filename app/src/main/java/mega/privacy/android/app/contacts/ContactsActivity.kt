@@ -124,12 +124,12 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
             addOnDestinationChangedListener { _, _, _ ->
                 supportActionBar?.title = StringResourcesUtils.getString(
-                        when (this.currentDestination?.id) {
-                            R.id.contact_requests -> R.string.section_requests
-                            R.id.contact_groups -> R.string.section_groups
-                            else -> R.string.section_contacts
-                        }
-                ).uppercase(Locale.getDefault())
+                    when (this.currentDestination?.id) {
+                        R.id.contact_requests -> R.string.section_requests
+                        R.id.contact_groups -> R.string.section_groups
+                        else -> R.string.section_contacts
+                    }
+                )
             }
         }
     }

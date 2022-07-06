@@ -110,7 +110,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             title = StringResourcesUtils.getString(R.string.choose_account_fragment)
-                .uppercase(Locale.getDefault())
         }
 
         binding.billingWarningClose.setOnClickListener {

@@ -145,7 +145,6 @@
                     android:id="@+id/button_forgot_pass"
                     style="?attr/borderlessButtonStyle"
                     android:paddingLeft="3dp"
-                    android:textAllCaps="false"
                     android:layout_marginBottom="18dp"
                     android:text="@string/forgot_pass" />
 
@@ -169,7 +168,6 @@
                 <TextView
                     android:id="@+id/button_create_account_login"
                     style="?attr/borderlessButtonStyle"
-                    android:textAllCaps="false"
                     android:layout_marginBottom="24dp"
                     android:text="@string/create_account" />
 
