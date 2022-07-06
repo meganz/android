@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,7 +17,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAlbumBinding
 import mega.privacy.android.app.domain.entity.Album
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.callManager
  * AlbumsFragment is a sub fragment of PhotosFragment. Its sibling is TimelineFragment
  */
 @AndroidEntryPoint
-class AlbumsFragment : BaseFragment(), PhotosTabCallback {
+class AlbumsFragment : Fragment(), PhotosTabCallback {
 
     private lateinit var mManagerActivity: ManagerActivity
     private lateinit var binding: FragmentAlbumBinding
@@ -140,7 +140,7 @@ class AlbumsFragment : BaseFragment(), PhotosTabCallback {
      * Calculate cover width
      */
     private fun calculateCoverWidth(coverMargin: Int, span: Int) =
-            (outMetrics.widthPixels - coverMargin * span * 2 - coverMargin * 2) / span
+        (resources.displayMetrics.widthPixels - coverMargin * span * 2 - coverMargin * 2) / span
 
     /**
      * Calculate cover margin
