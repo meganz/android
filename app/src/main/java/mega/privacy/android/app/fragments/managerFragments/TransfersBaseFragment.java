@@ -44,8 +44,8 @@ public class TransfersBaseFragment extends RotatableFragment {
         View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
         listView = v.findViewById(R.id.transfers_list_view);
-        listView.addItemDecoration(itemDecoration = new SimpleDividerItemDecoration(context));
-        mLayoutManager = new LinearLayoutManager(context);
+        listView.addItemDecoration(itemDecoration = new SimpleDividerItemDecoration(requireContext()));
+        mLayoutManager = new LinearLayoutManager(requireContext());
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(null);
@@ -60,7 +60,7 @@ public class TransfersBaseFragment extends RotatableFragment {
         emptyImage = v.findViewById(R.id.transfers_empty_image);
         emptyText = v.findViewById(R.id.transfers_empty_text);
         getMoreQuotaView = v.findViewById(R.id.get_more_quota_view);
-        v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivity) context).navigateToUpgradeAccount());
+        v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivity) requireActivity()).navigateToUpgradeAccount());
 
         setGetMoreQuotaViewVisibility();
 
@@ -106,8 +106,8 @@ public class TransfersBaseFragment extends RotatableFragment {
         if (getMoreQuotaView != null) {
             if (transfersManagement.isOnTransferOverQuota()) {
                 getMoreQuotaView.setVisibility(View.VISIBLE);
-                if (Util.isDarkMode(context)) {
-                    getMoreQuotaView.setBackgroundColor(ColorUtils.getColorForElevation(context, 6));
+                if (Util.isDarkMode(requireContext())) {
+                    getMoreQuotaView.setBackgroundColor(ColorUtils.getColorForElevation(requireContext(), 6));
                 } else {
                     getMoreQuotaView.setBackgroundResource(R.drawable.white_layout_with_broder_shadow);
                 }

@@ -444,7 +444,7 @@ public class InboxFragment extends RotatableFragment {
             recyclerView.setClipToPadding(false);
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

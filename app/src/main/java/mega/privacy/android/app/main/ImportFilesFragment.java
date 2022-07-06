@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -17,7 +18,6 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding;
-import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 
@@ -25,7 +25,7 @@ import static android.text.TextUtils.isEmpty;
 import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
-public class ImportFilesFragment extends BaseFragment implements ImportFilesAdapter.OnImportFilesAdapterFooterListener {
+public class ImportFilesFragment extends Fragment implements ImportFilesAdapter.OnImportFilesAdapterFooterListener {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
 
@@ -40,7 +40,7 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
     }
 
     public void changeActionBarElevation() {
-        ((FileExplorerActivity) context).changeActionBarElevation(
+        ((FileExplorerActivity) requireActivity()).changeActionBarElevation(
                 binding.scrollContainerImport.canScrollVertically(SCROLLING_UP_DIRECTION),
                 FileExplorerActivity.IMPORT_FRAGMENT);
     }
@@ -53,9 +53,9 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        filePreparedInfos = ((FileExplorerActivity) context).getFilePreparedInfos();
+        filePreparedInfos = ((FileExplorerActivity) requireActivity()).getFilePreparedInfos();
         if (filePreparedInfos != null) {
-            HashMap<String, String> nameFiles = ((FileExplorerActivity) context).getNameFiles();
+            HashMap<String, String> nameFiles = ((FileExplorerActivity) requireActivity()).getNameFiles();
             if (nameFiles == null || nameFiles.isEmpty()) {
                 new GetNamesAsyncTask().execute();
             }
@@ -76,7 +76,7 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
             binding.contentText.setText(getResources().getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
-                adapter = new ImportFilesAdapter(context, this, filePreparedInfos, getNameFiles());
+                adapter = new ImportFilesAdapter(requireActivity(), this, filePreparedInfos, getNameFiles());
             }
 
             adapter.setImportNameFiles(getNameFiles());
@@ -122,14 +122,14 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
                 warning = StringResourcesUtils.getString(R.string.invalid_characters_defined);
             }
 
-            ((FileExplorerActivity) context).showSnackbar(warning);
+            ((FileExplorerActivity) requireActivity()).showSnackbar(warning);
         } else {
-            ((FileExplorerActivity) context).chooseFragment(fragment);
+            ((FileExplorerActivity) requireActivity()).chooseFragment(fragment);
         }
     }
 
     private HashMap<String, String> getNameFiles() {
-        return ((FileExplorerActivity) context).getNameFiles();
+        return ((FileExplorerActivity) requireActivity()).getNameFiles();
     }
 
     @Override
@@ -156,7 +156,7 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
                 nameFiles.put(name, name);
             }
 
-            ((FileExplorerActivity) context).setNameFiles(nameFiles);
+            ((FileExplorerActivity) requireActivity()).setNameFiles(nameFiles);
             return null;
         }
     }

@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
 
 /**
  * Fragment of [GetLinkActivity] which informs the user about Copyright.
  */
-class CopyrightFragment : BaseFragment(), Scrollable {
+class CopyrightFragment : Fragment(), Scrollable {
 
     private val viewModel: GetLinkViewModel by activityViewModels()
 

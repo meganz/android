@@ -463,7 +463,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         if (videoListener == null) {
             videoListener = IndividualCallVideoListener(
                 binding.localSurfaceView,
-                outMetrics,
+                resources.displayMetrics,
                 MEGACHAT_INVALID_HANDLE,
                 isFloatingWindow = false,
                 isOneToOneCall = true

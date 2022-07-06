@@ -9,13 +9,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.ALBUM_INDEX
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosPagerAdapter.Companion.TIMELINE_INDEX
 import mega.privacy.android.app.main.ManagerActivity
@@ -25,7 +25,7 @@ import java.util.Locale
 /**
  * PhotosFragment is a parent fragment for both TimelineFragment and AlbumsFragment
  */
-class PhotosFragment : BaseFragment() {
+class PhotosFragment : Fragment() {
 
     private lateinit var mManagerActivity: ManagerActivity
 

@@ -258,7 +258,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (videoListener == null) {
             videoListener = IndividualCallVideoListener(
                 videoSurfaceView,
-                outMetrics,
+                resources.displayMetrics,
                 clientId,
                 isFloatingWindow = false,
                 isOneToOneCall = true
@@ -473,7 +473,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
                 videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
-                    outMetrics,
+                    resources.displayMetrics,
                     MEGACHAT_INVALID_HANDLE,
                     isFloatingWindow,
                     isOneToOneChat
@@ -487,7 +487,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 Timber.d("Video listener is null")
                 videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
-                    outMetrics,
+                    resources.displayMetrics,
                     clientId,
                     isFloatingWindow = false,
                     isOneToOneCall = true
@@ -562,11 +562,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         val params = rootLayout.layoutParams
         if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
-            params.width = Util.dp2px(88f, outMetrics)
-            params.height = Util.dp2px(120f, outMetrics)
+            params.width = Util.dp2px(88f, resources.displayMetrics)
+            params.height = Util.dp2px(120f, resources.displayMetrics)
         } else {
-            params.width = Util.dp2px(120f, outMetrics)
-            params.height = Util.dp2px(88f, outMetrics)
+            params.width = Util.dp2px(120f, resources.displayMetrics)
+            params.height = Util.dp2px(88f, resources.displayMetrics)
         }
 
         rootLayout.layoutParams = params

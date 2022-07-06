@@ -110,7 +110,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         binding.typeMeetingEditText.let {
             it.visibility = View.VISIBLE
             it.setSelectAllOnFocus(true)
-            it.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), outMetrics))
+            it.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), resources.displayMetrics))
             val defaultName = viewModel.initHintMeetingName()
             it.hint = defaultName
             val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
