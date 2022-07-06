@@ -6,8 +6,10 @@ GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-UNIT_TEST_SUMMARY = ""
-UNIT_TEST_REPORT_ARCHIVE = "unit_test_result_${BUILD_NUMBER}.zip"
+APP_UNIT_TEST_SUMMARY = ""
+DOMAIN_UNIT_TEST_SUMMARY = ""
+APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
+DOMAIN_UNIT_TEST_REPORT_ARCHIVE = "domain_unit_test_result_${env.GIT_COMMIT}.zip"
 
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -151,15 +153,19 @@ pipeline {
                         // upload unit test report if unit test fails
                         String unitTestResult = ""
                         if (BUILD_STEP == "Unit Test") {
-                            if (archiveUnitTestReport()) {
-                                final String unitTestUploadResponse = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${UNIT_TEST_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-                                def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
+                            def appUnitTestSummary = unitTestSummaryWithArchiveLink(
+                                    "app/build/test-results/testGmsDebugUnitTest",
+                                    "app/build/reports",
+                                    APP_UNIT_TEST_REPORT_ARCHIVE
+                            )
+                            unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
 
-                                String unitTestSummary = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                                unitTestResult = "<br/>${unitTestSummary} <br/>Unit Test Report:${unitTestFileLink}"
-                            } else {
-                                unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
-                            }
+                            def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
+                                    "domain/build/test-results/test",
+                                    "domain/build/reports",
+                                    DOMAIN_UNIT_TEST_REPORT_ARCHIVE
+                            )
+                            unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
                         }
 
                         // upload SDK build log if SDK build fails
@@ -194,7 +200,6 @@ pipeline {
                 }
             }
         }
-
         success {
             script {
                 if (env.BRANCH_NAME.startsWith('MR-')) {
@@ -213,7 +218,8 @@ pipeline {
                             env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
                                     "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})" +
                                     "<br/>Build Warnings: ${readBuildWarnings()}" +
-                                    "<br/>${UNIT_TEST_SUMMARY}"
+                                    "<br/>App Unit Test: ${APP_UNIT_TEST_SUMMARY}" +
+                                    "<br/>Domain Unit Test: ${DOMAIN_UNIT_TEST_SUMMARY}"
 
                             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
@@ -374,15 +380,17 @@ pipeline {
                     BUILD_STEP = "Unit Test"
                 }
                 gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run the unit tests for the app and its dependencies
+                    // Compile and run unit tests for the app and domain
                     sh "./gradlew testGmsDebugUnitTest"
+                    sh "./gradlew domain:test"
 
                     script {
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
                         // If UnitTest is failed, summary is collected at post.failure{} phase
-                        UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        // We have to collect the report here, before they are cleaned in the last stage.
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
                     }
-
                 }
             }
         }
@@ -418,12 +426,6 @@ pipeline {
             }
         }
     }
-    // post {
-    //   failure {
-    //     // Notify developer team of the failure
-    //     mail to: 'android-devs@example.com', subject: 'Oops!', body: "Build ${env.BUILD_NUMBER} failed; ${env.BUILD_URL}"
-    //   }
-    // }
 }
 
 String readBuildWarnings() {
@@ -467,22 +469,61 @@ String wrapBuildWarnings(String rawWarning) {
 
 /**
  * Analyse unit test report and get the summary string
+ * @param testReportPath path of the unit test report in xml format
  * @return summary string of unit test
  */
-String unitTestSummary(String testReportRoot) {
-    return sh(script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportRoot}", returnStdout: true).trim()
+String unitTestSummary(String testReportPath) {
+    return sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
+            returnStdout: true).trim()
 }
 
-def archiveUnitTestReport() {
-    sh("rm -f ${WORKSPACE}/${UNIT_TEST_REPORT_ARCHIVE}")
-    if (fileExists(WORKSPACE + "/app/build/reports")) {
+/**
+ *
+ * @param reportPath relative path of the test report folder,
+ *                  for example: "app/build/reports" or "domain/build/reports"
+ *
+ * @param targetFileName target archive file name
+ * @return true if test report files are available. Otherwise return false.
+ */
+def archiveUnitTestReport(String reportPath, String targetFileName) {
+    sh("rm -f ${WORKSPACE}/${targetFileName}")
+    if (fileExists(WORKSPACE + "/" + reportPath)) {
         sh """
-            cd app/build
-            zip -r ${UNIT_TEST_REPORT_ARCHIVE} reports/* 
-            mv ${UNIT_TEST_REPORT_ARCHIVE} ${WORKSPACE}
+            cd ${WORKSPACE}
+            zip -r ${targetFileName} ${reportPath}/* 
         """
         return true
     } else {
         return false
+    }
+}
+
+/**
+ * Create a unit test summary after uploading the HTML test report. The summary includes the download
+ * link of the HTML test report.
+ *
+ * @param testResultPath relative path to the xml format test results
+ * @param reportPath relative path to the HTML format test report
+ * @param archiveTargetName file name of the test report zip file
+ */
+def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, String archiveTargetName) {
+    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+        // upload unit test report if unit test fails
+
+        String unitTestResult
+
+        if (archiveUnitTestReport(reportPath, archiveTargetName)) {
+            final String unitTestUploadResponse = sh(
+                    script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${archiveTargetName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads",
+                    returnStdout: true).trim()
+            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
+
+            String unitTestSummary = unitTestSummary("${WORKSPACE}/${testResultPath}")
+            unitTestResult = "<br/>${unitTestSummary} <br/>${unitTestFileLink}"
+        } else {
+            unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+        }
+        return unitTestResult
     }
 }
