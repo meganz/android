@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -77,19 +78,6 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             binding.meetingName.text = it
         }
 
-        inMeetingViewModel.participants.observe(this) { participants ->
-            binding.participantSize.text =
-                StringResourcesUtils.getString(
-                    R.string.info_participants_number,
-                    participants.size + 1
-                )
-            binding.moderatorName.text =
-                StringResourcesUtils.getString(
-                    R.string.info_moderator_name,
-                    inMeetingViewModel.getModeratorNames(requireActivity(), participants)
-                )
-        }
-
         shareViewModel.meetingLinkLiveData.observe(this) { link ->
             if (link.isNotEmpty()) {
                 binding.copyLink.isVisible = true
@@ -103,6 +91,23 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             updateView()
             if (chatLink.isEmpty()) {
                 (parentFragment as InMeetingFragment).onShareLink(false)
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.updateModeratorsName.collect { moderatorsName ->
+                if (moderatorsName.isNotEmpty()) {
+                    binding.moderatorName.text = moderatorsName
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.updateNumParticipants.collect { numParticipants ->
+                binding.participantSize.text =
+                    StringResourcesUtils.getQuantityString(R.plurals.meeting_call_screen_meeting_info_bottom_panel_num_of_participants,
+                        numParticipants,
+                        numParticipants)
             }
         }
 

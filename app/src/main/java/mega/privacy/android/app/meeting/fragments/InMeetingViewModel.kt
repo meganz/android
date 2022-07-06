@@ -95,7 +95,6 @@ class InMeetingViewModel @Inject constructor(
 
     private var haveConnection: Boolean = false
 
-    private var callInProgressDisposable: Disposable? = null
     private var anotherCallInProgressDisposable: Disposable? = null
     private var networkQualityDisposable: Disposable? = null
     private var reconnectingDisposable: Disposable? = null
@@ -167,6 +166,14 @@ class InMeetingViewModel @Inject constructor(
 
     private val _getParticipantsChanges = MutableStateFlow(Pair(TYPE_JOIN, ""))
     val getParticipantsChanges: StateFlow<Pair<Int, String>> get() = _getParticipantsChanges
+
+    // Name of moderators
+    private val _updateModeratorsName = MutableStateFlow(" ")
+    val updateModeratorsName: StateFlow<String> get() = _updateModeratorsName
+
+    // Num of participants
+    private val _updateNumParticipants = MutableStateFlow(1)
+    val updateNumParticipants: StateFlow<Int> get() = _updateNumParticipants
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -346,19 +353,7 @@ class InMeetingViewModel @Inject constructor(
      * Method that controls whether the toolbar should be clickable or not.
      */
     private fun checkToolbarClickability() {
-        if (!isOneToOneCall()) {
-            callInProgressDisposable?.dispose()
-
-            callInProgressDisposable = getCallUseCase.isThereAnInProgressCall(currentChatId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = {
-                        _allowClickingOnToolbar.value = it
-                    },
-                    onError = Timber::e
-                ).addTo(composite)
-        }
+        _allowClickingOnToolbar.value = !isOneToOneCall()
     }
 
     /**
@@ -777,8 +772,9 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
-        }
 
+            updateMeetingInfoBottomPanel()
+        }
         return listWithChanges
     }
 
@@ -795,6 +791,8 @@ class InMeetingViewModel @Inject constructor(
                     )
                 )
             }?.toMutableList()
+
+            updateMeetingInfoBottomPanel()
         }
     }
 
@@ -815,6 +813,8 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
+
+            updateMeetingInfoBottomPanel()
         }
 
         return listWithChanges
@@ -1099,10 +1099,18 @@ class InMeetingViewModel @Inject constructor(
                     }
                 }
 
-                participants.value = participants.value
-                Timber.d("Num of participants: ${participants.value?.size}")
+                updateParticipantsList()
             }
         }
+    }
+
+    /**
+     * Method to control when the number of participants changes
+     */
+    fun updateParticipantsList() {
+        participants.value = participants.value
+        Timber.d("Num of participants in the call: ${participants.value?.size}")
+        updateMeetingInfoBottomPanel()
     }
 
     /**
@@ -1115,8 +1123,7 @@ class InMeetingViewModel @Inject constructor(
         createParticipant(session)?.let { participantCreated ->
             participants.value?.add(participantCreated)
             Timber.d("Adding participant... ${participantCreated.clientId}")
-            participants.value = participants.value
-            Timber.d("Num of participants: ${participants.value?.size}")
+            updateParticipantsList()
 
             val currentSpeaker = getCurrentSpeakerParticipant()
             if (currentSpeaker == null) {
@@ -1234,8 +1241,8 @@ class InMeetingViewModel @Inject constructor(
 
                             participants.value?.removeAt(position)
                             Timber.d("Removing participant... $clientId")
-                            participants.value = participants.value
-                            Timber.d("Num of participants: ${participants.value?.size}")
+                            updateParticipantsList()
+
                             if (isSpeaker) {
                                 Timber.d("The removed participant was speaker, clientID ${participant.clientId}")
                                 removePreviousSpeakers()
@@ -2091,23 +2098,29 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Get the moderator list and return the string of name list
-     *
-     * @param participants the current participant list
-     * @return the string of moderators' name
+     * Method for updating meeting info panel information
      */
-    fun getModeratorNames(context: Context, participants: MutableList<Participant>): String {
+    private fun updateMeetingInfoBottomPanel() {
         var nameList =
-            if (isModerator()) ChatController(context).myFullName else ""
+            if (isModerator()) inMeetingRepository.getMyName() else ""
 
-        participants
-            .filter { it.isModerator && it.name.isNotEmpty() }
-            .map { it.name }
-            .forEach {
-                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else it
-            }
+        var numParticipantsModerator = if (isModerator()) 1 else 0
 
-        return nameList
+        participants.value?.apply {
+            this.filter { it.isModerator && it.name.isNotEmpty() }
+                .map { it.name }
+                .forEach {
+                    numParticipantsModerator++
+                    nameList = if (nameList.isNotEmpty()) "$nameList, $it" else it
+                }
+        }
+
+        _updateNumParticipants.value = numParticipantsModerator
+
+        _updateModeratorsName.value =
+            StringResourcesUtils.getQuantityString(R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
+                numParticipantsModerator,
+                nameList)
     }
 
     /**
