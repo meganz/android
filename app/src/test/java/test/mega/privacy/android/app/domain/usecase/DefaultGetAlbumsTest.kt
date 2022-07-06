@@ -282,7 +282,6 @@ class DefaultGetAlbumsTest {
     }
 
     private fun createFavouriteItem(
-        node: MegaNode = mock(),
         id: Long = 1L,
         parentId: Long = 2L,
         lastModified: Long = 3L,
