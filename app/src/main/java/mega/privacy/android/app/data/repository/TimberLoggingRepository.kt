@@ -18,12 +18,12 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.logging.LogEntry
-import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree
 import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import mega.privacy.android.domain.entity.logging.LogEntry
+import mega.privacy.android.domain.repository.LoggingRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatLoggerInterface

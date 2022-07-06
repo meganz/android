@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.entity.Album
-import mega.privacy.android.app.domain.usecase.GetAlbums
+import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.usecase.GetAlbums
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
 import org.junit.Before

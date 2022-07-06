@@ -5,8 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 
 /**
  * Provides the use case implementation regarding sort order

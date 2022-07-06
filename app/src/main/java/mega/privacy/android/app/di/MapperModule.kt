@@ -12,6 +12,7 @@ import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toData
+import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper

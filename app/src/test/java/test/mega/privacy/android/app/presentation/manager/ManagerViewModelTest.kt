@@ -17,7 +17,7 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetInboxNode
-import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates

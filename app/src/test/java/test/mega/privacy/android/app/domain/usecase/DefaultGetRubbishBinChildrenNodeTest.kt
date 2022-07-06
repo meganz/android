@@ -4,10 +4,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before

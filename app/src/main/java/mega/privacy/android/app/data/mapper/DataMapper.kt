@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.mapper
 
 import androidx.work.Data
-import mega.privacy.android.app.domain.entity.pushes.PushMessage
+import mega.privacy.android.domain.entity.pushes.PushMessage
 
 /**
  * Mapper to convert [PushMessage] to [Data].

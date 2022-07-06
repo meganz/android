@@ -15,10 +15,10 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.GetPushToken
-import mega.privacy.android.app.domain.usecase.RegisterPushNotifications
-import mega.privacy.android.app.domain.usecase.SetPushToken
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.domain.usecase.GetPushToken
+import mega.privacy.android.domain.usecase.RegisterPushNotifications
+import mega.privacy.android.domain.usecase.SetPushToken
 import timber.log.Timber
 
 /**

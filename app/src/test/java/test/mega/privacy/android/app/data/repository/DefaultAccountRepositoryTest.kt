@@ -11,9 +11,9 @@ import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
-import mega.privacy.android.app.domain.entity.user.UserId
-import mega.privacy.android.app.domain.entity.user.UserUpdate
-import mega.privacy.android.app.domain.repository.AccountRepository
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test

@@ -2,11 +2,11 @@ package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any

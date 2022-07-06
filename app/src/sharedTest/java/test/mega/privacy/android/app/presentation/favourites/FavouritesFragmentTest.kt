@@ -11,24 +11,32 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 
@@ -151,7 +159,11 @@ class FavouritesFragmentTest {
                 flowOf(list)
             )
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-            whenever(FavouritesTestModule.favouriteMapper(any(), any(), any(), any(), any())).thenReturn(
+            whenever(FavouritesTestModule.favouriteMapper(any(),
+                any(),
+                any(),
+                any(),
+                any())).thenReturn(
                 favourite)
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
         }

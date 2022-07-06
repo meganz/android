@@ -1,25 +1,27 @@
 package mega.privacy.android.app.usecase.call
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.*
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.data.extensions.observeOnce
-import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.constants.EventConstants
-
-import nz.mega.sdk.*
+import mega.privacy.android.app.data.extensions.observeOnce
+import mega.privacy.android.app.meeting.CallSoundType
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
+import mega.privacy.android.app.utils.Constants.TYPE_JOIN
+import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -50,7 +52,7 @@ class GetCallSoundsUseCase @Inject constructor(
      */
     data class ParticipantInfo(
         val peerId: Long,
-        val clientId: Long
+        val clientId: Long,
     )
 
     var countDownTimer: CustomCountDownTimer? = null
@@ -224,7 +226,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private fun startCountDown(
         call: MegaChatCall,
         participant: ParticipantInfo,
-        seconds: Long
+        seconds: Long,
     ) {
         megaChatApi.getChatRoom(call.chatid)?.let { chat ->
             if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {

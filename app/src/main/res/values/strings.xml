@@ -417,8 +417,6 @@
     <string name="context_no_renamed">Error. Not renamed</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Copied successfully</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Error. Not sent to Inbox</string>
     <!-- error message -->
     <string name="context_no_copied">Error. Not copied</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
@@ -469,8 +467,6 @@
     <string name="number_contact_removed">%d contacts removed successfully</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d contacts were not removed</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Successfully sent to:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Rubbish Bin emptied successfully</string>
     <!-- error message when emptying the RB -->
@@ -1754,8 +1750,6 @@
     <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">No files</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1888,10 +1882,6 @@
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Save on File System</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">Jump to latest</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">New messages</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Incoming call</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2730,8 +2720,6 @@
     <string name="alert_enter_group_name">To create a chat link you must name the group.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Start chatting securely with your contacts using end-to-end encryption</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20&#160;GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -3412,8 +3400,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Clear all offline files?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">You are the only one here</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3464,16 +3450,8 @@
     <string name="pin_to_speaker">Display in main view</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Leave meeting now?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Leave anyway</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
@@ -3492,8 +3470,6 @@
     <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Tap the Meeting link sent to you or paste it here</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Poor connection quality</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3515,7 +3491,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Quickly set up a MEGA meeting with our new encrypted meeting feature</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">You are the new host</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3681,8 +3657,6 @@
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Upload folder</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel upload?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Payment</string>
     <!-- Label indicating payment methods -->
@@ -3707,12 +3681,8 @@
     <string name="pro_iii_monthly">Pro III monthly</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III yearly</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Cancel upload</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Don’t cancel</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Buy new subscription?</string>
     <!-- Text of buy new subscription button -->
