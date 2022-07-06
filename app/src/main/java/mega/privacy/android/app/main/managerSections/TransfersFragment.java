@@ -38,6 +38,7 @@ import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
 
@@ -76,7 +77,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
         emptyImage.setImageResource(isScreenInPortrait(requireContext()) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
-        String textToShow = getString(R.string.transfers_empty_new);
+        String textToShow = StringResourcesUtils.getString(R.string.transfers_empty_new);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'"
                     + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)

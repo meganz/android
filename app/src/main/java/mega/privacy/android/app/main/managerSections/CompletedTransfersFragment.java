@@ -23,6 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -47,7 +48,7 @@ public class CompletedTransfersFragment extends TransfersBaseFragment {
 
         emptyImage.setImageResource(isScreenInPortrait(requireContext()) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
-        String textToShow = getString(R.string.completed_transfers_empty_new);
+        String textToShow = StringResourcesUtils.getString(R.string.completed_transfers_empty_new);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'"
                     + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)

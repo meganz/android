@@ -167,7 +167,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
                     title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
@@ -199,7 +199,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
                     title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
@@ -231,7 +231,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
                     title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
@@ -255,7 +255,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
             }
 
             if (diffDays > 0) {
-                title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
             } else {
                 title.setText(StringResourcesUtils.getString(R.string.expired_label));
             }
