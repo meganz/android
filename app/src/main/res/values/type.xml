@@ -122,12 +122,6 @@
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextAppearance.Mega.Subtitle1.AccentColor.Variant1">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
-
     <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -169,6 +163,12 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    .Medium.AccentColor
 
     <style name="TextAppearance.Mega.Subtitle1.Medium.Grey900White">
         <item name="android:textColor">@color/grey_900_white</item>
@@ -334,10 +334,6 @@
 
     <style name="TextAppearance.Mega.Subtitle2.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Subtitle2.AccentColor.AllCaps">
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
@@ -582,7 +578,7 @@
 
     <!-- ================== Button ====================== -->
 
-    <!-- Medium, 14sp, 0px, textColorPrimary, AllCaps=true -->
+    <!-- Medium, 14sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
