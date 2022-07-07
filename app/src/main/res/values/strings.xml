@@ -957,8 +957,6 @@
     <string name="file_link_unavaible_delete_account">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">The provided decryption key for the folder link is invalid.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Limited</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1200,10 +1198,6 @@
     <string name="more_users_typing">%1$s [A]and more are typing&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">More</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Storage</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">Transfer quota</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Storage space</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -3889,7 +3883,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Skip this folder</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists at this destination.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Bad connection</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -4004,4 +3998,24 @@
         <item quantity="one">1 file</item>
         <item quantity="other">%1$d files</item>
     </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] storage</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer quota</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">Storage</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] transfer quota</string>
+    <!-- Chat message when the permissions for a user has been changed to read-only-->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/D][E]%2$s[/E]</string>
+    <!-- Chat message when the permissions for a user has been changed to standard-->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/D][E]%2$s[/E]</string>
+    <!-- Chat message when the permissions for a user has been changed to host-->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/D][E]%2$s[/E]</string>
+    <!-- Last message in chats list when the permissions for a user has been changed to read-only-->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s was changed to read-only by %2$s</string>
+    <!-- Last message in chats list when the permissions for a user has been changed to  standard-->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
+    <!-- Last message in chats list when the permissions for a user has been changed to host-->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
 </resources>
