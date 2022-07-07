@@ -253,8 +253,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     @SuppressLint("SetTextI18n")
     private fun setFreePlan() {
         //Currently the API side doesn't return this value, so we have to hardcode.
-        var textToShowFreeStorage = "[A] 20 GB+ [/A]" +
-                StringResourcesUtils.getString(R.string.label_storage_upgrade_account) + " "
+        var textToShowFreeStorage =
+            StringResourcesUtils.getString(R.string.account_upgrade_storage_label, "20 GB+")
 
         try {
             textToShowFreeStorage = textToShowFreeStorage.replace(
@@ -270,10 +270,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             "$textToShowFreeStorage<sup><small><font color='#ff333a'>1</font></small></sup>"
                 .toSpannedHtmlText()
 
-        var textToShowFreeBandwidth = "[A] " +
-                StringResourcesUtils.getString(R.string.limited_bandwith) +
-                "[/A] " +
-                StringResourcesUtils.getString(R.string.label_transfer_quota_upgrade_account)
+        var textToShowFreeBandwidth =
+            StringResourcesUtils.getString(R.string.account_choose_free_limited_transfer_quota)
 
         try {
             textToShowFreeBandwidth = textToShowFreeBandwidth
