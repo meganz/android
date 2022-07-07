@@ -11,16 +11,21 @@ import mega.privacy.android.app.middlelayer.iab.MegaSku
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate
 import mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCurrency
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaPricing
+import timber.log.Timber
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.*
+import java.util.BitSet
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +37,7 @@ import javax.inject.Singleton
 @Singleton
 class MyAccountInfo @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
 ) {
 
     companion object {
@@ -157,10 +162,10 @@ class MyAccountInfo @Inject constructor(
     }
 
     fun setAccountDetails(numDetails: Int) {
-        logDebug("numDetails: $numDetails")
+        Timber.d("numDetails: $numDetails")
 
         if (accountInfo == null) {
-            logError("Error because account info is NUll in setAccountDetails")
+            Timber.e("Error because account info is NUll in setAccountDetails")
         }
 
         val accountInfo = accountInfo ?: return
@@ -243,7 +248,7 @@ class MyAccountInfo @Inject constructor(
         }
 
         isAccountDetailsFinished = true
-        logDebug("LEVELACCOUNTDETAILS: $levelAccountDetails; LEVELINVENTORY: $levelInventory; INVENTORYFINISHED: $isInventoryFinished")
+        Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails; LEVELINVENTORY: $levelInventory; INVENTORYFINISHED: $isInventoryFinished")
     }
 
     /**
@@ -255,7 +260,7 @@ class MyAccountInfo @Inject constructor(
      */
     fun updateMyData(firstName: Boolean, newName: String?, e: MegaError) {
         if (e.errorCode != MegaError.API_OK || newName == null) {
-            logError("ERROR - request.getText(): $newName")
+            Timber.e("ERROR - request.getText(): $newName")
 
             if (firstName) {
                 setFirstNameText("")
@@ -266,7 +271,7 @@ class MyAccountInfo @Inject constructor(
             return
         }
 
-        logDebug("request.getText(): $newName")
+        Timber.d("request.getText(): $newName")
 
         val handle = megaApi.myUser?.handle ?: MegaApiJava.INVALID_HANDLE
 
@@ -289,10 +294,10 @@ class MyAccountInfo @Inject constructor(
 
     fun setAccountInfo(accountInfo: MegaAccountDetails) {
         this.accountInfo = accountInfo
-        logDebug("Renews ts: " + accountInfo.subscriptionRenewTime)
-        logDebug("Renews on: " + getDateString(accountInfo.subscriptionRenewTime))
-        logDebug("Expires ts: " + accountInfo.proExpiration)
-        logDebug("Expires on: " + getDateString(accountInfo.proExpiration))
+        Timber.d("Renews ts: ${accountInfo.subscriptionRenewTime}")
+        Timber.d("Renews on: ${getDateString(accountInfo.subscriptionRenewTime)}")
+        Timber.d("Expires ts: ${accountInfo.proExpiration}")
+        Timber.d("Expires on: ${getDateString(accountInfo.proExpiration)}")
     }
 
     fun getFirstNameText(): String = firstNameText
@@ -310,7 +315,7 @@ class MyAccountInfo @Inject constructor(
     }
 
     private fun setFullName() {
-        logDebug("setFullName")
+        Timber.d("setFullName")
 
         fullName = if (firstNameText.trim().isEmpty()) {
             lastNameText
@@ -319,7 +324,7 @@ class MyAccountInfo @Inject constructor(
         }
 
         if (fullName.trim().isEmpty()) {
-            logDebug("Put email as fullname")
+            Timber.d("Put email as fullname")
 
             var email = ""
             val user = megaApi.myUser
@@ -334,7 +339,7 @@ class MyAccountInfo @Inject constructor(
 
         if (fullName.trim().isEmpty()) {
             fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text)
-            logDebug("Full name set by default: $fullName")
+            Timber.d("Full name set by default: $fullName")
         }
 
         firstLetter = fullName[0].toString() + ""
@@ -349,7 +354,7 @@ class MyAccountInfo @Inject constructor(
         }
 
         for (i in 0 until p.numProducts) {
-            logDebug(
+            Timber.d(
                 "p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___"
                         + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i)
                         + "___" + p.getGBTransfer(i)
@@ -382,7 +387,7 @@ class MyAccountInfo @Inject constructor(
         val result = activeSubscription!!.sku == sku
 
         if (result) {
-            logDebug("$sku already subscribed.")
+            Timber.d("$sku already subscribed.")
         }
 
         return result
@@ -406,7 +411,7 @@ class MyAccountInfo @Inject constructor(
             return Base64.encodeToString(encodeHash, Base64.DEFAULT)
         } catch (e: NoSuchAlgorithmException) {
             e.printStackTrace()
-            logError("Generate obfuscated account Id failed.", e)
+            Timber.e(e, "Generate obfuscated account Id failed.")
         }
 
         return null

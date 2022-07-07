@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.functions.Consumer
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 object RxUtil {
@@ -13,7 +14,7 @@ object RxUtil {
     @JvmStatic
     fun logErr(context: String): Consumer<in Throwable> {
         return Consumer { throwable: Throwable? ->
-            LogUtil.logError("$context onError", throwable)
+            Timber.e(throwable, "$context onError")
         }
     }
 

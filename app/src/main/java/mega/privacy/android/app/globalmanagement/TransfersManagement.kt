@@ -19,9 +19,16 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.*
+import mega.privacy.android.app.AndroidCompletedTransfer
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.DownloadService
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
+import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
+import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
@@ -30,7 +37,6 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
@@ -39,7 +45,12 @@ import nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.*
+import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
+import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
+import nz.mega.sdk.MegaTransfer.STATE_PAUSED
+import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
+import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -52,7 +63,7 @@ import javax.inject.Singleton
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
 ) {
 
     companion object {
@@ -92,7 +103,7 @@ class TransfersManagement @Inject constructor(
         @JvmStatic
         fun addCompletedTransfer(
             completedTransfer: AndroidCompletedTransfer,
-            dbH: DatabaseHandler
+            dbH: DatabaseHandler,
         ) {
             Completable.create { emitter ->
                 completedTransfer.id = dbH.setCompletedTransfer(completedTransfer)
@@ -106,9 +117,7 @@ class TransfersManagement @Inject constructor(
                                 .putExtra(COMPLETED_TRANSFER, completedTransfer)
                         )
                     },
-                    onError = { error ->
-                        LogUtil.logError(error.message)
-                    }
+                    onError = Timber::e
                 )
                 .addTo(CompositeDisposable())
         }
@@ -128,7 +137,7 @@ class TransfersManagement @Inject constructor(
             notificationChannelName: String?,
             mNotificationManager: NotificationManager,
             mBuilderCompat: NotificationCompat.Builder,
-            mBuilder: Notification.Builder
+            mBuilder: Notification.Builder,
         ): Notification =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
@@ -417,7 +426,7 @@ class TransfersManagement @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                LogUtil.logWarning("Exception checking pending transfers", e)
+                Timber.w(e, "Exception checking pending transfers")
             }
         }, WAIT_TIME_TO_RESTART_SERVICES)
     }
@@ -439,7 +448,7 @@ class TransfersManagement @Inject constructor(
         type: Int,
         localPath: String,
         node: MegaNode,
-        isFolder: Boolean
+        isFolder: Boolean,
     ): MegaCancelToken? {
         if (shouldBreakTransfersProcessing()) {
             return null

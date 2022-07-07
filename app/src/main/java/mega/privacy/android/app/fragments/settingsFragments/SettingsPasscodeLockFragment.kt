@@ -13,13 +13,15 @@ import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.PassCodeActivityContract
-import mega.privacy.android.app.constants.SettingsConstants.*
+import mega.privacy.android.app.constants.SettingsConstants.KEY_FINGERPRINT_ENABLE
+import mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_ENABLE
+import mega.privacy.android.app.constants.SettingsConstants.KEY_REQUIRE_PASSCODE
+import mega.privacy.android.app.constants.SettingsConstants.KEY_RESET_PASSCODE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import timber.log.Timber
 import java.util.concurrent.Executor
 import javax.inject.Inject
 
@@ -53,7 +55,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             if (isSuccess) {
                 enablePasscode()
             } else {
-                logWarning("Set PIN ERROR")
+                Timber.w("Set PIN ERROR")
             }
         }
     }
@@ -139,13 +141,13 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         when (val canAuthenticate = from(requireContext()).canAuthenticate(BIOMETRIC_STRONG)) {
             BIOMETRIC_SUCCESS -> {
-                logDebug("Show fingerprint setting, hardware available and fingerprint enabled.")
+                Timber.d("Show fingerprint setting, hardware available and fingerprint enabled.")
                 fingerprintSwitch?.let { preferenceScreen.addPreference(it) }
                 fingerprintSwitch?.isChecked = dbH.isFingerprintLockEnabled
             }
             else -> {
                 fingerprintSwitch?.let { preferenceScreen.removePreference(it) }
-                logDebug("Error. Cannot show fingerprint setting: $canAuthenticate")
+                Timber.d("Error. Cannot show fingerprint setting: $canAuthenticate")
             }
         }
     }
@@ -165,15 +167,15 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationError(
                         errorCode: Int,
-                        errString: CharSequence
+                        errString: CharSequence,
                     ) {
                         super.onAuthenticationError(errorCode, errString)
-                        logWarning("Error: $errString")
+                        Timber.w("Error: $errString")
                         fingerprintSwitch?.isChecked = false
                     }
 
                     override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult
+                        result: BiometricPrompt.AuthenticationResult,
                     ) {
                         super.onAuthenticationSucceeded(result)
                         dbH.isFingerprintLockEnabled = true
@@ -184,7 +186,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
-                        logWarning("Authentication failed")
+                        Timber.w("Authentication failed")
                     }
                 })
         }

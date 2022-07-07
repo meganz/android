@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get children nodes of the rubbish bin parent handle
  */
-interface GetRubbishBinChildrenNode {
+fun interface GetRubbishBinChildrenNode {
     /**
      * Get children nodes of the rubbish bin parent handle
      *

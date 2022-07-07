@@ -11,6 +11,24 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 interface MegaChatApiGateway {
 
     /**
+     * Init state
+     */
+    val initState: Int
+
+    /**
+     * Initializes API.
+     *
+     * @param session   Account session.
+     * @return Init state.
+     */
+    fun init(session: String): Int
+
+    /**
+     * Logouts API.
+     */
+    fun logout()
+
+    /**
      * Set logger
      *
      * @param logger
@@ -37,4 +55,19 @@ interface MegaChatApiGateway {
      * @param listener
      */
     fun removeChatRequestListener(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Notifies a push has been received.
+     *
+     * @param beep      True if should beep, false otherwise.
+     * @param listener  Listener.
+     */
+    fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Refreshes DNS servers and retries pending connections.
+     *
+     * @param disconnect True if should disconnect, false otherwise.
+     */
+    fun retryPendingConnections(disconnect: Boolean)
 }

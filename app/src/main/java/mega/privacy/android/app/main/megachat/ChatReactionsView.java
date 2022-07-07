@@ -1,5 +1,9 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.utils.ChatUtil.addReactionInMsg;
+import static mega.privacy.android.app.utils.ChatUtil.shouldReactionBeClicked;
+import static mega.privacy.android.app.utils.Constants.TYPE_REACTION;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -18,10 +22,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralCha
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class ChatReactionsView extends RelativeLayout implements View.OnClickListener {
 
@@ -123,7 +124,7 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
     @Override
     public void onClick(View view) {
         if (message == null) {
-            logWarning("The message is NULL");
+            Timber.w("The message is NULL");
             return;
         }
 
@@ -132,7 +133,7 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 
         if (!shouldReactionBeClicked(chatRoom)) {
-            logDebug("No privileges to add a reaction");
+            Timber.d("No privileges to add a reaction");
             return;
         }
 
@@ -174,12 +175,12 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
      * @param emoji The Emoji.
      */
     private void addReaction(Emoji emoji) {
-        if(emoji == null){
+        if (emoji == null) {
             closeDialog();
             return;
         }
 
-        if (recentEmoji != null ) {
+        if (recentEmoji != null) {
             recentEmoji.addEmoji(emoji);
         }
 

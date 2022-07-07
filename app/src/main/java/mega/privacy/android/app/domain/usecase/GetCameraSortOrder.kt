@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 /**
  * Use case interface for getting camera sort order
  */
-interface GetCameraSortOrder {
+fun interface GetCameraSortOrder {
 
     /**
      * Get camera sort order

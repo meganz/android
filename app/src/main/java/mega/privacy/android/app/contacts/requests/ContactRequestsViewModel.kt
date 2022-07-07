@@ -3,6 +3,7 @@ package mega.privacy.android.app.contacts.requests
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import com.google.android.play.core.appupdate.e
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -15,8 +16,8 @@ import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdap
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -42,9 +43,7 @@ class ContactRequestsViewModel @Inject constructor(
                 onNext = { items ->
                     contactRequests.value = items
                 },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
+                onError = Timber::e
             )
             .addTo(composite)
     }
@@ -122,7 +121,7 @@ class ContactRequestsViewModel @Inject constructor(
                         }
                     }
                 },
-                onError = { logError(it.stackTraceToString()) })
+                onError = Timber::e)
             .addTo(composite)
         return result
     }
@@ -131,7 +130,7 @@ class ContactRequestsViewModel @Inject constructor(
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError = { logError(it.stackTraceToString()) }
+                onError = Timber::e
             )
             .addTo(composite)
     }

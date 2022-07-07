@@ -1,12 +1,16 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
+import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 import android.content.Context;
 import android.net.Uri;
-import androidx.documentfile.provider.DocumentFile;
-
 import android.os.Handler;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,11 +27,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
+import timber.log.Timber;
 
 public class SDCardOperator {
 
@@ -172,7 +172,6 @@ public class SDCardOperator {
      *
      * @param targetPath Path where the file has to be moved.
      * @param file       File to move.
-     *
      * @throws IOException If some error happens opening output stream.
      */
     public void moveFile(String targetPath, File file) throws IOException {
@@ -182,18 +181,18 @@ public class SDCardOperator {
 
         //Already exists
         if (df != null && df.length() == file.length()) {
-            logDebug(name + " already exists.");
+            Timber.d("%s already exists.", name);
             return;
         }
 
         //Update
         if (df != null && df.length() != file.length()) {
-            logDebug("delete former file.");
+            Timber.d("delete former file.");
             df.delete();
         }
 
         DocumentFile targetFile = parent.createFile(MimeTypeList.typeForName(name).getType(), name);
-        if(targetFile == null) {
+        if (targetFile == null) {
             throw new IOException("Create file on SD card failed.");
         }
 
@@ -225,9 +224,8 @@ public class SDCardOperator {
      * Copy an Uri to targetPath.
      *
      * @param targetPath Path where the file has to be moved.
-     * @param source Uri to copy.
-     * @param name File name of the Uri.
-     *
+     * @param source     Uri to copy.
+     * @param name       File name of the Uri.
      * @throws IOException If some error happens opening output stream.
      */
     public void copyUri(String targetPath, Uri source, String name) throws IOException {
@@ -235,12 +233,12 @@ public class SDCardOperator {
         DocumentFile df = parent.findFile(name);
 
         if (df != null) {
-            logDebug("delete former file.");
+            Timber.d("delete former file.");
             df.delete();
         }
 
         DocumentFile targetFile = parent.createFile(MimeTypeList.typeForName(name).getType(), name);
-        if(targetFile == null) {
+        if (targetFile == null) {
             throw new IOException("Create file on SD card failed.");
         }
 
@@ -313,8 +311,8 @@ public class SDCardOperator {
     /**
      * Checks if the download path belongs to an SD card.
      *
-     * @param context       current Context
-     * @param downloadPath  download path
+     * @param context      current Context
+     * @param downloadPath download path
      * @return The new SDCardOperator to continue its initialization.
      */
     private static SDCardOperator checkDownloadPath(Context context, String downloadPath) {
@@ -325,11 +323,10 @@ public class SDCardOperator {
         try {
             sdCardOperator = new SDCardOperator(context);
         } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError("Initialize SDCardOperator failed", e);
+            Timber.e(e, "Initialize SDCardOperator failed");
             // user uninstall the sd card. but default download location is still on the sd card
             if (isSDCardPath) {
-                logDebug("select new path as download location.");
+                Timber.d("select new path as download location.");
                 new Handler().postDelayed(() -> Toast.makeText(MegaApplication.getInstance(), R.string.old_sdcard_unavailable, Toast.LENGTH_LONG).show(), 1000);
                 return null;
             }
@@ -338,7 +335,7 @@ public class SDCardOperator {
         if (sdCardOperator != null && isSDCardPath) {
             //user has installed another sd card.
             if (sdCardOperator.isNewSDCardPath(downloadPath)) {
-                logDebug("new sd card, check permission.");
+                Timber.d("new sd card, check permission.");
                 new Handler().postDelayed(() -> Toast.makeText(MegaApplication.getInstance(), R.string.old_sdcard_unavailable, Toast.LENGTH_LONG).show(), 1000);
                 return null;
             }
@@ -346,8 +343,7 @@ public class SDCardOperator {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
             } catch (SDCardOperator.SDCardException e) {
-                e.printStackTrace();
-                logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
+                Timber.e(e, "SDCardOperator initDocumentFileRoot failed requestSDCardPermission");
                 return null;
             }
         }
@@ -358,15 +354,15 @@ public class SDCardOperator {
     /**
      * Inits the SDCardOperator.
      *
-     * @param context       current Context
-     * @param parentPath    SD card parent path
+     * @param context    current Context
+     * @param parentPath SD card parent path
      * @return The initialized SDCardOperator.
      */
     public static SDCardOperator initSDCardOperator(Context context, String parentPath) {
         SDCardOperator sdCardOperator;
 
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            sdCardOperator =  checkDownloadPath(context, parentPath);
+        if (SDCardOperator.isSDCardPath(parentPath)) {
+            sdCardOperator = checkDownloadPath(context, parentPath);
             if (sdCardOperator != null) {
                 sdCardOperator.setSDCardDownload(!isTextEmpty(sdCardOperator.getDownloadRoot()));
             }
@@ -386,15 +382,15 @@ public class SDCardOperator {
      * @param tag            Identifier of the SD transfer on DB.
      */
     public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
-       if(!downloadedFile.exists()) {
-           logError("Download file doesn't exist!");
-           return;
-       }
+        if (!downloadedFile.exists()) {
+            Timber.e("Download file doesn't exist!");
+            return;
+        }
 
-       if(TextUtil.isTextEmpty(targetPath)) {
-           logError("Target path is empty!");
-           return;
-       }
+        if (TextUtil.isTextEmpty(targetPath)) {
+            Timber.e("Target path is empty!");
+            return;
+        }
 
         MegaApplication app = MegaApplication.getInstance();
         try {
@@ -405,12 +401,12 @@ public class SDCardOperator {
             //New path, after moving to target location.
             File newFile = new File(targetPath + File.separator + downloadedFile.getName());
             if (!newFile.exists() || newFile.length() != downloadedFile.length()) {
-                logError("Error moving file to the sd card path");
+                Timber.e("Error moving file to the sd card path");
             } else {
                 app.getDbH().removeSDTransfer(tag);
             }
         } catch (Exception e) {
-            logError("Error moving file to the sd card path", e);
+            Timber.e(e, "Error moving file to the sd card path");
         } finally {
             downloadedFile.delete();
         }

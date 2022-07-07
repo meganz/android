@@ -1,5 +1,28 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
+import static mega.privacy.android.app.constants.BroadcastConstants.PRIMARY_HANDLE;
+import static mega.privacy.android.app.constants.BroadcastConstants.SECONDARY_FOLDER;
+import static mega.privacy.android.app.utils.CameraUploadUtil.forceUpdateCameraUploadFolderIcon;
+import static mega.privacy.android.app.utils.CameraUploadUtil.resetPrimaryTimeline;
+import static mega.privacy.android.app.utils.CameraUploadUtil.resetSecondaryTimeline;
+import static mega.privacy.android.app.utils.ContactUtil.notifyNicknameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.updateFirstName;
+import static mega.privacy.android.app.utils.ContactUtil.updateLastName;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
+import static nz.mega.sdk.MegaApiJava.base64ToHandle;
+
 import android.content.Context;
 import android.content.Intent;
 
@@ -13,20 +36,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.showSnackbar;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
-import static nz.mega.sdk.MegaApiJava.base64ToHandle;
+import timber.log.Timber;
 
 public class SetAttrUserListener extends BaseListener {
 
@@ -43,7 +53,7 @@ public class SetAttrUserListener extends BaseListener {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateMyChatFilesFolderHandle(request.getMegaStringMap());
                 } else {
-                    logWarning("Error setting \"My chat files\" folder as user's attribute");
+                    Timber.w("Error setting \"My chat files\" folder as user's attribute");
                 }
                 break;
 
@@ -75,7 +85,7 @@ public class SetAttrUserListener extends BaseListener {
                     dBH.setContactNickname(null, request.getNodeHandle());
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
-                    logError("Error adding, updating or removing the alias" + e.getErrorCode());
+                    Timber.e("Error adding, updating or removing the alias%s", e.getErrorCode());
                 }
                 break;
 
@@ -88,17 +98,17 @@ public class SetAttrUserListener extends BaseListener {
                     long primaryHandle = request.getNodeHandle();
                     long secondaryHandle = request.getParentHandle();
 
-                    logDebug("Set CU folders successfully primary: " + primaryHandle + ", secondary: " + secondaryHandle);
-                    if(primaryHandle != INVALID_HANDLE){
+                    Timber.d("Set CU folders successfully primary: %d, secondary: %d", primaryHandle, secondaryHandle);
+                    if (primaryHandle != INVALID_HANDLE) {
                         resetPrimaryTimeline();
                         dBH.setCamSyncHandle(primaryHandle);
                         prefs.setCamSyncHandle(String.valueOf(primaryHandle));
                         forceUpdateCameraUploadFolderIcon(false, primaryHandle);
                         if (context instanceof CameraUploadsService) {
-                            logDebug("Trigger on onSetFolderAttribute by set primary.");
+                            Timber.d("Trigger on onSetFolderAttribute by set primary.");
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
-                            logDebug("Start CU by set primary, try to start CU, true.");
+                            Timber.d("Start CU by set primary, try to start CU, true.");
                             JobUtil.fireStopCameraUploadJob(context);
                             JobUtil.fireCameraUploadJob(context, true);
                         }
@@ -110,10 +120,10 @@ public class SetAttrUserListener extends BaseListener {
                         forceUpdateCameraUploadFolderIcon(true, secondaryHandle);
                         //make sure to start the process once secondary is enabled
                         if (context instanceof CameraUploadsService) {
-                            logDebug("Trigger on onSetFolderAttribute by set secondary.");
+                            Timber.d("Trigger on onSetFolderAttribute by set secondary.");
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
-                            logDebug("Start CU by set secondary, try to start CU, true.");
+                            Timber.d("Start CU by set secondary, try to start CU, true.");
                             JobUtil.fireStopCameraUploadJob(context);
                             JobUtil.fireCameraUploadJob(context, true);
                         }
@@ -130,7 +140,7 @@ public class SetAttrUserListener extends BaseListener {
                     }
                     MegaApplication.getInstance().sendBroadcast(intent);
                 } else {
-                    logWarning("Set CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    Timber.w("Set CU attributes failed, error code: %d, %s", e.getErrorCode(), e.getErrorString());
                     JobUtil.fireStopCameraUploadJob(context);
                 }
                 break;
@@ -155,10 +165,10 @@ public class SetAttrUserListener extends BaseListener {
             case MegaApiJava.USER_ATTR_DISABLE_VERSIONS:
                 MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
                 if (e.getErrorCode() != MegaError.API_OK) {
-                    logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
+                    Timber.e("ERROR:USER_ATTR_DISABLE_VERSIONS");
                     MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_FILE_VERSIONS));
                 } else {
-                    logDebug("File versioning attribute changed correctly");
+                    Timber.d("File versioning attribute changed correctly");
                 }
                 break;
         }
@@ -167,7 +177,7 @@ public class SetAttrUserListener extends BaseListener {
     /**
      * Updates in DB the handle of "My chat files" folder node if the request
      * for set a node as USER_ATTR_MY_CHAT_FILES_FOLDER finished without errors.
-     *
+     * <p>
      * Before update the DB, it has to obtain the handle contained in a MegaStringMap,
      * where one of the entries will contain a key "h" and its value, the handle in base64.
      *

@@ -14,6 +14,12 @@
     <!-- chat reaction add/own emoji background fill -->
     <color name="grey_003_white_018">@color/white_alpha_018</color>
 
+    <!-- collapsed input text chat background-->
+    <color name="grey_003_white_015">@color/white_alpha_015</color>
+
+    <!-- expanded input text chat background-->
+    <color name="white_white_015">@color/white_alpha_015</color>
+
     <!-- chat reaction add/own emoji background border -->
     <color name="grey_012_white_015">@color/white_alpha_015</color>
 
@@ -100,6 +106,9 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
+    <!-- The record voice clip bubble -->
+    <color name="grey_800_white">@color/white</color>
+
     <!-- Same as textColorSecondary on light and textColorPrimary on dark. -->
     <color name="grey_054_white_087">@color/white_alpha_087</color>
 
@@ -154,6 +163,8 @@
     <color name="homepage_background">@color/dark_grey</color>
 
     <color name="grey_700_grey_300">@color/grey_300</color>
+
+    <color name="grey_700_white">@color/white</color>
 
     <color name="grey_200_grey_600">@color/grey_600</color>
 

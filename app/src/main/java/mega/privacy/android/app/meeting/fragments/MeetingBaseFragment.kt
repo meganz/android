@@ -3,16 +3,20 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.fragment.app.activityViewModels
 import android.os.Bundle
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.permission.*
+import mega.privacy.android.app.utils.permission.PermissionRequest
+import mega.privacy.android.app.utils.permission.PermissionType
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.app.utils.permission.PermissionsRequester
+import mega.privacy.android.app.utils.permission.permissionsBuilder
+import timber.log.Timber
 
 /**
  * Base fragment for meeting fragment:
@@ -44,8 +48,8 @@ open class MeetingBaseFragment : BaseFragment() {
 
     // Default permission array for meeting
     protected val permissions = arrayOf(
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA
+        Manifest.permission.RECORD_AUDIO,
+        Manifest.permission.CAMERA
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +77,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     private fun onCheckRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user check the permissions: $it")
+            Timber.d("user check the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(true)
@@ -92,7 +96,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     private fun onCheckPermissionDenied(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            Timber.d("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
@@ -111,7 +115,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     protected open fun onRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user requires the permissions: $it")
+            Timber.d("user requires the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(true)
@@ -146,7 +150,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     protected open fun onPermissionDenied(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            Timber.d("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
@@ -174,7 +178,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     protected fun onNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies and never ask for the permissions: $it")
+            Timber.d("user denies and never ask for the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(false)
@@ -193,7 +197,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     protected fun onRequiresAudioPermission(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
-            logDebug("user requires the Audio permissions")
+            Timber.d("user requires the Audio permissions")
             sharedModel.setRecordAudioPermission(true)
         }
     }
@@ -205,7 +209,7 @@ open class MeetingBaseFragment : BaseFragment() {
      */
     protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user requires the Camera permissions")
+            Timber.d("user requires the Camera permissions")
             sharedModel.setCameraPermission(true)
         }
     }
@@ -264,9 +268,9 @@ open class MeetingBaseFragment : BaseFragment() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
-        logDebug("onRequestPermissionsResult")
+        Timber.d("onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // After request, we should consider "shouldShowRequestPermissionRationale" because the user may ticket 'Don't ask again'
         bRequested = true

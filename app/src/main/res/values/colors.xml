@@ -55,9 +55,10 @@
     <color name="grey_300_alpha_026">#429E9E9E</color>
     <color name="grey_600_alpha_085">#D96C6C6C</color>
     <color name="grey_700_alpha_026">#424F4F4F</color>
+    <color name="grey_800_alpha_070">#B32E2E2E</color>
     <color name="grey_700_alpha_065">#A64F4F4F</color>
 
-    <color name="grey_alpha_003">#08000000</color>
+    <color name="grey_alpha_003">#07000000</color>
     <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1F000000</color>
@@ -181,6 +182,9 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
+    <!-- The record voice clip bubble -->
+    <color name="grey_800_white">@color/grey_800</color>
+
     <!--  Same as colorOnSecondary  -->
     <color name="white_087_dark_grey">@color/white_alpha_087</color>
 
@@ -221,6 +225,12 @@
 
     <!-- chat reaction add/own emoji background fill -->
     <color name="grey_003_white_018">@color/grey_alpha_003</color>
+
+    <!-- collapsed input text chat background-->
+    <color name="grey_003_white_015">@color/grey_alpha_003</color>
+
+    <!-- expanded input text chat background-->
+    <color name="white_white_015">@color/white</color>
 
     <!-- chat reaction add/own emoji background border -->
     <color name="grey_012_white_015">@color/grey_alpha_012</color>
@@ -371,6 +381,9 @@
     <color name="orange_400_orange_300">@color/orange_400</color>
     <!-- Online -->
     <color name="lime_green_500_300">@color/lime_green_500</color>
+
+    <!-- Badge with unread msg -->
+    <color name="grey_700_white">@color/grey_700</color>
 
     <!-- Chat contact text message text color -->
     <color name="grey_087_white">@color/grey_alpha_087</color>

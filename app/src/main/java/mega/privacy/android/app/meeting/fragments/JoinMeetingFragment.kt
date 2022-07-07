@@ -9,24 +9,23 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
+import timber.log.Timber
 
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onMeetingButtonClick() {
         if (chatId == MEGACHAT_INVALID_HANDLE) {
-            logError("Chat Id is invalid when join meeting")
+            Timber.e("Chat Id is invalid when join meeting")
             return
         }
 
         releaseVideoDeviceAndRemoveChatVideoListener()
         if (amIParticipatingInAChat(chatId)) {
-            logDebug("I am a member of the chat, just answer the call")
+            Timber.d("I am a member of the chat, just answer the call")
             findNavController().navigate(
                 JoinMeetingFragmentDirections
                     .actionGlobalInMeeting(MEETING_ACTION_START)
@@ -34,7 +33,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         } else {
             val chatRoom = sharedModel.getSpecificChat(chatId)
             if (chatRoom != null && chatRoom.ownPrivilege == MegaChatRoom.PRIV_RM) {
-                logDebug("I was a member of the chat but was removed, I have to re-join")
+                Timber.d("I was a member of the chat but was removed, I have to re-join")
                 findNavController().navigate(
                     JoinMeetingFragmentDirections
                         .actionGlobalInMeeting(
@@ -46,7 +45,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
                         )
                 )
             } else {
-                logDebug("I am not a member of the chat. I have to auto-join")
+                Timber.d("I am not a member of the chat. I have to auto-join")
                 findNavController().navigate(
                     JoinMeetingFragmentDirections
                         .actionGlobalInMeeting(

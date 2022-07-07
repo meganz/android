@@ -1,5 +1,36 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
+import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
+import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.SELECTED_CHATS;
+import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.Util.changeToolBarElevation;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,15 +43,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
@@ -36,11 +58,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.primitives.Longs;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,16 +78,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -65,14 +93,18 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -87,24 +119,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
-import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import javax.inject.Inject;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
@@ -185,7 +200,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -292,7 +307,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         int pos = mLayoutManager.findFirstVisibleItemPosition();
 
                         if (pos <= NUMBER_MESSAGES_BEFORE_LOAD && getMoreHistory) {
-                            logDebug("DE->loadAttachments:scrolling down");
+                            Timber.d("DE->loadAttachments:scrolling down");
                             isLoadingHistory = true;
                             stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
                             getMoreHistory = false;
@@ -326,7 +341,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                 boolean resultOpen = megaChatApi.openNodeHistory(chatId, this);
                 if (resultOpen) {
-                    logDebug("Node history opened correctly");
+                    Timber.d("Node history opened correctly");
 
                     messages = new ArrayList<MegaChatMessage>();
 
@@ -346,18 +361,18 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                     adapter.setMessages(messages);
 
                     isLoadingHistory = true;
-                    logDebug("A->loadAttachments");
+                    Timber.d("A->loadAttachments");
                     stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
                 }
             } else {
-                logError("ERROR: node is NULL");
+                Timber.e("ERROR: node is NULL");
             }
         }
     }
 
     @Override
     protected void onDestroy() {
-        logDebug("onDestroy");
+        Timber.d("onDestroy");
         super.onDestroy();
         unregisterReceiver(errorCopyingNodesReceiver);
 
@@ -423,7 +438,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void activateActionMode() {
-        logDebug("activateActionMode");
+        Timber.d("activateActionMode");
         if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new NodeAttachmentHistoryActivity.ActionBarCallBack());
@@ -438,7 +453,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void selectAll() {
-        logDebug("selectAll");
+        Timber.d("selectAll");
         if (adapter != null) {
             if (adapter.isMultipleSelect()) {
                 adapter.selectAll();
@@ -461,7 +476,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void itemClick(int position) {
-        logDebug("Position: " + position);
+        Timber.d("Position: %s", position);
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -487,16 +502,16 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                         if (MimeTypeList.typeForName(node.getName()).isImage()) {
                             if (node.hasPreview()) {
-                                logDebug("Show full screen viewer");
+                                Timber.d("Show full screen viewer");
                                 showFullScreenViewer(m.getMsgId());
                             } else {
-                                logDebug("Image without preview - show node attachment panel for one node");
+                                Timber.d("Image without preview - show node attachment panel for one node");
                                 showNodeAttachmentBottomSheet(m, position);
                             }
                         } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
-                            logDebug("isFile:isVideoReproducibleOrIsAudio");
+                            Timber.d("isFile:isVideoReproducibleOrIsAudio");
                             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-                            logDebug("FILE HANDLE: " + node.getHandle() + ", TYPE: " + mimeType);
+                            Timber.d("FILE HANDLE: %d, TYPE: %s", node.getHandle(), mimeType);
 
                             Intent mediaIntent;
                             boolean internalIntent;
@@ -509,7 +524,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                     opusFile = true;
                                 }
                             } else {
-                                logDebug("setIntentToAudioVideoPlayer");
+                                Timber.d("setIntentToAudioVideoPlayer");
                                 mediaIntent = getMediaIntent(this, node.getName());
                                 internalIntent = true;
                             }
@@ -526,10 +541,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    logDebug("FileProviderOption");
+                                    Timber.d("FileProviderOption");
                                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                     if (mediaFileUri == null) {
-                                        logError("ERROR: NULL media file Uri");
+                                        Timber.e("ERROR: NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     } else {
                                         mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -537,7 +552,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 } else {
                                     Uri mediaFileUri = Uri.fromFile(mediaFile);
                                     if (mediaFileUri == null) {
-                                        logError("ERROR :NULL media file Uri");
+                                        Timber.e("ERROR :NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     } else {
                                         mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -545,13 +560,13 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 }
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             } else {
-                                logWarning("Local Path NULL");
+                                Timber.w("Local Path NULL");
                                 if (isOnline(this)) {
                                     if (megaApi.httpServerIsRunning() == 0) {
                                         megaApi.httpServerStart();
                                         mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                                     } else {
-                                        logWarning("ERROR: HTTP server already running");
+                                        Timber.w("ERROR: HTTP server already running");
                                     }
 
                                     ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -559,10 +574,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                     activityManager.getMemoryInfo(mi);
 
                                     if (mi.totalMem > BUFFER_COMP) {
-                                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                                     } else {
-                                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                                     }
 
@@ -572,11 +587,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                         if (parsedUri != null) {
                                             mediaIntent.setDataAndType(parsedUri, mimeType);
                                         } else {
-                                            logError("ERROR: HTTP server get local link");
+                                            Timber.e("ERROR: HTTP server get local link");
                                             showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                         }
                                     } else {
-                                        logError("ERROR: HTTP server get local link");
+                                        Timber.e("ERROR: HTTP server get local link");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     }
                                 } else {
@@ -590,18 +605,18 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             if (internalIntent) {
                                 startActivity(mediaIntent);
                             } else {
-                                logDebug("External Intent");
+                                Timber.d("External Intent");
                                 if (isIntentAvailable(this, mediaIntent)) {
                                     startActivity(mediaIntent);
                                 } else {
-                                    logWarning("No available Intent");
+                                    Timber.w("No available Intent");
                                     showNodeAttachmentBottomSheet(m, position);
                                 }
                             }
                         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
-                            logDebug("isFile:isPdf");
+                            Timber.d("isFile:isPdf");
                             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-                            logDebug("FILE HANDLE: " + node.getHandle() + ", TYPE: " + mimeType);
+                            Timber.d("FILE HANDLE: %d, TYPE: %s", node.getHandle(), mimeType);
                             Intent pdfIntent = new Intent(this, PdfViewerActivity.class);
                             pdfIntent.putExtra("inside", true);
                             pdfIntent.putExtra("adapterType", FROM_CHAT);
@@ -614,10 +629,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    logDebug("File Provider Option");
+                                    Timber.d("File Provider Option");
                                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                     if (mediaFileUri == null) {
-                                        logError("ERROR: NULL media file Uri");
+                                        Timber.e("ERROR: NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     } else {
                                         pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -625,7 +640,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 } else {
                                     Uri mediaFileUri = Uri.fromFile(mediaFile);
                                     if (mediaFileUri == null) {
-                                        logError("ERROR: NULL media file Uri");
+                                        Timber.e("ERROR: NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     } else {
                                         pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -633,22 +648,22 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 }
                                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             } else {
-                                logWarning("Local Path NULL");
+                                Timber.w("Local Path NULL");
                                 if (isOnline(this)) {
                                     if (megaApi.httpServerIsRunning() == 0) {
                                         megaApi.httpServerStart();
                                         pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                                     } else {
-                                        logWarning("ERROR: HTTP server already running");
+                                        Timber.w("ERROR: HTTP server already running");
                                     }
                                     ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
                                     ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
                                     activityManager.getMemoryInfo(mi);
                                     if (mi.totalMem > BUFFER_COMP) {
-                                        logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                                        Timber.d("Total mem: %d allocate 32 MB", mi.totalMem);
                                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                                     } else {
-                                        logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                                        Timber.d("Total mem: %d allocate 16 MB", mi.totalMem);
                                         megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                                     }
                                     String url = megaApi.httpServerGetLocalLink(node);
@@ -657,11 +672,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                         if (parsedUri != null) {
                                             pdfIntent.setDataAndType(parsedUri, mimeType);
                                         } else {
-                                            logError("ERROR: HTTP server get local link");
+                                            Timber.e("ERROR: HTTP server get local link");
                                             showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                         }
                                     } else {
-                                        logError("ERROR: HTTP server get local link");
+                                        Timber.e("ERROR: HTTP server get local link");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
                                     }
                                 } else {
@@ -673,24 +688,24 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             if (isIntentAvailable(this, pdfIntent)) {
                                 startActivity(pdfIntent);
                             } else {
-                                logWarning("No svailable Intent");
+                                Timber.w("No svailable Intent");
                                 showNodeAttachmentBottomSheet(m, position);
                             }
                             overridePendingTransition(0, 0);
                         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
                             manageTextFileIntent(this, m.getMsgId(), chatId);
                         } else {
-                            logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
+                            Timber.d("NOT Image, pdf, audio or video - show node attachment panel for one node");
                             showNodeAttachmentBottomSheet(m, position);
                         }
                     } else {
-                        logDebug("Show node attachment panel");
+                        Timber.d("Show node attachment panel");
                         showNodeAttachmentBottomSheet(m, position);
                     }
                 }
             }
         } else {
-            logWarning("DO NOTHING: Position (" + position + ") is more than size in messages (size: " + messages.size() + ")");
+            Timber.w("DO NOTHING: Position (%d) is more than size in messages (size: %d)", position, messages.size());
         }
     }
 
@@ -715,7 +730,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     private void updateActionModeTitle() {
-        logDebug("updateActionModeTitle");
+        Timber.d("updateActionModeTitle");
         if (actionMode == null) {
             return;
         }
@@ -726,7 +741,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
-            logError("Invalidate error", e);
+            Timber.e(e, "Invalidate error");
         }
     }
 
@@ -761,7 +776,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
+        Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (chatRoom != null) {
             outState.putLong("chatId", chatRoom.getChatId());
@@ -797,7 +812,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            logDebug("onActionItemClicked");
+            Timber.d("onActionItemClicked");
             final ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
             if (app.getStorageState() == STORAGE_STATE_PAYWALL &&
@@ -816,7 +831,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                     break;
                 }
                 case R.id.chat_cab_menu_forward: {
-                    logDebug("Forward message");
+                    Timber.d("Forward message");
                     clearSelections();
                     hideMultipleSelect();
                     forwardMessages(messagesSelected);
@@ -861,7 +876,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            logDebug("onCreateActionMode");
+            Timber.d("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_node_history_action, menu);
 
@@ -872,7 +887,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            logDebug("onDestroyActionMode");
+            Timber.d("onDestroyActionMode");
             adapter.clearSelections();
             adapter.setMultipleSelect(false);
             checkScroll();
@@ -880,7 +895,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            logDebug("onPrepareActionMode");
+            Timber.d("onPrepareActionMode");
             List<MegaChatMessage> selected = adapter.getSelectedMessages();
             if (selected.size() != 0) {
 
@@ -904,7 +919,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                 } else {
 
-                    logDebug("Chat with permissions");
+                    Timber.d("Chat with permissions");
                     if (isOnline(nodeAttachmentHistoryActivity) && !chatC.isInAnonymousMode()) {
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
                     } else {
@@ -913,7 +928,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                     if (selected.size() == 1) {
                         if (selected.get(0).getUserHandle() == megaChatApi.getMyUserHandle() && selected.get(0).isDeletable()) {
-                            logDebug("One message - Message DELETABLE");
+                            Timber.d("One message - Message DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                         } else {
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
@@ -935,7 +950,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         }
 
                     } else {
-                        logDebug("Many items selected");
+                        Timber.d("Many items selected");
                         boolean showDelete = true;
                         boolean allNodeAttachments = true;
 
@@ -995,7 +1010,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<MegaChatMessage> messages, final MegaChatRoom chat) {
-        logDebug("Chat ID: " + chat.getChatId());
+        Timber.d("Chat ID: %s", chat.getChatId());
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -1025,7 +1040,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected) {
-        logDebug("forwardMessages");
+        Timber.d("forwardMessages");
         chatC.prepareMessagesToForward(messagesSelected, chatId);
     }
 
@@ -1040,7 +1055,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        logDebug("Result Code: " + resultCode);
+        Timber.d("Result Code: %s", resultCode);
 
         if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
@@ -1111,19 +1126,19 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                     }
                 } else {
                     int countChat = chatHandles.length;
-                    logDebug("Selected: " + countChat + " chats to send");
+                    Timber.d("Selected: %d chats to send", countChat);
 
                     MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
                     forwardChatProcessor.forward(chatRoom);
                 }
             } else {
-                logError("Error on sending to chat");
+                Timber.e("Error on sending to chat");
             }
         }
     }
 
     public void showProgressForwarding() {
-        logDebug("showProgressForwarding");
+        Timber.d("showProgressForwarding");
 
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
@@ -1133,7 +1148,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         try {
             statusDialog.dismiss();
         } catch (Exception ex) {
-            logError(ex.getMessage());
+            Timber.e(ex);
         }
     }
 
@@ -1201,7 +1216,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Override
     public void onAttachmentLoaded(MegaChatApiJava api, MegaChatMessage msg) {
         if (msg != null) {
-            logDebug("Message ID" + msg.getMsgId());
+            Timber.d("Message ID%s", msg.getMsgId());
             if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
 
                 MegaNodeList nodeList = msg.getMegaNodeList();
@@ -1209,32 +1224,32 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                     if (nodeList.size() == 1) {
                         MegaNode node = nodeList.get(0);
-                        logDebug("Node Handle: " + node.getHandle());
+                        Timber.d("Node Handle: %s", node.getHandle());
                         bufferMessages.add(msg);
-                        logDebug("Size of buffer: " + bufferMessages.size());
-                        logDebug("Size of messages: " + messages.size());
+                        Timber.d("Size of buffer: %s", bufferMessages.size());
+                        Timber.d("Size of messages: %s", messages.size());
                     }
                 }
             }
         } else {
-            logDebug("Message is NULL: end of history");
+            Timber.d("Message is NULL: end of history");
             if ((bufferMessages.size() + messages.size()) >= NUMBER_MESSAGES_TO_LOAD) {
                 fullHistoryReceivedOnLoad();
                 isLoadingHistory = false;
             } else {
-                logDebug("Less Number Received");
+                Timber.d("Less Number Received");
                 if ((stateHistory != MegaChatApi.SOURCE_NONE) && (stateHistory != MegaChatApi.SOURCE_ERROR)) {
-                    logDebug("But more history exists --> loadAttachments");
+                    Timber.d("But more history exists --> loadAttachments");
                     isLoadingHistory = true;
                     stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
-                    logDebug("New state of history: " + stateHistory);
+                    Timber.d("New state of history: %s", stateHistory);
                     getMoreHistory = false;
                     if (stateHistory == MegaChatApi.SOURCE_NONE || stateHistory == MegaChatApi.SOURCE_ERROR) {
                         fullHistoryReceivedOnLoad();
                         isLoadingHistory = false;
                     }
                 } else {
-                    logDebug("New state of history: " + stateHistory);
+                    Timber.d("New state of history: %s", stateHistory);
                     fullHistoryReceivedOnLoad();
                     isLoadingHistory = false;
                 }
@@ -1243,10 +1258,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void fullHistoryReceivedOnLoad() {
-        logDebug("Messages size: " + messages.size());
+        Timber.d("Messages size: %s", messages.size());
 
         if (bufferMessages.size() != 0) {
-            logDebug("Buffer size: " + bufferMessages.size());
+            Timber.d("Buffer size: %s", bufferMessages.size());
             emptyLayout.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
 
@@ -1279,7 +1294,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             bufferMessages.clear();
         }
 
-        logDebug("getMoreHistoryTRUE");
+        Timber.d("getMoreHistoryTRUE");
         getMoreHistory = true;
 
         invalidateOptionsMenu();
@@ -1287,29 +1302,29 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public void onAttachmentReceived(MegaChatApiJava api, MegaChatMessage msg) {
-        logDebug("STATUS: " + msg.getStatus());
-        logDebug("TEMP ID: " + msg.getTempId());
-        logDebug("FINAL ID: " + msg.getMsgId());
-        logDebug("TIMESTAMP: " + msg.getTimestamp());
-        logDebug("TYPE: " + msg.getType());
+        Timber.d("STATUS: %s", msg.getStatus());
+        Timber.d("TEMP ID: %s", msg.getTempId());
+        Timber.d("FINAL ID: %s", msg.getMsgId());
+        Timber.d("TIMESTAMP: %s", msg.getTimestamp());
+        Timber.d("TYPE: %s", msg.getType());
 
         int lastIndex = 0;
         if (messages.size() == 0) {
             messages.add(msg);
         } else {
-            logDebug("Status of message: " + msg.getStatus());
+            Timber.d("Status of message: %s", msg.getStatus());
 
             while (messages.get(lastIndex).getMsgIndex() > msg.getMsgIndex()) {
                 lastIndex++;
             }
 
-            logDebug("Append in position: " + lastIndex);
+            Timber.d("Append in position: %s", lastIndex);
             messages.add(lastIndex, msg);
         }
 
         //Create adapter
         if (adapter == null) {
-            logDebug("Create adapter");
+            Timber.d("Create adapter");
             adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
             listView.setLayoutManager(mLayoutManager);
             listView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -1323,9 +1338,9 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
         } else {
-            logDebug("Update adapter with last index: " + lastIndex);
+            Timber.d("Update adapter with last index: %s", lastIndex);
             if (lastIndex < 0) {
-                logDebug("Arrives the first message of the chat");
+                Timber.d("Arrives the first message of the chat");
                 adapter.setMessages(messages);
             } else {
                 adapter.addMessage(messages, lastIndex + 1);
@@ -1341,7 +1356,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public void onAttachmentDeleted(MegaChatApiJava api, long msgid) {
-        logDebug("Message ID: " + msgid);
+        Timber.d("Message ID: %s", msgid);
 
         int indexToChange = -1;
 
@@ -1360,7 +1375,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         if (indexToChange != -1) {
             messages.remove(indexToChange);
-            logDebug("Removed index: " + indexToChange + ", Messages size: " + messages.size());
+            Timber.d("Removed index: %d, Messages size: %d", indexToChange, messages.size());
 
             adapter.removeMessage(indexToChange, messages);
 
@@ -1369,7 +1384,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 listView.setVisibility(View.GONE);
             }
         } else {
-            logWarning("Index to remove not found");
+            Timber.w("Index to remove not found");
         }
 
         invalidateOptionsMenu();
@@ -1377,7 +1392,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public void onTruncate(MegaChatApiJava api, long msgid) {
-        logDebug("Message ID: " + msgid);
+        Timber.d("Message ID: %s", msgid);
         invalidateOptionsMenu();
         messages.clear();
         adapter.notifyDataSetChanged();
@@ -1386,7 +1401,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void showNodeAttachmentBottomSheet(MegaChatMessage message, int position) {
-        logDebug("showNodeAttachmentBottomSheet: " + position);
+        Timber.d("showNodeAttachmentBottomSheet: %s", position);
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 

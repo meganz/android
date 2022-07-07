@@ -34,13 +34,13 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -116,7 +116,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 collisionsList != null -> viewModel.setData(collisionsList)
                 singleCollision != null -> viewModel.setSingleData(singleCollision)
                 else -> {
-                    logError("No collisions received")
+                    Timber.e("No collisions received")
                     finish()
                 }
             }
@@ -213,7 +213,7 @@ class NameCollisionActivity : PasscodeActivity() {
      */
     private fun showCollision(collisionResult: NameCollisionResult?) {
         if (collisionResult == null) {
-            logError("Cannot show any collision. Finishing...")
+            Timber.e("Cannot show any collision. Finishing...")
             finish()
             return
         }

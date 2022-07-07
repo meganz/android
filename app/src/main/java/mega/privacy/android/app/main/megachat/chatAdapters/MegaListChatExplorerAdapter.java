@@ -1,11 +1,22 @@
 package mega.privacy.android.app.main.megachat.chatAdapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.setContactLastGreen;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -17,6 +28,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,19 +50,12 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import timber.log.Timber;
 
 public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListChatExplorerAdapter.ViewHolderChatExplorerList> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 
     DisplayMetrics outMetrics;
-    
+
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     ChatController cC;
@@ -70,18 +76,18 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     SparseBooleanArray searchSelectedItems;
 
     public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
-        logDebug("New adapter");
+        Timber.d("New adapter");
         this.context = _context;
         this.items = _items;
         this.fragment = _fragment;
         this.listView = _listView;
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
         selectedItems = new SparseBooleanArray();
@@ -118,8 +124,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     @Override
     public MegaListChatExplorerAdapter.ViewHolderChatExplorerList onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         dbH = DatabaseHandler.getDbHandler(context);
@@ -137,9 +143,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
         holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
-        if(isScreenInPortrait(context)){
+        if (isScreenInPortrait(context)) {
             holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_PORT, outMetrics));
-        }else{
+        } else {
             holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_LAND, outMetrics));
         }
 
@@ -158,8 +164,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             holder.headerLayout.setVisibility(View.VISIBLE);
             if (item.isRecent()) {
                 holder.headerText.setText(R.string.recents_label);
-            }
-            else {
+            } else {
                 holder.headerText.setText(R.string.chats_label);
             }
             return;
@@ -171,10 +176,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (chat != null && chat.isGroup()) {
 
-            if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
+            if ((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))) {
                 holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
-            }
-            else{
+            } else {
                 createGroupChatAvatar(holder);
             }
             holder.stateIcon.setVisibility(View.GONE);
@@ -183,8 +187,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
             long peerCount = chatRoom.getPeerCount() + 1;
             holder.participantsText.setText(context.getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) peerCount, peerCount));
-        }
-        else {
+        } else {
 
             holder.participantsText.setVisibility(View.GONE);
             MegaContactAdapter contact = item.getContact();
@@ -193,9 +196,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             if (chat != null) {
                 holder.email = megaChatApi.getContactEmail(chat.getPeerHandle());
-                logDebug("Email: " + holder.email);
-            }
-            else if (contact != null && contact.getMegaUser() != null) {
+                Timber.d("Email: %s", holder.email);
+            } else if (contact != null && contact.getMegaUser() != null) {
                 holder.email = contact.getMegaUser().getEmail();
             }
 
@@ -205,10 +207,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
-            if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
+            if ((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))) {
                 holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
-            }
-            else{
+            } else {
                 setUserAvatar(holder, userHandleEncoded);
             }
 
@@ -216,70 +217,70 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             setContactStatus(userStatus, holder.stateIcon, holder.lastSeenStateText, StatusIconLocation.STANDARD);
             setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.lastSeenStateText);
         }
-        
+
 
         holder.itemLayout.setOnClickListener(this);
         holder.itemLayout.setOnLongClickListener(this);
     }
 
-    public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
-        logDebug("createGroupChatAvatar()");
+    public void createGroupChatAvatar(ViewHolderChatExplorerList holder) {
+        Timber.d("createGroupChatAvatar()");
         String title = holder.titleText.getText().toString();
         holder.avatarImage.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
     }
 
-    public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){
-		/*Default Avatar*/
+    public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle) {
+        /*Default Avatar*/
         String fullName = holder.titleText.getText().toString();
-        if ((fullName == null || fullName.trim().length() <= 0) && holder.email != null && holder.email.length() > 0){
+        if ((fullName == null || fullName.trim().length() <= 0) && holder.email != null && holder.email.length() > 0) {
             fullName = holder.email;
         }
         holder.avatarImage.setImageBitmap(getDefaultAvatar(getColorAvatar(userHandle), fullName, AVATAR_SIZE, true));
 
         /*Avatar*/
-		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
+        ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
         File avatar = (holder.email == null) ?
-                buildAvatarFile(context,userHandle + ".jpg") :
-                buildAvatarFile(context,holder.email + ".jpg");
+                buildAvatarFile(context, userHandle + ".jpg") :
+                buildAvatarFile(context, holder.email + ".jpg");
 
-		Bitmap bitmap = null;
-		if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
+        Bitmap bitmap = null;
+        if (isFileAvailable(avatar)) {
+            if (avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap == null) {
+                    avatar.delete();
 
-					if(megaApi==null){
-                        logWarning("megaApi is Null in Offline mode");
-						return;
-					}
+                    if (megaApi == null) {
+                        Timber.w("megaApi is Null in Offline mode");
+                        return;
+                    }
 
-                    megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
-                }else{
-					holder.avatarImage.setImageBitmap(bitmap);
-				}
-			}else{
+                    megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                } else {
+                    holder.avatarImage.setImageBitmap(bitmap);
+                }
+            } else {
 
-				if(megaApi==null){
-                    logWarning("megaApi is Null in Offline mode");
-					return;
-				}
+                if (megaApi == null) {
+                    Timber.w("megaApi is Null in Offline mode");
+                    return;
+                }
 
-                megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
-			}
-		}else{
+                megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+            }
+        } else {
 
-			if(megaApi==null){
-                logWarning("megaApi is Null in Offline mode");
-				return;
-			}
+            if (megaApi == null) {
+                Timber.w("megaApi is Null in Offline mode");
+                return;
+            }
 
-            megaApi.getUserAvatar(holder.email,buildAvatarFile(context,holder.email + ".jpg").getAbsolutePath(),listener);
-		}
-	}
+            megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+        }
+    }
 
     public ChatExplorerListItem getItem(int position) {
         return items.get(position);
@@ -297,8 +298,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         return 0;
     }
 
-    public int getPosition (ChatExplorerListItem item) {
-        logDebug("getPosition");
+    public int getPosition(ChatExplorerListItem item) {
+        Timber.d("getPosition");
         return items.indexOf(item);
     }
 
@@ -314,7 +315,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         return true;
     }
 
-    void setClick (View v) {
+    void setClick(View v) {
         ViewHolderChatExplorerList holder = (ViewHolderChatExplorerList) v.getTag();
 
         if (v.getId() == R.id.chat_explorer_list_item_layout) {
@@ -328,20 +329,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             if (position >= 0 && position < items.size()) {
                 String name = items.get(position).getTitle();
                 if (name != null && !name.isEmpty()) {
-                    return ""+name.charAt(0);
+                    return "" + name.charAt(0);
                 }
             }
         }
         return "";
     }
 
-    public void setItems (ArrayList<ChatExplorerListItem> items) {
-        this.items =  items;
+    public void setItems(ArrayList<ChatExplorerListItem> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
-    public void updateItemContactStatus(int position){
-        logDebug("position: " + position);
+    public void updateItemContactStatus(int position) {
+        Timber.d("position: %s", position);
 
         notifyItemChanged(position);
     }
@@ -355,21 +356,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void toggleSelection(int pos) {
-        logDebug("position: " + pos);
+        Timber.d("position: %s", pos);
 
         if (selectedItems.get(pos, false)) {
-            logDebug("Delete pos: " + pos);
+            Timber.d("Delete pos: %s", pos);
             selectedItems.delete(pos);
-        }
-        else {
-            logDebug("PUT pos: " + pos);
+        } else {
+            Timber.d("PUT pos: %s", pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
 
         MegaListChatExplorerAdapter.ViewHolderChatExplorerList view = (MegaListChatExplorerAdapter.ViewHolderChatExplorerList) listView.findViewHolderForLayoutPosition(pos);
-        if(view!=null){
-            logDebug("Start animation: " + pos);
+        if (view != null) {
+            Timber.d("Start animation: %s", pos);
             Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
             flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -388,8 +388,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 }
             });
             view.avatarImage.startAnimation(flipAnimation);
-        }
-        else {
+        } else {
 //            Hide multipleselect
         }
     }
@@ -398,11 +397,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         this.isSearchEnabled = searchEnabled;
     }
 
-    public boolean isSearchEnabled () {
+    public boolean isSearchEnabled() {
         return isSearchEnabled;
     }
 
-    public void setSearchSelectedItems (SparseBooleanArray searchSelectedItems) {
+    public void setSearchSelectedItems(SparseBooleanArray searchSelectedItems) {
         this.searchSelectedItems = searchSelectedItems;
     }
 

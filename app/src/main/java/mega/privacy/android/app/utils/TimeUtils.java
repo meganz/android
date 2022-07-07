@@ -1,5 +1,12 @@
 package mega.privacy.android.app.utils;
 
+import static android.text.format.DateFormat.getBestDateTimePattern;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -20,12 +27,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
-
-import static android.text.format.DateFormat.getBestDateTimePattern;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import timber.log.Timber;
 
 public class TimeUtils implements Comparator<Calendar> {
 
@@ -48,11 +50,11 @@ public class TimeUtils implements Comparator<Calendar> {
 
     int type;
 
-    public TimeUtils(int type){
+    public TimeUtils(int type) {
         this.type = type;
     }
 
-    public long calculateDifferenceDays(Calendar c1, Calendar c2){
+    public long calculateDifferenceDays(Calendar c1, Calendar c2) {
 
         long diff = Math.abs(c1.getTimeInMillis() - c2.getTimeInMillis());
         long days = diff / (24 * 60 * 60 * 1000);
@@ -61,11 +63,10 @@ public class TimeUtils implements Comparator<Calendar> {
 
     @Override
     public int compare(Calendar c1, Calendar c2) {
-        if(type==TIME){
-            if (c1.get(Calendar.HOUR) != c2.get(Calendar.HOUR)){
+        if (type == TIME) {
+            if (c1.get(Calendar.HOUR) != c2.get(Calendar.HOUR)) {
                 return c1.get(Calendar.HOUR) - c2.get(Calendar.HOUR);
-            }
-            else{
+            } else {
                 long milliseconds1 = c1.getTimeInMillis();
                 long milliseconds2 = c2.getTimeInMillis();
 
@@ -73,17 +74,15 @@ public class TimeUtils implements Comparator<Calendar> {
 //                long diffSeconds = diff / 1000;
                 long diffMinutes = Math.abs(diff / (60 * 1000));
 
-                if(diffMinutes<3){
+                if (diffMinutes < 3) {
                     return 0;
-                }
-                else{
+                } else {
                     return 1;
                 }
 
                 //            return c1.get(Calendar.MINUTE) - c2.get(Calendar.MINUTE);
             }
-        }
-        else if(type==DATE){
+        } else if (type == DATE) {
             if (c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR))
                 return c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
             if (c1.get(Calendar.MONTH) != c2.get(Calendar.MONTH))
@@ -93,7 +92,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return -1;
     }
 
-    public static String formatTime(MegaChatMessage lastMessage){
+    public static String formatTime(MegaChatMessage lastMessage) {
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
         Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
         TimeZone tz = cal.getTimeZone();
@@ -103,13 +102,12 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatDateAndTime(Context context, MegaChatMessage lastMessage, int format){
+    public static String formatDateAndTime(Context context, MegaChatMessage lastMessage, int format) {
 
         java.text.DateFormat df;
-        if(format == DATE_LONG_FORMAT){
+        if (format == DATE_LONG_FORMAT) {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-        }
-        else{
+        } else {
             df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
@@ -120,25 +118,22 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
-        if(tc.compare(cal, calToday)==0) {
+        if (tc.compare(cal, calToday) == 0) {
             String time = formatTime(lastMessage);
             String formattedDate = context.getString(R.string.label_today) + " " + time;
             return formattedDate;
-        }
-        else if(tc.compare(cal, calYesterday)==0){
+        } else if (tc.compare(cal, calYesterday) == 0) {
             String time = formatTime(lastMessage);
             String formattedDate = context.getString(R.string.label_yesterday) + " " + time;
             return formattedDate;
-        }
-        else{
-            if(tc.calculateDifferenceDays(cal, calToday)<7){
+        } else {
+            if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
                 String dayWeek = new SimpleDateFormat("EEEE").format(date);
                 String time = formatTime(lastMessage);
                 String formattedDate = dayWeek + " " + time;
                 return formattedDate;
-            }
-            else{
+            } else {
                 TimeZone tz = cal.getTimeZone();
                 df.setTimeZone(tz);
                 Date date = cal.getTime();
@@ -149,12 +144,12 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     /**
-     Gets a date formatted string from a timestamp.
+     * Gets a date formatted string from a timestamp.
      *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @return The date formatted string.
      */
-    public static String formatDate(long timestamp){
+    public static String formatDate(long timestamp) {
         return formatDate(timestamp, DATE_LONG_FORMAT, true);
     }
 
@@ -165,7 +160,7 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param format    Date format.
      * @return The date formatted string.
      */
-    public static String formatDate(long timestamp, int format){
+    public static String formatDate(long timestamp, int format) {
         return formatDate(timestamp, format, true);
     }
 
@@ -193,7 +188,7 @@ public class TimeUtils implements Comparator<Calendar> {
                 df = new SimpleDateFormat("MMM d, yyyy", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
-                df = new SimpleDateFormat(getBestDateTimePattern (locale, "yyyy-MM-dd HH:mm"), locale);
+                df = new SimpleDateFormat(getBestDateTimePattern(locale, "yyyy-MM-dd HH:mm"), locale);
                 break;
             case DATE_LONG_FORMAT:
             default:
@@ -241,7 +236,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return tc.compare(date, today) == 0 || tc.compare(date, yesterday) == 0;
     }
 
-    public static String formatShortDateTime(long timestamp){
+    public static String formatShortDateTime(long timestamp) {
 
         java.text.DateFormat df;
 
@@ -253,7 +248,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatLongDateTime(long timestamp){
+    public static String formatLongDateTime(long timestamp) {
 
         java.text.DateFormat df = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault());
 
@@ -263,7 +258,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatTime(long ts){
+    public static String formatTime(long ts) {
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
         Calendar cal = calculateDateFromTimestamp(ts);
         TimeZone tz = cal.getTimeZone();
@@ -273,7 +268,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String lastGreenDate (Context context, int minutesAgo){
+    public static String lastGreenDate(Context context, int minutesAgo) {
 //        minutesAgo = 1442;
         Calendar calGreen = Calendar.getInstance();
         calGreen.add(Calendar.MINUTE, -minutesAgo);
@@ -283,13 +278,11 @@ public class TimeUtils implements Comparator<Calendar> {
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         long ts = calGreen.getTimeInMillis();
-        logDebug("Ts last green: " + ts);
-        if(minutesAgo>=65535){
+        Timber.d("Ts last green: %s", ts);
+        if (minutesAgo >= 65535) {
             String formattedDate = context.getString(R.string.last_seen_long_time_ago);
             return formattedDate;
-        }
-        else if(tc.compare(calGreen, calToday)==0) {
-
+        } else if (tc.compare(calGreen, calToday) == 0) {
             TimeZone tz = calGreen.getTimeZone();
 
             java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -297,7 +290,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
             String time = df.format(calGreen.getTime());
 
-            String formattedDate =  context.getString(R.string.last_seen_today, time);
+            String formattedDate = context.getString(R.string.last_seen_today, time);
 
             return formattedDate;
         }
@@ -314,18 +307,18 @@ public class TimeUtils implements Comparator<Calendar> {
 //
 //            return formattedDate;
 //        }
-        else{
+        else {
             TimeZone tz = calGreen.getTimeZone();
 
             java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
             df.setTimeZone(tz);
 
-            String time =df.format(calGreen.getTime());
+            String time = df.format(calGreen.getTime());
 
             df = new SimpleDateFormat("dd MMM", Locale.getDefault());
-            String day =df.format(calGreen.getTime());
+            String day = df.format(calGreen.getTime());
 
-            String formattedDate =  context.getString(R.string.last_seen_general, day, time);
+            String formattedDate = context.getString(R.string.last_seen_general, day, time);
             return formattedDate;
         }
     }
@@ -336,13 +329,12 @@ public class TimeUtils implements Comparator<Calendar> {
                 .replace("[/A]", "");
     }
 
-    public static String formatDateAndTime(Context context, long ts, int format){
+    public static String formatDateAndTime(Context context, long ts, int format) {
 
         java.text.DateFormat df;
-        if(format == DATE_LONG_FORMAT){
+        if (format == DATE_LONG_FORMAT) {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-        }
-        else{
+        } else {
             df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
@@ -353,25 +345,22 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
-        if(tc.compare(cal, calToday)==0) {
+        if (tc.compare(cal, calToday) == 0) {
             String time = formatTime(ts);
             String formattedDate = context.getString(R.string.label_today) + " " + time;
             return formattedDate;
-        }
-        else if(tc.compare(cal, calYesterday)==0){
+        } else if (tc.compare(cal, calYesterday) == 0) {
             String time = formatTime(ts);
             String formattedDate = context.getString(R.string.label_yesterday) + " " + time;
             return formattedDate;
-        }
-        else{
-            if(tc.calculateDifferenceDays(cal, calToday)<7){
+        } else {
+            if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
                 String dayWeek = new SimpleDateFormat("EEEE").format(date);
                 String time = formatTime(ts);
                 String formattedDate = dayWeek + " " + time;
                 return formattedDate;
-            }
-            else{
+            } else {
                 TimeZone tz = cal.getTimeZone();
                 df.setTimeZone(tz);
                 Date date = cal.getTime();
@@ -381,11 +370,11 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    public static String getDateString(long date){
+    public static String getDateString(long date) {
         DateFormat datf = DateFormat.getDateTimeInstance();
         String dateString = "";
 
-        dateString = datf.format(new Date(date*1000));
+        dateString = datf.format(new Date(date * 1000));
 
         return dateString;
     }
@@ -407,6 +396,37 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
+    /**
+     * Method of getting the appropriate string from a given duration
+     *
+     * @param duration The duration
+     * @return The appropriate string
+     */
+    public static String getGalleryVideoDuration(long duration) {
+        long hours = TimeUnit.MILLISECONDS.toHours(duration);
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toSeconds(hours);
+
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) -
+                TimeUnit.MINUTES.toSeconds(minutes);
+
+        if (hours > 0) {
+            return String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds);
+        }
+
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+    }
+
+    /**
+     * Get minutes and seconds from milliseconds
+     *
+     * @param milliseconds Time in milliseconds
+     * @return Time in minutes and seconds
+     */
+    public static String getMinutesAndSecondsFromMilliseconds(long milliseconds) {
+        return (new SimpleDateFormat("mm:ss")).format(new Date(milliseconds));
+    }
+
     public static String getVideoDuration(int duration) {
         if (duration > 0) {
             int hours = duration / 3600;
@@ -426,7 +446,7 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Method for obtaining the appropriate String depending on the current time.
      *
-     * @param option  Selected mute type.
+     * @param option Selected mute type.
      * @return The right string.
      */
     public static String getCorrectStringDependingOnCalendar(String option) {
@@ -473,6 +493,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     /**
      * Method for obtaining a calendar depending on the type of silencing chosen.
+     *
      * @param option Selected mute type.
      * @return The Calendar.
      */
@@ -484,7 +505,7 @@ public class TimeUtils implements Comparator<Calendar> {
         calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
         calendar.set(Calendar.AM_PM, Calendar.AM);
 
-        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)){
+        if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         return calendar;
@@ -525,7 +546,7 @@ public class TimeUtils implements Comparator<Calendar> {
         long seconds = TimeUnit.SECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
 
         if (days > 0) {
-            return context.getResources().getQuantityString(R.plurals.label_time_in_days_full, (int)days, (int)days);
+            return context.getResources().getQuantityString(R.plurals.label_time_in_days_full, (int) days, (int) days);
         } else if (hours > 0) {
             return context.getString(R.string.label_time_in_hours, hours) + " " +
                     context.getString(R.string.label_time_in_minutes, minutes);
@@ -553,17 +574,17 @@ public class TimeUtils implements Comparator<Calendar> {
 
     /**
      * Shows and manages a countdown timer in a view.
-     *
+     * <p>
      * Note:    The view can be an AlertDialog or any other type of View.
-     *          - If the view is an AlertDialog, it can be:
-     *              * Simple, which does not need any other view received by param.
-     *              * Customized, which must contain a TextView received by param.
-     *          - If the view is any other type of View, it must contain a TextView received by param.
+     * - If the view is an AlertDialog, it can be:
+     * * Simple, which does not need any other view received by param.
+     * * Customized, which must contain a TextView received by param.
+     * - If the view is any other type of View, it must contain a TextView received by param.
      *
-     * @param stringResource    string resource in which the timer has to be shown
-     * @param alertDialog       warning dialog in which the timer has to be shown
-     * @param v                 View in which the timer has to be shown
-     * @param textView          TextView in which the string resource has to be set
+     * @param stringResource string resource in which the timer has to be shown
+     * @param alertDialog    warning dialog in which the timer has to be shown
+     * @param v              View in which the timer has to be shown
+     * @param textView       TextView in which the string resource has to be set
      */
     public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog, View v, TextView textView) {
         Context context = MegaApplication.getInstance().getApplicationContext();
@@ -596,9 +617,9 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Shows and manages a countdown timer in a warning dialog.
      *
-     * @param alertDialog       warning dialog in which the timer has to be shown
-     * @param stringResource    string resource in which the timer has to be shown
-     * @param textView          TextView in which the string resource has to be set
+     * @param alertDialog    warning dialog in which the timer has to be shown
+     * @param stringResource string resource in which the timer has to be shown
+     * @param textView       TextView in which the string resource has to be set
      */
     public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog, TextView textView) {
         createAndShowCountDownTimer(stringResource, alertDialog, null, textView);
@@ -607,8 +628,8 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Shows and manages a countdown timer in a warning dialog.
      *
-     * @param alertDialog       warning dialog in which the timer has to be shown
-     * @param stringResource    string resource in which the timer has to be shown
+     * @param alertDialog    warning dialog in which the timer has to be shown
+     * @param stringResource string resource in which the timer has to be shown
      */
     public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog) {
         createAndShowCountDownTimer(stringResource, alertDialog, null, null);
@@ -617,8 +638,8 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Shows and manages a countdown timer in a view.
      *
-     * @param stringResource    string resource in which the timer has to be shown
-     * @param textView          TextView in which the string resource has to be set
+     * @param stringResource string resource in which the timer has to be shown
+     * @param textView       TextView in which the string resource has to be set
      */
     public static void createAndShowCountDownTimer(int stringResource, View v, TextView textView) {
         createAndShowCountDownTimer(stringResource, null, v, textView);

@@ -1,19 +1,44 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.ChatUtil.shouldMuteOrUnmuteOptionsBeShown;
+import static mega.privacy.android.app.utils.ChatUtil.showConfirmationClearChat;
+import static mega.privacy.android.app.utils.ChatUtil.showConfirmationLeaveChat;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -31,14 +56,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import timber.log.Timber;
 
 public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -193,13 +211,13 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             if (isEnableChatNotifications(chat.getChatId())) {
                 optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_mute));
                 optionMuteChatText.setText(getString(R.string.general_mute));
-            }else{
+            } else {
                 optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_unmute));
                 optionMuteChatText.setText(getString(R.string.general_unmute));
             }
 
             ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
-            if(chatPrefs == null) {
+            if (chatPrefs == null) {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
                 if (chatRoom != null) {
                     String email = chatC.getParticipantEmail(chatRoom.getPeerHandle(0));
@@ -255,7 +273,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     @Override
     public void onClick(View v) {
         if (chat == null) {
-            logDebug("Selected chat NULL");
+            Timber.d("Selected chat NULL");
             return;
         }
 
@@ -274,7 +292,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.chat_list_leave_chat_layout:
-                logDebug("Leave chat - Chat ID: " + chat.getChatId());
+                Timber.d("Leave chat - Chat ID: %s", chat.getChatId());
 
                 if (requireActivity() instanceof ManagerActivity) {
                     showConfirmationLeaveChat(requireActivity(), chat.getChatId(), ((ManagerActivity) requireActivity()));
@@ -282,7 +300,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.chat_list_clear_history_chat_layout:
-                logDebug("Clear chat - Chat ID: " + chat.getChatId());
+                Timber.d("Clear chat - Chat ID: %s", chat.getChatId());
                 showConfirmationClearChat(((ManagerActivity) requireActivity()), megaChatApi.getChatRoom(chat.getChatId()));
                 break;
 

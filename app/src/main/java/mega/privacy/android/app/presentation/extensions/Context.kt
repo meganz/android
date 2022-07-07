@@ -7,9 +7,14 @@ import androidx.annotation.StringRes
 import timber.log.Timber
 import java.util.*
 
-fun Context.getFormattedStringOrDefault(@StringRes resId: Int, vararg formatArgs: Any?): String {
-
-    return kotlin.runCatching {
+/**
+ * Get formatted string or default
+ *
+ * @param resId of the formatted sting
+ * @param formatArgs Format arguments for the string
+ */
+fun Context.getFormattedStringOrDefault(@StringRes resId: Int, vararg formatArgs: Any?) =
+    runCatching {
         getString(resId, *formatArgs)
     }.getOrElse { exception ->
         Timber.w(exception, "Error getting a translated and formatted string.")
@@ -17,7 +22,6 @@ fun Context.getFormattedStringOrDefault(@StringRes resId: Int, vararg formatArgs
             Timber.i("Using the original English string: $it")
         }
     }
-}
 
 private fun Context.getEnglishResources(): Resources {
     val configuration = Configuration(resources.configuration)

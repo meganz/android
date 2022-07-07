@@ -1,5 +1,12 @@
 package mega.privacy.android.app.listeners;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_UPDATE_HISTORY_BY_RT;
+import static mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
+
 import android.content.Intent;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -9,12 +16,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
-import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
+import timber.log.Timber;
 
 public class ChatRoomListener implements MegaChatRoomListenerInterface {
 
@@ -24,14 +26,14 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_RETENTION_TIME)) {
-            logDebug("CHANGE_TYPE_RETENTION_TIME for the chat: " + chat.getChatId());
+            Timber.d("CHANGE_TYPE_RETENTION_TIME for the chat: %s", chat.getChatId());
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
         }
 
-        if(chat.hasChanged(CHANGE_TYPE_TITLE)){
-            logDebug("CHANGE_TYPE_TITLE for the chat: " + chat.getChatId());
+        if (chat.hasChanged(CHANGE_TYPE_TITLE)) {
+            Timber.d("CHANGE_TYPE_TITLE for the chat: %s", chat.getChatId());
             LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).post(chat);
         }
     }
@@ -63,7 +65,7 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
 
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
-        if(msg != null){
+        if (msg != null) {
             Intent intentRetentionTime = new Intent(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT);
             intentRetentionTime.putExtra(MESSAGE_ID, msg.getMsgId());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);

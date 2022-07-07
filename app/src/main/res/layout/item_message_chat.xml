@@ -654,35 +654,28 @@
                             android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
-                        <RelativeLayout
-                            android:id="@+id/gradient_own_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@id/content_own_message_thumb_portrait"
-                            android:layout_alignRight="@id/content_own_message_thumb_portrait"
-                            android:layout_alignLeft="@id/content_own_message_thumb_portrait"
-                            android:layout_alignBottom="@id/content_own_message_thumb_portrait"/>
-
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_play_arrow_white_24dp"
-                            android:background="@null"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:layout_alignLeft="@+id/content_own_message_thumb_portrait"/>
+                            android:src="@drawable/ic_play_video_recorded"
+                            android:layout_centerInParent="true"
+                            android:background="@null"/>
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_portrait"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:layout_alignRight="@+id/content_own_message_thumb_portrait"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginEnd="10dp"
-                            tools:text="00:00"/>
+                            android:layout_alignEnd="@+id/content_own_message_thumb_portrait"
+                            android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+                            tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -791,35 +784,28 @@
                             android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
-                        <RelativeLayout
-                            android:id="@+id/gradient_own_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@id/content_own_message_thumb_landscape"
-                            android:layout_alignRight="@id/content_own_message_thumb_landscape"
-                            android:layout_alignLeft="@id/content_own_message_thumb_landscape"
-                            android:layout_alignBottom="@id/content_own_message_thumb_landscape"/>
-
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_play_arrow_white_24dp"
-                            android:background="@null"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"/>
+                            android:src="@drawable/ic_play_video_recorded"
+                            android:layout_centerInParent="true"
+                            android:background="@null"/>
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginEnd="10dp"
-                            tools:text="00:00"/>
+                            android:layout_alignEnd="@+id/content_own_message_thumb_landscape"
+                            android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+                            tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
 
@@ -1604,35 +1590,28 @@
                             android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
-                        <RelativeLayout
-                            android:id="@+id/gradient_contact_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@id/content_contact_message_thumb_portrait"
-                            android:layout_alignRight="@id/content_contact_message_thumb_portrait"
-                            android:layout_alignLeft="@id/content_contact_message_thumb_portrait"
-                            android:layout_alignBottom="@id/content_contact_message_thumb_portrait"/>
-
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_play_arrow_white_24dp"
-                            android:background="@null"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
-                            android:layout_alignLeft="@+id/content_contact_message_thumb_portrait"/>
+                            android:src="@drawable/ic_play_video_recorded"
+                            android:layout_centerInParent="true"
+                            android:background="@null"/>
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_portrait"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
-                            android:layout_alignRight="@+id/content_contact_message_thumb_portrait"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginEnd="10dp"
-                            tools:text="00:00"/>
+                            android:layout_alignEnd="@+id/content_contact_message_thumb_portrait"
+                            android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+                            tools:ignore="SmallSp"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -1683,35 +1662,28 @@
                             android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
-                        <RelativeLayout
-                            android:id="@+id/gradient_contact_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@id/content_contact_message_thumb_landscape"
-                            android:layout_alignRight="@id/content_contact_message_thumb_landscape"
-                            android:layout_alignLeft="@id/content_contact_message_thumb_landscape"
-                            android:layout_alignBottom="@id/content_contact_message_thumb_landscape"/>
-
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_play_arrow_white_24dp"
-                            android:background="@null"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
-                            android:layout_alignLeft="@+id/content_contact_message_thumb_landscape"/>
+                            android:src="@drawable/ic_play_video_recorded"
+                            android:layout_centerInParent="true"
+                            android:background="@null"/>
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_landscape"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:layout_height="24dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
-                            android:layout_alignRight="@+id/content_contact_message_thumb_landscape"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginEnd="10dp"
-                            tools:text="00:00"/>
+                            android:layout_alignEnd="@+id/content_contact_message_thumb_landscape"
+                            android:background="@drawable/background_video_duration_message"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:visibility="visible"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+                            tools:ignore="SmallSp" />
 
                         <!--Icon to PDF with preview-->
                         <ImageView

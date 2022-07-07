@@ -1,13 +1,13 @@
 package mega.privacy.android.app.main.qrcode;
 
 import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class QRCodePageAdapter extends FragmentPagerAdapter {
 
@@ -21,13 +21,13 @@ public class QRCodePageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        logDebug("getItem: " + position);
+        Timber.d("getItem: %s", position);
 
-        switch (position){
+        switch (position) {
             case 0: {
                 return MyCodeFragment.newInstance();
             }
-            case 1:{
+            case 1: {
                 return ScanCodeFragment.newInstance();
             }
         }
@@ -42,11 +42,11 @@ public class QRCodePageAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
+        switch (position) {
             case 0: {
                 return context.getString(R.string.section_my_code);
             }
-            case 1:{
+            case 1: {
                 return context.getString(R.string.section_scan_code);
             }
         }

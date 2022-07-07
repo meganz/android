@@ -15,21 +15,25 @@ import mega.privacy.android.app.presentation.settings.SettingsActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
+import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
+
 import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class SettingsActivityTest{
 
-    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
-    @get:Rule(order = 1)
-    var activityRule = ActivityScenarioRule(SettingsActivity::class.java)
+    @get:Rule
+    var ruleChain: RuleChain = RuleChain
+        .outerRule(hiltRule)
+        .around(ActivityScenarioRule(SettingsActivity::class.java))
 
     @Before
     fun setUp() {
@@ -65,10 +69,9 @@ class SettingsActivityTest{
                 )
             )
 
-
         onPreferences()
             .check(
-                RecyclerViewAssertions.withRowContaining(
+                withRowContaining(
                     hasDescendant(withText(R.string.setting_subtitle_use_https_only))
                 )
             )

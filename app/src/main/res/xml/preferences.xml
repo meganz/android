@@ -180,6 +180,14 @@
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
+		<androidx.preference.Preference
+			android:key="settings_help_report_issue"
+			android:title="@string/settings_help_report_issue"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false"
+			android:fragment="mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment"
+			/>
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory

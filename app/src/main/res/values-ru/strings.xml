@@ -1132,7 +1132,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Обычный</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Модератор</string>
+    <string name="administrator_permission_label_participants_panel">Host</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(изменено)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -3017,7 +3017,7 @@
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_added">Псевдоним добавлен</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Псевдоним удален</string>
+    <string name="snackbar_nickname_removed">Псевдоним удалён</string>
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">Псевдоним</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
@@ -3645,25 +3645,25 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Показать в главном окне</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Назначить модератора</string>
+    <string name="make_moderator">Make host</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Покинуть встречу?</string>
     <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">Нет модератора</string>
+    <string name="no_moderator">No host</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Перед тем как уйти, назначьте одного или нескольких новых модераторов для встречи.</string>
+    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Сделать модератором</string>
+    <string name="assign_moderator">Make host</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Всё равно выйти</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Назначьте одного или нескольких новых модераторов.</string>
+    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Название встречи</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">Участники: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Модератор: %s</string>
+    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Ссылка на встречу</string>
     <!-- Subtitle of the meeting screen-->
@@ -3697,7 +3697,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Быстро организуйте встречу в MEGA с помощью нашей новой функции зашифрованной встречи</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">Вы новый модератор.</string>
+    <string name="be_new_moderator">You are the new host.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3896,7 +3896,7 @@
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">Не отменять</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Удалить модератора</string>
+    <string name="remove_moderator">Remove host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Оформить ещё одну подписку?</string>
     <!-- Text of buy new subscription button -->
@@ -4028,7 +4028,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Повторяющиеся элементы</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">В этой папке уже существует файл с названием «[B]%1$s[/B]».</string>
+    <string name="file_already_exists_in_location">В этой папке уже существует файл «[B]%1$s[/B]».</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Выберите файл, который хотите оставить</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -4163,4 +4163,28 @@
     <string name="photos_filter_camera_uploads">Загрузки из камеры</string>
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">Только видео</string>
+    <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_title">Невозможно открыть файл</string>
+    <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
+    <string name="dialog_cannot_open_file_text">Этот тип файла не поддерживается. Чтобы открыть файл, сначала скачайте его.</string>
+    <!-- General open action. -->
+    <string name="general_confirmation_open">Открыть</string>
+    <!-- Option in the chat menu to end call for all participants -->
+    <string name="meetings_chat_screen_menu_option_end_call_for_all">Завершить звонок для всех</string>
+    <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_title_end_call_for_all">Завершить звонок для всех?</string>
+    <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Это завершит звонок для всех участников.</string>
+    <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Да</string>
+    <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
+    <string name="meetings_chat_screen_dialog_negative_button_end_call_for_all">Нет</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_leave_call_option">Выйти</string>
+    <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Завершить для всех</string>
+    <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
 </resources>

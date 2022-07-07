@@ -5,8 +5,7 @@ import android.content.Context;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
+import timber.log.Timber;
 
 public class SetRetentionTimeListener extends ChatBaseListener {
 
@@ -19,9 +18,9 @@ public class SetRetentionTimeListener extends ChatBaseListener {
         if (request.getType() != MegaChatRequest.TYPE_SET_RETENTION_TIME) return;
 
         if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-            logDebug("Establish the retention time successfully");
+            Timber.d("Establish the retention time successfully");
         } else {
-            logError("Error setting retention time: " + e.getErrorString());
+            Timber.e("Error setting retention time: %s", e.getErrorString());
         }
     }
 }

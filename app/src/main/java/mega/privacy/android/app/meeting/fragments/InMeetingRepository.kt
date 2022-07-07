@@ -11,14 +11,31 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.meeting.listeners.AddContactListener
+import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaChatVideoListenerInterface
+import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,7 +44,7 @@ class InMeetingRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -40,7 +57,7 @@ class InMeetingRepository @Inject constructor(
     fun setTitleChatRoom(
         chatId: Long,
         newTitle: String,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         megaChatApi.setChatTitle(chatId, newTitle, listener)
     }
@@ -57,9 +74,9 @@ class InMeetingRepository @Inject constructor(
         chatId: Long,
         enableVideo: Boolean,
         enableAudio: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Starting call with video enable $enableVideo and audio enable $enableAudio")
+        Timber.d("Starting call with video enable $enableVideo and audio enable $enableAudio")
         megaChatApi.startChatCall(chatId, enableVideo, enableAudio, listener)
     }
 
@@ -281,12 +298,12 @@ class InMeetingRepository @Inject constructor(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MegaChatVideoListenerInterface
+        listener: MegaChatVideoListenerInterface,
     ) {
         if (hiRes) {
-            logDebug("Add Chat remote video listener of client $clientId , with HiRes")
+            Timber.d("Add Chat remote video listener of client $clientId , with HiRes")
         } else {
-            logDebug("Add Chat remote video listener of client $clientId , with LowRes")
+            Timber.d("Add Chat remote video listener of client $clientId , with LowRes")
         }
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
@@ -303,12 +320,12 @@ class InMeetingRepository @Inject constructor(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MegaChatVideoListenerInterface
+        listener: MegaChatVideoListenerInterface,
     ) {
         if (hiRes) {
-            logDebug("Remove Chat remote video listener of client $clientId, with HiRes")
+            Timber.d("Remove Chat remote video listener of client $clientId, with HiRes")
         } else {
-            logDebug("Remove Chat remote video listener of client $clientId, with LowRes")
+            Timber.d("Remove Chat remote video listener of client $clientId, with LowRes")
         }
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
@@ -323,9 +340,9 @@ class InMeetingRepository @Inject constructor(
     fun requestHiResVideo(
         chatId: Long,
         clientId: Long,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Request HiRes video of client $clientId")
+        Timber.d("Request HiRes video of client $clientId")
         megaChatApi.requestHiResVideo(chatId, clientId, listener)
     }
 
@@ -339,9 +356,9 @@ class InMeetingRepository @Inject constructor(
     fun stopHiResVideo(
         chatId: Long,
         clientId: MegaHandleList,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Stop HiRes video of client  ${clientId[0]}")
+        Timber.d("Stop HiRes video of client  ${clientId[0]}")
         megaChatApi.stopHiResVideo(chatId, clientId, listener)
     }
 
@@ -355,9 +372,9 @@ class InMeetingRepository @Inject constructor(
     fun requestLowResVideo(
         chatId: Long,
         clientId: MegaHandleList,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Request LowRes video of client ${clientId[0]}")
+        Timber.d("Request LowRes video of client ${clientId[0]}")
         megaChatApi.requestLowResVideo(chatId, clientId, listener)
     }
 
@@ -371,9 +388,9 @@ class InMeetingRepository @Inject constructor(
     fun stopLowResVideo(
         chatId: Long,
         clientId: MegaHandleList,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Stop LowRes video of client  ${clientId[0]}")
+        Timber.d("Stop LowRes video of client  ${clientId[0]}")
         megaChatApi.stopLowResVideo(chatId, clientId, listener)
     }
 
@@ -403,17 +420,17 @@ class InMeetingRepository @Inject constructor(
     fun createEphemeralAccountPlusPlus(
         firstName: String,
         lastName: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         val ret = megaChatApi.initState
         if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-            logDebug("INIT STATE: $ret")
+            Timber.d("INIT STATE: $ret")
             val initResult = megaChatApi.init(null)
-            logDebug("result of init ---> $initResult")
+            Timber.d("result of init ---> $initResult")
             if (initResult == INIT_WAITING_NEW_SESSION) {
                 megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
             } else {
-                logWarning("Init chat failed, result: $initResult")
+                Timber.w("Init chat failed, result: $initResult")
             }
         }
     }
@@ -423,7 +440,7 @@ class InMeetingRepository @Inject constructor(
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
         if (!MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
-            logDebug("Joining to public chat with ID $chatId")
+            Timber.d("Joining to public chat with ID $chatId")
             MegaApplication.getChatManagement().addJoiningChatId(chatId)
             megaChatApi.autojoinPublicChat(chatId, listener)
         }
@@ -432,9 +449,9 @@ class InMeetingRepository @Inject constructor(
     fun rejoinPublicChat(
         chatId: Long,
         publicChatHandle: Long,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
-        logDebug("Rejoining to public chat with ID $chatId")
+        Timber.d("Rejoining to public chat with ID $chatId")
         megaChatApi.autorejoinPublicChat(chatId, publicChatHandle, listener)
     }
 
@@ -448,7 +465,7 @@ class InMeetingRepository @Inject constructor(
                     when (change) {
                         is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate -> {
                             if (change.chatid == chatId && change.newState == MegaChatApi.CHAT_CONNECTION_ONLINE) {
-                                logDebug("Connect to chat ${change.chatid} successfully!")
+                                Timber.d("Connect to chat ${change.chatid} successfully!")
                                 callback()
                                 chatSubscription?.dispose()
                             }
