@@ -364,9 +364,13 @@
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
-    <!--- 0.5px, Medium, AllCap -->
+    <!--- 0.5px, Medium -->
     <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
+    </style>
+
+    <!--- 0.5px, Medium, AllCap -->
+    <style name="TextAppearance.Mega.Subtitle2.Variant.AllCaps">
         <item name="android:textAllCaps">true</item>
     </style>
 

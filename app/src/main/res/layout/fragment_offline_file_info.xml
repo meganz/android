@@ -128,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="9dp"
                 android:text="@string/file_properties_info_size"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps"
                 app:layout_constraintStart_toStartOf="@id/guideline"
                 app:layout_constraintTop_toBottomOf="@id/divider" />
 
@@ -147,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:text="@string/file_properties_info_content"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@id/guideline"
                 app:layout_constraintTop_toBottomOf="@id/total_size_value"
@@ -170,7 +170,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:text="@string/file_properties_info_added"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps"
                 app:layout_constraintStart_toStartOf="@id/guideline"
                 app:layout_constraintTop_toBottomOf="@id/contains_value" />
 
