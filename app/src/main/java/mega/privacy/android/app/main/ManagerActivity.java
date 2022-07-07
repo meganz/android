@@ -119,7 +119,7 @@ import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessF
 import static mega.privacy.android.app.utils.OfflineUtils.removeInitialOfflinePath;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.MEDIA_DISCOVER_CLICK;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.MEDIA_DISCOVERY_CLICK;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
@@ -407,6 +407,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
+import mega.privacy.android.app.utils.MDClickStatsUtil;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -3534,21 +3535,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
         mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
-        SharedPreferences sharedPreference = getApplicationContext().getSharedPreferences(MEDIA_DISCOVER_CLICK, Context.MODE_PRIVATE);
-        int clickCount = sharedPreference.getInt("ClickCount", 0);
-        int clickCountFolder = sharedPreference.getInt("ClickCountFolder" + mediaHandle, 0);
-        SharedPreferences.Editor editor = sharedPreference.edit();
-        editor.putInt("ClickCount", (++clickCount));
-        editor.putInt("ClickCountFolder" + mediaHandle, (++clickCountFolder));
-        editor.apply();
-        megaApi.sendEvent(99200, "Media Discovery Click");
-        if (clickCount > 3) {
-            megaApi.sendEvent(99201, "Media Discovery Click > 3");
-        }
-        if (clickCountFolder > 3) {
-            megaApi.sendEvent(99202, "Media Discovery Click Specific Folder > 3");
-        }
-
+        MDClickStatsUtil.Companion.fireStatsEvent(megaApi, this, mediaHandle);
         isInMDMode = true;
     }
 
