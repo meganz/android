@@ -4,15 +4,16 @@ import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 import android.os.Bundle;
 
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 
-import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import timber.log.Timber;
 
-public abstract class RotatableFragment extends BaseFragment {
+public abstract class RotatableFragment extends Fragment {
 
     private final static String UNHANDLED_ITEM = "unHandledItem";
     private final static String SELECTED_ITEMS = "selectedItems";

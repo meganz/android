@@ -7,6 +7,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
@@ -24,7 +25,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -71,6 +72,11 @@ class MeetingListener : MegaChatCallListenerInterface {
             sendCallEvent(EVENT_RINGING_STATUS_CHANGE, call)
         }
 
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP)) {
+            Timber.d("Changes in outgoing ringing")
+            sendCallEvent(EVENT_CALL_OUTGOING_RINGING_CHANGE, call)
+        }
+
         // Call composition has changed (User added or removed from call)
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
             Timber.d("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
@@ -107,7 +113,7 @@ class MeetingListener : MegaChatCallListenerInterface {
         api: MegaChatApiJava,
         chatid: Long,
         callid: Long,
-        session: MegaChatSession?
+        session: MegaChatSession?,
     ) {
         if (session == null) {
             Timber.w("Session is null")

@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.data.gateway.MonitorNetworkConnectivityChange
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.domain.entity.ConnectivityState
-import mega.privacy.android.app.domain.repository.NetworkRepository
+import mega.privacy.android.domain.entity.ConnectivityState
+import mega.privacy.android.domain.repository.NetworkRepository
 import javax.inject.Inject
 
 /**
@@ -67,7 +67,7 @@ class DefaultNetworkRepository @Inject constructor(
 
             override fun onCapabilitiesChanged(
                 network: Network,
-                networkCapabilities: NetworkCapabilities
+                networkCapabilities: NetworkCapabilities,
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
                 trySend(

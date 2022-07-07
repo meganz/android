@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MainDispatcher
-import mega.privacy.android.app.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.GetThumbnail
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

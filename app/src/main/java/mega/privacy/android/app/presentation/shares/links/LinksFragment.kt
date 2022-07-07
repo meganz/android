@@ -58,7 +58,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         }
         val v = getListView(inflater, container)
         if (adapter == null) {
-            adapter = MegaNodeAdapter(context,
+            adapter = MegaNodeAdapter(requireActivity(),
                 this,
                 nodes,
                 managerViewModel.state.value.linksParentHandle,
@@ -120,9 +120,9 @@ class LinksFragment : MegaNodeBaseFragment() {
         if (megaApi.rootNode.handle == managerViewModel.state.value.linksParentHandle
             || managerViewModel.state.value.linksParentHandle == -1L
         ) {
-            setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
+            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links)
-            textToShow = context.getString(R.string.context_empty_links)
+            textToShow = requireContext().getString(R.string.context_empty_links)
         }
         setFinalEmptyView(textToShow)
     }

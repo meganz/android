@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.mapper
 
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 
 /**

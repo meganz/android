@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
@@ -14,13 +13,14 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 
 /**
  * Manager module

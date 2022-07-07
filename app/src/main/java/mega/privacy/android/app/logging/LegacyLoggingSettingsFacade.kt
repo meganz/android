@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.app.domain.usecase.ResetSdkLogger
-import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.domain.usecase.ResetSdkLogger
+import mega.privacy.android.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import timber.log.Timber
 import javax.inject.Inject
 

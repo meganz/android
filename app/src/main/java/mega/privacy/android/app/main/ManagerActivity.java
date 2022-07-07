@@ -288,7 +288,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -298,6 +297,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
@@ -418,6 +418,8 @@ import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.domain.entity.ContactRequest;
+import mega.privacy.android.domain.entity.ContactRequestStatus;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -4156,6 +4158,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     /**
      * Updates the Transfers tab index.
+     *
      * @param showCompleted True if should show the Completed tab, false otherwise.
      */
     private void updateTransfersTab(Boolean showCompleted) {
@@ -6999,7 +7002,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Showing the full screen mask by adding the mask layout to the window content
      */
     private void addMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
         windowContent.addView(fabMaskLayout);
     }
 
@@ -7007,7 +7009,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Removing the full screen mask
      */
     private void removeMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
         windowContent.removeView(fabMaskLayout);
     }
 
@@ -7126,9 +7127,9 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
-                .setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+        builder.setMessage(getQuantityString(R.plurals.alert_remove_several_shares, shares.size(), shares.size()))
+                .setPositiveButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes, (dialog, which) -> nC.removeSeveralFolderShares(shares))
+                .setNegativeButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_no, (dialog, which) -> {
                 })
                 .show();
     }
@@ -9850,23 +9851,23 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    public void updateContactRequests(List<MegaContactRequest> requests) {
+    public void updateContactRequests(List<ContactRequest> requests) {
         Timber.d("onContactRequestsUpdate");
 
         if (requests != null) {
             for (int i = 0; i < requests.size(); i++) {
-                MegaContactRequest req = requests.get(i);
+                ContactRequest req = requests.get(i);
                 if (req.isOutgoing()) {
                     Timber.d("SENT REQUEST");
-                    Timber.d("STATUS: %d, Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s, Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getTargetEmail());
                     }
                 } else {
                     Timber.d("RECEIVED REQUEST");
                     setContactTitleSection();
-                    Timber.d("STATUS: %d Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getSourceEmail());
                     }
                 }

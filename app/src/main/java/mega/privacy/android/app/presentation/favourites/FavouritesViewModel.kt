@@ -17,10 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.app.domain.usecase.RemoveFavourites
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -36,6 +32,10 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.RemoveFavourites
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject

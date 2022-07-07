@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
 import static mega.privacy.android.app.utils.Constants.ORDER_OTHERS;
 import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
@@ -70,12 +69,12 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -96,6 +95,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragm
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -103,9 +103,11 @@ import timber.log.Timber;
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
 
+    @MegaApi
     @Inject
-    protected
-    SortOrderManagement sortOrderManagement;
+    public MegaApiAndroid megaApi;
+    @Inject
+    protected SortOrderManagement sortOrderManagement;
 
     protected ManagerActivity managerActivity;
 
@@ -114,8 +116,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected ArrayList<MegaNode> nodes = new ArrayList<>();
     protected MegaNodeAdapter adapter;
 
-    protected MegaPreferences prefs;
-    protected String downloadLocationDefaultPath;
     protected Stack<Integer> lastPositionStack = new Stack<>();
 
     protected FastScroller fastScroller;
@@ -147,11 +147,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected abstract void refresh();
 
-    public MegaNodeBaseFragment() {
-        prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -177,7 +172,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             MenuInflater inflater = actionMode.getMenuInflater();
             inflater.inflate(R.menu.cloud_storage_action, menu);
-            if (context instanceof ManagerActivity) {
+            if (getActivity() instanceof ManagerActivity) {
                 managerActivity.hideFabButton();
                 managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
@@ -204,7 +199,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 handleList.add(node.getHandle());
             }
 
-            NodeController nC = new NodeController(context);
+            NodeController nC = new NodeController(requireActivity());
 
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
@@ -237,7 +232,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_share_out:
-                    MegaNodeUtil.shareNodes(context, selected);
+                    MegaNodeUtil.shareNodes(requireActivity(), selected);
                     hideActionMode();
                     break;
 
@@ -296,7 +291,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         public void onDestroyActionMode(ActionMode actionMode) {
             clearSelections();
             adapter.setMultipleSelect(false);
-            if (context instanceof ManagerActivity) {
+            if (requireActivity() instanceof ManagerActivity) {
                 managerActivity.showFabButton();
                 managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
@@ -502,7 +497,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 String[] s = node.getName().split("\\.");
                 opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
-                intent = getMediaIntent(context, node.getName());
+                intent = getMediaIntent(requireContext(), node.getName());
                 internalIntent = true;
             }
 
@@ -518,7 +513,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(node.getName()).getType());
+                    intent.setDataAndType(FileProvider.getUriForFile(requireContext(), AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(node.getName()).getType());
                 } else {
                     intent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(node.getName()).getType());
                 }
@@ -532,7 +527,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 }
 
                 ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager activityManager = (ActivityManager) requireActivity().getSystemService(Context.ACTIVITY_SERVICE);
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
@@ -564,10 +559,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             launchIntent(intent, internalIntent, position);
         } else if (mimeType.isURL()) {
-            manageURLNode(context, megaApi, node);
+            manageURLNode(requireContext(), megaApi, node);
         } else if (mimeType.isPdf()) {
             Timber.d("isFile:isPdf");
-            intent = new Intent(context, PdfViewerActivity.class);
+            intent = new Intent(requireContext(), PdfViewerActivity.class);
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
@@ -576,7 +571,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), mimeTypeType);
+                    intent.setDataAndType(FileProvider.getUriForFile(requireContext(), AUTHORITY_STRING_FILE_PROVIDER, mediaFile), mimeTypeType);
                 } else {
                     intent.setDataAndType(Uri.fromFile(mediaFile), mimeTypeType);
                 }
@@ -588,7 +583,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 }
 
                 ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager activityManager = (ActivityManager) requireActivity().getSystemService(Context.ACTIVITY_SERVICE);
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
@@ -619,7 +614,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
         } else {
             Timber.d("itemClick:isFile:otherOption");
-            onNodeTapped(context, node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
+            onNodeTapped(requireContext(), node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
     }
 
@@ -632,12 +627,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      */
     private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
-            if (internalIntent || isIntentAvailable(context, intent)) {
+            if (internalIntent || isIntentAvailable(requireContext(), intent)) {
                 putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
-                context.startActivity(intent);
+                startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
             } else {
-                Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), StringResourcesUtils.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -665,9 +660,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
         recyclerView = v.findViewById(R.id.file_list_view_browser);
-        mLayoutManager = new LinearLayoutManager(context);
+        mLayoutManager = new LinearLayoutManager(requireContext());
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+        recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
         recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
@@ -723,7 +718,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private void setRecyclerView() {
-        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, getResources().getDisplayMetrics()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -741,13 +736,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private String getGeneralEmptyView() {
-        if (isScreenInPortrait(context)) {
+        if (isScreenInPortrait(requireContext())) {
             emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
         } else {
             emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
         }
 
-        return context.getString(R.string.file_browser_empty_folder_new);
+        return StringResourcesUtils.getString(R.string.file_browser_empty_folder_new);
     }
 
     protected void setFinalEmptyView(String text) {
@@ -757,11 +752,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         try {
             text = text.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
                     + "\'>");
             text = text.replace("[/A]", "</font>");
             text = text.replace("[B]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
                     + "\'>");
             text = text.replace("[/B]", "</font>");
         } catch (Exception e) {

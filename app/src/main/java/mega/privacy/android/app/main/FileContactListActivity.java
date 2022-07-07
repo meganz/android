@@ -899,11 +899,10 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         };
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-        String message = getResources().getString(R.string.remove_multiple_contacts_shared_folder, contacts.size());
+        String message = getResources().getQuantityString(R.plurals.remove_multiple_contacts_shared_folder, contacts.size(), contacts.size());
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
+	}
 
     public void removeMultipleShares(ArrayList<MegaShare> shares) {
         Timber.d("Number of shared to remove: %s", shares.size());

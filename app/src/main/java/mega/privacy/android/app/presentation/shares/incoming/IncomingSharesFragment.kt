@@ -53,7 +53,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         if (managerActivity.isList) {
             v = getListView(inflater, container)
             if (adapter == null) {
-                adapter = MegaNodeAdapter(context,
+                adapter = MegaNodeAdapter(requireActivity(),
                     this,
                     nodes,
                     managerViewModel.state.value.incomingParentHandle,
@@ -65,7 +65,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         } else {
             v = getGridView(inflater, container)
             if (adapter == null) {
-                adapter = MegaNodeAdapter(context,
+                adapter = MegaNodeAdapter(requireActivity(),
                     this,
                     nodes,
                     managerViewModel.state.value.incomingParentHandle,
@@ -260,13 +260,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         if (megaApi.rootNode.handle == managerViewModel.state.value.incomingParentHandle
             || managerViewModel.state.value.incomingParentHandle == -1L
         ) {
-            setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
-            if (Util.isScreenInPortrait(context)) {
+            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
+            if (Util.isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.incoming_shares_empty)
             } else {
                 emptyImageView.setImageResource(R.drawable.incoming_empty_landscape)
             }
-            textToShow = context.getString(R.string.context_empty_incoming)
+            textToShow = requireContext().getString(R.string.context_empty_incoming)
         }
         setFinalEmptyView(textToShow)
     }

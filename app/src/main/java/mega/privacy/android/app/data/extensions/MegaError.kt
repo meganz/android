@@ -1,6 +1,6 @@
 package mega.privacy.android.app.data.extensions
 
-import mega.privacy.android.app.domain.exception.MegaException
+import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
 
 /**

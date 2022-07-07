@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +34,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentMediaDiscoveryBinding
-import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -71,13 +72,19 @@ import mega.privacy.android.app.utils.Constants.MEDIA_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ZoomUtil
+import nz.mega.sdk.MegaApiAndroid
+import javax.inject.Inject
 
 /**
  * Class to handle Media Discovery
  */
 @AndroidEntryPoint
-class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback,
+class MediaDiscoveryFragment : Fragment(), GestureScaleListener.GestureScaleCallback,
     GalleryCardAdapter.Listener {
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private lateinit var mManagerActivity: ManagerActivity
 
@@ -238,7 +245,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         ColorUtils.setImageViewAlphaIfDark(
-            context,
+            requireContext(),
             binding.emptyHint.emptyHintImage,
             ColorUtils.DARK_IMAGE_ALPHA
         )
@@ -404,12 +411,12 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
         listView.layoutManager = layoutManager
 
         if (selectedView == ALL_VIEW) {
-            val imageMargin = ZoomUtil.getMargin(context, currentZoom)
-            ZoomUtil.setMargin(context, params, currentZoom)
+            val imageMargin = ZoomUtil.getMargin(requireContext(), currentZoom)
+            ZoomUtil.setMargin(requireContext(), params, currentZoom)
             val gridWidth =
-                ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
-            val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(context, currentZoom)
-            val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(context, currentZoom)
+                ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
+            val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(requireContext(), currentZoom)
+            val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(requireContext(), currentZoom)
             val itemSizeConfig = GalleryItemSizeConfig(
                 currentZoom, gridWidth,
                 icSelectedWidth, imageMargin,
@@ -426,7 +433,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
             layoutManager.apply {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
                 val itemDimen =
-                    ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
+                    ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
                 gridAdapter.setItemDimen(itemDimen)
             }
 
@@ -437,7 +444,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
                 resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
 
             val cardWidth: Int =
-                (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
+                (resources.displayMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
 
             cardAdapter =
                 GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
@@ -456,7 +463,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
         scaleGestureHandler = ScaleGestureHandler(
-            context,
+            requireContext(),
             this
         )
         with(listView) {
@@ -632,7 +639,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
                     // Draw the green outline for the thumbnail view at once
                     val thumbnailView =
                         itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(requireContext())
 
                     val imageView = itemView.findViewById<ImageView>(
                         R.id.icon_selected
@@ -672,7 +679,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
                 SNACKBAR_TYPE,
-                context.getString(R.string.error_server_connection_problem),
+                StringResourcesUtils.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
         }
@@ -690,9 +697,9 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
         if (!this::menu.isInitialized)
             return
         val menuItem = this.menu.findItem(menuItemId)
-        var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
+        var colorRes = ColorUtils.getThemeColor(requireContext(), R.attr.colorControlNormal)
         if (!isEnable) {
-            colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
+            colorRes = ContextCompat.getColor(requireContext(), R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
             menuItem.icon ?: return,
@@ -779,7 +786,7 @@ class MediaDiscoveryFragment : BaseFragment(), GestureScaleListener.GestureScale
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             val params = viewTypePanel.layoutParams
-            params.width = outMetrics.heightPixels
+            params.width = resources.displayMetrics.heightPixels
             viewTypePanel.layoutParams = params
         }
 

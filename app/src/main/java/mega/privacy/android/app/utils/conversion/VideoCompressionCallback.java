@@ -1,6 +1,6 @@
 package mega.privacy.android.app.utils.conversion;
 
-import mega.privacy.android.app.domain.entity.SyncRecord;
+import mega.privacy.android.domain.entity.SyncRecord;
 
 public interface VideoCompressionCallback {
 

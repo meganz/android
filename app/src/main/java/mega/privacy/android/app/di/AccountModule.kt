@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.domain.usecase.GetSession
-import mega.privacy.android.app.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.RetryPendingConnections
 
 /**
  * Account module.

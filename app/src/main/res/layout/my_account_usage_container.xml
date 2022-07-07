@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/storage_progress"
             android:layout_toEndOf="@+id/storage_progress_layout"
-            android:text="@string/label_storage_upgrade_account"
+            android:text="@string/account_storage_label"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
 
     </RelativeLayout>

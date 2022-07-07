@@ -2,7 +2,6 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
@@ -15,9 +14,4 @@ class DefaultGlobalStatesRepository @Inject constructor(
 ) : GlobalStatesRepository {
 
     override fun monitorGlobalUpdates(): Flow<GlobalUpdate> = megaApiGateway.globalUpdates
-
-    override suspend fun areTransfersPaused(): Boolean =
-        withContext(ioDispatcher) {
-            megaApiGateway.areTransfersPaused()
-        }
 }

@@ -59,6 +59,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -110,6 +111,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -124,6 +126,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
@@ -2511,6 +2517,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         findNavController().navigate(
             InMeetingFragmentDirections.actionGlobalMakeModerator()
         )
+
     }
 
     /**
@@ -2552,7 +2559,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
             .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
             .setView(dialogLayout)
-            .setCancelable(true)
+            .setCancelable(false)
             .create()
 
         onlyMeDialog?.show()

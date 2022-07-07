@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.IsUseHttpsEnabled
-import mega.privacy.android.app.domain.usecase.MonitorConnectivity
-import mega.privacy.android.app.domain.usecase.RootNodeExists
-import mega.privacy.android.app.domain.usecase.SetUseHttps
 import mega.privacy.android.app.presentation.settings.advanced.model.SettingsAdvancedState
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.SetUseHttps
 import javax.inject.Inject
 
 /**

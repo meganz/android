@@ -14,17 +14,25 @@ import androidx.core.text.HtmlCompat;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import timber.log.Timber;
 
-
+@AndroidEntryPoint
 public class CompletedTransfersFragment extends TransfersBaseFragment {
     private MegaCompletedTransfersAdapter adapter;
     public ArrayList<AndroidCompletedTransfer> tL = new ArrayList<>();
+
+    @Inject
+    DatabaseHandler dbH;
 
     public static CompletedTransfersFragment newInstance() {
         return new CompletedTransfersFragment();
@@ -38,16 +46,16 @@ public class CompletedTransfersFragment extends TransfersBaseFragment {
 
         View v = initView(inflater, container);
 
-        emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
+        emptyImage.setImageResource(isScreenInPortrait(requireContext()) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
-        String textToShow = context.getString(R.string.completed_transfers_empty_new);
+        String textToShow = StringResourcesUtils.getString(R.string.completed_transfers_empty_new);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
                     + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
                     + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
@@ -57,7 +65,7 @@ public class CompletedTransfersFragment extends TransfersBaseFragment {
 
         setCompletedTransfers();
 
-        adapter = new MegaCompletedTransfersAdapter(context, tL);
+        adapter = new MegaCompletedTransfersAdapter(requireActivity(), tL);
         listView.setAdapter(adapter);
 
         return v;
