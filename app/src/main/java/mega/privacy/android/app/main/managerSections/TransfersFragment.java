@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack;
 import mega.privacy.android.app.interfaces.MoveTransferInterface;
@@ -36,14 +38,22 @@ import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
-
+@AndroidEntryPoint
 public class TransfersFragment extends TransfersBaseFragment implements MegaTransfersAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionCallback, MoveTransferInterface {
+
+    @MegaApi
+    @Inject
+    public MegaApiAndroid megaApi;
 
     private MegaTransfersAdapter adapter;
 
@@ -65,16 +75,16 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
         View v = initView(inflater, container);
 
-        emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
+        emptyImage.setImageResource(isScreenInPortrait(requireContext()) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
-        String textToShow = context.getString(R.string.transfers_empty_new);
+        String textToShow = StringResourcesUtils.getString(R.string.transfers_empty_new);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
                     + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
                     + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
@@ -84,7 +94,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
         setTransfers();
 
-        adapter = new MegaTransfersAdapter(context, tL, listView, this, transfersManagement);
+        adapter = new MegaTransfersAdapter(requireActivity(), tL, listView, this, transfersManagement);
 
         adapter.setMultipleSelect(false);
         listView.setAdapter(adapter);
@@ -123,7 +133,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
                 if (addElevation) {
                     recyclerView.post(() -> listView.removeItemDecoration(itemDecoration));
                     ViewPropertyAnimator animator = viewHolder.itemView.animate();
-                    viewHolder.itemView.setTranslationZ(dp2px(2, outMetrics));
+                    viewHolder.itemView.setTranslationZ(dp2px(2, getResources().getDisplayMetrics()));
                     viewHolder.itemView.setAlpha(0.95f);
                     animator.start();
 
@@ -321,7 +331,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
      * @param newPosition The new position on the list.
      */
     private void startMovementRequest(MegaTransfer transfer, int newPosition) {
-        MoveTransferListener moveTransferListener = new MoveTransferListener(context, this);
+        MoveTransferListener moveTransferListener = new MoveTransferListener(requireContext(), this);
 
         if (newPosition == 0) {
             megaApi.moveTransferToFirst(transfer, moveTransferListener);
@@ -381,7 +391,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
     public void activateActionMode() {
         if (adapter != null && !adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
-            actionMode = ((AppCompatActivity) context).startSupportActionMode(new TransfersActionBarCallBack(this));
+            actionMode = ((AppCompatActivity) requireActivity()).startSupportActionMode(new TransfersActionBarCallBack(this));
             updateActionModeTitle();
             disableDragAndDrop();
         }

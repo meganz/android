@@ -96,9 +96,8 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.updateModeratorsName.collect { moderatorsName ->
-                if (moderatorsName.isNotEmpty()) {
-                    binding.moderatorName.text = moderatorsName
-                }
+                binding.moderatorName.text = moderatorsName
+                binding.moderatorName.isVisible = moderatorsName.isNotEmpty()
             }
         }
 

@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -33,7 +33,7 @@ import timber.log.Timber
  * include some common functions: Permissions...
  * Use shareModel to share data between sub fragments
  */
-open class MeetingBaseFragment : BaseFragment() {
+open class MeetingBaseFragment : Fragment() {
 
     lateinit var meetingActivity: MeetingActivity
 
@@ -132,7 +132,7 @@ open class MeetingBaseFragment : BaseFragment() {
      * Then continue permission check without education dialog
      */
     protected fun showPermissionsEducation() {
-        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
+        val sp = requireActivity().getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
         val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
         if (showEducation) {
             sp.edit()

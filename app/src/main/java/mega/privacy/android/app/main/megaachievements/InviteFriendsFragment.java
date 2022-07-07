@@ -18,23 +18,33 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
+import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
-public class InviteFriendsFragment extends BaseFragment implements OnClickListener
+@AndroidEntryPoint
+public class InviteFriendsFragment extends Fragment implements OnClickListener
         , GetAchievementsListener.DataCallback {
     Button inviteContactsBtn;
     TextView titleCard;
+
+    @Inject
+    @MegaApi
+    MegaApiAndroid megaApi;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -53,8 +63,8 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
         inviteContactsBtn.setOnClickListener(this);
         titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
 
-        if (Util.isDarkMode(context)) {
-            int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+        if (Util.isDarkMode(requireContext())) {
+            int backgroundColor = ColorUtils.getColorForElevation(requireContext(), 1f);
             v.findViewById(R.id.invite_contacts_layout).setBackgroundColor(backgroundColor);
             v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
         }
@@ -66,12 +76,10 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Activity actionbar has been created which might be accessed by UpdateUI().
-        if (mActivity != null) {
-            ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
-                        .toUpperCase(Locale.getDefault()));
-            }
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
+                    .toUpperCase(Locale.getDefault()));
         }
 
         // The root view has been created, fill it with the data when data ready
@@ -84,20 +92,16 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.invite_contacts_button) {
             Timber.d("To InviteContactActivity.");
-            Intent intent = new Intent(context, InviteContactActivity.class);
+            Intent intent = new Intent(requireContext(), InviteContactActivity.class);
             intent.putExtra(InviteContactActivity.KEY_FROM, true);
-            if (mActivity != null) {
-                mActivity.startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
-            }
+            requireActivity().startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
         }
     }
 
     public int onBackPressed() {
         Timber.d("onBackPressed");
 
-        if (mActivity != null) {
-            ((AchievementsActivity) mActivity).showFragment(ACHIEVEMENTS_FRAGMENT, INVALID_TYPE);
-        }
+        ((AchievementsActivity) requireActivity()).showFragment(ACHIEVEMENTS_FRAGMENT, INVALID_TYPE);
         return 0;
     }
 

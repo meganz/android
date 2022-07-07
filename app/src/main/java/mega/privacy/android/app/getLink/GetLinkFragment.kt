@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
@@ -25,7 +26,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -45,7 +45,7 @@ import java.util.*
 /**
  * Fragment of [GetLinkActivity] to get or manage a link of a node.
  */
-class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
+class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
         private const val SHARE = 0
@@ -434,7 +434,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = MaterialStyledDatePickerDialog(
-            context,
+            requireContext(),
             R.style.Widget_Mega_DatePickerDialog,
             this, year, month, day
         )
@@ -470,12 +470,12 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         if (passwordVisible) {
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
             binding.passwordProtectionSetToggle.setColorFilter(
-                ContextCompat.getColor(context, R.color.grey_012_white_038), PorterDuff.Mode.SRC_IN
+                ContextCompat.getColor(requireContext(), R.color.grey_012_white_038), PorterDuff.Mode.SRC_IN
             )
         } else {
             binding.passwordProtectionSetText.transformationMethod = null
             binding.passwordProtectionSetToggle.setColorFilter(
-                ColorUtils.getThemeColor(context, R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
+                ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
             )
         }
 

@@ -456,6 +456,7 @@ class InMeetingViewModel @Inject constructor(
                     checkParticipantsList()
                     checkNetworkQualityChanges()
                     checkReconnectingChanges()
+                    updateMeetingInfoBottomPanel()
                 }
 
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
@@ -772,7 +773,6 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
-
             updateMeetingInfoBottomPanel()
         }
         return listWithChanges
@@ -791,7 +791,6 @@ class InMeetingViewModel @Inject constructor(
                     )
                 )
             }?.toMutableList()
-
             updateMeetingInfoBottomPanel()
         }
     }
@@ -813,7 +812,6 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
-
             updateMeetingInfoBottomPanel()
         }
 
@@ -2103,11 +2101,12 @@ class InMeetingViewModel @Inject constructor(
     private fun updateMeetingInfoBottomPanel() {
         var nameList =
             if (isModerator()) inMeetingRepository.getMyName() else ""
-
         var numParticipantsModerator = if (isModerator()) 1 else 0
+        var numParticipants = 1
 
-        participants.value?.apply {
-            this.filter { it.isModerator && it.name.isNotEmpty() }
+        participants.value?.let { list ->
+            numParticipants = list.size + 1
+            list.filter { it.isModerator && it.name.isNotEmpty() }
                 .map { it.name }
                 .forEach {
                     numParticipantsModerator++
@@ -2115,9 +2114,9 @@ class InMeetingViewModel @Inject constructor(
                 }
         }
 
-        _updateNumParticipants.value = numParticipantsModerator
+        _updateNumParticipants.value = numParticipants
 
-        _updateModeratorsName.value =
+        _updateModeratorsName.value = if (numParticipantsModerator == 0) "" else
             StringResourcesUtils.getQuantityString(R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
                 numParticipantsModerator,
                 nameList)
