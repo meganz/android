@@ -13,6 +13,7 @@ import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -56,10 +57,12 @@ class GetParticipantsChangesUseCase @Inject constructor(
      *
      * @property chatId        Chat ID of the call
      * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
+     * @property waitingForOthers True, if I'm waiting for others participants. False, otherwise.
      */
     data class NumParticipantsChangesResult(
         val chatId: Long,
         val onlyMeInTheCall: Boolean,
+        val waitingForOthers: Boolean
     )
 
     /**
@@ -72,12 +75,12 @@ class GetParticipantsChangesUseCase @Inject constructor(
                     val isRequestSent =
                         MegaApplication.getChatManagement().isRequestSent(call.callId)
                     val isOneToOneCall = !chat.isGroup && !chat.isMeeting
-                    if (!isRequestSent && !isOneToOneCall) {
+                    if (!isOneToOneCall) {
                         call.peeridParticipants?.let { list ->
                             val onlyMeInTheCall =
                                 list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
                             emitter.onNext(NumParticipantsChangesResult(call.chatid,
-                                onlyMeInTheCall))
+                                onlyMeInTheCall, isRequestSent))
                         }
                     }
                 }

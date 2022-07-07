@@ -115,12 +115,20 @@ class InMeetingViewModel @Inject constructor(
     private val _showOnlyMeBanner = MutableStateFlow(false)
     val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
 
+    private val _showWaitingForOthersBanner = MutableStateFlow(false)
+    val showWaitingForOthersBanner: StateFlow<Boolean> get() = _showWaitingForOthersBanner
+
     private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
     val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> = _showEndMeetingAsModeratorBottomPanel
 
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
+    /**
+     * Participant in carousel clicked
+     *
+     * @param item Participant clicked
+     */
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
     }
@@ -216,13 +224,26 @@ class InMeetingViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { (chatId, onlyMeInTheCall) ->
+                onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
+
                     if (currentChatId == chatId) {
-                        if(onlyMeInTheCall) {
+                        if (onlyMeInTheCall) {
                             hideBottomPanels()
+                            if (waitingForOthers) {
+                                _showWaitingForOthersBanner.value = onlyMeInTheCall
+                            } else {
+                                _showOnlyMeBanner.value = onlyMeInTheCall
+                            }
+                        } else {
+                            _showWaitingForOthersBanner.value = onlyMeInTheCall
+                            _showOnlyMeBanner.value = onlyMeInTheCall
                         }
 
-                        _showOnlyMeBanner.value = onlyMeInTheCall
+                        if (waitingForOthers) {
+                            _showWaitingForOthersBanner.value = onlyMeInTheCall
+                        } else {
+                            _showOnlyMeBanner.value = onlyMeInTheCall
+                        }
                     }
                 },
                 onError = Timber::e

@@ -1136,9 +1136,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
+            inMeetingViewModel.showOnlyMeBanner.collect { onlyMeInTheCall ->
                 checkMenuItemsVisibility()
-                amIOnlyOneOnTheCall = shouldBeShown
+                amIOnlyOneOnTheCall = onlyMeInTheCall
                 if (!amIOnlyOneOnTheCall) {
                     val currentTime = MegaApplication.getChatManagement().millisecondsUntilEndCall
                     if (currentTime > 0) {
@@ -1148,6 +1148,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         hideCallWillEndInBanner()
                         dismissDialog(onlyMeDialog)
                     }
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            inMeetingViewModel.showWaitingForOthersBanner.collect { shouldBeShown ->
+                checkMenuItemsVisibility()
+                if(shouldBeShown) {
+                    showWaitingForOthersBanner()
+                } else {
+                    hideCallWillEndInBanner()
                 }
             }
         }
@@ -1297,6 +1308,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     callWillEndBanner?.isVisible = false
                 }
             }.start()
+        }
+    }
+
+    /**
+     * Show Waiting for others banner
+     */
+    private fun showWaitingForOthersBanner() {
+        callWillEndBanner?.apply {
+            collapsePanel()
+            hideCallWillEndInBanner()
+
+            isVisible = true
+            text = StringResourcesUtils.getString(
+                R.string.calls_call_screen_waiting_for_participants)
         }
     }
 
@@ -1957,7 +1982,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkGridSpeakerViewMenuItemVisibility() {
         inMeetingViewModel.getCall()?.let { call ->
-            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING || inMeetingViewModel.showOnlyMeBanner.value) {
+            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING || inMeetingViewModel.showOnlyMeBanner.value || inMeetingViewModel.showWaitingForOthersBanner.value) {
                 gridViewMenuItem?.apply {
                     isVisible = false
                 }
