@@ -23,6 +23,8 @@ class MDClickStatsUtil @Inject constructor(
          * @param mediaHandle   The folder which the click is happening
          */
         fun fireStatsEvent(megaApi: MegaApiAndroid, context: Context, mediaHandle: Long) {
+            //TODO this method needs to be refactored to clean architecture
+
             CoroutineScope(Dispatchers.IO).launch {
                 val sharedPreference: SharedPreferences = context.getSharedPreferences(
                     MEDIA_DISCOVERY_CLICK,
