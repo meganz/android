@@ -3995,6 +3995,7 @@
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
         <item quantity="one">Participant: %s</item>
         <item quantity="other">Participants: %s</item>
+    </plurals>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
