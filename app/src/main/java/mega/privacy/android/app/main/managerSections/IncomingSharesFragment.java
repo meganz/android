@@ -31,6 +31,7 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -138,7 +139,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
             v = getListView(inflater, container);
 
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context, this, nodes,
+                adapter = new MegaNodeAdapter(requireActivity(), this, nodes,
                         managerActivity.getParentHandleIncoming(), recyclerView,
                         INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
             }
@@ -146,7 +147,7 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
             v = getGridView(inflater, container);
 
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context, this, nodes,
+                adapter = new MegaNodeAdapter(requireActivity(), this, nodes,
                         managerActivity.getParentHandleIncoming(), recyclerView,
                         INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
             }
@@ -358,14 +359,14 @@ public class IncomingSharesFragment extends MegaNodeBaseFragment {
 
         if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleIncoming()
                 || managerActivity.getParentHandleIncoming() == -1) {
-            ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+            ColorUtils.setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 
-            if (isScreenInPortrait(context)) {
+            if (isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
             } else {
                 emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
             }
-            textToShow = context.getString(R.string.context_empty_incoming);
+            textToShow = StringResourcesUtils.getString(R.string.context_empty_incoming);
         }
 
         setFinalEmptyView(textToShow);

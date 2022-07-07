@@ -30,6 +30,7 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -161,7 +162,7 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
             v = getListView(inflater, container);
 
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context, this, nodes,
+                adapter = new MegaNodeAdapter(requireActivity(), this, nodes,
                         managerActivity.getParentHandleOutgoing(), recyclerView,
                         OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
             }
@@ -169,7 +170,7 @@ public class OutgoingSharesFragment extends MegaNodeBaseFragment {
             v = getGridView(inflater, container);
 
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context, this, nodes,
+                adapter = new MegaNodeAdapter(requireActivity(), this, nodes,
                         managerActivity.getParentHandleOutgoing(), recyclerView,
                         OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
             }
@@ -402,12 +403,12 @@ Timber.d("Parent Handle: %s",  managerActivity.getParentHandleOutgoing());
 
         if (rootNode != null && rootNode.getHandle() == managerActivity.getParentHandleOutgoing()
                 || managerActivity.getParentHandleOutgoing() == -1) {
-            if (isScreenInPortrait(context)) {
+            if (isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait);
             } else {
                 emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape);
             }
-            textToShow = context.getString(R.string.context_empty_outgoing);
+            textToShow = StringResourcesUtils.getString(R.string.context_empty_outgoing);
         }
 
         setFinalEmptyView(textToShow);

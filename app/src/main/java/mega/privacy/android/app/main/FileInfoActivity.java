@@ -2487,7 +2487,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     public void showConfirmationRemoveMultipleContactFromShare(final ArrayList<MegaShare> contacts) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        String message = getResources().getString(R.string.remove_multiple_contacts_shared_folder, contacts.size());
+        String message = getResources().getQuantityString(R.plurals.remove_multiple_contacts_shared_folder, contacts.size(), contacts.size());
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeMultipleShares(contacts))
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {

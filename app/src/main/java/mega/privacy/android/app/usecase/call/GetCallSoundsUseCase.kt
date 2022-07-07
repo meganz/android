@@ -42,6 +42,7 @@ class GetCallSoundsUseCase @Inject constructor(
     companion object {
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
         const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
+        const val ONE_PARTICIPANT: Int = 1
     }
 
     /**
@@ -68,7 +69,9 @@ class GetCallSoundsUseCase @Inject constructor(
         Flowable.create({ emitter ->
 
             val outgoingRingingStatusObserver = Observer<MegaChatCall> { call ->
-                if (MegaApplication.getChatManagement().isRequestSent(call.callId)) {
+                if (MegaApplication.getChatManagement()
+                        .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
+                ) {
                     endCallUseCase.hangCall(call.callId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())

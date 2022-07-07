@@ -416,6 +416,8 @@ import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.domain.entity.ContactRequest;
+import mega.privacy.android.domain.entity.ContactRequestStatus;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -7179,9 +7181,9 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
-                .setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+        builder.setMessage(getQuantityString(R.plurals.alert_remove_several_shares, shares.size(), shares.size()))
+                .setPositiveButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes, (dialog, which) -> nC.removeSeveralFolderShares(shares))
+                .setNegativeButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_no, (dialog, which) -> {
                 })
                 .show();
     }
@@ -9907,23 +9909,23 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    public void updateContactRequests(List<MegaContactRequest> requests) {
+    public void updateContactRequests(List<ContactRequest> requests) {
         Timber.d("onContactRequestsUpdate");
 
         if (requests != null) {
             for (int i = 0; i < requests.size(); i++) {
-                MegaContactRequest req = requests.get(i);
+                ContactRequest req = requests.get(i);
                 if (req.isOutgoing()) {
                     Timber.d("SENT REQUEST");
-                    Timber.d("STATUS: %d, Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s, Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getTargetEmail());
                     }
                 } else {
                     Timber.d("RECEIVED REQUEST");
                     setContactTitleSection();
-                    Timber.d("STATUS: %d Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getSourceEmail());
                     }
                 }

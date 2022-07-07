@@ -1,7 +1,7 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import nz.mega.sdk.MegaContactRequest
+import mega.privacy.android.domain.entity.ContactRequest
 
 /**
  * Contacts repository.
@@ -13,5 +13,5 @@ interface ContactsRepository {
      *
      * @return A flow of all global contact request updates.
      */
-    fun monitorContactRequestUpdates(): Flow<List<MegaContactRequest>>
+    fun monitorContactRequestUpdates(): Flow<List<ContactRequest>>
 }
