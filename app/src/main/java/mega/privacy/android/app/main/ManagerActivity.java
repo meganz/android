@@ -7162,9 +7162,9 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
-                .setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+        builder.setMessage(getQuantityString(R.plurals.alert_remove_several_shares, shares.size(), shares.size()))
+                .setPositiveButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes, (dialog, which) -> nC.removeSeveralFolderShares(shares))
+                .setNegativeButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_no, (dialog, which) -> {
                 })
                 .show();
     }

@@ -423,8 +423,11 @@
     <string name="context_no_destination_folder">Please choose a destination folder</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Moved successfully</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d items moved successfully.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="one">Moved %d item</item>
+        <item quantity="other">Moved %d items</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items were not moved successfully</string>
     <!-- success message when moving a node -->
@@ -969,15 +972,21 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">The contact %s will be removed from the shared folder.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d contacts will be removed from the shared folder.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="one">%d contact will be removed from the shared folder.</item>
+        <item quantity="other">%d contacts will be removed from the shared folder.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Failed to update permissions for %d contacts</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Loading contacts from the phone&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d requests already sent.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d invite requests sent successfully.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="one">%d invite sent</item>
+        <item quantity="other">%d invites sent</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -2427,10 +2436,10 @@
         <item quantity="one">%d folder</item>
         <item quantity="other">%d folders</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folders · 1 file</item>
-        <item quantity="other">%1$d folders · %2$d files</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
@@ -2755,11 +2764,20 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s and %2$d more</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d Images</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d image</item>
+        <item quantity="other">%d images</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d Videos</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d Images and %2$d Videos</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d Images and 1 Video</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2885,7 +2903,10 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">on %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Are you sure you want to stop sharing these %1$d folders?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Unshare this folder?</item>
+        <item quantity="other">Unshare these %1$d folders?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Download location</string>
     <!-- Text asking confirmation for download location -->
@@ -3963,6 +3984,20 @@
     <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">No</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">and %1$d video</item>
+        <item quantity="other">and %1$d videos</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">1 file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] Storage</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->

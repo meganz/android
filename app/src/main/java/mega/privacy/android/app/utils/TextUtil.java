@@ -219,12 +219,8 @@ public class TextUtil {
             return getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
         } else if (numFiles == 0 && numFolders > 0) {
             return getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
-        } else if (numFolders == 1 && numFiles == 1) {
-            return getString(R.string.one_folder_one_file);
-        } else if (numFolders == 1 && numFiles > 1) {
-            return getString(R.string.one_folder_several_files, numFiles);
         } else {
-            return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
+            return getQuantityString(R.plurals.num_folders_num_files, numFolders, numFolders) + getQuantityString(R.plurals.num_folders_num_files_2, numFiles, numFiles);
         }
     }
 
