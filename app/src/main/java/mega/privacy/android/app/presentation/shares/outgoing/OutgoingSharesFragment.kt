@@ -35,6 +35,10 @@ import timber.log.Timber
 @AndroidEntryPoint
 class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
+    init {
+        viewerFrom = Constants.VIEWER_FROM_OUTGOING_SHARES
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -105,9 +109,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
-
-    public override fun refresh() {
+    override fun refresh() {
         Timber.d("Parent Handle: %s", managerViewModel.state.value.outgoingParentHandle)
         if (managerViewModel.state.value.outgoingParentHandle == -1L) {
             findNodes()
@@ -140,7 +142,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         orderNodes()
     }
 
-    public override fun itemClick(position: Int) {
+    override fun itemClick(position: Int) {
         if (adapter.isMultipleSelect) {
             Timber.d("multiselect ON")
             adapter.toggleSelection(position)
@@ -156,7 +158,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    public override fun navigateToFolder(node: MegaNode) {
+    override fun navigateToFolder(node: MegaNode) {
         managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
         managerViewModel.increaseOutgoingTreeDepth()
         Timber.d("deepBrowserTree after clicking folder%s", managerActivity.deepBrowserTreeOutgoing)
@@ -184,7 +186,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         managerActivity.showFabButton()
     }
 
-    override fun setNodes(nodes: ArrayList<MegaNode>) {
+    override fun setNodes(nodes: List<MegaNode>) {
         this.nodes = nodes
         orderNodes()
     }
@@ -198,7 +200,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         adapter.setNodes(nodes)
     }
 
-    public override fun onBackPressed(): Int {
+    override fun onBackPressed(): Int {
         Timber.d("deepBrowserTree: %s", managerActivity.deepBrowserTreeOutgoing)
         if (adapter == null) {
             return 0
@@ -285,7 +287,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
      *
      * @param contactHandle Contact ID.
      */
-    fun updateContact(contactHandle: Long) {
+    override fun updateContact(contactHandle: Long) {
         adapter.updateItem(contactHandle)
     }
 

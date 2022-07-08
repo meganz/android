@@ -113,7 +113,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected ActionMode actionMode;
 
-    protected ArrayList<MegaNode> nodes = new ArrayList<>();
+    protected List<MegaNode> nodes = new ArrayList<>();
     protected MegaNodeAdapter adapter;
 
     protected Stack<Integer> lastPositionStack = new Stack<>();
@@ -128,29 +128,35 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected TextView emptyTextViewFirst;
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
-    protected ManagerViewModel managerViewModel;
+    public ManagerViewModel managerViewModel;
 
-    protected abstract void setNodes(ArrayList<MegaNode> nodes);
+    @NonNull protected int viewerFrom;
 
-    protected abstract void setEmptyView();
+    public abstract void setNodes(List<MegaNode> nodes);
 
-    protected abstract int onBackPressed();
+    public abstract void setEmptyView();
 
-    protected abstract void itemClick(int position);
+    public abstract int onBackPressed();
+
+    public abstract void itemClick(int position);
 
     /**
      * Navigates to a new child folder.
      *
      * @param node The folder node.
      */
-    protected abstract void navigateToFolder(MegaNode node);
+    public abstract void navigateToFolder(MegaNode node);
 
-    protected abstract void refresh();
+    public abstract void refresh();
+
+    public abstract void updateContact(long contactHandle);
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        managerViewModel =  new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
@@ -628,7 +634,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
             if (internalIntent || isIntentAvailable(requireContext(), intent)) {
-                putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
+                putThumbnailLocation(intent, recyclerView, position, viewerFrom, adapter);
                 startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
             } else {
@@ -636,8 +642,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         }
     }
-
-    protected abstract int viewerFrom();
 
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
@@ -791,7 +795,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom);
         checkScroll();
     }
 }

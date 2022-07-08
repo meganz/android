@@ -372,10 +372,8 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
+import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
-import mega.privacy.android.app.presentation.shares.links.LinksFragment;
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -744,9 +742,9 @@ public class ManagerActivity extends TransfersManagementActivity
     private FileBrowserFragment fileBrowserFragment;
     private RubbishBinFragment rubbishBinFragment;
     private InboxFragment inboxFragment;
-    private IncomingSharesFragment incomingSharesFragment;
-    private OutgoingSharesFragment outgoingSharesFragment;
-    private LinksFragment linksFragment;
+    private MegaNodeBaseFragment incomingSharesFragment;
+    private MegaNodeBaseFragment outgoingSharesFragment;
+    private MegaNodeBaseFragment linksFragment;
     private TransfersFragment transfersFragment;
     private CompletedTransfersFragment completedTransfersFragment;
     private SearchFragment searchFragment;
@@ -4767,7 +4765,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isIncomingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.getFragment(SharesTab.INCOMING_TAB.getPosition());
+        incomingSharesFragment = (MegaNodeBaseFragment) sharesPageAdapter.getFragment(SharesTab.INCOMING_TAB.getPosition());
 
         return incomingSharesFragment != null && incomingSharesFragment.isAdded();
     }
@@ -4775,7 +4773,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isOutgoingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.getPosition());
+        outgoingSharesFragment = (MegaNodeBaseFragment) sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.getPosition());
 
         return outgoingSharesFragment != null && outgoingSharesFragment.isAdded();
     }
@@ -4783,7 +4781,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isLinksAdded() {
         if (sharesPageAdapter == null) return false;
 
-        linksFragment = (LinksFragment)  sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
+        linksFragment = (MegaNodeBaseFragment)  sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
 
         return linksFragment != null && linksFragment.isAdded();
     }

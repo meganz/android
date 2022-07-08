@@ -47,6 +47,10 @@ class LinksFragment : MegaNodeBaseFragment() {
         }
     }
 
+    init {
+        viewerFrom = Constants.VIEWER_FROM_LINKS
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,8 +99,6 @@ class LinksFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
-
     private fun findNodes() {
         setNodes(
             megaApi.getPublicLinks(
@@ -108,7 +110,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         )
     }
 
-    override fun setNodes(nodes: ArrayList<MegaNode>) {
+    override fun setNodes(nodes: List<MegaNode>) {
         this.nodes = nodes
         adapter.setNodes(nodes)
         setEmptyView()
@@ -211,6 +213,8 @@ class LinksFragment : MegaNodeBaseFragment() {
                 managerViewModel.state.value.isFirstNavigationLevel)))
         }
     }
+
+    override fun updateContact(contactHandle: Long) {}
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
