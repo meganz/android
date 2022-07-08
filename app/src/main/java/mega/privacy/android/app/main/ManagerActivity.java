@@ -1845,6 +1845,8 @@ public class ManagerActivity extends TransfersManagementActivity
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares);
         viewPagerShares = findViewById(R.id.shares_tabs_pager);
         viewPagerShares.setOffscreenPageLimit(3);
+        // Set an empty page transformer to override default animation when notifying the adapter
+        viewPagerShares.setPageTransformer((page, position) -> { });
 
         viewPagerShares.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -5672,12 +5674,10 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
         //Refresh shares section
-        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+        sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
 
         //Refresh shares section
-        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-
-        refreshSharesPageAdapter();
+        sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
 
         //Refresh search section
         refreshFragment(FragmentTag.SEARCH.getTag());
@@ -10948,7 +10948,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (parentNode.isInShare()) {
             viewModel.setIncomingParentHandle(node.getParentHandle());
             viewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this));
-            refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
             viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
                 viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());

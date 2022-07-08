@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
 import mega.privacy.android.app.presentation.shares.links.LinksFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
-import timber.log.Timber
 
 /**
  * Pager adapter for shares pages
@@ -16,6 +15,15 @@ import timber.log.Timber
  */
 class SharesPageAdapter(private val fa: FragmentActivity) :
     FragmentStateAdapter(fa) {
+
+    /**
+     * The list of fragments hold by the adapter
+     */
+    private val fragments = mutableMapOf(
+        SharesTab.INCOMING_TAB to IncomingSharesFragment(),
+        SharesTab.OUTGOING_TAB to OutgoingSharesFragment(),
+        SharesTab.LINKS_TAB to LinksFragment()
+    )
 
     /**
      * Returns the total number of items in the data set held by the adapter.
@@ -32,13 +40,43 @@ class SharesPageAdapter(private val fa: FragmentActivity) :
      * @return the instance of the new fragment at the given position
      */
     override fun createFragment(position: Int): Fragment {
-        Timber.d("Position: %s", position)
-        return when (position) {
-            SharesTab.INCOMING_TAB.position -> IncomingSharesFragment()
-            SharesTab.OUTGOING_TAB.position -> OutgoingSharesFragment()
-            SharesTab.LINKS_TAB.position -> LinksFragment()
+        return fragments[SharesTab.fromPosition(position)] ?: throw Exception("Invalid position")
+    }
+
+    /**
+     * Refresh a fragment inside the adapter
+     *
+     * @param position the given position of the fragment in the adapter
+     */
+    fun refreshFragment(position: Int) {
+        val fragment = when (SharesTab.fromPosition(position)) {
+            SharesTab.INCOMING_TAB -> IncomingSharesFragment()
+            SharesTab.OUTGOING_TAB -> OutgoingSharesFragment()
+            SharesTab.LINKS_TAB -> LinksFragment()
             else -> throw Exception("Invalid position")
         }
+        fragments[SharesTab.fromPosition(position)] = fragment
+        notifyItemChanged(position)
+    }
+
+    /**
+     * Returns the itemId of the element in the adapter
+     *
+     * @param position the given position of the fragment in the adapter
+     * @return a unique id that identifies the item in the adapter
+     */
+    override fun getItemId(position: Int): Long {
+        return fragments[SharesTab.fromPosition(position)].hashCode().toLong()
+    }
+
+    /**
+     * Check if the adapter contains an item based on his itemId
+     *
+     * @param itemId the unique id of the item
+     * @return true if the item is the adapter contains the item
+     */
+    override fun containsItem(itemId: Long): Boolean {
+        return fragments.filterValues { it.hashCode().toLong() == itemId }.isNotEmpty()
     }
 
     /**
@@ -48,5 +86,14 @@ class SharesPageAdapter(private val fa: FragmentActivity) :
      * @return the fragment at the given position
      */
     fun getFragment(position: Int): Fragment? =
-        fa.supportFragmentManager.findFragmentByTag("f${getItemId(position)}")
+        fa.supportFragmentManager.findFragmentByTag(getFragmentTag(position))
+
+    /**
+     * Return the tag of a fragment hold by the adapter
+     *
+     * @return the tag of a fragment hold by the adapter
+     */
+    fun getFragmentTag(position: Int): String {
+        return "f${getItemId(position)}"
+    }
 }
