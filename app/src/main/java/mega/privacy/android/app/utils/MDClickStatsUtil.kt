@@ -7,10 +7,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.SharedPreferenceConstants.MEDIA_DISCOVERY_CLICK
 import nz.mega.sdk.MegaApiAndroid
-import javax.inject.Inject
 
-class MDClickStatsUtil @Inject constructor(
-
+//TODO this class needs to be refactored to clean architecture
+class MDClickStatsUtil (
 ) {
     companion object {
         private const val CLICK_COUNT = "ClickCount"
@@ -22,9 +21,9 @@ class MDClickStatsUtil @Inject constructor(
          * @param context       The context
          * @param mediaHandle   The folder which the click is happening
          */
+        @JvmStatic
+        @Suppress("DEPRECATION")
         fun fireStatsEvent(megaApi: MegaApiAndroid, context: Context, mediaHandle: Long) {
-            //TODO this method needs to be refactored to clean architecture
-
             CoroutineScope(Dispatchers.IO).launch {
                 val sharedPreference: SharedPreferences = context.getSharedPreferences(
                     MEDIA_DISCOVERY_CLICK,

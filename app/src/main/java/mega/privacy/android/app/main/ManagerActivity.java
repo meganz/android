@@ -3535,7 +3535,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
         mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
-        MDClickStatsUtil.Companion.fireStatsEvent(megaApi, this, mediaHandle);
+        MDClickStatsUtil.fireStatsEvent(megaApi, this, mediaHandle);
         isInMDMode = true;
     }
 
