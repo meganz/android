@@ -234,7 +234,7 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that incoming tree depth if if new value provided`() =
+    fun `test that incoming tree depth is updated if new value provided`() =
         runTest {
             setUnderTest()
 
