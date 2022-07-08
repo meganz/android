@@ -23,7 +23,7 @@ class MDClickStatsUtil (
          */
         @JvmStatic
         @Suppress("DEPRECATION")
-        fun fireStatsEvent(megaApi: MegaApiAndroid, context: Context, mediaHandle: Long) {
+        fun fireMDStatsEvent(megaApi: MegaApiAndroid, context: Context, mediaHandle: Long) {
             CoroutineScope(Dispatchers.IO).launch {
                 val sharedPreference: SharedPreferences = context.getSharedPreferences(
                     MEDIA_DISCOVERY_CLICK,
@@ -40,16 +40,16 @@ class MDClickStatsUtil (
                     Constants.STATS_MD_CLICK,
                     "Media Discovery Click"
                 )
-                if (clickCount > 3) {
+                if (clickCount >= 3) {
                     megaApi.sendEvent(
                         Constants.STATS_MD_CLICK_MORE_THAN_3,
-                        "Media Discovery Click > 3"
+                        "Media Discovery Click >= 3"
                     )
                 }
-                if (clickCountFolder > 3) {
+                if (clickCountFolder >= 3) {
                     megaApi.sendEvent(
                         Constants.STATS_MD_CLICK_MORE_THAN_3_SAME_FOLDER,
-                        "Media Discovery Click Specific Folder > 3"
+                        "Media Discovery Click Specific Folder > =3"
                     )
                 }
             }
