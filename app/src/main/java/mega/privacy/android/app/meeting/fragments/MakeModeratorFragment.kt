@@ -156,7 +156,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         toolbarTitle = meetingActivity.binding.titleToolbar
         toolbarTitle.apply {
             text = StringResourcesUtils.getString(R.string.assign_moderator)
-                .uppercase(Locale.getDefault())
 
             setTextColor(ContextCompat.getColor(requireContext(), R.color.black_white))
         }

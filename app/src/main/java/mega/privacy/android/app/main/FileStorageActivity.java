@@ -225,7 +225,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
 
             serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES);
         } else if (mode == Mode.BROWSE_FILES) {
-            aB.setTitle(getString(R.string.browse_files_label).toUpperCase());
+            aB.setTitle(getString(R.string.browse_files_label));
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(PATH)) {

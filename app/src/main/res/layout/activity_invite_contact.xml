@@ -90,7 +90,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="16dp"
                     android:text="@string/menu_item_scan_code"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor" />
 
                 <View
                     android:id="@+id/separator_scan_qr"

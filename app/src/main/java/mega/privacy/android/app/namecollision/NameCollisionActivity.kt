@@ -144,7 +144,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            title = StringResourcesUtils.getString(R.string.title_duplicated_items).uppercase()
+            title = StringResourcesUtils.getString(R.string.title_duplicated_items)
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }

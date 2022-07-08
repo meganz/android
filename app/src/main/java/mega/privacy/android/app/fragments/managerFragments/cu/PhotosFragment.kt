@@ -278,7 +278,7 @@ class PhotosFragment : Fragment() {
         val v: View = actionBar.customView
         val actionBarTitle = v.findViewById<TextView>(R.id.ab_title)
         actionBarTitle?.text = Util.adjustForLargeFont(
-            getString(R.string.settings_start_screen_photos_option).uppercase(Locale.getDefault())
+            getString(R.string.settings_start_screen_photos_option)
         )
         actionBarSubtitle = v.findViewById(R.id.ab_subtitle)
         actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow)

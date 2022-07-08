@@ -3691,7 +3691,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                            aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+                            aB.setTitle(getString(R.string.section_cloud_drive));
                             viewModel.setIsFirstNavigationLevel(true);
                         } else {
                             aB.setTitle(parentNode.getName());
@@ -3703,7 +3703,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else {
                     if (megaApi.getRootNode() != null) {
                         viewModel.setBrowserParentHandle(megaApi.getRootNode().getHandle());
-                        aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                        aB.setTitle(getString(R.string.title_mega_info_empty_screen));
                         viewModel.setIsFirstNavigationLevel(true);
                     } else {
                         viewModel.setBrowserParentHandle(-1);
@@ -3720,7 +3720,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     viewModel.setRubbishBinParentHandle(INVALID_HANDLE);
                     viewModel.setIsFirstNavigationLevel(true);
                 } else if (viewModel.getState().getValue().getRubbishBinParentHandle() == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()) {
-                    aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin).toUpperCase());
+                    aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     aB.setTitle(node.getName());
@@ -3739,14 +3739,14 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (viewModel.getState().getValue().getIncomingParentHandle() != -1) {
                                 MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getIncomingParentHandle());
                                 if (node == null) {
-                                    aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                    aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 } else {
                                     aB.setTitle(node.getName());
                                 }
 
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             }
                         } else {
@@ -3762,7 +3762,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             }
                         }
@@ -3771,7 +3771,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case LINKS_TAB:
                         if (isLinksAdded()) {
                             if (viewModel.getState().getValue().getLinksParentHandle() == INVALID_HANDLE) {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             } else {
                                 MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getLinksParentHandle());
@@ -3781,7 +3781,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                         break;
                     default: {
-                        aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                        aB.setTitle(getResources().getString(R.string.title_shared_items));
                         viewModel.setIsFirstNavigationLevel(true);
                         break;
                     }
@@ -3791,7 +3791,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case INBOX: {
                 aB.setSubtitle(null);
                 if (viewModel.getState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getState().getValue().getInboxParentHandle() == -1) {
-                    aB.setTitle(getResources().getString(R.string.section_inbox).toUpperCase());
+                    aB.setTitle(getResources().getString(R.string.section_inbox));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
@@ -3802,13 +3802,13 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case NOTIFICATIONS: {
                 aB.setSubtitle(null);
-                aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
+                aB.setTitle(getString(R.string.title_properties_chat_contact_notifications));
                 viewModel.setIsFirstNavigationLevel(true);
                 break;
             }
             case CHAT: {
                 abL.setVisibility(View.VISIBLE);
-                aB.setTitle(getString(R.string.section_chat).toUpperCase());
+                aB.setTitle(getString(R.string.section_chat));
 
                 viewModel.setIsFirstNavigationLevel(true);
                 break;
@@ -3820,12 +3820,12 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (searchViewModel.getState().getValue().getSearchQuery() != null) {
                         searchViewModel.setTextSubmitted(true);
                         if (!searchViewModel.getState().getValue().getSearchQuery().isEmpty()) {
-                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + searchViewModel.getState().getValue().getSearchQuery());
+                            aB.setTitle(getString(R.string.action_search) + ": " + searchViewModel.getState().getValue().getSearchQuery());
                         } else {
-                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + "");
+                            aB.setTitle(getString(R.string.action_search) + ": " + "");
                         }
                     } else {
-                        aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + "");
+                        aB.setTitle(getString(R.string.action_search) + ": " + "");
                     }
 
                 } else {
@@ -3839,7 +3839,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case TRANSFERS: {
                 aB.setSubtitle(null);
-                aB.setTitle(getString(R.string.section_transfers).toUpperCase());
+                aB.setTitle(getString(R.string.section_transfers));
                 setFirstNavigationLevel(true);
                 break;
             }
@@ -3847,13 +3847,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 if (getPhotosFragment() != null && photosFragment.isEnablePhotosFragmentShown()) {
                     setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
+                    aB.setTitle(getString(R.string.settings_camera_upload_on));
                 } else {
                     if (isInAlbumContent) {
                         aB.setTitle(getString(R.string.title_favourites_album));
                     } else {
                         setFirstNavigationLevel(true);
-                        aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                        aB.setTitle(getString(R.string.sortby_type_photo_first));
                     }
                 }
                 break;
@@ -3878,7 +3878,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 if (titleId != -1) {
-                    aB.setTitle(getString(titleId).toUpperCase(Locale.getDefault()));
+                    aB.setTitle(getString(titleId));
                 }
             }
             default: {

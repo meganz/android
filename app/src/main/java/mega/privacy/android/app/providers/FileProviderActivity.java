@@ -368,7 +368,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                             if (cloudDriveProviderFragment != null) {
                                 if (cloudDriveProviderFragment.getParentHandle() == INVALID_HANDLE || cloudDriveProviderFragment.getParentHandle() == megaApi.getRootNode().getHandle()) {
-                                    aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
+                                    aB.setTitle(getString(R.string.file_provider_title));
                                 } else {
                                     aB.setTitle(megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()).getName());
                                 }
@@ -379,7 +379,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                             if (incomingSharesProviderFragment != null) {
                                 if (incomingSharesProviderFragment.getDeepBrowserTree() == 0) {
-                                    aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
+                                    aB.setTitle(getString(R.string.file_provider_title));
                                 } else {
                                     aB.setTitle(megaApi.getNodeByHandle(incomingSharesProviderFragment.getParentHandle()).getName());
 
@@ -436,7 +436,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 
         bLoginLol = findViewById(R.id.button_login_login);
-        bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+        bLoginLol.setText(getString(R.string.login_text));
 
         bLoginLol.setOnClickListener(this);
 
@@ -445,7 +445,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
         bRegisterLol = findViewById(R.id.button_create_account_login);
 
-        bRegisterLol.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
+        bRegisterLol.setText(getString(R.string.create_account));
 
         bRegisterLol.setOnClickListener(this);
 
@@ -1524,7 +1524,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                     if (cloudDriveProviderFragment != null) {
                         if (cloudDriveProviderFragment.getParentHandle() == INVALID_HANDLE || cloudDriveProviderFragment.getParentHandle() == megaApi.getRootNode().getHandle()) {
-                            aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
+                            aB.setTitle(getString(R.string.file_provider_title));
                         } else {
                             aB.setTitle(megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()).getName());
                         }
@@ -1535,7 +1535,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                     if (incomingSharesProviderFragment != null) {
                         if (incomingSharesProviderFragment.getDeepBrowserTree() == 0) {
-                            aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
+                            aB.setTitle(getString(R.string.file_provider_title));
                         } else {
                             aB.setTitle(incomingSharesProviderFragment.name);
                         }

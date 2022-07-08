@@ -256,8 +256,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener
 
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
-                    .toUpperCase(Locale.getDefault()));
+            actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title));
         }
 
         // The root view has been created, fill it with the data when data ready

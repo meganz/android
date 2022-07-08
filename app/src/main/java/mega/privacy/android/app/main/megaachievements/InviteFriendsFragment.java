@@ -78,8 +78,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
         // Activity actionbar has been created which might be accessed by UpdateUI().
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
-                    .toUpperCase(Locale.getDefault()));
+            actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses));
         }
 
         // The root view has been created, fill it with the data when data ready

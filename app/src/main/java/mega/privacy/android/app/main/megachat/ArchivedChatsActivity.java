@@ -107,7 +107,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if (aB != null) {
-            aB.setTitle(getString(R.string.archived_chats_title_section).toUpperCase());
+            aB.setTitle(getString(R.string.archived_chats_title_section));
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         } else {

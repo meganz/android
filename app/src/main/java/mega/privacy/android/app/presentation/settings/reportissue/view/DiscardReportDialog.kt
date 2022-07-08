@@ -41,7 +41,7 @@ fun DiscardReportDialog(
                 modifier = Modifier
             ) {
                 Text(
-                    text = stringResource(id = R.string.settings_help_report_issue_discard_button).uppercase(),
+                    text = stringResource(id = R.string.settings_help_report_issue_discard_button),
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
                     )
@@ -54,7 +54,7 @@ fun DiscardReportDialog(
                 modifier = Modifier
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel).uppercase(),
+                    text = stringResource(id = R.string.general_cancel),
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
                     )
