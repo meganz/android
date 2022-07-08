@@ -58,7 +58,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = StringResourcesUtils.getString(R.string.payment).uppercase(Locale.getDefault())
+            title = StringResourcesUtils.getString(R.string.payment)
         }
 
         binding.scrollview.setOnScrollChangeListener { _, _, _, _, _ ->

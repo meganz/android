@@ -2479,7 +2479,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         int fullSize = fullListContacts.size();
         if (fullSize > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
             moreButton.setVisibility(View.VISIBLE);
-            moreButton.setText((fullSize - MAX_NUMBER_OF_CONTACTS_IN_LIST) + " " + getResources().getString(R.string.label_more).toUpperCase());
+            moreButton.setText((fullSize - MAX_NUMBER_OF_CONTACTS_IN_LIST) + " " + getResources().getString(R.string.label_more));
         } else {
             moreButton.setVisibility(View.GONE);
         }

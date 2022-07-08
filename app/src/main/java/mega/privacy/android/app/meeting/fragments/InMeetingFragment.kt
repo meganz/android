@@ -2537,10 +2537,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         firstButton.text =
             StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call)
-                .uppercase()
         secondButton.text =
             StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call)
-                .uppercase()
 
         firstButton.setOnClickListener {
             MegaApplication.getChatManagement().stopCounterToFinishCall()

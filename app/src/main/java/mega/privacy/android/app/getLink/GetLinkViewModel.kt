@@ -100,7 +100,7 @@ class GetLinkViewModel @Inject constructor(
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
                 if (node.isExported) {
-                    getString(R.string.edit_link_option).uppercase(Locale.getDefault())
+                    getString(R.string.edit_link_option)
                 } else {
                     getQuantityString(R.plurals.get_links, 1)
                 }

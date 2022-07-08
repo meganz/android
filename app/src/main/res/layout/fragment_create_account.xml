@@ -36,7 +36,7 @@
                         android:layout_gravity="start"
                         android:layout_marginTop="17dp"
                         android:text="@string/create_account_title"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -376,7 +376,7 @@
                     android:layout_marginEnd="16dp"
                     android:singleLine="false"
                     android:textAppearance="?attr/textAppearanceCaption"
-                    tools:text="term of service" />
+                    tools:text="@string/tos" />
             </LinearLayout>
 
             <include
@@ -400,14 +400,14 @@
                     android:id="@+id/button_create_account_create"
                     style="?attr/materialButtonStyle"
                     android:layout_gravity="center_vertical"
-                    tools:text="create account" />
+                    tools:text="@string/create_account" />
 
                 <Button
                     android:id="@+id/button_login_create"
                     style="?attr/borderlessButtonStyle"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="8dp"
-                    tools:text="login" />
+                    tools:text="@string/login_text" />
 
             </LinearLayout>
 

@@ -108,7 +108,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
                 break;
         }
 
-        actionBar.setTitle(title.toUpperCase(Locale.getDefault()));
+        actionBar.setTitle(title);
     }
 
     private void updateUI() {

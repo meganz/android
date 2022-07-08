@@ -416,7 +416,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
         long count = adapter.getSelectedItemsCount();
         String title = count == 0 ? getString(R.string.title_select_transfers) : count + "";
-        actionMode.setTitle(title.toUpperCase());
+        actionMode.setTitle(title);
         actionMode.invalidate();
     }
 

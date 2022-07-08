@@ -601,8 +601,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 emptyImage.setVisibility(View.GONE);
                 emptyText.setVisibility(View.GONE);
                 if (parentHandle == -1) {
-                    aB.setTitle(StringResourcesUtils.getString(R.string.file_properties_shared_folder_select_contact)
-                            .toUpperCase(Locale.getDefault()));
+                    aB.setTitle(StringResourcesUtils.getString(R.string.file_properties_shared_folder_select_contact));
 
                     aB.setLogo(R.drawable.ic_action_navigation_accept_white);
                     supportInvalidateOptionsMenu();
