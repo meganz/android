@@ -134,7 +134,7 @@ android {
 
         debug {
             res {
-                srcDirs 'src/main/res', 'src/sharedTest/res'
+                srcDirs 'src/main/res'
             }
         }
 
@@ -147,16 +147,7 @@ android {
             }
         }
 
-        testDebug {
-            java.srcDir 'src/sharedTest/java'
-        }
 
-        androidTest {
-            java.srcDir 'src/sharedTest/java'
-            resources {
-                srcDirs 'src/sharedTest/res'
-            }
-        }
     }
 
     buildTypes {
