@@ -4007,11 +4007,11 @@
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
     <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] transfer quota</string>
     <!-- Chat message when the permissions for a user has been changed to read-only-->
-    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/D][E]%2$s[/E]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/B][A]%2$s[/A]</string>
     <!-- Chat message when the permissions for a user has been changed to standard-->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/D][E]%2$s[/E]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/B][A]%2$s[/A]</string>
     <!-- Chat message when the permissions for a user has been changed to host-->
-    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/D][E]%2$s[/E]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/B][A]%2$s[/A]</string>
     <!-- Last message in chats list when the permissions for a user has been changed to read-only-->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s was changed to read-only by %2$s</string>
     <!-- Last message in chats list when the permissions for a user has been changed to  standard-->
