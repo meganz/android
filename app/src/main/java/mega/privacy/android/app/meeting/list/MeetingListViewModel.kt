@@ -1,19 +1,14 @@
 package mega.privacy.android.app.meeting.list
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.contacts.list.data.ContactItem
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
-import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
-import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
-import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
-import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
@@ -31,28 +26,44 @@ class MeetingListViewModel @Inject constructor(
     }
 
     private var queryString: String? = null
-    private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
+    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData()
 
     init {
-        retrieveContacts()
+        retrieveMeetings()
     }
 
-    private fun retrieveContacts() {
+    fun getGroups(): LiveData<List<MeetingItem>> =
+        meetings.map { items ->
+            if (!queryString.isNullOrBlank()) {
+                items.filter { (_, title, lastMessage, _, firstUser, lastUser) ->
+                    title.contains(queryString!!, true)
+                            || lastMessage.contains(queryString!!, true)
+                            || firstUser.firstName?.contains(queryString!!, true) == true
+                            || lastUser.firstName?.contains(queryString!!, true) == true
+                            || firstUser.email?.contains(queryString!!, true) == true
+                            || lastUser.email?.contains(queryString!!, true) == true
+                }
+            } else {
+                items
+            }
+        }
+
+    fun setSearchQuery(query: String?) {
+        queryString = query
+        meetings.notifyObserver()
+    }
+
+    private fun retrieveMeetings() {
         getMeetingListUseCase.get()
             .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-//                    contacts.value = items.toList()
+                    meetings.value = items.toList()
                 },
                 onError = Timber::e
             )
             .addTo(composite)
-    }
-
-    fun setQuery(query: String?) {
-        queryString = query
-        contacts.notifyObserver()
     }
 }
