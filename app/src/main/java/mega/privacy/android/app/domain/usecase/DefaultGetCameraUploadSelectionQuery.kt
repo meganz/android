@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DefaultGetCameraUploadSelectionQuery @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getCameraUploadLocalPath: GetCameraUploadLocalPath,
-    // TODO SECONDARY PATH USECASE
+    private val getCameraUploadLocalPathSecondary: GetCameraUploadLocalPathSecondary,
 ) : GetCameraUploadSelectionQuery {
 
     override fun invoke(timestampType: SyncTimeStamp): String? {
@@ -28,7 +28,7 @@ class DefaultGetCameraUploadSelectionQuery @Inject constructor(
         Timber.d("%s timestamp is: %s", timestampType.toString(), currentTimeStamp)
         val localPath = when (timestampType) {
             SyncTimeStamp.PRIMARY_PHOTO, SyncTimeStamp.PRIMARY_VIDEO -> getCameraUploadLocalPath()
-            SyncTimeStamp.SECONDARY_PHOTO, SyncTimeStamp.SECONDARY_VIDEO -> getCameraUploadLocalPath() //TODO SECONDARY PATH
+            SyncTimeStamp.SECONDARY_PHOTO, SyncTimeStamp.SECONDARY_VIDEO -> getCameraUploadLocalPathSecondary()
         }
 
         @Suppress("DEPRECATION")

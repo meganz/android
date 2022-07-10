@@ -31,10 +31,8 @@ import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CAMERA_UPLOA
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA;
-import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.FileUtil.copyFile;
-import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
 import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
 import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.ImageProcessor.createImagePreview;
@@ -80,10 +78,10 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.service.notification.StatusBarNotification;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.lifecycle.LifecycleService;
 
@@ -112,6 +110,7 @@ import mega.privacy.android.app.domain.entity.SyncRecordType;
 import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath;
+import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery;
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
@@ -143,10 +142,19 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     GetCameraUploadLocalPath localPath;
 
     @Inject
+    GetCameraUploadLocalPathSecondary localPathSecondary;
+
+    @Inject
     GetCameraUploadSelectionQuery selectionQuery;
 
     @Inject
     IsLocalPrimaryFolderSet isLocalPrimaryFolderSet;
+
+    @Inject
+    IsLocalSecondaryFolderSet isLocalSecondaryFolderSet;
+
+    @Inject
+    IsSecondaryFolderEnabled isSecondaryFolderEnabled;
 
     @Inject
     CameraUploadRepository cameraUploadRepository;
@@ -160,7 +168,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
-    private static final int BATTERY_STATE_LOW = 20;
     private static final int LOW_BATTERY_LEVEL = 20;
     public static final String CAMERA_UPLOADS_ENGLISH = "Camera Uploads";
     public static final String SECONDARY_UPLOADS_ENGLISH = "Media Uploads";
@@ -201,8 +208,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private MegaApplication app;
 
     private long cameraUploadHandle = INVALID_HANDLE;
-    private boolean secondaryEnabled;
-    private String localPathSecondary = INVALID_NON_NULL_VALUE;
     private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode;
 
@@ -237,7 +242,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private String tempRoot;
     private VideoCompressor mVideoCompressor;
 
-    private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -320,7 +325,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(@NonNull Intent intent) {
         super.onBind(intent);
         return null;
     }
@@ -493,7 +498,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     private void extractMedia(Cursor cursor, boolean isSecondary, boolean isVideo) {
         try {
             Timber.d("Extract %d media from cursor, is video: %s, is secondary: %s", cursor.getCount(), isVideo, isSecondary);
-            String parentPath = isSecondary ? localPathSecondary : localPath.invoke();
+            String parentPath = isSecondary ? localPathSecondary.invoke() : localPath.invoke();
 
             int dataColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
             int modifiedColumn = 0, addedColumn = 0;
@@ -555,6 +560,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         String selectionSecondary = selectionQuery.invoke(SyncTimeStamp.SECONDARY_PHOTO);
         String selectionSecondaryVideo = selectionQuery.invoke(SyncTimeStamp.SECONDARY_VIDEO);
 
+        boolean secondaryEnabled = isSecondaryFolderEnabled.invoke();
         if (secondaryEnabled) {
             Timber.d("Secondary upload is enabled.");
             secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
@@ -641,7 +647,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
                 String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
 
-                boolean shouldPagingSecondary = !isLocalFolderOnSDCard(this, localPathSecondary);
+                boolean shouldPagingSecondary = !isLocalFolderOnSDCard(this, localPathSecondary.invoke());
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingSecondary) {
                     Bundle args = new Bundle();
@@ -675,10 +681,10 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             }
         }
         totalUploaded = 0;
-        prepareUpload(cameraFiles, mediaFilesSecondary, primaryVideos, secondaryVideos);
+        prepareUpload(cameraFiles, mediaFilesSecondary, primaryVideos, secondaryVideos, secondaryEnabled);
     }
 
-    private void prepareUpload(Queue<Media> primaryList, Queue<Media> secondaryList, Queue<Media> primaryVideoList, Queue<Media> secondaryVideoList) {
+    private void prepareUpload(Queue<Media> primaryList, Queue<Media> secondaryList, Queue<Media> primaryVideoList, Queue<Media> secondaryVideoList, boolean secondaryEnabled) {
         Timber.d("\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d", primaryList.size(), secondaryList.size(), primaryVideoList.size(), secondaryVideoList.size());
 
         List<SyncRecord> pendingUploadsList = getPendingList(primaryList, false, false);
@@ -703,7 +709,10 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         if (stopped) return;
 
         // Need to maintain timestamp for better performance
-        updateTimeStamp();
+        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_PHOTO);
+        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_VIDEO);
+        updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_PHOTO);
+        updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_VIDEO);
 
         List<SyncRecord> finalList = cameraUploadRepository.getPendingSyncRecords();
 
@@ -1005,18 +1014,12 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     Timber.d("Add local file with handle: %d to pending list, for copy.", record.getNodeHandle());
                     pendingList.add(record);
                 } else {
-                    if (!isSecondary) {
-                        if (isVideo) {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_VIDEO);
-                        } else {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_PHOTO);
-                        }
+                    if (isVideo) {
+                        updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_VIDEO);
+                        updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_VIDEO);
                     } else {
-                        if (isVideo) {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_VIDEO);
-                        } else {
-                            updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_PHOTO);
-                        }
+                        updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.PRIMARY_PHOTO);
+                        updateTimeStamp.invoke(media.timestamp, SyncTimeStamp.SECONDARY_PHOTO);
                     }
                 }
             }
@@ -1041,7 +1044,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
         }
 
-        if (!checkSecondaryLocalFolder()) {
+        if (!isLocalSecondaryFolderSet.invoke()) {
             localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable, LOCAL_FOLDER_REMINDER_SECONDARY);
             // disable media upload only
             disableMediaUploadProcess();
@@ -1101,50 +1104,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     /**
-     * Check the availability of secondary local folder.
-     * If it's a path in internal storage, just check its existence.
-     * If it's a path in SD card, check the corresponding DocumentFile's existence.
-     *
-     * @return true, if secondary local folder is available. false， when it's unavailable.
-     */
-    private boolean checkSecondaryLocalFolder() {
-        // check secondary local folder if media upload is enabled
-        secondaryEnabled = cameraUploadRepository.isSecondaryMediaFolderEnabled();
-        if (secondaryEnabled) {
-            if (cameraUploadRepository.isMediaFolderExternalSd()) {
-                Uri uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd());
-                localPathSecondary = getFullPathFromTreeUri(uri, this);
-                if (localPathSecondary != null && !localPathSecondary.endsWith(SEPARATOR)) {
-                    localPathSecondary += SEPARATOR;
-                }
-
-                DocumentFile file = DocumentFile.fromTreeUri(this, uri);
-                if (file == null) {
-                    Timber.d("Local media folder on sd card is unavailable.");
-                    return false;
-                }
-
-                return file.exists();
-            } else {
-                localPathSecondary = cameraUploadRepository.getSecondaryFolderPath();
-
-                if (localPathSecondary == null) return false;
-
-                if (!localPathSecondary.endsWith(SEPARATOR)) {
-                    localPathSecondary += SEPARATOR;
-                }
-
-                return new File(localPathSecondary).exists();
-            }
-        } else {
-            Timber.d("Not enabled Secondary");
-            cameraUploadRepository.setSecondaryEnabled(false);
-            // if not enable secondary
-            return true;
-        }
-    }
-
-    /**
      * Before CU process launches, check CU and MU folder.
      *
      * @return 0, if both folders are alright, CU will start normally.
@@ -1155,6 +1114,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         long primaryToSet = INVALID_HANDLE;
         // If CU folder in local setting is deleted, then need to reset.
         boolean needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle);
+        boolean secondaryEnabled = isSecondaryFolderEnabled.invoke();
 
         if (needToSetPrimary) {
             // Try to find a folder which name is "Camera Uploads" from root.
@@ -1408,7 +1368,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 megaApi.resetTotalUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
-            Timber.d("Pausetransfer false received");
+            Timber.d("PauseTransfer false received");
             if (e.getErrorCode() == MegaError.API_OK) {
                 finish();
             }
@@ -1631,15 +1591,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return true;
-    }
-
-    private void updateTimeStamp() {
-        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_PHOTO);
-        updateTimeStamp.invoke(null, SyncTimeStamp.PRIMARY_VIDEO);
-        if (secondaryEnabled) {
-            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_PHOTO);
-            updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_VIDEO);
-        }
     }
 
     private boolean isCompressedVideoPending() {

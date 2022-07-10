@@ -3,6 +3,7 @@ package mega.privacy.android.app.domain.usecase
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp
 import mega.privacy.android.app.domain.entity.SyncRecordType
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.app.jobservices.IsSecondaryFolderEnabled
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -11,7 +12,10 @@ import javax.inject.Inject
  *
  * @property cameraUploadRepository
  */
-class DefaultUpdateCameraUploadTimeStamp @Inject constructor(private val cameraUploadRepository: CameraUploadRepository) :
+class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
+    private val cameraUploadRepository: CameraUploadRepository,
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+) :
     UpdateCameraUploadTimeStamp {
     override fun invoke(
         timestamp: Long?,
@@ -31,16 +35,21 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(private val cameraU
                 updateTimeStamp(timeStampPrimaryVideo, timestampType)
             }
             SyncTimeStamp.SECONDARY_PHOTO -> {
-                val timeStampSecondary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                    true,
-                    SyncRecordType.TYPE_PHOTO.value)
-                updateTimeStamp(timeStampSecondary, timestampType)
+                if (isSecondaryFolderEnabled()) {
+                    val timeStampSecondary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
+                        true,
+                        SyncRecordType.TYPE_PHOTO.value)
+                    updateTimeStamp(timeStampSecondary, timestampType)
+                }
             }
             SyncTimeStamp.SECONDARY_VIDEO -> {
-                val timeStampSecondaryVideo = timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                    true,
-                    SyncRecordType.TYPE_VIDEO.value)
-                updateTimeStamp(timeStampSecondaryVideo, timestampType)
+                if (isSecondaryFolderEnabled()) {
+                    val timeStampSecondaryVideo =
+                        timestamp ?: cameraUploadRepository.getMaxTimestamp(
+                            true,
+                            SyncRecordType.TYPE_VIDEO.value)
+                    updateTimeStamp(timeStampSecondaryVideo, timestampType)
+                }
             }
         }
     }

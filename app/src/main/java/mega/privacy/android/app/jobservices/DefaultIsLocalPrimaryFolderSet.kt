@@ -28,7 +28,7 @@ class DefaultIsLocalPrimaryFolderSet @Inject constructor(
             val uri = Uri.parse(cameraUploadRepository.getUriExternalSd())
             val file = DocumentFile.fromTreeUri(context, uri)
             if (file == null) {
-                Timber.d("Local folder on SD card is unavailable")
+                Timber.d("Local Folder on SD card is unavailable")
                 return false
             }
             file.exists()
