@@ -19,7 +19,7 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
-                app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps.Variant"
+                app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.16_5sp"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">

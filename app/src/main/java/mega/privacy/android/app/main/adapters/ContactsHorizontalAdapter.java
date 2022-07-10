@@ -125,9 +125,9 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = String.format(context.getString(R.string.title_confirm_send_invitation), contact.getLocalName());
         builder.setMessage(message);
-        String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
+        String invite = context.getResources().getString(R.string.contact_invite);
         builder.setPositiveButton(invite, dialogClickListener);
-        String cancel = context.getResources().getString(R.string.general_cancel).toUpperCase();
+        String cancel = context.getResources().getString(R.string.general_cancel);
         builder.setNegativeButton(cancel, dialogClickListener);
         sendInvitationDialog = builder.create();
         sendInvitationDialog.show();
